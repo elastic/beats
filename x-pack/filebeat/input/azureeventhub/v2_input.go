@@ -36,7 +36,6 @@ type eventHubInputV2 struct {
 	metrics            *inputMetrics
 	checkpointStore    *checkpoints.BlobStore
 	consumerClient     *azeventhubs.ConsumerClient
-	pipelineClient     beat.Client
 	pipeline           beat.Pipeline
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
@@ -365,7 +364,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 		in.log.Debugw("received events", "count", len(events), "partition", partitionID)
 
-		err = in.processReceivedEvents(events, pipelineClient)
+		err = in.processReceivedEvents(events, partitionID, pipelineClient)
 		if err != nil {
 			return fmt.Errorf("error processing received events: %w", err)
 		}
@@ -386,11 +385,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 }
 
 // processReceivedEvents
-func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, pipelineClient beat.Client) error {
+func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, partitionID string, pipelineClient beat.Client) error {
 	processingStartTime := time.Now()
 	azure := mapstr.M{
-		// The partition ID is not available.
-		// "partition_id":   partitionID,
+		"partition_id":   partitionID,
 		"eventhub":       in.config.EventHubName,
 		"consumer_group": in.config.ConsumerGroup,
 	}
@@ -435,6 +433,9 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 	return nil
 }
 
+// initializePartitionResources initializes any partition specific resources for your application.
+//
+// Sets up a pipelineClient for publishing events and receive notification of their ACKs.
 func initializePartitionResources(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient, pipeline beat.Pipeline, log *logp.Logger) (beat.Client, error) {
 	// initialize things that might be partition specific, like a
 	// database connection.
@@ -444,6 +445,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			if err != nil {
 				log.Errorw("error updating checkpoint", "error", err)
 			}
+
 			log.Debugw(
 				"checkpoint updated",
 				"partition", partitionClient.PartitionID(),
@@ -463,5 +465,7 @@ func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhub
 	// not processing them anymore.
 	defer partitionClient.Close(ctx)
 
+	// Closing the pipeline since we're done
+	// processing events for this partition.
 	defer pipelineClient.Close()
 }
