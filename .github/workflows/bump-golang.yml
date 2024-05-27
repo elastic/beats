@@ -10,34 +10,43 @@ permissions:
   contents: read
 
 jobs:
-  bump-main:
+  bump:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
     steps:
       - uses: actions/checkout@v4
 
-      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
-        with:
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: .github/workflows/updatecli.d/bump-golang.yml
-          values: .github/workflows/updatecli.d/scm.yml
-          command: '--experimental apply'
-          notifySlackChannel: "#ingest-notifications"
-          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@9a37c7e35598d7b37d8e7568b40ed9538112be01 # v0.76.1
 
-  bump-7-17:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - name: Run Updatecli in Apply mode
+        run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/scm.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
+      - if: ${{ failure()  }}
+        uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
         with:
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: .github/workflows/updatecli.d/bump-golang-7.17.yml
-          values: .github/workflows/updatecli.d/scm.yml
-          command: '--experimental apply'
-          notifySlackChannel: "#ingest-notifications"
-          messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
+          channel-id: '#ingest-notifications'
+          payload: |
+            {
+              "text": "${{ env.SLACK_MESSAGE }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ env.SLACK_MESSAGE }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
