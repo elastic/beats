@@ -45,6 +45,9 @@ updates:
       - dependency-name: cloud.google.com/go/*
     groups:
       # Cloud providers' SDK dependencies
+      aws-sdks:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2/*"
       azure-sdks:
         patterns:
           - "github.com/Azure/azure-*-go"
