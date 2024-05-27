@@ -1,6 +1,6 @@
 //go:build linux
 
-package quark_provider
+package quarkprovider
 
 import (
 	"context"

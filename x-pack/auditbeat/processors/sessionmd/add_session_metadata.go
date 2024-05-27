@@ -17,9 +17,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfs_provider"
-	quarkprovider "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quark_provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quarkprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpfprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,10 +64,10 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		p, err = ebpf_provider.NewProvider(ctx, logger, db)
+		p, err = ebpfprovider.NewProvider(ctx, logger, db)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf on system, try procfs
-			p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
+			p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
@@ -76,12 +76,12 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			logger.Info("backend=auto using ebpf")
 		}
 	case "ebpf":
-		p, err = ebpf_provider.NewProvider(ctx, logger, db)
+		p, err = ebpfprovider.NewProvider(ctx, logger, db)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
 	case "procfs":
-		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
+		p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}

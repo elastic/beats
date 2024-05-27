@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package ebpf_provider
+package ebpfprovider
 
 import (
 	"context"
