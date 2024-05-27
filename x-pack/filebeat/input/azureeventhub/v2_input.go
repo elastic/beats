@@ -12,6 +12,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
+
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
@@ -26,13 +29,14 @@ import (
 // azureInputConfig the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 type eventHubInputV2 struct {
-	config          azureInputConfig
-	log             *logp.Logger
-	metrics         *inputMetrics
-	checkpointStore *checkpoints.BlobStore
-	consumerClient  *azeventhubs.ConsumerClient
-	pipelineClient  beat.Client
-	messageDecoder  messageDecoder
+	config             azureInputConfig
+	log                *logp.Logger
+	metrics            *inputMetrics
+	checkpointStore    *checkpoints.BlobStore
+	consumerClient     *azeventhubs.ConsumerClient
+	pipelineClient     beat.Client
+	messageDecoder     messageDecoder
+	migrationAssistant *migrationAssistant
 }
 
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
@@ -66,14 +70,6 @@ func (in *eventHubInputV2) Run(
 	defer inputMetrics.Close()
 	in.metrics = inputMetrics
 
-	// Decode the messages from event hub into
-	// a `[]string`.
-	in.messageDecoder = messageDecoder{
-		config:  &in.config,
-		log:     in.log,
-		metrics: in.metrics,
-	}
-
 	// Initialize the components needed to process events,
 	// in particular the consumerClient.
 	err = in.setup(ctx)
@@ -98,6 +94,15 @@ func (in *eventHubInputV2) Run(
 
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
+
+	// Decode the messages from event hub into
+	// a `[]string`.
+	in.messageDecoder = messageDecoder{
+		config:  &in.config,
+		log:     in.log,
+		metrics: in.metrics,
+	}
+
 	// FIXME: check more pipelineClient creation options.
 	blobContainerClient, err := container.NewClientFromConnectionString(
 		in.config.SAConnectionString,
@@ -108,12 +113,27 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		return fmt.Errorf("failed to create blob container pipelineClient: %w", err)
 	}
 
+	// The modern event hub SDK does not create the container
+	// automatically like the old SDK.
+	//
+	// The new `BlobStore` explicitly says:
+	//   "the container must exist before the checkpoint store can be used."
+	//
+	// We need to ensure it exists before we can use it.
+	err = in.ensureContainerExists(ctx, blobContainerClient)
+	if err != nil {
+		return fmt.Errorf("failed to ensure blob container exists: %w", err)
+	}
+
+	// The checkpoint store is used to store the checkpoint information
+	// in the blob container.
 	checkpointStore, err := checkpoints.NewBlobStore(blobContainerClient, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
 	}
 	in.checkpointStore = checkpointStore
 
+	// Create the event hub consumerClient to receive events.
 	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
 		in.config.ConnectionString,
 		in.config.EventHubName,
@@ -125,11 +145,30 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.consumerClient = consumerClient
 
+	// FIXME: add migration assistant.
+	in.migrationAssistant = newMigrationAssistant(
+		in.log,
+		consumerClient,
+		blobContainerClient,
+		checkpointStore,
+	)
+
 	return nil
 }
 
 // run starts the main loop for processing events.
 func (in *eventHubInputV2) run(ctx context.Context) {
+	// Check if we need to migrate the checkpoint store.
+	err := in.migrationAssistant.checkAndMigrate(
+		ctx,
+		in.config.ConnectionString,
+		in.config.EventHubName,
+		in.config.ConsumerGroup,
+	)
+	if err != nil {
+		in.log.Errorw("error migrating checkpoint store", "error", err)
+		// FIXME: should we return here?
+	}
 
 	// Handle the case when the processor stops due to
 	// transient errors (network failures) and we need to
@@ -140,6 +179,10 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		120*time.Second, // max backoff
 	)
 
+	processorOptions := azeventhubs.ProcessorOptions{
+		LoadBalancingStrategy: azeventhubs.ProcessorStrategyBalanced,
+	}
+
 	for ctx.Err() == nil {
 		// Create a new processor for each run.
 		//
@@ -148,7 +191,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		processor, err := azeventhubs.NewProcessor(
 			in.consumerClient,
 			in.checkpointStore,
-			nil, // default options
+			&processorOptions,
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
@@ -161,14 +204,16 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 		// Run the processor to start processing events.
 		//
-		// This is a blocking call. It will return when the processor
-		// stops due to an error or when the context is cancelled.
+		// This is a blocking call.
+		//
+		// It will return when the processor stops due to:
+		//  - an error
+		//	- when the context is cancelled.
+		//
+		// On cancellation, it will return a nil error.
 		if err := processor.Run(ctx); err != nil {
 			in.log.Errorw("processor exited with a non-nil error", "error", err)
 
-			// FIXME: `time.Sleep()` is not the best way to handle this.
-			// Using it for testing purposes.
-			// time.Sleep(30 * time.Second)
 			in.log.Infow("waiting before retrying starting the processor")
 
 			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
@@ -176,7 +221,10 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 			// we add an and retry mechanism with exponential backoff?
 			processorRunBackoff.Wait()
 
-			in.log.Infow("ready to try to start the processor again")
+			// Update input metrics.
+			in.metrics.processorRestarts.Inc()
+
+			in.log.Infow("Pssor again")
 		}
 
 		in.log.Infow(
@@ -186,9 +234,55 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 	}
 }
 
+// ensureContainerExists ensures the blob container exists.
+func (in *eventHubInputV2) ensureContainerExists(ctx context.Context, blobContainerClient *container.Client) error {
+	exists, err := in.containerExists(ctx, blobContainerClient)
+	if err != nil {
+		return fmt.Errorf("failed to check if blob container exists: %w", err)
+	}
+	if exists {
+		return nil
+	}
+
+	// Since the container does not exist, we create it.
+	r, err := blobContainerClient.Create(ctx, nil)
+	if err != nil {
+		// If the container already exists, we ignore the error.
+		var responseError *azcore.ResponseError
+		if !errors.As(err, &responseError) || responseError.ErrorCode != string(bloberror.ContainerAlreadyExists) {
+			return fmt.Errorf("failed to create blob container: %w", err)
+		}
+
+		in.log.Debugw("blob container already exists, no need to create a new one", "container", in.config.SAContainer)
+	}
+
+	in.log.Infow("blob container created successfully", "response", r)
+
+	return nil
+}
+
+// containerExists checks if the blob container exists.
+func (in *eventHubInputV2) containerExists(ctx context.Context, blobContainerClient *container.Client) (bool, error) {
+	// Try to access the container to see if it exists.
+	_, err := blobContainerClient.GetProperties(ctx, &container.GetPropertiesOptions{})
+	if err == nil {
+		in.log.Debugw("blob container already exists, no need to create a new one", "container", in.config.SAContainer)
+		return true, nil
+	}
+
+	var responseError *azcore.ResponseError
+	if errors.As(err, &responseError) && responseError.ErrorCode == string(bloberror.ContainerNotFound) {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("failed to check if blob container exists: %w", err)
+}
+
 // workersLoop starts a goroutine for each partition to process events.
 func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhubs.Processor) {
 	for {
+		// The call blocks until an owned partition is available or the
+		// context is cancelled.
 		processorPartitionClient := processor.NextPartitionClient(ctx)
 		if processorPartitionClient == nil {
 			// We break out from the for loop when `NextPartitionClient`
@@ -198,6 +292,7 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 
 		partitionID := processorPartitionClient.PartitionID()
 
+		// Start a goroutine to process events for the partition.
 		go func() {
 			in.log.Infow(
 				"starting a partition worker",
@@ -223,6 +318,9 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 
 // processEventsForPartition receives events from a partition and processes them.
 func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient) error {
+
+	// pipelineClient := createPipelineClient()
+
 	// 1. [BEGIN] Initialize any partition specific resources for your application.
 	// 2. [CONTINUOUS] Loop, calling ReceiveEvents() and UpdateCheckpoint().
 	// 3. [END] Cleanup any resources.
@@ -235,7 +333,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 	partitionID := partitionClient.PartitionID()
 
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
-	if err := initializePartitionResources(partitionID); err != nil {
+	if err := initializePartitionResources(partitionID, partitionClient); err != nil {
 		return err
 	}
 
@@ -260,7 +358,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 			continue
 		}
 
-		in.log.Debugw("received events", "partition", partitionID)
+		in.log.Debugw("received events", "count", len(events), "partition", partitionID)
 
 		err = in.processReceivedEvents(events)
 		if err != nil {
@@ -332,7 +430,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 	return nil
 }
 
-func initializePartitionResources(partitionID string) error {
+func initializePartitionResources(partitionID string, partitionClient *azeventhubs.ProcessorPartitionClient) error {
 	// initialize things that might be partition specific, like a
 	// database connection.
 	return nil
