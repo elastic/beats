@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
@@ -21,6 +22,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -35,6 +37,7 @@ type eventHubInputV2 struct {
 	checkpointStore    *checkpoints.BlobStore
 	consumerClient     *azeventhubs.ConsumerClient
 	pipelineClient     beat.Client
+	pipeline           beat.Pipeline
 	messageDecoder     messageDecoder
 	migrationAssistant *migrationAssistant
 }
@@ -80,11 +83,12 @@ func (in *eventHubInputV2) Run(
 
 	// Create pipelineClient for publishing events and receive
 	// notification of their ACKs.
-	in.pipelineClient, err = createPipelineClient(pipeline)
-	if err != nil {
-		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
-	}
-	defer in.pipelineClient.Close()
+	// in.pipelineClient, err = createPipelineClient(pipeline)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
+	// }
+	// defer in.pipelineClient.Close()
+	in.pipeline = pipeline
 
 	// Start the main run loop
 	in.run(ctx)
@@ -319,23 +323,24 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 // processEventsForPartition receives events from a partition and processes them.
 func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient) error {
 
-	// pipelineClient := createPipelineClient()
-
 	// 1. [BEGIN] Initialize any partition specific resources for your application.
 	// 2. [CONTINUOUS] Loop, calling ReceiveEvents() and UpdateCheckpoint().
 	// 3. [END] Cleanup any resources.
-	defer func() {
-		// 3/3 [END] Do cleanup here, like shutting down database clients
-		// or other resources used for processing this partition.
-		shutdownPartitionResources(partitionClient)
-	}()
 
 	partitionID := partitionClient.PartitionID()
 
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
-	if err := initializePartitionResources(partitionID, partitionClient); err != nil {
+	pipelineClient, err := initializePartitionResources(ctx, partitionClient, in.pipeline, in.log)
+	if err != nil {
 		return err
 	}
+
+	defer func() {
+		// 3/3 [END] Do cleanup here, like shutting down database clients
+		// or other resources used for processing this partition.
+		shutdownPartitionResources(ctx, partitionClient, pipelineClient)
+		in.log.Debugw("partition resources cleaned up", "partition", partitionID)
+	}()
 
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
 	for {
@@ -360,28 +365,28 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 		in.log.Debugw("received events", "count", len(events), "partition", partitionID)
 
-		err = in.processReceivedEvents(events)
+		err = in.processReceivedEvents(events, pipelineClient)
 		if err != nil {
 			return fmt.Errorf("error processing received events: %w", err)
 		}
 
-		in.log.Debugw("updating checkpoint information", "partition", partitionID)
+		//in.log.Debugw("updating checkpoint information", "partition", partitionID)
 
-		// Updates the checkpoint with the latest event received.
-		//
-		// If processing needs to restart it will restart from this
-		// point, automatically.
-		if err := partitionClient.UpdateCheckpoint(ctx, events[len(events)-1], nil); err != nil {
-			in.log.Errorw("error updating checkpoint", "error", err)
-			return err
-		}
+		//// Updates the checkpoint with the latest event received.
+		////
+		//// If processing needs to restart it will restart from this
+		//// point, automatically.
+		//if err := partitionClient.UpdateCheckpoint(ctx, events[len(events)-1], nil); err != nil {
+		//	in.log.Errorw("error updating checkpoint", "error", err)
+		//	return err
+		//}
 
-		in.log.Debugw("checkpoint updated", "partition", partitionID)
+		//in.log.Debugw("checkpoint updated", "partition", partitionID)
 	}
 }
 
 // processReceivedEvents
-func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData) error {
+func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, pipelineClient beat.Client) error {
 	processingStartTime := time.Now()
 	azure := mapstr.M{
 		// The partition ID is not available.
@@ -416,7 +421,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 			}
 
 			// Publish the event to the Beats pipeline.
-			in.pipelineClient.Publish(event)
+			pipelineClient.Publish(event)
 
 			// Update input metrics.
 			in.metrics.sentEvents.Inc()
@@ -430,14 +435,33 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 	return nil
 }
 
-func initializePartitionResources(partitionID string, partitionClient *azeventhubs.ProcessorPartitionClient) error {
+func initializePartitionResources(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient, pipeline beat.Pipeline, log *logp.Logger) (beat.Client, error) {
 	// initialize things that might be partition specific, like a
 	// database connection.
-	return nil
+	return pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: acker.LastEventPrivateReporter(func(acked int, data any) {
+			err := partitionClient.UpdateCheckpoint(ctx, data.(*azeventhubs.ReceivedEventData), nil)
+			if err != nil {
+				log.Errorw("error updating checkpoint", "error", err)
+			}
+			log.Debugw(
+				"checkpoint updated",
+				"partition", partitionClient.PartitionID(),
+				"acked", acked,
+			)
+		}),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: to.Ptr(false),
+		},
+	})
 }
 
-func shutdownPartitionResources(partitionClient *azeventhubs.ProcessorPartitionClient) {
+func shutdownPartitionResources(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient, pipelineClient beat.Client) {
 	// Each PartitionClient holds onto an external resource and should be closed if you're
 	// not processing them anymore.
-	defer partitionClient.Close(context.TODO())
+	defer partitionClient.Close(ctx)
+
+	defer pipelineClient.Close()
 }
