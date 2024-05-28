@@ -521,7 +521,7 @@ func TestInputRunS3(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsListedTotal.Get(), 8)
 	assert.EqualValues(t, s3Input.metrics.s3ObjectsProcessedTotal.Get(), 7)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsAckedTotal.Get(), 6)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsAckedTotal.Get(), 7)
 	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 }
 
