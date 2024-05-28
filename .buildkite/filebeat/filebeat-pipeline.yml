@@ -32,7 +32,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
-          make -C ${{ env.BEAT_MODULE }} check update
+          make -C ${BEAT_MODULE} check update
           make check-no-changes
         retry:
           automatic:
