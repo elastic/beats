@@ -30,6 +30,21 @@ steps:
   - group: "Filebeat Mandatory Tests"
     key: "filebeat-mandatory-tests"
     steps:
+      - label: "Run check/update"
+        command: |
+          make -C ${{ env.BEAT_MODULE }} check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "filebeat: check/update"
+
       - label: ":ubuntu: Filebeat Unit Tests"
         command: |
           cd filebeat
