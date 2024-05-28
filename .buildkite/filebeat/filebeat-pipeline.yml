@@ -38,7 +38,7 @@ steps:
           automatic:
             - limit: 3
         agents:
-          provider: gcp
+          provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
