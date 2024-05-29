@@ -122,9 +122,6 @@ func (l *runLoop) runIteration() {
 	case req := <-pushChan: // producer pushing new event
 		l.handleInsert(&req)
 
-	case req := <-l.broker.cancelChan: // producer cancelling active events
-		l.handleCancel(&req)
-
 	case req := <-getChan: // consumer asking for next batch
 		l.handleGetRequest(&req)
 
@@ -243,45 +240,5 @@ func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
 		currentQueueSize: l.eventCount,
 		occupiedRead:     l.consumedCount,
 		oldestEntryID:    oldestEntryID,
-	}
-}
-
-func (l *runLoop) handleCancel(req *producerCancelRequest) {
-	var removedCount int
-
-	// Traverse all unconsumed events in the buffer, removing any with
-	// the specified producer. As we go we condense all the remaining
-	// events to be sequential.
-	buf := l.broker.buf
-	startIndex := l.bufPos + l.consumedCount
-	unconsumedEventCount := l.eventCount - l.consumedCount
-	for i := 0; i < unconsumedEventCount; i++ {
-		readIndex := (startIndex + i) % len(buf)
-		if buf[readIndex].producer == req.producer {
-			// The producer matches, skip this event
-			removedCount++
-		} else {
-			// Move the event to its final position after accounting for any
-			// earlier indices that were removed.
-			// (Count backwards from (startIndex + i), not from readIndex, to avoid
-			// sign issues when the buffer wraps.)
-			writeIndex := (startIndex + i - removedCount) % len(buf)
-			buf[writeIndex] = buf[readIndex]
-		}
-	}
-
-	// Clear the event pointers at the end of the buffer so we don't keep
-	// old events in memory by accident.
-	for i := 0; i < removedCount; i++ {
-		index := (l.bufPos + l.eventCount - removedCount + i) % len(buf)
-		buf[index].event = nil
-	}
-
-	// Subtract removed events from the internal event count
-	l.eventCount -= removedCount
-
-	// signal cancel request being finished
-	if req.resp != nil {
-		req.resp <- producerCancelResponse{removed: removedCount}
 	}
 }
