@@ -106,12 +106,6 @@ type ProducerConfig struct {
 	// if ACK is set, the callback will be called with number of events produced
 	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
-
-	// OnDrop is called to report events being silently dropped by
-	// the queue. Currently this can only happen when a Publish call is sent
-	// to the memory queue's request channel but the producer is cancelled
-	// before it reaches the queue buffer.
-	OnDrop func(Entry)
 }
 
 type EntryID uint64

@@ -49,15 +49,13 @@ type openState struct {
 type producerID uint64
 
 type produceState struct {
-	cb        ackHandler
-	dropCB    func(queue.Entry)
-	cancelled bool
-	lastACK   producerID
+	cb      ackHandler
+	lastACK producerID
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), encoder queue.Encoder) queue.Producer {
+func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer {
 	openState := openState{
 		log:       b.logger,
 		done:      make(chan struct{}),
@@ -69,7 +67,6 @@ func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), encoder que
 	if cb != nil {
 		p := &ackProducer{broker: b, openState: openState}
 		p.state.cb = cb
-		p.state.dropCB = dropCB
 		return p
 	}
 	return &forgetfulProducer{broker: b, openState: openState}

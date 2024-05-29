@@ -195,16 +195,15 @@ func (l *runLoop) handleDelete(count int) {
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
-	if l.insert(req, l.nextEntryID) {
-		// Send back the new event id.
-		req.resp <- l.nextEntryID
+	l.insert(req, l.nextEntryID)
+	// Send back the new event id.
+	req.resp <- l.nextEntryID
 
-		l.nextEntryID++
-		l.eventCount++
+	l.nextEntryID++
+	l.eventCount++
 
-		// See if this gave us enough for a new batch
-		l.maybeUnblockGetRequest()
-	}
+	// See if this gave us enough for a new batch
+	l.maybeUnblockGetRequest()
 }
 
 // Checks if we can handle pendingGetRequest yet, and handles it if so
@@ -223,13 +222,7 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	}
 }
 
-// Returns true if the event was inserted, false if insertion was cancelled.
-func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
-	if req.producer != nil && req.producer.state.cancelled {
-		reportCancelledState(req)
-		return false
-	}
-
+func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
 		event:      req.event,
@@ -237,7 +230,6 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
-	return true
 }
 
 func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
@@ -291,12 +283,5 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	// signal cancel request being finished
 	if req.resp != nil {
 		req.resp <- producerCancelResponse{removed: removedCount}
-	}
-}
-
-func reportCancelledState(req *pushRequest) {
-	// do not add waiting events if producer did send cancel signal
-	if cb := req.producer.state.dropCB; cb != nil {
-		cb(req.event)
 	}
 }

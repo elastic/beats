@@ -250,18 +250,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	producerCfg := queue.ProducerConfig{}
 
-	if client.eventWaitGroup != nil || cfg.ClientListener != nil {
-		producerCfg.OnDrop = func(event queue.Entry) {
-			publisherEvent, _ := event.(publisher.Event)
-			if cfg.ClientListener != nil {
-				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
-			}
-			if client.eventWaitGroup != nil {
-				client.eventWaitGroup.Add(-1)
-			}
-		}
-	}
-
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {
 		waiter = newClientCloseWaiter(waitClose)
