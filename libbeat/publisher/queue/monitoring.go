@@ -49,9 +49,9 @@ type queueObserver struct {
 	removedEvents  *monitoring.Uint
 	removedBytes   *monitoring.Uint
 
-	events *monitoring.Uint  // gauge
-	bytes  *monitoring.Uint  // gauge
-	filled *monitoring.Float // gauge
+	filledEvents *monitoring.Uint  // gauge
+	filledBytes  *monitoring.Uint  // gauge
+	filledPct    *monitoring.Float // gauge
 }
 
 type nilObserver struct{}
@@ -81,9 +81,9 @@ func NewQueueObserver(metrics *monitoring.Registry) Observer {
 		removedEvents:  monitoring.NewUint(queueMetrics, "removed.events"),
 		removedBytes:   monitoring.NewUint(queueMetrics, "removed.bytes"),
 
-		events: monitoring.NewUint(queueMetrics, "events"),      // gauge
-		bytes:  monitoring.NewUint(queueMetrics, "bytes"),       // gauge
-		filled: monitoring.NewFloat(queueMetrics, "filled.pct"), // gauge
+		filledEvents: monitoring.NewUint(queueMetrics, "filled.events"), // gauge
+		filledBytes:  monitoring.NewUint(queueMetrics, "filled.bytes"),  // gauge
+		filledPct:    monitoring.NewFloat(queueMetrics, "filled.pct"),   // gauge
 	}
 
 	// Backwards compatibility: "queue.acked" represents the same value as
@@ -103,16 +103,18 @@ func (ob *queueObserver) MaxBytes(value int) {
 }
 
 func (ob *queueObserver) Restore(eventCount int, byteCount int) {
-	ob.events.Set(uint64(eventCount))
-	ob.bytes.Set(uint64(byteCount))
+	ob.filledEvents.Set(uint64(eventCount))
+	ob.filledBytes.Set(uint64(byteCount))
+	ob.updateFilledPct()
 }
 
 func (ob *queueObserver) AddEvent(byteCount int) {
 	ob.addedEvents.Inc()
 	ob.addedBytes.Add(uint64(byteCount))
 
-	ob.events.Inc()
-	ob.bytes.Add(uint64(byteCount))
+	ob.filledEvents.Inc()
+	ob.filledBytes.Add(uint64(byteCount))
+	ob.updateFilledPct()
 }
 
 func (ob *queueObserver) ConsumeEvents(eventCount int, byteCount int) {
@@ -124,8 +126,17 @@ func (ob *queueObserver) RemoveEvents(eventCount int, byteCount int) {
 	ob.removedEvents.Add(uint64(eventCount))
 	ob.removedBytes.Add(uint64(byteCount))
 
-	ob.events.Sub(uint64(eventCount))
-	ob.bytes.Sub(uint64(byteCount))
+	ob.filledEvents.Sub(uint64(eventCount))
+	ob.filledBytes.Sub(uint64(byteCount))
+	ob.updateFilledPct()
+}
+
+func (ob *queueObserver) updateFilledPct() {
+	if maxBytes := ob.maxBytes.Get(); maxBytes > 0 {
+		ob.filledPct.Set(float64(ob.filledBytes.Get()) / float64(maxBytes))
+	} else {
+		ob.filledPct.Set(float64(ob.filledEvents.Get()) / float64(ob.maxEvents.Get()))
+	}
 }
 
 func (nilObserver) MaxEvents(_ int)            {}
