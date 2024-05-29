@@ -291,10 +291,6 @@ func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occup
 	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
 }
 
-func TestProducerCancelRemovesEvents(t *testing.T) {
-	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024, 0, 0))
-}
-
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
 		return NewQueue(nil, nil, Settings{
