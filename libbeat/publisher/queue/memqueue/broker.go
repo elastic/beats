@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // The string used to specify this queue in beats configurations.
@@ -274,25 +273,6 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	return resp, nil
-}
-
-func (b *broker) Metrics() (queue.Metrics, error) {
-
-	responseChan := make(chan memQueueMetrics, 1)
-	select {
-	case <-b.ctx.Done():
-		return queue.Metrics{}, io.EOF
-	case b.metricChan <- metricsRequest{
-		responseChan: responseChan}:
-	}
-	resp := <-responseChan
-
-	return queue.Metrics{
-		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
-		EventLimit:            opt.UintWith(uint64(len(b.buf))),
-		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
-		OldestEntryID:         resp.oldestEntryID,
-	}, nil
 }
 
 var batchPool = sync.Pool{

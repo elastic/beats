@@ -125,10 +125,6 @@ type testProducer struct {
 	cancel  func()
 }
 
-func (q *testQueue) Metrics() (queue.Metrics, error) {
-	return queue.Metrics{}, nil
-}
-
 func (q *testQueue) Close() error {
 	if q.close != nil {
 		return q.close()
