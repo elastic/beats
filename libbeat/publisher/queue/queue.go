@@ -53,7 +53,7 @@ type Queue interface {
 // encode queued events before returning them.
 type QueueFactory func(
 	logger *logp.Logger,
-	ack func(eventCount int),
+	observer Observer,
 	inputQueueSize int,
 	encoderFactory EncoderFactory,
 ) (Queue, error)

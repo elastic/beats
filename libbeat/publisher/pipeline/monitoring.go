@@ -41,13 +41,12 @@ type clientObserver interface {
 	filteredEvent()
 	publishedEvent()
 	failedPublishEvent()
+	eventsACKed(count int)
 }
 
 type outputObserver interface {
 	eventsDropped(int)
 	eventsRetry(int)
-	queueACKed(n int)
-	queueMaxEvents(n int)
 }
 
 // metricsObserver is used by many component in the publisher pipeline, to report
@@ -93,9 +92,6 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			failed:    monitoring.NewUint(reg, "events.failed"),
 			dropped:   monitoring.NewUint(reg, "events.dropped"),
 			retry:     monitoring.NewUint(reg, "events.retry"),
-
-			queueACKed:     monitoring.NewUint(reg, "queue.acked"),
-			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
 			activeEvents:     monitoring.NewUint(reg, "events.active"), // Gauge
 			percentQueueFull: monitoring.NewFloat(reg, "queue.filled.pct.events"),
@@ -152,27 +148,16 @@ func (o *metricsObserver) publishedEvent() {
 	o.vars.published.Inc()
 }
 
-// (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent() {
-	o.vars.failed.Inc()
-	o.vars.activeEvents.Dec()
-	o.setPercentageFull()
-}
-
-//
-// queue events
-//
-
-// (queue) number of events ACKed by the queue/broker in use
-func (o *metricsObserver) queueACKed(n int) {
-	o.vars.queueACKed.Add(uint64(n))
+// (client) number of ACKed events from this client
+func (o *metricsObserver) eventsACKed(n int) {
 	o.vars.activeEvents.Sub(uint64(n))
 	o.setPercentageFull()
 }
 
-// (queue) maximum queue event capacity
-func (o *metricsObserver) queueMaxEvents(n int) {
-	o.vars.queueMaxEvents.Set(uint64(n))
+// (client) client closing down or DropIfFull is set
+func (o *metricsObserver) failedPublishEvent() {
+	o.vars.failed.Inc()
+	o.vars.activeEvents.Dec()
 	o.setPercentageFull()
 }
 
@@ -201,7 +186,6 @@ func (*emptyObserver) newEvent()           {}
 func (*emptyObserver) filteredEvent()      {}
 func (*emptyObserver) publishedEvent()     {}
 func (*emptyObserver) failedPublishEvent() {}
-func (*emptyObserver) queueACKed(n int)    {}
-func (*emptyObserver) queueMaxEvents(int)  {}
+func (*emptyObserver) eventsACKed(n int)   {}
 func (*emptyObserver) eventsDropped(int)   {}
 func (*emptyObserver) eventsRetry(int)     {}

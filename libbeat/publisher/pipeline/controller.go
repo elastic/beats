@@ -40,10 +40,6 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	// If eventWaitGroup is non-nil, it will be decremented as the queue
-	// reports upstream acknowledgment of published events.
-	eventWaitGroup *sync.WaitGroup
-
 	// The queue is not created until the outputController is assigned a
 	// nonempty outputs.Group, in case the output group requests a proxy
 	// queue. At that time, any prior calls to outputController.queueProducer
@@ -86,7 +82,6 @@ func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
 	observer outputObserver,
-	eventWaitGroup *sync.WaitGroup,
 	queueFactory queue.QueueFactory,
 	inputQueueSize int,
 ) (*outputController, error) {
@@ -94,7 +89,6 @@ func newOutputController(
 		beat:           beat,
 		monitors:       monitors,
 		observer:       observer,
-		eventWaitGroup: eventWaitGroup,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
 		consumer:       newEventConsumer(monitors.Logger, observer),
@@ -233,16 +227,6 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	return <-request.responseChan
 }
 
-// onACK receives event acknowledgment notifications from the queue and
-// forwards them to the metrics observer and the pipeline's global event
-// wait group if one is set.
-func (c *outputController) onACK(eventCount int) {
-	c.observer.queueACKed(eventCount)
-	if c.eventWaitGroup != nil {
-		c.eventWaitGroup.Add(-eventCount)
-	}
-}
-
 func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	logger := c.monitors.Logger
 	if len(outGrp.Clients) == 0 {
@@ -266,12 +250,13 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if factory == nil {
 		factory = c.queueFactory
 	}
+	queueObserver := queue.NewQueueObserver()
 
-	queue, err := factory(logger, c.onACK, c.inputQueueSize, outGrp.EncoderFactory)
+	queue, err := factory(logger, queueObserver, c.inputQueueSize, outGrp.EncoderFactory)
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize, outGrp.EncoderFactory)
+		queue = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
 	}
 	c.queue = queue
 
@@ -279,8 +264,6 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		queueReg := c.monitors.Telemetry.NewRegistry("queue")
 		monitoring.NewString(queueReg, "name").Set(c.queue.QueueType())
 	}
-	maxEvents := c.queue.BufferConfig().MaxEvents
-	c.observer.queueMaxEvents(maxEvents)
 
 	// Now that we've created a queue, go through and unblock any callers
 	// that are waiting for a producer.

@@ -76,11 +76,9 @@ type broker struct {
 	// through this channel so ackLoop can monitor them for acknowledgments.
 	consumedChan chan batchList
 
-	// ackCallback is a configurable callback to invoke when ACKs are processed.
-	// ackLoop calls this function when it advances the consumer ACK position.
-	// Right now this forwards the notification to queueACKed() in
-	// the pipeline observer, which updates the beats registry if needed.
-	ackCallback func(eventCount int)
+	// observer is a metrics observer that the queue should use to report
+	// internal state.
+	observer queue.Observer
 
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
@@ -143,11 +141,11 @@ type batchList struct {
 func FactoryForSettings(settings Settings) queue.QueueFactory {
 	return func(
 		logger *logp.Logger,
-		ackCallback func(eventCount int),
+		observer queue.Observer,
 		inputQueueSize int,
 		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory), nil
+		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory), nil
 	}
 }
 
@@ -156,12 +154,12 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
-	ackCallback func(eventCount int),
+	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
-	b := newQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory)
+	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
 	b.wg.Add(2)
@@ -183,7 +181,7 @@ func NewQueue(
 // when the workers are active.
 func newQueue(
 	logger *logp.Logger,
-	ackCallback func(eventCount int),
+	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
@@ -225,7 +223,7 @@ func newQueue(
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
 
-		ackCallback: ackCallback,
+		observer: observer,
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 

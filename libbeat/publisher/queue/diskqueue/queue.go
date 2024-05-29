@@ -93,11 +93,11 @@ type diskQueue struct {
 func FactoryForSettings(settings Settings) queue.QueueFactory {
 	return func(
 		logger *logp.Logger,
-		ackCallback func(eventCount int),
+		observer queue.Observer,
 		inputQueueSize int,
 		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings, encoderFactory)
+		return NewQueue(logger, observer, settings, encoderFactory)
 	}
 }
 
@@ -105,7 +105,7 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 // and settings, creating it if it doesn't exist.
 func NewQueue(
 	logger *logp.Logger,
-	writeToDiskCallback func(eventCount int),
+	observer queue.Observer,
 	settings Settings,
 	encoderFactory queue.EncoderFactory,
 ) (*diskQueue, error) {
@@ -218,7 +218,7 @@ func NewQueue(
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
 		readerLoop:  newReaderLoop(settings, encoder),
-		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
+		writerLoop:  newWriterLoop(logger, settings),
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
