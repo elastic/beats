@@ -146,7 +146,7 @@ func (c *client) Close() error {
 		c.logger.Debug("client: done closing acker")
 
 		c.logger.Debug("client: close queue producer")
-		c.producer.Cancel()
+		c.producer.Close()
 		c.onClosed()
 		c.logger.Debug("client: done producer close")
 

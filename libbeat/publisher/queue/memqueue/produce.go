@@ -90,7 +90,7 @@ func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) 
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) Cancel() {
+func (p *forgetfulProducer) Close() {
 	p.openState.Close()
 }
 
@@ -121,7 +121,7 @@ func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	return id, published
 }
 
-func (p *ackProducer) Cancel() {
+func (p *ackProducer) Close() {
 	p.openState.Close()
 }
 

@@ -94,7 +94,7 @@ func (producer *diskQueueProducer) publish(
 	}
 }
 
-func (producer *diskQueueProducer) Cancel() {
+func (producer *diskQueueProducer) Close() {
 	if producer.cancelled {
 		return
 	}

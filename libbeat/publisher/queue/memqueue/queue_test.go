@@ -207,7 +207,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// Cancel the producer, then read and acknowledge two batches. If the
 	// Publish calls and the queue code are working, activeEvents should
 	// _usually_ end up as 0, but _always_ end up non-negative.
-	p.Cancel()
+	p.Close()
 
 	// The queue reads also need to be done in a goroutine, in case the
 	// producer cancellation signal went through before the Publish

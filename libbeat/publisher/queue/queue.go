@@ -130,10 +130,10 @@ type Producer interface {
 	// the event's assigned ID, and false otherwise.
 	TryPublish(entry Entry) (EntryID, bool)
 
-	// Cancel closes this Producer endpoint.
-	// Note: A queue may still send ACK signals even after Cancel is called on
+	// Close closes this Producer endpoint.
+	// Note: A queue may still send ACK signals even after Close is called on
 	// the originating Producer. The pipeline client must accept these ACKs.
-	Cancel()
+	Close()
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.

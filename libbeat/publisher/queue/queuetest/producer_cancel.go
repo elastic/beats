@@ -59,7 +59,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		// cancel producer
 		log.Debugf("cancel producer")
-		producer.Cancel()
+		producer.Close()
 
 		// reconnect and send some more events
 		log.Debug("connect new producer")

@@ -175,7 +175,7 @@ func (p *testProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (p *testProducer) Cancel() {
+func (p *testProducer) Close() {
 	if p.cancel != nil {
 		p.cancel()
 	}
@@ -190,7 +190,7 @@ func makeTestQueue() queue.Queue {
 		close: func() error {
 			mux.Lock()
 			for producer := range producers {
-				producer.Cancel()
+				producer.Close()
 			}
 			mux.Unlock()
 
