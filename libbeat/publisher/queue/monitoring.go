@@ -17,6 +17,10 @@
 
 package queue
 
+import (
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
+
 // Observer is an interface for queues to send state updates to a metrics
 // or test listener.
 type Observer interface {
@@ -34,9 +38,33 @@ type Observer interface {
 	RemoveEvents(eventCount int, byteCount int)
 }
 
-func NewQueueObserver() Observer {
+type nilObserver struct{}
+
+func (nilObserver) MaxEvents(_ int)            {}
+func (nilObserver) MaxBytes(_ int)             {}
+func (nilObserver) Restore(_ int, _ int)       {}
+func (nilObserver) AddEvent(_ int)             {}
+func (nilObserver) ConsumeEvents(_ int, _ int) {}
+func (nilObserver) RemoveEvents(_ int, _ int)  {}
+
+func NewQueueObserver(metrics *monitoring.Registry) Observer {
+	if metrics == nil {
+		return nilObserver{}
+	}
+	metrics = metrics.GetRegistry("queue")
+	if metrics != nil {
+		err := metrics.Clear()
+		if err != nil {
+			return nilObserver{}
+		}
+	} else {
+		metrics = metrics.NewRegistry("queue")
+	}
+	//outStats = outputs.NewStats(metrics)
+
 	//queueACKed:     monitoring.NewUint(reg, "queue.acked"),
 	//queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
 	return nil
+
 }

@@ -152,7 +152,7 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// send configuration updates without blocking.
 			targetChan: make(chan consumerTarget, 4),
 		},
-		observer: nilObserver,
+		retryObserver: nilObserver,
 	}
 	// Set to an empty output group. This should not create a queue.
 	controller.Set(outputs.Group{})
@@ -175,7 +175,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
-		observer: nilObserver,
+		retryObserver: nilObserver,
 	}
 	controller.Set(outputs.Group{
 		Clients:      []outputs.Client{newMockClient(nil)},
@@ -197,7 +197,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
-		observer: nilObserver,
+		retryObserver: nilObserver,
 		monitors: Monitors{
 			Logger: logp.NewLogger("tests"),
 		},
@@ -215,7 +215,7 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan: make(chan consumerTarget, 4),
 		},
-		observer: nilObserver,
+		retryObserver: nilObserver,
 	}
 	// Send producer requests from different goroutines. They should all
 	// block, because there is no queue, but they should become unblocked

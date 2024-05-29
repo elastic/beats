@@ -36,9 +36,9 @@ import (
 // - stop
 // - reload
 type outputController struct {
-	beat     beat.Info
-	monitors Monitors
-	observer outputObserver
+	beat          beat.Info
+	monitors      Monitors
+	retryObserver outputObserver
 
 	// The queue is not created until the outputController is assigned a
 	// nonempty outputs.Group, in case the output group requests a proxy
@@ -81,17 +81,17 @@ type outputWorker interface {
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
-	observer outputObserver,
+	retryObserver outputObserver,
 	queueFactory queue.QueueFactory,
 	inputQueueSize int,
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
 		monitors:       monitors,
-		observer:       observer,
+		retryObserver:  retryObserver,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
-		consumer:       newEventConsumer(monitors.Logger, observer),
+		consumer:       newEventConsumer(monitors.Logger, retryObserver),
 		inputQueueSize: inputQueueSize,
 	}
 
@@ -164,10 +164,11 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:      c.queue,
-			ch:         targetChan,
-			batchSize:  outGrp.BatchSize,
-			timeToLive: outGrp.Retry + 1,
+			queue:         c.queue,
+			ch:            targetChan,
+			batchSize:     outGrp.BatchSize,
+			timeToLive:    outGrp.Retry + 1,
+			retryObserver: c.retryObserver,
 		})
 }
 
@@ -250,7 +251,7 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if factory == nil {
 		factory = c.queueFactory
 	}
-	queueObserver := queue.NewQueueObserver()
+	queueObserver := queue.NewQueueObserver(c.monitors.Metrics)
 
 	queue, err := factory(logger, queueObserver, c.inputQueueSize, outGrp.EncoderFactory)
 	if err != nil {

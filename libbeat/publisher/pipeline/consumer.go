@@ -58,10 +58,11 @@ type eventConsumer struct {
 // consumerTarget specifies the queue to read from, the parameters needed
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
-	queue      queue.Queue
-	ch         chan publisher.Batch
-	timeToLive int
-	batchSize  int
+	queue         queue.Queue
+	ch            chan publisher.Batch
+	timeToLive    int
+	batchSize     int
+	retryObserver outputObserver
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
