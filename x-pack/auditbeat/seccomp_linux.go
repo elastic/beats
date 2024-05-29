@@ -17,6 +17,7 @@ func init() {
 		// requirements beyond the default policy from libbeat so whitelist
 		// these additional syscalls.
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"faccessat2",
 			"mremap",
 			"umask",
 		); err != nil {

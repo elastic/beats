@@ -254,6 +254,13 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) {
 	}
 }
 
+func (db *DB) InsertProcess(process Process) {
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+
+	db.insertProcess(process)
+}
+
 func (db *DB) insertProcess(process Process) {
 	pid := process.PIDs.Tgid
 	db.processes[pid] = process

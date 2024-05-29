@@ -57,8 +57,9 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	backfilledPIDs := db.ScrapeProcfs()
-	logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	//TODO: backfill if not using quark
+//	backfilledPIDs := db.ScrapeProcfs()
+//	logger.Infof("backfilled %d processes", len(backfilledPIDs))
 
 	var p provider.Provider
 
@@ -90,7 +91,6 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create quark provider: %w", err)
 		}
-
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
