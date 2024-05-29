@@ -70,9 +70,8 @@ func (bm *batchMock) ACK() {
 func (bm *batchMock) Drop() {
 	bm.drop = true
 }
-func (bm *batchMock) Retry()       { panic("unimplemented") }
-func (bm *batchMock) Cancelled()   { panic("unimplemented") }
-func (bm *batchMock) FreeEntries() {}
+func (bm *batchMock) Retry()     { panic("unimplemented") }
+func (bm *batchMock) Cancelled() { panic("unimplemented") }
 func (bm *batchMock) SplitRetry() bool {
 	if bm.canSplit {
 		bm.didSplit = true
