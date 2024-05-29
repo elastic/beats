@@ -109,6 +109,8 @@ const (
 	defaultEventType = "doc"
 )
 
+// Flags passed with the Bulk API request: we filter the response to include
+// only the fields we need for checking request/item state.
 var bulkRequestParams = map[string]string{
 	"filter_path": "errors,items.*.error,items.*.status",
 }
@@ -456,14 +458,14 @@ func (client *Client) applyItemStatus(
 		} else {
 			stats.acked++
 		}
-		return false // ok value
+		return false // no retry needed
 	}
 
 	if itemStatus == 409 {
-		// 409 is used to indicate an event with same ID already exists if
-		// `create` op_type is used.
+		// 409 is used to indicate there is already an event with the same ID, or
+		// with identical Time Series Data Stream dimensions when TSDS is active.
 		stats.duplicates++
-		return false // ok
+		return false // no retry needed
 	}
 
 	if itemStatus == http.StatusTooManyRequests {
