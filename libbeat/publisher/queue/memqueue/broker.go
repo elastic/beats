@@ -264,7 +264,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	if b.encoderFactory != nil {
 		encoder = b.encoderFactory()
 	}
-	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel, encoder)
+	return newProducer(b, cfg.ACK, cfg.OnDrop, encoder)
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {

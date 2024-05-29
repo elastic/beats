@@ -96,9 +96,8 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
-		ACK:          func(count int) {},
-		OnDrop:       func(e queue.Entry) {},
-		DropOnCancel: false,
+		ACK:    func(count int) {},
+		OnDrop: func(e queue.Entry) {},
 	})
 
 	success := atomic.Bool{}
@@ -173,7 +172,6 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 		OnDrop: func(e queue.Entry) {
 			//activeEvents.Add(-1)
 		},
-		DropOnCancel: false,
 	})
 
 	// Asynchronously, send 4 events to the queue.

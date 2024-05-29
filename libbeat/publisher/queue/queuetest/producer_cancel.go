@@ -47,8 +47,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		log.Debug("create first producer")
 		producer := b.Producer(queue.ProducerConfig{
-			ACK:          func(int) {}, // install function pointer, so 'cancel' will remove events
-			DropOnCancel: true,
+			ACK: func(int) {}, // install function pointer, so 'cancel' will remove events
 		})
 
 		for ; i < N1; i++ {

@@ -112,10 +112,6 @@ type ProducerConfig struct {
 	// to the memory queue's request channel but the producer is cancelled
 	// before it reaches the queue buffer.
 	OnDrop func(Entry)
-
-	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
-	// via Cancel.
-	DropOnCancel bool
 }
 
 type EntryID uint64
@@ -134,12 +130,10 @@ type Producer interface {
 	// the event's assigned ID, and false otherwise.
 	TryPublish(entry Entry) (EntryID, bool)
 
-	// Cancel closes this Producer endpoint. If the producer is configured to
-	// drop its entries on Cancel, the number of dropped entries is returned.
+	// Cancel closes this Producer endpoint.
 	// Note: A queue may still send ACK signals even after Cancel is called on
-	//       the originating Producer. The pipeline client must accept and
-	//       discard these ACKs.
-	Cancel() int
+	// the originating Producer. The pipeline client must accept these ACKs.
+	Cancel()
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.
