@@ -32,6 +32,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          cd filebeat
           make -C ${BEAT_MODULE} check update
           make check-no-changes
         retry:
