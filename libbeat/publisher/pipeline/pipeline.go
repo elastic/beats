@@ -71,10 +71,6 @@ type Pipeline struct {
 	waitCloseTimeout time.Duration
 	eventWaitGroup   *sync.WaitGroup
 
-	// closeRef signal propagation support
-	guardStartSigPropagation sync.Once
-	sigNewClient             chan *client
-
 	processors processing.Supporter
 }
 
