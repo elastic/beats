@@ -17,7 +17,7 @@ The module supports the following types of metrics:
 *Set (s)*:: Measurement which counts unique occurrences until flushed (value set to 0).
 
 [float]
-=== Suported tag extensions
+=== Supported tag extensions
 
 Example of tag styles supported by the `statsd` module:
 
