@@ -2,20 +2,21 @@
 name: "beats-auditbeat"
 
 env:
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_UBUNTU_1804_X86_64: "family/core-ubuntu-1804"
   IMAGE_UBUNTU_2004_X86_64: "family/core-ubuntu-2004"
   IMAGE_UBUNTU_2204_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_2004_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  IMAGE_UBUNTU_2204_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  IMAGE_UBUNTU_2404_X86_64: "family/core-ubuntu-2404"
   IMAGE_DEBIAN_10: "family/platform-ingest-beats-debian-10"
   IMAGE_DEBIAN_12: "family/platform-ingest-beats-debian-12"
   IMAGE_CENTOS_7: "family/platform-ingest-beats-centos-7"
   IMAGE_RHEL_8: "family/platform-ingest-beats-rhel-8"
-
   IMAGE_RHEL_9: "family/platform-ingest-beats-rhel-9"
   IMAGE_SLES_12: "family/platform-ingest-beats-sles-12"
   IMAGE_SLES_15: "family/platform-ingest-beats-sles-15"
-  IMAGE_AMZN_2_ARM_64: "platform-ingest-beats-amazonlinux-2-aarch64"
+
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -23,13 +24,12 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_AMZN_2_ARM64: "platform-ingest-beats-amazonlinux-2-aarch64"
+  AWS_IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
 
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_MACOS_ARM64: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
 
   # Other deps
@@ -143,7 +143,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
 
     steps:
-      - label: ":linux: Auditbeat Ubuntu Integration Tests"
+      - label: ":linux: Auditbeat Linux x86_64 Integration Tests -- {{image}}"
         key: "auditbeat-extended-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -155,16 +155,30 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "{{image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Linux Integration Tests"
+              context: "auditbeat: Linux x86_64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_1804_X86_64}"
+              - "${IMAGE_UBUNTU_2004_X86_64}"
+              - "${IMAGE_UBUNTU_2204_X86_64}"
+              - "${IMAGE_UBUNTU_2404_X86_64}"
+              - "${IMAGE_DEBIAN_10}"
+              - "${IMAGE_DEBIAN_12}"
+              - "${IMAGE_CENTOS_7}"
+              - "${IMAGE_RHEL_8}"
+              - "${IMAGE_RHEL_9}"
+              - "${IMAGE_SLES_12}"
+              - "${IMAGE_SLES_15}"
 
-      - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
+      - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{image}}"
         key: "auditbeat-extended-arm64-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -176,7 +190,7 @@ steps:
             - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "{{image}}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -184,6 +198,13 @@ steps:
         notify:
           - github_commit_status:
               context: "auditbeat: Linux arm64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${AWS_IMAGE_AMZN_2_ARM64}"
+              - "${AWS_IMAGE_UBUNTU_2004_ARM64}"
+              - "${AWS_IMAGE_UBUNTU_2204_ARM64}"
+              - "${AWS_IMAGE_UBUNTU_2404_ARM64}"
 
       - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
