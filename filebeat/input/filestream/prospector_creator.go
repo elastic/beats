@@ -55,7 +55,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 
 	logp.L().
 		Named("prospector").
-		With("filestream_id", config.ID).
+		With("input_id", config.ID).
 		Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{

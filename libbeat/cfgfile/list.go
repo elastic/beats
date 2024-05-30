@@ -114,12 +114,13 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// Stop removed runners
 	for hash, runner := range stopList {
 		wg.Add(1)
-		r.logger.Debugf("Stopping runner: %s", runner)
+		idFields := getRunnerID(runner)
+		r.logger.Debugw(fmt.Sprintf("Stopping runner: %s", runner), idFields...)
 		delete(r.runners, hash)
 		go func(runner Runner) {
 			defer wg.Done()
 			runner.Stop()
-			r.logger.Debugf("Runner: '%s' has stopped", runner)
+			r.logger.Debugw(fmt.Sprintf("Runner: '%s' has stopped", runner), idFields...)
 		}(runner)
 		moduleStops.Add(1)
 	}
@@ -152,7 +153,8 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			continue
 		}
 
-		r.logger.Debugf("Starting runner: %s", runner)
+		idFields := getRunnerID(runner)
+		r.logger.Debugw(fmt.Sprintf("Starting runner: %s", runner), idFields...)
 		r.runners[hash] = runner
 		if config.StatusReporter != nil {
 			if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
@@ -164,12 +166,12 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		moduleStarts.Add(1)
 		if config.DiagCallback != nil {
 			if diag, ok := runner.(diagnostics.DiagnosticReporter); ok {
-				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
+				r.logger.Debugw(fmt.Sprintf("Runner '%s' has diagnostics, attempting to register", runner), idFields...)
 				for _, dc := range diag.Diagnostics() {
 					config.DiagCallback.Register(dc.Name, dc.Description, dc.Filename, dc.ContentType, dc.Callback)
 				}
 			} else {
-				r.logger.Debugf("Runner %s does not implement DiagnosticRunner, skipping", runner)
+				r.logger.Debugw(fmt.Sprintf("Runner %s does not implement DiagnosticRunner, skipping", runner), idFields...)
 			}
 		}
 	}
@@ -181,6 +183,20 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	moduleRunning.Set(int64(len(r.runners)))
 
 	return errs.Err()
+}
+
+func getRunnerID(r Runner) []any {
+	type ider interface {
+		InputID() string
+	}
+
+	idFields := []any{}
+	idRunner, ok := r.(ider)
+	if ok {
+		idFields = append(idFields, "input_id", idRunner.InputID())
+	}
+
+	return idFields
 }
 
 // Stop all runners
@@ -202,10 +218,11 @@ func (r *RunnerList) Stop() {
 
 		// Stop modules in parallel
 		go func(h uint64, run Runner) {
+			idFields := getRunnerID(run)
 			defer wg.Done()
-			r.logger.Debugf("Stopping runner: %s", run)
+			r.logger.Debugw(fmt.Sprintf("Stopping runner: %s", run), idFields...)
 			run.Stop()
-			r.logger.Debugf("Stopped runner: %s", run)
+			r.logger.Debugw(fmt.Sprintf("Stopped runner: %s", run), idFields...)
 		}(hash, runner)
 	}
 

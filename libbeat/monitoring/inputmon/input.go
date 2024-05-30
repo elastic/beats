@@ -60,14 +60,14 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	log := logp.NewLogger("metric_registry")
 	// Make an orthogonal ID to allow tracking register/deregister pairs.
 	uuid := uuid.New().String()
-	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
+	log.Infow("registering", "input_type", inputType, "input_id", id, "key", key, "uuid", uuid)
 
 	reg = parentRegistry.NewRegistry(key)
 	monitoring.NewString(reg, "input").Set(inputType)
 	monitoring.NewString(reg, "id").Set(id)
 
 	return reg, func() {
-		log.Infow("unregistering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
+		log.Infow("unregistering", "input_type", inputType, "input_id", id, "key", key, "uuid", uuid)
 		parentRegistry.Remove(key)
 	}
 }

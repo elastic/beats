@@ -92,12 +92,8 @@ func newScannerWatcher(paths []string, c *conf.C, id string) (loginp.FSWatcher, 
 		return nil, err
 	}
 
-	// logger := logp.NewLogger(watcherDebugKey).With("id", id)
-	// logger.Info("here")
-
 	return &fileWatcher{
-		// log:     logger,
-		log:     logp.NewLogger(watcherDebugKey).With("id", id),
+		log:     logp.NewLogger(watcherDebugKey).With("input_id", id),
 		cfg:     config,
 		prev:    make(map[string]loginp.FileDescriptor, 0),
 		scanner: scanner,
@@ -304,7 +300,7 @@ func newFileScanner(paths []string, config fileScannerConfig, id string) (*fileS
 	s := fileScanner{
 		paths:  paths,
 		cfg:    config,
-		log:    logp.NewLogger(scannerDebugKey).With("id", id),
+		log:    logp.NewLogger(scannerDebugKey).With("input_id", id),
 		hasher: sha256.New(),
 	}
 
