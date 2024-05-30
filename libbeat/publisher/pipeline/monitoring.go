@@ -18,8 +18,6 @@
 package pipeline
 
 import (
-	"math"
-
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -68,11 +66,6 @@ type metricsObserverVars struct {
 	events, filtered, published, failed *monitoring.Uint
 	dropped, retry                      *monitoring.Uint // (retryer) drop/retry counters
 	activeEvents                        *monitoring.Uint
-
-	// queue metrics
-	queueACKed       *monitoring.Uint
-	queueMaxEvents   *monitoring.Uint
-	percentQueueFull *monitoring.Float
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -93,8 +86,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			dropped:   monitoring.NewUint(reg, "events.dropped"),
 			retry:     monitoring.NewUint(reg, "events.retry"),
 
-			activeEvents:     monitoring.NewUint(reg, "events.active"), // Gauge
-			percentQueueFull: monitoring.NewFloat(reg, "queue.filled.pct.events"),
+			activeEvents: monitoring.NewUint(reg, "events.active"), // Gauge
 		},
 	}
 }
@@ -123,24 +115,12 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 func (o *metricsObserver) newEvent() {
 	o.vars.events.Inc()
 	o.vars.activeEvents.Inc()
-	o.setPercentageFull()
-}
-
-// setPercentageFull is used interally to set the `queue.full` metric
-func (o *metricsObserver) setPercentageFull() {
-	maxEvt := o.vars.queueMaxEvents.Get()
-	if maxEvt != 0 {
-		pct := float64(o.vars.activeEvents.Get()) / float64(maxEvt)
-		pctRound := math.Round(pct/0.0005) * 0.0005
-		o.vars.percentQueueFull.Set(pctRound)
-	}
 }
 
 // (client) event is filtered out (on purpose or failed)
 func (o *metricsObserver) filteredEvent() {
 	o.vars.filtered.Inc()
 	o.vars.activeEvents.Dec()
-	o.setPercentageFull()
 }
 
 // (client) managed to push an event into the publisher pipeline
@@ -151,14 +131,12 @@ func (o *metricsObserver) publishedEvent() {
 // (client) number of ACKed events from this client
 func (o *metricsObserver) eventsACKed(n int) {
 	o.vars.activeEvents.Sub(uint64(n))
-	o.setPercentageFull()
 }
 
 // (client) client closing down or DropIfFull is set
 func (o *metricsObserver) failedPublishEvent() {
 	o.vars.failed.Inc()
 	o.vars.activeEvents.Dec()
-	o.setPercentageFull()
 }
 
 //

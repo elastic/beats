@@ -226,6 +226,8 @@ func newQueue(
 	b.runLoop = newRunLoop(b)
 	b.ackLoop = newACKLoop(b)
 
+	observer.MaxEvents(settings.Events)
+
 	return b
 }
 
