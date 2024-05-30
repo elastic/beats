@@ -4,10 +4,10 @@
 
 syntax = "proto3";
 
-package cproto;
+package proto;
 
 option cc_enable_arenas = true;
-option go_package = "pkg/agent/control/cproto;cproto";
+option go_package = "pkg/agent/control/proto;proto";
 
 // Status codes for the current state.
 enum Status {
@@ -66,7 +66,7 @@ message UpgradeRequest {
   // If provided the upgrade process will use the provided sourceURI instead of the configured
   // sourceURI in the configuration.
   string sourceURI = 2;
-
+  
   // (Optional) Overrides predefined behavior for agent package verification.
   //
   // If provided Elastic Agent package is not checked for signature during upgrade.

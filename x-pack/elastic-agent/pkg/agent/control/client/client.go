@@ -13,27 +13,27 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/cproto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 )
 
 // Status is the status of the Elastic Agent
-type Status = cproto.Status
+type Status = proto.Status
 
 const (
 	// Starting is when the it is still starting.
-	Starting Status = cproto.Status_STARTING
+	Starting Status = proto.Status_STARTING
 	// Configuring is when it is configuring.
-	Configuring Status = cproto.Status_CONFIGURING
+	Configuring Status = proto.Status_CONFIGURING
 	// Healthy is when it is healthy.
-	Healthy Status = cproto.Status_HEALTHY
+	Healthy Status = proto.Status_HEALTHY
 	// Degraded is when it is degraded.
-	Degraded Status = cproto.Status_DEGRADED
+	Degraded Status = proto.Status_DEGRADED
 	// Failed is when it is failed.
-	Failed Status = cproto.Status_FAILED
+	Failed Status = proto.Status_FAILED
 	// Stopping is when it is stopping.
-	Stopping Status = cproto.Status_STOPPING
+	Stopping Status = proto.Status_STOPPING
 	// Upgrading is when it is upgrading.
-	Upgrading Status = cproto.Status_UPGRADING
+	Upgrading Status = proto.Status_UPGRADING
 )
 
 // Version is the current running version of the daemon.
@@ -102,7 +102,7 @@ type client struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
-	client cproto.ElasticAgentControlClient
+	client proto.ElasticAgentControlClient
 }
 
 // New creates a client connection to Elastic Agent.
@@ -117,7 +117,7 @@ func (c *client) Connect(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	c.client = cproto.NewElasticAgentControlClient(conn)
+	c.client = proto.NewElasticAgentControlClient(conn)
 	return nil
 }
 
@@ -133,7 +133,7 @@ func (c *client) Disconnect() {
 
 // Version returns the current version of the running agent.
 func (c *client) Version(ctx context.Context) (Version, error) {
-	res, err := c.client.Version(ctx, &cproto.Empty{})
+	res, err := c.client.Version(ctx, &proto.Empty{})
 	if err != nil {
 		return Version{}, err
 	}
@@ -151,7 +151,7 @@ func (c *client) Version(ctx context.Context) (Version, error) {
 
 // Status returns the current status of the running agent.
 func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
-	res, err := c.client.Status(ctx, &cproto.Empty{})
+	res, err := c.client.Status(ctx, &proto.Empty{})
 	if err != nil {
 		return nil, err
 	}
@@ -181,11 +181,11 @@ func (c *client) Status(ctx context.Context) (*AgentStatus, error) {
 
 // Restart triggers restarting the current running daemon.
 func (c *client) Restart(ctx context.Context) error {
-	res, err := c.client.Restart(ctx, &cproto.Empty{})
+	res, err := c.client.Restart(ctx, &proto.Empty{})
 	if err != nil {
 		return err
 	}
-	if res.Status == cproto.ActionStatus_FAILURE {
+	if res.Status == proto.ActionStatus_FAILURE {
 		return fmt.Errorf(res.Error)
 	}
 	return nil
@@ -193,7 +193,7 @@ func (c *client) Restart(ctx context.Context) error {
 
 // Upgrade triggers upgrade of the current running daemon.
 func (c *client) Upgrade(ctx context.Context, version string, sourceURI string, skipVerify bool, pgpBytes ...string) (string, error) {
-	res, err := c.client.Upgrade(ctx, &cproto.UpgradeRequest{
+	res, err := c.client.Upgrade(ctx, &proto.UpgradeRequest{
 		Version:    version,
 		SourceURI:  sourceURI,
 		SkipVerify: skipVerify,
@@ -202,7 +202,7 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string, 
 	if err != nil {
 		return "", err
 	}
-	if res.Status == cproto.ActionStatus_FAILURE {
+	if res.Status == proto.ActionStatus_FAILURE {
 		return "", fmt.Errorf(res.Error)
 	}
 	return res.Version, nil
@@ -210,7 +210,7 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string, 
 
 // ProcMeta gathers running beat metadata.
 func (c *client) ProcMeta(ctx context.Context) ([]ProcMeta, error) {
-	resp, err := c.client.ProcMeta(ctx, &cproto.Empty{})
+	resp, err := c.client.ProcMeta(ctx, &proto.Empty{})
 	if err != nil {
 		return nil, err
 	}
