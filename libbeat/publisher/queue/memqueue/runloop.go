@@ -306,16 +306,13 @@ func (l *runLoop) canFitPushRequest(req pushRequest) bool {
 }
 
 func (l *runLoop) maybeUnblockPushRequests() {
-	req, err := l.pendingPushRequests.First()
-	for err == nil {
+	for !l.pendingPushRequests.Empty() {
+		req := l.pendingPushRequests.First()
 		if !l.canFitPushRequest(req) {
 			break
 		}
 		l.doInsert(req)
 		l.pendingPushRequests.Remove()
-
-		// Fetch the next request
-		req, err = l.pendingPushRequests.First()
 	}
 }
 

@@ -45,13 +45,15 @@ func (f *FIFO[T]) Empty() bool {
 	return f.first == nil
 }
 
-// Return the first value (if present) without removing it from the queue
-func (f *FIFO[T]) First() (T, error) {
+// Return the first value (if present) without removing it from the queue.
+// Returns a default value if the queue is empty. To recognize this case,
+// check (*FIFO).Empty().
+func (f *FIFO[T]) First() T {
 	if f.first == nil {
 		var none T
-		return none, errFIFOEmpty
+		return none
 	}
-	return f.first.value, nil
+	return f.first.value
 }
 
 // Remove the first entry in the queue. Does nothing if the FIFO is empty.

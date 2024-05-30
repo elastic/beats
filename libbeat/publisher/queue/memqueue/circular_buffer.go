@@ -17,30 +17,6 @@
 
 package memqueue
 
-// the queue's underlying array buffer needs to coordinate concurrent
-// access by:
-//
-//				runLoop
-//				 - when a pushRequest is accepted, writes to the newly created entry index.
-//				 - when a producer is cancelled, reads and writes to entry indices that
-//				   have been created but not yet consumed, to discard events from that
-//				   producer.
-//				 - when entries are deleted (after consumed events have been
-//		      acknowledged), reads from the deleted entry indices.
-//			  - when a pushRequest requires resizing of the array, expands and/or
-//			    replaces the buffer.
-//
-//				the queue's consumer (in a live Beat this means queueReader in
-//				libbeat/publisher/pipeline/queue_reader.go) which reads from entry
-//				indices that have been consumed but not deleted via (*batch).Entry().
-//
-//	 ackLoop, which reads producer metadata from acknowledged entry
-//	 indices before they are deleted so acknowledgment callbacks can be
-//	 invoked.
-//
-// Most of these are not in conflict since they access disjoint array indices.
-// The exception is growing the circular buffer, which conflicts with read
-// access from batches of consumed events.
 type circularBuffer struct {
 	// Do not access this array directly! use (circularBuffer).entry().
 	_entries []queueEntry
