@@ -34,6 +34,7 @@ const QueueType = "disk"
 // of queue.Queue.
 type diskQueue struct {
 	logger   *logp.Logger
+	observer queue.Observer
 	settings Settings
 
 	// Metadata related to the segment files.
@@ -120,6 +121,7 @@ func NewQueue(
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
+	observer.MaxBytes(int(settings.MaxBufferSize))
 
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
@@ -193,10 +195,14 @@ func NewQueue(
 	//nolint:godox // Ignore This
 	// TODO: pass in a context that queues can use to report these events.
 	activeFrameCount := 0
+	activeByteCount := 0
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
+		activeByteCount += int(segment.byteCount)
 	}
 	activeFrameCount -= int(nextReadPosition.frameIndex)
+	activeByteCount -= int(nextReadPosition.byteIndex)
+	observer.Restore(activeFrameCount, activeByteCount)
 	logger.Infof("Found %d existing events on queue start", activeFrameCount)
 
 	var encoder queue.Encoder
@@ -206,6 +212,7 @@ func NewQueue(
 
 	queue := &diskQueue{
 		logger:   logger,
+		observer: observer,
 		settings: settings,
 
 		segments: diskQueueSegments{
