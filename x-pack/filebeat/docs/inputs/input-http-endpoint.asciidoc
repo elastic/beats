@@ -262,6 +262,7 @@ The secret stored in the header name specified by `secret.header`. Certain webho
 ==== `hmac.header`
 
 The name of the header that contains the HMAC signature: `X-Dropbox-Signature`, `X-Hub-Signature-256`, etc.
+HMAC signatures may be encoded as hex or base64.
 
 [float]
 ==== `hmac.key`
