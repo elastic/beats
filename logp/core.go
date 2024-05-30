@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"unsafe"
 
@@ -66,10 +67,13 @@ type coreLogger struct {
 type closerCore struct {
 	zapcore.Core
 	io.Closer
+	mutex sync.Mutex
 }
 
 func (c *closerCore) With(fields []zapcore.Field) zapcore.Core {
+	c.mutex.Lock()
 	c.Core = c.Core.With(fields)
+	c.mutex.Unlock()
 	return c
 }
 
