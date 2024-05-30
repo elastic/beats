@@ -47,7 +47,7 @@ func (dq *diskQueue) run() {
 			// After receiving new ACKs, a segment might be ready to delete.
 			dq.maybeDeleteACKed()
 
-		case <-dq.done:
+		case <-dq.close:
 			dq.handleShutdown()
 			return
 

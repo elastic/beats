@@ -37,7 +37,13 @@ type Entry interface{}
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
 type Queue interface {
+	// Close signals the queue to shut down, but it may keep handling requests
+	// and acknowledgments for events that are already in progress.
 	Close() error
+
+	// Done returns a channel that unblocks when the queue is closed and all
+	// its events are persisted or acknowledged.
+	Done() <-chan struct{}
 
 	QueueType() string
 	BufferConfig() BufferConfig

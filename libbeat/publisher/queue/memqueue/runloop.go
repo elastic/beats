@@ -57,6 +57,11 @@ type runLoop struct {
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
 
+	// closing is set when a close request is received. Once closing is true,
+	// the queue will not accept any new events, but will continue responding
+	// to Gets and Acks to allow pending events to complete on shutdown.
+	closing bool
+
 	// TODO (https://github.com/elastic/beats/issues/37893): entry IDs were a
 	// workaround for an external project that no longer exists. At this point
 	// they just complicate the API and should be removed.
@@ -90,8 +95,8 @@ func (l *runLoop) run() {
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
 	var pushChan chan pushRequest
-	// Push requests are enabled if the queue isn't yet full.
-	if l.eventCount < len(l.broker.buf) {
+	// Push requests are enabled if the queue isn't full or closing.
+	if l.eventCount < len(l.broker.buf) && !l.closing {
 		pushChan = l.broker.pushChan
 	}
 
@@ -116,7 +121,13 @@ func (l *runLoop) runIteration() {
 	}
 
 	select {
+	case <-l.broker.closeChan:
+		l.closing = true
+		// Get requests are handled immediately during shutdown
+		l.maybeUnblockGetRequest()
+
 	case <-l.broker.ctx.Done():
+		// The queue is fully shut down, do nothing
 		return
 
 	case req := <-pushChan: // producer pushing new event
@@ -154,8 +165,8 @@ func (l *runLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
-	if l.broker.settings.FlushTimeout <= 0 {
-		// Never block if the flush timeout isn't positive
+	if l.broker.settings.FlushTimeout <= 0 || l.closing {
+		// Never block if the flush timeout isn't positive, or during shutdown
 		return false
 	}
 	eventsAvailable := l.eventCount - l.consumedCount
@@ -198,6 +209,10 @@ func (l *runLoop) handleDelete(count int) {
 	l.eventCount -= count
 	l.consumedCount -= count
 	l.broker.observer.RemoveEvents(count, byteCount)
+	if l.closing && l.eventCount == 0 {
+		// Our last events were acknowledged during shutdown, signal final shutdown
+		l.broker.ctxCancel()
+	}
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
@@ -217,8 +232,7 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	// If a get request is blocked waiting for more events, check if
 	// we should unblock it.
 	if getRequest := l.pendingGetRequest; getRequest != nil {
-		available := l.eventCount - l.consumedCount
-		if available >= getRequest.entryCount {
+		if !l.getRequestShouldBlock(getRequest) {
 			l.pendingGetRequest = nil
 			if !l.getTimer.Stop() {
 				<-l.getTimer.C

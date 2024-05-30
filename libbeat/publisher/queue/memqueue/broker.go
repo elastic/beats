@@ -65,6 +65,9 @@ type broker struct {
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
+	// Close triggers a queue close by sending to closeChan.
+	closeChan chan struct{}
+
 	///////////////////////////
 	// internal channels
 
@@ -212,8 +215,9 @@ func newQueue(
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan: make(chan pushRequest, chanSize),
-		getChan:  make(chan getRequest),
+		pushChan:  make(chan pushRequest, chanSize),
+		getChan:   make(chan getRequest),
+		closeChan: make(chan struct{}),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
@@ -232,8 +236,12 @@ func newQueue(
 }
 
 func (b *broker) Close() error {
-	b.ctxCancel()
+	b.closeChan <- struct{}{}
 	return nil
+}
+
+func (b *broker) Done() <-chan struct{} {
+	return b.ctx.Done()
 }
 
 func (b *broker) QueueType() string {

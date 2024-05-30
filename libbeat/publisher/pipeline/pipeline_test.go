@@ -132,6 +132,10 @@ func (q *testQueue) Close() error {
 	return nil
 }
 
+func (q *testQueue) Done() <-chan struct{} {
+	return nil
+}
+
 func (q *testQueue) QueueType() string {
 	return "test"
 }

@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -48,10 +47,6 @@ type diskQueue struct {
 	readerLoop  *readerLoop
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
-
-	// Wait group for shutdown of the goroutines associated with this queue:
-	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
-	waitGroup sync.WaitGroup
 
 	// writing is true if the writer loop is processing a request, false
 	// otherwise.
@@ -84,7 +79,12 @@ type diskQueue struct {
 	// waiting for free space in the queue.
 	blockedProducers []producerWriteRequest
 
-	// The channel to signal our goroutines to shut down.
+	// The channel to signal our goroutines to shut down, used by
+	// (*diskQueue).Close.
+	close chan struct{}
+
+	// The channel to report that shutdown is finished, used by
+	// (*diskQueue).Done.
 	done chan struct{}
 }
 
@@ -228,30 +228,15 @@ func NewQueue(
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
 
-		done: make(chan struct{}),
+		close: make(chan struct{}),
+		done:  make(chan struct{}),
 	}
 
-	// We wait for four goroutines on shutdown: core loop, reader loop,
-	// writer loop, deleter loop.
-	queue.waitGroup.Add(4)
-
 	// Start the goroutines and return the queue!
-	go func() {
-		queue.readerLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.writerLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.deleterLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.run()
-		queue.waitGroup.Done()
-	}()
+	go queue.readerLoop.run()
+	go queue.writerLoop.run()
+	go queue.deleterLoop.run()
+	go queue.run()
 
 	return queue, nil
 }
@@ -263,10 +248,13 @@ func NewQueue(
 func (dq *diskQueue) Close() error {
 	// Closing the done channel signals to the core loop that it should
 	// shut down the other helper goroutines and wrap everything up.
-	close(dq.done)
-	dq.waitGroup.Wait()
+	close(dq.close)
 
 	return nil
+}
+
+func (dq *diskQueue) Done() <-chan struct{} {
+	return dq.done
 }
 
 func (dq *diskQueue) QueueType() string {

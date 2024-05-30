@@ -166,13 +166,8 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.waitCloseTimeout > 0 {
-		// TODO (hi fae): delay up to the specified timeout waiting for the queue
-		// to empty.
-	}
-
 	// Note: active clients are not closed / disconnected.
-	p.outputController.Close()
+	p.outputController.WaitClose(p.waitCloseTimeout)
 
 	p.observer.cleanup()
 	return nil
