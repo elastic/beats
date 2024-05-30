@@ -2,8 +2,6 @@
 name: "beats-xpack-osquerybeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -27,8 +25,9 @@ env:
 steps:
   - group: "x-pack/osquerybeat Mandatory Tests"
     key: "x-pack-osquerybeat-mandatory-tests"
+
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/osquerybeat Linux x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/osquerybeat
@@ -45,9 +44,9 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Ubuntu Unit Tests"
+              context: "x-pack/osquerybeat: Linux x86_64 Unit Tests"
 
-      - label: ":go: Go Integration Tests"
+      - label: ":ubuntu: x-pack/osquerybeat Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/osquerybeat
@@ -66,7 +65,7 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Go Integration Tests"
 
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: x-pack/osquerybeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -85,9 +84,9 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 2016 Unit Tests"
+              context: "x-pack/osquerybeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
+      - label: ":windows: x-pack/osquerybeat Win-2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -106,13 +105,14 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 2022 Unit Tests"
+              context: "x-pack/osquerybeat: Win-2022 Unit Tests"
 
   - group: "x-pack/osquerybeat Extended Windows Tests"
     key: "x-pack-osquerybeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
-      - label: ":windows: Windows 10 Unit Tests"
+      - label: ":windows: x-pack/osquerybeat Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -131,9 +131,9 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 10 Unit Tests"
+              context: "x-pack/osquerybeat: Win 10 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: x-pack/osquerybeat Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -152,9 +152,9 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 11 Unit Tests"
+              context: "x-pack/osquerybeat: Win 11 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: x-pack/osquerybeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -178,8 +178,9 @@ steps:
   - group: "x-pack/osquerybeat Extended Tests"
     key: "x-pack-osquerybeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+
     steps:
-      - label: ":mac: MacOS x86_64 Unit Tests"
+      - label: ":mac: x-pack/osquerybeat macOS x86_64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -195,9 +196,9 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: MacOS x86_64 Unit Tests"
+              context: "x-pack/osquerybeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: MacOS arm64 Unit Tests"
+      - label: ":mac: x-pack/osquerybeat macOS arm64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -213,7 +214,7 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: MacOS arm64 Unit Tests"
+              context: "x-pack/osquerybeat: macOS arm64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -226,7 +227,7 @@ steps:
   - group: "x-pack/osquerybeat Packaging"
     key: "x-pack-querybeat-packaging"
     steps:
-      - label: ":linux: Packaging Linux"
+      - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
         command: |
           .buildkite/scripts/install-msitools.sh
@@ -247,4 +248,3 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Packaging Linux"
-      # no packaging arm step since there wasn't one on Jenkins, see https://github.com/elastic/beats/blob/0f118b18d36ce1627af73104c98b109e5d5f91f4/x-pack/osquerybeat/Jenkinsfile.yml#L93
