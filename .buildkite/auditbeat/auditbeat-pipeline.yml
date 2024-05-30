@@ -4,17 +4,9 @@ name: "beats-auditbeat"
 env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  IMAGE_UBUNTU_1804_X86_64: "family/platform-ingest-beats-ubuntu-1804"
   IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
   IMAGE_UBUNTU_2204_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
-  IMAGE_DEBIAN_10: "family/platform-ingest-beats-debian-10"
-  IMAGE_DEBIAN_12: "family/platform-ingest-beats-debian-12"
-  IMAGE_CENTOS_7: "family/platform-ingest-beats-centos-7"
-  IMAGE_RHEL_8: "family/platform-ingest-beats-rhel-8"
   IMAGE_RHEL_9: "family/platform-ingest-beats-rhel-9"
-  IMAGE_SLES_12: "family/platform-ingest-beats-sles-12"
-  IMAGE_SLES_15: "family/platform-ingest-beats-sles-15"
 
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -24,10 +16,8 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_AMZN_2_ARM64: "platform-ingest-beats-amazonlinux-2-aarch64"
   AWS_IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
   AWS_IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  AWS_IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
 
   IMAGE_MACOS_ARM64: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
@@ -166,17 +156,9 @@ steps:
         matrix:
           setup:
             image:
-              - "${IMAGE_UBUNTU_1804_X86_64}"
               - "${IMAGE_UBUNTU_2004_X86_64}"
               - "${IMAGE_UBUNTU_2204_X86_64}"
-              - "${IMAGE_UBUNTU_2404_X86_64}"
-              - "${IMAGE_DEBIAN_10}"
-              - "${IMAGE_DEBIAN_12}"
-              - "${IMAGE_CENTOS_7}"
-              - "${IMAGE_RHEL_8}"
               - "${IMAGE_RHEL_9}"
-              - "${IMAGE_SLES_12}"
-              - "${IMAGE_SLES_15}"
 
       - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
@@ -202,10 +184,8 @@ steps:
         matrix:
           setup:
             image:
-              - "${AWS_IMAGE_AMZN_2_ARM64}"
               - "${AWS_IMAGE_UBUNTU_2004_ARM64}"
               - "${AWS_IMAGE_UBUNTU_2204_ARM64}"
-              - "${AWS_IMAGE_UBUNTU_2404_ARM64}"
 
       - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
