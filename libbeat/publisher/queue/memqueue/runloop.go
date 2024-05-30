@@ -96,7 +96,7 @@ func newRunLoop(broker *broker) *runLoop {
 	}
 
 	eventBufSize := broker.settings.Events
-	if eventBufSize <= 0 {
+	if broker.useByteLimits() {
 		// The queue is using byte limits, start with a buffer of 2^10 and
 		// we will expand it as needed.
 		eventBufSize = 1 << 10
@@ -212,9 +212,9 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 // Respond to the given get request without blocking or waiting for more events
 func (l *runLoop) handleGetReply(req *getRequest) {
 	entriesAvailable := l.eventCount - l.consumedEventCount
-	// backwards compatibility: if all byte bounds are <= 0 then batch size
+	// backwards compatibility: when using event-based limits, batch size
 	// can't be more than settings.MaxGetRequest.
-	if req.byteCount <= 0 && l.broker.settings.Bytes <= 0 {
+	if l.broker.useByteLimits() {
 		if entriesAvailable > l.broker.settings.MaxGetRequest {
 			entriesAvailable = l.broker.settings.MaxGetRequest
 		}
@@ -343,10 +343,9 @@ func (l *runLoop) growEventBuffer() {
 // Insert the given new event without bounds checks, and report the result
 // to the caller via the push request's response channel.
 func (l *runLoop) doInsert(req pushRequest) {
-	maxEvents := l.broker.settings.Events
-	// If there is no event limit, check if we need to grow the current queue
-	// buffer to fit the new event.
-	if maxEvents <= 0 && l.eventCount >= l.buf.size() {
+	// If using byte limits (no hard limit on event count), check if we need to
+	// grow the current queue buffer to fit the new event.
+	if l.broker.useByteLimits() && l.eventCount >= l.buf.size() {
 		l.growEventBuffer()
 	}
 

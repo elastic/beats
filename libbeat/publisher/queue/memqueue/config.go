@@ -41,16 +41,17 @@ type config struct {
 
 const minQueueBytes = 32768
 const minQueueEvents = 32
+const defaultMaxQueueEvents = 3200
 
 func (c *config) Validate() error {
 	if c.Bytes != nil && *c.Bytes < minQueueBytes {
-		return errors.New(fmt.Sprintf("queue byte size must be at least %v", minQueueBytes))
+		return fmt.Errorf("queue byte size must be at least %v", minQueueBytes)
 	}
 	if c.Events != nil && *c.Events < minQueueEvents {
-		return errors.New(fmt.Sprintf("queue event size must be at least %v", minQueueEvents))
+		return fmt.Errorf("queue event size must be at least %v", minQueueEvents)
 	}
-	if c.Events == nil && c.Bytes == nil {
-		return errors.New("queue must have an event limit or a byte limit")
+	if c.Events != nil && c.Bytes != nil {
+		return errors.New("memory queue can only have an event limit or a byte limit, not both")
 	}
 	if c.Events != nil && c.MaxGetEvents > *c.Events {
 		return errors.New("flush.min_events must be less than events")
@@ -66,7 +67,7 @@ var defaultConfig = config{
 // SettingsForUserConfig unpacks a ucfg config from a Beats queue
 // configuration and returns the equivalent memqueue.Settings object.
 func SettingsForUserConfig(cfg *c.C) (Settings, error) {
-	var config config
+	config := defaultConfig
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {
 			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
@@ -76,6 +77,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 		MaxGetRequest: config.MaxGetEvents,
 		FlushTimeout:  config.FlushTimeout,
 	}
+
 	if config.Events != nil {
 		result.Events = *config.Events
 	}
@@ -84,7 +86,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 	}
 	// If no size constraint was given, fall back on the default event cap
 	if config.Events == nil && config.Bytes == nil {
-		result.Events = 3200
+		result.Events = defaultMaxQueueEvents
 	}
 	return result, nil
 }
