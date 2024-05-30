@@ -142,7 +142,7 @@ steps:
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
     steps:
-      - label: ":linux: Auditbeat Linux x86_64 Integration Tests -- {{image}}"
+      - label: ":linux: Auditbeat Linux x86_64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -155,7 +155,7 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "{{image}}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -178,7 +178,7 @@ steps:
               - "${IMAGE_SLES_12}"
               - "${IMAGE_SLES_15}"
 
-      - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{image}}"
+      - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -191,7 +191,7 @@ steps:
             - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "{{image}}"
+          imagePrefix: "{{matrix.image}}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
