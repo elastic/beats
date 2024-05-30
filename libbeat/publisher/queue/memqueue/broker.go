@@ -46,9 +46,6 @@ type broker struct {
 	ctx       context.Context
 	ctxCancel context.CancelFunc
 
-	// wait group for queue workers (runLoop and ackLoop)
-	wg sync.WaitGroup
-
 	// The factory used to create an event encoder when creating a producer
 	encoderFactory queue.EncoderFactory
 
@@ -168,15 +165,8 @@ func NewQueue(
 	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
-	b.wg.Add(2)
-	go func() {
-		defer b.wg.Done()
-		b.runLoop.run()
-	}()
-	go func() {
-		defer b.wg.Done()
-		b.ackLoop.run()
-	}()
+	go b.runLoop.run()
+	go b.ackLoop.run()
 
 	return b
 }
@@ -281,6 +271,10 @@ func (b *broker) Get(count int, bytes int) (queue.Batch, error) {
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	return resp, nil
+}
+
+func (b *broker) useByteLimits() bool {
+	return b.settings.Bytes > 0
 }
 
 var batchPool = sync.Pool{

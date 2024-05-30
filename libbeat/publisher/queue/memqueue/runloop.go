@@ -177,9 +177,9 @@ func (l *runLoop) runIteration() {
 }
 
 func (l *runLoop) handleGetRequest(req *getRequest) {
-	// Backwards compatibility: if all byte parameters are <= 0, get requests
+	// Backwards compatibility: when using event-based limits, get requests
 	// are capped by settings.MaxGetRequest.
-	if req.byteCount <= 0 && l.broker.settings.Bytes <= 0 {
+	if !l.broker.useByteLimits() {
 		if req.entryCount > l.broker.settings.MaxGetRequest {
 			req.entryCount = l.broker.settings.MaxGetRequest
 		}
@@ -198,17 +198,15 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 		// Never block if the flush timeout isn't positive, or during shutdown
 		return false
 	}
-	availableEntries := l.eventCount - l.consumedEventCount
-	availableBytes := l.byteCount - l.consumedByteCount
 
 	// The entry/byte limits are satisfied if they are <= 0 (indicating no
 	// limit) or if we have at least the requested number available.
-	entriesSatisfied := req.entryCount <= 0 || availableEntries >= req.entryCount
-	bytesSatisfied := req.byteCount <= 0 || availableBytes >= req.byteCount
-
-	// Block if there are neither enough entries nor enough bytes to fill
-	// the request.
-	return !entriesSatisfied && !bytesSatisfied
+	if l.broker.useByteLimits() {
+		availableBytes := l.byteCount - l.consumedByteCount
+		return req.byteCount <= 0 || availableBytes >= req.byteCount
+	}
+	availableEntries := l.eventCount - l.consumedEventCount
+	return req.entryCount <= 0 || availableEntries >= req.entryCount
 }
 
 // Respond to the given get request without blocking or waiting for more events
@@ -297,18 +295,14 @@ func (l *runLoop) handlePushRequest(req pushRequest) {
 }
 
 // Returns true if the given push request can be added to the queue
-// without exceeding entry count or byte limits
+// without exceeding the entry count or byte limit.
 func (l *runLoop) canFitPushRequest(req pushRequest) bool {
-	maxEvents := l.broker.settings.Events
-	maxBytes := l.broker.settings.Bytes
-
+	if l.broker.useByteLimits() {
+		newByteCount := l.byteCount + req.eventSize
+		return newByteCount <= l.broker.settings.Bytes
+	}
 	newEventCount := l.eventCount + 1
-	newByteCount := l.byteCount + req.eventSize
-
-	eventCountFits := maxEvents <= 0 || newEventCount <= maxEvents
-	byteCountFits := maxBytes <= 0 || newByteCount <= maxBytes
-
-	return eventCountFits && byteCountFits
+	return newEventCount <= l.broker.settings.Events
 }
 
 func (l *runLoop) maybeUnblockPushRequests() {
