@@ -169,6 +169,15 @@ func NewQueue(
 		lastID := initialSegments[len(initialSegments)-1].id
 		nextSegmentID = lastID + 1
 	}
+	// Check the initial contents to report to the metrics observer.
+	initialEventCount := 0
+	initialByteCount := 0
+	for _, segment := range initialSegments {
+		initialEventCount += int(segment.frameCount)
+		// Event metrics for the queue observer don't include segment headser size
+		initialByteCount += int(segment.byteCount - segment.headerSize())
+	}
+	observer.Restore(initialEventCount, initialByteCount)
 
 	// If any of the initial segments are older than the current queue
 	// position, move them directly to the acked list where they can be
@@ -186,24 +195,13 @@ func NewQueue(
 		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
 	}
 
-	// We can compute the active frames right now but still need a way to report
-	// them to the global beat metrics. For now, just log the total.
-	// Note that for consistency with existing queue behavior, this excludes
-	// events that are still present on disk but were already sent and
-	// acknowledged on a previous run (we probably want to track these as well
-	// in the future.)
-	//nolint:godox // Ignore This
-	// TODO: pass in a context that queues can use to report these events.
+	// Count just the active events to report in the log
 	activeFrameCount := 0
-	activeByteCount := 0
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
-		activeByteCount += int(segment.byteCount)
 	}
 	activeFrameCount -= int(nextReadPosition.frameIndex)
-	activeByteCount -= int(nextReadPosition.byteIndex)
-	observer.Restore(activeFrameCount, activeByteCount)
-	logger.Infof("Found %d existing events on queue start", activeFrameCount)
+	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
 
 	var encoder queue.Encoder
 	if encoderFactory != nil {
