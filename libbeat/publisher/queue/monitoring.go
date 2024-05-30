@@ -52,6 +52,13 @@ type queueObserver struct {
 	filledEvents *monitoring.Uint  // gauge
 	filledBytes  *monitoring.Uint  // gauge
 	filledPct    *monitoring.Float // gauge
+
+	// backwards compatibility: the metric "acked" is the old name for
+	// "removed.events". Ideally we would like to define an alias in the
+	// monitoring API, but until that's possible we shadow it with this
+	// extra variable and make sure to always change removedEvents and
+	// acked at the same time.
+	acked *monitoring.Uint
 }
 
 type nilObserver struct{}
@@ -84,13 +91,10 @@ func NewQueueObserver(metrics *monitoring.Registry) Observer {
 		filledEvents: monitoring.NewUint(queueMetrics, "filled.events"), // gauge
 		filledBytes:  monitoring.NewUint(queueMetrics, "filled.bytes"),  // gauge
 		filledPct:    monitoring.NewFloat(queueMetrics, "filled.pct"),   // gauge
-	}
 
-	// Backwards compatibility: "queue.acked" represents the same value as
-	// "queue.removed.events", when the queue had no other metrics variables
-	// and didn't support byte measurements. We keep a copy of it under the
-	// old name to avoid breaking dashboards that used it.
-	monitoring.AliasVar(queueMetrics, "removed.events", "acked")
+		// backwards compatibility: "acked" is an alias for "removed.events".
+		acked: monitoring.NewUint(queueMetrics, "acked"),
+	}
 	return ob
 }
 
@@ -124,6 +128,7 @@ func (ob *queueObserver) ConsumeEvents(eventCount int, byteCount int) {
 
 func (ob *queueObserver) RemoveEvents(eventCount int, byteCount int) {
 	ob.removedEvents.Add(uint64(eventCount))
+	ob.acked.Add(uint64(eventCount))
 	ob.removedBytes.Add(uint64(byteCount))
 
 	ob.filledEvents.Sub(uint64(eventCount))
