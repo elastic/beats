@@ -64,6 +64,7 @@ func TestDevices(t *testing.T) {
 		expected = append(expected, fmt.Sprintf("%d:%s:%s", ifc.Index, ifc.Name, ifc.Flags))
 	}
 	t.Log("Expect interfaces:\n", expected)
+	t.Log("Actual interfaces:\n", stdout)
 
 	for _, ifc := range ifcs {
 		assert.Contains(t, stdout, ifc.Name)
