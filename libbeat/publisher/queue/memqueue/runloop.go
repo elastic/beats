@@ -133,9 +133,6 @@ func (l *runLoop) runIteration() {
 	case count := <-l.broker.deleteChan:
 		l.handleDelete(count)
 
-	case req := <-l.broker.metricChan: // asking broker for queue metrics
-		l.handleMetricsRequest(&req)
-
 	case <-timeoutChan:
 		// The get timer has expired, handle the blocked request
 		l.getTimer.Stop()
@@ -223,22 +220,9 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
 		event:      req.event,
+		eventSize:  req.eventSize,
 		id:         id,
 		producer:   req.producer,
 		producerID: req.producerID,
-	}
-}
-
-func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
-	oldestEntryID := l.nextEntryID
-	if l.eventCount > 0 {
-		index := l.bufPos % len(l.broker.buf)
-		oldestEntryID = l.broker.buf[index].id
-	}
-
-	req.responseChan <- memQueueMetrics{
-		currentQueueSize: l.eventCount,
-		occupiedRead:     l.consumedCount,
-		oldestEntryID:    oldestEntryID,
 	}
 }

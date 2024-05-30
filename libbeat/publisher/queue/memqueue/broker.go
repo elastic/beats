@@ -65,10 +65,6 @@ type broker struct {
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
-	// Metrics() sends requests to metricChan to expose internal queue
-	// metrics to external callers.
-	metricChan chan metricsRequest
-
 	///////////////////////////
 	// internal channels
 
@@ -109,8 +105,9 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event queue.Entry
-	id    queue.EntryID
+	event     queue.Entry
+	eventSize int
+	id        queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -215,9 +212,8 @@ func newQueue(
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, chanSize),
-		getChan:    make(chan getRequest),
-		metricChan: make(chan metricsRequest),
+		pushChan: make(chan pushRequest, chanSize),
+		getChan:  make(chan getRequest),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
