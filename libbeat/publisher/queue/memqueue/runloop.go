@@ -134,7 +134,7 @@ func (l *runLoop) runIteration() {
 	var consumedChan chan batchList
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.
-	if !l.consumedBatches.empty() {
+	if !l.consumedBatches.Empty() {
 		consumedChan = l.broker.consumedChan
 	}
 
@@ -244,7 +244,7 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 
 	// Send the batch to the caller and update internal state
 	req.responseChan <- batch
-	l.consumedBatches.append(batch)
+	l.consumedBatches.Add(batch)
 	l.consumedEventCount += batchEntryCount
 	l.consumedByteCount += batchByteCount
 	l.broker.observer.ConsumeEvents(batchEntryCount, batchByteCount)

@@ -53,7 +53,7 @@ type getRequest struct {
 	byteCount int
 
 	// The channel to send the new batch to.
-	responseChan chan *batch
+	responseChan chan batch
 }
 
 type batchDoneMsg struct{}

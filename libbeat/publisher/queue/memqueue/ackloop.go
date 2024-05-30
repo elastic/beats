@@ -37,7 +37,10 @@ func newACKLoop(broker *broker) *ackLoop {
 func (l *ackLoop) run() {
 	b := l.broker
 	for {
-		nextBatchChan := l.pendingBatches.nextBatchChannel()
+		var nextBatchChan chan batchDoneMsg
+		if !l.pendingBatches.Empty() {
+			nextBatchChan = l.pendingBatches.First().doneChan
+		}
 
 		select {
 		case <-b.ctx.Done():
@@ -46,7 +49,7 @@ func (l *ackLoop) run() {
 
 		case chanList := <-b.consumedChan:
 			// New batches have been generated, add them to the pending list
-			l.pendingBatches.concat(&chanList)
+			l.pendingBatches.Concat(chanList)
 
 		case <-nextBatchChan:
 			// The oldest outstanding batch has been acknowledged, advance our
@@ -58,43 +61,30 @@ func (l *ackLoop) run() {
 
 // handleBatchSig collects and handles a batch ACK/Cancel signal. handleBatchSig
 // is run by the ackLoop.
-func (l *ackLoop) handleBatchSig() int {
+func (l *ackLoop) handleBatchSig() {
 	ackedBatches := l.collectAcked()
 
-	count := 0
-	for batch := ackedBatches.front(); batch != nil; batch = batch.next {
-		count += batch.count
-	}
-
-	if count > 0 {
+	if !ackedBatches.Empty() {
 		// report acks to waiting clients
-		l.processACK(ackedBatches, count)
+		l.processACK(ackedBatches)
 	}
-
-	for !ackedBatches.empty() {
-		// Release finished batch structs into the shared memory pool
-		releaseBatch(ackedBatches.pop())
-	}
-
-	// return final ACK to EventLoop, in order to clean up internal buffer
-	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
-
-	l.broker.logger.Debug("ackloop:  done send ack")
-	return count
 }
 
 func (l *ackLoop) collectAcked() batchList {
 	ackedBatches := batchList{}
 
-	acks := l.pendingBatches.pop()
-	ackedBatches.append(acks)
+	// The first batch is always included, since that's what triggered the call
+	// to collectAcked.
+	nextBatch := l.pendingBatches.ConsumeFirst()
+	ackedBatches.Add(nextBatch)
 
 	done := false
-	for !l.pendingBatches.empty() && !done {
-		acks := l.pendingBatches.front()
+	for !l.pendingBatches.Empty() && !done {
+		nextBatch = l.pendingBatches.First()
 		select {
-		case <-acks.doneChan:
-			ackedBatches.append(l.pendingBatches.pop())
+		case <-nextBatch.doneChan:
+			ackedBatches.Add(nextBatch)
+			l.pendingBatches.Remove()
 
 		default:
 			done = true
@@ -107,16 +97,22 @@ func (l *ackLoop) collectAcked() batchList {
 // Called by ackLoop. This function exists to decouple the work of collecting
 // and running producer callbacks from logical deletion of the events, so
 // input callbacks can't block the queue by occupying the runLoop goroutine.
-func (l *ackLoop) processACK(lst batchList, N int) {
+func (l *ackLoop) processACK(lst batchList) {
 	ackCallbacks := []func(){}
+	batches := []batch{}
+	for !lst.Empty() {
+		batches = append(batches, lst.First())
+		lst.Remove()
+	}
 	// First we traverse the entries we're about to remove, collecting any callbacks
 	// we need to run.
-	lst.reverse()
-	for !lst.empty() {
-		batch := lst.pop()
+	// Traverse entries from last to first, so we can acknowledge the most recent
+	// ones first and skip repeated producer callbacks.
+	eventCount := 0
+	for batchIndex := len(batches) - 1; batchIndex >= 0; batchIndex-- {
+		batch := batches[batchIndex]
+		eventCount += batch.count
 
-		// Traverse entries from last to first, so we can acknowledge the most recent
-		// ones first and skip subsequent producer callbacks.
 		for i := batch.count - 1; i >= 0; i-- {
 			entry := batch.entry(i)
 			if entry.producer == nil {
@@ -136,7 +132,8 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 		}
 	}
 	// Signal runLoop to delete the events
-	l.broker.deleteChan <- N
+	l.broker.deleteChan <- eventCount
+	l.broker.logger.Debug("ackloop: return ack to broker loop:", eventCount)
 
 	// The events have been removed; notify their listeners.
 	for _, f := range ackCallbacks {

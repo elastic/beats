@@ -56,6 +56,27 @@ func (f *FIFO[T]) First() T {
 	return f.first.value
 }
 
+// Remove the first entry in this FIFO and return it.
+func (f *FIFO[T]) ConsumeFirst() T {
+	result := f.First()
+	f.Remove()
+	return result
+}
+
+// Append another FIFO queue to an existing one. Takes ownership of
+// the given FIFO's contents.
+func (f *FIFO[T]) Concat(list FIFO[T]) {
+	if list.Empty() {
+		return
+	}
+	if f.Empty() {
+		*f = list
+		return
+	}
+	f.last.next = list.first
+	f.last = list.last
+}
+
 // Remove the first entry in the queue. Does nothing if the FIFO is empty.
 func (f *FIFO[T]) Remove() {
 	if f.first != nil {

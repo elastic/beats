@@ -20,9 +20,9 @@ package memqueue
 import (
 	"context"
 	"io"
-	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/fifo"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -117,9 +117,6 @@ type batch struct {
 	// to be valid).
 	queueBuf circularBuffer
 
-	// Next batch in the containing batchList
-	next *batch
-
 	// Position of the batch's events within the queue. This is an absolute
 	// index over the lifetime of the queue, to get the position within the
 	// queue's current circular buffer, use (start % len(queue.buf)).
@@ -133,10 +130,7 @@ type batch struct {
 	doneChan chan batchDoneMsg
 }
 
-type batchList struct {
-	head *batch
-	tail *batch
-}
+type batchList = fifo.FIFO[batch]
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
 // Settings object can be wrapped in a queue-agnostic interface for
@@ -260,7 +254,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (b *broker) Get(count int, bytes int) (queue.Batch, error) {
-	responseChan := make(chan *batch, 1)
+	responseChan := make(chan batch, 1)
 	select {
 	case <-b.ctx.Done():
 		return nil, io.EOF
@@ -277,93 +271,12 @@ func (b *broker) useByteLimits() bool {
 	return b.settings.Bytes > 0
 }
 
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return &batch{
-			doneChan: make(chan batchDoneMsg, 1),
-		}
-	},
-}
-
-func newBatch(queueBuf circularBuffer, start entryIndex, count int) *batch {
-	batch := batchPool.Get().(*batch)
-	batch.next = nil
-	batch.queueBuf = queueBuf
-	batch.start = start
-	batch.count = count
-	return batch
-}
-
-func releaseBatch(b *batch) {
-	b.next = nil
-	batchPool.Put(b)
-}
-
-func (l *batchList) prepend(b *batch) {
-	b.next = l.head
-	l.head = b
-	if l.tail == nil {
-		l.tail = b
-	}
-}
-
-func (l *batchList) concat(other *batchList) {
-	if other.head == nil {
-		return
-	}
-
-	if l.head == nil {
-		*l = *other
-		return
-	}
-
-	l.tail.next = other.head
-	l.tail = other.tail
-}
-
-func (l *batchList) append(b *batch) {
-	if l.head == nil {
-		l.head = b
-	} else {
-		l.tail.next = b
-	}
-	l.tail = b
-}
-
-func (l *batchList) empty() bool {
-	return l.head == nil
-}
-
-func (l *batchList) front() *batch {
-	return l.head
-}
-
-func (l *batchList) nextBatchChannel() chan batchDoneMsg {
-	if l.head == nil {
-		return nil
-	}
-	return l.head.doneChan
-}
-
-func (l *batchList) pop() *batch {
-	ch := l.head
-	if ch != nil {
-		l.head = ch.next
-		if l.head == nil {
-			l.tail = nil
-		}
-	}
-
-	ch.next = nil
-	return ch
-}
-
-func (l *batchList) reverse() {
-	tmp := *l
-	*l = batchList{}
-
-	for !tmp.empty() {
-		l.prepend(tmp.pop())
+func newBatch(queueBuf circularBuffer, start entryIndex, count int) batch {
+	return batch{
+		doneChan: make(chan batchDoneMsg, 1),
+		queueBuf: queueBuf,
+		start:    start,
+		count:    count,
 	}
 }
 
@@ -379,25 +292,21 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 	return actual
 }
 
-func (b *batch) Count() int {
+func (b batch) Count() int {
 	return b.count
 }
 
-func (ei entryIndex) inBuffer(buf []queueEntry) *queueEntry {
-	return &buf[int(ei)%len(buf)]
-}
-
 // Return a pointer to the queueEntry for the i-th element of this batch
-func (b *batch) entry(i int) *queueEntry {
+func (b batch) entry(i int) *queueEntry {
 	entryIndex := b.start.plus(i)
 	return b.queueBuf.entry(entryIndex)
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) queue.Entry {
+func (b batch) Entry(i int) queue.Entry {
 	return b.entry(i).event
 }
 
-func (b *batch) Done() {
+func (b batch) Done() {
 	b.doneChan <- batchDoneMsg{}
 }
