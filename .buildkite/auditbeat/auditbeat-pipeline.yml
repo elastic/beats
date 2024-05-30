@@ -5,10 +5,10 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  IMAGE_UBUNTU_1804_X86_64: "family/core-ubuntu-1804"
-  IMAGE_UBUNTU_2004_X86_64: "family/core-ubuntu-2004"
-  IMAGE_UBUNTU_2204_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_2404_X86_64: "family/core-ubuntu-2404"
+  IMAGE_UBUNTU_1804_X86_64: "family/platform-ingest-beats-ubuntu-1804"
+  IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
+  IMAGE_UBUNTU_2204_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
   IMAGE_DEBIAN_10: "family/platform-ingest-beats-debian-10"
   IMAGE_DEBIAN_12: "family/platform-ingest-beats-debian-12"
   IMAGE_CENTOS_7: "family/platform-ingest-beats-centos-7"
@@ -148,6 +148,7 @@ steps:
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
+          echo "using kernel $(uname -r)"
           cd auditbeat
           mage build integTest
         retry:
@@ -183,6 +184,7 @@ steps:
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
+          echo "using kernel $(uname -r)"
           cd auditbeat
           mage build integTest
         retry:
@@ -259,7 +261,7 @@ steps:
             - limit: 3
         agents:
           provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
+          imagePrefix: "${IMAGE_MACOS_ARM64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -360,7 +362,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
