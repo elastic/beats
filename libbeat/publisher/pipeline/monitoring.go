@@ -24,7 +24,7 @@ import (
 type observer interface {
 	pipelineObserver
 	clientObserver
-	outputObserver
+	retryObserver
 
 	cleanup()
 }
@@ -42,7 +42,7 @@ type clientObserver interface {
 	eventsACKed(count int)
 }
 
-type outputObserver interface {
+type retryObserver interface {
 	eventsDropped(int)
 	eventsRetry(int)
 }

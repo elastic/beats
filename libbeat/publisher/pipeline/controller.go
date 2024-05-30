@@ -36,9 +36,8 @@ import (
 // - stop
 // - reload
 type outputController struct {
-	beat          beat.Info
-	monitors      Monitors
-	retryObserver outputObserver
+	beat     beat.Info
+	monitors Monitors
 
 	// The queue is not created until the outputController is assigned a
 	// nonempty outputs.Group, in case the output group requests a proxy
@@ -81,14 +80,13 @@ type outputWorker interface {
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
-	retryObserver outputObserver,
+	retryObserver retryObserver,
 	queueFactory queue.QueueFactory,
 	inputQueueSize int,
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
 		monitors:       monitors,
-		retryObserver:  retryObserver,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
 		consumer:       newEventConsumer(monitors.Logger, retryObserver),
@@ -164,11 +162,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:         c.queue,
-			ch:            targetChan,
-			batchSize:     outGrp.BatchSize,
-			timeToLive:    outGrp.Retry + 1,
-			retryObserver: c.retryObserver,
+			queue:      c.queue,
+			ch:         targetChan,
+			batchSize:  outGrp.BatchSize,
+			timeToLive: outGrp.Retry + 1,
 		})
 }
 
