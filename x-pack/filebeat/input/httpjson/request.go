@@ -236,18 +236,16 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 
 func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(ctx, func() (*http.Response, error) {
-		return c.client.Do(req)
+		resp, err := c.client.Do(req)
+		if err == nil {
+			// Read the whole resp.Body so we can release the connection.
+			// This implementation is inspired by httputil.DumpResponse
+			resp.Body, err = drainBody(resp.Body)
+		}
+		return resp, err
 	})
 	if err != nil {
 		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// Read the whole resp.Body so we can release the connection.
-	// This implementation is inspired by httputil.DumpResponse
-	resp.Body, err = drainBody(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
@@ -442,7 +440,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	req := transformable{}
 	req.setURL(rf.url)
 
-	if rf.body != nil && len(*rf.body) > 0 {
+	if rf.body != nil {
 		req.setBody(rf.body.Clone())
 	}
 
@@ -939,6 +937,8 @@ func cloneResponse(source *http.Response) (*http.Response, error) {
 //
 // This function is a modified version of drainBody from the http/httputil package.
 func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
+	defer b.Close()
+
 	if b == nil || b == http.NoBody {
 		// No copying needed. Preserve the magic sentinel meaning of NoBody.
 		return http.NoBody, nil
@@ -946,10 +946,10 @@ func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
 
 	var buf bytes.Buffer
 	if _, err = buf.ReadFrom(b); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to read http.response.body: %w", err)
 	}
 	if err = b.Close(); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to close http.response.body: %w", err)
 	}
 
 	return io.NopCloser(&buf), nil

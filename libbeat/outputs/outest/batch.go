@@ -77,8 +77,6 @@ func (b *Batch) SplitRetry() bool {
 	return len(b.events) > 1
 }
 
-func (b *Batch) FreeEntries() {}
-
 func (b *Batch) Cancelled() {
 	b.doSignal(BatchSignal{Tag: BatchCancelled})
 }

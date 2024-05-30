@@ -67,7 +67,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 		clients[i] = client
 	}
 
-	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, clients...)
+	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, clients...)
 }
 
 func (*testOutput) Close() error { return nil }

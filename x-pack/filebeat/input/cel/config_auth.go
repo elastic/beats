@@ -6,7 +6,6 @@ package cel
 
 import (
 	"context"
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -264,11 +263,11 @@ func (o *oAuth2Config) Validate() error {
 	case oAuth2ProviderOkta:
 		return o.validateOktaProvider()
 	case oAuth2ProviderDefault:
-		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == nil {
-			return errors.New("both token_url and client credentials must be provided")
-		}
 		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
 			return errors.New("both user and password credentials must be provided")
+		}
+		if o.TokenURL == "" || ((o.ClientID == "" || o.ClientSecret == nil) && (o.User == "" || o.Password == "")) {
+			return errors.New("both token_url and client credentials must be provided")
 		}
 	default:
 		return fmt.Errorf("unknown provider %q", o.getProvider())
@@ -341,7 +340,10 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		_, err := x509.ParsePKCS1PrivateKey([]byte(o.OktaJWKPEM))
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
 		return err
 	}
 	// jwk_file

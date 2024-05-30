@@ -1,7 +1,7 @@
 queue_rules:
   - name: default
     conditions:
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
 pull_request_rules:
   - name: self-assign PRs
     conditions:
@@ -57,7 +57,7 @@ pull_request_rules:
   - name: automatic approval for automated pull requests with bump updates
     conditions:
       - author=apmmachine
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
     actions:
@@ -66,7 +66,7 @@ pull_request_rules:
         message: Automatically approving mergify
   - name: automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
     conditions:
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
       - "#approved-reviews-by>=1"
@@ -99,7 +99,7 @@ pull_request_rules:
   - name: automatic approval for mergify pull requests with changes in bump-rules
     conditions:
       - author=mergify[bot]
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
@@ -109,7 +109,7 @@ pull_request_rules:
         message: Automatically approving mergify
   - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
     conditions:
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
@@ -299,6 +299,32 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.12"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.13 branch
+    conditions:
+      - merged
+      - label=backport-v8.13.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.13"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.14 branch
+    conditions:
+      - merged
+      - label=backport-v8.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.14"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

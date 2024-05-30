@@ -43,7 +43,7 @@ var (
 		"consumers": s.Object{
 			"count": c.Int("consumers"),
 			"utilisation": s.Object{
-				"pct": c.Int("consumer_utilisation", s.IgnoreAllErrors),
+				"pct": c.Float("consumer_utilisation", s.IgnoreAllErrors),
 			},
 		},
 		"messages": s.Object{

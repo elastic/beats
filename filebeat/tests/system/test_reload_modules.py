@@ -144,9 +144,9 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() == 1, max_timeout=10)
         print(self.output_lines())
 
-        # Remove input
-        with open(self.working_dir + "/configs/system.yml", 'w') as f:
-            f.write("")
+        # Remove input by moving the file
+        # we keep it around to help debugging
+        os.rename(self.working_dir + "/configs/system.yml", self.working_dir + "/configs/system.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(

@@ -559,6 +559,142 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name:   "GET_request_check_user_agent_default",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, userAgent)
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_request_check_user_agent_user_defined",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get_request(state.url).with({
+		"Header": {
+			"User-Agent": ["custom user agent"]
+		}
+	}).do_request().Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			const customUserAgent = "custom user agent"
+
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if r.UserAgent() != customUserAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, customUserAgent)
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_request_check_user_agent_none",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get_request(state.url).with({
+		"Header": {
+			"User-Agent": [""]
+		}
+	}).do_request().Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if _, ok := r.Header["User-Agent"]; ok {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected no user agent header, but got %#q"}`, r.UserAgent())
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
 		name:   "GET_request_TLS",
 		server: newTestServer(httptest.NewTLSServer),
 		config: map[string]interface{}{
@@ -1434,7 +1570,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{
@@ -1576,13 +1712,13 @@ func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
 		switch {
 		case r.Method != expectedMethod:
 			w.WriteHeader(http.StatusBadRequest)
-			msg = fmt.Sprintf(`{"error":"expected method was %q"}`, expectedMethod)
+			msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, expectedMethod)
 		case expectedBody != "":
 			body, _ := io.ReadAll(r.Body)
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected body was %q"}`, expectedBody)
+				msg = fmt.Sprintf(`{"error":"expected body was %#q"}`, expectedBody)
 			}
 		}
 

@@ -72,11 +72,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// what caused it is going through Filebeat's logs.
 	integration.EnsureESIsRunning(t)
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
 	generateLogFile(t, logFilePath)
@@ -290,11 +286,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// If ES is not running, the test will timeout and the only way to know
 	// what caused it is going through Filebeat's logs.
 	integration.EnsureESIsRunning(t)
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	finalStateReached := atomic.Bool{}
 	var units = []*proto.UnitExpected{
@@ -375,11 +367,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 }
 
 func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	// Having the log file enables the inputs to start, while it is not
 	// strictly necessary for testing output issues, it allows for the
@@ -533,11 +521,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	wantVersion := "8.13.0+build20131123"
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
 	generateLogFile(t, logFilePath)

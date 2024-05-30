@@ -40,10 +40,10 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 }
 
 // Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (m InputManager) Init(grp unison.Group) error {
 	return multierr.Append(
-		m.stateless.Init(grp, mode),
-		m.cursor.Init(grp, mode),
+		m.stateless.Init(grp),
+		m.cursor.Init(grp),
 	)
 }
 

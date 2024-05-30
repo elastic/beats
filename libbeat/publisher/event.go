@@ -47,17 +47,6 @@ type Batch interface {
 	// batch.Drop() if necessary).
 	SplitRetry() bool
 
-	// Release the internal pointer to this batch's events but do not yet
-	// acknowledge this batch. This exists specifically for the shipper output,
-	// where there is potentially a long gap between when events are handed off
-	// to the shipper and when they are acknowledged upstream; during that time,
-	// we need to preserve batch metadata for producer end-to-end acknowledgments,
-	// but we do not need the events themselves since they are already queued by
-	// the shipper. It is only guaranteed to release event pointers when using the
-	// proxy queue.
-	// Never call this on a batch that might be retried.
-	FreeEntries()
-
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()
 }
@@ -68,6 +57,12 @@ type Event struct {
 	Content beat.Event
 	Flags   EventFlags
 	Cache   EventCache
+
+	// If the output provides an early encoder for incoming events,
+	// it should store the encoded form in EncodedEvent and clear Content
+	// to free the unencoded data. The updated event will be provided to
+	// output workers when calling Publish.
+	EncodedEvent interface{}
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.

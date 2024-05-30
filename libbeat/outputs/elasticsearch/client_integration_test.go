@@ -22,11 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"testing"
 	"time"
 
@@ -85,15 +81,15 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	output, client := connectTestEsWithStats(t, cfg, index)
 
 	// drop old index preparing test
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":    "libbeat",
 			"message": "Test message from libbeat",
 		},
-	})
+	}))
 
 	err := output.Publish(context.Background(), batch)
 	if err != nil {
@@ -131,7 +127,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	// Check version
 	if client.conn.GetVersion().Major < 5 {
@@ -139,7 +135,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		err := output.Publish(context.Background(), outest.NewBatch(event))
+		batch := encodeBatch(client, outest.NewBatch(event))
+		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,7 +164,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.conn.DeletePipeline(pipeline, nil)
+	_, _, _ = client.conn.DeletePipeline(pipeline, nil)
 	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
@@ -217,10 +214,10 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			},
 		},
 	})
-	client.conn.Delete(index, "", "", nil)
-	client.conn.Delete(deadletterIndex, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
-	err := output.Publish(context.Background(), outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -228,18 +225,19 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			"testfield": 0,
 		},
 	}))
+	err := output.Publish(context.Background(), batch)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	batch := outest.NewBatch(beat.Event{
+	batch = encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 2",
 			"testfield": "foo0",
 		},
-	})
+	}))
 	err = output.Publish(context.Background(), batch)
 	if err == nil {
 		t.Fatal("Expecting mapping conflict")
@@ -277,14 +275,15 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	publish := func(events ...beat.Event) {
-		err := output.Publish(context.Background(), outest.NewBatch(events...))
+		batch := encodeBatch(client, outest.NewBatch(events...))
+		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -312,7 +311,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.conn.DeletePipeline(pipeline, nil)
+	_, _, _ = client.conn.DeletePipeline(pipeline, nil)
 	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
@@ -354,14 +353,14 @@ func TestClientPublishTracer(t *testing.T) {
 		"index": index,
 	})
 
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"message": "Hello world",
 		},
-	})
+	}))
 
 	tx, spans, _ := apmtest.WithTransaction(func(ctx context.Context) {
 		err := output.Publish(ctx, batch)
@@ -434,7 +433,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	client := randomClient(output).(clientWrap).Client().(*Client)
 
 	// Load version number
-	client.Connect()
+	_ = client.Connect()
 
 	return client, client
 }
@@ -474,33 +473,4 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 
 	client := grp.Clients[rand.Intn(L)]
 	return client.(outputs.NetworkClient)
-}
-
-// startTestProxy starts a proxy that redirects all connections to the specified URL
-func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
-	t.Helper()
-
-	realURL, err := url.Parse(redirectURL)
-	require.NoError(t, err)
-
-	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req := r.Clone(context.Background())
-		req.RequestURI = ""
-		req.URL.Scheme = realURL.Scheme
-		req.URL.Host = realURL.Host
-
-		resp, err := http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		require.NoError(t, err)
-
-		for _, header := range []string{"Content-Encoding", "Content-Type"} {
-			w.Header().Set(header, resp.Header.Get(header))
-		}
-		w.WriteHeader(resp.StatusCode)
-		w.Write(body)
-	}))
-	return proxy
 }

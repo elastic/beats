@@ -26,14 +26,14 @@ import (
 )
 
 type fileOutConfig struct {
-	Path            string           `config:"path"`
-	Filename        string           `config:"filename"`
-	RotateEveryKb   uint             `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles   uint             `config:"number_of_files"`
-	Codec           codec.Config     `config:"codec"`
-	Permissions     uint32           `config:"permissions"`
-	RotateOnStartup bool             `config:"rotate_on_startup"`
-	Queue           config.Namespace `config:"queue"`
+	Path            *PathFormatString `config:"path"`
+	Filename        string            `config:"filename"`
+	RotateEveryKb   uint              `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles   uint              `config:"number_of_files"`
+	Codec           codec.Config      `config:"codec"`
+	Permissions     uint32            `config:"permissions"`
+	RotateOnStartup bool              `config:"rotate_on_startup"`
+	Queue           config.Namespace  `config:"queue"`
 }
 
 func defaultConfig() fileOutConfig {
@@ -43,6 +43,18 @@ func defaultConfig() fileOutConfig {
 		Permissions:     0600,
 		RotateOnStartup: true,
 	}
+}
+
+func readConfig(cfg *config.C) (*fileOutConfig, error) {
+	foConfig := defaultConfig()
+	if err := cfg.Unpack(&foConfig); err != nil {
+		return nil, err
+	}
+
+	// disable bulk support in publisher pipeline
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
+
+	return &foConfig, nil
 }
 
 func (c *fileOutConfig) Validate() error {

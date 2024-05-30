@@ -41,13 +41,13 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			// get all metric definitions supported by the namespace provided
-			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(resourceID, namespace)
+			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceID, namespace)
 			if err != nil {
-				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s %w", resourceID, namespace, err)
+				return nil, err
 			}
 
 			if len(metricDefinitions.Value) == 0 {
-				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s %w", resourceID, namespace, err)
+				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s", resourceID, namespace)
 			}
 
 			var filteredMetricDefinitions []armmonitor.MetricDefinition

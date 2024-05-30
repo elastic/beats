@@ -29,8 +29,8 @@ func (client *MockService) GetResourceDefinitions(id []string, group []string, r
 	return args.Get(0).([]*armresources.GenericResourceExpanded), args.Error(1)
 }
 
-// GetMetricDefinitions is a mock function for the azure service
-func (client *MockService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
+// GetMetricDefinitionsWithRetry is a mock function for the azure service
+func (client *MockService) GetMetricDefinitionsWithRetry(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
 	args := client.Called(resourceId, namespace)
 	return args.Get(0).(armmonitor.MetricDefinitionCollection), args.Error(1)
 }
@@ -43,7 +43,7 @@ func (client *MockService) GetMetricNamespaces(resourceId string) (armmonitor.Me
 
 // GetMetricValues is a mock function for the azure service
 func (client *MockService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]armmonitor.Metric, string, error) {
-	args := client.Called(resourceId, namespace)
+	args := client.Called(resourceId, namespace, timegrain, timespan, metricNames, aggregations, filter)
 	return args.Get(0).([]armmonitor.Metric), args.String(1), args.Error(2)
 }
 

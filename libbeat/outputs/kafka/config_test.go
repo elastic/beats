@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,16 +33,18 @@ import (
 
 func TestConfigAcceptValid(t *testing.T) {
 	tests := map[string]mapstr.M{
-		"default config is valid": mapstr.M{},
 		"lz4 with 0.11": mapstr.M{
 			"compression": "lz4",
 			"version":     "0.11",
+			"topic":       "foo",
 		},
 		"lz4 with 1.0": mapstr.M{
 			"compression": "lz4",
 			"version":     "1.0.0",
+			"topic":       "foo",
 		},
 		"Kerberos with keytab": mapstr.M{
+			"topic": "foo",
 			"kerberos": mapstr.M{
 				"auth_type":    "keytab",
 				"username":     "elastic",
@@ -52,6 +55,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			},
 		},
 		"Kerberos with user and password pair": mapstr.M{
+			"topic": "foo",
 			"kerberos": mapstr.M{
 				"auth_type":    "password",
 				"username":     "elastic",
@@ -67,7 +71,9 @@ func TestConfigAcceptValid(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
-			c.SetString("hosts", 0, "localhost")
+			if err := c.SetString("hosts", 0, "localhost"); err != nil {
+				t.Fatalf("could not set 'hosts' on config: %s", err)
+			}
 			cfg, err := readConfig(c)
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
@@ -89,16 +95,98 @@ func TestConfigInvalid(t *testing.T) {
 				"realm":        "ELASTIC",
 			},
 		},
+		// The default config does not set `topic` nor `topics`.
+		"No topics or topic provided": mapstr.M{},
 	}
 
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
-			c.SetString("hosts", 0, "localhost")
+			if err := c.SetString("hosts", 0, "localhost"); err != nil {
+				t.Fatalf("could not set 'hosts' on config: %s", err)
+			}
 			_, err := readConfig(c)
 			if err == nil {
 				t.Fatalf("Can create test configuration from invalid input")
+			}
+		})
+	}
+}
+
+func TestConfigUnderElasticAgent(t *testing.T) {
+	oldUnderAgent := management.UnderAgent()
+	t.Cleanup(func() {
+		// Restore the previous value
+		management.SetUnderAgent(oldUnderAgent)
+	})
+
+	management.SetUnderAgent(true)
+
+	tests := []struct {
+		name        string
+		cfg         mapstr.M
+		expectError bool
+	}{
+		{
+			name: "topic with all valid characters",
+			cfg: mapstr.M{
+				"topic": "abcdefghijklmnopqrstuvxz-ABCDEFGHIJKLMNOPQRSTUVXZ_01234567890.",
+			},
+		},
+		{
+			name: "topics is provided",
+			cfg: mapstr.M{
+				"topics": []string{"foo", "bar"},
+			},
+			expectError: true,
+		},
+		{
+			name: "topic cannot contain invalid characters",
+			cfg: mapstr.M{
+				"topic": "foo bar",
+			},
+			expectError: true,
+		},
+		{
+			name: "topic with invalid characters",
+			cfg: mapstr.M{
+				"topic": "foo + bar",
+			},
+			expectError: true,
+		},
+		{
+			name: "topic with invalid characters from dynamic topic selection",
+			cfg: mapstr.M{
+				"topic": "%{event.field}",
+			},
+			expectError: true,
+		},
+
+		// The default config does not set `topic` not `topics`.
+		{
+			name:        "empty config is invalid",
+			cfg:         mapstr.M{},
+			expectError: true,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			c := config.MustNewConfigFrom(test.cfg)
+			if err := c.SetString("hosts", 0, "localhost"); err != nil {
+				t.Fatalf("could not set 'hosts' on config: %s", err)
+			}
+
+			_, err := readConfig(c)
+
+			if test.expectError && err == nil {
+				t.Fatalf("invalid configuration must not be created")
+			}
+
+			if !test.expectError && err != nil {
+				t.Fatalf("could not create config: %s", err)
 			}
 		})
 	}
@@ -178,6 +266,7 @@ func TestTopicSelection(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
+			test := test
 			selector, err := buildTopicSelector(config.MustNewConfigFrom(test.cfg))
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)

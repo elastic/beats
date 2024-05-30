@@ -144,6 +144,8 @@ type Flows struct {
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
+	// DeltaFlowReports when enabled will report flow network stats(bytes, packets) as delta values
+	EnableDeltaFlowReports bool `config:"enable_delta_flow_reports"`
 }
 
 type ProtocolCommon struct {

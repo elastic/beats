@@ -70,17 +70,17 @@ in the manifest file:
 ------------------------------------------------
 
 [float]
-===== Running {beatname_uc} on master nodes
+===== Running {beatname_uc} on control plane nodes
 
-Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
-to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+Kubernetes control plane nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on control plane nodes you may need to
 update the Daemonset spec to include proper tolerations:
 
 [source,yaml]
 ------------------------------------------------
 spec:
  tolerations:
- - key: node-role.kubernetes.io/master
+ - key: node-role.kubernetes.io/control-plane
    effect: NoSchedule
 ------------------------------------------------
 
@@ -166,7 +166,7 @@ oc patch namespace kube-system -p \
 ----
 +
 This command sets the node selector for the project to an empty string. If you
-don't run this command, the default node selector will skip master nodes.
+don't run this command, the default node selector will skip control plane nodes.
 
 NOTE: for openshift versions prior to the version 4.x additionally you need to modify the `DaemonSet` container spec in the manifest file to enable the container to run as privileged:
 [source,yaml]

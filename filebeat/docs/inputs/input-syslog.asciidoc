@@ -3,6 +3,10 @@
 [id="{beatname_lc}-input-{type}"]
 === Syslog input
 
+deprecated:[8.14.0]
+
+The syslog input is deprecated. Please use the <<syslog, `syslog`>> processor for processing syslog messages.
+
 ++++
 <titleabbrev>Syslog</titleabbrev>
 ++++

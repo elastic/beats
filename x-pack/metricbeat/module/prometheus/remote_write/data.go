@@ -44,9 +44,10 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 	}
 
 	if config.UseTypes {
+		logp.Debug("prometheus.remote_write.cache", "Period for counter cache for remote_write: %v", config.Period.String())
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
-		counters := collector.NewCounterCache(base.Module().Config().Period * 5)
+		counters := collector.NewCounterCache(config.Period * 5)
 
 		g := remoteWriteTypedGenerator{
 			counterCache: counters,

@@ -18,10 +18,12 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -72,6 +74,25 @@ const (
 	XXH64       HashType = "xxh64"
 )
 
+type Backend string
+
+const (
+	BackendFSNotify Backend = "fsnotify"
+	BackendKprobes  Backend = "kprobes"
+	BackendEBPF     Backend = "ebpf"
+	BackendAuto     Backend = "auto"
+)
+
+func (b *Backend) Unpack(v string) error {
+	*b = Backend(v)
+	switch *b {
+	case BackendFSNotify, BackendKprobes, BackendEBPF, BackendAuto:
+		return nil
+	default:
+		return fmt.Errorf("invalid backend: %q", v)
+	}
+}
+
 // Config contains the configuration parameters for the file integrity
 // metricset.
 type Config struct {
@@ -86,6 +107,7 @@ type Config struct {
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 	IncludeFiles        []match.Matcher `config:"include_files"`
+	Backend             Backend         `config:"backend"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -160,6 +182,11 @@ nextHash:
 	if err != nil {
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
+
+	if c.Backend != "" && c.Backend != BackendAuto && runtime.GOOS != "linux" {
+		errs = append(errs, errors.New("backend can only be specified on linux"))
+	}
+
 	return errs.Err()
 }
 

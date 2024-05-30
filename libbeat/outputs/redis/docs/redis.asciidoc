@@ -158,7 +158,7 @@ Output codec configuration. If the `codec` section is missing, events will be js
 
 See <<configuration-output-codec>> for more information.
 
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers to use for each host configured to publish events to Redis. Use this setting along with the
 `loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
@@ -216,10 +216,8 @@ endif::[]
 
 The maximum number of events to bulk in a single Redis request or pipeline. The default is 2048.
 
-Events can be collected into batches. When using the memory queue with `queue.mem.flush.min_events`
-set to a value greater than `1`, the maximum batch is is the value of `queue.mem.flush.min_events`.
-{beatname_uc} will split batches read from the queue which are larger than `bulk_max_size` into
-multiple batches.
+Events can be collected into batches. {beatname_uc} will split batches read from the queue which are
+larger than `bulk_max_size` into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead
 of sending events. However big batch sizes can also increase processing times,
