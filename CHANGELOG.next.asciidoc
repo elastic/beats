@@ -286,6 +286,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}[]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
 - Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
+- Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 
 *Auditbeat*
 
