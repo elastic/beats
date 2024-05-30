@@ -17,10 +17,6 @@
 
 package fifo
 
-import "errors"
-
-var errFIFOEmpty = errors.New("tried to read from an empty FIFO queue")
-
 type FIFO[T any] struct {
 	first *node[T]
 	last  *node[T]
