@@ -5,7 +5,6 @@
 package awss3
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -154,13 +153,4 @@ func TestRegionSelection(t *testing.T) {
 			}
 		})
 	}
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("awss3_test"),
-		ID:          "test_id",
-		Cancelation: ctx,
-	}, cancel
 }
