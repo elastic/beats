@@ -43,15 +43,6 @@ type pushRequest struct {
 	resp       chan bool
 }
 
-type producerCancelRequest struct {
-	producer *ackProducer
-	resp     chan producerCancelResponse
-}
-
-type producerCancelResponse struct {
-	removed int
-}
-
 // consumer -> broker API
 
 type getRequest struct {

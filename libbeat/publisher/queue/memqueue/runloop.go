@@ -140,9 +140,6 @@ func (l *runLoop) runIteration() {
 	case req := <-l.broker.pushChan: // producer pushing new event
 		l.handlePushRequest(req)
 
-	case req := <-l.broker.cancelChan: // producer cancelling active events
-		l.handleCancel(&req)
-
 	case req := <-getChan: // consumer asking for next batch
 		l.handleGetRequest(&req)
 
@@ -345,15 +342,6 @@ func (l *runLoop) growEventBuffer() {
 // Insert the given new event without bounds checks, and report the result
 // to the caller via the push request's response channel.
 func (l *runLoop) doInsert(req pushRequest) {
-	// We reject events if their producer was cancelled before they reach
-	// the queue.
-	if req.producer != nil && req.producer.state.cancelled {
-		// Report failure to the caller (this only happens if the producer is
-		// closed before we handle the insert request).
-		req.resp <- false
-		return
-	}
-
 	maxEvents := l.broker.settings.Events
 	// If there is no event limit, check if we need to grow the current queue
 	// buffer to fit the new event.
@@ -383,47 +371,5 @@ func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
 	req.responseChan <- memQueueMetrics{
 		currentQueueSize: l.eventCount,
 		occupiedRead:     l.consumedEventCount,
-	}
-}
-
-func (l *runLoop) handleCancel(req *producerCancelRequest) {
-	var removedCount int
-
-	// Traverse all unconsumed events in the buffer, removing any with
-	// the specified producer. As we go we condense all the remaining
-	// events to be sequential.
-	startIndex := l.bufferStart.plus(l.consumedEventCount)
-	unconsumedEventCount := l.eventCount - l.consumedEventCount
-	for i := 0; i < unconsumedEventCount; i++ {
-		readIndex := startIndex.plus(i)
-		entry := *l.buf.entry(readIndex)
-		if entry.producer == req.producer {
-			// The producer matches, skip this event
-			removedCount++
-		} else {
-			// Move the event to its final position after accounting for any
-			// earlier indices that were removed.
-			// (Count backwards from (startIndex + i), not from readIndex, to avoid
-			// sign issues when the buffer wraps.)
-			if removedCount > 0 {
-				writeIndex := readIndex.plus(-removedCount)
-				*l.buf.entry(writeIndex) = entry
-			}
-		}
-	}
-
-	// Clear the event pointers at the end of the buffer so we don't keep
-	// old events in memory by accident.
-	for i := l.eventCount - removedCount; i < l.eventCount; i++ {
-		entryIndex := l.bufferStart.plus(i)
-		l.buf.entry(entryIndex).event = nil
-	}
-
-	// Subtract removed events from the internal event count
-	l.eventCount -= removedCount
-
-	// signal cancel request being finished
-	if req.resp != nil {
-		req.resp <- producerCancelResponse{removed: removedCount}
 	}
 }
