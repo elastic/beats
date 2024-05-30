@@ -32,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var seed int64
@@ -228,69 +227,6 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
 }
 
-func TestQueueMetricsDirect(t *testing.T) {
-	eventsToTest := 5
-	maxEvents := 10
-
-	// Test the directEventLoop
-	directSettings := Settings{
-		Events:        maxEvents,
-		MaxGetRequest: 1,
-		FlushTimeout:  0,
-	}
-	t.Logf("Testing directEventLoop")
-	queueTestWithSettings(t, directSettings, eventsToTest, "directEventLoop")
-
-}
-
-func TestQueueMetricsBuffer(t *testing.T) {
-	eventsToTest := 5
-	maxEvents := 10
-	// Test Buffered Event Loop
-	bufferedSettings := Settings{
-		Events:        maxEvents,
-		MaxGetRequest: eventsToTest, // The buffered event loop can only return FlushMinEvents per Get()
-		FlushTimeout:  time.Millisecond,
-	}
-	t.Logf("Testing bufferedEventLoop")
-	queueTestWithSettings(t, bufferedSettings, eventsToTest, "bufferedEventLoop")
-}
-
-func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
-	testQueue := NewQueue(nil, nil, settings, 0, nil)
-	defer testQueue.Close()
-
-	// Send events to queue
-	producer := testQueue.Producer(queue.ProducerConfig{})
-	for i := 0; i < eventsToTest; i++ {
-		producer.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
-	}
-	queueMetricsAreValid(t, testQueue, 5, settings.Events, 0, fmt.Sprintf("%s - First send of metrics to queue", testName))
-
-	// Read events, don't yet ack them
-	batch, err := testQueue.Get(eventsToTest, 0)
-	assert.NoError(t, err, "error in Get")
-	t.Logf("Got batch of %d events", batch.Count())
-
-	queueMetricsAreValid(t, testQueue, 5, settings.Events, 5, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
-
-	// Test metrics after ack
-	batch.Done()
-
-	queueMetricsAreValid(t, testQueue, 0, settings.Events, 0, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
-
-}
-
-func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occupied int, test string) {
-	// wait briefly to avoid races across all the queue channels
-	time.Sleep(time.Millisecond * 100)
-	testMetrics, err := q.Metrics()
-	assert.NoError(t, err, "error calling metrics for test %s", test)
-	assert.Equal(t, testMetrics.EventCount.ValueOr(0), uint64(evtCount), "incorrect EventCount for %s", test)
-	assert.Equal(t, testMetrics.EventLimit.ValueOr(0), uint64(evtLimit), "incorrect EventLimit for %s", test)
-	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
-}
-
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
 		return NewQueue(nil, nil, Settings{
@@ -325,63 +261,4 @@ func TestAdjustInputQueueSize(t *testing.T) {
 		mainQueue := 4096
 		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
 	})
-}
-
-// producerACKWaiter is a helper that can listen to queue producer callbacks
-// and wait on them from the test thread, so we can test the queue's asynchronous
-// behavior without relying on time.Sleep.
-type producerACKWaiter struct {
-	sync.Mutex
-
-	// The number of acks received from a producer callback.
-	acked int
-
-	// The number of acks that callers have waited for in waitForEvents.
-	waited int
-
-	// When non-nil, this channel is being listened to by a test thread
-	// blocking on ACKs, and incoming producer callbacks are forwarded
-	// to it.
-	ackChan chan int
-}
-
-func (w *producerACKWaiter) ack(count int) {
-	w.Lock()
-	defer w.Unlock()
-	w.acked += count
-	if w.ackChan != nil {
-		w.ackChan <- count
-	}
-}
-
-func (w *producerACKWaiter) waitForEvents(count int) {
-	w.Lock()
-	defer w.Unlock()
-	if w.ackChan != nil {
-		panic("don't call producerACKWaiter.waitForEvents from multiple goroutines")
-	}
-
-	avail := w.acked - w.waited
-	if count <= avail {
-		w.waited += count
-		return
-	}
-	w.waited = w.acked
-	count -= avail
-	// We have advanced as far as we can, we have to wait for
-	// more incoming ACKs.
-	// Set a listener and unlock, so ACKs can come in on another
-	// goroutine.
-	w.ackChan = make(chan int)
-	w.Unlock()
-
-	newAcked := 0
-	for newAcked < count {
-		newAcked += <-w.ackChan
-	}
-	// When we're done, turn off the listener channel and update
-	// the number of events waited on.
-	w.Lock()
-	w.ackChan = nil
-	w.waited += count
 }

@@ -87,7 +87,7 @@ func (producer *diskQueueProducer) publish(
 		// blocking the core loop.
 		response := <-request.responseChan
 		return response
-	case <-producer.queue.done:
+	case <-producer.queue.close:
 		return false
 	case <-producer.done:
 		return false

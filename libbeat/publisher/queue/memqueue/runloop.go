@@ -76,6 +76,11 @@ type runLoop struct {
 	// and/or bytes is not available.
 	// getTimer is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
+
+	// closing is set when a close request is received. Once closing is true,
+	// the queue will not accept any new events, but will continue responding
+	// to Gets and Acks to allow pending events to complete on shutdown.
+	closing bool
 }
 
 func newRunLoop(broker *broker) *runLoop {
@@ -113,6 +118,12 @@ func (l *runLoop) run() {
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
+	var pushChan chan pushRequest
+	// Push requests are enabled if the queue isn't closing.
+	if !l.closing {
+		pushChan = l.broker.pushChan
+	}
+
 	var getChan chan getRequest
 	// Get requests are enabled if the queue has events that weren't yet sent
 	// to consumers, and no existing request is active.
@@ -134,10 +145,16 @@ func (l *runLoop) runIteration() {
 	}
 
 	select {
+	case <-l.broker.closeChan:
+		l.closing = true
+		// Get requests are handled immediately during shutdown
+		l.maybeUnblockGetRequest()
+
 	case <-l.broker.ctx.Done():
+		// The queue is fully shut down, do nothing
 		return
 
-	case req := <-l.broker.pushChan: // producer pushing new event
+	case req := <-pushChan: // producer pushing new event
 		l.handlePushRequest(req)
 
 	case req := <-getChan: // consumer asking for next batch
@@ -150,9 +167,6 @@ func (l *runLoop) runIteration() {
 
 	case count := <-l.broker.deleteChan:
 		l.handleDelete(count)
-
-	case req := <-l.broker.metricChan: // asking broker for queue metrics
-		l.handleMetricsRequest(&req)
 
 	case <-timeoutChan:
 		// The get timer has expired, handle the blocked request
@@ -180,8 +194,8 @@ func (l *runLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
-	if l.broker.settings.FlushTimeout <= 0 {
-		// Never block if the flush timeout isn't positive
+	if l.broker.settings.FlushTimeout <= 0 || l.closing {
+		// Never block if the flush timeout isn't positive, or during shutdown
 		return false
 	}
 	availableEntries := l.eventCount - l.consumedEventCount
@@ -235,6 +249,7 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 	l.consumedBatches.append(batch)
 	l.consumedEventCount += batchEntryCount
 	l.consumedByteCount += batchByteCount
+	l.broker.observer.ConsumeEvents(batchEntryCount, batchByteCount)
 }
 
 func (l *runLoop) handleDelete(deletedEntryCount int) {
@@ -251,6 +266,11 @@ func (l *runLoop) handleDelete(deletedEntryCount int) {
 	l.byteCount -= deletedByteCount
 	l.consumedEventCount -= deletedEntryCount
 	l.consumedByteCount -= deletedByteCount
+	l.broker.observer.RemoveEvents(deletedEntryCount, deletedByteCount)
+	if l.closing && l.eventCount == 0 {
+		// Our last events were acknowledged during shutdown, signal final shutdown
+		l.broker.ctxCancel()
+	}
 
 	// We just freed up space in the queue, see if this unblocked any
 	// pending inserts.
@@ -289,19 +309,6 @@ func (l *runLoop) canFitPushRequest(req pushRequest) bool {
 	byteCountFits := maxBytes <= 0 || newByteCount <= maxBytes
 
 	return eventCountFits && byteCountFits
-}
-
-// Checks if we can handle pendingGetRequest yet, and handles it if so
-func (l *runLoop) maybeUnblockGetRequest() {
-	if l.pendingGetRequest != nil {
-		if !l.getRequestShouldBlock(l.pendingGetRequest) {
-			l.handleGetReply(l.pendingGetRequest)
-			l.pendingGetRequest = nil
-			if !l.getTimer.Stop() {
-				<-l.getTimer.C
-			}
-		}
-	}
 }
 
 func (l *runLoop) maybeUnblockPushRequests() {
@@ -367,9 +374,17 @@ func (l *runLoop) doInsert(req pushRequest) {
 	l.maybeUnblockGetRequest()
 }
 
-func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
-	req.responseChan <- memQueueMetrics{
-		currentQueueSize: l.eventCount,
-		occupiedRead:     l.consumedEventCount,
+// Checks if we can handle pendingGetRequest yet, and handles it if so
+func (l *runLoop) maybeUnblockGetRequest() {
+	// If a get request is blocked waiting for more events, check if
+	// we should unblock it.
+	if getRequest := l.pendingGetRequest; getRequest != nil {
+		if !l.getRequestShouldBlock(getRequest) {
+			l.pendingGetRequest = nil
+			if !l.getTimer.Stop() {
+				<-l.getTimer.C
+			}
+			l.handleGetReply(getRequest)
+		}
 	}
 }
