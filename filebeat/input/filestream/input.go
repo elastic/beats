@@ -133,7 +133,7 @@ func (inp *filestream) Run(
 		return fmt.Errorf("not file source")
 	}
 
-	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
+	log := ctx.Logger
 	state := initState(log, cursor, fs)
 
 	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)

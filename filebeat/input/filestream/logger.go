@@ -25,13 +25,13 @@ import (
 func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
 	log := logger.With(
 		"operation", event.Op.String(),
-		"source_name", src.Name(),
+		"state_id", src.Name(),
 	)
 	if event.Descriptor.Fingerprint != "" {
 		log = log.With("fingerprint", event.Descriptor.Fingerprint)
 	}
 	if event.Descriptor.Info != nil {
-		osID := event.Descriptor.Info.GetOSState().String()
+		osID := src.OSID()
 		if osID != "" {
 			log = log.With("os_id", osID)
 		}

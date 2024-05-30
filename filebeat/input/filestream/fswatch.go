@@ -70,7 +70,7 @@ type fileWatcher struct {
 	events  chan loginp.FSEvent
 }
 
-func newFileWatcher(paths []string, ns *conf.Namespace) (loginp.FSWatcher, error) {
+func newFileWatcher(paths []string, ns *conf.Namespace, id string) (loginp.FSWatcher, error) {
 	var config *conf.C
 	if ns == nil {
 		config = conf.NewConfig()
@@ -78,21 +78,26 @@ func newFileWatcher(paths []string, ns *conf.Namespace) (loginp.FSWatcher, error
 		config = ns.Config()
 	}
 
-	return newScannerWatcher(paths, config)
+	return newScannerWatcher(paths, config, id)
 }
 
-func newScannerWatcher(paths []string, c *conf.C) (loginp.FSWatcher, error) {
+func newScannerWatcher(paths []string, c *conf.C, id string) (loginp.FSWatcher, error) {
 	config := defaultFileWatcherConfig()
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, err
 	}
-	scanner, err := newFileScanner(paths, config.Scanner)
+	scanner, err := newFileScanner(paths, config.Scanner, id)
 	if err != nil {
 		return nil, err
 	}
+
+	// logger := logp.NewLogger(watcherDebugKey).With("id", id)
+	// logger.Info("here")
+
 	return &fileWatcher{
-		log:     logp.NewLogger(watcherDebugKey),
+		// log:     logger,
+		log:     logp.NewLogger(watcherDebugKey).With("id", id),
 		cfg:     config,
 		prev:    make(map[string]loginp.FileDescriptor, 0),
 		scanner: scanner,
@@ -295,11 +300,11 @@ type fileScanner struct {
 	readBuffer []byte
 }
 
-func newFileScanner(paths []string, config fileScannerConfig) (*fileScanner, error) {
+func newFileScanner(paths []string, config fileScannerConfig, id string) (*fileScanner, error) {
 	s := fileScanner{
 		paths:  paths,
 		cfg:    config,
-		log:    logp.NewLogger(scannerDebugKey),
+		log:    logp.NewLogger(scannerDebugKey).With("id", id),
 		hasher: sha256.New(),
 	}
 

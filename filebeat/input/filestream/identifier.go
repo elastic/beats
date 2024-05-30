@@ -68,9 +68,20 @@ type fileSource struct {
 	identifierGenerator string
 }
 
+// File returns the complete file path for this source
+func (f fileSource) File() string {
+	return f.newPath
+}
+
 // Name returns the registry identifier of the file.
 func (f fileSource) Name() string {
 	return f.fileID
+}
+
+// OSID returns the OS ID for this source, on Linux it is
+// <inode>-<device ID>
+func (f fileSource) OSID() string {
+	return f.desc.Info.GetOSState().String()
 }
 
 // newFileIdentifier creates a new state identifier for a log input.
