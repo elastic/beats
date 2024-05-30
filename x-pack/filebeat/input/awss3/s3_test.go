@@ -286,3 +286,11 @@ func TestS3Poller(t *testing.T) {
 		poller.run(ctx)
 	})
 }
+
+func TestS3ReaderLoop(t *testing.T) {
+
+}
+
+func TestS3WorkerLoop(t *testing.T) {
+
+}

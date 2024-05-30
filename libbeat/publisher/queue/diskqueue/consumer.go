@@ -90,9 +90,6 @@ func (batch *diskQueueBatch) Entry(i int) queue.Entry {
 	return batch.frames[i].event
 }
 
-func (batch *diskQueueBatch) FreeEntries() {
-}
-
 func (batch *diskQueueBatch) Done() {
 	batch.queue.acks.addFrames(batch.frames)
 }

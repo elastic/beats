@@ -9,7 +9,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -136,7 +136,7 @@ func TestRegionSelection(t *testing.T) {
 				RegionName: test.regionName,
 				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
 			}
-			in := newSQSReaderInput(config, aws.Config{})
+			in := newSQSReaderInput(config, awssdk.Config{})
 			inputCtx := v2.Context{
 				Logger: logp.NewLogger("awss3_test"),
 				ID:     "test_id",

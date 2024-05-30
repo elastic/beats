@@ -426,16 +426,6 @@ func (b *batch) Entry(i int) queue.Entry {
 	return b.entry(i).event
 }
 
-func (b *batch) FreeEntries() {
-	// This signals that the event data has been copied out of the batch, and is
-	// safe to free from the queue buffer, so set all the event pointers to nil.
-	for i := 0; i < b.count; i++ {
-		index := b.start.plus(i)
-		entry := b.queueBuf.entry(index)
-		entry.event = nil
-	}
-}
-
 func (b *batch) Done() {
 	b.doneChan <- batchDoneMsg{}
 }
