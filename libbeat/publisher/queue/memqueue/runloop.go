@@ -174,18 +174,30 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 	startIndex := l.bufPos + l.consumedCount
 	batch := newBatch(l.broker, startIndex, batchSize)
 
+	batchBytes := 0
+	for i := 0; i < batchSize; i++ {
+		batchBytes += batch.rawEntry(i).eventSize
+	}
+
 	// Send the batch to the caller and update internal state
 	req.responseChan <- batch
 	l.consumedBatches.append(batch)
 	l.consumedCount += batchSize
+	l.broker.observer.ConsumeEvents(batchSize, batchBytes)
 }
 
 func (l *runLoop) handleDelete(count int) {
+	byteCount := 0
+	for i := 0; i < count; i++ {
+		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
+		byteCount += entry.eventSize
+	}
 	// Advance position and counters. Event data was already cleared in
 	// batch.FreeEntries when the events were vended.
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count
+	l.broker.observer.RemoveEvents(count, byteCount)
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
@@ -225,4 +237,5 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
+	l.broker.observer.AddEvent(req.eventSize)
 }
