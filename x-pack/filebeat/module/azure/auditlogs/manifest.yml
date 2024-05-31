@@ -17,6 +17,8 @@ var:
     default: [forwarded]
   - name: processor_version
     default: "v1"
+  - name: migrate_checkpoint
+    default: true
 
 ingest_pipeline:
   - ingest/pipeline.yml

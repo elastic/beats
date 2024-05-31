@@ -41,6 +41,10 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processor_version: {{ .processor_version }}
 {{ end }}
 
+{{ if .migrate_checkpoint }}
+migrate_checkpoint: {{ .migrate_checkpoint }}
+{{ end }}
+
 processors:
   - add_fields:
       target: ''

@@ -29,6 +29,8 @@ type azureInputConfig struct {
 	SanitizeOptions []string `config:"sanitize_options"`
 	// Processor version to use (v1 or v2). Default is v1.
 	ProcessorVersion string `config:"processor_version"`
+	// Perform the checkpoint information migration from v1 to v2
+	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 }
 
 const ephContainerName = "filebeat"

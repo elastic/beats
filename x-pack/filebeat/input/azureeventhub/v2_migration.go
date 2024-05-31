@@ -40,7 +40,6 @@ func newMigrationAssistant(log *logp.Logger, consumerClient *azeventhubs.Consume
 }
 
 func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, eventHubName, consumerGroup string) error {
-
 	// Fetching event hub information
 	eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
@@ -48,7 +47,7 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 	}
 
 	m.log.Infow(
-		"Event Hub properties",
+		"event hub information",
 		"name", eventHubProperties.Name,
 		"created_on", eventHubProperties.CreatedOn,
 		"partition_ids", eventHubProperties.PartitionIDs,

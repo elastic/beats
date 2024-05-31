@@ -161,16 +161,19 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 
 // run starts the main loop for processing events.
 func (in *eventHubInputV2) run(ctx context.Context) {
-	// Check if we need to migrate the checkpoint store.
-	err := in.migrationAssistant.checkAndMigrate(
-		ctx,
-		in.config.ConnectionString,
-		in.config.EventHubName,
-		in.config.ConsumerGroup,
-	)
-	if err != nil {
-		in.log.Errorw("error migrating checkpoint store", "error", err)
-		// FIXME: should we return here?
+	if in.config.MigrateCheckpoint {
+		in.log.Infow("checkpoint migration is enabled")
+		// Check if we need to migrate the checkpoint store.
+		err := in.migrationAssistant.checkAndMigrate(
+			ctx,
+			in.config.ConnectionString,
+			in.config.EventHubName,
+			in.config.ConsumerGroup,
+		)
+		if err != nil {
+			in.log.Errorw("error migrating checkpoint store", "error", err)
+			// FIXME: should we return here?
+		}
 	}
 
 	// Handle the case when the processor stops due to
