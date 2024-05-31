@@ -175,7 +175,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
-			fmt.Printf("\033[94mhi fae, receiving callback for \033[0m\n"
 			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
