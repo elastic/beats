@@ -303,6 +303,5 @@ func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) Cancel() int {
-	return 0
+func (emptyProducer) Close() {
 }

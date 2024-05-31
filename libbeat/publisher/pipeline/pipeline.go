@@ -71,10 +71,6 @@ type Pipeline struct {
 	waitCloseTimeout time.Duration
 	eventWaitGroup   *sync.WaitGroup
 
-	// closeRef signal propagation support
-	guardStartSigPropagation sync.Once
-	sigNewClient             chan *client
-
 	processors processing.Supporter
 }
 
@@ -249,18 +245,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	ackHandler := cfg.EventListener
 
 	producerCfg := queue.ProducerConfig{}
-
-	if client.eventWaitGroup != nil || cfg.ClientListener != nil {
-		producerCfg.OnDrop = func(event queue.Entry) {
-			publisherEvent, _ := event.(publisher.Event)
-			if cfg.ClientListener != nil {
-				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
-			}
-			if client.eventWaitGroup != nil {
-				client.eventWaitGroup.Add(-1)
-			}
-		}
-	}
 
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {

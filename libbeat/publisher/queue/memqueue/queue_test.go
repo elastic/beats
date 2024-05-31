@@ -96,9 +96,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
-		ACK:          func(count int) {},
-		OnDrop:       func(e queue.Entry) {},
-		DropOnCancel: false,
+		ACK: func(count int) {},
 	})
 
 	success := atomic.Bool{}
@@ -170,10 +168,6 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 		ACK: func(count int) {
 			activeEvents.Add(-int64(count))
 		},
-		OnDrop: func(e queue.Entry) {
-			//activeEvents.Add(-1)
-		},
-		DropOnCancel: false,
 	})
 
 	// Asynchronously, send 4 events to the queue.
@@ -209,7 +203,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// Cancel the producer, then read and acknowledge two batches. If the
 	// Publish calls and the queue code are working, activeEvents should
 	// _usually_ end up as 0, but _always_ end up non-negative.
-	p.Cancel()
+	p.Close()
 
 	// The queue reads also need to be done in a goroutine, in case the
 	// producer cancellation signal went through before the Publish
@@ -295,10 +289,6 @@ func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occup
 	assert.Equal(t, testMetrics.EventCount.ValueOr(0), uint64(evtCount), "incorrect EventCount for %s", test)
 	assert.Equal(t, testMetrics.EventLimit.ValueOr(0), uint64(evtLimit), "incorrect EventLimit for %s", test)
 	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
-}
-
-func TestProducerCancelRemovesEvents(t *testing.T) {
-	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024, 0, 0))
 }
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
