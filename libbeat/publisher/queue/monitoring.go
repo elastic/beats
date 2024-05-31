@@ -63,18 +63,23 @@ type queueObserver struct {
 
 type nilObserver struct{}
 
+// Creates queue metrics in the given registry under the path "pipeline.queue".
 func NewQueueObserver(metrics *monitoring.Registry) Observer {
 	if metrics == nil {
 		return nilObserver{}
 	}
-	queueMetrics := metrics.GetRegistry("queue")
+	pipelineMetrics := metrics.GetRegistry("pipeline")
+	if pipelineMetrics == nil {
+		pipelineMetrics = metrics.NewRegistry("pipeline")
+	}
+	queueMetrics := pipelineMetrics.GetRegistry("queue")
 	if queueMetrics != nil {
 		err := queueMetrics.Clear()
 		if err != nil {
 			return nilObserver{}
 		}
 	} else {
-		queueMetrics = metrics.NewRegistry("queue")
+		queueMetrics = pipelineMetrics.NewRegistry("queue")
 	}
 
 	ob := &queueObserver{

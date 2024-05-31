@@ -242,11 +242,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 			}
 		},
 	}
-	if ackHandler != nil {
-		producerCfg.ACK = ackHandler.ACKEvents
-	} else {
-		ackHandler = acker.Nil()
-	}
 
 	client.eventListener = ackHandler
 	client.waiter = waiter
