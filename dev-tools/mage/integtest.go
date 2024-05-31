@@ -274,12 +274,9 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 		}
 	}
 
-	// log missing requirements and do nothing
 	err = r.tester.HasRequirements()
 	if err != nil {
-		// log error; and return (otherwise on machines without requirements it will mark the tests as failed)
-		fmt.Printf("skipping test run with %s due to missing requirements: %s\n", r.tester.Name(), err)
-		err = nil
+		err = fmt.Errorf("test %s failed due to missing requirements: %s\n", r.tester.Name(), err)
 		return
 	}
 
