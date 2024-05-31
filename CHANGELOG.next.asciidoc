@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
+
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
@@ -98,6 +100,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
 - Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
 - Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
+- Fix seccomp policy of FIM kprobes backend on arm64 {pull}39759[39759]
 
 
 
@@ -146,6 +149,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
+- Expand ID patterns in request trace logger for HTTP Endpoint. {pull}39656[39656]
 
 *Heartbeat*
 
@@ -340,6 +344,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 
