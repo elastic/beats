@@ -635,6 +635,70 @@ func TestCoresCanBeClosed(t *testing.T) {
 	}
 }
 
+func TestCloserLoggerCoreWith(t *testing.T) {
+	defaultWriter := writeSyncer{}
+
+	cfg := zap.NewProductionEncoderConfig()
+	cfg.TimeKey = "" // remove the time to make the log entry consistent
+
+	core := closerCore{
+		Core: zapcore.NewCore(
+			zapcore.NewJSONEncoder(cfg),
+			&defaultWriter,
+			zapcore.InfoLevel,
+		),
+	}
+
+	expectedLines := []string{
+		// First/Default logger
+		`{"level":"info","msg":"Very first message"}`,
+
+		// Two messages after calling With
+		`{"level":"info","msg":"a message with extra fields","foo":"bar"}`,
+		`{"level":"info","msg":"another message with extra fields","foo":"bar"}`,
+
+		// A message with the default logger
+		`{"level":"info","msg":"a message without extra fields"}`,
+
+		// Two more messages with a different field
+		`{"level":"info","msg":"a message with an answer","answer":"42"}`,
+		`{"level":"info","msg":"another message with an answer","answer":"42"}`,
+
+		// One last message with the default logger
+		`{"level":"info","msg":"another message without any extra fields"}`,
+	}
+
+	// The default logger, it should not be modified by any call to With.
+	logger := zap.New(&core)
+	logger.Info("Very first message")
+
+	// Add a field and write messages
+	loggerWithFields := logger.With(strField("foo", "bar"))
+	loggerWithFields.Info("a message with extra fields")
+	loggerWithFields.Info("another message with extra fields")
+
+	// Use the default logger again
+	logger.Info("a message without extra fields")
+
+	// New logger with other fields
+	loggerWithFields = logger.With(strField("answer", "42"))
+	loggerWithFields.Info("a message with an answer")
+	loggerWithFields.Info("another message with an answer")
+
+	// One last message with the default logger
+	logger.Info("another message without any extra fields")
+
+	scanner := bufio.NewScanner(strings.NewReader(defaultWriter.String()))
+	count := 0
+	for scanner.Scan() {
+		l := scanner.Text()
+		if l != expectedLines[count] {
+			t.Error("Expecting:\n", l, "\nGot:\n", expectedLines[count])
+		}
+		count++
+	}
+}
+
 func strField(key, val string) zapcore.Field {
 	return zapcore.Field{Type: zapcore.StringType, Key: key, String: val}
 }

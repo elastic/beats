@@ -26,7 +26,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"unsafe"
 
@@ -67,14 +66,13 @@ type coreLogger struct {
 type closerCore struct {
 	zapcore.Core
 	io.Closer
-	mutex sync.Mutex
 }
 
-func (c *closerCore) With(fields []zapcore.Field) zapcore.Core {
-	c.mutex.Lock()
-	c.Core = c.Core.With(fields)
-	c.mutex.Unlock()
-	return c
+func (c closerCore) With(fields []zapcore.Field) zapcore.Core {
+	return closerCore{
+		Core:   c.Core.With(fields),
+		Closer: c.Closer,
+	}
 }
 
 // Configure configures the logp package.

@@ -18,6 +18,11 @@
 package logp
 
 import (
+	"bufio"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,7 +60,9 @@ func TestLoggerSelectors(t *testing.T) {
 	assert.Len(t, logs, 1)
 }
 
-func TestTypedCoreSelectors(t *testing.T) {
+func TestTypedAndCloserCoreSelectors(t *testing.T) {
+	tempDir := t.TempDir()
+
 	logSelector := "enabled-log-selector"
 	expectedMsg := "this should be logged"
 
@@ -63,59 +70,91 @@ func TestTypedCoreSelectors(t *testing.T) {
 	eventsCfg := DefaultEventConfig(DefaultEnvironment)
 
 	defaultCfg.Level = DebugLevel
-	defaultCfg.toObserver = true
-	defaultCfg.ToStderr = false
-	defaultCfg.ToFiles = false
+	defaultCfg.Beat = t.Name()
 	defaultCfg.Selectors = []string{logSelector}
+	defaultCfg.ToStderr = false
+	defaultCfg.ToFiles = true
+	defaultCfg.Files.Path = tempDir
 
 	eventsCfg.Level = defaultCfg.Level
-	eventsCfg.toObserver = defaultCfg.toObserver
+	eventsCfg.Beat = defaultCfg.Beat
+	eventsCfg.Selectors = defaultCfg.Selectors
 	eventsCfg.ToStderr = defaultCfg.ToStderr
 	eventsCfg.ToFiles = defaultCfg.ToFiles
-	eventsCfg.Selectors = defaultCfg.Selectors
+	eventsCfg.Files.Path = tempDir
 
 	if err := ConfigureWithTypedOutput(defaultCfg, eventsCfg, "log.type", "event"); err != nil {
 		t.Fatalf("could not configure logger: %s", err)
 	}
 
 	enabledSelector := NewLogger(logSelector)
+	defer enabledSelector.Close()
 	disabledSelector := NewLogger("foo-selector")
+	defer disabledSelector.Close()
 
 	enabledSelector.Debugw(expectedMsg)
 	enabledSelector.Debugw(expectedMsg, "log.type", "event")
 	disabledSelector.Debug("this should not be logged")
 
-	logEntries := ObserverLogs().TakeAll()
+	logEntries := takeAllLogsFromPath(t, tempDir)
 	if len(logEntries) != 2 {
 		t.Errorf("expecting 2 log entries, got %d", len(logEntries))
 		t.Log("Log entries:")
 		for _, e := range logEntries {
-			t.Log("Message:", e.Message, "Fields:", e.Context)
+			t.Log(e)
 		}
 		t.FailNow()
 	}
 
 	for i, logEntry := range logEntries {
-		msg := logEntry.Message
+		msg := logEntry["message"].(string) //nolint: errcheck // We know it's a string and it is a test
 		if msg != expectedMsg {
 			t.Fatalf("[%d] expecting log message '%s', got '%s'", i, expectedMsg, msg)
 		}
 
 		// The second entry should also contain `log.type: event`
 		if i == 1 {
-			fields := logEntry.Context
-			if len(fields) != 1 {
-				t.Errorf("expecting one field, got %d", len(fields))
-			}
-
-			k := fields[0].Key
-			v := fields[0].String
-			if k != "log.type" {
-				t.Errorf("expecting key 'log.type', got '%s'", k)
-			}
-			if v != "event" {
-				t.Errorf("expecting value 'event', got '%s'", v)
+			logType := logEntry["log.type"].(string) //nolint: errcheck // We know it's a string and it is a test
+			if logType != "event" {
+				t.Errorf("expecting value 'event', got '%s'", logType)
 			}
 		}
 	}
+}
+
+func takeAllLogsFromPath(t *testing.T, path string) []map[string]any {
+	entries := []map[string]any{}
+
+	glob := filepath.Join(path, "*.ndjson")
+	files, err := filepath.Glob(glob)
+	if err != nil {
+		t.Fatalf("cannot get files for glob '%s': %s", glob, err)
+	}
+
+	for _, filePath := range files {
+		f, err := os.Open(filePath)
+		if err != nil {
+			t.Fatalf("cannot open file '%s': %s", filePath, err)
+		}
+		defer f.Close()
+
+		sc := bufio.NewScanner(f)
+		for sc.Scan() {
+			m := map[string]any{}
+			bytes := sc.Bytes()
+			if err := json.Unmarshal(bytes, &m); err != nil {
+				t.Fatalf("cannot unmarshal log entry: '%s', err: %s", string(bytes), err)
+			}
+
+			entries = append(entries, m)
+		}
+	}
+
+	sort.Slice(entries, func(i, j int) bool {
+		t1 := entries[i]["@timestamp"].(string) //nolint: errcheck // We know it's a string and it is a test
+		t2 := entries[j]["@timestamp"].(string) //nolint: errcheck // We know it's a string and it is a test
+		return t1 < t2
+	})
+
+	return entries
 }
