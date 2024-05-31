@@ -293,3 +293,79 @@ Below are some samples:
 `2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:16	some message`
 
 `2017-12-17T18:54:16.242-0500	INFO	[example]	logp/core_test.go:19	some message	{"x": 1}`
+
+ifndef::serverless[]
+[float]
+=== Configuration options for event_data logger
+
+Some outputs will log raw events on errors like indexing errors in the
+Elasticsearch output, to prevent logging raw events (that may contain
+sensitive information) together with other log messages, a different
+log file, only for log entries containing raw events, is used. It will
+use the same level, selectors and all other configurations from the
+default logger, but it will have it's own file configuration.
+
+Having a different log file for raw events also prevents event data
+from drowning out the regular log files.
+
+IMPORTANT: No matter the default logger output configuration, raw events
+will **always** be logged to a file configured by `logging.event_data.files`.
+
+[float]
+==== `logging.event_data.files.path`
+
+The directory that log files are written to. The default is the logs path. See
+the <<directory-layout>> section for details.
+
+[float]
+==== `logging.event_data.files.name`
+
+The name of the file that logs are written to. The default is '{beatname_lc}'-event-data.
+
+[float]
+==== `logging.event_data.files.rotateeverybytes`
+
+The maximum size of a log file. If the limit is reached, a new log file is
+generated. The default size limit is 5242880 (5 MB).
+
+[float]
+==== `logging.event_data.files.keepfiles`
+
+The number of most recent rotated log files to keep on disk. Older files are
+deleted during log rotation. The default value is 2. The `keepfiles` options has
+to be in the range of 2 to 1024 files.
+
+[float]
+==== `logging.event_data.files.permissions`
+
+The permissions mask to apply when rotating log files. The default value is
+0600. The `permissions` option must be a valid Unix-style file permissions mask
+expressed in octal notation. In Go, numbers in octal notation must start with
+'0'.
+
+The most permissive mask allowed is 0640. If a higher permissions mask is
+specified via this setting, it will be subject to an umask of 0027.
+
+This option is not supported on Windows.
+
+Examples:
+
+* 0640: give read and write access to the file owner, and read access to members of the group associated with the file.
+* 0600: give read and write access to the file owner, and no access to all others.
+
+[float]
+==== `logging.event_data.files.interval`
+
+Enable log file rotation on time intervals in addition to size-based rotation.
+Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+are boundary-aligned with minutes, hours, days, weeks, months, and years as
+reported by the local system clock. All other intervals are calculated from the
+unix epoch. Defaults to disabled.
+
+[float]
+==== `logging.event_data.files.rotateonstartup`
+
+If the log file already exists on startup, immediately rotate it and start
+writing to a new file instead of appending to the existing one. Defaults to
+false.
+endif::serverless[]

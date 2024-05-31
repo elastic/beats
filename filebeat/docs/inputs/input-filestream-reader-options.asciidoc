@@ -153,6 +153,7 @@ Available parsers:
 * `ndjson`
 * `container`
 * `syslog`
+* `include_message`
 
 In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
 and are encapsulated in single-line JSON objects.

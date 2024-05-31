@@ -517,9 +517,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + "-" + self.today + ".ndjson"
 
-        print("logfile", logfile, self.working_dir)
+        logfile_path = os.path.join(self.working_dir, logfile)
+        print("logfile      ", logfile_path)
         try:
-            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
+            with open(logfile_path, "r", encoding="utf_8") as f:
                 for line in f:
                     if is_regexp:
                         if msg.search(line) is not None:
@@ -529,6 +530,27 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
+
+            # Event log file:
+            logfile = self.beat_name + "-events-data-" + self.today + ".ndjson"
+            logfile_path = os.path.join(self.working_dir, "logs", logfile)
+            print("event logfile", logfile_path)
+            try:
+                with open(logfile_path, "r", encoding="utf_8") as f:
+                    for line in f:
+                        if is_regexp:
+                            if msg.search(line) is not None:
+                                counter = counter + 1
+                            continue
+                        if ignore_case:
+                            line = line.lower()
+                        if line.find(msg) >= 0:
+                            counter = counter + 1
+            except FileNotFoundError as e:
+                # The events log file is not always present, so we ignore
+                # if it does not exit
+                pass
+
         except IOError as ioe:
             print(ioe)
             counter = -1

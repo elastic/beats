@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -47,6 +48,11 @@ type ConfigWithMeta struct {
 
 	// InputUnitID is the unit's ID that generated this ConfigWithMeta
 	InputUnitID string
+
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of a Beat this is
+	// expected to be nil.
+	StatusReporter status.StatusReporter
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities
@@ -160,7 +166,7 @@ func (r *Registry) GetReloadableOutput() Reloadable {
 func (r *Registry) GetRegisteredNames() []string {
 	r.RLock()
 	defer r.RUnlock()
-	var names []string
+	names := make([]string, 0, len(r.confs)+len(r.confsLists))
 
 	for name := range r.confs {
 		names = append(names, name)
