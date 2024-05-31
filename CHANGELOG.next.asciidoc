@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 
 *Osquerybeat*
 
@@ -283,9 +284,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Implement Elastic Agent status and health reporting for CEL Filebeat input. {pull}39209[39209]
 - Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
 - Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
-- Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}[]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
 - Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
+- Update CEL mito extensions to v1.12.2. {pull}39755[39755]
+- Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
 
 *Auditbeat*
 
