@@ -105,7 +105,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Filebeat*
-
+- Fix handling of endpoint for custom domains and ensure region, default_region, and region parsed from queue_url are applied in the order specified in the documentation for the awss3 input {pull}39709[39709]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
