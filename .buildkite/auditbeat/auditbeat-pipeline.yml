@@ -2,22 +2,25 @@
 name: "beats-auditbeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
+  IMAGE_UBUNTU_2204_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_RHEL_9: "family/platform-ingest-beats-rhel-9"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
+  IMAGE_MACOS_ARM64: "generic-13-ventura-arm"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -41,7 +44,7 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -60,7 +63,7 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_RHEL9}"
+          image: "${IMAGE_RHEL_9}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -119,7 +122,7 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
@@ -128,13 +131,13 @@ steps:
   - group: "Auditbeat Extended Tests"
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
-
     steps:
-      - label: ":linux: Auditbeat Ubuntu Integration Tests"
+      - label: ":linux: Auditbeat Linux x86_64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
+          echo "using kernel $(uname -r)"
           cd auditbeat
           mage build integTest
         retry:
@@ -142,20 +145,27 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Linux Integration Tests"
+              context: "auditbeat: Linux x86_64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_2004_X86_64}"
+              - "${IMAGE_UBUNTU_2204_X86_64}"
+              - "${IMAGE_RHEL_9}"
 
-      - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
+      - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
+          echo "using kernel $(uname -r)"
           cd auditbeat
           mage build integTest
         retry:
@@ -163,7 +173,7 @@ steps:
             - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "{{matrix.image}}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -171,6 +181,11 @@ steps:
         notify:
           - github_commit_status:
               context: "auditbeat: Linux arm64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${AWS_IMAGE_UBUNTU_2004_ARM64}"
+              - "${AWS_IMAGE_UBUNTU_2204_ARM64}"
 
       - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
@@ -184,7 +199,7 @@ steps:
             - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_2204_ARM64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
@@ -225,7 +240,7 @@ steps:
             - limit: 3
         agents:
           provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
+          imagePrefix: "${IMAGE_MACOS_ARM64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -326,7 +341,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
@@ -348,7 +363,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_2204_ARM64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
