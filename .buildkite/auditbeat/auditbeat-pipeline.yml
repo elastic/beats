@@ -158,7 +158,6 @@ steps:
             image:
               - "${IMAGE_UBUNTU_2004_X86_64}"
               - "${IMAGE_UBUNTU_2204_X86_64}"
-              - "${IMAGE_RHEL_9}"
 
       - label: ":linux: Auditbeat Linux arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
