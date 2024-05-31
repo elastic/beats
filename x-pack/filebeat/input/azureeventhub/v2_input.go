@@ -387,7 +387,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 // processReceivedEvents
 func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, partitionID string, pipelineClient beat.Client) error {
 	processingStartTime := time.Now()
-	azure := mapstr.M{
+	eventHubMetadata := mapstr.M{
 		"partition_id":   partitionID,
 		"eventhub":       in.config.EventHubName,
 		"consumer_group": in.config.ConsumerGroup,
@@ -403,9 +403,14 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
 		for record := range records {
-			_, _ = azure.Put("offset", receivedEventData.Offset)
-			_, _ = azure.Put("sequence_number", receivedEventData.SequenceNumber)
-			_, _ = azure.Put("enqueued_time", receivedEventData.EnqueuedTime)
+			_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
+			_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
+			_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
+
+			// The partition key is optional.
+			if receivedEventData.PartitionKey != nil {
+				_, _ = eventHubMetadata.Put("partition_key", *receivedEventData.PartitionKey)
+			}
 
 			event := beat.Event{
 				// this is the default value for the @timestamp field; usually the ingest
@@ -413,7 +418,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 				Timestamp: processingStartTime,
 				Fields: mapstr.M{
 					"message": record,
-					"azure":   azure,
+					"azure":   eventHubMetadata,
 				},
 				Private: receivedEventData,
 			}
