@@ -78,7 +78,7 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
-				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TotalSpaceBytes})
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.UsedSpaceBytes})
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.FreeSpace})
 			}
@@ -101,6 +101,7 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 				if name == freeSpaceTable.TablespaceName {
 					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalFreeBytes})
 					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalUsedBytes})
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalSpaceBytes})
 				}
 			}
 		}
