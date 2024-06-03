@@ -618,7 +618,6 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 		err               error
 		urlCopy           url.URL
 		urlString         string
-		httpResp          *http.Response
 		intermediateResps []*http.Response
 		finalResps        []*http.Response
 	)
@@ -672,10 +671,16 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			}
 
 			// collect data from new urls
-			httpResp, err = rf.collectResponse(ctx, chainTrCtx, r)
+			httpResp, err := rf.collectResponse(ctx, chainTrCtx, r)
 			if err != nil {
 				return -1, fmt.Errorf("failed to collect response: %w", err)
 			}
+			defer func() {
+				if httpResp != nil && httpResp.Body != nil {
+					httpResp.Body.Close()
+				}
+			}()
+
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {
 				finalResps = append(finalResps, httpResp)
@@ -701,12 +706,6 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
-
-	defer func() {
-		if httpResp != nil && httpResp.Body != nil {
-			httpResp.Body.Close()
-		}
-	}()
 
 	return n, nil
 }
