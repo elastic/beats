@@ -45,6 +45,10 @@ processor_version: {{ .processor_version }}
 migrate_checkpoint: {{ .migrate_checkpoint }}
 {{ end }}
 
+{{ if .start_position }}
+start_position: {{ .start_position }}
+{{ end }}
+
 processors:
   - add_fields:
       target: ''

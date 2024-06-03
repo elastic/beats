@@ -17,7 +17,9 @@ var:
   - name: processor_version
     default: "v1"
   - name: migrate_checkpoint
-    default: true
+    default: yes
+  - name: start_position
+    default: "earliest"
 
 ingest_pipeline:
   - ingest/pipeline.yml

@@ -39,6 +39,10 @@ processor_version: {{ .processor_version }}
 migrate_checkpoint: {{ .migrate_checkpoint }}
 {{ end }}
 
+{{ if .start_position }}
+start_position: {{ .start_position }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 

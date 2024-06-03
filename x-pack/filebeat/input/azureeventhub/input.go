@@ -26,6 +26,8 @@ const (
 	eventHubConnector        = ";EntityPath="
 	expandEventListFromField = "records"
 	inputName                = "azure-eventhub"
+	processorV1              = "v1"
+	processorV2              = "v2"
 )
 
 var environments = map[string]azure.Environment{
@@ -70,9 +72,9 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	switch config.ProcessorVersion {
-	case "v1":
+	case processorV1:
 		return newEventHubInputV1(config, m.log)
-	case "v2":
+	case processorV2:
 		return newEventHubInputV2(config, m.log)
 	default:
 		return nil, fmt.Errorf("invalid azure-eventhub processor version: %s (available versions: v1, v2)", config.ProcessorVersion)

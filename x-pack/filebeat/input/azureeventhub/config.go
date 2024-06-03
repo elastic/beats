@@ -20,17 +20,21 @@ type azureInputConfig struct {
 	EventHubName     string `config:"eventhub" validate:"required"`
 	ConsumerGroup    string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
-	SAName      string `config:"storage_account"`
-	SAKey       string `config:"storage_account_key"`
-	SAContainer string `config:"storage_account_container"`
+	SAName             string `config:"storage_account" validate:"required"`
+	SAKey              string `config:"storage_account_key"`               // (processor v1 only)
+	SAConnectionString string `config:"storage_account_connection_string"` // (processor v2 only)
+	SAContainer        string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
-	// Processor version to use (v1 or v2). Default is v1.
+	// Processor version to use (v1 or v2). Default is v1 (processor v2 only).
 	ProcessorVersion string `config:"processor_version"`
-	// Perform the checkpoint information migration from v1 to v2
+	// Controls if the input should perform the checkpoint information
+	// migration from v1 to v2 (processor v2 only).
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
+	// Controls the start position for all partitions (processor v2 only).
+	StartPosition string `config:"start_position"`
 }
 
 const ephContainerName = "filebeat"
@@ -44,9 +48,8 @@ func (conf *azureInputConfig) Validate() error {
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
-	// FIXME: this check applies only to processor v1
-	if conf.SAName == "" || conf.SAKey == "" {
-		return errors.New("no storage account or storage account key configured")
+	if conf.SAName == "" {
+		return errors.New("no storage account configured (config: storage_account)")
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)
@@ -79,7 +82,30 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	if conf.ProcessorVersion == "" {
-		conf.ProcessorVersion = "v1"
+		// The default processor version is "v1".
+		conf.ProcessorVersion = processorV1
+	}
+
+	switch conf.ProcessorVersion {
+	case processorV1:
+		if conf.SAKey == "" {
+			return errors.New("no storage account key configured (config: storage_account_key)")
+		}
+	case processorV2:
+		if conf.SAKey != "" {
+			logger.Warnf("storage_account_key is not used in processor v2")
+		}
+		if conf.SAConnectionString == "" {
+			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+		}
+	default:
+		return fmt.Errorf("invalid azure-eventhub processor version: %s (available versions: v1, v2)", conf.ProcessorVersion)
+	}
+
+	if conf.StartPosition == "" {
+		// For backward compatibility with v1,
+		// the default start position is "earliest".
+		conf.StartPosition = startPositionEarliest
 	}
 
 	return nil

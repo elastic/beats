@@ -28,6 +28,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const (
+	startPositionEarliest = "earliest"
+	startPositionLatest   = "latest"
+)
+
 // azureInputConfig the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 type eventHubInputV2 struct {
@@ -185,9 +190,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		120*time.Second, // max backoff
 	)
 
-	processorOptions := azeventhubs.ProcessorOptions{
-		LoadBalancingStrategy: azeventhubs.ProcessorStrategyBalanced,
-	}
+	processorOptions := createProcessorOptions(in.config)
 
 	for ctx.Err() == nil {
 		// Create a new processor for each run.
@@ -237,6 +240,44 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 			"run completed; continue if context error is nil",
 			"context_error", ctx.Err(),
 		)
+	}
+}
+
+// createProcessorOptions creates the processor options using the input configuration.
+func createProcessorOptions(config azureInputConfig) azeventhubs.ProcessorOptions {
+	// LoadBalancingStrategy offers multiple options:
+	//
+	// - Balanced
+	// - Greedy
+	//
+	// As of now, we only support Balanced.
+	loadBalancingStrategy := azeventhubs.ProcessorStrategyBalanced
+
+	// Start position offers multiple options:
+	//
+	// - Offset
+	// - SequenceNumber
+	// - EnqueuedTime
+	//
+	// As of now, we only support Earliest and Latest.
+	//
+	// The processor uses the default start position for
+	// all partitions if there is no checkpoint information
+	// available from the storage account container.
+	defaultStartPosition := azeventhubs.StartPosition{}
+
+	switch config.StartPosition {
+	case startPositionEarliest:
+		defaultStartPosition.Earliest = to.Ptr(true)
+	case startPositionLatest:
+		defaultStartPosition.Latest = to.Ptr(true)
+	}
+
+	return azeventhubs.ProcessorOptions{
+		LoadBalancingStrategy: loadBalancingStrategy,
+		StartPositions: azeventhubs.StartPositions{
+			Default: defaultStartPosition,
+		},
 	}
 }
 
