@@ -589,8 +589,9 @@ The goal of this scenario is to verify that if the input uses an invalid Elastic
 - Start one input
 - Take a note with the sequencenumber for all partitions
 - Send 10 events
-- check that checkpoint info v2 are not updated
-- check that the 10 events are stored in the in-memory queue
+- Check that checkpoint info v2 are not updated
+- Check that the 10 events are stored in the in-memory queue
+- Check that after fixing the problem the input successfully processed the 10 events
 
 #### Setup
 
@@ -662,7 +663,7 @@ sending batch of 10 events
 batch sent successfully
 ```
 
-#### check that checkpoint info v2 are not updated
+#### Check that checkpoint info v2 are not updated
 
 The partition `1` received 10 events:
 
@@ -682,7 +683,7 @@ Current checkpoint info are:
 Partition `1`, and all other partitions checkpoint info as metadata, are unchanged.
 
 
-#### check that the 10 events are stored in the in-memory queue
+#### Check that the 10 events are stored in the in-memory queue
 
 Checking the metrics:
 
