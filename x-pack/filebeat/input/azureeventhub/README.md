@@ -363,7 +363,7 @@ $ pbpaste | grep '^{' |  jq -r 'select(."log.logger" == "input.azure-eventhub") 
 2024-06-03T13:05:03.167+0200	debug	input.azure-eventhub	checkpoint updated	2	0	20	na
 ```
 
-### Scenario 003: ingest 100 events (2 input)
+### Scenario 003: ingest 100 events (2 inputs)
 
 - Setup
 - Start two inputs
@@ -371,6 +371,8 @@ $ pbpaste | grep '^{' |  jq -r 'select(."log.logger" == "input.azure-eventhub") 
 - Process 100 events
 - Check that the 100 events are processed
 - check that checkpoint info v2 have been updated
+- Stop input 2
+- Check that input 1 started two new consumer
 
 #### Setup
 
@@ -455,7 +457,7 @@ After input 2 started successfully, the two input share 50% of the event hub par
 - input 1: partition 1, 2
 - input 2: partition 0, 3
 
-#### Process 100 events
+#### Send 100 events
 
 Edit the `activitylogs.ndjson` to have 100 events.
 
@@ -565,3 +567,196 @@ I get this split:
   }
 }
 ```
+
+#### Stop input 2
+
+Just shut down the input 2.
+
+#### Check that input 1 started two new consumers
+
+After ~10s, the input 1 started two new consumer to claim the partition from input 2:
+
+```shell
+2024-06-03T19:25:20.104+0200	info	input.azure-eventhub	starting a partition worker	2	0	0	na
+2024-06-03T19:25:32.100+0200	info	input.azure-eventhub	starting a partition worker	1	0	0	na
+```
+
+### Scenario 004: Invalid Elasticsearch endpoint
+
+The goal of this scenario is to verify that if the input uses an invalid Elasticsearch endpoint, the input does not update the checkpoint data.
+
+- Setup
+- Start one input
+- Take a note with the sequencenumber for all partitions
+- Send 10 events
+- check that checkpoint info v2 are not updated
+- check that the 10 events are stored in the in-memory queue
+
+#### Setup
+
+- Delete the index `filebeat-8.15.0` from the test cluster.
+
+
+#### Start one input
+
+Using the following configuration:
+
+```yaml
+# x-pack/filebeat/modules.d/azure.yml
+
+- module: azure
+  # All logs
+  activitylogs:
+    enabled: true
+    var:
+      eventhub: "eventhubsdkupgrade"
+      consumer_group: "$Default"
+      connection_string: "<redacted>"
+      storage_account: "mbrancageneral"
+      storage_account_container: "filebeat-activitylogs-zmoog-0005"
+      storage_account_key: "<redacted>"
+      storage_account_connection_string: "<redacted>"
+      processor_version: "v2"
+      migrate_checkpoint: yes
+      start_position: "earliest"
+```
+
+Important: set the `cloud.id` with a deleted deployment, or set `cloud.auth` with invalid credentials. 
+
+```shell
+./filebeat -e -v -d * \
+    --strict.perms=false \
+    --path.home /Users/zmoog/code/projects/elastic/beats/x-pack/filebeat \
+    -E cloud.id=<redacted> \
+    -E cloud.auth=<redacted> \
+    -E gc_percent=100 \
+    -E setup.ilm.enabled=false \
+    -E setup.template.enabled=false \
+    -E output.elasticsearch.allow_older_versions=true
+```
+
+The Elasticsearch output must fail to send anything to the cluster.
+
+#### Take a note with the sequencenumber for all partitions
+
+Current checkpoint info are:
+
+| Partition | Sequence number | Offset |
+| --------- | --------------- | ------ |
+| 0         | 59              | 207680 |
+| 1         | 49              | 172480 |
+| 2         | 59              | 207680 |
+| 3         | 39              | 137280 |
+
+#### Send 10 events
+
+Edit the `activitylogs.ndjson` to have 10 events.
+
+Send the 10 events:
+
+```shell
+$ eh -v eventdata send-batch --lines-from-text-file activitylogs.ndjson --batch-size 40
+
+Sending 10 events to eventhubsdkupgrade
+sending batch of 10 events
+batch sent successfully
+```
+
+#### check that checkpoint info v2 are not updated
+
+The partition `1` received 10 events:
+
+```
+2024-06-03T22:55:18.539+0200	debug	input.azure-eventhub	received events	1	10	0	na
+```
+
+Current checkpoint info are:
+
+| Partition | Sequence number | Offset |
+| --------- | --------------- | ------ |
+| 0         | 59              | 207680 |
+| 1         | 49              | 172480 |
+| 2         | 59              | 207680 |
+| 3         | 39              | 137280 |
+
+Partition `1`, and all other partitions checkpoint info as metadata, are unchanged.
+
+
+#### check that the 10 events are stored in the in-memory queue
+
+Checking the metrics:
+
+```shell
+$ pbpaste | grep "Non-zero" | jq -r '[.["@timestamp"],.component.id,.monitoring.metrics.filebeat.events.active,.monitoring.metrics.libbeat.pipeline.events.active,.monitoring.metrics.libbeat.output.events.total//"n/a",.monitoring.metrics.libbeat.output.events.acked//"n/a",.monitoring.metrics.libbeat.output.events.failed//0] | @tsv' | sort
+
+2024-06-03T22:54:14.956+0200		0	0	n/a	n/a	0
+2024-06-03T22:54:44.956+0200		0	0	n/a	n/a	0
+2024-06-03T22:55:14.972+0200		0	0	n/a	n/a	0
+2024-06-03T22:55:44.958+0200		10	10	n/a	n/a	0
+2024-06-03T22:56:14.956+0200		10	10	n/a	n/a	0
+2024-06-03T22:56:44.962+0200		10	10	n/a	n/a	0
+2024-06-03T22:57:14.957+0200		10	10	n/a	n/a	0
+2024-06-03T22:57:44.955+0200		10	10	n/a	n/a	0
+2024-06-03T22:58:14.957+0200		10	10	n/a	n/a	0
+2024-06-03T22:58:44.956+0200		10	10	n/a	n/a	0
+2024-06-03T22:59:14.957+0200		10	10	n/a	n/a	0
+2024-06-03T22:59:44.957+0200		10	10	n/a	n/a	0
+2024-06-03T23:00:14.957+0200		10	10	n/a	n/a	0
+2024-06-03T23:00:44.956+0200		10	10	n/a	n/a	0
+2024-06-03T23:01:14.956+0200		10	10	n/a	n/a	0
+202e-06-03T23:01:44.955+0200		10	10	n/a	n/a	0
+2024-06-03T23:02:14.961+0200		10	10	n/a	n/a	0
+2024-06-03T23:02:44.957+0200		10	10	n/a	n/a	0
+2024-06-03T23:03:14.955+0200		10	10	n/a	n/a	0
+```
+
+I see the `.monitoring.metrics.filebeat.events.active` and `.monitoring.metrics.libbeat.pipeline.events.active` metrics values are both `10`, but `.monitoring.metrics.libbeat.output.events.total` and `.monitoring.metrics.libbeat.output.events.acked` metrics values are both `n/a`.
+
+#### Check that after fixing the problem the input successfully processed the 10 events
+
+- Update `cloud.auth` with valid credentials 
+- restart the input
+
+After restarting the input, here are the input metrics:
+
+```shell
+$ pbpaste | grep "Non-zero" | jq -r '[.["@timestamp"],.component.id,.monitoring.metrics.filebeat.events.active,.monitoring.metrics.libbeat.pipeline.events.active,.monitoring.metrics.libbeat.output.events.total//"n/a",.monitoring.metrics.libbeat.output.events.acked//"n/a",.monitoring.metrics.libbeat.output.events.failed//0] | @tsv' | sort
+
+2024-06-03T23:25:57.052+0200		0	0	n/a	n/a	0
+2024-06-03T23:26:27.057+0200		10	10	n/a	n/a	0
+2024-06-03T23:26:57.060+0200		0	0	10	10	0
+```
+
+The 10 events have been reprocessed successfully.
+
+Here are the checkpoint info.
+
+Before:
+
+Current checkpoint info are:
+
+| Partition | Sequence number | Offset |
+| --------- | --------------- | ------ |
+| 0         | 59              | 207680 |
+| 1         | 49              | 172480 |
+| 2         | 59              | 207680 |
+| 3         | 39              | 137280 |
+
+After:
+
+Current checkpoint info are:
+
+| Partition | Sequence number | Offset |
+| --------- | --------------- | ------ |
+| 0         | 59              | 207680 |
+| 1         | 59              | 207680 |
+| 2         | 59              | 207680 |
+| 3         | 39              | 137280 |
+
+
+Of the 10 events published, 
+
+- 0  landed on partition 0
+- 10 landed on partition 1 (49 > 59)
+- 0  landed on partition 2
+- 0  landed on partition 3
