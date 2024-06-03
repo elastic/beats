@@ -219,7 +219,7 @@ func PythonIntegTest(ctx context.Context) error {
 
 // TestJournaldInput executes the Journald input unit tests.
 //
-// It requires Systemd >= 255 and D-Bus to be installed
+// It requires Systemd and D-Bus to be installed
 // on the host.
 //
 // Use TEST_COVERAGE=true to enable code coverage profiling.
