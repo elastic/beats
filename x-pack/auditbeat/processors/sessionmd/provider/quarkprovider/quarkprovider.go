@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 //go:build linux
 
 package quarkprovider
@@ -29,7 +33,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	}
 
 	qq, err := quark.OpenQueue(quark.QueueAttr{
-		Flags: (quark.QQ_KPROBE),
+		Flags:     (quark.QQ_KPROBE),
 		MaxLength: 1000,
 	}, 64)
 	if err != nil {
@@ -41,7 +45,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		logger.Error("MWOLF: got PID!")
 	}
 
-	go func(qq *quark.Queue, logger *logp.Logger){
+	go func(qq *quark.Queue, logger *logp.Logger) {
 		for {
 			qevs, err := qq.GetEvents()
 			if err != nil {
@@ -49,27 +53,31 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 				continue
 			}
 			for _, qev := range qevs {
-				pr := processdb.Process {
-					PIDs: types.PIDInfo {
-						Tid: qev.Pid,
-						Tgid: qev.Pid,
-						Ppid: qev.Proc.Ppid,
-						Pgid: qev.Pid,
-						Sid: qev.Proc.Sid,
+				pr := processdb.Process{
+					PIDs: types.PIDInfo{
+						Tid:         qev.Pid,
+						Tgid:        qev.Pid,
+						Ppid:        qev.Proc.Ppid,
+						Pgid:        qev.Proc.Pgid,
+						Sid:         qev.Proc.Sid,
 						StartTimeNS: qev.Proc.TimeBoot,
 					},
 					Creds: types.CredInfo{
-						Ruid: qev.Proc.Uid,
-						Rgid: qev.Proc.Gid,
-						Euid: qev.Proc.Euid,
-						Egid: qev.Proc.Egid,
-						Suid: qev.Proc.Suid,
-						Sgid: qev.Proc.Sgid,
+						Ruid:         qev.Proc.Uid,
+						Rgid:         qev.Proc.Gid,
+						Euid:         qev.Proc.Euid,
+						Egid:         qev.Proc.Egid,
+						Suid:         qev.Proc.Suid,
+						Sgid:         qev.Proc.Sgid,
 						CapPermitted: qev.Proc.CapPermitted,
 						CapEffective: qev.Proc.CapEffective,
-						},
-					Cwd: qev.Cwd,
-					Argv: qev.Cmdline,
+					},
+					CTTY: types.TTYDev{
+						Major: uint16(qev.Proc.TtyMajor),
+						Minor: uint16(qev.Proc.TtyMinor),
+					},
+					Cwd:      qev.Cwd,
+					Argv:     qev.Cmdline,
 					Filename: qev.Comm,
 				}
 				if qev.ExitEvent != nil {
@@ -78,45 +86,45 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 				logger.Errorf("MWOLF: Inserting PID %v", pr.PIDs.Tgid)
 				p.db.InsertProcess(pr)
 
-//				if qev.ExitEvent == nil {
-//					pe :=  types.ProcessExecEvent{
-//						PIDs: types.PIDInfo {
-//							Tid: qev.Pid,
-//							Tgid: qev.Pid,
-//							Ppid: qev.Proc.Ppid,
-//							Pgid: qev.Pid,
-//							Sid: qev.Proc.Sid,
-//							StartTimeNS: qev.Proc.TimeBoot,
-//						},
-//						Creds: types.CredInfo{
-//							Ruid: qev.Proc.Uid,
-//							Rgid: qev.Proc.Gid,
-//							Euid: qev.Proc.Euid,
-//							Egid: qev.Proc.Egid,
-//							Suid: qev.Proc.Suid,
-//							Sgid: qev.Proc.Sgid,
-//							CapPermitted: qev.Proc.CapPermitted,
-//							CapEffective: qev.Proc.CapEffective,
-//							},
-//						CWD: qev.Cwd,
-//						Argv: qev.Cmdline,
-//						Filename: qev.Comm,
-//					}
-//					p.db.InsertExec(pe)
-//				} else {
-//					// Exit event
-//					pe := types.ProcessExitEvent {
-//						PIDs: types.PIDInfo {
-//							Tid: qev.Pid,
-//							Tgid: qev.Pid,
-//							Ppid: qev.Proc.Ppid,
-//							Sid: qev.Proc.Sid,
-//							StartTimeNS: qev.Proc.TimeBoot,
-//						},
-//						ExitCode: qev.ExitEvent.ExitCode,
-//					}
-//					p.db.InsertExit(pe)
-//				}
+				//				if qev.ExitEvent == nil {
+				//					pe :=  types.ProcessExecEvent{
+				//						PIDs: types.PIDInfo {
+				//							Tid: qev.Pid,
+				//							Tgid: qev.Pid,
+				//							Ppid: qev.Proc.Ppid,
+				//							Pgid: qev.Pid,
+				//							Sid: qev.Proc.Sid,
+				//							StartTimeNS: qev.Proc.TimeBoot,
+				//						},
+				//						Creds: types.CredInfo{
+				//							Ruid: qev.Proc.Uid,
+				//							Rgid: qev.Proc.Gid,
+				//							Euid: qev.Proc.Euid,
+				//							Egid: qev.Proc.Egid,
+				//							Suid: qev.Proc.Suid,
+				//							Sgid: qev.Proc.Sgid,
+				//							CapPermitted: qev.Proc.CapPermitted,
+				//							CapEffective: qev.Proc.CapEffective,
+				//							},
+				//						CWD: qev.Cwd,
+				//						Argv: qev.Cmdline,
+				//						Filename: qev.Comm,
+				//					}
+				//					p.db.InsertExec(pe)
+				//				} else {
+				//					// Exit event
+				//					pe := types.ProcessExitEvent {
+				//						PIDs: types.PIDInfo {
+				//							Tid: qev.Pid,
+				//							Tgid: qev.Pid,
+				//							Ppid: qev.Proc.Ppid,
+				//							Sid: qev.Proc.Sid,
+				//							StartTimeNS: qev.Proc.TimeBoot,
+				//						},
+				//						ExitCode: qev.ExitEvent.ExitCode,
+				//					}
+				//					p.db.InsertExit(pe)
+				//				}
 			}
 			if len(qevs) == 0 {
 				err = qq.Block()
@@ -133,9 +141,9 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 
 const (
 	maxWaitLimit      = 4500 * time.Millisecond // Maximum time SyncDB will wait for process
-	combinedWaitLimit = 6 * time.Second        // Multiple SyncDB calls will wait up to this amount within resetDuration
-	backoffDuration   = 10 * time.Second       // SyncDB will stop waiting for processes for this time
-	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
+	combinedWaitLimit = 6 * time.Second         // Multiple SyncDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 10 * time.Second        // SyncDB will stop waiting for processes for this time
+	resetDuration     = 5 * time.Second         // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
 var (
@@ -145,7 +153,6 @@ var (
 	since          = time.Now()
 	backoffSkipped = 0
 )
-
 
 func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	if s.db.HasProcess(pid) {

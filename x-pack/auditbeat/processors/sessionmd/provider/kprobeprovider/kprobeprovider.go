@@ -20,7 +20,7 @@ import (
 
 const (
 	tracingEvents = "/sys/kernel/debug/tracing/kprobe_events"
-	tracingPipe = "/sys/kernel/tracing/trace_pipe"
+	tracingPipe   = "/sys/kernel/tracing/trace_pipe"
 
 	loadExecve = "p:kprobes/my_probe sys_execve\n"
 )
@@ -39,7 +39,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	}
 
 	// Load kprobe
-	eventsFile, err := os.OpenFile(tracingEvents, os.O_APPEND | os.O_RDWR, 0777)
+	eventsFile, err := os.OpenFile(tracingEvents, os.O_APPEND|os.O_RDWR, 0777)
 	if err != nil {
 		return nil, fmt.Errorf("opening %v: %v", tracingEvents, err)
 	}
@@ -67,4 +67,3 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	return nil
 }
-

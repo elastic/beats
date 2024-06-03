@@ -17,9 +17,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quarkprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpfprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quarkprovider"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,8 +58,8 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	//TODO: backfill if not using quark
-//	backfilledPIDs := db.ScrapeProcfs()
-//	logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	//	backfilledPIDs := db.ScrapeProcfs()
+	//	logger.Infof("backfilled %d processes", len(backfilledPIDs))
 
 	var p provider.Provider
 
