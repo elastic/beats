@@ -94,15 +94,10 @@ func (producer *diskQueueProducer) publish(
 	}
 }
 
-func (producer *diskQueueProducer) Cancel() int {
+func (producer *diskQueueProducer) Close() {
 	if producer.cancelled {
-		return 0
+		return
 	}
 	producer.cancelled = true
 	close(producer.done)
-
-	// TODO (possibly?): message the core loop to remove any pending events that
-	// were sent through this producer. If we do, return the number of cancelled
-	// events here instead of zero.
-	return 0
 }

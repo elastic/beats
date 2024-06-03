@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -200,18 +199,16 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
-		if management.TraceLevelEnabled() {
-			mux.Lock()
-			defer mux.Unlock()
+		mux.Lock()
+		defer mux.Unlock()
 
-			b, err := encoder.Encode(info.Beat, event)
-			if err != nil {
-				//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
-				return event, nil
-			}
-
-			log.Debugf("Publish event: %s", b)
+		b, err := encoder.Encode(info.Beat, event)
+		if err != nil {
+			//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
+			return event, nil
 		}
+
+		log.Debugw(fmt.Sprintf("Publish event: %s", b), logp.TypeKey, logp.EventType)
 		return event, nil
 	})
 }

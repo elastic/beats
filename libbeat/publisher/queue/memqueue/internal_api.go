@@ -38,15 +38,6 @@ type pushRequest struct {
 	resp       chan queue.EntryID
 }
 
-type producerCancelRequest struct {
-	producer *ackProducer
-	resp     chan producerCancelResponse
-}
-
-type producerCancelResponse struct {
-	removed int
-}
-
 // consumer -> broker API
 
 type getRequest struct {

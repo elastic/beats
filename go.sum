@@ -554,8 +554,8 @@ github.com/elastic/elastic-agent-autodiscover v0.6.14 h1:0zJYNyv9GKTOiNqCHqEVboP
 github.com/elastic/elastic-agent-autodiscover v0.6.14/go.mod h1:39/fHHlnyTK6oUNZfAhxJwBTVahO9tNasEIjzsxGMu8=
 github.com/elastic/elastic-agent-client/v7 v7.9.0 h1:ryNbISIg4tTRT9KA0MYOa+fxW0CpsF+qxELWWb13rYE=
 github.com/elastic/elastic-agent-client/v7 v7.9.0/go.mod h1:/AeiwX9zxG99eUNrLhpApTpwmE71Qwuh4ozObn7a0ss=
-github.com/elastic/elastic-agent-libs v0.9.8 h1:fwl3hp0gNmKkuERcUQTwe4cyIK6M0jJkv16EIsB6Apw=
-github.com/elastic/elastic-agent-libs v0.9.8/go.mod h1:xhHF9jeWhPzKPtEHN+epKjdiZi0bCbACLxwkp1aHMpc=
+github.com/elastic/elastic-agent-libs v0.9.11 h1:J4aduNJhVeb699FxJIW/dD4BPREILqXgpWD41sCw8Uc=
+github.com/elastic/elastic-agent-libs v0.9.11/go.mod h1:TLFd0T/e1SHmxnx9pbdm/pqOV9y+VMvHikDyPN4Owkw=
 github.com/elastic/elastic-agent-system-metrics v0.10.2 h1:AVW+YqgezR0mNOZ80NxPLH3tiYMenNGZ8SC/bIUf4Uc=
 github.com/elastic/elastic-agent-system-metrics v0.10.2/go.mod h1:0jJ2ARnzTTOEMmcRX9UNqSwbwguEluE/mK2HaM3GViI=
 github.com/elastic/elastic-transport-go/v8 v8.5.0 h1:v5membAl7lvQgBTexPRDBO/RdnlQX+FM9fUVDyXxvH0=
@@ -593,8 +593,8 @@ github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a h1:8WfL/X6fK11
 github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
-github.com/elastic/mito v1.11.0 h1:thk9uxsTuTFeihMf3I6WLIeZyrBLQYuisWRYRUZl6Ec=
-github.com/elastic/mito v1.11.0/go.mod h1:J+wCf4HccW2YoSFmZMGu+d06gN+WmnIlj5ehBqine74=
+github.com/elastic/mito v1.12.2 h1:DQCYWg4U7rwNP45Ed2cHtAY94HEK1rfVUbNUT/8cYXk=
+github.com/elastic/mito v1.12.2/go.mod h1:J+wCf4HccW2YoSFmZMGu+d06gN+WmnIlj5ehBqine74=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
 github.com/elastic/pkcs8 v1.0.0/go.mod h1:ipsZToJfq1MxclVTwpG7U/bgeDtf+0HkUiOxebk95+0=
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3 h1:ChPwRVv1RR4a0cxoGjKcyWjTEpxYfm5gydMIzo32cAw=
@@ -2435,6 +2435,8 @@ gopkg.in/jcmturner/gokrb5.v7 v7.5.0 h1:a9tsXlIDD9SKxotJMK3niV7rPZAJeX2aD/0yg3qlI
 gopkg.in/jcmturner/gokrb5.v7 v7.5.0/go.mod h1:l8VISx+WGYp+Fp7KRbsiUuXTTOnxIc3Tuvyavf11/WM=
 gopkg.in/jcmturner/rpc.v1 v1.1.0 h1:QHIUxTX1ISuAv9dD2wJ9HWQVuWDX/Zc0PfeC2tjc4rU=
 gopkg.in/jcmturner/rpc.v1 v1.1.0/go.mod h1:YIdkC4XfD6GXbzje11McwsDuOlZQSb9W4vfLvuNnlv8=
+gopkg.in/mcuadros/go-syslog.v2 v2.3.0 h1:kcsiS+WsTKyIEPABJBJtoG0KkOS6yzvJ+/eZlhD79kk=
+gopkg.in/mcuadros/go-syslog.v2 v2.3.0/go.mod h1:l5LPIyOOyIdQquNg+oU6Z3524YwrcqEm0aKH+5zpt2U=
 gopkg.in/natefinch/lumberjack.v2 v2.0.0 h1:1Lc07Kr7qY4U2YPouBjpCLxpiyxIVoxqXgkXLknAOE8=
 gopkg.in/natefinch/lumberjack.v2 v2.0.0/go.mod h1:l0ndWWf7gzL7RNwBG7wST/UCcT4T24xpD6X8LsfU/+k=
 gopkg.in/resty.v1 v1.12.0/go.mod h1:mDo4pnntr5jdWRML875a/NmxYqAlA73dVijT2AXvQQo=

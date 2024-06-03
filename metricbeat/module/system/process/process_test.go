@@ -20,6 +20,7 @@
 package process
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -48,6 +49,20 @@ func TestFetch(t *testing.T) {
 	t.Logf("fetched %d events, showing events[0]:", len(events))
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
+}
+
+func TestFetchSinglePid(t *testing.T) {
+	logp.DevelopmentSetup()
+
+	cfg := getConfig()
+	cfg["process.pid"] = os.Getpid()
+
+	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.NotEmpty(t, events)
+	assert.Equal(t, os.Getpid(), events[0].RootFields["process"].(map[string]interface{})["pid"])
+	assert.NotEmpty(t, events[0].MetricSetFields["cpu"])
 }
 
 func TestData(t *testing.T) {
