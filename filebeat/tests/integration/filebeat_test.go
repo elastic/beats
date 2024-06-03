@@ -73,12 +73,11 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 
 	var f *os.File
 	var err error
+	// We have to wait until the file is created, so we wait
+	// until `os.Open` returns no error.
 	require.Eventuallyf(t, func() bool {
 		f, err = os.Open(filebeatLogFile)
-		if err != nil {
-			return false
-		}
-		return true
+		return err == nil
 	}, 10*time.Second, time.Millisecond, "could not read log file '%s'", filebeatLogFile)
 	defer f.Close()
 
