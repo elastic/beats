@@ -23,8 +23,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
@@ -353,33 +353,23 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 }
 
 // parseSystemdVersion parses the string version from Systemd fetched via D-Bus.
-//
-// The expected format is:
-//
-//   - 255.6-1-arch
-//   - 252.16-1.amzn2023.0.2
-//
-// The function will parse and return the integer before the full stop.
+// The function will parse and return the 3 digit major version, minor version
+// and patch are ignored.
 func parseSystemdVersion(ver string) (int, error) {
-	// First try, it's just the version number
-	version, err := strconv.Atoi(ver)
-	if err == nil {
-		return version, nil
+	re := regexp.MustCompile(`(v)?(?P<version>\d\d\d)(\.)?`)
+	matches := re.FindStringSubmatch(ver)
+	if len(matches) == 0 {
+		return 0, fmt.Errorf("unsupported Systemd version format '%s'", ver)
 	}
 
-	separators := []string{" ", "."}
-	// Second try, it's separated by '.' like: 255.6-1-arch
-	for _, sep := range separators {
-		parts := strings.Split(ver, sep)
-		if len(parts) >= 2 {
-			version, err := strconv.Atoi(parts[0])
-			if err == nil {
-				return version, nil
-			}
-		}
+	// This should never fail because the regexp ensures we're getting a 3-digt
+	// integer, however, better safe than sorry.
+	version, err := strconv.Atoi(matches[2])
+	if err != nil {
+		return 0, fmt.Errorf("could not convert '%s' to int: %w", matches[2], err)
 	}
 
-	return 0, fmt.Errorf("unknown format for Systemd version: '%s'", ver)
+	return version, nil
 }
 
 // getSystemdVersionViaDBus gets the Systemd version from D-Bus
