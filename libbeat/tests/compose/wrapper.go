@@ -154,7 +154,8 @@ func (d *wrapperDriver) Close() error {
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	var args []string
-	args = append(args, "--no-ansi", "--project-name", d.Name)
+	args = append(args, "--ansi never", "--project-name", d.Name)
+	//args = append(args, "--no-ansi", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
@@ -367,7 +368,7 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 	cmd.Stdout = &stdout
 	err := cmd.Run()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get list of service names")
+		return nil, errors.Wrap(err, "failed to get list of service names. attempted command: ["+cmd.String()+"]")
 	}
 	return strings.Fields(stdout.String()), nil
 }
