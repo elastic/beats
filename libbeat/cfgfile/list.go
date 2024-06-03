@@ -186,12 +186,12 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 }
 
 func getRunnerID(r Runner) []any {
-	type ider interface {
+	type inputIDer interface {
 		InputID() string
 	}
 
 	idFields := []any{}
-	idRunner, ok := r.(ider)
+	idRunner, ok := r.(inputIDer)
 	if ok {
 		idFields = append(idFields, "input_id", idRunner.InputID())
 	}
