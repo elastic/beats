@@ -257,7 +257,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 	// Inside the testing environment just run the test.
 	if IsInIntegTestEnv() {
 		err = r.tester.InsideTest(test)
-		return
+		return err
 	}
 
 	// Honor the TEST_ENVIRONMENT value if set.
@@ -266,22 +266,22 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 		enabled, err = strconv.ParseBool(testEnvVar)
 		if err != nil {
 			err = fmt.Errorf("failed to parse TEST_ENVIRONMENT value: %w", err)
-			return
+			return err
 		}
 		if !enabled {
 			err = fmt.Errorf("TEST_ENVIRONMENT=%s", testEnvVar)
-			return
+			return err
 		}
 	}
 
 	err = r.tester.HasRequirements()
 	if err != nil {
 		err = fmt.Errorf("test %s not run due to missing requirements: %w\n", r.tester.Name(), err)
-		return
+		return err
 	}
 
 	if err = r.steps.Setup(r.env); err != nil {
-		return
+		return err
 	}
 
 	// catch any panics to run teardown
