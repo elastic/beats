@@ -74,7 +74,6 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	var f *os.File
 	var err error
 	require.Eventuallyf(t, func() bool {
-		fmt.Println(".")
 		f, err = os.Open(filebeatLogFile)
 		if err != nil {
 			return false
