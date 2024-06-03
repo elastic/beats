@@ -285,19 +285,6 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 
 		objType = "clusterrolebinding"
 
-	case *PodSecurityPolicy:
-		psp := client.PolicyV1beta1().PodSecurityPolicies()
-		listwatch = &cache.ListWatch{
-			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return psp.List(ctx, options)
-			},
-			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return psp.Watch(ctx, options)
-			},
-		}
-
-		objType = "podsecuritypolicy"
-
 	case *NetworkPolicy:
 		np := client.ExtensionsV1beta1().NetworkPolicies(opts.Namespace)
 		listwatch = &cache.ListWatch{

@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Update Kubernetes client library `client-go` to `v0.29.5`
+
+  This is a breaking change that removes support for [PodSecurityPolicy](https://kubernetes.io/docs/concepts/security/pod-security-policy/).
+
 ### Deprecated
 
 ### Removed
