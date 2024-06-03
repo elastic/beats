@@ -15,7 +15,7 @@ exportAwsSecrets() {
 }
 
 terraformApply() {
-  echo "~~~ Terraform Init on $MODULE_DIR"
+  echo "Terraform Init on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" init
 
   TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
@@ -26,7 +26,7 @@ terraformApply() {
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 
-  echo "~~~ Terraform Apply on $MODULE_DIR"
+  echo "Terraform Apply on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" apply -auto-approve
 }
 
@@ -52,7 +52,7 @@ timeout=5
 retries=0
 
 while true; do
-  echo "--- Setting up Terraform"
+  echo "~~~ Setting up Terraform"
   out=$(terraformApply 2>&1)
   exit_code=$?
 

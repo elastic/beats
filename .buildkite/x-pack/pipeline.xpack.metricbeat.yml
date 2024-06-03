@@ -202,6 +202,7 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"
+
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
