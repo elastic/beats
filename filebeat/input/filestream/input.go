@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
@@ -128,8 +129,10 @@ func (inp *filestream) Run(
 	publisher loginp.Publisher,
 	metrics *loginp.Metrics,
 ) error {
+	ctx.UpdateStatus(status.Starting, "")
 	fs, ok := src.(fileSource)
 	if !ok {
+		ctx.UpdateStatus(status.Failed, "'src' is not a 'fileSource'")
 		return fmt.Errorf("not file source")
 	}
 
@@ -138,7 +141,9 @@ func (inp *filestream) Run(
 
 	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
-		log.Errorf("File could not be opened for reading: %v", err)
+		errMsg := fmt.Sprintf("File could not be opened for reading: %v", err)
+		log.Error(errMsg)
+		ctx.UpdateStatus(status.Failed, errMsg)
 		return err
 	}
 
@@ -155,7 +160,8 @@ func (inp *filestream) Run(
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
 		if err != nil {
-			log.Errorf("Error stopping filestream reader %v", err)
+			errMsg := fmt.Sprintf("Error stopping filestream reader %v", err)
+			log.Error(errMsg)
 		}
 	})
 	defer streamCancel()
@@ -352,6 +358,7 @@ func (inp *filestream) readFromSource(
 	defer metrics.HarvesterOpenFiles.Dec()
 	defer metrics.HarvesterClosed.Inc()
 
+	ctx.UpdateStatus(status.Running, "")
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
@@ -362,12 +369,18 @@ func (inp *filestream) readFromSource(
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {
-				log.Errorf("Read line error: %v", err)
+				errMsg := fmt.Sprintf("Read line error: %v", err)
+				log.Errorf(errMsg)
+				ctx.UpdateStatus(status.Failed, errMsg)
+
 				metrics.ProcessingErrors.Inc()
 			}
 
 			return nil
 		}
+
+		ctx.UpdateStatus(status.Failed, "Failed on purpose")
+		return errors.New("Failed on purpose")
 
 		s.Offset += int64(message.Bytes)
 
@@ -379,6 +392,7 @@ func (inp *filestream) readFromSource(
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
+			ctx.UpdateStatus(status.Failed, fmt.Sprintf("error publishing event: %s", err))
 			metrics.ProcessingErrors.Inc()
 			return err
 		}
