@@ -32,10 +32,9 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		db:     db,
 	}
 
-	qq, err := quark.OpenQueue(quark.QueueAttr{
-		Flags:     (quark.QQ_KPROBE),
-		MaxLength: 1000,
-	}, 64)
+	attr := quark.DefaultQueueAttr()
+	attr.Flags = quark.QQ_KPROBE
+	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %v", err)
 	}
@@ -53,6 +52,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 				continue
 			}
 			for _, qev := range qevs {
+				if qev.Proc == nil {
+					logger.Errorf("qev has no Proc: %v", qev)
+					continue
+				}
 				pr := processdb.Process{
 					PIDs: types.PIDInfo{
 						Tid:         qev.Pid,
@@ -77,13 +80,12 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						Minor: uint16(qev.Proc.TtyMinor),
 					},
 					Cwd:      qev.Cwd,
-					Argv:     qev.Cmdline,
+					Argv:     []string{"foo", "bar", },//qev.Cmdline,
 					Filename: qev.Comm,
 				}
 				if qev.ExitEvent != nil {
 					pr.ExitCode = qev.ExitEvent.ExitCode
 				}
-				logger.Errorf("MWOLF: Inserting PID %v", pr.PIDs.Tgid)
 				p.db.InsertProcess(pr)
 
 				//				if qev.ExitEvent == nil {
