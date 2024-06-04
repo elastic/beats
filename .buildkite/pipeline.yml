@@ -605,7 +605,7 @@ steps:
                 - libbeat/
                 - testing/
               config:
-                trigger: "beats-packetbeat"
+                trigger: "beats-xpack-agentbeat"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
@@ -616,7 +616,7 @@ steps:
 
   - label: "Triggering Build for Agentbeat"
     if: build.pull_request.id == null
-    trigger: "beats-agentbeat"
+    trigger: "beats-xpack-agentbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
