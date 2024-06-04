@@ -21,7 +21,11 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+<<<<<<< HEAD
 	"io/ioutil"
+=======
+	"io"
+>>>>>>> 217f5a6264 (Fix high IO after sudden filebeat stop (#35893) (#39392))
 	"os"
 	"path/filepath"
 	"sort"
@@ -180,7 +184,7 @@ func (s *diskstore) tryOpenLog() error {
 		f.Close()
 	})
 
-	_, err = f.Seek(0, os.SEEK_END)
+	_, err = f.Seek(0, io.SeekEnd)
 	if err != nil {
 		return err
 	}
@@ -399,7 +403,12 @@ func (s *diskstore) checkpointClearLog() {
 
 	err := s.logFile.Truncate(0)
 	if err == nil {
+<<<<<<< HEAD
 		_, err = s.logFile.Seek(0, os.SEEK_SET)
+=======
+		_, err = s.logFile.Seek(0, io.SeekStart)
+		s.logInvalid = false
+>>>>>>> 217f5a6264 (Fix high IO after sudden filebeat stop (#35893) (#39392))
 	}
 
 	if err != nil {
@@ -436,7 +445,7 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
-	if err := ioutil.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
+	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
 		log.Errorf("Failed to write temporary pointer file: %v", err)
 		return err
 	}
@@ -534,7 +543,11 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 	var states []map[string]interface{}
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&states); err != nil {
+<<<<<<< HEAD
 		return fmt.Errorf("corrupted data file: %v", err)
+=======
+		return fmt.Errorf("%w: %w", ErrCorruptStore, err)
+>>>>>>> 217f5a6264 (Fix high IO after sudden filebeat stop (#35893) (#39392))
 	}
 
 	for _, state := range states {
