@@ -84,9 +84,9 @@ type happyFreeSpaceData struct{}
 
 func (happyFreeSpaceData) usedAndFreeSpaceData(_ context.Context) ([]usedAndFreeSpace, error) {
 	return []usedAndFreeSpace{
-		{TablespaceName: "SYSTEM", TotalFreeBytes: sql.NullInt64{Int64: 9990, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 9991, Valid: true}},
-		{TablespaceName: "SYSAUX", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 9991, Valid: true}},
-		{TablespaceName: "UNDOTBS1", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 9991, Valid: true}},
-		{TablespaceName: "USERS", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 9991, Valid: true}},
+		{TablespaceName: "SYSTEM", TotalFreeBytes: sql.NullInt64{Int64: 9990, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 99999, Valid: true}},
+		{TablespaceName: "SYSAUX", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 99999, Valid: true}},
+		{TablespaceName: "UNDOTBS1", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 99999, Valid: true}},
+		{TablespaceName: "USERS", TotalFreeBytes: sql.NullInt64{Int64: 9999, Valid: true}, TotalUsedBytes: sql.NullInt64{Int64: 9991, Valid: true}, TotalSpaceBytes: sql.NullInt64{Int64: 99999, Valid: true}},
 	}, nil
 }
