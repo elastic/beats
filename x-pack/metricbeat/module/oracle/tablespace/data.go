@@ -41,7 +41,7 @@ func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 	out = make(map[string]mapstr.M, 0)
 
 	for _, dataFile := range in.dataFiles {
-		dataFileCopy := dataFile              
+		dataFileCopy := dataFile
 		m.addDataFileData(&dataFileCopy, out)
 	}
 
