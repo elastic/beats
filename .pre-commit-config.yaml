@@ -3,13 +3,3 @@ repos:
     rev: v4.0.1
     hooks:
     -   id: check-merge-conflict
-<<<<<<< HEAD
-
--   repo: https://github.com/elastic/apm-pipeline-library.git
-    rev: current
-    hooks:
-    -   id: check-jenkins-pipelines
-        files: ^(.ci/(.*\.groovy|Jenkinsfile)|Jenkinsfile)$
-    -   id: check-jjbb
-=======
->>>>>>> bef2cc6beb (github-action: support check/lint/pre-commit (#38175))
