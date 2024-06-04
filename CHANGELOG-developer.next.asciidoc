@@ -98,6 +98,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 - Skip flakey metrics test on windows in filebeat httpjson input. {issue}39676[39676] {pull}39678[39678]
+- Close connections properly in Filbeat's HTTPJSON input. {pull}39790[39790]
 
 ==== Added
 
