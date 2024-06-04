@@ -17,14 +17,6 @@ type usedAndFreeSpace struct {
 	TotalUsedBytes  sql.NullInt64
 }
 
-func (d *usedAndFreeSpace) hash() string {
-	return d.TablespaceName
-}
-
-func (d *usedAndFreeSpace) eventKey() string {
-	return d.TablespaceName
-}
-
 func (e *tablespaceExtractor) usedAndFreeSpaceData(ctx context.Context) ([]usedAndFreeSpace, error) {
 	rows, err := e.db.QueryContext(ctx, `SELECT b.tablespace_name, (b.tbs_size - a.free_space) used, a.free_space free, (SELECT SUM(bytes) FROM DBA_DATA_FILES) + (SELECT SUM(bytes) FROM DBA_TEMP_FILES) AS total_sum FROM (SELECT tablespace_name, SUM(bytes) AS free_space FROM DBA_FREE_SPACE GROUP BY tablespace_name) a RIGHT JOIN (SELECT tablespace_name, SUM(bytes) AS tbs_size FROM DBA_DATA_FILES GROUP BY tablespace_name) b ON a.tablespace_name = b.tablespace_name`)
 	if err != nil {

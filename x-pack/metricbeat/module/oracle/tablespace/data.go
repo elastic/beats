@@ -31,7 +31,7 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 		return nil, fmt.Errorf("error getting free space data: %w", err)
 	}
 
-	return
+	return out, nil
 }
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
@@ -41,13 +41,14 @@ func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 	out = make(map[string]mapstr.M, 0)
 
 	for _, dataFile := range in.dataFiles {
-		m.addDataFileData(&dataFile, out)
+		dataFileCopy := dataFile              
+		m.addDataFileData(&dataFileCopy, out)
 	}
 
 	m.addUsedAndFreeSpaceData(in.freeSpace, out)
 	m.addTempFreeSpaceData(in.tempFreeSpace, out)
 
-	return
+	return out
 }
 
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {

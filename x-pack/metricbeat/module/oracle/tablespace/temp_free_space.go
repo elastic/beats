@@ -17,14 +17,6 @@ type tempFreeSpace struct {
 	FreeSpace       sql.NullInt64
 }
 
-func (d *tempFreeSpace) hash() string {
-	return d.TablespaceName
-}
-
-func (d *tempFreeSpace) eventKey() string {
-	return d.TablespaceName
-}
-
 func (e *tablespaceExtractor) tempFreeSpaceData(ctx context.Context) ([]tempFreeSpace, error) {
 	rows, err := e.db.QueryContext(ctx, `WITH sums AS ( SELECT (SELECT SUM(BYTES) FROM DBA_DATA_FILES) + (SELECT SUM(BYTES) FROM DBA_TEMP_FILES) AS TOTAL_SUM FROM dual ) SELECT t.TABLESPACE_NAME, s.TOTAL_SUM, t.ALLOCATED_SPACE, t.FREE_SPACE FROM DBA_TEMP_FREE_SPACE t, sums s `)
 	if err != nil {
