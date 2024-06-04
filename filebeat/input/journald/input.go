@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -27,8 +28,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/coreos/go-systemd/v22/dbus"
 	"github.com/coreos/go-systemd/v22/sdjournal"
-	"github.com/godbus/dbus/v5"
 	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -372,12 +373,7 @@ func parseSystemdVersion(ver string) (int, error) {
 	return version, nil
 }
 
-// getSystemdVersionViaDBus gets the Systemd version from D-Bus
-//
-// We get the version by reading the property
-// `org.freedesktop.systemd1.Manager.Version`. Even though this property is
-// documented as not being part of the official API and having an unstable
-// scheme, on our tests it proved to be stable enough for this use.
+// getSystemdVersionViaDBus gets the Systemd version from sd-bus
 //
 // The Systemd D-Bus documentation states:
 //
@@ -388,21 +384,17 @@ func parseSystemdVersion(ver string) (int, error) {
 //	 the versioning scheme at any time and it is not part of the API.
 //	Source: https://www.freedesktop.org/wiki/Software/systemd/dbus/
 func getSystemdVersionViaDBus() (string, error) {
-	conn, err := dbus.ConnectSessionBus()
+	// Get a context with timeout just to be on the safe side
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	conn, err := dbus.NewSystemConnectionContext(ctx)
 	if err != nil {
-		return "", fmt.Errorf("cannot connect to D-Bus: %w", err)
-	}
-	defer conn.Close()
-
-	obj := conn.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
-	resp, err := obj.GetProperty("org.freedesktop.systemd1.Manager.Version")
-	if err != nil {
-		return "", fmt.Errorf("cannot get version property from D-Bus %w", err)
+		return "", fmt.Errorf("cannot connect to sd-bus: %w", err)
 	}
 
-	version := ""
-	if err := resp.Store(&version); err != nil {
-		return "", fmt.Errorf("cannot store Systemd version into Go string: %s", err)
+	version, err := conn.GetManagerProperty("Version")
+	if err != nil {
+		return "", fmt.Errorf("cannot get version property: %w", err)
 	}
 
 	return version, nil
