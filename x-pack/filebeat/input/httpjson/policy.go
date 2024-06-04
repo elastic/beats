@@ -93,6 +93,7 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 	if resp.StatusCode == 0 || (resp.StatusCode >= 500 && resp.StatusCode != 501) {
 		defer func() {
 			if resp.Body != nil {
+				io.Copy(io.Discard, resp.Body)
 				resp.Body.Close()
 			}
 		}()
