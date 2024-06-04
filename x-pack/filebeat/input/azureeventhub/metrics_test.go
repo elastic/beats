@@ -129,6 +129,11 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			metrics:        metrics,
 			pipelineClient: &fakeClient,
 			log:            log,
+			messageDecoder: messageDecoder{
+				config:  inputConfig,
+				metrics: metrics,
+				log:     log,
+			},
 		}
 
 		ev := eventhub.Event{

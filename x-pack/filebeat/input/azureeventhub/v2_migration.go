@@ -11,26 +11,41 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
-	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// migrationAssistant assists the input in migrating
-// checkpoint data from v1 to v2.
-type migrationAssistant struct {
-	log                 *logp.Logger
-	consumerClient      *azeventhubs.ConsumerClient
-	blobContainerClient *container.Client
-	checkpointStore     *checkpoints.BlobStore
+type consumerClient interface {
+	GetEventHubProperties(ctx context.Context, options *azeventhubs.GetEventHubPropertiesOptions) (azeventhubs.EventHubProperties, error)
 }
 
-func newMigrationAssistant(log *logp.Logger, consumerClient *azeventhubs.ConsumerClient, blobContainerClient *container.Client, checkpointStore *checkpoints.BlobStore) *migrationAssistant {
+type containerClient interface {
+	NewBlobClient(blobName string) *blob.Client
+	NewListBlobsFlatPager(o *container.ListBlobsFlatOptions) *runtime.Pager[container.ListBlobsFlatResponse]
+}
+
+type checkpointer interface {
+	SetCheckpoint(ctx context.Context, checkpoint azeventhubs.Checkpoint, options *azeventhubs.SetCheckpointOptions) error
+}
+
+// migrationAssistant assists the input in migrating
+// v1 checkpoint information to v2.
+type migrationAssistant struct {
+	log                 *logp.Logger
+	consumerClient      consumerClient
+	blobContainerClient containerClient
+	checkpointStore     checkpointer
+}
+
+// newMigrationAssistant creates a new migration assistant.
+func newMigrationAssistant(log *logp.Logger, consumerClient consumerClient, blobContainerClient containerClient, checkpointStore checkpointer) *migrationAssistant {
 	return &migrationAssistant{
 		log:                 log,
 		consumerClient:      consumerClient,
@@ -39,6 +54,8 @@ func newMigrationAssistant(log *logp.Logger, consumerClient *azeventhubs.Consume
 	}
 }
 
+// checkAndMigrate checks if the v1 checkpoint information for the partitions
+// exists and migrates it to v2 if it does.
 func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, eventHubName, consumerGroup string) error {
 	// Fetching event hub information
 	eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
@@ -54,144 +71,130 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 	)
 
 	// Parse the connection string to get FQDN.
-	props, err := parseConnectionString(eventHubConnectionString)
+	connectionStringInfo, err := parseConnectionString(eventHubConnectionString)
 	if err != nil {
 		return fmt.Errorf("failed to parse connection string: %w", err)
 	}
 
-	err = m.checkAndMigratePartition(ctx, eventHubProperties, props, eventHubName, consumerGroup)
+	blobs, err := m.listBlobs(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to check and migrate partition: %w", err)
+		return err
 	}
 
-	// blobClient := m.blobContainerClient.NewBlobClient("")
-	// blobClient.BlobExists(ctx)
-
-	// blobPager := m.blobContainerClient.NewListBlobsFlatPager(nil)
-
-	// for blobPager.More() {
-	// 	page, err := blobPager.NextPage(ctx)
-	// 	if err != nil {
-	// 		return fmt.Errorf("failed to list blobs: %w", err)
-	// 	}
-
-	// }
-
-	// Fetching the list of blobs in the container.
-
-	// Search for the checkpoint blobs in the container.
-	// The blobs are named as <fullyQualifiedNamespace>/<eventHubName>/<consumerGroup>/checkpoint/<partitionID>
-
-	// blobPager := m.blobContainerClient.NewListBlobsFlatPager(nil)
-
-	// r, err := blobPager.NextPage(ctx)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to list blobs: %w", err)
-	// }
-
-	// props.FullyQualifiedNamespace
-
-	// // Fetching event hub information
-	// eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to get event hub properties: %w", err)
-	// }
-
-	// // v2 checkpoint information path
-	// // mbranca-general.servicebus.windows.net/sdh4552/$Default/checkpoint/0
-
-	// eventHubProperties.PartitionIDs
+	for _, partitionID := range eventHubProperties.PartitionIDs {
+		err = m.checkAndMigratePartition(ctx, blobs, partitionID, connectionStringInfo.FullyQualifiedNamespace, eventHubName, consumerGroup)
+		if err != nil {
+			return fmt.Errorf("failed to check and migrate partition: %w", err)
+		}
+	}
 
 	return nil
 }
 
+// checkAndMigratePartition checks if the v1 checkpoint information for the
+// `partitionID` partition.
 func (m *migrationAssistant) checkAndMigratePartition(
 	ctx context.Context,
-	eventHubProperties azeventhubs.EventHubProperties,
-	props ConnectionStringProperties,
+	blobs map[string]bool,
+	partitionID,
+	fullyQualifiedNamespace,
 	eventHubName,
 	consumerGroup string) error {
 
+	// v2 checkpoint information path
+	// mbranca-general.servicebus.windows.net/sdh4552/$Default/checkpoint/0
+	blob := fmt.Sprintf("%s/%s/%s/checkpoint/%s", fullyQualifiedNamespace, eventHubName, consumerGroup, partitionID)
+
+	// Check if v2 checkpoint information exists
+	if _, ok := blobs[blob]; ok {
+		m.log.Infow(
+			"checkpoint v2 information for partition already exists, no migration needed",
+			"partitionID", partitionID,
+		)
+
+		return nil
+	}
+
+	// Check if v1 checkpoint information exists
+	if _, ok := blobs[partitionID]; !ok {
+		m.log.Infow(
+			"checkpoint v1 information for partition doesn't exist, no migration needed",
+			"partitionID", partitionID,
+		)
+
+		return nil
+	}
+
+	// Try downloading the checkpoint v1 information for the partition
+	cln := m.blobContainerClient.NewBlobClient(partitionID)
+
+	// 4KB buffer should be enough to read
+	// the checkpoint v1 information.
+	buff := [4000]byte{}
+
+	size, err := cln.DownloadBuffer(ctx, buff[:], nil)
+	if err != nil {
+		return fmt.Errorf("failed to download checkpoint v1 information for partition %s: %w", partitionID, err)
+	}
+
+	m.log.Infow(
+		"downloaded checkpoint v1 information for partition",
+		"partitionID", partitionID,
+		"size", size,
+	)
+
+	// Unmarshal the checkpoint v1 information
+	var checkpointV1 *LegacyCheckpoint
+
+	if err := json.Unmarshal(buff[0:size], &checkpointV1); err != nil {
+		return fmt.Errorf("failed to unmarshal checkpoint v1 information for partition %s: %w", partitionID, err)
+	}
+
+	// migrate the checkpoint v1 information to v2
+	m.log.Infow("migrating checkpoint v1 information to v2", "partitionID", partitionID)
+
+	// Common checkpoint information
+	checkpointV2 := azeventhubs.Checkpoint{
+		ConsumerGroup:           consumerGroup,
+		EventHubName:            eventHubName,
+		FullyQualifiedNamespace: fullyQualifiedNamespace,
+		PartitionID:             partitionID,
+	}
+
+	offset, err := strconv.ParseInt(checkpointV1.Checkpoint.Offset, 10, 64)
+	if err != nil {
+		return fmt.Errorf("failed to parse offset: %w", err)
+	}
+
+	checkpointV2.Offset = &offset
+	checkpointV2.SequenceNumber = &checkpointV1.Checkpoint.SequenceNumber
+
+	// Stores the checkpoint v2 information for the partition
+	if err := m.checkpointStore.SetCheckpoint(ctx, checkpointV2, nil); err != nil {
+		return fmt.Errorf("failed to update checkpoint v2 information for partition %s: %w", partitionID, err)
+	}
+
+	m.log.Infow("migrated checkpoint v1 information to v2", "partitionID", partitionID)
+
+	return nil
+}
+
+// listBlobs lists all the blobs in the container.
+func (m *migrationAssistant) listBlobs(ctx context.Context) (map[string]bool, error) {
 	blobs := map[string]bool{}
 
 	c := m.blobContainerClient.NewListBlobsFlatPager(nil)
-
 	for c.More() {
 		page, err := c.NextPage(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to list blobs: %w", err)
+			return map[string]bool{}, fmt.Errorf("failed to list blobs: %w", err)
 		}
 
 		for _, blob := range page.Segment.BlobItems {
 			blobs[*blob.Name] = true
 		}
 	}
-
-	for _, partitionID := range eventHubProperties.PartitionIDs {
-		// v2 checkpoint information path
-		// mbranca-general.servicebus.windows.net/sdh4552/$Default/checkpoint/0
-		blob := fmt.Sprintf("%s/%s/%s/checkpoint/%s", props.FullyQualifiedNamespace, eventHubName, consumerGroup, partitionID)
-
-		if _, ok := blobs[blob]; ok {
-			m.log.Infow(
-				"checkpoint v2 information for partition already exists, no migration needed",
-				"partitionID", partitionID,
-			)
-			continue
-		}
-
-		// try downloading the checkpoint v1 information for the partition
-		if _, ok := blobs[partitionID]; !ok {
-			m.log.Infow(
-				"checkpoint v1 information for partition doesn't exist, no migration needed",
-				"partitionID", partitionID,
-			)
-			continue
-		}
-
-		// v1 checkpoint information path is the partition ID itself
-		cln := m.blobContainerClient.NewBlobClient(partitionID)
-
-		buff := [4000]byte{}
-		size, err := cln.DownloadBuffer(ctx, buff[:], nil)
-		if err != nil {
-			return fmt.Errorf("failed to download checkpoint v1 information for partition %s: %w", partitionID, err)
-		}
-
-		m.log.Infow("downloaded checkpoint v1 information for partition", "partitionID", partitionID, "size", size)
-
-		var checkpointV1 *LegacyCheckpoint
-
-		if err := json.Unmarshal(buff[0:size], &checkpointV1); err != nil {
-			return fmt.Errorf("failed to unmarshal checkpoint v1 information for partition %s: %w", partitionID, err)
-		}
-
-		// migrate the checkpoint v1 information to v2
-		m.log.Infow("migrating checkpoint v1 information to v2", "partitionID", partitionID)
-
-		checkpointV2 := azeventhubs.Checkpoint{
-			ConsumerGroup:           consumerGroup,
-			EventHubName:            eventHubName,
-			FullyQualifiedNamespace: props.FullyQualifiedNamespace,
-			PartitionID:             partitionID,
-		}
-
-		offset, err := strconv.ParseInt(checkpointV1.Checkpoint.Offset, 10, 64)
-		if err != nil {
-			return fmt.Errorf("failed to parse offset: %w", err)
-		}
-
-		checkpointV2.Offset = &offset
-		checkpointV2.SequenceNumber = &checkpointV1.Checkpoint.SequenceNumber
-
-		if err := m.checkpointStore.SetCheckpoint(ctx, checkpointV2, nil); err != nil {
-			return fmt.Errorf("failed to update checkpoint v2 information for partition %s: %w", partitionID, err)
-		}
-
-		m.log.Infow("migrated checkpoint v1 information to v2", "partitionID", partitionID)
-	}
-
-	return nil
+	return blobs, nil
 }
 
 type LegacyCheckpoint struct {

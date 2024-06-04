@@ -16,37 +16,66 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const ephContainerName = "filebeat"
+
 type azureInputConfig struct {
+	// EventHubName is the name of the event hub to connect to.
+	EventHubName string `config:"eventhub" validate:"required"`
+	// ConnectionString is the connection string to connect to the event hub.
 	ConnectionString string `config:"connection_string" validate:"required"`
-	EventHubName     string `config:"eventhub" validate:"required"`
-	ConsumerGroup    string `config:"consumer_group"`
+	// ConsumerGroup is the name of the consumer group to use.
+	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
-	SAName             string `config:"storage_account" validate:"required"`
-	SAKey              string `config:"storage_account_key"`               // (processor v1 only)
-	SAConnectionString string `config:"storage_account_connection_string"` // (processor v2 only)
-	SAContainer        string `config:"storage_account_container"`
+	SAName string `config:"storage_account" validate:"required"`
+	// SAKey is used to connect to the storage account (processor v1 only)
+	SAKey string `config:"storage_account_key"`
+	// SAConnectionString is used to connect to the storage account (processor v2 only)
+	SAConnectionString string `config:"storage_account_connection_string"`
+	// SAContainer is the name of the storage account container to store
+	// partition ownership and checkpoint information.
+	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
-	// Processor version to use (v1 or v2). Default is v1 (processor v2 only).
-	ProcessorVersion string `config:"processor_version"`
 	// Controls if the input should perform the checkpoint information
 	// migration from v1 to v2 (processor v2 only).
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
+	// Processor version to use (v1 or v2). Default is v1.
+	ProcessorVersion string `config:"processor_version"`
+	//
+	ProcessorUpdateInterval time.Duration `config:"processor_update_interval"`
 	// Controls the start position for all partitions (processor v2 only).
-	StartPosition string `config:"start_position"`
+	ProcessorStartPosition string `config:"processor_start_position"`
 	// Processor receive timeout (processor v2 only).
-	// Wait up to `ReceiveTimeout` for `ReceiveCount` events,
+	// Wait up to `PartitionReceiveTimeout` for `PartitionReceiveCount` events,
 	// otherwise returns whatever we collected during that time.
-	ReceiveTimeout time.Duration `config:"receive_timeout"`
+	PartitionReceiveTimeout time.Duration `config:"partition_receive_timeout"`
 	// Processor receive count (processor v2 only).
-	// Wait up to `ReceiveTimeout` for `ReceiveCount` events,
+	// Wait up to `PartitionReceiveTimeout` for `PartitionReceiveCount` events,
 	// otherwise returns whatever we collected during that time.
-	ReceiveCount int `config:"receive_count"`
+	PartitionReceiveCount int `config:"partition_receive_count"`
 }
 
-const ephContainerName = "filebeat"
+func defaultConfig() azureInputConfig {
+	return azureInputConfig{
+		// For this release, we continue to use
+		// the processor v1 as the default.
+		ProcessorVersion: processorV1,
+		//
+		ProcessorUpdateInterval: 10 * time.Second,
+		// For backward compatibility with v1,
+		// the default start position is "earliest".
+		ProcessorStartPosition: startPositionEarliest,
+		// Receive timeout and count control how
+		// many events we want to receive from
+		// the processor before returning.
+		PartitionReceiveTimeout: 5 * time.Second,
+		PartitionReceiveCount:   100,
+		// Default
+		SanitizeOptions: []string{},
+	}
+}
 
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
@@ -90,11 +119,6 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	}
 
-	if conf.ProcessorVersion == "" {
-		// The default processor version is "v1".
-		conf.ProcessorVersion = processorV1
-	}
-
 	switch conf.ProcessorVersion {
 	case processorV1:
 		if conf.SAKey == "" {
@@ -102,29 +126,13 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	case processorV2:
 		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2")
+			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
 		}
 		if conf.SAConnectionString == "" {
 			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 		}
 	default:
 		return fmt.Errorf("invalid azure-eventhub processor version: %s (available versions: v1, v2)", conf.ProcessorVersion)
-	}
-
-	if conf.StartPosition == "" {
-		// For backward compatibility with v1,
-		// the default start position is "earliest".
-		conf.StartPosition = startPositionEarliest
-	}
-
-	// Default receive timeout and count.
-	if conf.ReceiveTimeout == 0 {
-		// The default receive timeout is 5 second.
-		conf.ReceiveTimeout = 5 * time.Second
-	}
-	if conf.ReceiveCount == 0 {
-		// The default receive count is 100.
-		conf.ReceiveCount = 100
 	}
 
 	return nil

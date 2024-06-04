@@ -9,8 +9,10 @@ package azureeventhub
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest/azure"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -20,6 +22,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -77,7 +80,7 @@ func (in *eventHubInputV1) Run(
 	defer in.metrics.Close()
 
 	in.messageDecoder = messageDecoder{
-		config:  &in.config,
+		config:  in.config,
 		log:     in.log,
 		metrics: in.metrics,
 	}
@@ -266,6 +269,33 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 
 	in.metrics.processedMessages.Inc()
 	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
+}
+
+func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
+	return pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: acker.LastEventPrivateReporter(func(acked int, data interface{}) {
+			// fmt.Println(acked, data)
+		}),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: to.Ptr(false),
+		},
+	})
+}
+
+// Strip connection string to remove sensitive information
+// A connection string should look like this:
+// Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=
+// This code will remove everything after ';' so key information is stripped
+func stripConnectionString(c string) string {
+	if parts := strings.SplitN(c, ";", 2); len(parts) == 2 {
+		return parts[0]
+	}
+
+	// We actually expect the string to have the documented format
+	// if we reach here something is wrong, so let's stay on the safe side
+	return "(redacted)"
 }
 
 //// unpackRecords will try to split the message into multiple ones based on the group field provided by the configuration

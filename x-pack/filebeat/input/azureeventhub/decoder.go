@@ -14,7 +14,7 @@ import (
 )
 
 type messageDecoder struct {
-	config  *azureInputConfig
+	config  azureInputConfig
 	log     *logp.Logger
 	metrics *inputMetrics
 }

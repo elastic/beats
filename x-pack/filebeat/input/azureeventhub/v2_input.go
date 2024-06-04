@@ -12,12 +12,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/bloberror"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -29,9 +30,17 @@ import (
 )
 
 const (
-	startPositionEarliest      = "earliest"
-	startPositionLatest        = "latest"
-	processorRestartBackoff    = 10 * time.Second
+	// startPositionEarliest lets the processor start from the earliest
+	// available event from the event hub retention period.
+	startPositionEarliest = "earliest"
+	// startPositionEarliest lets the processor start from the latest
+	// available event from the event hub retention period.
+	startPositionLatest = "latest"
+	// processorRestartBackoff is the initial backoff time before
+	// restarting the processor.
+	processorRestartBackoff = 10 * time.Second
+	// processorRestartMaxBackoff is the maximum backoff time before
+	// restarting the processor.
 	processorRestartMaxBackoff = 120 * time.Second
 )
 
@@ -104,16 +113,20 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	// Decode the messages from event hub into
 	// a `[]string`.
 	in.messageDecoder = messageDecoder{
-		config:  &in.config,
+		config:  in.config,
 		log:     in.log,
 		metrics: in.metrics,
 	}
 
 	// FIXME: check more pipelineClient creation options.
-	blobContainerClient, err := container.NewClientFromConnectionString(
+	containerClient, err := container.NewClientFromConnectionString(
 		in.config.SAConnectionString,
 		in.config.SAContainer,
-		nil,
+		&container.ClientOptions{
+			ClientOptions: azcore.ClientOptions{
+				Cloud: cloud.AzurePublic,
+			},
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create blob container pipelineClient: %w", err)
@@ -126,14 +139,14 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	//   "the container must exist before the checkpoint store can be used."
 	//
 	// We need to ensure it exists before we can use it.
-	err = in.ensureContainerExists(ctx, blobContainerClient)
+	err = in.ensureContainerExists(ctx, containerClient)
 	if err != nil {
 		return fmt.Errorf("failed to ensure blob container exists: %w", err)
 	}
 
 	// The checkpoint store is used to store the checkpoint information
 	// in the blob container.
-	checkpointStore, err := checkpoints.NewBlobStore(blobContainerClient, nil)
+	checkpointStore, err := checkpoints.NewBlobStore(containerClient, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
 	}
@@ -156,7 +169,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	in.migrationAssistant = newMigrationAssistant(
 		in.log,
 		consumerClient,
-		blobContainerClient,
+		containerClient,
 		checkpointStore,
 	)
 
@@ -245,13 +258,6 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 // createProcessorOptions creates the processor options using the input configuration.
 func createProcessorOptions(config azureInputConfig) *azeventhubs.ProcessorOptions {
-	// LoadBalancingStrategy offers multiple options:
-	//
-	// - Balanced
-	// - Greedy
-	//
-	// As of now, we only support Balanced.
-	loadBalancingStrategy := azeventhubs.ProcessorStrategyBalanced
 
 	// Start position offers multiple options:
 	//
@@ -266,7 +272,7 @@ func createProcessorOptions(config azureInputConfig) *azeventhubs.ProcessorOptio
 	// available from the storage account container.
 	defaultStartPosition := azeventhubs.StartPosition{}
 
-	switch config.StartPosition {
+	switch config.ProcessorStartPosition {
 	case startPositionEarliest:
 		defaultStartPosition.Earliest = to.Ptr(true)
 	case startPositionLatest:
@@ -274,7 +280,22 @@ func createProcessorOptions(config azureInputConfig) *azeventhubs.ProcessorOptio
 	}
 
 	return &azeventhubs.ProcessorOptions{
-		LoadBalancingStrategy: loadBalancingStrategy,
+		//
+		// The `LoadBalancingStrategy` controls how the
+		// processor distributes the partitions across the
+		// consumers.
+		//
+		// LoadBalancingStrategy offers multiple options:
+		//
+		// - Balanced
+		// - Greedy
+		//
+		// As of now, we only support the "balanced" load
+		// balancing strategy for retro compatibility with
+		// the old SDK.
+		//
+		LoadBalancingStrategy: azeventhubs.ProcessorStrategyBalanced,
+		UpdateInterval:        config.ProcessorUpdateInterval,
 		StartPositions: azeventhubs.StartPositions{
 			Default: defaultStartPosition,
 		},
@@ -388,10 +409,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
 	for {
-		// Wait up to `in.config.ReceiveTimeout` for `in.config.ReceiveCount` events,
+		// Wait up to `in.config.PartitionReceiveTimeout` for `in.config.PartitionReceiveCount` events,
 		// otherwise returns whatever we collected during that time.
-		receiveCtx, cancelReceive := context.WithTimeout(ctx, in.config.ReceiveTimeout)
-		events, err := partitionClient.ReceiveEvents(receiveCtx, in.config.ReceiveCount, nil)
+		receiveCtx, cancelReceive := context.WithTimeout(ctx, in.config.PartitionReceiveTimeout)
+		events, err := partitionClient.ReceiveEvents(receiveCtx, in.config.PartitionReceiveCount, nil)
 		cancelReceive()
 
 		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
