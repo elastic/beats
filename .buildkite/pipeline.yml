@@ -581,3 +581,42 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Trigger Agentbeat"
+    if: build.pull_request.id != null
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - auditbeat/
+                - filebeat/
+                - heartbeat/
+                - metricbeat/
+                - osquerybeat/
+                - packetbeat/
+                - .buildkite/agentbeat/pipeline.agentbeat.yml
+                # - .buildkite/scripts/
+                # - .buildkite/hooks/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/
+                - testing/
+              config:
+                trigger: "beats-packetbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Triggering Build for Agentbeat"
+    if: build.pull_request.id == null
+    trigger: "beats-agentbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"

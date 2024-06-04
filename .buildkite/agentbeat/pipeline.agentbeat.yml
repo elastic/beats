@@ -1,0 +1,31 @@
+env:
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+steps:
+  - group: "Agentbeat tests"
+    key: "agentbeat-mandatory-tests"
+
+    steps:
+      - label: ":linux: Agentbeat/Packaging Linux"
+        key: "agentbeat-package-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          set -euo pipefail
+          cd agentbeat
+          mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging Linux arm64"
