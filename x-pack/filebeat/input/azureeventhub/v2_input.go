@@ -29,8 +29,10 @@ import (
 )
 
 const (
-	startPositionEarliest = "earliest"
-	startPositionLatest   = "latest"
+	startPositionEarliest      = "earliest"
+	startPositionLatest        = "latest"
+	processorRestartBackoff    = 10 * time.Second
+	processorRestartMaxBackoff = 120 * time.Second
 )
 
 // azureInputConfig the Azure Event Hub input v2,
@@ -85,13 +87,9 @@ func (in *eventHubInputV2) Run(
 	}
 	defer in.consumerClient.Close(context.Background())
 
-	// Create pipelineClient for publishing events and receive
-	// notification of their ACKs.
-	// in.pipelineClient, err = createPipelineClient(pipeline)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
-	// }
-	// defer in.pipelineClient.Close()
+	// Store a reference to the pipeline, so we
+	// can create a new pipeline client for each
+	// partition.
 	in.pipeline = pipeline
 
 	// Start the main run loop
@@ -153,7 +151,8 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.consumerClient = consumerClient
 
-	// FIXME: add migration assistant.
+	// Manage the migration of the checkpoint information
+	// from the old Event Hub SDK to the new Event Hub SDK.
 	in.migrationAssistant = newMigrationAssistant(
 		in.log,
 		consumerClient,
@@ -183,13 +182,15 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 	// Handle the case when the processor stops due to
 	// transient errors (network failures) and we need to
-	// restart.
+	// restart it.
 	processorRunBackoff := backoff.NewEqualJitterBackoff(
 		ctx.Done(),
-		10*time.Second,  // initial backoff
-		120*time.Second, // max backoff
+		processorRestartBackoff,    // initial backoff
+		processorRestartMaxBackoff, // max backoff
 	)
 
+	// Create the processor options using the input
+	// configuration.
 	processorOptions := createProcessorOptions(in.config)
 
 	for ctx.Err() == nil {
@@ -200,7 +201,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		processor, err := azeventhubs.NewProcessor(
 			in.consumerClient,
 			in.checkpointStore,
-			&processorOptions,
+			processorOptions,
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
@@ -225,26 +226,25 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 			in.log.Infow("waiting before retrying starting the processor")
 
-			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
-			// We should check the error and decide if we want to retry or not. Should
-			// we add an and retry mechanism with exponential backoff?
+			// `Run()` returns an error when the processor thinks it's
+			// unrecoverable.
+			//
+			// We wait before retrying to start the processor.
 			processorRunBackoff.Wait()
 
 			// Update input metrics.
 			in.metrics.processorRestarts.Inc()
-
-			in.log.Infow("Pssor again")
 		}
 
 		in.log.Infow(
-			"run completed; continue if context error is nil",
+			"run completed; restarting the processor if context error is nil",
 			"context_error", ctx.Err(),
 		)
 	}
 }
 
 // createProcessorOptions creates the processor options using the input configuration.
-func createProcessorOptions(config azureInputConfig) azeventhubs.ProcessorOptions {
+func createProcessorOptions(config azureInputConfig) *azeventhubs.ProcessorOptions {
 	// LoadBalancingStrategy offers multiple options:
 	//
 	// - Balanced
@@ -273,7 +273,7 @@ func createProcessorOptions(config azureInputConfig) azeventhubs.ProcessorOption
 		defaultStartPosition.Latest = to.Ptr(true)
 	}
 
-	return azeventhubs.ProcessorOptions{
+	return &azeventhubs.ProcessorOptions{
 		LoadBalancingStrategy: loadBalancingStrategy,
 		StartPositions: azeventhubs.StartPositions{
 			Default: defaultStartPosition,
@@ -347,7 +347,8 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 			)
 
 			if err := in.processEventsForPartition(ctx, processorPartitionClient); err != nil {
-				// FIXME: it seems we always get an error, even when the processor is stopped.
+				// It seems we always get an error,
+				// even when the processor is stopped.
 				in.log.Infow(
 					"stopping processing events for partition",
 					"reason", err,
@@ -387,15 +388,20 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
 	for {
-		// Wait up to a minute for 100 events, otherwise returns whatever we collected during that time.
-		receiveCtx, cancelReceive := context.WithTimeout(ctx, 5*time.Second)
-		events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
+		// Wait up to `in.config.ReceiveTimeout` for `in.config.ReceiveCount` events,
+		// otherwise returns whatever we collected during that time.
+		receiveCtx, cancelReceive := context.WithTimeout(ctx, in.config.ReceiveTimeout)
+		events, err := partitionClient.ReceiveEvents(receiveCtx, in.config.ReceiveCount, nil)
 		cancelReceive()
 
 		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
 			var eventHubError *azeventhubs.Error
-
 			if errors.As(err, &eventHubError) && eventHubError.Code == azeventhubs.ErrorCodeOwnershipLost {
+				in.log.Infow(
+					"ownership lost for partition, stopping processing",
+					"partition", partitionID,
+				)
+
 				return nil
 			}
 
@@ -406,25 +412,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 			continue
 		}
 
-		in.log.Debugw("received events", "count", len(events), "partition", partitionID)
-
 		err = in.processReceivedEvents(events, partitionID, pipelineClient)
 		if err != nil {
 			return fmt.Errorf("error processing received events: %w", err)
 		}
-
-		//in.log.Debugw("updating checkpoint information", "partition", partitionID)
-
-		//// Updates the checkpoint with the latest event received.
-		////
-		//// If processing needs to restart it will restart from this
-		//// point, automatically.
-		//if err := partitionClient.UpdateCheckpoint(ctx, events[len(events)-1], nil); err != nil {
-		//	in.log.Errorw("error updating checkpoint", "error", err)
-		//	return err
-		//}
-
-		//in.log.Debugw("checkpoint updated", "partition", partitionID)
 	}
 }
 
@@ -442,8 +433,8 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		in.metrics.receivedMessages.Inc()
 		in.metrics.receivedBytes.Add(uint64(len(receivedEventData.Body)))
 
-		// A single event can contain multiple records. We create a new event for each record.
-		//records := in.unpackRecords(receivedEventData.Body)
+		// A single event can contain multiple records.
+		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
 		for record := range records {

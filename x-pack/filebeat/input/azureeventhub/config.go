@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -35,6 +36,14 @@ type azureInputConfig struct {
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
 	// Controls the start position for all partitions (processor v2 only).
 	StartPosition string `config:"start_position"`
+	// Processor receive timeout (processor v2 only).
+	// Wait up to `ReceiveTimeout` for `ReceiveCount` events,
+	// otherwise returns whatever we collected during that time.
+	ReceiveTimeout time.Duration `config:"receive_timeout"`
+	// Processor receive count (processor v2 only).
+	// Wait up to `ReceiveTimeout` for `ReceiveCount` events,
+	// otherwise returns whatever we collected during that time.
+	ReceiveCount int `config:"receive_count"`
 }
 
 const ephContainerName = "filebeat"
@@ -106,6 +115,16 @@ func (conf *azureInputConfig) Validate() error {
 		// For backward compatibility with v1,
 		// the default start position is "earliest".
 		conf.StartPosition = startPositionEarliest
+	}
+
+	// Default receive timeout and count.
+	if conf.ReceiveTimeout == 0 {
+		// The default receive timeout is 5 second.
+		conf.ReceiveTimeout = 5 * time.Second
+	}
+	if conf.ReceiveCount == 0 {
+		// The default receive count is 100.
+		conf.ReceiveCount = 100
 	}
 
 	return nil
