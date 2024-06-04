@@ -232,7 +232,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	processingStartTime := time.Now()
 	eventHubMetadata := mapstr.M{
 		// The `partition_id` is not available in the
-		// current version of the SDK.
+		// legacy version of the SDK.
 		"eventhub":       in.config.EventHubName,
 		"consumer_group": in.config.ConsumerGroup,
 	}
@@ -297,60 +297,6 @@ func stripConnectionString(c string) string {
 	// if we reach here something is wrong, so let's stay on the safe side
 	return "(redacted)"
 }
-
-//// unpackRecords will try to split the message into multiple ones based on the group field provided by the configuration
-//func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
-//	var mapObject map[string][]interface{}
-//	var messages []string
-//
-//	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
-//	// Sanitization occurs if options are available and the message contains an invalid JSON.
-//	//
-//	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-//	if len(in.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
-//		bMessage = sanitize(bMessage, in.config.SanitizeOptions...)
-//		in.metrics.sanitizedMessages.Inc()
-//	}
-//
-//	// check if the message is a "records" object containing a list of events
-//	err := json.Unmarshal(bMessage, &mapObject)
-//	if err == nil {
-//		if len(mapObject[expandEventListFromField]) > 0 {
-//			for _, ms := range mapObject[expandEventListFromField] {
-//				js, err := json.Marshal(ms)
-//				if err == nil {
-//					messages = append(messages, string(js))
-//					in.metrics.receivedEvents.Inc()
-//				} else {
-//					in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-//				}
-//			}
-//		}
-//	} else {
-//		in.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
-//		// in some cases the message is an array
-//		var arrayObject []interface{}
-//		err = json.Unmarshal(bMessage, &arrayObject)
-//		if err != nil {
-//			// return entire message
-//			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-//			in.metrics.decodeErrors.Inc()
-//			return []string{string(bMessage)}
-//		}
-//
-//		for _, ms := range arrayObject {
-//			js, err := json.Marshal(ms)
-//			if err == nil {
-//				messages = append(messages, string(js))
-//				in.metrics.receivedEvents.Inc()
-//			} else {
-//				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-//			}
-//		}
-//	}
-//
-//	return messages
-//}
 
 func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
 	// if no override is set then the azure public cloud is used

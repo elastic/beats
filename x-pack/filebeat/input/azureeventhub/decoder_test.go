@@ -10,9 +10,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDecodeRecords(t *testing.T) {
