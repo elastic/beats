@@ -19,7 +19,6 @@ import (
   "os/user"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
   "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
@@ -112,10 +111,10 @@ func readPIDNsInode() (uint64, error) {
 	return ret, nil
 }
 
-func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (provider.Provider, error) {
+func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
 
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_KPROBE
+	attr.Flags = quark.QQ_KPROBE | quark.QQ_MIN_AGG
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %v", err)
@@ -127,17 +126,15 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		qq:     qq,
 	}
 
-	pid1 := qq.Lookup(1)
-	if pid1 != nil {
-		logger.Error("MWOLF: got PID!")
-	}
-
 	go func(qq *quark.Queue, logger *logp.Logger) {
 		for {
 			qevs, err := qq.GetEvents()
 			if err != nil {
 				logger.Errorf("get events from quark: %v", err)
 				continue
+			}
+			for _, qev := range qevs {
+				logger.Debugf("qev: %v", qev)
 			}
 			if len(qevs) == 0 {
 				err = qq.Block()
@@ -153,29 +150,32 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 }
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+	time.Sleep(500 * time.Millisecond)
+	return nil
 
-	timeout := 5 * time.Second
-	ch := time.After(timeout)
-	for {
-		select {
-		case <- ch:
-			p.logger.Errorf("%v not seen after %v", pid, timeout)
-			break
-		default:
-			proc := p.qq.Lookup(int(pid))
-			//TODO: check event, eg. make sure exit seen when enriching exit event
-			if proc != nil {
-				break
-			}
-			time.Sleep(200 * time.Millisecond)
-		}
-	}
+//// TODO: Not working correctly...
+//	timeout := 5 * time.Second
+//	ch := time.After(timeout)
+//	for {
+//		select {
+//		case <- ch:
+//			p.logger.Errorf("%v not seen after %v", pid, timeout)
+//			break
+//		default:
+//			proc := p.qq.Lookup(int(pid))
+//			//TODO: check event, eg. make sure exit seen when enriching exit event
+//			if proc != nil {
+//				break
+//			}
+//			time.Sleep(200 * time.Millisecond)
+//		}
+//	}
 }
 
-func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
+func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
   qev := p.qq.Lookup(int(pid))
   if qev == nil {
-    return types.Process{}, fmt.Errorf("PID %d not found in cache", pid)
+    return nil, fmt.Errorf("PID %d not found in cache", pid)
   }
 
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
@@ -215,7 +215,7 @@ func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
   p.fillParent(&ret, qev.Proc.Ppid)
   p.fillGroupLeader(&ret, qev.Proc.Pgid)
   p.fillSessionLeader(&ret, qev.Proc.Sid)
-	return ret, nil
+	return &ret, nil
 }
 
 func (p prvdr) fillParent(process *types.Process, ppid uint32) {
