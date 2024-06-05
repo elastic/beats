@@ -6,8 +6,9 @@
 ++++
 
 Libbeat uses the Elastic APM Go Agent to instrument its publishing pipeline.
-Currently, only the Elasticsearch output is instrumented.
 To gain insight into the performance of {beatname_uc}, you can enable this instrumentation and send trace data to the APM Integration.
+
+WARNING: Currently, only the Elasticsearch output is instrumented.
 
 Example configuration with instrumentation enabled:
 
