@@ -21,6 +21,7 @@ package memory
 
 import (
 	"fmt"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/docker/docker/client"
