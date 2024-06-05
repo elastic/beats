@@ -58,10 +58,10 @@ https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL. {issue}36761[36761] {pull}38488[38488]
 - Fix handling of truncated files in Filestream {issue}38070[38070] {pull}38416[38416]
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
-- Fix a bug in cloudwatch task allocation that could skip some logs. {issue}38918[38918] {pull}38953[38953]
+- Fix a bug in CloudWatch task allocation that could skip some logs. {issue}38918[38918] {pull}38953[38953]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages`. {issue}35029[35029] {pull}38985[38985]
 - entity-analytics input: Improve structured logging. {pull}38990[38990]
-- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
+- Upgrade `azure-event-hubs-go` and `azure-storage-blob-go` dependencies. {pull}38861[38861]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 - Expand ID patterns in request trace logger for HTTP Endpoint. {pull}39656[39656]
@@ -84,17 +84,17 @@ https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
 *Affecting all Beats*
 
 - Update Go version to 1.21.10. {pull}39467[39467]
-- Enable early event encoding in the Elasticsearch output, improving cpu and memory use. {pull}38572[38572]
+- Enable early event encoding in the Elasticsearch output, improving CPU and memory use. {pull}38572[38572]
 
 *Auditbeat*
 
-- Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
+- Add `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
 - Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
-- Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events. {pull}38776[38776]
+- Add `process.entity_id`, `process.group.name` and `process.group.id` in `add_process_metadata` processor. Make FIM module with Kprobes backend to always add an appropriately configured `add_process_metadata` processor to enrich file events. {pull}38776[38776]
 
 *Filebeat*
 
-- Adding Saved Object name field to Kibana audit logs. {pull}38307[38307]
+- Add Saved Object name field to Kibana audit logs. {pull}38307[38307]
 - Add Salesforce input. {pull}37331[37331]
 - Add logging for cache processor file reads and writes. {pull}38052[38052]
 - Support VPC endpoint for aws-s3 input SQS queue url. {pull}38189[38189]
@@ -104,15 +104,15 @@ https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
 - Add support for Active Directory an entity analytics provider. {pull}37919[37919]
 - Add AWS AWSHealth metricset. {pull}38370[38370]
 - Add debugging breadcrumb to logs when writing request trace log. {pull}38636[38636]
-- Added benchmark input and discard output. {pull}37437[37437]
+- Add benchmark input and discard output. {pull}37437[37437]
 
 *Libbeat*
 
-- Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
+- Add support for Linux capabilities in `add_process_metadata`. {pull}38252[38252]
 
 *Metricbeat*
 
-- Add support for shards_stats.total_count in Elasticsearch Monitoring data. {pull}38891[38891]
+- Add support for `shards_stats.total_count` in Elasticsearch Monitoring data. {pull}38891[38891]
 - Add SSL support to MySQL module. {pull}37997[37997]
 - Add SSL support for Aerospike module. {pull}38126[38126]
 
