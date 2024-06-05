@@ -65,8 +65,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	return &p, nil
 }
 
-func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
-	return types.Process{}, fmt.Errorf("not implemented")
+func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {

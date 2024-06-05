@@ -153,29 +153,32 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 }
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+	time.Sleep(500 * time.Millisecond)
+	return nil
 
-	timeout := 5 * time.Second
-	ch := time.After(timeout)
-	for {
-		select {
-		case <- ch:
-			p.logger.Errorf("%v not seen after %v", pid, timeout)
-			break
-		default:
-			proc := p.qq.Lookup(int(pid))
-			//TODO: check event, eg. make sure exit seen when enriching exit event
-			if proc != nil {
-				break
-			}
-			time.Sleep(200 * time.Millisecond)
-		}
-	}
+//// TODO: Not working correctly...
+//	timeout := 5 * time.Second
+//	ch := time.After(timeout)
+//	for {
+//		select {
+//		case <- ch:
+//			p.logger.Errorf("%v not seen after %v", pid, timeout)
+//			break
+//		default:
+//			proc := p.qq.Lookup(int(pid))
+//			//TODO: check event, eg. make sure exit seen when enriching exit event
+//			if proc != nil {
+//				break
+//			}
+//			time.Sleep(200 * time.Millisecond)
+//		}
+//	}
 }
 
-func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
+func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
   qev := p.qq.Lookup(int(pid))
   if qev == nil {
-    return types.Process{}, fmt.Errorf("PID %d not found in cache", pid)
+    return nil, fmt.Errorf("PID %d not found in cache", pid)
   }
 
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
@@ -215,7 +218,7 @@ func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
   p.fillParent(&ret, qev.Proc.Ppid)
   p.fillGroupLeader(&ret, qev.Proc.Pgid)
   p.fillSessionLeader(&ret, qev.Proc.Sid)
-	return ret, nil
+	return &ret, nil
 }
 
 func (p prvdr) fillParent(process *types.Process, ppid uint32) {

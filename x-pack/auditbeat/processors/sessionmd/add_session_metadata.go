@@ -94,6 +94,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create quark provider: %w", err)
 		}
+		db.Close() // db not used with quark
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
@@ -159,7 +160,13 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	var fullProcess types.Process
 	if p.backend == "quark" {
 		// Quark doesn't enrich with the processor DB;  process info is taken directly from quark cache
-		fullProcess, err = p.provider.GetProcess(pid)
+		proc, err := p.provider.GetProcess(pid)
+		if err != nil {
+			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+			p.logger.Errorf("%v", e)
+			return nil, e
+		}
+		fullProcess = *proc
 	} else {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
