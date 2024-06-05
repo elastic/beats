@@ -44,8 +44,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 
-
 *Heartbeat*
+
+- Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
 
 *Metricbeat*
 
@@ -91,12 +92,20 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
 - Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
+- Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 
 *Auditbeat*
 - Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
+- Fix failing to enrich process events in sessionmd processor {issue}38955[38955] {pull}39173[39173] {pull}39243[39243]
+- Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
+- Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
+- Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
+- Fix seccomp policy of FIM kprobes backend on arm64 {pull}39759[39759]
+
+
 
 *Filebeat*
-
+- Fix handling of endpoint for custom domains and ensure region, default_region, and region parsed from queue_url are applied in the order specified in the documentation for the awss3 input {pull}39709[39709]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
@@ -131,10 +140,16 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
 - [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
+- Fix a bug in cloudwatch task allocation that could skip some logs {issue}38918[38918] {pull}38953[38953]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - entity-analytics input: Improve structured logging. {pull}38990[38990]
 - Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
+- Restore netflow input on Windows {pull}39024[39024]
+- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
+- Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
+- Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
+- Expand ID patterns in request trace logger for HTTP Endpoint. {pull}39656[39656]
 
 *Heartbeat*
 
@@ -142,6 +157,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setuid root when running under cgroups v2. {pull}37794[37794]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 - Reset prctl dumpable flag after cap drop. {pull}38269[38269]
+- Redact synthexec cmd output. {pull}39535[39535]
 
 *Heartbeat*
 
@@ -151,6 +167,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
+- Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
+- Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
 
 *Osquerybeat*
 
@@ -160,6 +178,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix error handling in perfmon metrics. {issue}38140[38140] {pull}39404[39404]
 
 *Elastic Logging Plugin*
 
@@ -175,7 +194,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-- Update to Go 1.21.9. {pulk}38727[38727]
+- Update to Go 1.21.10. {pull}39467[39467]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 
@@ -284,6 +303,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Use fixed size buffer at first pass for event parsing, improving throughput {issue}39530[39530] {pull}39544[39544]
 
 *Functionbeat*
 
@@ -324,6 +344,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 

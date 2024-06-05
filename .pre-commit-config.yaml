@@ -9,4 +9,3 @@ repos:
     hooks:
     -   id: check-jenkins-pipelines
         files: ^(.ci/(.*\.groovy|Jenkinsfile)|Jenkinsfile)$
-    -   id: check-jjbb

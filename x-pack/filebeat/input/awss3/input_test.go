@@ -70,6 +70,18 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			want:     "us-east-1",
 		},
 		{
+			name:     "abc.xyz_and_domain_with_matching_endpoint_and_scheme",
+			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:     "abc.xyz_and_domain_with_matching_url_endpoint",
+			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://s3.us-east-1.abc.xyz",
+			want:     "us-east-1",
+		},
+		{
 			name:     "abc.xyz_and_domain_with_blank_endpoint",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
 			wantErr:  errBadQueueURL,
