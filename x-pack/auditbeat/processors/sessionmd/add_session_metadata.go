@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -58,7 +57,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	backfilledPIDs := db.ScrapeProcfs()
-	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
+	logger.Infof("backfilled %d processes", len(backfilledPIDs))
 
 	var p provider.Provider
 
@@ -71,6 +70,9 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
+			logger.Info("backend=auto using procfs")
+		} else {
+			logger.Info("backend=auto using ebpf")
 		}
 	case "ebpf":
 		p, err = ebpf_provider.NewProvider(ctx, logger, db)
@@ -94,13 +96,24 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 }
 
 func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
-	_, err := ev.GetValue(p.config.PIDField)
+	pi, err := ev.GetValue(p.config.PIDField)
 	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
 		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
-	err = p.provider.UpdateDB(ev)
+	// Do not enrich failed syscalls, as there was no actual process change related to it
+	v, err := ev.GetValue("auditd.result")
+	if err == nil && v == "fail" {
+		return ev, nil
+	}
+
+	pid, err := pidToUInt32(pi)
+	if err != nil {
+		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
+	}
+
+	err = p.provider.SyncDB(ev, pid)
 	if err != nil {
 		return ev, err
 	}
@@ -112,9 +125,14 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 	return result, nil
 }
 
+func (p *addSessionMetadata) Close() error {
+	p.db.Close()
+	return nil
+}
+
 func (p *addSessionMetadata) String() string {
-	return fmt.Sprintf("%v=[backend=%s, pid_field=%s, replace_fields=%t]",
-		processorName, p.config.Backend, p.config.PIDField, p.config.ReplaceFields)
+	return fmt.Sprintf("%v=[backend=%s, pid_field=%s]",
+		processorName, p.config.Backend, p.config.PIDField)
 }
 
 func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
@@ -129,7 +147,9 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
-		return nil, fmt.Errorf("pid %v not found in db: %w", pid, err)
+		e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+		p.logger.Errorf("%v", e)
+		return nil, e
 	}
 
 	processMap := fullProcess.ToMap()
@@ -148,12 +168,6 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		return nil, fmt.Errorf("merging enriched fields with event: %w", err)
 	}
 	result.Fields["process"] = m
-
-	if p.config.ReplaceFields {
-		if err := p.replaceFields(result); err != nil {
-			return nil, fmt.Errorf("replace fields: %w", err)
-		}
-	}
 	return result, nil
 }
 
@@ -182,40 +196,6 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 		return 0, fmt.Errorf("not an integer or string, but %T", v)
 	}
 	return pid, nil
-}
-
-// replaceFields replaces event fields with values suitable user with the session viewer in Kibana
-// The current version of session view in Kibana expects different values than what are used by auditbeat
-// for some fields. This function converts these field to have values that will work with session view.
-//
-// This function is temporary, and can be removed when this Kibana issue is completed: https://github.com/elastic/kibana/issues/179396.
-func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
-	kind, err := ev.Fields.GetValue("event.kind")
-	if err != nil {
-		return err
-	}
-	isAuditdEvent, err := ev.Fields.HasKey("auditd")
-	if err != nil {
-		return err
-	}
-	if kind == "event" && isAuditdEvent {
-		// process start
-		syscall, err := ev.Fields.GetValue("auditd.data.syscall")
-		if err != nil {
-			return nil //nolint:nilerr // processor can be called on unsupported events; not an error
-		}
-		switch syscall {
-		case "execveat", "execve":
-			ev.Fields.Put("event.action", []string{"exec", "fork"})
-			ev.Fields.Put("event.type", []string{"start"})
-
-		case "exit_group":
-			ev.Fields.Put("event.action", []string{"end"})
-			ev.Fields.Put("event.type", []string{"end"})
-			ev.Fields.Put("process.end", time.Now())
-		}
-	}
-	return nil
 }
 
 func tryToMapStr(v interface{}) (mapstr.M, bool) {

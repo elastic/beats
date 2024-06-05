@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -44,23 +45,32 @@ func TestEventMapping(t *testing.T) {
 	events, err := eventMapping(body, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
-	assert.Len(t, events, 1, "got wrong number of events")
+	assert.Len(t, events, 2, "got wrong number of events")
 
-	testCases := map[string]interface{}{
-		"name": "default-token-sg8x5",
-
-		"fs.available.bytes": 1939689472,
-		"fs.capacity.bytes":  1939701760,
-		"fs.used.bytes":      12288,
-		"fs.used.pct":        float64(12288) / float64(1939701760),
-		"fs.inodes.used":     9,
-		"fs.inodes.free":     473551,
-		"fs.inodes.count":    473560,
-		"fs.inodes.pct":      float64(9) / float64(473560),
+	testCases := []map[string]interface{}{
+		// Test for ephemeral volume
+		{
+			"name":               "default-token-sg8x5",
+			"fs.available.bytes": 1939689472,
+			"fs.capacity.bytes":  1939701760,
+			"fs.used.bytes":      12288,
+			"fs.used.pct":        float64(12288) / float64(1939701760),
+			"fs.inodes.used":     9,
+			"fs.inodes.free":     473551,
+			"fs.inodes.count":    473560,
+			"fs.inodes.pct":      float64(9) / float64(473560),
+		},
+		// Test for the persistent volume claim
+		{
+			mb.ModuleDataKey + ".persistentvolumeclaim.name": "pvc-demo",
+			"name": "pvc-demo-vol",
+		},
 	}
 
-	for k, v := range testCases {
-		testValue(t, events[0], k, v)
+	for i := range testCases {
+		for k, v := range testCases[i] {
+			testValue(t, events[i], k, v)
+		}
 	}
 }
 

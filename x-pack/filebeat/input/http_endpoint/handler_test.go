@@ -240,6 +240,101 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
+			name: "single_event_root",
+			conf: func() config {
+				c := defaultConfig()
+				c.Prefix = "."
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"id": int64(0),
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_hex",
+			conf: func() config {
+				c := defaultConfig()
+				c.Prefix = "."
+				c.HMACHeader = "Test-HMAC"
+				c.HMACKey = "Test-HMAC-Key"
+				c.HMACType = "sha1"
+				c.HMACPrefix = "sha1:"
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Test-HMAC", "sha1:f6bf232bf1f0ca3d768f8b6bd5c26a204ba57e89")
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"id": int64(0),
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_base64",
+			conf: func() config {
+				c := defaultConfig()
+				c.Prefix = "."
+				c.HMACHeader = "Test-HMAC"
+				c.HMACKey = "Test-HMAC-Key"
+				c.HMACType = "sha1"
+				c.HMACPrefix = "sha1:"
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Test-HMAC", "sha1:9r8jK/Hwyj12j4tr1cJqIEulfok=")
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"id": int64(0),
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_raw_base64",
+			conf: func() config {
+				c := defaultConfig()
+				c.Prefix = "."
+				c.HMACHeader = "Test-HMAC"
+				c.HMACKey = "Test-HMAC-Key"
+				c.HMACType = "sha1"
+				c.HMACPrefix = "sha1:"
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Test-HMAC", "sha1:9r8jK/Hwyj12j4tr1cJqIEulfok")
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"id": int64(0),
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
 			name: "single_event_gzip",
 			conf: defaultConfig(),
 			request: func() *http.Request {
@@ -378,7 +473,7 @@ func Test_apiResponse(t *testing.T) {
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-			apiHandler := newHandler(ctx, tracerConfig(tc.name, tc.conf, *withTraces), nil, pub, logp.NewLogger("http_endpoint.test"), metrics)
+			apiHandler := newHandler(ctx, tracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

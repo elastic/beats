@@ -166,7 +166,14 @@ func getResource(resourceName string) kubernetes.Resource {
 func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddResourceMetadataConfig) []string {
 	switch resourceName {
 	case PodResource:
-		extra := []string{NamespaceResource, NodeResource}
+		extra := []string{}
+		if addResourceMetadata.Node.Enabled() {
+			extra = append(extra, NodeResource)
+		}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+
 		// We need to create watchers for ReplicaSets and Jobs that it might belong to,
 		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 		// Deployment -> Replicaset -> Pod
@@ -179,23 +186,55 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		}
 		return extra
 	case ServiceResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case DeploymentResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case ReplicaSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case StatefulSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case DaemonSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case JobResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case CronJobResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case PersistentVolumeResource:
 		return []string{}
 	case PersistentVolumeClaimResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case StorageClassResource:
 		return []string{}
 	case NodeResource:

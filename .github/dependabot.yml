@@ -34,10 +34,34 @@ updates:
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
+      - dependency-name: github.com/elastic/ebpfevents
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
     open-pull-requests-limit: 2
+
+  # Cloud providers' SDK dependencies
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - automation
+      - dependabot
+    reviewers:
+      - "elastic/obs-ds-hosted-services"
+      - "elastic/obs-infraobs-integrations"
+    groups:
+      azure-sdks:
+        patterns:
+          - "github.com/Azure/azure-sdk-for-go/*"
+          - "github.com/Azure/azure-event-hubs-go/*"
+          - "github.com/Azure/go-autorest/*"
+          - "github.com/Azure/azure-storage-blob-go/*"
+      gcp-sdks:
+        patterns:
+          - "cloud.google.com/go/*"
+          - "google.golang.org/*"
 
   # GitHub actions
   - package-ecosystem: "github-actions"

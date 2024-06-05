@@ -18,7 +18,11 @@
 package v2
 
 import (
+	"context"
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -36,7 +40,7 @@ type InputManager interface {
 	// Init signals to InputManager to initialize internal resources.
 	// The mode tells the input manager if the Beat is actually running the inputs or
 	// if inputs are only configured for testing/validation purposes.
-	Init(grp unison.Group, mode Mode) error
+	Init(grp unison.Group) error
 
 	// Create builds a new Input instance from the given configuation, or returns
 	// an error if the configuation is invalid.
@@ -44,16 +48,6 @@ type InputManager interface {
 	// will use the Test/Run methods of the input.
 	Create(*conf.C) (Input, error)
 }
-
-// Mode tells the InputManager in which mode it is initialized.
-type Mode uint8
-
-//go:generate stringer -type Mode -trimprefix Mode
-const (
-	ModeRun Mode = iota
-	ModeTest
-	ModeOther
-)
 
 // Input is a configured input object that can be used to test or start
 // the actual data collection.
@@ -90,6 +84,17 @@ type Context struct {
 
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
+
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of Filebeat this is
+	// expected to be nil.
+	StatusReporter status.StatusReporter
+}
+
+func (c Context) UpdateStatus(status status.Status, msg string) {
+	if c.StatusReporter != nil {
+		c.StatusReporter.UpdateStatus(status, msg)
+	}
 }
 
 // TestContext provides the Input Test function with common environmental
@@ -110,4 +115,20 @@ type TestContext struct {
 type Canceler interface {
 	Done() <-chan struct{}
 	Err() error
+}
+
+type cancelerCtx struct {
+	Canceler
+}
+
+func GoContextFromCanceler(c Canceler) context.Context {
+	return cancelerCtx{c}
+}
+
+func (c cancelerCtx) Deadline() (deadline time.Time, ok bool) {
+	return time.Time{}, false
+}
+
+func (c cancelerCtx) Value(_ any) any {
+	return nil
 }

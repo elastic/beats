@@ -60,6 +60,9 @@ func defaultRoute(af int) (name string, index int, err error) {
 			inTable = f[0] == "-------"
 			continue
 		}
+		if len(f) < 5 {
+			return "", -1, fmt.Errorf("unexpected netsh %s line: %q\n\n%s", name, sc.Text(), r)
+		}
 		if strings.Contains(f[3], "/") {
 			ip, _, err := net.ParseCIDR(f[3])
 			if err != nil || !ip.IsUnspecified() {
@@ -98,7 +101,7 @@ func defaultRoute(af int) (name string, index int, err error) {
 			continue
 		}
 		if len(f) < 5 {
-			return "", -1, fmt.Errorf("unexpected netsh %s line: %q", name, sc.Text())
+			return "", -1, fmt.Errorf("unexpected netsh %s line: %q\n\n%s", name, sc.Text(), d)
 		}
 		idx, err := strconv.Atoi(f[0])
 		if err != nil {

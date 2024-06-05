@@ -61,9 +61,11 @@ CHANGELOG*
 /libbeat/processors/decode_xml_wineventlog/ @elastic/sec-windows-platform
 /libbeat/processors/dns/ @elastic/sec-deployment-and-devices
 /libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
+/libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
 /libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
 /libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
+/libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
