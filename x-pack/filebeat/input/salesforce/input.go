@@ -7,8 +7,11 @@ package salesforce
 import (
 	"bytes"
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/csv"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io"
@@ -20,7 +23,6 @@ import (
 	"github.com/g8rswimmer/go-sfdc/credentials"
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
@@ -409,7 +411,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
 		}
 
-		signKey, err := jwt.ParseRSAPrivateKeyFromPEM(pemBytes)
+		signKey, err := parseRSAPrivateKeyFromPEM(pemBytes)
 		if err != nil {
 			return nil, fmt.Errorf("problem with client key for JWT auth: %w", err)
 		}
@@ -452,6 +454,27 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 		Client:      client,
 		Version:     cfg.Version,
 	}, nil
+}
+
+func parseRSAPrivateKeyFromPEM(key []byte) (*rsa.PrivateKey, error) {
+	// Parse PEM block
+	var block *pem.Block
+	if block, _ = pem.Decode(key); block == nil {
+		return nil, errors.New("Invalid Key: Key must be a PEM encoded PKCS1 or PKCS8 key")
+	}
+
+	if parsedKey, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
+		return parsedKey, nil
+	}
+
+	if parsedKey, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
+		if pkey, ok := parsedKey.(*rsa.PrivateKey); ok {
+			return pkey, nil
+		}
+
+	}
+
+	return nil, errors.New("Key is not a valid RSA private key")
 }
 
 // retryLog is a shim for the retryablehttp.Client.Logger.

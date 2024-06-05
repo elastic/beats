@@ -215,7 +215,6 @@ require (
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/g8rswimmer/go-sfdc v0.0.0-00010101000000-000000000000
 	github.com/go-ldap/ldap/v3 v3.4.6
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/cel-go v0.19.0
 	github.com/googleapis/gax-go/v2 v2.12.0
 	github.com/gorilla/handlers v1.5.1
@@ -307,6 +306,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
