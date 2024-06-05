@@ -19,12 +19,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func MajorTTY(ttyNr uint32) uint16 {
-	return uint16((ttyNr >> 8) & 0xff)
+func MajorTTY(ttyNr uint32) uint32 {
+	return uint32((ttyNr >> 8) & 0xff)
 }
 
-func MinorTTY(ttyNr uint32) uint16 {
-	return uint16(((ttyNr & 0xfff00000) >> 20) | (ttyNr & 0xff))
+func MinorTTY(ttyNr uint32) uint32 {
+	return uint32(((ttyNr >> 12) & 0xfff00) | (ttyNr & 0xff))
 }
 
 // this interface exists so that we can inject a mock procfs reader for deterministic testing

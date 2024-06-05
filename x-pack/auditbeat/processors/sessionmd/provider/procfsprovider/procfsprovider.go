@@ -40,12 +40,12 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 	}, nil
 }
 
-func (s prvdr) GetProcess(pid uint32) (*types.Process, error) {
-	return nil, fmt.Errorf("not implemented")
+func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
+	return types.Process{}, fmt.Errorf("not implemented")
 }
 
 // SyncDB will update the process DB with process info from procfs or the event itself
-func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
 	if err != nil {
 		return fmt.Errorf("event not supported, no syscall data")
@@ -54,7 +54,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	switch syscall {
 	case "execveat", "execve":
 		pe := types.ProcessExecEvent{}
-		proc_info, err := s.reader.GetProcess(pid)
+		proc_info, err := p.reader.GetProcess(pid)
 		if err == nil {
 			pe.PIDs = proc_info.PIDs
 			pe.Creds = proc_info.Creds
@@ -64,7 +64,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			pe.Env = proc_info.Env
 			pe.Filename = proc_info.Filename
 		} else {
-			s.logger.Warnf("couldn't get process info from proc for pid %v: %w", pid, err)
+			p.logger.Warnf("couldn't get process info from proc for pid %v: %w", pid, err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
 			pe.PIDs.Tgid = pid
@@ -81,7 +81,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			}
 			pe.PIDs.Ppid = uint32(i)
 
-			parent, err = s.db.GetProcess(pe.PIDs.Ppid)
+			parent, err = p.db.GetProcess(pe.PIDs.Ppid)
 			if err != nil {
 				goto out
 			}
@@ -94,7 +94,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			pe.CWD = intr.(string)
 		out:
 		}
-		s.db.InsertExec(pe)
+		p.db.InsertExec(pe)
 		if err != nil {
 			return fmt.Errorf("insert exec to db: %w", err)
 		}
@@ -104,7 +104,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 				Tgid: pid,
 			},
 		}
-		s.db.InsertExit(pe)
+		p.db.InsertExit(pe)
 	case "setsid":
 		intr, err := ev.Fields.GetValue("auditd.result")
 		if err != nil {
@@ -121,7 +121,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 					Sid:  pid,
 				},
 			}
-			s.db.InsertSetsid(setsid_ev)
+			p.db.InsertSetsid(setsid_ev)
 		}
 	}
 	return nil

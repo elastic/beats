@@ -60,8 +60,8 @@ type TTYTermios struct {
 }
 
 type TTYDev struct {
-	Minor   uint16
-	Major   uint16
+	Minor   uint32
+	Major   uint32
 	Winsize TTYWinsize
 	Termios TTYTermios
 }

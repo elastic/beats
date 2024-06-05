@@ -465,8 +465,8 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	}
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
-	ret.TTY.CharDevice.Major = p.CTTY.Major
-	ret.TTY.CharDevice.Minor = p.CTTY.Minor
+	ret.TTY.CharDevice.Major = uint16(p.CTTY.Major)
+	ret.TTY.CharDevice.Minor = uint16(p.CTTY.Minor)
 	ret.ExitCode = p.ExitCode
 
 	return ret
@@ -743,7 +743,7 @@ func isFilteredExecutable(executable string) bool {
 	return stringStartsWithEntryInList(executable, filteredExecutables[:])
 }
 
-func getTTYType(major uint16, minor uint16) TTYType {
+func getTTYType(major uint32, minor uint32) TTYType {
 	if major >= ptsMinMajor && major <= ptsMaxMajor {
 		return Pts
 	}

@@ -10,11 +10,19 @@ import (
 	"context"
 	"fmt"
 	"time"
+  "os"
+  "sync"
+  "strings"
+  "encoding/base64"
+  "strconv"
+  "path"
+  "os/user"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
+  "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	quark "github.com/elastic/quark/go"
 )
@@ -23,6 +31,85 @@ type prvdr struct {
 	ctx    context.Context
 	logger *logp.Logger
 	qq     *quark.Queue
+}
+
+type TTYType int
+
+const (
+	TTYUnknown TTYType = iota
+	Pts
+	TTY
+	TTYConsole
+)
+
+type EntryType string
+
+const (
+	Init         EntryType = "init"
+	Sshd         EntryType = "sshd"
+	Ssm          EntryType = "ssm"
+	Container    EntryType = "container"
+	Terminal     EntryType = "terminal"
+	EntryConsole EntryType = "console"
+	EntryUnknown EntryType = "unknown"
+)
+
+var containerRuntimes = [...]string{
+	"containerd-shim",
+	"runc",
+	"conmon",
+}
+
+// "filtered" executables are executables that relate to internal
+// implementation details of entry mechanisms. The set of circumstances under
+// which they can become an entry leader are reduced compared to other binaries
+// (see implementation and unit tests).
+var filteredExecutables = [...]string{
+	"runc",
+	"containerd-shim",
+	"calico-node",
+	"check-status",
+	"conmon",
+}
+
+const (
+	ptsMinMajor     = 136
+	ptsMaxMajor     = 143
+	ttyMajor        = 4
+	consoleMaxMinor = 63
+	ttyMaxMinor     = 255
+	retryCount      = 2
+)
+
+var (
+	bootID     string
+	pidNsInode uint64
+	initError  error
+	once       sync.Once
+)
+
+func readBootID() (string, error) {
+	bootID, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
+	if err != nil {
+		panic(fmt.Sprintf("could not read /proc/sys/kernel/random/boot_id: %v", err))
+	}
+
+	return strings.TrimRight(string(bootID), "\n"), nil
+}
+
+func readPIDNsInode() (uint64, error) {
+	var ret uint64
+
+	pidNsInodeRaw, err := os.Readlink("/proc/self/ns/pid")
+	if err != nil {
+		panic(fmt.Sprintf("could not read /proc/self/ns/pid: %v", err))
+	}
+
+	if _, err = fmt.Sscanf(pidNsInodeRaw, "pid:[%d]", &ret); err != nil {
+		panic(fmt.Sprintf("could not parse contents of /proc/self/ns/pid (%s): %v", pidNsInodeRaw, err))
+	}
+
+	return ret, nil
 }
 
 func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (provider.Provider, error) {
@@ -65,46 +152,19 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	return &p, nil
 }
 
-func (s prvdr) GetProcess(pid uint32) (*types.Process, error) {
-	p := s.qq.Lookup(int(pid))
-	if p == nil {
-		return nil, fmt.Errorf("pid %v not found in quark cache", pid)
-	}
-
-	proc := types.Process {
-		EntityID: fmt.Sprintf("%s__%s", p.Comm, p.Pid),
-		Executable: p.Comm,
-		Name: p.Comm,
-		Start: starttime(p.Proc.TimeBoot),
-		End: endtime(p.ExitEvent.ExitTimeEvent),
-		ExitCode: p.ExitEvent.ExitCode,
-		Interactive: interactive(p.Proc.TtyMajor, p.Proc.TtyMinor),
-		WorkingDirectory: p.Cwd,
-		User: struct{
-			ID: p.Proc.Euid,
-			Name: usernameFromId(p.Proc.Euid),
-		},
-		Group: struct {
-			ID: p.Proc.Eguid,
-			Name: groupnameFromId(p.Proc.Eguid),
-		},
-	}
-	return &proc, nil
-}
-
-func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 
 	timeout := 5 * time.Second
 	ch := time.After(timeout)
 	for {
 		select {
 		case <- ch:
-			s.logger.Errorf("%v not seen after %v", pid, timeout)
+			p.logger.Errorf("%v not seen after %v", pid, timeout)
 			break
 		default:
-			p := s.qq.Lookup(int(pid))
+			proc := p.qq.Lookup(int(pid))
 			//TODO: check event, eg. make sure exit seen when enriching exit event
-			if p != nil {
+			if proc != nil {
 				break
 			}
 			time.Sleep(200 * time.Millisecond)
@@ -112,26 +172,30 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	}
 }
 
-func interactiveFromTTY(tty types.TTYDev) bool {
-	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
-}
+func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
+  qev := p.qq.Lookup(int(pid))
+  if qev == nil {
+    return types.Process{}, fmt.Errorf("PID %d not found in cache", pid)
+  }
 
-func fullProcessFromDBProcess(p Process) types.Process {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
-	interactive := interactiveFromTTY(p.CTTY)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	interactive := interactiveFromTTY(types.TTYDev{
+    Major: qev.Proc.TtyMajor,
+    Minor: qev.Proc.TtyMinor,
+  })
 
 	ret := types.Process{
-		PID:              p.PIDs.Tgid,
+		PID:              qev.Pid,
 		Start:            timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
-		Name:             basename(p.Filename),
-		Executable:       p.Filename,
-		Args:             p.Argv,
-		WorkingDirectory: p.Cwd,
+		Name:             basename(qev.Filename),
+		Executable:       qev.Filename,
+//		Args:             qev.Argv,
+		WorkingDirectory: qev.Cwd,
 		Interactive:      &interactive,
 	}
 
-	euid := p.Creds.Euid
-	egid := p.Creds.Egid
+	euid := qev.Proc.Euid
+	egid := qev.Proc.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(ret.User.ID)
 	if ok {
@@ -142,27 +206,37 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	if ok {
 		ret.Group.Name = groupname
 	}
-	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
-	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
-	ret.TTY.CharDevice.Major = p.CTTY.Major
-	ret.TTY.CharDevice.Minor = p.CTTY.Minor
-	ret.ExitCode = p.ExitCode
+	ret.TTY.CharDevice.Major = uint16(qev.Proc.TtyMajor)
+	ret.TTY.CharDevice.Minor = uint16(qev.Proc.TtyMinor)
+  if qev.ExitEvent != nil {
+	  ret.ExitCode = qev.ExitEvent.ExitCode
+  }
 
-	return ret
+  p.fillParent(&ret, qev.Proc.Ppid)
+  p.fillGroupLeader(&ret, qev.Proc.Pgid)
+  p.fillSessionLeader(&ret, qev.Proc.Sid)
+	return ret, nil
 }
 
-func fillParent(process *types.Process, parent Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
+func (p prvdr) fillParent(process *types.Process, ppid uint32) {
+  qev := p.qq.Lookup(int(ppid))
+  if qev == nil {
+    return
+  }
 
-	interactive := interactiveFromTTY(parent.CTTY)
-	euid := parent.Creds.Euid
-	egid := parent.Creds.Egid
-	process.Parent.PID = parent.PIDs.Tgid
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	interactive := interactiveFromTTY(types.TTYDev{
+    Major: qev.Proc.TtyMajor,
+    Minor: qev.Proc.TtyMinor,
+  })
+	euid := qev.Proc.Euid
+	egid := qev.Proc.Egid
+	process.Parent.PID = qev.Proc.Ppid
 	process.Parent.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-	process.Parent.Name = basename(parent.Filename)
-	process.Parent.Executable = parent.Filename
-	process.Parent.Args = parent.Argv
-	process.Parent.WorkingDirectory = parent.Cwd
+	process.Parent.Name = basename(qev.Filename)
+	process.Parent.Executable = qev.Filename
+//	process.Parent.Args = qev.Argv
+	process.Parent.WorkingDirectory = qev.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.Parent.User.ID)
@@ -176,18 +250,26 @@ func fillParent(process *types.Process, parent Process) {
 	}
 }
 
-func fillGroupLeader(process *types.Process, groupLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
+func (p prvdr)fillGroupLeader(process *types.Process, pgid uint32) {
+	qev := p.qq.Lookup(int(pgid))
+  if qev == nil {
+    return
+  }
 
-	interactive := interactiveFromTTY(groupLeader.CTTY)
-	euid := groupLeader.Creds.Euid
-	egid := groupLeader.Creds.Egid
-	process.GroupLeader.PID = groupLeader.PIDs.Tgid
+  reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+
+	interactive := interactiveFromTTY(types.TTYDev{
+    Major: qev.Proc.TtyMajor,
+    Minor: qev.Proc.TtyMinor,
+  })
+	euid := qev.Proc.Euid
+	egid := qev.Proc.Egid
+	process.GroupLeader.PID = qev.Pid
 	process.GroupLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-	process.GroupLeader.Name = basename(groupLeader.Filename)
-	process.GroupLeader.Executable = groupLeader.Filename
-	process.GroupLeader.Args = groupLeader.Argv
-	process.GroupLeader.WorkingDirectory = groupLeader.Cwd
+	process.GroupLeader.Name = basename(qev.Filename)
+	process.GroupLeader.Executable = qev.Filename
+//	process.GroupLeader.Args = qev.Argv
+	process.GroupLeader.WorkingDirectory = qev.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.GroupLeader.User.ID)
@@ -201,18 +283,26 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 	}
 }
 
-func fillSessionLeader(process *types.Process, sessionLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
+func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
+	qev := p.qq.Lookup(int(sid))
+  if qev == nil {
+    return
+  }
 
-	interactive := interactiveFromTTY(sessionLeader.CTTY)
-	euid := sessionLeader.Creds.Euid
-	egid := sessionLeader.Creds.Egid
-	process.SessionLeader.PID = sessionLeader.PIDs.Tgid
+  reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+
+	interactive := interactiveFromTTY(types.TTYDev{
+    Major: qev.Proc.TtyMajor,
+    Minor: qev.Proc.TtyMinor,
+  })
+	euid := qev.Proc.Euid
+	egid := qev.Proc.Egid
+	process.SessionLeader.PID = qev.Pid
 	process.SessionLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-	process.SessionLeader.Name = basename(sessionLeader.Filename)
-	process.SessionLeader.Executable = sessionLeader.Filename
-	process.SessionLeader.Args = sessionLeader.Argv
-	process.SessionLeader.WorkingDirectory = sessionLeader.Cwd
+	process.SessionLeader.Name = basename(qev.Filename)
+	process.SessionLeader.Executable = qev.Filename
+//	process.SessionLeader.Args = qev.Argv
+	process.SessionLeader.WorkingDirectory = qev.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.SessionLeader.User.ID)
@@ -226,31 +316,90 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	}
 }
 
-func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
+//func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
+//	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
+//
+//	interactive := interactiveFromTTY(entryLeader.CTTY)
+//	euid := entryLeader.Creds.Euid
+//	egid := entryLeader.Creds.Egid
+//	process.EntryLeader.PID = entryLeader.PIDs.Tgid
+//	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+//	process.EntryLeader.Name = basename(entryLeader.Filename)
+//	process.EntryLeader.Executable = entryLeader.Filename
+//	process.EntryLeader.Args = entryLeader.Argv
+//	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
+//	process.EntryLeader.Interactive = &interactive
+//	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+//	username, ok := getUserName(process.EntryLeader.User.ID)
+//	if ok {
+//		process.EntryLeader.User.Name = username
+//	}
+//	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+//	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
+//	if ok {
+//		process.EntryLeader.Group.Name = groupname
+//	}
+//
+//	process.EntryLeader.EntryMeta.Type = string(entryType)
+//}
 
-	interactive := interactiveFromTTY(entryLeader.CTTY)
-	euid := entryLeader.Creds.Euid
-	egid := entryLeader.Creds.Egid
-	process.EntryLeader.PID = entryLeader.PIDs.Tgid
-	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-	process.EntryLeader.Name = basename(entryLeader.Filename)
-	process.EntryLeader.Executable = entryLeader.Filename
-	process.EntryLeader.Args = entryLeader.Argv
-	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
-	process.EntryLeader.Interactive = &interactive
-	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := getUserName(process.EntryLeader.User.ID)
-	if ok {
-		process.EntryLeader.User.Name = username
-	}
-	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
-	if ok {
-		process.EntryLeader.Group.Name = groupname
-	}
-
-	process.EntryLeader.EntryMeta.Type = string(entryType)
+func interactiveFromTTY(tty types.TTYDev) bool {
+	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
 }
 
+func getTTYType(major uint32, minor uint32) TTYType {
+	if major >= ptsMinMajor && major <= ptsMaxMajor {
+		return Pts
+	}
 
+	if ttyMajor == major {
+		if minor <= consoleMaxMinor {
+			return TTYConsole
+		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
+			return TTY
+		}
+	}
+
+	return TTYUnknown
+}
+
+func calculateEntityIDv1(pid uint32, startTime time.Time) string {
+	return base64.StdEncoding.EncodeToString(
+		[]byte(
+			fmt.Sprintf("%d__%s__%d__%d",
+				pidNsInode,
+				bootID,
+				uint64(pid),
+				uint64(startTime.Unix()),
+			),
+		),
+	)
+}
+
+// `path.Base` returns a '.' for empty strings, this just special cases that
+// situation to return an empty string
+func basename(pathStr string) string {
+	if pathStr == "" {
+		return ""
+	}
+
+	return path.Base(pathStr)
+}
+
+// getUserName will return the name associated with the user ID, if it exists
+func getUserName(id string) (string, bool) {
+	user, err := user.LookupId(id)
+	if err != nil {
+		return "", false
+	}
+	return user.Username, true
+}
+
+// getGroupName will return the name associated with the group ID, if it exists
+func getGroupName(id string) (string, bool) {
+	group, err := user.LookupGroupId(id)
+	if err != nil {
+		return "", false
+	}
+	return group.Name, true
+}

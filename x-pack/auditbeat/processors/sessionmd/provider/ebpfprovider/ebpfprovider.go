@@ -118,8 +118,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						CapEffective: body.Creds.CapEffective,
 					},
 					CTTY: types.TTYDev{
-						Major: body.CTTY.Major,
-						Minor: body.CTTY.Minor,
+						Major: uint32(body.CTTY.Major),
+						Minor: uint32(body.CTTY.Minor),
 					},
 					CWD:      body.Cwd,
 					Argv:     body.Argv,
@@ -152,8 +152,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	return &p, nil
 }
 
-func (s prvdr) GetProcess(pid uint32) (*types.Process, error) {
-	return nil, fmt.Errorf("not implemented")
+func (p prvdr) GetProcess(pid uint32) (types.Process, error) {
+	return types.Process{}, fmt.Errorf("not implemented")
 }
 
 const (
@@ -180,15 +180,15 @@ var (
 // If for some reason a lot of time has been spent waiting for missing processes, this also has a backoff timer during
 // which it will continue without waiting for missing events to arrive, so the processor doesn't become overly backed-up
 // waiting for these processes, at the cost of possibly not enriching some processes.
-func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
-	if s.db.HasProcess(pid) {
+func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+	if p.db.HasProcess(pid) {
 		return nil
 	}
 
 	now := time.Now()
 	if inBackoff {
 		if now.Sub(backoffStart) > backoffDuration {
-			s.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
+			p.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
 			inBackoff = false
 			combinedWait = 0 * time.Millisecond
 		} else {
@@ -197,7 +197,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 		}
 	} else {
 		if combinedWait > combinedWaitLimit {
-			s.logger.Warn("starting backoff")
+			p.logger.Warn("starting backoff")
 			inBackoff = true
 			backoffStart = now
 			backoffSkipped = 0
@@ -214,14 +214,14 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if s.db.HasProcess(pid) {
-			s.logger.Debugf("got process that was missing after %v", waited)
+		if p.db.HasProcess(pid) {
+			p.logger.Debugf("got process that was missing after %v", waited)
 			combinedWait = combinedWait + waited
 			return nil
 		}
 		if waited >= maxWaitLimit {
 			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
-			s.logger.Warnf("%w", e)
+			p.logger.Warnf("%w", e)
 			combinedWait = combinedWait + waited
 			return e
 		}
