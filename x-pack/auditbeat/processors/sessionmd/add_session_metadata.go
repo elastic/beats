@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpfprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quarkprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -40,6 +41,7 @@ type addSessionMetadata struct {
 	logger   *logp.Logger
 	db       *processdb.DB
 	provider provider.Provider
+	backend  string
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
@@ -57,9 +59,10 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	//TODO: backfill if not using quark
-	//	backfilledPIDs := db.ScrapeProcfs()
-	//	logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	if c.Backend != "quark" {
+		backfilledPIDs := db.ScrapeProcfs()
+		logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	}
 
 	var p provider.Provider
 
@@ -99,6 +102,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		logger:   logger,
 		db:       db,
 		provider: p,
+		backend:  c.Backend,
 	}, nil
 }
 
@@ -152,13 +156,19 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		return nil, fmt.Errorf("cannot parse pid field '%s': %w", p.config.PIDField, err)
 	}
 
-	fullProcess, err := p.db.GetProcess(pid)
-	if err != nil {
-		e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-		p.logger.Errorf("%v", e)
-		return nil, e
+	var fullProcess types.Process
+	if p.backend == "quark" {
+		// Quark doesn't enrich with the processor DB;  process info is taken directly from quark cache
+		i, ok := p.provider.(QuarkProvider)
+		fullProcess, err = p.provider.(quarkprovider).GetProcess(pid)
+	} else {
+		fullProcess, err = p.db.GetProcess(pid)
+		if err != nil {
+			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+			p.logger.Errorf("%v", e)
+			return nil, e
+		}
 	}
-
 	processMap := fullProcess.ToMap()
 
 	if b, err := ev.Fields.HasKey("process"); !b || err != nil {

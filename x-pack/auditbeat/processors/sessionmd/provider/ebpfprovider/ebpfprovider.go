@@ -152,6 +152,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	return &p, nil
 }
 
+func (s prvdr) GetProcess(pid uint32) (*types.Process, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
 const (
 	maxWaitLimit      = 200 * time.Millisecond // Maximum time SyncDB will wait for process
 	combinedWaitLimit = 2 * time.Second        // Multiple SyncDB calls will wait up to this amount within resetDuration

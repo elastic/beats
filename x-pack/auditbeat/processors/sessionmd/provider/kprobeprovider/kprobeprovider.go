@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -62,6 +63,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		}
 	}(pipeFile, logger)
 	return &p, nil
+}
+
+func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {

@@ -40,6 +40,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 	}, nil
 }
 
+func (s prvdr) GetProcess(pid uint32) (*types.Process, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
 // SyncDB will update the process DB with process info from procfs or the event itself
 func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
