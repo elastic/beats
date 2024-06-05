@@ -40,9 +40,8 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
 	out = make(map[string]mapstr.M, 0)
 
-	for _, dataFile := range in.dataFiles {
-		dataFileCopy := dataFile
-		m.addDataFileData(&dataFileCopy, out)
+	for i := range in.dataFiles {
+		m.addDataFileData(&in.dataFiles[i], out)
 	}
 
 	m.addUsedAndFreeSpaceData(in.freeSpace, out)
