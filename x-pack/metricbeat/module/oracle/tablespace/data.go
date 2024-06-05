@@ -16,8 +16,9 @@ import (
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
-func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {
-	out = &extractedData{}
+func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (*extractedData, error) {
+	out := &extractedData{}
+	var err error
 
 	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
 		return nil, fmt.Errorf("error getting data_files: %w", err)
@@ -37,8 +38,8 @@ func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMeth
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
 // to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
 // was necessary. Data is organized by Tablespace entity (Tablespaces might contain one or more data files)
-func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
-	out = make(map[string]mapstr.M, 0)
+func (m *MetricSet) transform(in *extractedData) map[string]mapstr.M {
+	out := make(map[string]mapstr.M, 0)
 
 	for i := range in.dataFiles {
 		m.addDataFileData(&in.dataFiles[i], out)
