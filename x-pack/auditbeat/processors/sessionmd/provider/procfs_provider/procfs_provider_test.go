@@ -124,7 +124,7 @@ func TestExecveEvent(t *testing.T) {
 	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
-	err = provider.UpdateDB(&event)
+	err = provider.UpdateDB(&event, expected.PIDs.Tgid)
 	require.Nil(t, err)
 
 	actual, err := db.GetProcess(pid)
@@ -234,7 +234,7 @@ func TestExecveatEvent(t *testing.T) {
 	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
-	err = provider.UpdateDB(&event)
+	err = provider.UpdateDB(&event, expected.PIDs.Tgid)
 	require.Nil(t, err)
 
 	actual, err := db.GetProcess(pid)
@@ -317,7 +317,7 @@ func TestSetSidEvent(t *testing.T) {
 	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
-	err = provider.UpdateDB(&event)
+	err = provider.UpdateDB(&event, expected.PIDs.Tgid)
 	require.Nil(t, err)
 
 	actual, err := db.GetProcess(pid)
@@ -399,7 +399,7 @@ func TestSetSidEventFailed(t *testing.T) {
 	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
-	err = provider.UpdateDB(&event)
+	err = provider.UpdateDB(&event, expected.PIDs.Tgid)
 	require.Nil(t, err)
 
 	actual, err := db.GetProcess(pid)
@@ -470,7 +470,7 @@ func TestSetSidSessionLeaderNotScraped(t *testing.T) {
 	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
-	err = provider.UpdateDB(&event)
+	err = provider.UpdateDB(&event, expected.PIDs.Tgid)
 	require.Nil(t, err)
 
 	actual, err := db.GetProcess(pid)

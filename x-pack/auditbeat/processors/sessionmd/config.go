@@ -8,15 +8,13 @@ package sessionmd
 
 // Config for add_session_metadata processor.
 type config struct {
-	Backend       string `config:"backend"`
-	ReplaceFields bool   `config:"replace_fields"`
-	PIDField      string `config:"pid_field"`
+	Backend  string `config:"backend"`
+	PIDField string `config:"pid_field"`
 }
 
 func defaultConfig() config {
 	return config{
-		Backend:       "auto",
-		ReplaceFields: false,
-		PIDField:      "process.pid",
+		Backend:  "auto",
+		PIDField: "process.pid",
 	}
 }

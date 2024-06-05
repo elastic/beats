@@ -20,6 +20,7 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
@@ -112,11 +113,19 @@ func CrossBuildDeps() error {
 	return callForBeat("crossBuildExt", "osquerybeat")
 }
 
+// PrepareLightModules prepares the module packaging.
+func PrepareLightModules() error {
+	return metricbeat.PrepareLightModulesPackaging(
+		filepath.Join("..", "metricbeat", "module"),       // x-pack/metricbeat
+		filepath.Join("..", "..", "metricbeat", "module"), // metricbeat (oss)
+	)
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
 // Use VERSION_QUALIFIER to control the version qualifier.
-func Package() {
+func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
@@ -126,7 +135,14 @@ func Package() {
 	// Add osquery distro binaries, required for the osquerybeat subcommand.
 	osquerybeat.CustomizePackaging()
 
-	mg.SerialDeps(Update, osquerybeat.FetchOsqueryDistros, CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
+	// Add metricbeat lightweight modules.
+	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {
+		return err
+	}
+
+	mg.SerialDeps(Update, PrepareLightModules, osquerybeat.FetchOsqueryDistros, CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
+
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
