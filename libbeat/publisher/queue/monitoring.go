@@ -68,18 +68,14 @@ func NewQueueObserver(metrics *monitoring.Registry) Observer {
 	if metrics == nil {
 		return nilObserver{}
 	}
-	pipelineMetrics := metrics.GetRegistry("pipeline")
-	if pipelineMetrics == nil {
-		pipelineMetrics = metrics.NewRegistry("pipeline")
-	}
-	queueMetrics := pipelineMetrics.GetRegistry("queue")
+	queueMetrics := metrics.GetRegistry("queue")
 	if queueMetrics != nil {
 		err := queueMetrics.Clear()
 		if err != nil {
 			return nilObserver{}
 		}
 	} else {
-		queueMetrics = pipelineMetrics.NewRegistry("queue")
+		queueMetrics = metrics.NewRegistry("queue")
 	}
 
 	ob := &queueObserver{

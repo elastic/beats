@@ -29,6 +29,9 @@ import (
 type runLoop struct {
 	broker *broker
 
+	// observer is a metrics observer used to report internal queue state.
+	observer queue.Observer
+
 	// The index of the beginning of the current ring buffer within its backing
 	// array. If the queue isn't empty, bufPos points to the oldest remaining
 	// event.
@@ -68,7 +71,7 @@ type runLoop struct {
 	nextEntryID queue.EntryID
 }
 
-func newRunLoop(broker *broker) *runLoop {
+func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
 	var timer *time.Timer
 
 	// Create the timer we'll use for get requests, but stop it until a
@@ -81,6 +84,7 @@ func newRunLoop(broker *broker) *runLoop {
 	}
 	return &runLoop{
 		broker:   broker,
+		observer: observer,
 		getTimer: timer,
 	}
 }
@@ -194,7 +198,7 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 	req.responseChan <- batch
 	l.consumedBatches.append(batch)
 	l.consumedCount += batchSize
-	l.broker.observer.ConsumeEvents(batchSize, batchBytes)
+	l.observer.ConsumeEvents(batchSize, batchBytes)
 }
 
 func (l *runLoop) handleDelete(count int) {
@@ -208,7 +212,7 @@ func (l *runLoop) handleDelete(count int) {
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count
-	l.broker.observer.RemoveEvents(count, byteCount)
+	l.observer.RemoveEvents(count, byteCount)
 	if l.closing && l.eventCount == 0 {
 		// Our last events were acknowledged during shutdown, signal final shutdown
 		l.broker.ctxCancel()
@@ -251,5 +255,5 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
-	l.broker.observer.AddEvent(req.eventSize)
+	l.observer.AddEvent(req.eventSize)
 }

@@ -75,10 +75,6 @@ type broker struct {
 	// through this channel so ackLoop can monitor them for acknowledgments.
 	consumedChan chan batchList
 
-	// observer is a metrics observer that the queue should use to report
-	// internal state.
-	observer queue.Observer
-
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
 	// safe to free these events and advance the queue by sending the
@@ -222,12 +218,10 @@ func newQueue(
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
-
-		observer: observer,
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
-	b.runLoop = newRunLoop(b)
+	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)
 
 	observer.MaxEvents(settings.Events)
