@@ -90,7 +90,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}
 	case "quark":
-		p, err = quarkprovider.NewProvider(ctx, logger, db)
+		p, err = quarkprovider.NewProvider(ctx, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create quark provider: %w", err)
 		}
