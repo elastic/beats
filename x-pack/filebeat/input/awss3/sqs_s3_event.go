@@ -132,7 +132,10 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	// Start SQS keepalive worker.
 	var keepaliveWg sync.WaitGroup
 	keepaliveWg.Add(1)
-	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
+	go func() {
+		defer keepaliveWg.Done()
+		p.keepalive(keepaliveCtx, log, msg)
+	}()
 
 	receiveCount := getSQSReceiveCount(msg.Attributes)
 	if receiveCount == 1 {
@@ -195,9 +198,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
-func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
-	defer wg.Done()
-
+func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, msg *types.Message) {
 	t := time.NewTicker(p.sqsVisibilityTimeout / 2)
 	defer t.Stop()
 

@@ -37,25 +37,9 @@ import (
 const s3RequestURLMetadataKey = `x-beat-s3-request-url`
 
 type sqsAPI interface {
-	sqsReceiver
-	sqsDeleter
-	sqsVisibilityChanger
-	sqsAttributeGetter
-}
-
-type sqsReceiver interface {
 	ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error)
-}
-
-type sqsDeleter interface {
 	DeleteMessage(ctx context.Context, msg *types.Message) error
-}
-
-type sqsVisibilityChanger interface {
 	ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error
-}
-
-type sqsAttributeGetter interface {
 	GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error)
 }
 

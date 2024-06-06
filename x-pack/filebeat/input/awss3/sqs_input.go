@@ -34,7 +34,7 @@ type sqsReaderInput struct {
 
 	// Workers send on workRequestChan to indicate they're ready for the next
 	// message, and the reader loop replies on workResponseChan.
-	workRequestChan  chan struct{}
+	//workRequestChan  chan struct{}
 	workResponseChan chan types.Message
 
 	// workerWg is used to wait on worker goroutines during shutdown
