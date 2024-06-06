@@ -81,6 +81,10 @@ type broker struct {
 	// acknowledged event count to this channel.
 	deleteChan chan int
 
+	// closingChan is closed when the queue has processed a close request.
+	// It's used to prevent producers from blocking on a closing queue.
+	closingChan chan struct{}
+
 	///////////////////////////////
 	// internal goroutine state
 
@@ -221,6 +225,7 @@ func newQueue(
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
+		closingChan:  make(chan struct{}),
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
