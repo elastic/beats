@@ -289,6 +289,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
+- Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
 
 *Auditbeat*
 
