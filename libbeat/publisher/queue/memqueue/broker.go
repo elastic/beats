@@ -182,6 +182,9 @@ func newQueue(
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
+	if observer == nil {
+		observer = queue.NewQueueObserver(nil)
+	}
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
