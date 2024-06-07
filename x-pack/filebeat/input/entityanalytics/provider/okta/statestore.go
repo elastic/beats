@@ -39,7 +39,8 @@ const (
 
 type User struct {
 	okta.User `json:"properties"`
-	State     State `json:"state"`
+	Groups    []okta.Group `json:"groups"`
+	State     State        `json:"state"`
 }
 
 type Device struct {
