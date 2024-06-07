@@ -383,7 +383,7 @@ func (inp *filestream) readFromSource(
 
 		// add "take_over" tag if `take_over` is set to true
 		if inp.takeOver {
-			mapstr.AddTags(message.Fields, []string{"take_over"})
+			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
