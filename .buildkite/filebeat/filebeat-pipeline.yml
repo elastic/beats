@@ -32,8 +32,6 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
-          apt-get update
-          apt-get install -y libsystemd-dev
           make -C filebeat check update
           make check-no-changes
         retry:
