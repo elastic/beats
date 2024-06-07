@@ -41,6 +41,7 @@ const NilHandle EvtHandle = 0
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 const (
 	ERROR_INVALID_HANDLE        syscall.Errno = 6
+	ERROR_INVALID_PARAMETER     syscall.Errno = 87
 	ERROR_INSUFFICIENT_BUFFER   syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS         syscall.Errno = 259
 	RPC_S_SERVER_UNAVAILABLE    syscall.Errno = 1722

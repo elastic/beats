@@ -189,6 +189,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
 - Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
 - Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
+- Improve robustness and error reporting from packetbeat default route testing. {pull}39757[39757]
 
 ==== Deprecated
 
