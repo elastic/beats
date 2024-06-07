@@ -184,9 +184,6 @@ func TestClient(t *testing.T) {
 }
 
 func TestClientWaitClose(t *testing.T) {
-	routinesChecker := resources.NewGoroutinesChecker()
-	defer routinesChecker.Check(t)
-
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
@@ -209,6 +206,9 @@ func TestClientWaitClose(t *testing.T) {
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
+		routinesChecker := resources.NewGoroutinesChecker()
+		defer routinesChecker.Check(t)
+
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			WaitClose: 500 * time.Millisecond,
 		})
@@ -240,6 +240,8 @@ func TestClientWaitClose(t *testing.T) {
 	})
 
 	t.Run("ACKing events unblocks WaitClose", func(t *testing.T) {
+		routinesChecker := resources.NewGoroutinesChecker()
+		defer routinesChecker.Check(t)
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			WaitClose: time.Minute,
 		})
