@@ -158,6 +158,7 @@ func fieldsN(s string, n int) []string {
 	}
 	var f []string
 	for s != "" {
+		l := len(s)
 		for i, r := range s {
 			if unicode.IsSpace(r) {
 				f = append(f, s[:i])
@@ -171,7 +172,7 @@ func fieldsN(s string, n int) []string {
 				break
 			}
 		}
-		if len(f) == n-1 {
+		if len(f) == n-1 || len(s) == l {
 			break
 		}
 	}
