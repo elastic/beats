@@ -25,9 +25,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test all required plugins are exported by this module, since it's the one imported by agentbeat
+// https://github.com/elastic/beats/pull/39818
 func TestRootCmdPlugins(t *testing.T) {
-	// Test all required plugins are exported by this module, since it's the one imported by agentbeat
-	// https://github.com/elastic/beats/pull/39818
 	t.Parallel()
 	plugins := []string{"http", "tcp", "icmp"}
 	for _, p := range plugins {
