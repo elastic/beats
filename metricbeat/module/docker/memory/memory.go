@@ -30,10 +30,8 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
 
-const metricsetName = "memory"
-
 func init() {
-	mb.Registry.MustAddMetricSet("docker", metricsetName, New,
+	mb.Registry.MustAddMetricSet("docker", "memory", New,
 		mb.WithHostParser(docker.HostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -50,7 +48,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker memory MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := logp.NewLogger("docker.memory")
 	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
