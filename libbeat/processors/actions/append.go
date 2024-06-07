@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -82,9 +81,8 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
-		if management.TraceLevelEnabled() {
-			f.logger.Debug(errMsg.Error())
-		}
+		f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 		if f.config.FailOnError {
 			event = backup
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {

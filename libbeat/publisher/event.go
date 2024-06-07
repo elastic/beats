@@ -27,6 +27,8 @@ import (
 // errors), one of the signal methods must be called. In normal operation
 // every batch will eventually receive an ACK() or a Drop().
 type Batch interface {
+	// The output that receives a batch owns the entries in its Events array,
+	// and changes to them will persist between retries.
 	Events() []Event
 
 	// All events have been acknowledged by the output.
@@ -46,17 +48,6 @@ type Batch interface {
 	// caller is responsible for reporting the error (including calling
 	// batch.Drop() if necessary).
 	SplitRetry() bool
-
-	// Release the internal pointer to this batch's events but do not yet
-	// acknowledge this batch. This exists specifically for the shipper output,
-	// where there is potentially a long gap between when events are handed off
-	// to the shipper and when they are acknowledged upstream; during that time,
-	// we need to preserve batch metadata for producer end-to-end acknowledgments,
-	// but we do not need the events themselves since they are already queued by
-	// the shipper. It is only guaranteed to release event pointers when using the
-	// proxy queue.
-	// Never call this on a batch that might be retried.
-	FreeEntries()
 
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()

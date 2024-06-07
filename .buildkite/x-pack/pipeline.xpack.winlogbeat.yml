@@ -14,24 +14,25 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
-  - group: "x-pack/Winlogbeat Mandatory Tests"
+  - group: "x-pack/winlogbeat Mandatory Tests"
     key: "x-pack-winlogbeat-mandatory-tests"
     steps:
-
-      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
+      - label: ":windows: x-pack/winlogbeat Win-2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-module-unit-tests"
         command: |
           Import-Module ./.buildkite/scripts/changesets.psm1
           defineModuleFromTheChangeSet 'x-pack/winlogbeat'
-          Write-Output "~~~ Will run tests with env var MODULE=$$Env:MODULE"
+          Write-Output "~~~ Running tests"
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        env:
-          MODULE: $MODULE
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -43,16 +44,16 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
+              context: "x-pack/winlogbeat Win-2019 Unit (MODULE) Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -64,16 +65,16 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2016 Unit Tests"
+              context: "x-pack/winlogbeat Win-2016 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win-2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -85,21 +86,21 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2022 Unit Tests"
+              context: "x-pack/winlogbeat Win-2022 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/Winlogbeat Win-10 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -111,16 +112,16 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-10 Unit Tests"
+              context: "x-pack/winlogbeat Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-11 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -132,16 +133,16 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-11 Unit Tests"
+              context: "x-pack/winlogbeat Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -163,13 +164,17 @@ steps:
     depends_on:
       - "x-pack-winlogbeat-mandatory-tests"
 
-  - group: "x-pack/Winlogbeat Packaging"
+  - group: "x-pack/winlogbeat Packaging"
     key: "x-pack-winlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Packaging Linux"
+      - label: ":ubuntu: x-pack/winlogbeat Packaging Linux"
         key: "packaging-linux"
         command: "cd x-pack/winlogbeat && mage package"
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -180,4 +185,4 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Packaging"
+              context: "x-pack/winlogbeat Packaging Linux"

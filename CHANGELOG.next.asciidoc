@@ -42,16 +42,20 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Sophos UTM from Beats. Use the https://docs.elastic.co/integrations/sophos[Sophos] Elastic integration instead. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
-
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Heartbeat*
+
+- Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
 
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 
 *Osquerybeat*
 
+- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 
 *Packetbeat*
 
@@ -91,6 +95,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 - Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
+- Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
 
 *Auditbeat*
 - Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
@@ -98,6 +103,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
 - Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
 - Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
+- Fix seccomp policy of FIM kprobes backend on arm64 {pull}39759[39759]
+
 
 
 *Filebeat*
@@ -144,6 +151,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Restore netflow input on Windows {pull}39024[39024]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
+- Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
+- Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 
 *Heartbeat*
 
@@ -151,6 +160,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setuid root when running under cgroups v2. {pull}37794[37794]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 - Reset prctl dumpable flag after cap drop. {pull}38269[38269]
+- Redact synthexec cmd output. {pull}39535[39535]
+- Fix import of browser plugin for agentbeat. {pull}39818[39818]
 
 *Heartbeat*
 
@@ -162,6 +173,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
 - Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
 - Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
+- Fix handling of access errors when reading process metrics {pull}39627[39627]
+- Fix behavior of cgroups path discovery when monitoring the host system from within a container {pull}39627[39627]
+- Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
+- Fix for MySQL/Performance - Query failure for MySQL versions below v8.0.1, for performance metric `quantile_95`. {pull}38710[38710]
+- Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 
 *Osquerybeat*
 
@@ -171,6 +187,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix error handling in perfmon metrics. {issue}38140[38140] {pull}39404[39404]
 
 *Elastic Logging Plugin*
 
@@ -186,11 +203,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-- Update to Go 1.21.9. {pulk}38727[38727]
+- Update to Go 1.21.10. {pull}39467[39467]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
-
+- Add persistent volume claim name to volume if available {pull}38839[38839]
+- Raw events are now logged to a different file, this prevents potentially sensitive information from leaking into log files {pull}38767[38767]
 
 *Auditbeat*
 
@@ -203,6 +221,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 - Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Reduce data size for add_session_metadata processor by removing unneeded fields {pull}39500[39500]
+- Enrich process events with user and group names, with add_session_metadata processor  {pull}39537[39537]
+
+*Auditbeat*
+
 
 *Filebeat*
 
@@ -251,12 +274,23 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add parseDateInTZ value template for the HTTPJSON input. {pull}37738[37738]
 - Add support for complex event objects in the HTTP Endpoint input. {issue}37910[37910] {pull}38193[38193]
 - Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
-- Update CEL mito extensions to v1.10.0 to add keys/values helper. {pull}38504[38504]
+- Update CEL mito extensions to v1.10.0 to add base64 decode functions. {pull}38504[38504]
 - Add support for Active Directory an entity analytics provider. {pull}37919[37919]
 - Add AWS AWSHealth metricset. {pull}38370[38370]
 - Add debugging breadcrumb to logs when writing request trace log. {pull}38636[38636]
 - added benchmark input {pull}37437[37437]
 - added benchmark input and discard output {pull}37437[37437]
+- Ensure all responses sent by HTTP Endpoint are HTML-escaped. {pull}39329[39329]
+- Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
+- Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
+- Implement Elastic Agent status and health reporting for CEL Filebeat input. {pull}39209[39209]
+- Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
+- Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
+- Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
+- Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
+- Update CEL mito extensions to v1.12.2. {pull}39755[39755]
+- Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
+- Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
 
 *Auditbeat*
 
@@ -282,9 +316,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+- Support schema_name for MySQL performance metricset {pull}38363[38363]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add last_terminated_timestamp metric in kubernetes module {pull}39200[39200] {issue}3802[3802]
+- Add pod.status.ready_time and pod.status.reason metrics in kubernetes module {pull}39316[39316]
 
 
 *Metricbeat*
@@ -298,6 +334,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Use fixed size buffer at first pass for event parsing, improving throughput {issue}39530[39530] {pull}39544[39544]
+- Add ERROR_INVALID_PARAMETER to the list of recoverable errors. {pull}39781[39781]
 
 *Functionbeat*
 
@@ -338,6 +376,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
+
 
 
 

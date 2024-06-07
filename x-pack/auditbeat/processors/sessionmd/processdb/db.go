@@ -447,7 +447,15 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	euid := p.Creds.Euid
 	egid := p.Creds.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(ret.User.ID)
+	if ok {
+		ret.User.Name = username
+	}
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(ret.Group.ID)
+	if ok {
+		ret.Group.Name = groupname
+	}
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
 	ret.TTY.CharDevice.Major = p.CTTY.Major
@@ -471,7 +479,15 @@ func fillParent(process *types.Process, parent Process) {
 	process.Parent.WorkingDirectory = parent.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(process.Parent.User.ID)
+	if ok {
+		process.Parent.User.Name = username
+	}
 	process.Parent.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(process.Parent.Group.ID)
+	if ok {
+		process.Parent.Group.Name = groupname
+	}
 }
 
 func fillGroupLeader(process *types.Process, groupLeader Process) {
@@ -488,7 +504,15 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 	process.GroupLeader.WorkingDirectory = groupLeader.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(process.GroupLeader.User.ID)
+	if ok {
+		process.GroupLeader.User.Name = username
+	}
 	process.GroupLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(process.GroupLeader.Group.ID)
+	if ok {
+		process.GroupLeader.Group.Name = groupname
+	}
 }
 
 func fillSessionLeader(process *types.Process, sessionLeader Process) {
@@ -505,7 +529,15 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	process.SessionLeader.WorkingDirectory = sessionLeader.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(process.SessionLeader.User.ID)
+	if ok {
+		process.SessionLeader.User.Name = username
+	}
 	process.SessionLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(process.SessionLeader.Group.ID)
+	if ok {
+		process.SessionLeader.Group.Name = groupname
+	}
 }
 
 func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
@@ -522,7 +554,15 @@ func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Pr
 	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(process.EntryLeader.User.ID)
+	if ok {
+		process.EntryLeader.User.Name = username
+	}
 	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
+	if ok {
+		process.EntryLeader.Group.Name = groupname
+	}
 
 	process.EntryLeader.EntryMeta.Type = string(entryType)
 }

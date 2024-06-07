@@ -66,10 +66,6 @@ type broker struct {
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
-	// Producers send requests to cancelChan to cancel events they've
-	// sent so far that have not yet reached a consumer.
-	cancelChan chan producerCancelRequest
-
 	// Metrics() sends requests to metricChan to expose internal queue
 	// metrics to external callers.
 	metricChan chan metricsRequest
@@ -224,7 +220,6 @@ func newQueue(
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),
 		getChan:    make(chan getRequest),
-		cancelChan: make(chan producerCancelRequest, 5),
 		metricChan: make(chan metricsRequest),
 
 		// internal runLoop and ackLoop channels
@@ -264,7 +259,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	if b.encoderFactory != nil {
 		encoder = b.encoderFactory()
 	}
-	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel, encoder)
+	return newProducer(b, cfg.ACK, encoder)
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
@@ -415,15 +410,6 @@ func (b *batch) rawEntry(i int) *queueEntry {
 // Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) queue.Entry {
 	return b.rawEntry(i).event
-}
-
-func (b *batch) FreeEntries() {
-	// This signals that the event data has been copied out of the batch, and is
-	// safe to free from the queue buffer, so set all the event pointers to nil.
-	for i := 0; i < b.count; i++ {
-		index := (b.start + i) % len(b.queue.buf)
-		b.queue.buf[index].event = nil
-	}
 }
 
 func (b *batch) Done() {

@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -96,6 +97,14 @@ type Credentials struct {
 type Provider struct {
 	Type string  `json:"type"`
 	Name *string `json:"name,omitempty"`
+}
+
+// Group is an Okta user group.
+//
+// See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
+type Group struct {
+	ID      string         `json:"id"`
+	Profile map[string]any `json:"profile"`
 }
 
 // Device is an Okta device's details.
@@ -223,6 +232,27 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window)
 }
 
+// GetUserGroupDetails returns Okta group details using the users API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. user must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
+func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration) ([]Group, http.Header, error) {
+	const endpoint = "/api/v1/users"
+
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path.Join(endpoint, user, "groups"),
+	}
+	return getDetails[Group](ctx, cli, u, key, true, OmitNone, lim, window)
+}
+
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. If device is not empty,
 // details for the specific device are returned, otherwise a list of all devices is returned.
@@ -242,7 +272,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 	return getDetails[Device](ctx, cli, u, key, device == "", OmitNone, lim, window)
 }
 
-// GetDeviceUsers returns Okta user details for users asscoiated with the provided device identifier
+// GetDeviceUsers returns Okta user details for users associated with the provided device identifier
 // using the list device users API. host is the Okta user domain and key is the API token to use for
 // the query. If device is empty, a nil User slice and header is returned, without error.
 //
@@ -276,7 +306,7 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 
 // entity is an Okta entity analytics entity.
 type entity interface {
-	User | Device | devUser
+	User | Group | Device | devUser
 }
 
 type devUser struct {

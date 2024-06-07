@@ -43,6 +43,14 @@ var (
 						Pgid: uint32(100),
 						Sid:  uint32(40),
 					},
+					Creds: types.CredInfo{
+						Ruid: 0,
+						Euid: 0,
+						Suid: 0,
+						Rgid: 0,
+						Egid: 0,
+						Sgid: 0,
+					},
 					CWD:      "/",
 					Filename: "/bin/ls",
 				},
@@ -78,12 +86,24 @@ var (
 						"pid":               uint32(100),
 						"parent": mapstr.M{
 							"pid": uint32(50),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 						"session_leader": mapstr.M{
 							"pid": uint32(40),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 						"group_leader": mapstr.M{
 							"pid": uint32(100),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 					},
 				},
@@ -318,33 +338,35 @@ var (
 
 func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
-		reader := procfs.NewMockReader()
-		db, err := processdb.NewDB(reader, *logger)
-		require.Nil(t, err)
+		t.Run(tt.testName, func(t *testing.T) {
+			reader := procfs.NewMockReader()
+			db, err := processdb.NewDB(reader, *logger)
+			require.Nil(t, err)
 
-		for _, ev := range tt.mockProcesses {
-			db.InsertExec(ev)
-		}
-		s := addSessionMetadata{
-			logger: logger,
-			db:     db,
-			config: tt.config,
-		}
-
-		// avoid taking address of loop variable
-		i := tt.input
-		actual, err := s.enrich(&i)
-		if tt.expect_error {
-			require.Error(t, err, "%s: error unexpectedly nil", tt.testName)
-		} else {
-			require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
-			require.NotNil(t, actual, "%s: returned nil event", tt.testName)
-
-			//Validate output
-			if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
-				t.Errorf("field mismatch:\n%s", diff)
+			for _, ev := range tt.mockProcesses {
+				db.InsertExec(ev)
 			}
-		}
+			s := addSessionMetadata{
+				logger: logger,
+				db:     db,
+				config: tt.config,
+			}
+
+			// avoid taking address of loop variable
+			i := tt.input
+			actual, err := s.enrich(&i)
+			if tt.expect_error {
+				require.Error(t, err, "%s: error unexpectedly nil", tt.testName)
+			} else {
+				require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
+				require.NotNil(t, actual, "%s: returned nil event", tt.testName)
+
+				//Validate output
+				if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
+					t.Errorf("field mismatch:\n%s", diff)
+				}
+			}
+		})
 	}
 }
 
@@ -364,8 +386,10 @@ func ignoreMissingFrom(m mapstr.M) cmp.Option {
 // Note: This validates test code only
 func TestFilter(t *testing.T) {
 	for _, tt := range filterTests {
-		if eq := cmp.Equal(tt.mx, tt.my, ignoreMissingFrom(tt.mx)); eq != tt.expected {
-			t.Errorf("%s: unexpected comparator result", tt.testName)
-		}
+		t.Run(tt.testName, func(t *testing.T) {
+			if eq := cmp.Equal(tt.mx, tt.my, ignoreMissingFrom(tt.mx)); eq != tt.expected {
+				t.Errorf("%s: unexpected comparator result", tt.testName)
+			}
+		})
 	}
 }
