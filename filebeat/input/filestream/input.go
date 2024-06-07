@@ -381,6 +381,7 @@ func (inp *filestream) readFromSource(
 
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
+		// add "take_over" tag if `take_over` is set to true
 		if inp.takeOver {
 			mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
