@@ -18,7 +18,7 @@ type tempFreeSpace struct {
 }
 
 func (e *tablespaceExtractor) tempFreeSpaceData(ctx context.Context) ([]tempFreeSpace, error) {
-	rows, err := e.db.QueryContext(ctx, `WITH sums AS ( SELECT (SELECT SUM(BYTES) FROM DBA_DATA_FILES) + (SELECT SUM(BYTES) FROM DBA_TEMP_FILES) AS TOTAL_SUM FROM dual ) SELECT t.TABLESPACE_NAME, s.TOTAL_SUM, t.ALLOCATED_SPACE, t.FREE_SPACE FROM DBA_TEMP_FREE_SPACE t, sums s `)
+	rows, err := e.db.QueryContext(ctx, `SELECT t.TABLESPACE_NAME, (SELECT SUM(BYTES) FROM DBA_DATA_FILES) + (SELECT SUM(BYTES) FROM DBA_TEMP_FILES) AS TOTAL_SUM, t.ALLOCATED_SPACE, t.FREE_SPACE FROM DBA_TEMP_FREE_SPACE t `)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %w", err)
 	}
