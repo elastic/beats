@@ -22,14 +22,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"flag"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
-	cfglib "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -111,13 +109,9 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestUserAgentHeader(t *testing.T) {
-	// manually set cli to put beats into agent mode
-	_ = cfglib.SettingFlag(nil, "E", "Configuration overwrite")
-	_ = flag.Set("E", "management.enabled=true")
-	flag.Parse()
-
 	conn, err := NewConnection(ConnectionSettings{
-		Beatname: "testbeat",
+		Beatname:         "testbeat",
+		UserAgentPostfix: "Agent",
 	})
 	require.NoError(t, err)
 

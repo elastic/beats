@@ -30,7 +30,6 @@ import (
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -87,6 +86,11 @@ type ConnectionSettings struct {
 	IdleConnTimeout time.Duration
 
 	Transport httpcommon.HTTPTransportSettings
+
+	// UserAgentPostfix can be used to report the agent running mode
+	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// then this string will be appended to the user agent.
+	UserAgentPostfix string
 }
 
 type ESPingData struct {
@@ -136,9 +140,10 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	if s.Beatname == "" {
 		s.Beatname = "Libbeat"
 	}
-	if fleetmode.Enabled() {
-		s.Beatname = fmt.Sprintf("%s-Agent", s.Beatname)
+	if s.UserAgentPostfix != "" {
+		s.Beatname = fmt.Sprintf("%s-%s", s.Beatname, s.UserAgentPostfix)
 	}
+
 	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
