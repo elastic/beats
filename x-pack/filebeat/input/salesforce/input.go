@@ -20,7 +20,7 @@ import (
 	"github.com/g8rswimmer/go-sfdc/credentials"
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
