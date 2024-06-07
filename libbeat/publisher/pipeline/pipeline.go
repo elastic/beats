@@ -224,9 +224,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {
 		waiter = newClientCloseWaiter(waitClose)
-	}
-
-	if waiter != nil {
 		if ackHandler == nil {
 			ackHandler = waiter
 		} else {
@@ -241,6 +238,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 				ackHandler.ACKEvents(count)
 			}
 		},
+	}
+
+	if ackHandler == nil {
+		ackHandler = acker.Nil()
 	}
 
 	client.eventListener = ackHandler

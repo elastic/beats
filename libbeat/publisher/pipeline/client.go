@@ -131,34 +131,30 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	wasOpen := c.isOpen.Swap(false)
-	if !wasOpen {
-		// already closed
-		return nil
-	}
-	c.onClosing()
+	if c.isOpen.Swap(false) {
+		// Only do shutdown handling the first time Close is called
+		c.onClosing()
 
-	c.logger.Debug("client: closing acker")
-	c.waiter.signalClose()
-	c.waiter.wait()
+		c.logger.Debug("client: closing acker")
+		c.waiter.signalClose()
+		c.waiter.wait()
 
-	if c.eventListener != nil {
 		c.eventListener.ClientClosed()
-	}
-	c.logger.Debug("client: done closing acker")
+		c.logger.Debug("client: done closing acker")
 
-	c.logger.Debug("client: close queue producer")
-	c.producer.Close()
-	c.onClosed()
-	c.logger.Debug("client: done producer close")
+		c.logger.Debug("client: close queue producer")
+		c.producer.Close()
+		c.onClosed()
+		c.logger.Debug("client: done producer close")
 
-	if c.processors != nil {
-		c.logger.Debug("client: closing processors")
-		err := processors.Close(c.processors)
-		if err != nil {
-			c.logger.Errorf("client: error closing processors: %v", err)
+		if c.processors != nil {
+			c.logger.Debug("client: closing processors")
+			err := processors.Close(c.processors)
+			if err != nil {
+				c.logger.Errorf("client: error closing processors: %v", err)
+			}
+			c.logger.Debug("client: done closing processors")
 		}
-		c.logger.Debug("client: done closing processors")
 	}
 	return nil
 }
