@@ -30,7 +30,7 @@ import (
 
 func TestRecoverFromCorruption(t *testing.T) {
 	path := t.TempDir()
-	logp.DevelopmentSetup()
+	logp.DevelopmentSetup() //nolint: errcheck // it's a test and we don't rely on the logs
 
 	if err := copyPath(path, "testdata/1/logfile_incomplete/"); err != nil {
 		t.Fatalf("Failed to copy test file to the temporary directory: %v", err)
