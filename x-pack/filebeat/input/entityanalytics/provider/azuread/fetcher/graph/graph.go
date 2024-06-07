@@ -398,7 +398,7 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	return &f, nil
 }
 
-// requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Trace
+// requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
 func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *logp.Logger) *http.Client {
 	if cfg.Tracer == nil {
@@ -417,7 +417,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	)
 	traceLogger := zap.New(core)
 
-	const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
 	maxSize := cfg.Tracer.MaxSize * 1e6
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
 	return cli
