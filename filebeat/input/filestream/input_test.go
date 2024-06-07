@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -116,21 +117,45 @@ paths:
 }
 
 func TestTakeOverTags(t *testing.T) {
-	filename := generateFile(t, t.TempDir(), 5)
 
-	cfg := `
+	testCases := []struct {
+		name     string
+		takeOver bool
+		testFunc func(event beat.Event)
+	}{
+		{
+			name:     "test-take_over-true",
+			takeOver: true,
+			testFunc: func(event beat.Event) {
+				tags, err := event.GetValue("tags")
+				require.NoError(t, err)
+				require.Contains(t, tags, "take_over")
+			},
+		},
+		{
+			name:     "test-take_over-false",
+			takeOver: false,
+			testFunc: func(event beat.Event) {
+				_, err := event.GetValue("tags")
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			filename := generateFile(t, t.TempDir(), 5)
+			cfg := fmt.Sprintf(`
 type: filestream
 prospector.scanner.check_interval: 1s
-take_over: true
+take_over: %t
 paths:
-  - ` + filename + `
-`
-	runner := createFilestreamTestRunner(context.Background(), t, "test-take_over-tag", cfg, 5, true)
-	events := runner(t)
-	for _, event := range events {
-		tags, err := event.GetValue("tags")
-		require.NoError(t, err)
-		require.Contains(t, tags, "take_over")
+    - %s`, testCase.takeOver, filename)
+			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
+			events := runner(t)
+			for _, event := range events {
+				testCase.testFunc(event)
+			}
+		})
 	}
 }
 
