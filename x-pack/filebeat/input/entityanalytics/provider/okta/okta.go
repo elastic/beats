@@ -385,7 +385,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				state.storeUser(u)
+				p.addGroup(ctx, u, state)
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -393,7 +393,8 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		} else {
 			users = grow(users, len(batch))
 			for _, u := range batch {
-				users = append(users, state.storeUser(u))
+				su := p.addGroup(ctx, u, state)
+				users = append(users, su)
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -422,6 +423,17 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 	p.logger.Debugf("received %d users from API", len(users))
 	return users, nil
+}
+
+func (p *oktaInput) addGroup(ctx context.Context, u okta.User, state *stateStore) *User {
+	su := state.storeUser(u)
+	groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow)
+	if err != nil {
+		p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
+		return su
+	}
+	su.Groups = groups
+	return su
 }
 
 // doFetchDevices handles fetching device and associated user identities from Okta.

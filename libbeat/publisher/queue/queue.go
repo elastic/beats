@@ -106,16 +106,6 @@ type ProducerConfig struct {
 	// if ACK is set, the callback will be called with number of events produced
 	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
-
-	// OnDrop is called to report events being silently dropped by
-	// the queue. Currently this can only happen when a Publish call is sent
-	// to the memory queue's request channel but the producer is cancelled
-	// before it reaches the queue buffer.
-	OnDrop func(Entry)
-
-	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
-	// via Cancel.
-	DropOnCancel bool
 }
 
 type EntryID uint64
@@ -134,12 +124,10 @@ type Producer interface {
 	// the event's assigned ID, and false otherwise.
 	TryPublish(entry Entry) (EntryID, bool)
 
-	// Cancel closes this Producer endpoint. If the producer is configured to
-	// drop its entries on Cancel, the number of dropped entries is returned.
-	// Note: A queue may still send ACK signals even after Cancel is called on
-	//       the originating Producer. The pipeline client must accept and
-	//       discard these ACKs.
-	Cancel() int
+	// Close closes this Producer endpoint.
+	// Note: A queue may still send ACK signals even after Close is called on
+	// the originating Producer. The pipeline client must accept these ACKs.
+	Close()
 }
 
 // Batch of entries (usually publisher.Event) to be returned to Consumers.

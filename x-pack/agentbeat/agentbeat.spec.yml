@@ -100,6 +100,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
+  - name: benchmark
+    description: "Benchmark Input"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
   - name: cel
     description: "Common Expression Language Input"
     platforms: *platforms
@@ -199,6 +204,11 @@ inputs:
     aliases:
       - log/redis_slowlog
     description: "Redis"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: salesforce
+    description: "Salesforce input"
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
