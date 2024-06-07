@@ -54,6 +54,9 @@ func defaultRoute(af int) (name string, index int, err error) {
 	for inTable := false; sc.Scan(); {
 		f := strings.Fields(sc.Text())
 		if len(f) == 0 {
+			if inTable {
+				break
+			}
 			continue
 		}
 		if !inTable {
@@ -94,6 +97,9 @@ func defaultRoute(af int) (name string, index int, err error) {
 	for inTable := false; sc.Scan(); {
 		f := fieldsN(sc.Text(), 5)
 		if len(f) == 0 {
+			if inTable {
+				break
+			}
 			continue
 		}
 		if !inTable {
