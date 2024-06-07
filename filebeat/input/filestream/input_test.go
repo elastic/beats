@@ -117,16 +117,15 @@ paths:
 }
 
 func TestTakeOverTags(t *testing.T) {
-
 	testCases := []struct {
 		name     string
 		takeOver bool
-		testFunc func(event beat.Event)
+		testFunc func(t *testing.T, event beat.Event)
 	}{
 		{
 			name:     "test-take_over-true",
 			takeOver: true,
-			testFunc: func(event beat.Event) {
+			testFunc: func(t *testing.T, event beat.Event) {
 				tags, err := event.GetValue("tags")
 				require.NoError(t, err)
 				require.Contains(t, tags, "take_over")
@@ -135,7 +134,7 @@ func TestTakeOverTags(t *testing.T) {
 		{
 			name:     "test-take_over-false",
 			takeOver: false,
-			testFunc: func(event beat.Event) {
+			testFunc: func(t *testing.T, event beat.Event) {
 				_, err := event.GetValue("tags")
 				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 			},
@@ -153,7 +152,7 @@ paths:
 			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
 			events := runner(t)
 			for _, event := range events {
-				testCase.testFunc(event)
+				testCase.testFunc(t, event)
 			}
 		})
 	}
