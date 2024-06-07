@@ -24,8 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestRecoverFromCorruption(t *testing.T) {
@@ -42,7 +42,7 @@ func TestRecoverFromCorruption(t *testing.T) {
 	require.NoError(t, err, "openStore must succeed")
 	require.True(t, store.disk.logInvalid, "expecting the log file to be invalid")
 
-	err = store.logOperation(&opSet{K: "key", V: mapstr.M{
+	err = store.logOperation(&opSet{K: "key", V: common.MapStr{
 		"field": 42,
 	}})
 	require.NoError(t, err, "logOperation must succeed")
