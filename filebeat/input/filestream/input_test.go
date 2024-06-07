@@ -115,6 +115,25 @@ paths:
 	})
 }
 
+func TestTakeOverTags(t *testing.T) {
+	filename := generateFile(t, t.TempDir(), 5)
+
+	cfg := `
+type: filestream
+prospector.scanner.check_interval: 1s
+take_over: true
+paths:
+  - ` + filename + `
+`
+	runner := createFilestreamTestRunner(context.Background(), t, "test-take_over-tag", cfg, 5, true)
+	events := runner(t)
+	for _, event := range events {
+		tags, err := event.GetValue("tags")
+		require.NoError(t, err)
+		require.Contains(t, tags, "take_over")
+	}
+}
+
 // runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
