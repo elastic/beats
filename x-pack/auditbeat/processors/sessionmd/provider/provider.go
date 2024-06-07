@@ -9,7 +9,6 @@ package provider
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
-
 )
 
 // SyncDB should ensure the DB is in a state to handle the event before returning.
