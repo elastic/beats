@@ -23,7 +23,7 @@ import (
 	"crypto/sha512"
 	"hash"
 
-	"github.com/xdg/scram"
+	"github.com/xdg-go/scram"
 )
 
 var SHA256 scram.HashGeneratorFcn = func() hash.Hash { return sha256.New() }
