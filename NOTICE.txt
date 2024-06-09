@@ -16557,12 +16557,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/go-sfdc
-Version: v0.0.0-20201201191151-3190c381b3e1
+Dependency : github.com/g8rswimmer/go-sfdc
+Version: v2.0.2-0.20201201191151-3190c381b3e1+incompatible
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sfdc@v0.0.0-20201201191151-3190c381b3e1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/g8rswimmer/go-sfdc@v2.0.2-0.20201201191151-3190c381b3e1+incompatible/LICENSE.txt:
 
 MIT License
 
