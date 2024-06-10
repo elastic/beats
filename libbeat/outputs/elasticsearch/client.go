@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"go.elastic.co/apm/v2"
-	"gotest.tools/gotestsum/log"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -433,7 +432,7 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 
 		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
 			eventsToRetry = append(eventsToRetry, events[i])
-			log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+			client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
 		}
 	}
 
