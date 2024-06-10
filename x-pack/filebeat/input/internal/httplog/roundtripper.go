@@ -15,9 +15,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"sync/atomic"
 	"time"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -40,7 +40,7 @@ func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyL
 		maxBodyLen:  maxBodyLen,
 		txLog:       logger,
 		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
+		txIDCounter: &atomic.Uint64{},
 		log:         log,
 	}
 }
@@ -220,7 +220,7 @@ func (rt *LoggingRoundTripper) TxID() string {
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
-	count := rt.txIDCounter.Inc()
+	count := rt.txIDCounter.Add(1)
 	return rt.formatTxID(count)
 }
 

@@ -20,11 +20,11 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -330,7 +330,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		ctx:         ctx,
 		log:         log,
 		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
+		txIDCounter: &atomic.Uint64{},
 
 		publish: pub,
 		metrics: metrics,

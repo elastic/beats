@@ -18,13 +18,13 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -290,7 +290,7 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 }
 
 func (h *handler) nextTxID() string {
-	count := h.txIDCounter.Inc()
+	count := h.txIDCounter.Add(1)
 	return h.formatTxID(count)
 }
 
