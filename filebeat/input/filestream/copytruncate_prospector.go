@@ -230,7 +230,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Error("%s", fmt.Errorf("running prospector failed: %w", errors.Join(errs...)))
+		log.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 
