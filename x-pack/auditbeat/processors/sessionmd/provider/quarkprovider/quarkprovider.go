@@ -212,10 +212,12 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	if qev.ExitEvent != nil {
 		ret.ExitCode = qev.ExitEvent.ExitCode
 	}
+	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
 	p.fillParent(&ret, qev.Proc.Ppid)
 	p.fillGroupLeader(&ret, qev.Proc.Pgid)
 	p.fillSessionLeader(&ret, qev.Proc.Sid)
+	p.fillEntryLeader(&ret, Init, uint32(1))
 	setEntityID(&ret)
 	return &ret, nil
 }
@@ -250,6 +252,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	if ok {
 		process.Parent.Group.Name = groupname
 	}
+	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Start)
 }
 
 func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
@@ -283,6 +286,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	if ok {
 		process.GroupLeader.Group.Name = groupname
 	}
+	process.GroupLeader.EntityID = calculateEntityIDv1(pgid, *process.GroupLeader.Start)
 }
 
 func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
@@ -316,34 +320,45 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	if ok {
 		process.SessionLeader.Group.Name = groupname
 	}
+	process.SessionLeader.EntityID = calculateEntityIDv1(sid, *process.SessionLeader.Start)
 }
 
-//func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
-//	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
-//
-//	interactive := interactiveFromTTY(entryLeader.CTTY)
-//	euid := entryLeader.Creds.Euid
-//	egid := entryLeader.Creds.Egid
-//	process.EntryLeader.PID = entryLeader.PIDs.Tgid
-//	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-//	process.EntryLeader.Name = basename(entryLeader.Filename)
-//	process.EntryLeader.Executable = entryLeader.Filename
-//	process.EntryLeader.Args = entryLeader.Argv
-//	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
-//	process.EntryLeader.Interactive = &interactive
-//	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
-//	username, ok := getUserName(process.EntryLeader.User.ID)
-//	if ok {
-//		process.EntryLeader.User.Name = username
-//	}
-//	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
-//	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
-//	if ok {
-//		process.EntryLeader.Group.Name = groupname
-//	}
-//
-//	process.EntryLeader.EntryMeta.Type = string(entryType)
-//}
+func (p prvdr) fillEntryLeader(process *types.Process, entryType EntryType, elid uint32) {
+	qev := p.qq.Lookup(int(elid))
+	if qev == nil {
+		return
+	}
+
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+
+	interactive := interactiveFromTTY(types.TTYDev{
+		Major: qev.Proc.TtyMajor,
+		Minor: qev.Proc.TtyMinor,
+	})
+
+	euid := qev.Proc.Euid
+	egid := qev.Proc.Egid
+	process.EntryLeader.PID = qev.Pid
+	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+	process.EntryLeader.Name = basename(qev.Filename)
+	process.EntryLeader.Executable = qev.Filename
+	//	process.EntryLeader.Args = qev.Argv
+	process.EntryLeader.WorkingDirectory = qev.Cwd
+	process.EntryLeader.Interactive = &interactive
+	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := getUserName(process.EntryLeader.User.ID)
+	if ok {
+		process.EntryLeader.User.Name = username
+	}
+	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
+	if ok {
+		process.EntryLeader.Group.Name = groupname
+	}
+
+	process.EntryLeader.EntityID = calculateEntityIDv1(elid, *process.EntryLeader.Start)
+	process.EntryLeader.EntryMeta.Type = string(entryType)
+}
 
 func setEntityID(process *types.Process) {
 	if process.PID != 0 && process.Start != nil {
