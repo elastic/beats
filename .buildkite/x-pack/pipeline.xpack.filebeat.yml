@@ -25,7 +25,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-
 steps:
   - group: "x-pack/filebeat Mandatory Tests"
     key: "x-pack-filebeat-mandatory-tests"
