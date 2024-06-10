@@ -130,6 +130,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	for description, test := range testCases {
 		dq := &diskQueue{
 			logger:   logp.L(),
+			observer: queue.NewQueueObserver(nil),
 			settings: settings,
 			segments: test.segments,
 		}

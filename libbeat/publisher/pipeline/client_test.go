@@ -314,9 +314,6 @@ func TestMonitoring(t *testing.T) {
 	require.NoError(t, err)
 	defer pipeline.Close()
 
-	metricsSnapshot := monitoring.CollectFlatSnapshot(metrics, monitoring.Full, true)
-	assert.Equal(t, int64(maxEvents), metricsSnapshot.Ints["pipeline.queue.max_events"])
-
 	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
 	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
