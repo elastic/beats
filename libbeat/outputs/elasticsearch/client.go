@@ -397,9 +397,15 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 			return nil, bulkResultStats{}
 		}
 
+<<<<<<< HEAD
 		if status < 300 {
 			stats.acked++
 			continue // ok value
+=======
+		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
+			eventsToRetry = append(eventsToRetry, events[i])
+			client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+>>>>>>> a2ab85dac7 (fix: avoid gotestsum import in libbeat es output (#39835))
 		}
 
 		if status == 409 {
