@@ -19,7 +19,6 @@ package filestream
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"regexp"
 	"sort"
