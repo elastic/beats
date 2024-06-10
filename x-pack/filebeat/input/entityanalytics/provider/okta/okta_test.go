@@ -7,6 +7,7 @@ package okta
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -17,10 +18,13 @@ import (
 	"time"
 
 	"golang.org/x/time/rate"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
 
 func TestOktaDoFetch(t *testing.T) {
 	tests := []struct {
@@ -153,6 +157,16 @@ func TestOktaDoFetch(t *testing.T) {
 				lim:    rate.NewLimiter(1, 1),
 				logger: logp.L(),
 			}
+			if *trace {
+				name := test.dataset
+				if name == "" {
+					name = "default"
+				}
+				a.cfg.Tracer = &lumberjack.Logger{
+					Filename: fmt.Sprintf("test_trace_%s.ndjson", name),
+				}
+			}
+			a.client = requestTrace(context.Background(), a.client, a.cfg, a.logger)
 
 			ss, err := newStateStore(store)
 			if err != nil {
