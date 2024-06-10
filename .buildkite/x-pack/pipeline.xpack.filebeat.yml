@@ -31,7 +31,8 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
-          go install github.com/magefile/mage
+          apt-get update
+          apt-get install -y libpcap-dev
           make -C x-pack/filebeat check update
           make check-no-changes
         retry:
