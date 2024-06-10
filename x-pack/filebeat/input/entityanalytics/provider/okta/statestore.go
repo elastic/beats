@@ -185,7 +185,7 @@ func (s *stateStore) close(commit bool) (err error) {
 			return
 		}
 		rollbackErr := s.tx.Rollback()
-		if rollbackErr == nil {
+		if rollbackErr != nil {
 			err = fmt.Errorf("multiple errors during statestore close: %w", errors.Join(err, rollbackErr))
 		}
 	}()
