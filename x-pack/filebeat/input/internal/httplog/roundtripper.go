@@ -36,22 +36,21 @@ type contextKey string
 // responses to the provided logger. Transaction creation is logged to log.
 func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
-		transport:   next,
-		maxBodyLen:  maxBodyLen,
-		txLog:       logger,
-		txBaseID:    newID(),
-		txIDCounter: &atomic.Uint64{},
-		log:         log,
+		transport:  next,
+		maxBodyLen: maxBodyLen,
+		txLog:      logger,
+		txBaseID:   newID(),
+		log:        log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
-	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
-	txLog       *zap.Logger    // Destination logger.
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	maxBodyLen  int           // The maximum length of a body. Longer bodies will be truncated.
+	txLog       *zap.Logger   // Destination logger.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 	log         *logp.Logger
 }
 

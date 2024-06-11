@@ -330,7 +330,6 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		ctx:         ctx,
 		log:         log,
 		txBaseID:    newID(),
-		txIDCounter: &atomic.Uint64{},
 
 		publish: pub,
 		metrics: metrics,

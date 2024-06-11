@@ -53,8 +53,8 @@ type handler struct {
 	publish     func(beat.Event)
 	log         *logp.Logger
 	validator   apiValidator
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
 	reqLogger    *zap.Logger
 	host, scheme string
