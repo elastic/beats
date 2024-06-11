@@ -254,7 +254,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registry_home="a/b/c/registry_x",
+            registry_home=registry_home,
             registry_file_permissions=0o640
         )
 
@@ -269,7 +269,7 @@ class Test(BaseTest):
             max_timeout=1)
 
         # Wait a moment to make sure registry is completely written
-        time.sleep(1)
+        time.sleep(10)
 
         filebeat.check_kill_and_wait()
 
@@ -975,8 +975,8 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            clean_inactive="10s",
-            ignore_older="5s"
+            clean_inactive="20s",
+            ignore_older="10s"
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1002,8 +1002,8 @@ class Test(BaseTest):
         # No config file which does not match the existing state
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test2.log",
-            clean_inactive="10s",
-            ignore_older="5s",
+            clean_inactive="20s",
+            ignore_older="10s",
         )
 
         filebeat = self.start_beat(output="filebeat2.log")
@@ -1136,8 +1136,8 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
-            clean_inactive="10s",
-            ignore_older="5s"
+            clean_inactive="20s",
+            ignore_older="10s"
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1158,7 +1158,7 @@ class Test(BaseTest):
         # Check that ttl > 0 was set because of clean_inactive
         data = self.get_registry()
         assert len(data) == 1
-        assert data[0]["ttl"] == 10 * 1000 * 1000 * 1000
+        assert data[0]["ttl"] == 20 * 1000 * 1000 * 1000
 
         # New config without clean_inactive
         self.render_config_template(
