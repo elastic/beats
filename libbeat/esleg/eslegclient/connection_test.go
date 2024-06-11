@@ -23,11 +23,17 @@ import (
 	"context"
 	"encoding/base64"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	mock "github.com/elastic/mock-es/pkg/api"
+	"github.com/rcrowley/go-metrics"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -109,27 +115,33 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestUserAgentHeader(t *testing.T) {
+	metricsReg := metrics.NewRegistry()
+
+	mux := http.NewServeMux()
+	mockHandler := mock.NewAPIHandler(uuid.New(), "", metricsReg, time.Now().Add(time.Hour), 0, 0, 0, 0, 0)
+	mux.Handle("/", mockHandler)
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
 	conn, err := NewConnection(ConnectionSettings{
+		URL:              server.URL,
 		Beatname:         "testbeat",
 		UserAgentPostfix: "Agent",
 	})
 	require.NoError(t, err)
 
-	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://localhost/some/path", nil)
+	err = conn.Connect()
 	require.NoError(t, err)
 
-	rawClient, ok := conn.HTTP.(*http.Client)
-	require.True(t, ok)
-
-	// don't want to check the error, since the URL doesn't exist, so we'll always return an error.
-	resp, _ := rawClient.Transport.RoundTrip(req)
-	// just to make linter happy, there's no body
-	if resp != nil {
-		resp.Body.Close()
+	// search mock metrics for our user-agent string
+	found := false
+	for key := range metricsReg.GetAll() {
+		if strings.Contains(key, "testbeat-Agent") {
+			found = true
+		}
 	}
 
-	// the `RoundTrip` will set the header in our request
-	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Agent")
+	require.True(t, found, "did not find user-agent in %#v", metricsReg.GetAll())
 
 }
 

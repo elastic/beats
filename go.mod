@@ -1,8 +1,8 @@
 module github.com/elastic/beats/v7
 
-go 1.21.0
+go 1.21.9
 
-toolchain go1.21.10
+toolchain go1.22.3
 
 require (
 	cloud.google.com/go/bigquery v1.55.0
@@ -102,7 +102,7 @@ require (
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.6.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-multierror v1.1.1
@@ -210,6 +210,7 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.10.2
 	github.com/elastic/go-elasticsearch/v8 v8.13.1
 	github.com/elastic/mito v1.12.2
+	github.com/elastic/mock-es v0.0.0-20240610195132-8fc87dc3f130
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -351,6 +352,7 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
+	github.com/mileusna/useragent v1.3.4 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
