@@ -18,11 +18,7 @@
 package queue
 
 import (
-	"errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // Entry is a placeholder type for the objects contained by the queue, which
@@ -30,31 +26,6 @@ import (
 // use interface{} everywhere but this makes the API's intentions clearer
 // and reduces accidental type mismatches.
 type Entry interface{}
-
-// Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
-type Metrics struct {
-	//EventCount is the total events currently in the queue
-	EventCount opt.Uint
-	//ByteCount is the total byte size of the queue
-	ByteCount opt.Uint
-	//ByteLimit is the user-configured byte limit of the queue
-	ByteLimit opt.Uint
-	//EventLimit is the user-configured event limit of the queue
-	EventLimit opt.Uint
-
-	//UnackedConsumedEvents is the count of events that an output consumer has read, but not yet ack'ed
-	UnackedConsumedEvents opt.Uint
-
-	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
-	OldestActiveTimestamp common.Time
-
-	// OldestActiveID is ID of the oldest unacknowledged event in the queue, or
-	// the next ID that will be assigned if the queue is empty.
-	OldestEntryID EntryID
-}
-
-// ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
-var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 
 // Queue is responsible for accepting, forwarding and ACKing events.
 // A queue will receive and buffer single events from its producers.
@@ -66,7 +37,13 @@ var ErrMetricsNotImplemented = errors.New("Queue metrics not implemented")
 // consumer or flush to some other intermediate storage), it will send an ACK signal
 // with the number of ACKed events to the Producer (ACK happens in batches).
 type Queue interface {
+	// Close signals the queue to shut down, but it may keep handling requests
+	// and acknowledgments for events that are already in progress.
 	Close() error
+
+	// Done returns a channel that unblocks when the queue is closed and all
+	// its events are persisted or acknowledged.
+	Done() <-chan struct{}
 
 	QueueType() string
 	BufferConfig() BufferConfig
@@ -76,15 +53,13 @@ type Queue interface {
 	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
 	// there is no bound on the number of returned events.
 	Get(eventCount int) (Batch, error)
-
-	Metrics() (Metrics, error)
 }
 
 // If encoderFactory is provided, then the resulting queue must use it to
 // encode queued events before returning them.
 type QueueFactory func(
 	logger *logp.Logger,
-	ack func(eventCount int),
+	observer Observer,
 	inputQueueSize int,
 	encoderFactory EncoderFactory,
 ) (Queue, error)
