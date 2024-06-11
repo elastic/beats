@@ -35,11 +35,11 @@ type ackProducer struct {
 }
 
 type openState struct {
-	log       *logp.Logger
-	done      chan struct{}
-	queueDone <-chan struct{}
-	events    chan pushRequest
-	encoder   queue.Encoder
+	log          *logp.Logger
+	done         chan struct{}
+	queueClosing <-chan struct{}
+	events       chan pushRequest
+	encoder      queue.Encoder
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -57,11 +57,11 @@ type ackHandler func(count int)
 
 func newProducer(b *broker, cb ackHandler, encoder queue.Encoder) queue.Producer {
 	openState := openState{
-		log:       b.logger,
-		done:      make(chan struct{}),
-		queueDone: b.ctx.Done(),
-		events:    b.pushChan,
-		encoder:   encoder,
+		log:          b.logger,
+		done:         make(chan struct{}),
+		queueClosing: b.closingChan,
+		events:       b.pushChan,
+		encoder:      encoder,
 	}
 
 	if cb != nil {
@@ -141,14 +141,14 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 		select {
 		case resp := <-req.resp:
 			return resp, true
-		case <-st.queueDone:
+		case <-st.queueClosing:
 			st.events = nil
 			return 0, false
 		}
 	case <-st.done:
 		st.events = nil
 		return 0, false
-	case <-st.queueDone:
+	case <-st.queueClosing:
 		st.events = nil
 		return 0, false
 	}
@@ -169,7 +169,7 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 		select {
 		case resp := <-req.resp:
 			return resp, true
-		case <-st.queueDone:
+		case <-st.queueClosing:
 			st.events = nil
 			return 0, false
 		}
