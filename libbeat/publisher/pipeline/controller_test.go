@@ -150,9 +150,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// We aren't testing the values sent to eventConsumer, we
 			// just need a placeholder here so outputController can
 			// send configuration updates without blocking.
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	// Set to an empty output group. This should not create a queue.
 	controller.Set(outputs.Group{})
@@ -173,9 +173,9 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	controller.Set(outputs.Group{
 		Clients:      []outputs.Client{newMockClient(nil)},
@@ -189,15 +189,15 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 
 func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
-	failedFactory := func(_ *logp.Logger, _ func(int), _ int, _ queue.EncoderFactory) (queue.Queue, error) {
+	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	controller := outputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 		monitors: Monitors{
 			Logger: logp.NewLogger("tests"),
 		},
@@ -213,9 +213,9 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	// Send producer requests from different goroutines. They should all
 	// block, because there is no queue, but they should become unblocked
