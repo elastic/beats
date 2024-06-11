@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
 
 // The string used to specify this queue in beats configurations.
@@ -66,9 +65,8 @@ type broker struct {
 	// Consumers send requests to getChan to read events from the queue.
 	getChan chan getRequest
 
-	// Metrics() sends requests to metricChan to expose internal queue
-	// metrics to external callers.
-	metricChan chan metricsRequest
+	// Close triggers a queue close by sending to closeChan.
+	closeChan chan struct{}
 
 	///////////////////////////
 	// internal channels
@@ -77,17 +75,15 @@ type broker struct {
 	// through this channel so ackLoop can monitor them for acknowledgments.
 	consumedChan chan batchList
 
-	// ackCallback is a configurable callback to invoke when ACKs are processed.
-	// ackLoop calls this function when it advances the consumer ACK position.
-	// Right now this forwards the notification to queueACKed() in
-	// the pipeline observer, which updates the beats registry if needed.
-	ackCallback func(eventCount int)
-
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
 	// safe to free these events and advance the queue by sending the
 	// acknowledged event count to this channel.
 	deleteChan chan int
+
+	// closingChan is closed when the queue has processed a close request.
+	// It's used to prevent producers from blocking on a closing queue.
+	closingChan chan struct{}
 
 	///////////////////////////////
 	// internal goroutine state
@@ -112,8 +108,9 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event queue.Entry
-	id    queue.EntryID
+	event     queue.Entry
+	eventSize int
+	id        queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -144,11 +141,11 @@ type batchList struct {
 func FactoryForSettings(settings Settings) queue.QueueFactory {
 	return func(
 		logger *logp.Logger,
-		ackCallback func(eventCount int),
+		observer queue.Observer,
 		inputQueueSize int,
 		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory), nil
+		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory), nil
 	}
 }
 
@@ -157,12 +154,12 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 // workers handling incoming messages and ACKs have been shut down.
 func NewQueue(
 	logger *logp.Logger,
-	ackCallback func(eventCount int),
+	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
-	b := newQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory)
+	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
 	b.wg.Add(2)
@@ -184,11 +181,14 @@ func NewQueue(
 // when the workers are active.
 func newQueue(
 	logger *logp.Logger,
-	ackCallback func(eventCount int),
+	observer queue.Observer,
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
+	if observer == nil {
+		observer = queue.NewQueueObserver(nil)
+	}
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
@@ -218,27 +218,32 @@ func newQueue(
 		encoderFactory: encoderFactory,
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, chanSize),
-		getChan:    make(chan getRequest),
-		metricChan: make(chan metricsRequest),
+		pushChan:  make(chan pushRequest, chanSize),
+		getChan:   make(chan getRequest),
+		closeChan: make(chan struct{}),
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
-
-		ackCallback: ackCallback,
+		closingChan:  make(chan struct{}),
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
-	b.runLoop = newRunLoop(b)
+	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)
+
+	observer.MaxEvents(settings.Events)
 
 	return b
 }
 
 func (b *broker) Close() error {
-	b.ctxCancel()
+	b.closeChan <- struct{}{}
 	return nil
+}
+
+func (b *broker) Done() <-chan struct{} {
+	return b.ctx.Done()
 }
 
 func (b *broker) QueueType() string {
@@ -274,25 +279,6 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	return resp, nil
-}
-
-func (b *broker) Metrics() (queue.Metrics, error) {
-
-	responseChan := make(chan memQueueMetrics, 1)
-	select {
-	case <-b.ctx.Done():
-		return queue.Metrics{}, io.EOF
-	case b.metricChan <- metricsRequest{
-		responseChan: responseChan}:
-	}
-	resp := <-responseChan
-
-	return queue.Metrics{
-		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
-		EventLimit:            opt.UintWith(uint64(len(b.buf))),
-		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
-		OldestEntryID:         resp.oldestEntryID,
-	}, nil
 }
 
 var batchPool = sync.Pool{
