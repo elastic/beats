@@ -29,11 +29,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	mock "github.com/elastic/mock-es/pkg/api"
-	"github.com/rcrowley/go-metrics"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
