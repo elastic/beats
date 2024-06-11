@@ -11,8 +11,8 @@ https://github.com/elastic/beats/compare/v7.17.21\...v7.17.22[View commits]
 
 *Auditbeat*
 
-- Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
-- Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
+- Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of Auditbeat file integrity module. {pull}39133[39133]
+- Fix losing events in FIM for MacOS X by allowing always to walk an added directory to monitor. {pull}39362[39362]
 
 ==== Added
 
