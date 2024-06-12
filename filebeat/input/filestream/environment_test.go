@@ -385,16 +385,20 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
-	for {
-		sum := len(e.pipeline.GetAllEvents())
+	msg := &strings.Builder{}
+	require.Eventuallyf(e.t, func() bool {
+		msg.Reset()
+
+		events := e.pipeline.GetAllEvents()
+		sum := len(events)
 		if sum == count {
-			return
+			return true
 		}
-		if count < sum {
-			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
+		fmt.Fprintf(msg, "unexpected number of events; expected: %d, actual: %d",
+			count, sum)
+
+		return false
+	}, 2*time.Minute, 10*time.Millisecond, "%s", msg)
 }
 
 // waitUntilEventCountCtx calls waitUntilEventCount, but fails if ctx is cancelled.
