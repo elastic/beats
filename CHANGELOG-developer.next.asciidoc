@@ -98,6 +98,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 - Skip flakey metrics test on windows in filebeat httpjson input. {issue}39676[39676] {pull}39678[39678]
 - Fix flakey test on Windows 2022 in packetbeat/route. {issue}39698[39698] {pull}39822[39822]
+- Fix bug in minimum length for request trace logging. {pull}39834[39834]
 
 ==== Added
 

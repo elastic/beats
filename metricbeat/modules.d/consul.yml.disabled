@@ -1,5 +1,5 @@
 # Module: consul
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-consul.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-consul.html
 
 - module: consul
   metricsets:

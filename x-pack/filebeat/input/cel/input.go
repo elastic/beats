@@ -723,7 +723,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
 		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
 		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
