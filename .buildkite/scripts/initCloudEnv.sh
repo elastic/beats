@@ -35,6 +35,7 @@ terraformDestroy() {
   cd $REPO_DIR
   find "$MODULE_DIR" -name terraform.tfstate -print0 | while IFS= read -r -d '' tfstate; do
     cd "$(dirname "$tfstate")"
+    echo "Uploading terraform.tfstate to Buildkite artifacts"
     buildkite-agent artifact upload "**/terraform.tfstate"
     if ! terraform destroy -auto-approve; then
       return 1
