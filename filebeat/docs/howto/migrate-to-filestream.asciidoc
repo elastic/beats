@@ -254,3 +254,8 @@ and return to old `log` inputs the files that were taken by `filestream` inputs,
 6. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
 
 NOTE: Reverting to backups might cause some events to repeat, depends on the amount of time the new configuration was running.
+
+=== Debugging on Kibana
+
+Events produced by `filestream` with `take_over: true` contains `take_over` tag.
+You can filter on this tag in Kibana and see the events which came from a filestream in the "take over" mode. 

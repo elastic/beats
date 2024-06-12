@@ -259,7 +259,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
 		maxSize := cfg.Tracer.MaxSize*1e6 - margin
 		if maxSize < 0 {
 			maxSize = 0

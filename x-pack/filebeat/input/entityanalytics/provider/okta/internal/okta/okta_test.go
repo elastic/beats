@@ -86,6 +86,31 @@ func Test(t *testing.T) {
 				return
 			}
 
+			t.Run("my_groups", func(t *testing.T) {
+				query := make(url.Values)
+				query.Set("limit", "200")
+				groups, _, err := GetUserGroupDetails(context.Background(), http.DefaultClient, host, key, me.ID, limiter, window)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if len(groups) == 0 {
+					t.Fatalf("unexpected len(groups): got:%d want:1", len(groups))
+				}
+
+				if omit&OmitCredentials != 0 && me.Credentials != nil {
+					t.Errorf("unexpected credentials with %s: %#v", omit, me.Credentials)
+				}
+
+				if !*logResponses {
+					return
+				}
+				b, err := json.Marshal(groups)
+				if err != nil {
+					t.Errorf("failed to marshal groups for logging: %v", err)
+				}
+				t.Logf("groups: %s", b)
+			})
+
 			t.Run("user", func(t *testing.T) {
 				if me.Profile.Login == "" {
 					b, _ := json.Marshal(me)
