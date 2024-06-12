@@ -162,7 +162,7 @@ value can be assigned the name of the field or `.[]`. This setting will be able 
 the messages under the group value into separate events. For example, CloudTrail
 logs are in JSON format and events are found under the JSON object "Records".
 
-Note: when using `expand_event_list_from_field`, `content_type` config parameter has to set to `application/json`.
+Note: when using `expand_event_list_from_field`, `content_type` config parameter has to be set to `application/json`.
 
 ["source","json"]
 ----
