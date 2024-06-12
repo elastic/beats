@@ -102,7 +102,7 @@ type TestConfig struct {
 	TestFile string `config:"TestFile" yaml:"TestFile"`
 }
 
-func getCreds(port int) (*proto.StartUpInfo, error) {
+func getCreds(port int) (*proto.ConnInfo, error) {
 	c, err := net.Dial("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func getCreds(port int) (*proto.StartUpInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	var connInfo proto.StartUpInfo
+	var connInfo proto.ConnInfo
 	err = protobuf.Unmarshal(buf[:n], &connInfo)
 	if err != nil {
 		return nil, err
