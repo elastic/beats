@@ -15,9 +15,6 @@ exportAwsSecrets() {
 }
 
 terraformApply() {
-  echo "Terraform Init on $MODULE_DIR"
-  terraform -chdir="$MODULE_DIR" init
-
   TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
   TF_VAR_CREATED_DATE=$(date +%s)
   export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
@@ -26,12 +23,15 @@ terraformApply() {
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 
-  echo "Terraform Apply on $MODULE_DIR"
+  echo "--- Terraform Init on $MODULE_DIR"
+  terraform -chdir="$MODULE_DIR" init
+
+  echo "--- Terraform Apply on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" apply -auto-approve
 }
 
 terraformDestroy() {
-  echo "~~~ Terraform Cleanup"
+  echo "--- Terraform Cleanup"
   cd $REPO_DIR
   find "$MODULE_DIR" -name terraform.tfstate -print0 | while IFS= read -r -d '' tfstate; do
     cd "$(dirname "$tfstate")"
@@ -40,7 +40,7 @@ terraformDestroy() {
     if ! terraform destroy -auto-approve; then
       return 1
     fi
-    cd -
+  cd -
   done
   return 0
 }
