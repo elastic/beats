@@ -1,5 +1,5 @@
 # Module: iis
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-iis.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.14/filebeat-module-iis.html
 
 - module: iis
   # Access logs

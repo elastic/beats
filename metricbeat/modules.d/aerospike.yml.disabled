@@ -1,5 +1,5 @@
 # Module: aerospike
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-aerospike.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-aerospike.html
 
 - module: aerospike
   #metricsets:
