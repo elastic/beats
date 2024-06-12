@@ -56,10 +56,12 @@ func NewParser(r reader.Reader, c *Config) *FilterParser {
 }
 
 func (p *FilterParser) Next() (message reader.Message, err error) {
-	// discardedOffset accounts for the bytes of discarded messages
+	// discardedOffset accounts for the bytes of discarded messages. The inputs
+	// need to correctly track the file offset, therefore if only the matching
+	// message size is returned, the offset cannot be correctly updated.
 	var discardedOffset int
 	defer func() {
-		message.Bytes += discardedOffset
+		message.Offset = discardedOffset
 	}()
 
 	for p.ctx.Err() == nil {
