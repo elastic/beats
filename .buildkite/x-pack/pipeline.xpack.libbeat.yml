@@ -41,7 +41,7 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "libbeat: check/update"
+              context: "x-pack/libbeat: check/update"
       
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
