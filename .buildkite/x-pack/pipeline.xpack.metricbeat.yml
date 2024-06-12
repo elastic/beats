@@ -43,7 +43,7 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "metricbeat: check/update"
+              context: "x-pack/metricbeat: check/update"
       
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
