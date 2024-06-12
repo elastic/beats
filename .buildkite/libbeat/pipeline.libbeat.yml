@@ -17,9 +17,6 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-<<<<<<< HEAD
-  - group: "Libbeat Mandatory Tests"
-=======
   - group: "libbeat Check/Update"
     key: "libbeat-check-update"
     steps:
@@ -47,7 +44,6 @@ steps:
     depends_on: "libbeat-check-update"
 
   - group: "Mandatory Tests"
->>>>>>> 02a57f7648 (Migrate github checks to buildkite for libbeat and x-pack/libbeat (#39869))
     key: "mandatory-tests"
 
     steps:
