@@ -23372,11 +23372,11 @@ Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.0.0-2
 
 --------------------------------------------------------------------------------
 Dependency : github.com/xdg-go/scram
-Version: v1.0.2
+Version: v1.1.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/xdg-go/scram@v1.0.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/xdg-go/scram@v1.1.2/LICENSE:
 
 
                                  Apache License
@@ -53132,11 +53132,11 @@ Contents of probable licence file $GOMODCACHE/github.com/xdg-go/pbkdf2@v1.0.0/LI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/xdg-go/stringprep
-Version: v1.0.2
+Version: v1.0.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/xdg-go/stringprep@v1.0.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/xdg-go/stringprep@v1.0.4/LICENSE:
 
 
                                  Apache License
