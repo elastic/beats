@@ -179,6 +179,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Add ERROR_INVALID_PARAMETER to the list of recoverable errors. {pull}39781[39781]
 
 *Functionbeat*
 
