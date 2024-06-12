@@ -30,7 +30,7 @@ class Test(BaseTest):
 
             # Flaky on MacOS, see https://github.com/elastic/beats/issues/39613#issuecomment-2158812325
             # we need to wait a bit longer for filebeat to start
-            if platform.system() == "Darwin" :
+            if platform.system() == "Darwin":
                 time.sleep(10)
             else:
                 time.sleep(.5)
