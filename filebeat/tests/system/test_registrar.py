@@ -952,7 +952,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             close_inactive="200ms",
             ignore_older="2000ms",
-            clean_inactive="3s",
+            clean_inactive="10s",
         )
 
         filebeat = self.start_beat()
