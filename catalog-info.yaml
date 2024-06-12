@@ -1002,7 +1002,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-xpack-agentbeat
-      description: "Beats x-pack heartbeat pipeline"
+      description: "Beats x-pack agentbeat pipeline"
     spec:
       # branch_configuration: "main 8.*"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.agentbeat.yml"
