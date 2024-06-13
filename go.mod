@@ -2,7 +2,7 @@ module github.com/elastic/beats/v7
 
 go 1.21.0
 
-toolchain go1.21.10
+toolchain go1.21.11
 
 require (
 	cloud.google.com/go/bigquery v1.55.0
@@ -149,7 +149,7 @@ require (
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.0
 	go.etcd.io/bbolt v1.3.6
-	go.uber.org/atomic v1.11.0
+	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.22.0
