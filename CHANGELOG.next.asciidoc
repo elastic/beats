@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
 
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Heartbeat*
 
