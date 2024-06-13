@@ -97,6 +97,7 @@
 - Allow the - char to appear as part of variable names in eql expressions. {pull}32350[32350]
 - Allow the / char to appear as part of variable names in eql expressions. {pull}32528{32528}
 - Fix add_fields processor on Docker provider {pull}33269{33269}
+- Change local fleet-server connection to localhost:8221. {pull}38785[38785]
 
 ==== New features
 
