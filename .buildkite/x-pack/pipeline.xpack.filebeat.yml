@@ -283,7 +283,7 @@ steps:
   - group: "x-pack/filebeat Packaging"
     key: "x-pack-filebeat-packaging"
     steps:
-      - label: ":linux: x-pack/filebeat Packaging Linux"
+      - label: ":ubuntu: x-pack/filebeat Packaging Linux"
         key: "packaging-linux"
         command: |
           cd x-pack/filebeat
@@ -304,7 +304,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux"
 
-      - label: ":linux: x-pack/filebeat Packaging arm64"
+      - label: ":ubuntu: x-pack/filebeat Packaging arm64"
         key: "packaging-arm"
         command: |
           cd x-pack/filebeat

@@ -23,10 +23,10 @@ terraformApply() {
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 
-  echo "--- Terraform Init on $MODULE_DIR"
+  echo "Terraform Init on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" init
 
-  echo "--- Terraform Apply on $MODULE_DIR"
+  echo "Terraform Apply on $MODULE_DIR"
   terraform -chdir="$MODULE_DIR" apply -auto-approve
 }
 
