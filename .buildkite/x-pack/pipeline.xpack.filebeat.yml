@@ -42,7 +42,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack-filebeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -249,6 +249,8 @@ steps:
 
       - label: ":ubuntu: x-pack/filebeat AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
+        skip: "skipping due to elastic/ingest-dev#3467"
+        # https://github.com/elastic/ingest-dev/issues/3467
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
           set -euo pipefail
