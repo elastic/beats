@@ -75,7 +75,7 @@
                 "type": "timeseries",
                 "use_kibana_indexes": false
             },
-            "title": "Tablespace Total Size [Metricbeat Oracle]",
+            "title": "Tablespace Max Total Size [Metricbeat Oracle]",
             "type": "metrics"
         }
     },
