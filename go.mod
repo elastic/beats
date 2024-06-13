@@ -89,7 +89,6 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/go-test/deep v1.0.7
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.0.6
 	github.com/godror/godror v0.33.2
