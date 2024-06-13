@@ -46,7 +46,7 @@
                 },
                 "panelIndex": "2",
                 "panelRefName": "panel_2",
-                "title": "Tablespace Total Size",
+                "title": "Tablespace Max Total Size",
                 "type": "visualization",
                 "version": "8.0.0-SNAPSHOT"
             },

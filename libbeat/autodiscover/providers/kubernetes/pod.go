@@ -100,9 +100,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 
 	if metaConf.Node.Enabled() || config.Hints.Enabled() {
 		options := kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Node:        config.Node,
-			Namespace:   config.Namespace,
+			SyncTimeout:  config.SyncPeriod,
+			Node:         config.Node,
+			HonorReSyncs: true,
 		}
 		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
@@ -112,20 +112,24 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 		}
 	}
 
-	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+	// Resource is Pod, so we need to create watchers for Replicasets and Jobs that it might belong to
 	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
 	if metaConf.Deployment {
 		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
@@ -133,7 +137,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	}
 	if metaConf.CronJob {
 		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
