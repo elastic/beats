@@ -14025,11 +14025,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-licenser
-Version: v0.4.1
+Version: v0.4.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.2/LICENSE:
 
 
                                  Apache License
