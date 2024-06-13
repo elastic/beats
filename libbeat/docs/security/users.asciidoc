@@ -273,7 +273,7 @@ endif::[]
 |Index
 |`auto_configure` on +{beat_default_index_prefix}-*+ indices
 |Update the datastream mapping. Consider either disabling entirely or adding the
-rule `-{beat_default_index_prefix}-*` to the cluster settings
+rule +{beat_default_index_prefix}-*+ to the cluster settings
 https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#index-creation[action.auto_create_index]
 to prevent unwanted indices creations from the agents.
 |====
