@@ -18,13 +18,17 @@
 package memqueue
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
@@ -111,4 +115,89 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
 	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
+}
+
+func TestObserverAddEvent(t *testing.T) {
+	// Confirm that an entry inserted into the queue is reported in
+	// queue.added.events and queue.added.bytes.
+	reg := monitoring.NewRegistry()
+	rl := &runLoop{
+		observer: queue.NewQueueObserver(reg),
+		broker: &broker{
+			buf: make([]queueEntry, 100),
+		},
+	}
+	request := &pushRequest{
+		event:     publisher.Event{},
+		eventSize: 123,
+	}
+	rl.insert(request, 0)
+	assertRegistryUint(t, reg, "queue.added.events", 1, "Queue insert should report added event")
+	assertRegistryUint(t, reg, "queue.added.bytes", 123, "Queue insert should report added bytes")
+}
+
+func TestObserverConsumeEvents(t *testing.T) {
+	// Confirm that event batches sent to the output are reported in
+	// queue.consumed.events and queue.consumed.bytes.
+	reg := monitoring.NewRegistry()
+	rl := &runLoop{
+		observer: queue.NewQueueObserver(reg),
+		broker: &broker{
+			buf: make([]queueEntry, 100),
+		},
+		eventCount: 50,
+	}
+	// Initialize the queue entries to a test byte size
+	for i := range rl.broker.buf {
+		rl.broker.buf[i].eventSize = 123
+	}
+	request := &getRequest{
+		entryCount:   len(rl.broker.buf),
+		responseChan: make(chan *batch, 1),
+	}
+	rl.handleGetReply(request)
+	// We should have gotten back 50 events, everything in the queue, so we expect the size
+	// to be 50 * 123.
+	assertRegistryUint(t, reg, "queue.consumed.events", 50, "Sending a batch to a Get caller should report the consumed events")
+	assertRegistryUint(t, reg, "queue.consumed.bytes", 50*123, "Sending a batch to a Get caller should report the consumed bytes")
+}
+
+func TestObserverRemoveEvents(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	rl := &runLoop{
+		observer: queue.NewQueueObserver(reg),
+		broker: &broker{
+			ctx:        context.Background(),
+			buf:        make([]queueEntry, 100),
+			deleteChan: make(chan int, 1),
+		},
+		eventCount: 50,
+	}
+	// Initialize the queue entries to a test byte size
+	for i := range rl.broker.buf {
+		rl.broker.buf[i].eventSize = 123
+	}
+	const deleteCount = 25
+	rl.broker.deleteChan <- deleteCount
+	// Run one iteration of the run loop, so it can handle the delete request
+	rl.runIteration()
+	// It should have deleted 25 events, so we expect the size to be 25 * 123.
+	assertRegistryUint(t, reg, "queue.removed.events", deleteCount, "Deleting from the queue should report the removed events")
+	assertRegistryUint(t, reg, "queue.removed.bytes", deleteCount*123, "Deleting from the queue should report the removed bytes")
+}
+
+func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expected uint64, message string) {
+	t.Helper()
+
+	entry := reg.Get(key)
+	if entry == nil {
+		assert.Failf(t, message, "registry key '%v' doesn't exist", key)
+		return
+	}
+	value, ok := reg.Get(key).(*monitoring.Uint)
+	if !ok {
+		assert.Failf(t, message, "registry key '%v' doesn't refer to a uint64", key)
+		return
+	}
+	assert.Equal(t, expected, value.Get(), message)
 }

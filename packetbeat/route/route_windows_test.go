@@ -54,6 +54,9 @@ func defaultRoute(af int) (name string, index int, err error) {
 	for inTable := false; sc.Scan(); {
 		f := strings.Fields(sc.Text())
 		if len(f) == 0 {
+			if inTable {
+				break
+			}
 			continue
 		}
 		if !inTable {
@@ -94,6 +97,9 @@ func defaultRoute(af int) (name string, index int, err error) {
 	for inTable := false; sc.Scan(); {
 		f := fieldsN(sc.Text(), 5)
 		if len(f) == 0 {
+			if inTable {
+				break
+			}
 			continue
 		}
 		if !inTable {
@@ -152,6 +158,7 @@ func fieldsN(s string, n int) []string {
 	}
 	var f []string
 	for s != "" {
+		l := len(s)
 		for i, r := range s {
 			if unicode.IsSpace(r) {
 				f = append(f, s[:i])
@@ -165,7 +172,7 @@ func fieldsN(s string, n int) []string {
 				break
 			}
 		}
-		if len(f) == n-1 {
+		if len(f) == n-1 || len(s) == l {
 			break
 		}
 	}

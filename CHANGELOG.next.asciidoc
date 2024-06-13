@@ -42,11 +42,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Sophos UTM from Beats. Use the https://docs.elastic.co/integrations/sophos[Sophos] Elastic integration instead. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
+- Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Heartbeat*
 
-- Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
 
 *Metricbeat*
 
@@ -86,8 +86,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
-- Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
-- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
@@ -98,12 +96,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
 
 *Auditbeat*
-- Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
-- Fix failing to enrich process events in sessionmd processor {issue}38955[38955] {pull}39173[39173] {pull}39243[39243]
-- Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
-- Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
-- Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
-- Fix seccomp policy of FIM kprobes backend on arm64 {pull}39759[39759]
 
 
 
@@ -121,9 +113,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
-- Fix m365_defender cursor value and query building. {pull}37116[37116]
-- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
-- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
 - Fix file handle leak when handling errors in filestream {pull}37973[37973]
 - Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
@@ -161,6 +150,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 - Reset prctl dumpable flag after cap drop. {pull}38269[38269]
 - Redact synthexec cmd output. {pull}39535[39535]
+- Fix import of browser plugin for agentbeat. {pull}39818[39818]
 
 *Heartbeat*
 
@@ -186,7 +176,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix error handling in perfmon metrics. {issue}38140[38140] {pull}39404[39404]
 
 *Elastic Logging Plugin*
 
@@ -226,10 +215,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Auditbeat*
 
 
+*Auditbeat*
+
+
 *Filebeat*
 
-- Adding Saved Object name field to Kibana audit logs {pull}38307[38307]
-- Update SQL input documentation regarding Oracle DSNs {pull}37590[37590]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
@@ -289,13 +279,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
+- Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
+- Add request trace support for Okta and EntraID entity analytics providers. {pull}39821[39821]
 
 *Auditbeat*
 
 
 *Libbeat*
 
-- Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
 
 
 *Heartbeat*
@@ -304,8 +295,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add support for shards_stats.total_count in Elasticsearch Monitoring data. {pull}38891[38891]
-- Add new fields to configure the lease duration, retry and renew when using leader elector with kubernetes autodiscover.{pull}38471[38471]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
@@ -348,8 +337,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- Deprecate `syslog` input in favor of `syslog` processor. {issue}37555[37555] {pull}38277[38277]
-- Deprecate `o365audit` input in favor of `CEL` input. {issue}37719[37719] {pull}38922[38922]
 
 *Heartbeat*
 
@@ -374,6 +361,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
