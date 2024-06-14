@@ -258,7 +258,7 @@ steps:
           source .buildkite/scripts/initCloudEnv.sh
           echo "~~~ Running tests"
           cd x-pack/metricbeat
-          mage build test
+          mage build test goIntegTest
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"

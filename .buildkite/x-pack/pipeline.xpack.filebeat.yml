@@ -286,16 +286,17 @@ steps:
 
       - label: ":ubuntu: x-pack/filebeat AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
+        skip: "skipping as it was on Jenkins: elastic/ingest-dev#3467"
+        # Related issue: https://github.com/elastic/ingest-dev/issues/3467
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/initCloudEnv.sh
           echo "~~~ Running tests"
           cd x-pack/filebeat
-          mage build test
+          mage build test goIntegTest
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
-          AWS_REGION: "eu-central-1"
           MODULE_DIR: "x-pack/filebeat/input/awss3/_meta/terraform"
           REPO: beats
         agents:
