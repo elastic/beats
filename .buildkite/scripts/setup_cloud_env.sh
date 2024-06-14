@@ -11,7 +11,7 @@ teardown() {
   tf_cleanup "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
   echo "~~~ Docker Compose Cleanup"
-  docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
 
 tf_cleanup() {
@@ -38,7 +38,7 @@ export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 set -o xtrace
 
 echo "~~~ Run docker-compose services for emulated cloud env"
-docker-compose -f .ci/jobs/docker-compose.yml up -d        #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
 echo "~~~ Initialize TF cloud resources"
 cd "$MODULE_DIR"
 export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
