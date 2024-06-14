@@ -63,6 +63,27 @@ updates:
           - "cloud.google.com/go/*"
           - "google.golang.org/*"
 
+  # Adding a separate group for AWS SDK dependencies
+  # to enable optional stages in the CI for AWS cloud
+  # testing using the `aws` label.
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - automation
+      - dependabot
+      # The `aws` label enables optional 
+      # stages in the CI for AWS cloud testing.
+      - aws
+    reviewers:
+      - "elastic/obs-ds-hosted-services"
+      - "elastic/obs-infraobs-integrations"
+    groups:
+      aws-sdk:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2/*"
+
   # GitHub actions
   - package-ecosystem: "github-actions"
     directory: "/"
