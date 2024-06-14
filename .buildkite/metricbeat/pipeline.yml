@@ -17,7 +17,7 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
 
   # Integration Tests
-  K8S_VERSION: "v1.29.0"
+  K8S_VERSION: "v1.21.1"
   ASDF_KIND_VERSION: "0.20.0"
 
   # Other deps
