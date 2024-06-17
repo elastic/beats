@@ -2,11 +2,18 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
+AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 
 exportAwsSecrets() {
+  local awsSecretKey
+  local awsAccessKey
+
+  awsSecretKey=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+  awsAccessKey=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+
   echo "~~~ Exporting AWS secrets"
-  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
-  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
+  export AWS_ACCESS_KEY_ID=$awsAccessKey
+  export AWS_SECRET_ACCESS_KEY=$awsSecretKey
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 
   # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
@@ -48,13 +55,11 @@ terraformDestroy() {
 }
 
 dockerUp() {
-  echo "--- COMPOSE UP: Current folder: $(pwd)"
   echo "~~~ Run docker-compose services for emulated cloud env"
   docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
 }
 
 dockerTeardown() {
-  echo "--- COMPOSE DOWN: Current folder: $(pwd)"
   echo "~~~ Docker Compose Teardown"
   docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
