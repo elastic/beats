@@ -33,7 +33,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -129,7 +128,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer grp.Stop()
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
 		inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
