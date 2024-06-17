@@ -1,4 +1,5 @@
 env:
+  ASDF_MAGE_VERSION: 1.15.0
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
