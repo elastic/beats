@@ -61,7 +61,7 @@ steps:
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3
