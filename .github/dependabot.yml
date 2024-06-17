@@ -58,6 +58,10 @@ updates:
           - "github.com/Azure/azure-event-hubs-go/*"
           - "github.com/Azure/go-autorest/*"
           - "github.com/Azure/azure-storage-blob-go/*"
+      gcp-sdks:
+        patterns:
+          - "cloud.google.com/go/*"
+          - "google.golang.org/*"
 
   # GitHub actions
   - package-ecosystem: "github-actions"

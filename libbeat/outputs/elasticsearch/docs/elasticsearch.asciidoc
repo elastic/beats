@@ -223,7 +223,9 @@ Additional headers to send to proxies during CONNECT requests.
 
 // Begin exclude for APM Server docs
 ifndef::apm-server[]
-The index name to write events to when you're using daily indices. The default is
+The indexing target to write events to. 
+Can point to an {ref}/index-mgmt.html[index], {ref}/aliases.html[alias], or {ref}/data-streams.html[data stream]. 
+When using daily indices, this will be the index name. The default is
 +"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"+, for example,
 +"{beatname_lc}-{version}-{localdate}"+. If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options

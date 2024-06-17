@@ -32,7 +32,6 @@ import (
 )
 
 func TestDefault(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/39698")
 	for _, family := range []int{syscall.AF_INET, syscall.AF_INET6} {
 		wantIface, wantIndex, wantErr := defaultRoute(family)
 		if wantErr != nil && wantErr != ErrNotFound {

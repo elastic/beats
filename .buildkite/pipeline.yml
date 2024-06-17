@@ -116,6 +116,7 @@ steps:
                 - .buildkite/x-pack/pipeline.xpack.filebeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
+                - .buildkite/deploy/docker/docker-compose.yml
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -219,6 +220,7 @@ steps:
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
+                - .buildkite/deploy/docker/docker-compose.yml
                 #OSS
                 - go.mod
                 - pytest.ini
