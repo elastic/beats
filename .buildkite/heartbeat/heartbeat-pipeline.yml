@@ -96,7 +96,7 @@ steps:
 
           echo "~~~ Running tests"
           cd heartbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3

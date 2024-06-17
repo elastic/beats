@@ -72,7 +72,7 @@ steps:
         command: |
           set -euo pipefail
           cd libbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3

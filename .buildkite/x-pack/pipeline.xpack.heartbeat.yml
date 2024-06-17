@@ -65,7 +65,7 @@ steps:
           npm install -g @elastic/synthetics
           echo "~~~ Running tests"
           cd x-pack/heartbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3

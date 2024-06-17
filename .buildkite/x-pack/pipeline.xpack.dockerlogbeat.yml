@@ -49,7 +49,7 @@ steps:
           defineModuleFromTheChangeSet x-pack/dockerlogbeat
           echo "~~~ Running tests"
           cd x-pack/dockerlogbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3
