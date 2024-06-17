@@ -1,7 +1,7 @@
 env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-# test change
+
 steps:
   - group: "Agentbeat tests"
     key: "agentbeat-mandatory-tests"
@@ -14,11 +14,13 @@ steps:
           SNAPSHOT: true
         command: |
           set -euo pipefail
-          cd agentbeat
+          cd x-pack/agentbeat
           mage package
+        artifact_paths:
+          - build/distributions/**/*
         retry:
           automatic:
-            - limit: 3
+            - limit: 2
         timeout_in_minutes: 60
         agents:
           provider: "gcp"
