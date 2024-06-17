@@ -27,7 +27,13 @@ class Test(BaseTest):
         )
         for i in range(1, 5):
             proc = self.start_beat(logging_args=["-e", "-v"])
-            time.sleep(.5)
+
+            # Flaky on MacOS, see https://github.com/elastic/beats/issues/39613#issuecomment-2158812325
+            # we need to wait a bit longer for filebeat to start
+            if platform.system() == "Darwin":
+                time.sleep(10)
+            else:
+                time.sleep(.5)
             proc.check_kill_and_wait()
 
     @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/14647")

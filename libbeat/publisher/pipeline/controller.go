@@ -19,6 +19,7 @@ package pipeline
 
 import (
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -38,11 +39,6 @@ import (
 type outputController struct {
 	beat     beat.Info
 	monitors Monitors
-	observer outputObserver
-
-	// If eventWaitGroup is non-nil, it will be decremented as the queue
-	// reports upstream acknowledgment of published events.
-	eventWaitGroup *sync.WaitGroup
 
 	// The queue is not created until the outputController is assigned a
 	// nonempty outputs.Group, in case the output group requests a proxy
@@ -58,10 +54,15 @@ type outputController struct {
 	// is called.
 	queueFactory queue.QueueFactory
 
+	// consumer is a helper goroutine that reads event batches from the queue
+	// and sends them to workerChan for an output worker to process.
+	consumer *eventConsumer
+
+	// Each worker is a goroutine that will read batches from workerChan and
+	// send them to the output.
+	workers    []outputWorker
 	workerChan chan publisher.Batch
 
-	consumer *eventConsumer
-	workers  []outputWorker
 	// The InputQueueSize can be set when the Beat is started, in
 	// libbeat/cmd/instance/Settings we need to preserve that
 	// value and pass it into the queue factory.  The queue
@@ -85,53 +86,41 @@ type outputWorker interface {
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
-	observer outputObserver,
-	eventWaitGroup *sync.WaitGroup,
+	retryObserver retryObserver,
 	queueFactory queue.QueueFactory,
 	inputQueueSize int,
 ) (*outputController, error) {
 	controller := &outputController{
 		beat:           beat,
 		monitors:       monitors,
-		observer:       observer,
-		eventWaitGroup: eventWaitGroup,
 		queueFactory:   queueFactory,
 		workerChan:     make(chan publisher.Batch),
-		consumer:       newEventConsumer(monitors.Logger, observer),
+		consumer:       newEventConsumer(monitors.Logger, retryObserver),
 		inputQueueSize: inputQueueSize,
 	}
 
 	return controller, nil
 }
 
-func (c *outputController) Close() error {
+func (c *outputController) WaitClose(timeout time.Duration) error {
+	// First: signal the queue that we're shutting down, and wait up to the
+	// given duration for it to drain and process ACKs.
+	c.closeQueue(timeout)
+
+	// We've drained the queue as much as we can, signal eventConsumer to
+	// close, and wait for it to finish. After consumer.close returns,
+	// there will be no more writes to c.workerChan, so it is safe to close.
 	c.consumer.close()
 	close(c.workerChan)
 
+	// Signal the output workers to close. This step is a hint, and carries
+	// no guarantees. For example, on close the Elasticsearch output workers
+	// will close idle connections, but will not change any behavior for
+	// active connections, giving any remaining events a chance to ingest
+	// before we terminate.
 	for _, out := range c.workers {
 		out.Close()
 	}
-
-	// Closing the queue stops ACKs from propagating, so we close everything
-	// else first to give it a chance to wait for any outstanding events to be
-	// acknowledged.
-	c.queueLock.Lock()
-	if c.queue != nil {
-		c.queue.Close()
-	}
-	for _, req := range c.pendingRequests {
-		// We can only end up here if there was an attempt to connect to the
-		// pipeline but it was shut down before any output was set.
-		// In this case, return nil and Pipeline.ConnectWith will pass on a
-		// real error to the caller.
-		// NOTE: under the current shutdown process, Pipeline.Close (and hence
-		// outputController.Close) is ~never called. So even if we did have
-		// blocked callers here, in a real shutdown they will never be woken
-		// up. But in hopes of a day when the shutdown process is more robust,
-		// I've decided to do the right thing here anyway.
-		req.responseChan <- nil
-	}
-	c.queueLock.Unlock()
 
 	return nil
 }
@@ -203,6 +192,32 @@ func (c *outputController) Reload(
 	return nil
 }
 
+// Close the queue, waiting up to the specified timeout for pending events
+// to complete.
+func (c *outputController) closeQueue(timeout time.Duration) {
+	c.queueLock.Lock()
+	defer c.queueLock.Unlock()
+	if c.queue != nil {
+		c.queue.Close()
+		select {
+		case <-c.queue.Done():
+		case <-time.After(timeout):
+		}
+	}
+	for _, req := range c.pendingRequests {
+		// We can only end up here if there was an attempt to connect to the
+		// pipeline but it was shut down before any output was set.
+		// In this case, return nil and Pipeline.ConnectWith will pass on a
+		// real error to the caller.
+		// NOTE: under the current shutdown process, Pipeline.Close (and hence
+		// outputController.Close) is ~never called. So even if we did have
+		// blocked callers here, in a real shutdown they will never be woken
+		// up. But in hopes of a day when the shutdown process is more robust,
+		// I've decided to do the right thing here anyway.
+		req.responseChan <- nil
+	}
+}
+
 // queueProducer creates a queue producer with the given config, blocking
 // until the queue is created if it does not yet exist.
 func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Producer {
@@ -233,16 +248,6 @@ func (c *outputController) queueProducer(config queue.ProducerConfig) queue.Prod
 	return <-request.responseChan
 }
 
-// onACK receives event acknowledgment notifications from the queue and
-// forwards them to the metrics observer and the pipeline's global event
-// wait group if one is set.
-func (c *outputController) onACK(eventCount int) {
-	c.observer.queueACKed(eventCount)
-	if c.eventWaitGroup != nil {
-		c.eventWaitGroup.Add(-eventCount)
-	}
-}
-
 func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	logger := c.monitors.Logger
 	if len(outGrp.Clients) == 0 {
@@ -266,12 +271,21 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if factory == nil {
 		factory = c.queueFactory
 	}
+	// Queue metrics are reported under the pipeline namespace
+	var pipelineMetrics *monitoring.Registry
+	if c.monitors.Metrics != nil {
+		pipelineMetrics := c.monitors.Metrics.GetRegistry("pipeline")
+		if pipelineMetrics == nil {
+			pipelineMetrics = c.monitors.Metrics.NewRegistry("pipeline")
+		}
+	}
+	queueObserver := queue.NewQueueObserver(pipelineMetrics)
 
-	queue, err := factory(logger, c.onACK, c.inputQueueSize, outGrp.EncoderFactory)
+	queue, err := factory(logger, queueObserver, c.inputQueueSize, outGrp.EncoderFactory)
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize, outGrp.EncoderFactory)
+		queue = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
 	}
 	c.queue = queue
 
@@ -279,8 +293,6 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		queueReg := c.monitors.Telemetry.NewRegistry("queue")
 		monitoring.NewString(queueReg, "name").Set(c.queue.QueueType())
 	}
-	maxEvents := c.queue.BufferConfig().MaxEvents
-	c.observer.queueMaxEvents(maxEvents)
 
 	// Now that we've created a queue, go through and unblock any callers
 	// that are waiting for a producer.
@@ -303,6 +315,5 @@ func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) Cancel() int {
-	return 0
+func (emptyProducer) Close() {
 }
