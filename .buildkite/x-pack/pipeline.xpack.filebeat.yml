@@ -67,7 +67,7 @@ steps:
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
           cd x-pack/filebeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3

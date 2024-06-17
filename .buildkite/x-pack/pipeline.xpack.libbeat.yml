@@ -46,7 +46,7 @@ steps:
         key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3
