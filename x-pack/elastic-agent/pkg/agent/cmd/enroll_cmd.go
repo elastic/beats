@@ -827,7 +827,7 @@ func safelyStoreAgentInfo(s saver, reader io.Reader) error {
 	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
 		backExp.Wait()
 		err = storeAgentInfo(s, reader)
-		if stderror.Is(err, filelock.ErrAppAlreadyRunning) {
+		if !stderror.Is(err, filelock.ErrAppAlreadyRunning) {
 			break
 		}
 	}
