@@ -596,8 +596,8 @@ steps:
                 - osquerybeat/
                 - packetbeat/
                 - .buildkite/agentbeat/pipeline.agentbeat.yml
-                # - .buildkite/scripts/
-                # - .buildkite/hooks/
+                - .buildkite/scripts/
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
