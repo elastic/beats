@@ -597,7 +597,7 @@ steps:
                 - metricbeat/
                 - osquerybeat/
                 - packetbeat/
-                - .buildkite/agentbeat/pipeline.agentbeat.yml
+                - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 #OSS
