@@ -8,8 +8,8 @@ exportAwsSecrets() {
   local awsSecretKey
   local awsAccessKey
 
-  awsSecretKey=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
-  awsAccessKey=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+  awsSecretKey=$(retry -t 5 -- 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+  awsAccessKey=$(retry -t 5 -- 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
 
   echo "~~~ Exporting AWS secrets"
   export AWS_ACCESS_KEY_ID=$awsAccessKey
