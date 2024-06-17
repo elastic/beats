@@ -2,14 +2,13 @@
 
 set -euo pipefail
 
-source .buildkite/hooks/scripts/util.sh
+unset_secrets () {
+  for var in $(printenv | sed 's;=.*;;' | sort); do
+    if [[ "$var" == *_SECRET || "$var" == *_TOKEN ]]; then
+      unset "$var"
+    fi
+  done
+}
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    docker logout "${DOCKER_REGISTRY}"
-  fi
+unset_secrets
 
-  # Ensure that any temporal files created during any step are removed
-  cleanup
-  unset_secrets
-fi
