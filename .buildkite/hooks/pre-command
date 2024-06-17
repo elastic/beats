@@ -2,18 +2,9 @@
 
 set -euo pipefail
 
-#source .buildkite/env-scripts/util.sh
-
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
-
-#if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" ]]; then
-#  if [[ -z "${GO_VERSION-""}" ]]; then
-#    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
-#  fi
-#fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
@@ -36,9 +27,8 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
-    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry_with_count 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
+    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
