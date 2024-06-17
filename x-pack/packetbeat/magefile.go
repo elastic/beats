@@ -173,10 +173,7 @@ func SystemTest(ctx context.Context) error {
 }
 
 func getBucketName() string {
-	if os.Getenv("BUILDKITE") == "true" {
-		return "ingest-buildkite-ci"
-	}
-	return "obs-ci-cache"
+	return "ingest-buildkite-ci"
 }
 
 // getNpcapInstaller gets the installer from the Google Cloud Storage service.
