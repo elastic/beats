@@ -876,7 +876,6 @@ func (b *Beat) configure(settings Settings) error {
 		}
 		b.Info.UserAgentPostfix = userAgent
 	}
-	logp.L().Infof("got user agent in beat: %s", b.Info.UserAgentPostfix)
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
