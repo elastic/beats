@@ -59,6 +59,28 @@ func assertConnection(t *testing.T, URL string, expectedStatusCode int) {
 	assert.Error(t, err)
 }
 
+func TestIsServerless(t *testing.T) {
+	rawStatusCall := `{"name":"kb","uuid":"d2130570-f7d8-463b-bd67-8503150004d5","version":{"number":"8.15.0","build_hash":"13382875e99e8c97f4574d86eca07cac3be9edfc","build_number":75422,"build_snapshot":false,"build_flavor":"stateful","build_date":"2024-06-15T18:13:50.595Z"}}`
+
+	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(rawStatusCall))
+	}))
+	defer kibanaTS.Close()
+
+	conn := Connection{
+		URL:  kibanaTS.URL,
+		HTTP: http.DefaultClient,
+	}
+
+	testClient := Client{
+		Connection: conn,
+	}
+
+	got, err := testClient.KibanaIsServerless()
+	require.NoError(t, err)
+	require.False(t, got)
+}
+
 func TestErrorBadJson(t *testing.T) {
 	kibanaTS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusGone)
