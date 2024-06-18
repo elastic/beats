@@ -38,7 +38,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	// available. This test verifies that Get requests that can be completely
 	// filled do not wait for the flush timer.
 
-	broker := newQueue(
+	broker, err := newQueue(
 		logp.NewLogger("testing"),
 		nil,
 		Settings{
@@ -47,6 +47,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 			FlushTimeout:  10 * time.Second,
 		},
 		10, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
@@ -77,7 +78,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	// there are enough events. This one uses the same setup to confirm that
 	// Get requests are delayed if there aren't enough events.
 
-	broker := newQueue(
+	broker, err := newQueue(
 		logp.NewLogger("testing"),
 		nil,
 		Settings{
@@ -86,6 +87,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 			FlushTimeout:  10 * time.Second,
 		},
 		10, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop

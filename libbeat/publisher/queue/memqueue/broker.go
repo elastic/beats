@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"context"
+	"errors"
 	"io"
 	"time"
 
@@ -142,7 +143,7 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		inputQueueSize int,
 		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory), nil
+		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 	}
 }
 
@@ -155,14 +156,16 @@ func NewQueue(
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
-) *broker {
-	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
+) (*broker, error) {
+	b, err := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
-	// Start the queue workers
-	go b.runLoop.run()
-	go b.ackLoop.run()
+	if err == nil {
+		// Start the queue workers
+		go b.runLoop.run()
+		go b.ackLoop.run()
+	}
 
-	return b
+	return b, err
 }
 
 // newQueue does most of the work of creating a queue from the given
@@ -175,7 +178,7 @@ func newQueue(
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
-) *broker {
+) (*broker, error) {
 	if observer == nil {
 		observer = queue.NewQueueObserver(nil)
 	}
@@ -188,6 +191,10 @@ func newQueue(
 	if settings.MaxGetRequest <= 1 {
 		settings.FlushTimeout = 0
 		settings.MaxGetRequest = (settings.Events + 1) / 2
+	}
+
+	if settings.Bytes > 0 && encoderFactory == nil {
+		return nil, errors.New("queue.mem.bytes is set but the output doesn't support byte-based event buffers")
 	}
 
 	// Can't request more than the full queue
@@ -222,7 +229,7 @@ func newQueue(
 
 	observer.MaxEvents(settings.Events)
 
-	return b
+	return b, nil
 }
 
 func (b *broker) Close() error {

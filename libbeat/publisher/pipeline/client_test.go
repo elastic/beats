@@ -88,11 +88,12 @@ func TestClient(t *testing.T) {
 		l := logp.L()
 
 		// a small in-memory queue with a very short flush interval
-		q := memqueue.NewQueue(l, nil, memqueue.Settings{
+		q, err := memqueue.NewQueue(l, nil, memqueue.Settings{
 			Events:        5,
 			MaxGetRequest: 1,
 			FlushTimeout:  time.Millisecond,
 		}, 5, nil)
+		require.NoError(t, err, "Queue creation must succeed")
 
 		// model a processor that we're going to make produce errors after
 		p := &testProcessor{}
@@ -201,7 +202,8 @@ func TestClientWaitClose(t *testing.T) {
 	}
 	logp.TestingSetup()
 
-	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0, nil)
+	q, err := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 

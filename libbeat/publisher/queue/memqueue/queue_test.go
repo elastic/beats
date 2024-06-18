@@ -86,12 +86,13 @@ func TestProduceConsumer(t *testing.T) {
 // than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
 func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
-	q := NewQueue(nil, nil,
+	q, err := NewQueue(nil, nil,
 		Settings{
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
 			FlushTimeout:  time.Millisecond,
 		}, 0, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
@@ -156,12 +157,13 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	var activeEvents atomic.Int64
 
-	q := NewQueue(nil, nil,
+	q, err := NewQueue(nil, nil,
 		Settings{
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
 			FlushTimeout:  10 * time.Millisecond,
 		}, 1, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	p := q.Producer(queue.ProducerConfig{
 		ACK: func(count int) {
@@ -229,11 +231,12 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, nil, Settings{
+		q, _ := NewQueue(nil, nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
 		}, 0, nil)
+		return q
 	}
 }
 

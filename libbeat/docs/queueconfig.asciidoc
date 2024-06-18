@@ -67,6 +67,17 @@ queue.mem:
   flush.timeout: 5s
 ------------------------------------------------------------------------------
 
+Here is an alternate configuration that measures queue size in bytes rather
+than event count. In this case, the output must set `bulk_max_bytes`
+instead of `bulk_max_size` to control the batch size:
+
+[source,yaml]
+------------------------------------------------------------------------------
+queue.mem:
+  bytes: 32MB
+  flush.timeout: 10s
+------------------------------------------------------------------------------
+
 [float]
 === Configuration options
 
@@ -81,6 +92,16 @@ Number of events the queue can store.
 The default value is 3200 events.
 
 [float]
+[[queue-mem-bytes-option]]
+===== `bytes`
+
+Number of bytes the queue can store. This option is only available for outputs
+that support byte-based event buffers (currently just the Elasticsearch output).
+The queue should set either `events` or `bytes` but not both.
+
+The default is 0, indicating the queue should use the `events` limit instead.
+
+[float]
 [[queue-mem-flush-min-events-option]]
 ===== `flush.min_events`
 
@@ -91,6 +112,8 @@ publishing.
 
 If 0 or 1, sets the maximum number of events per batch to half the queue size, and sets
 the queue to synchronous mode (equivalent to `flush.timeout` of 0).
+
+This value is ignored when `bytes` is set.
 
 The default value is 1600.
 

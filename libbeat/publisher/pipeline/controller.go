@@ -286,7 +286,9 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
+		// Memqueue creation can only fail when it's configured for byte-based limits,
+		// so we don't need to handle the fallback error.
+		queue, _ = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
 	}
 	c.queue = queue
 
