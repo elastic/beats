@@ -380,8 +380,6 @@ func (inp *filestream) readFromSource(
 		}
 
 		ctx.UpdateStatus(status.Failed, "Failed on purpose")
-		return errors.New("Failed on purpose")
-
 		s.Offset += int64(message.Bytes)
 
 		metrics.MessagesRead.Inc()

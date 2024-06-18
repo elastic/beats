@@ -144,10 +144,26 @@ func (c *crawler) startInput(
 
 	c.inputs[id] = runner
 
-	c.log.Infof("Starting input (ID: %d)", id)
+	idFields := getRunnerID(runner)
+
+	c.log.Infow(fmt.Sprintf("Starting input (ID: %d)", id), idFields...)
 	runner.Start()
 
 	return nil
+}
+
+func getRunnerID(r cfgfile.Runner) []any {
+	type inputIDer interface {
+		InputID() string
+	}
+
+	idFields := []any{}
+	idRunner, ok := r.(inputIDer)
+	if ok {
+		idFields = append(idFields, "input_id", idRunner.InputID())
+	}
+
+	return idFields
 }
 
 func (c *crawler) Stop() {
