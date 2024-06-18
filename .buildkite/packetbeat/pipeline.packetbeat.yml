@@ -27,7 +27,7 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Packetbeat Check/Update"
+  - group: "Check/Update"
     key: "packetbeat-check-update"
 
     steps:
@@ -55,11 +55,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "packetbeat-check-update"
 
-  - group: "packetbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "packetbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Packetbeat Linux x86_64 Unit Tests"
+      - label: ":ubuntu: Packetbeat: Ubuntu x86_64 Unit Tests"
         command: |
           cd packetbeat
           mage build unitTest
@@ -75,9 +75,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Linux x86_64 Unit Tests"
+              context: "packetbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":rhel: Packetbeat RHEL9 Unit Tests"
+      - label: ":rhel: Packetbeat: RHEL9 Unit Tests"
         command: |
           cd packetbeat
           mage build unitTest
@@ -95,7 +95,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: RHEL9 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2016 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -113,9 +113,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2016 Unit Tests"
+              context: "packetbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2022 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -133,14 +133,14 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2022 Unit Tests"
+              context: "packetbeat: Win 2022 Unit Tests"
 
-  - group: " Packetbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "packetbeat-extended-windows-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Packetbeat Win 10 Unit Tests"
+      - label: ":windows: Packetbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -158,9 +158,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended Windows 10 Unit Tests"
+              context: "packetbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Packetbeat Win 11 Unit Tests"
+      - label: ":windows: Packetbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -181,7 +181,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: Win 11 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2019 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -200,13 +200,13 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2019 Unit Tests"
+              context: "packetbeat: Win 2019 Unit Tests"
 
-  - group: "Packetbeat Extended Tests"
+  - group: "Extended Tests"
     key: "extended-tests"
 
     steps:
-      - label: ":mac: Packetbeat macOS x86_64 Unit Tests"
+      - label: ":mac: Packetbeat: macOS x86_64 Unit Tests"
         key: "macos-x86-64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -227,7 +227,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Packetbeat macOS arm64 Unit Tests"
+      - label: ":mac: Packetbeat: macOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
         command: |
