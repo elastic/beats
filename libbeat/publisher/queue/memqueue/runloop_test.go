@@ -124,10 +124,12 @@ func TestObserverAddEvent(t *testing.T) {
 	rl := &runLoop{
 		observer: queue.NewQueueObserver(reg),
 		buf:      newCircularBuffer(100),
+		broker:   &broker{},
 	}
 	request := pushRequest{
 		event:     publisher.Event{},
 		eventSize: 123,
+		resp:      make(chan bool, 1),
 	}
 	rl.doInsert(request)
 	assertRegistryUint(t, reg, "queue.added.events", 1, "Queue insert should report added event")
@@ -143,6 +145,7 @@ func TestObserverConsumeEvents(t *testing.T) {
 		observer:   queue.NewQueueObserver(reg),
 		buf:        newCircularBuffer(bufSize),
 		eventCount: 50,
+		broker:     &broker{},
 	}
 	// Initialize the queue entries to a test byte size
 	for i := 0; i < bufSize; i++ {

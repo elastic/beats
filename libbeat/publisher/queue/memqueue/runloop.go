@@ -18,7 +18,6 @@
 package memqueue
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/fifo"
@@ -153,8 +152,9 @@ func (l *runLoop) runIteration() {
 	select {
 	case <-l.broker.closeChan:
 		l.closing = true
-		// Get requests are handled immediately during shutdown
+		// Get and push requests are handled immediately during shutdown
 		l.maybeUnblockGetRequest()
+		l.maybeUnblockPushRequests()
 
 	case <-l.broker.ctx.Done():
 		// The queue is fully shut down, do nothing
@@ -205,11 +205,10 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 	// limit) or if we have at least the requested number available.
 	if l.broker.useByteLimits() {
 		availableBytes := l.byteCount - l.consumedByteCount
-		return req.byteCount <= 0 || availableBytes >= req.byteCount
+		return req.byteCount > 0 && availableBytes < req.byteCount
 	}
 	availableEntries := l.eventCount - l.consumedEventCount
-	fmt.Printf("hi fae, getRequestShouldBlock for %v entries while there are %v available\n", req.entryCount, availableEntries)
-	return req.entryCount <= 0 || availableEntries >= req.entryCount
+	return req.entryCount > 0 && availableEntries < req.entryCount
 }
 
 // Respond to the given get request without blocking or waiting for more events
@@ -316,7 +315,14 @@ func (l *runLoop) canFitPushRequest(req pushRequest) bool {
 func (l *runLoop) maybeUnblockPushRequests() {
 	for !l.pendingPushRequests.Empty() {
 		req := l.pendingPushRequests.First()
+		if l.closing {
+			// If the queue is closing, reject all pending requests
+			req.resp <- false
+			continue
+		}
 		if !l.canFitPushRequest(req) {
+			// We're out of space, the rest of the blocked requests will have
+			// to wait.
 			break
 		}
 		l.doInsert(req)
