@@ -209,7 +209,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: EmacOS x86_64 Unit Tests"
+              context: "metricbeat: macOS x86_64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
