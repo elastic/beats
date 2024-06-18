@@ -33,6 +33,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	"github.com/elastic/beats/v7/libbeat/version"
 	mock "github.com/elastic/mock-es/pkg/api"
 )
 
@@ -116,8 +117,10 @@ func TestHeaders(t *testing.T) {
 
 func TestUserAgentHeader(t *testing.T) {
 	metricsReg := metrics.NewRegistry()
+	version.SetPackageVersion("8.15.0")
 
 	mux := http.NewServeMux()
+	// create a fake elasticsearch endpoint to track the user-agent
 	mockHandler := mock.NewAPIHandler(uuid.New(), "", metricsReg, time.Now().Add(time.Hour), 0, 0, 0, 0, 0)
 	mux.Handle("/", mockHandler)
 	server := httptest.NewServer(mux)
@@ -133,7 +136,7 @@ func TestUserAgentHeader(t *testing.T) {
 	err = conn.Connect()
 	require.NoError(t, err)
 
-	// search mock metrics for our user-agent string
+	// the metrics object passed to the mock handler contains a list of reported user-agents, search those
 	found := false
 	for key := range metricsReg.GetAll() {
 		if strings.Contains(key, "testbeat-Agent") {
