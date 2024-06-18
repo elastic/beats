@@ -597,6 +597,14 @@ steps:
                 - metricbeat/
                 - osquerybeat/
                 - packetbeat/
+
+                - x-pack/auditbeat/
+                - x-pack/filebeat/
+                - x-pack/heartbeat/
+                - x-pack/metricbeat/
+                - x-pack/osquerybeat/
+                - x-pack/packetbeat/
+
                 - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/

@@ -2,13 +2,33 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
 
 steps:
   - group: "Agentbeat tests"
     key: "agentbeat-mandatory-tests"
 
     steps:
-      - label: ":linux: Agentbeat/Packaging Linux"
+      - label: "Agentbeat unit tests Linux"
+        key: "agentbeat-unit-tests-linux"
+        command: |
+          cd x-pack/agentbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/agentbeat: unit tests"
+
+      - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -17,8 +37,11 @@ steps:
           set -euo pipefail
           cd x-pack/agentbeat
           mage package
+          mage goIntegTest
         artifact_paths:
-          - build/distributions/**/*
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
         retry:
           automatic:
             - limit: 2
