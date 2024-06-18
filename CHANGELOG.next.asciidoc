@@ -101,6 +101,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix `namespace` filter option on `add_kubernetes_metadata` processor. {pull}[]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
