@@ -18,6 +18,10 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  ARCH_UNIX_X86_64: "-arch amd64"
+  ARCH_MINGW_X86_64: "-arch 386"
+  ARCH_UNIX_ARM_64: "-arch arm"
+
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
   # Integration Tests
@@ -60,6 +64,8 @@ steps:
     key: "filebeat-mandatory-tests"
     steps:
       - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd filebeat
           mage build unitTest
@@ -78,6 +84,8 @@ steps:
               context: "filebeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: Filebeat: Go Integration Tests"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd filebeat
           mage goIntegTest
@@ -96,6 +104,8 @@ steps:
               context: "filebeat: Go Integration Tests"
 
       - label: ":ubuntu: Filebeat: Python Integration Tests"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd filebeat
           mage pythonIntegTest
@@ -115,6 +125,8 @@ steps:
 
       - label: ":windows: Filebeat: Win 2016 Unit Tests"
         key: "windows-2016-unit-tests"
+        env:
+          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -136,6 +148,8 @@ steps:
 
       - label: ":windows: Filebeat: Win 2022 Unit Tests"
         key: "windows-2022-unit-tests"
+        env:
+          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -163,6 +177,8 @@ steps:
       - label: ":mac: Filebeat: macOS x86_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -184,6 +200,8 @@ steps:
       - label: ":mac: Filebeat: macOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -205,6 +223,8 @@ steps:
       - label: ":ubuntu: Filebeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-test"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd filebeat
           mage build unitTest
@@ -229,6 +249,8 @@ steps:
     steps:
       - label: ":windows: Filebeat: Win 2019 Unit Tests"
         key: "windows-extended-2019"
+        env:
+          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -250,6 +272,8 @@ steps:
 
       - label: ":windows: Filebeat: Win 11 Unit Tests"
         key: "windows-extended-11"
+        env:
+          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -271,6 +295,8 @@ steps:
 
       - label: ":windows: Filebeat: Win 10 Unit Tests"
         key: "windows-extended-10"
+        env:
+          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -302,6 +328,9 @@ steps:
     steps:
       - label: ":ubuntu: Filebeat: Packaging Linux"
         key: "packaging-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd filebeat
           mage package
@@ -315,8 +344,6 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "filebeat: Packaging Linux"
