@@ -159,9 +159,9 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 		st.ReportLatency(took)
 	}
 
-	st.Dropped(dropped)
+	st.PermanentErrors(dropped)
 
-	st.Acked(len(events) - dropped)
+	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }

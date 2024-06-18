@@ -272,7 +272,15 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if factory == nil {
 		factory = c.queueFactory
 	}
-	queueObserver := queue.NewQueueObserver(c.monitors.Metrics)
+	// Queue metrics are reported under the pipeline namespace
+	var pipelineMetrics *monitoring.Registry
+	if c.monitors.Metrics != nil {
+		pipelineMetrics := c.monitors.Metrics.GetRegistry("pipeline")
+		if pipelineMetrics == nil {
+			pipelineMetrics = c.monitors.Metrics.NewRegistry("pipeline")
+		}
+	}
+	queueObserver := queue.NewQueueObserver(pipelineMetrics)
 
 	queue, err := factory(logger, queueObserver, c.inputQueueSize, outGrp.EncoderFactory)
 	if err != nil {

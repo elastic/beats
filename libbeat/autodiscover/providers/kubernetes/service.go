@@ -74,8 +74,9 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Namespace:   config.Namespace,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)

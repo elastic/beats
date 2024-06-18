@@ -113,6 +113,9 @@ func NewQueue(
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
+	if observer == nil {
+		observer = queue.NewQueueObserver(nil)
+	}
 
 	if settings.MaxBufferSize > 0 &&
 		settings.MaxBufferSize < settings.MaxSegmentSize*2 {

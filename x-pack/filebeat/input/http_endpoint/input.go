@@ -24,7 +24,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -327,10 +326,9 @@ func (s *server) getErr() error {
 
 func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
-		ctx:         ctx,
-		log:         log,
-		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
+		ctx:      ctx,
+		log:      log,
+		txBaseID: newID(),
 
 		publish: pub,
 		metrics: metrics,

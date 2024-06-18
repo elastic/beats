@@ -131,10 +131,8 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
-	// for pending events to be ACKed.
-	c.closeOnce.Do(func() {
-		c.isOpen.Store(false)
+	if c.isOpen.Swap(false) {
+		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 
 		c.logger.Debug("client: closing acker")
@@ -157,7 +155,7 @@ func (c *client) Close() error {
 			}
 			c.logger.Debug("client: done closing processors")
 		}
-	})
+	}
 	return nil
 }
 

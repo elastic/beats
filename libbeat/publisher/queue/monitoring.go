@@ -63,6 +63,7 @@ type queueObserver struct {
 
 type nilObserver struct{}
 
+// Creates queue metrics in the given registry under the path "queue".
 func NewQueueObserver(metrics *monitoring.Registry) Observer {
 	if metrics == nil {
 		return nilObserver{}

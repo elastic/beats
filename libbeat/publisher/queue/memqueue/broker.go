@@ -68,15 +68,15 @@ type broker struct {
 	// through this channel so ackLoop can monitor them for acknowledgments.
 	consumedChan chan batchList
 
-	// observer is a metrics observer that the queue should use to report
-	// internal state.
-	observer queue.Observer
-
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
 	// safe to free these events and advance the queue by sending the
 	// acknowledged event count to this channel.
 	deleteChan chan int
+
+	// closingChan is closed when the queue has processed a close request.
+	// It's used to prevent producers from blocking on a closing queue.
+	closingChan chan struct{}
 
 	///////////////////////////////
 	// internal goroutine state
@@ -176,6 +176,9 @@ func newQueue(
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
+	if observer == nil {
+		observer = queue.NewQueueObserver(nil)
+	}
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
@@ -210,12 +213,11 @@ func newQueue(
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
-
-		observer: observer,
+		closingChan:  make(chan struct{}),
 	}
 	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
-	b.runLoop = newRunLoop(b)
+	b.runLoop = newRunLoop(b, observer)
 	b.ackLoop = newACKLoop(b)
 
 	observer.MaxEvents(settings.Events)

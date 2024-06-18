@@ -18,9 +18,11 @@
 package memqueue
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/fifo"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // runLoop internal state. These fields could mostly be local variables
@@ -37,6 +39,9 @@ type runLoop struct {
 	// underlying array (which is important when the queue has no maximum event
 	// count).
 	buf circularBuffer
+
+	// observer is a metrics observer used to report internal queue state.
+	observer queue.Observer
 
 	// The index of the oldest entry in the underlying circular buffer.
 	bufferStart entryIndex
@@ -83,7 +88,7 @@ type runLoop struct {
 	closing bool
 }
 
-func newRunLoop(broker *broker) *runLoop {
+func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
 	var timer *time.Timer
 
 	// Create the timer we'll use for get requests, but stop it until a
@@ -104,6 +109,7 @@ func newRunLoop(broker *broker) *runLoop {
 
 	return &runLoop{
 		broker:   broker,
+		observer: observer,
 		getTimer: timer,
 		buf:      newCircularBuffer(eventBufSize),
 	}
@@ -175,14 +181,10 @@ func (l *runLoop) runIteration() {
 		l.pendingGetRequest = nil
 	}
 }
-
 func (l *runLoop) handleGetRequest(req *getRequest) {
-	// Backwards compatibility: when using event-based limits, get requests
-	// are capped by settings.MaxGetRequest.
-	if !l.broker.useByteLimits() {
-		if req.entryCount > l.broker.settings.MaxGetRequest {
-			req.entryCount = l.broker.settings.MaxGetRequest
-		}
+	// When using event-based limits, requests are capped by settings.MaxGetRequest.
+	if !l.broker.useByteLimits() && req.entryCount > l.broker.settings.MaxGetRequest {
+		req.entryCount = l.broker.settings.MaxGetRequest
 	}
 
 	if l.getRequestShouldBlock(req) {
@@ -206,6 +208,7 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 		return req.byteCount <= 0 || availableBytes >= req.byteCount
 	}
 	availableEntries := l.eventCount - l.consumedEventCount
+	fmt.Printf("hi fae, getRequestShouldBlock for %v entries while there are %v available\n", req.entryCount, availableEntries)
 	return req.entryCount <= 0 || availableEntries >= req.entryCount
 }
 
@@ -242,12 +245,17 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 
 	batch := newBatch(l.buf, startIndex, batchEntryCount)
 
+	batchBytes := 0
+	for i := 0; i < batchEntryCount; i++ {
+		batchBytes += batch.entry(i).eventSize
+	}
+
 	// Send the batch to the caller and update internal state
 	req.responseChan <- batch
 	l.consumedBatches.Add(batch)
 	l.consumedEventCount += batchEntryCount
 	l.consumedByteCount += batchByteCount
-	l.broker.observer.ConsumeEvents(batchEntryCount, batchByteCount)
+	l.observer.ConsumeEvents(batchEntryCount, batchByteCount)
 }
 
 func (l *runLoop) handleDelete(deletedEntryCount int) {
@@ -264,7 +272,7 @@ func (l *runLoop) handleDelete(deletedEntryCount int) {
 	l.byteCount -= deletedByteCount
 	l.consumedEventCount -= deletedEntryCount
 	l.consumedByteCount -= deletedByteCount
-	l.broker.observer.RemoveEvents(deletedEntryCount, deletedByteCount)
+	l.observer.RemoveEvents(deletedEntryCount, deletedByteCount)
 	if l.closing && l.eventCount == 0 {
 		// Our last events were acknowledged during shutdown, signal final shutdown
 		l.broker.ctxCancel()
@@ -353,6 +361,7 @@ func (l *runLoop) doInsert(req pushRequest) {
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
+	l.observer.AddEvent(req.eventSize)
 
 	// Report success to the caller
 	req.resp <- true
