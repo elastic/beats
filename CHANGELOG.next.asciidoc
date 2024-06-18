@@ -278,6 +278,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
 - Add request trace support for Okta and EntraID entity analytics providers. {pull}39821[39821]
 - Fix handling of infinite rate values in CEL rate limit handling logic. {pull}39940[39940]
+- Allow elision of set and append failure logging. {issue}34544[34544] {pull}39929[39929]
 
 *Auditbeat*
 

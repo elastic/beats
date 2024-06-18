@@ -385,6 +385,44 @@ var testCases = []struct {
 		},
 	},
 	{
+		name: "pagination_not_log_fail",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       time.Millisecond,
+			"request.method": http.MethodGet,
+			"response.split": map[string]interface{}{
+				"target": "body.items",
+				"transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.page",
+							"value":  "[[.last_response.page]]",
+						},
+					},
+				},
+			},
+			"response.pagination": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":                 "url.params.page",
+						"value":                  "[[.last_response.body.nextPageToken]]",
+						"fail_on_template_error": true,
+						"do_not_log_failure":     true,
+					},
+				},
+			},
+		},
+		handler: paginationHandler(),
+		expected: []string{
+			`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+		},
+	},
+	{
 		name: "first_event",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
@@ -749,6 +787,37 @@ var testCases = []struct {
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
+					},
+				},
+			},
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.records[:].id",
+					},
+				},
+			},
+		},
+		handler: defaultHandler(http.MethodGet, "", ""),
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name:        "pagination_when_used_with_chaining_not_log_fail",
+		setupServer: newChainPaginationTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"response.pagination": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":                 "url.value",
+						"value":                  "[[.last_response.body.nextLink]]",
+						"fail_on_template_error": true,
+						"do_not_log_failure":     true,
 					},
 				},
 			},
