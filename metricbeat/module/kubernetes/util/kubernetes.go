@@ -29,13 +29,14 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type kubernetesConfig struct {
@@ -281,8 +282,7 @@ func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.
 }
 
 func isNamespaced(resourceName string) bool {
-	if resourceName == NodeResource || resourceName == PersistentVolumeResource || resourceName == StorageClassResource ||
-		resourceName == NamespaceResource {
+	if resourceName == NodeResource || resourceName == PersistentVolumeResource || resourceName == StorageClassResource {
 		return false
 	}
 	return true
