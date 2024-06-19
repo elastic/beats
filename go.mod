@@ -13,7 +13,6 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/magefile/mage v1.15.0
-	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/shirou/gopsutil/v3 v3.21.12
 	github.com/stretchr/testify v1.9.0
 	go.elastic.co/go-licence-detector v0.5.0
