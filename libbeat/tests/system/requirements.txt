@@ -1,4 +1,4 @@
-requests==2.31.0
+requests==2.32.2
 urllib3==1.26.18
 docker==6.1.3
 docker-compose @ git+https://github.com/pkoutsovasilis/compose@v1_fix
