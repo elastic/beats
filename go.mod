@@ -146,7 +146,6 @@ require (
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71 // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
-	github.com/xdg/scram v1.0.3
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.0
 	go.etcd.io/bbolt v1.3.6
@@ -228,6 +227,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/tklauser/go-sysconf v0.3.10
+	github.com/xdg-go/scram v1.1.2
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
@@ -376,9 +376,7 @@ require (
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
-	github.com/xdg-go/scram v1.0.2 // indirect
-	github.com/xdg-go/stringprep v1.0.2 // indirect
-	github.com/xdg/stringprep v1.0.3 // indirect
+	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
