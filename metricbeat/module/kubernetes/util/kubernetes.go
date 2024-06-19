@@ -590,8 +590,8 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	var specificMetaGen metadata.MetaGen  //nolint:all
-	var generalMetaGen *metadata.Resource //nolint:all
+	var specificMetaGen metadata.MetaGen  //nolint:unused // False positive, ignore the lint error that it is not used
+	var generalMetaGen *metadata.Resource //nolint:unused // False positive, ignore the lint error that it is not used
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
@@ -604,11 +604,11 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	// updateFunc to be used as the resource watcher's add and update handler.
+	// updateFunc to be used as the resource watchers add and update handler.
 	// The handler function is executed when a watcher is triggered(i.e. new/updated resource).
-	// It is responsible for generating the metadata for a detected resource by executing the metadata generator's Generate method.
+	// It is responsible for generating the metadata for a detected resource by executing the metadata generators Generate method.
 	// It is a common handler for all resource watchers. The kind of resource(e.g. pod or deployment) is checked inside the function.
-	// It returns a map of a resourse identifier(i.e namespace-resource_name) as key and the metadata as value.
+	// It returns a map of a resource identifier(i.e. namespace-resource_name) as key and the metadata as value.
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
@@ -691,7 +691,7 @@ func NewResourceMetadataEnricher(
 	indexFunc := func(e mapstr.M) string {
 		name := getString(e, "name")
 		namespace := getString(e, mb.ModuleDataKey+".namespace")
-		id := ""
+		var id string
 		if name != "" && namespace != "" {
 			id = join(namespace, name)
 		} else if namespace != "" {
