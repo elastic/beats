@@ -19,10 +19,9 @@ package cpu
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/opt"
 )
@@ -38,7 +37,7 @@ func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
 func parseCPULine(line string) (CPU, error) {
 	cpuData := CPU{}
 	fields := strings.Fields(line)
-	var errs multierror.Errors
+	var errs []error
 
 	tryParseUint := func(name, field string) (v opt.Uint) {
 		u, err := touint(field)
@@ -55,5 +54,5 @@ func parseCPULine(line string) (CPU, error) {
 	cpuData.Sys = tryParseUint("sys", fields[3])
 	cpuData.Idle = tryParseUint("idle", fields[4])
 
-	return cpuData, errs.Err()
+	return cpuData, errors.Join(errs...)
 }
