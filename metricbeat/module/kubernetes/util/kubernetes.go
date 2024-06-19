@@ -590,8 +590,8 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	var specificMetaGen metadata.MetaGen  //nolint:unused // False positive, ignore the lint error that it is not used
-	var generalMetaGen *metadata.Resource //nolint:unused // False positive, ignore the lint error that it is not used
+	var specificMetaGen metadata.MetaGen
+	var generalMetaGen *metadata.Resource
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
