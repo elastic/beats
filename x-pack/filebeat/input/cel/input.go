@@ -13,9 +13,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -740,7 +742,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	var trace *httplog.LoggingRoundTripper
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -758,6 +760,25 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
 		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
+	} else if cfg.Resource.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
+		err = os.Remove(cfg.Resource.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
+		}
+		paths, err := filepath.Glob(base + "-*" + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 
 	if reg != nil {
