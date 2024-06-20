@@ -153,7 +153,7 @@ func (s *Server) Start() error {
 	if ok := certPool.AppendCertsFromPEM(s.ca.Crt()); !ok {
 		return errors.New("failed to append root CA", errors.TypeSecurity)
 	}
-	//nolint:gosec // G402: TLS MinVersion too low.
+	//nolint:gosec // FIXME: https://github.com/elastic/ingest-dev/issues/3474
 	creds := credentials.NewTLS(&tls.Config{
 		ClientAuth:     tls.RequireAndVerifyClientCert,
 		ClientCAs:      certPool,
