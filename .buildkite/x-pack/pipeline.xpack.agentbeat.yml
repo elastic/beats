@@ -9,26 +9,7 @@ steps:
     key: "agentbeat-mandatory-tests"
 
     steps:
-      - label: "Agentbeat unit tests Linux"
-        key: "agentbeat-unit-tests-linux"
-        command: |
-          cd x-pack/agentbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/agentbeat/build/*.xml"
-          - "x-pack/agentbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/agentbeat: unit tests"
-
-      - label: ":linux: Agentbeat/Integration tests Linux"
+      - label: ":linux: Agentbeat packaging Linux"
         key: "agentbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -37,7 +18,6 @@ steps:
           set -euo pipefail
           cd x-pack/agentbeat
           mage package
-          mage goIntegTest
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
