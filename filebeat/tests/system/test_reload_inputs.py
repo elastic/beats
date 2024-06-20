@@ -91,8 +91,6 @@ class Test(BaseTest):
             inputs=False,
         )
 
-        proc = self.start_beat()
-
         os.mkdir(self.working_dir + "/logs/")
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
@@ -102,6 +100,8 @@ class Test(BaseTest):
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
+
+        proc = self.start_beat()
 
         self.wait_until(lambda: self.output_lines() == 1)
 
