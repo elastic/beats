@@ -299,7 +299,7 @@ nginx_sts_server_session_seconds{listen="TCP:8091:127.0.0.1",port="8091",protoco
 
 	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
-		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error: %v", ContentTypeTextFormat, err)
 	}
 	require.ElementsMatch(t, expected, result)
 }
