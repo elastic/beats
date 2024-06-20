@@ -19,6 +19,7 @@ package pageinfo
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -82,7 +83,7 @@ func readPageFile(log *logp.Logger, reader *bufio.Reader) (pageInfo, error) {
 	for {
 		raw, err := reader.ReadString('\n')
 
-		if err == io.EOF || err == io.ErrUnexpectedEOF {
+		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 			break
 		}
 
