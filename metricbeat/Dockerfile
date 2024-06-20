@@ -26,7 +26,7 @@ RUN pip3 install --upgrade setuptools==47.3.2
 RUN pip3 install --upgrade PyYAML==6.0.1
 RUN pip3 install requests==2.32.3
 RUN pip3 install urllib3==1.26.19
-RUN pip3 install docker==7.0.1
+RUN pip3 install docker==7.1.0
 RUN pip3 install git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
 
 # Oracle instant client
