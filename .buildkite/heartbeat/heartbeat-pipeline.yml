@@ -83,7 +83,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":rhel: Heartbeat: RHEL9 Unit Tests"
+      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -101,9 +101,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: RHEL9 Unit Tests"
+              context: "heartbeat: Rhel9 Unit Tests"
 
-      - label: ":windows: Heartbeat: Win 2016 Unit Tests"
+      - label: ":windows: Win-2016 Unit Tests"
         key: "windows-2016"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -123,9 +123,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Win 2016 Unit Tests"
+              context: "heartbeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Heartbeat: Win 2022 Unit Test"
+      - label: ":windows: Heartbeat: Win-2022 Unit Test"
         key: "windows-2022"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -145,9 +145,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Win 2022 Unit Tests"
+              context: "heartbeat: Win-2022 Unit Tests"
 
-      - label: ":ubuntu: Heartbeat: Go Integration Tests"
+      - label: ":ubuntu: Heartbeat Go (Module) Integration Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -176,7 +176,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Heartbeat: Python Integration Tests"
+      - label: ":ubuntu: Heartbeat Python (Module) Integration Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -202,7 +202,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Python Integration Tests"
 
-  - group: "Extended Tests"
+  - group: "Heartbeat Extended Tests"
     key: "heartbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
@@ -227,7 +227,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: Heartbeat: macOS x86_64 Unit Tests"
+      - label: ":mac: macOS x86_64 Unit Tests"
         key: "macos-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
@@ -250,7 +250,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Heartbeat: macOS arm64 Unit Tests"
+      - label: ":mac: macOS arm64 Unit Tests"
         key: "macos-arm-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
@@ -273,12 +273,12 @@ steps:
           - github_commit_status:
               context: "heartbeat: macOS arm64 Unit Tests"
 
-  - group: "Extended Windows Tests"
+  - group: "Heartbeat Windows Extended Testing"
     key: "heartbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Heartbeat: Win 2019 Unit Tests"
+      - label: ":windows: Win-2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -298,9 +298,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Win 2019 Unit Tests"
+              context: "heartbeat: Win-2019 Unit Tests"
 
-      - label: ":windows: Heartbeat: Win 11 Unit Tests"
+      - label: ":windows: Win-11 Unit Tests"
         key: "heartbeat-windows-extended-11"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -320,9 +320,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Win 11 Unit Tests"
+              context: "heartbeat: Win-11 Unit Tests"
 
-      - label: ":windows: Heartbeat: Win 10 Unit Tests"
+      - label: ":windows: Win-10 Unit Tests"
         key: "heartbeat-windows-extended-10"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -342,7 +342,7 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Win 10 Unit Tests"
+              context: "heartbeat: Win-10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -351,11 +351,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "heartbeat-mandatory-tests"
 
-  - group: "Packaging"
+  - group: "Heartbeat Packaging"
     key: "heartbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Heartbeat: Packaging Linux"
+      - label: ":ubuntu: Heartbeat Packaging Linux"
         key: "heartbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -375,7 +375,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Packaging Linux"
 
-      - label: ":ubuntu: Heartbeat: Packaging Linux arm64"
+      - label: ":linux: Heartbeat Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
