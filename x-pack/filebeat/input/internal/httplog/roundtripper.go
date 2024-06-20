@@ -15,9 +15,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"sync/atomic"
 	"time"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -36,22 +36,21 @@ type contextKey string
 // responses to the provided logger. Transaction creation is logged to log.
 func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
-		transport:   next,
-		maxBodyLen:  maxBodyLen,
-		txLog:       logger,
-		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
-		log:         log,
+		transport:  next,
+		maxBodyLen: maxBodyLen,
+		txLog:      logger,
+		txBaseID:   newID(),
+		log:        log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
-	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
-	txLog       *zap.Logger    // Destination logger.
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	maxBodyLen  int           // The maximum length of a body. Longer bodies will be truncated.
+	txLog       *zap.Logger   // Destination logger.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 	log         *logp.Logger
 }
 
@@ -220,7 +219,7 @@ func (rt *LoggingRoundTripper) TxID() string {
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
-	count := rt.txIDCounter.Inc()
+	count := rt.txIDCounter.Add(1)
 	return rt.formatTxID(count)
 }
 

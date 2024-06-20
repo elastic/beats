@@ -676,6 +676,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			if err != nil {
 				return -1, fmt.Errorf("failed to collect response: %w", err)
 			}
+
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {
 				finalResps = append(finalResps, httpResp)
@@ -701,12 +702,6 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
-
-	defer func() {
-		if httpResp != nil && httpResp.Body != nil {
-			httpResp.Body.Close()
-		}
-	}()
 
 	return n, nil
 }
