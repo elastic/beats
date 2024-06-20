@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
 - Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
 - Made GCS input GA and updated docs accordingly. {pull}37127[37127]
+- Fix handling of infinite rate values in CEL rate limit handling logic. {pull}39940[39940]
 
 *Auditbeat*
 
