@@ -17,35 +17,35 @@ GO_VERSION=$(cat .go-version)
 #export WORKSPACE
 #export GO_VERSION
 
-exportVars() {
-  local platform_type="$(uname)"
-  local arch_type="$(uname -m)"
-  if [ "${arch_type}" == "x86_64" ]; then
-    case "${platform_type}" in
-      Linux|Darwin)
-        export GOX_FLAGS="-arch amd64"
-        export testResults="**/build/TEST*.xml"
-        export artifacts="**/build/TEST*.out"
-        ;;
-      MINGW*)
-        export GOX_FLAGS="-arch 386"
-        export testResults="**\\build\\TEST*.xml"
-        export artifacts="**\\build\\TEST*.out"
-        ;;
-    esac
-  elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
-    export GOX_FLAGS="-arch arm"
-    export testResults="**/build/TEST*.xml"
-    export artifacts="**/build/TEST*.out"
-  else
-    echo "Unsupported OS"
-  fi
-}
+#exportVars() {
+#  local platform_type="$(uname)"
+#  local arch_type="$(uname -m)"
+#  if [ "${arch_type}" == "x86_64" ]; then
+#    case "${platform_type}" in
+#      Linux|Darwin)
+#        export GOX_FLAGS="-arch amd64"
+#        export testResults="**/build/TEST*.xml"
+#        export artifacts="**/build/TEST*.out"
+#        ;;
+#      MINGW*)
+#        export GOX_FLAGS="-arch 386"
+#        export testResults="**\\build\\TEST*.xml"
+#        export artifacts="**\\build\\TEST*.out"
+#        ;;
+#    esac
+#  elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
+#    export GOX_FLAGS="-arch arm"
+#    export testResults="**/build/TEST*.xml"
+#    export artifacts="**/build/TEST*.out"
+#  else
+#    echo "Unsupported OS"
+#  fi
+#}
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
-#  exportVars
-  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
-fi
+#if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
+##  exportVars
+#  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
+#fi
 
 #if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline"  || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
 #  source .buildkite/scripts/common.sh
