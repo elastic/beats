@@ -29,6 +29,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          set -eo pipefail
           make -C x-pack/filebeat check update
           make check-no-changes
         retry:

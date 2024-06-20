@@ -22,6 +22,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          set -eo pipefail
           make -C libbeat check update
           make check-no-changes
         retry:
