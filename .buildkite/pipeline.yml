@@ -29,7 +29,7 @@ steps:
       - ".buildkite/scripts/test.ps1"
     agents:
       provider: "gcp"
-      image: "family/ci-windows-2019"
+      image: "family/core-windows-2019"
     artifact_paths:
       - "junit-*.xml"
 
