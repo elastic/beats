@@ -1,7 +1,7 @@
-requests==2.31.0
+requests==2.32.2
 urllib3==1.26.18
-docker==6.1.3
-docker-compose @ git+https://github.com/pkoutsovasilis/compose@v1_fix
+docker @ git+https://github.com/pkoutsovasilis/docker-py@6.1.3_fix
+docker-compose @ git+https://github.com/pkoutsovasilis/compose@v1_fix_custom_docker
 async-timeout==4.0.3
 attrs==19.3.0
 autopep8==1.5.4
