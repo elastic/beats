@@ -20,10 +20,10 @@
 package journald
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
-	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
@@ -181,7 +181,7 @@ func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.
 		withTransports(inp.Transports),
 		withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
-		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
+		return nil, fmt.Errorf("failed to create reader for %s journal: %w", src.Name(), err)
 	}
 
 	return reader, nil

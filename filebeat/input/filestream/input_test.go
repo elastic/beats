@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -113,6 +114,48 @@ paths:
 			}
 		})
 	})
+}
+
+func TestTakeOverTags(t *testing.T) {
+	testCases := []struct {
+		name     string
+		takeOver bool
+		testFunc func(t *testing.T, event beat.Event)
+	}{
+		{
+			name:     "test-take_over-true",
+			takeOver: true,
+			testFunc: func(t *testing.T, event beat.Event) {
+				tags, err := event.GetValue("tags")
+				require.NoError(t, err)
+				require.Contains(t, tags, "take_over")
+			},
+		},
+		{
+			name:     "test-take_over-false",
+			takeOver: false,
+			testFunc: func(t *testing.T, event beat.Event) {
+				_, err := event.GetValue("tags")
+				require.ErrorIs(t, err, mapstr.ErrKeyNotFound)
+			},
+		},
+	}
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			filename := generateFile(t, t.TempDir(), 5)
+			cfg := fmt.Sprintf(`
+type: filestream
+prospector.scanner.check_interval: 1s
+take_over: %t
+paths:
+    - %s`, testCase.takeOver, filename)
+			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
+			events := runner(t)
+			for _, event := range events {
+				testCase.testFunc(t, event)
+			}
+		})
+	}
 }
 
 // runFilestreamBenchmark runs the entire filestream input with the in-memory registry and the test pipeline.

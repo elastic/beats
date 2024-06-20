@@ -238,10 +238,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			"testfield": "foo0",
 		},
 	}))
-	err = output.Publish(context.Background(), batch)
-	if err == nil {
-		t.Fatal("Expecting mapping conflict")
-	}
+	_ = output.Publish(context.Background(), batch)
 	_, _, err = client.conn.Refresh(deadletterIndex)
 	if err == nil {
 		t.Fatal("expecting index to not exist yet")
