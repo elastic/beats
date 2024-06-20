@@ -31,11 +31,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Check/Update"
+  - group: "Auditbeat Check/Update"
     key: "auditbeat-check-update"
 
     steps:
-      - label: "Auditbeat: Run check/update"
+      - label: "Run check/update"
         command: |
           set -eo pipefail
           make -C auditbeat check update
@@ -59,7 +59,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "auditbeat-check-update"
 
-  - group: "Mandatory Testing"
+  - group: "Auditbeat Mandatory Testing"
     key: "auditbeat-mandatory-tests"
 
     steps:
@@ -84,7 +84,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":rhel: Auditbeat: RHEL9 Unit Tests"
+      - label: ":rhel: Auditbeat Unit Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -103,9 +103,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: RHEL9 Unit Tests"
+              context: "auditbeat: RHEL Unit Tests"
 
-      - label: ":windows: Auditbeat: Win 2016 Unit Tests"
+      - label: ":windows: Auditbeat Win-2016 Unit Tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
@@ -125,9 +125,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Win 2016 Unit Tests"
+              context: "auditbeat: Windows 2016 Unit Tests"
 
-      - label: ":windows: Auditbeat: Win 2022 Unit Tests"
+      - label: ":windows: Auditbeat Win-2022 Unit Tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
@@ -147,9 +147,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Win 2022 Unit Tests"
+              context: "auditbeat: Windows 2022 Unit Tests"
 
-      - label: ":ubuntu: Auditbeat: Crosscompile"
+      - label: ":linux: Auditbeat Crosscompile"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -165,7 +165,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Crosscompile"
 
-  - group: "Extended Tests"
+  - group: "Auditbeat Extended Tests"
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
 
@@ -239,7 +239,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: Auditbeat: macOS x86_64 Unit Tests"
+      - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
@@ -261,7 +261,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Auditbeat: macOS arm64 Unit Tests"
+      - label: ":mac: Auditbeat macOS arm64 ARM Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
           GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
@@ -283,12 +283,12 @@ steps:
           - github_commit_status:
               context: "auditbeat: macOS arm64 Unit Tests"
 
-  - group: "Extended Windows Tests"
+  - group: "Auditbeat Windows Extended Testing"
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Auditbeat: Win 2019 Unit Tests"
+      - label: ":windows: Auditbeat Win-2019 Unit Tests"
         key: "auditbeat-extended-win-2019-unit-tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -309,9 +309,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Win 2019 Unit Tests"
+              context: "auditbeat: Extended Windows 2019 Unit Tests"
 
-      - label: ":windows: Auditbeat: Win 10 Unit Tests"
+      - label: ":windows: Auditbeat Win-10 Unit Tests"
         key: "auditbeat-extended-win-10-unit-tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -332,9 +332,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Win 10 Unit Tests"
+              context: "auditbeat: Extended Windows 10 Unit Tests"
 
-      - label: ":windows: Auditbeat: Win 11 Unit Tests"
+      - label: ":windows: Auditbeat Win-11 Unit Tests"
         key: "auditbeat-extended-win-11-unit-tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -355,7 +355,7 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Win 11 Unit Tests"
+              context: "auditbeat: Extended Windows 11 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -364,11 +364,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "auditbeat-mandatory-tests"
 
-  - group: "Packaging"
+  - group: "Auditbeat Packaging"
     key: "auditbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Auditbeat: Packaging Linux"
+      - label: ":ubuntu: Auditbeat/Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -389,7 +389,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Packaging Linux"
 
-      - label: ":ubuntu: Auditbeat: Packaging Linux arm64"
+      - label: ":linux: Auditbeat/Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64"
         env:
           PLATFORMS: "linux/arm64"
