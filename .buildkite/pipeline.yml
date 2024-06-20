@@ -3,7 +3,7 @@
 env:
   SETUP_GVM_VERSION: 'v0.5.2'
   LINUX_AGENT_IMAGE: "golang:${GO_VERSION}"
-  WINDOWS_AGENT_IMAGE: "family/ci-windows-2022"
+  WINDOWS_AGENT_IMAGE: "family/core-windows-2022"
 
 steps:
   - label: ":golangci-lint: Lint"
