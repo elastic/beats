@@ -86,6 +86,7 @@ steps:
         key: "mandatory-int-test"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
+          TEST_TAGS: "oracle"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
@@ -111,6 +112,7 @@ steps:
         key: "mandatory-python-int-test"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
+          TEST_TAGS: "oracle"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
