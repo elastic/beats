@@ -20,11 +20,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Check/Update"
+  - group: "libbeat Check/Update"
     key: "libbeat-check-update"
 
     steps:
-      - label: "Libbeat: Run check/update"
+      - label: "Run check/update"
         command: |
           set -eo pipefail
           make -C libbeat check update
@@ -98,6 +98,8 @@ steps:
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           cd libbeat
@@ -118,6 +120,8 @@ steps:
 
       - label: ":ubuntu: Libbeat: Crosscompile"
         key: "mandatory-cross-compile"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           cd libbeat
@@ -138,6 +142,8 @@ steps:
 
       - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           cd libbeat
@@ -161,6 +167,8 @@ steps:
     steps:
       - label: ":ubuntu: Libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
+        env:
+          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           cd libbeat

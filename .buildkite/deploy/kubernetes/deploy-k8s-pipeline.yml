@@ -52,7 +52,7 @@ steps:
     - label: "K8S Test/K8S version: v1.28.0"
       key: "k8s-test-128"
       env:
-        K8S_VERSION: "v1.29.0"
+        K8S_VERSION: "v1.28.0"
         MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
