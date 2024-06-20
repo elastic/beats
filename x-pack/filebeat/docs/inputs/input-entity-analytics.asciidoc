@@ -509,6 +509,18 @@ This is a list of optional query parameters. The default is `["accountEnabled", 
 "displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes",
 "alternativeSecurityIds"]`.
 
+[float]
+==== `tracer.filename`
+
+It is possible to log HTTP requests and responses to the EntraID API to a local file-system for debugging configurations.
+This option is enabled by setting the `tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
+For Example, `http-request-trace-*.ndjson`.
+
+Enabling this option compromises security and should only be used for debugging.
+
 [id="provider-okta"]
 ==== Okta User Identities (`okta`)
 
@@ -796,6 +808,18 @@ string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
 The interval in which incremental updates should occur. The interval must be
 shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
+[float]
+==== `tracer.filename`
+
+It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations.
+This option is enabled by setting the `tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
+For Example, `http-request-trace-*.ndjson`.
+
+Enabling this option compromises security and should only be used for debugging.
 
 [float]
 ==== Metrics

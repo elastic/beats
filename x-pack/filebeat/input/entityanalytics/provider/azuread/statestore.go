@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
@@ -176,7 +175,7 @@ func (s *stateStore) close(commit bool) (err error) {
 		}
 
 		if err != nil {
-			err = sderr.WrapAll([]error{err, rollbackErr}, "multiple errors during statestore close")
+			err = fmt.Errorf("multiple errors during statestore close: %w", errors.Join(err, rollbackErr))
 		} else {
 			err = rollbackErr
 		}

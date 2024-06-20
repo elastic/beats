@@ -14,6 +14,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/g8rswimmer/go-sfdc"
@@ -23,7 +24,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"

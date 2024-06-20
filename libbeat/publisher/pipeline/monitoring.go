@@ -18,15 +18,13 @@
 package pipeline
 
 import (
-	"math"
-
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type observer interface {
 	pipelineObserver
 	clientObserver
-	outputObserver
+	retryObserver
 
 	cleanup()
 }
@@ -47,18 +45,14 @@ type clientObserver interface {
 	publishedEvent()
 	// An event was rejected by the queue
 	failedPublishEvent()
+	eventsACKed(count int)
 }
 
-type outputObserver interface {
+type retryObserver interface {
 	// Events encountered too many errors and were permanently dropped.
 	eventsDropped(int)
 	// Events were sent back to an output worker after an earlier failure.
 	eventsRetry(int)
-	// The queue received acknowledgment for events from the output workers.
-	// (This may include events already reported via eventsDropped.)
-	queueACKed(n int)
-	// Report the maximum event count supported by the queue.
-	queueMaxEvents(n int)
 }
 
 // metricsObserver is used by many component in the publisher pipeline, to report
@@ -165,24 +159,12 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 func (o *metricsObserver) newEvent() {
 	o.vars.eventsTotal.Inc()
 	o.vars.activeEvents.Inc()
-	o.setPercentageFull()
-}
-
-// setPercentageFull is used interally to set the `queue.full` metric
-func (o *metricsObserver) setPercentageFull() {
-	maxEvt := o.vars.queueMaxEvents.Get()
-	if maxEvt != 0 {
-		pct := float64(o.vars.activeEvents.Get()) / float64(maxEvt)
-		pctRound := math.Round(pct/0.0005) * 0.0005
-		o.vars.percentQueueFull.Set(pctRound)
-	}
 }
 
 // (client) event is filtered out (on purpose or failed)
 func (o *metricsObserver) filteredEvent() {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
-	o.setPercentageFull()
 }
 
 // (client) managed to push an event into the publisher pipeline
@@ -190,28 +172,15 @@ func (o *metricsObserver) publishedEvent() {
 	o.vars.eventsPublished.Inc()
 }
 
+// (client) number of ACKed events from this client
+func (o *metricsObserver) eventsACKed(n int) {
+	o.vars.activeEvents.Sub(uint64(n))
+}
+
 // (client) client closing down or DropIfFull is set
 func (o *metricsObserver) failedPublishEvent() {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
-	o.setPercentageFull()
-}
-
-//
-// queue events
-//
-
-// (queue) number of events ACKed by the queue/broker in use
-func (o *metricsObserver) queueACKed(n int) {
-	o.vars.queueACKed.Add(uint64(n))
-	o.vars.activeEvents.Sub(uint64(n))
-	o.setPercentageFull()
-}
-
-// (queue) maximum queue event capacity
-func (o *metricsObserver) queueMaxEvents(n int) {
-	o.vars.queueMaxEvents.Set(uint64(n))
-	o.setPercentageFull()
 }
 
 //
@@ -239,7 +208,6 @@ func (*emptyObserver) newEvent()           {}
 func (*emptyObserver) filteredEvent()      {}
 func (*emptyObserver) publishedEvent()     {}
 func (*emptyObserver) failedPublishEvent() {}
-func (*emptyObserver) queueACKed(n int)    {}
-func (*emptyObserver) queueMaxEvents(int)  {}
+func (*emptyObserver) eventsACKed(n int)   {}
 func (*emptyObserver) eventsDropped(int)   {}
 func (*emptyObserver) eventsRetry(int)     {}

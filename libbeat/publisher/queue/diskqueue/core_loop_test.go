@@ -18,10 +18,13 @@
 package diskqueue
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestHandleProducerWriteRequest(t *testing.T) {
@@ -127,6 +130,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	for description, test := range testCases {
 		dq := &diskQueue{
 			logger:   logp.L(),
+			observer: queue.NewQueueObserver(nil),
 			settings: settings,
 			segments: test.segments,
 		}
@@ -947,6 +951,65 @@ func TestCanAcceptFrameOfSize(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestObserverAddEvent(t *testing.T) {
+	// Check that write requests accepted by the queue are reported to its
+	// metrics observer.
+	reg := monitoring.NewRegistry()
+	dq := diskQueue{
+		settings: Settings{
+			MaxBufferSize:   100000,
+			MaxSegmentSize:  1000,
+			WriteAheadLimit: 10,
+		},
+		observer: queue.NewQueueObserver(reg),
+	}
+	eventFrame := &writeFrame{serialized: make([]byte, 123)}
+	request := producerWriteRequest{
+		frame:        eventFrame,
+		responseChan: make(chan bool, 1),
+	}
+	dq.handleProducerWriteRequest(request)
+	assertRegistryUint(t, reg, "queue.added.events", 1, "handleProducerWriteRequest should report the added event")
+	assertRegistryUint(t, reg, "queue.added.bytes", eventFrame.sizeOnDisk(), "handleProducerWriteRequest should report the added bytes")
+}
+
+func TestObserverDeleteSegment(t *testing.T) {
+	// Check that the results of segment deletions are reported to the
+	// metrics observer.
+	reg := monitoring.NewRegistry()
+	dq := diskQueue{
+		logger:   logp.NewLogger("testing"),
+		observer: queue.NewQueueObserver(reg),
+	}
+	// Note the segment header size is added to the test values, because segment
+	// metadata isn't included in event metrics.
+	dq.segments.acked = []*queueSegment{
+		{
+			frameCount: 50,
+			byteCount:  1234 + segmentHeaderSize,
+		},
+		{
+			frameCount: 25,
+			byteCount:  567 + segmentHeaderSize,
+		},
+	}
+	// Handle a deletion response of length 1, which means the second acked
+	// segment shouldn't be reported yet.
+	dq.handleDeleterLoopResponse(deleterLoopResponse{results: []error{nil}})
+	assertRegistryUint(t, reg, "queue.removed.events", 50, "Deleted events should be reported")
+	assertRegistryUint(t, reg, "queue.removed.bytes", 1234, "Deleted bytes should be reported")
+
+	// Report an error, which should not change the metrics values
+	dq.handleDeleterLoopResponse(deleterLoopResponse{results: []error{errors.New("some error")}})
+	assertRegistryUint(t, reg, "queue.removed.events", 50, "Failed deletion shouldn't report any removed events")
+	assertRegistryUint(t, reg, "queue.removed.bytes", 1234, "Failed deletion shouldn't report any removed bytes")
+
+	// Now send a nil error, which should add the second segment to the metrics.
+	dq.handleDeleterLoopResponse(deleterLoopResponse{results: []error{nil}})
+	assertRegistryUint(t, reg, "queue.removed.events", 50+25, "Deleted events should be reported")
+	assertRegistryUint(t, reg, "queue.removed.bytes", 1234+567, "Deleted bytes should be reported")
 }
 
 func boolRef(b bool) *bool {
