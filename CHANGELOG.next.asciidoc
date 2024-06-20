@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
 - Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
 - Fix for MySQL/Performance - Query failure for MySQL versions below v8.0.1, for performance metric `quantile_95`. {pull}38710[38710]
+- Fix Prometheus helper text parser to store each metric family type. {pull}39743[39743]
 
 *Osquerybeat*
 
