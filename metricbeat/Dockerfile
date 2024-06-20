@@ -1,4 +1,4 @@
-FROM golang:1.21.10
+FROM golang:1.21.11
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
@@ -23,11 +23,11 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade setuptools==47.3.2
-RUN pip3 install --upgrade PyYAML==5.3.1
-RUN pip3 install requests==2.31.0
-RUN pip3 install urllib3==1.26.18
-RUN pip3 install docker==6.1.3
-RUN pip3 install git+https://github.com/pkoutsovasilis/compose@v1_fix
+RUN pip3 install --upgrade PyYAML==6.0.1
+RUN pip3 install requests==2.32.3
+RUN pip3 install urllib3==1.26.19
+RUN pip3 install docker==7.1.0
+RUN pip3 install git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
 
 # Oracle instant client
 RUN cd /usr/lib \

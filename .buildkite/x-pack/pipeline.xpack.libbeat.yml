@@ -24,6 +24,33 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
+  - group: "x-pack/libbeat Check/Update"
+    key: "x-pack-libbeat-check-update"
+    steps:
+      - label: "Run check/update"
+        command: |
+          set -eo pipefail
+          make -C x-pack/libbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: check/update"
+      
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-libbeat-check-update"
+
   - group: "x-pack/libbeat Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
 
