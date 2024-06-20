@@ -1,7 +1,7 @@
 requests==2.32.2
 urllib3==1.26.18
-docker @ git+https://github.com/pkoutsovasilis/docker-py@6.1.3_fix
-docker-compose @ git+https://github.com/pkoutsovasilis/compose@v1_fix_custom_docker
+docker==7.1.0
+docker-compose @ git+https://github.com/pkoutsovasilis/compose@v1_fix2
 async-timeout==4.0.3
 attrs==19.3.0
 autopep8==1.5.4
@@ -58,7 +58,7 @@ pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 python-dotenv==0.21.1
-PyYAML==5.3.1
+PyYAML==6.0.1
 redis==4.4.4
 semver==2.8.1
 six==1.15.0

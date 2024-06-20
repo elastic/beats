@@ -23,11 +23,11 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip3 install --upgrade pip==20.1.1
 RUN pip3 install --upgrade setuptools==47.3.2
-RUN pip3 install --upgrade PyYAML==5.3.1
+RUN pip3 install --upgrade PyYAML==6.0.1
 RUN pip3 install requests==2.32.2
 RUN pip3 install urllib3==1.26.18
-RUN pip3 install git+https://github.com/pkoutsovasilis/docker-py@6.1.3_fix
-RUN pip3 install git+https://github.com/pkoutsovasilis/compose@v1_fix_custom_docker
+RUN pip3 install docker==7.1.0
+RUN pip3 install git+https://github.com/pkoutsovasilis/compose@v1_fix2
 
 # Oracle instant client
 RUN cd /usr/lib \
