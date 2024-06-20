@@ -35,6 +35,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          set -eo pipefail
           make -C metricbeat check update
           make check-no-changes
         retry:
