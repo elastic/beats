@@ -706,7 +706,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	case float64:
 		limit = rate.Limit(r)
 	case string:
-		if !strings.EqualFold(r, "inf") {
+		if !strings.EqualFold(strings.TrimPrefix(r, "+"), "inf") && !strings.EqualFold(strings.TrimPrefix(r, "+"), "infinity") {
 			log.Errorw("unexpected value returned for rate limit "+which, "value", r, "rate_limit", mapstr.M(rateLimit))
 			return limit, false
 		}
