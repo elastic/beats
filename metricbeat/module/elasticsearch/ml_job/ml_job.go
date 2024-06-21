@@ -65,7 +65,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if mlErr != nil {
 		return mlErr
 	}
-	if !mLAvailability{
+	if !mLAvailability {
 		return nil
 	}
 

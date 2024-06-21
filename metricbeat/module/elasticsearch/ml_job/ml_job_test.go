@@ -69,7 +69,7 @@ func createEsMuxer(mlEnabled bool) *http.ServeMux {
 
 func TestMLNotAvailable(t *testing.T) {
 	tests := map[string]struct {
-		mlEnabled  bool
+		mlEnabled bool
 	}{
 		"feature_available": {
 			true,
@@ -83,7 +83,7 @@ func TestMLNotAvailable(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			mux := createEsMuxer(test.mlEnabled)
 			mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				http.Error(w, "this should never have been called", 418)
+				http.Error(w, "this should never have been called", http.StatusTeapot)
 			}))
 
 			server := httptest.NewServer(mux)
