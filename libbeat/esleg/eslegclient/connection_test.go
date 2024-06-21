@@ -26,15 +26,10 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
-	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
-	"github.com/elastic/beats/v7/libbeat/version"
-	mock "github.com/elastic/mock-es/pkg/api"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -116,36 +111,21 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestUserAgentHeader(t *testing.T) {
-	metricsReg := metrics.NewRegistry()
-	version.SetPackageVersion("8.15.0")
-
-	mux := http.NewServeMux()
-	// create a fake elasticsearch endpoint to track the user-agent
-	mockHandler := mock.NewAPIHandler(uuid.New(), "", metricsReg, time.Now().Add(time.Hour), 0, 0, 0, 0, 0)
-	mux.Handle("/", mockHandler)
-	server := httptest.NewServer(mux)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		prefix := "Elastic-testbeat-Agent"
+		if !strings.HasPrefix(r.UserAgent(), prefix) {
+			t.Errorf("User-Agent must start with '%s', got '%s'", prefix, r.UserAgent())
+		}
+		w.Write([]byte("{}"))
+	}))
 	defer server.Close()
-
 	conn, err := NewConnection(ConnectionSettings{
 		URL:              server.URL,
 		Beatname:         "testbeat",
 		UserAgentPostfix: "Agent",
 	})
 	require.NoError(t, err)
-
-	err = conn.Connect()
-	require.NoError(t, err)
-
-	// the metrics object passed to the mock handler contains a list of reported user-agents, search those
-	found := false
-	for key := range metricsReg.GetAll() {
-		if strings.Contains(key, "testbeat-Agent") {
-			found = true
-		}
-	}
-
-	require.True(t, found, "did not find user-agent in %#v", metricsReg.GetAll())
-
+	require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
 }
 
 func BenchmarkExecHTTPRequest(b *testing.B) {
