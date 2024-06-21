@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/g8rswimmer/go-sfdc"
-	"github.com/g8rswimmer/go-sfdc/soql"
+	"github.com/elastic/go-sfdc"
+	"github.com/elastic/go-sfdc/soql"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
