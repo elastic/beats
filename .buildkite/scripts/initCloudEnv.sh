@@ -14,7 +14,8 @@ exportAwsSecrets() {
   echo "~~~ Exporting AWS secrets"
   export AWS_ACCESS_KEY_ID=$awsAccessKey
   export AWS_SECRET_ACCESS_KEY=$awsSecretKey
-  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
+  #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
+  #  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 
   # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
   # - x-pack/metricbeat/module/aws/terraform.tf
@@ -27,7 +28,7 @@ terraformApply() {
   TF_VAR_CREATED_DATE=$(date +%s)
   export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
   export TF_VAR_ENVIRONMENT="ci"
-  export TF_VAR_REPO="${REPO}"
+  export TF_VAR_REPO="beats"
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 
