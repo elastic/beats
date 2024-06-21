@@ -24,9 +24,8 @@ import (
 	"math"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
-
-	"github.com/elastic/elastic-agent-libs/atomic"
 )
 
 // TsLayout is the layout to be used in the timestamp marshaling/unmarshaling.
@@ -64,9 +63,9 @@ func NewInt(r *Registry, name string, opts ...Option) *Int {
 func (v *Int) Get() int64               { return v.i.Load() }
 func (v *Int) Set(value int64)          { v.i.Store(value) }
 func (v *Int) Add(delta int64)          { v.i.Add(delta) }
-func (v *Int) Sub(delta int64)          { v.i.Sub(delta) }
-func (v *Int) Inc()                     { v.i.Inc() }
-func (v *Int) Dec()                     { v.i.Dec() }
+func (v *Int) Sub(delta int64)          { v.i.Add(-delta) }
+func (v *Int) Inc()                     { v.i.Add(1) }
+func (v *Int) Dec()                     { v.i.Add(-1) }
 func (v *Int) Visit(_ Mode, vs Visitor) { vs.OnInt(v.Get()) }
 
 // Uint is a 64bit unsigned integer variable satisfying the Var interface.
@@ -98,9 +97,9 @@ func NewUint(r *Registry, name string, opts ...Option) *Uint {
 func (v *Uint) Get() uint64      { return v.u.Load() }
 func (v *Uint) Set(value uint64) { v.u.Store(value) }
 func (v *Uint) Add(delta uint64) { v.u.Add(delta) }
-func (v *Uint) Sub(delta uint64) { v.u.Sub(delta) }
-func (v *Uint) Inc()             { v.u.Inc() }
-func (v *Uint) Dec()             { v.u.Dec() }
+func (v *Uint) Sub(delta uint64) { v.u.Add(-delta) }
+func (v *Uint) Inc()             { v.u.Add(1) }
+func (v *Uint) Dec()             { v.u.Add(^uint64(0)) }
 func (v *Uint) Visit(_ Mode, vs Visitor) {
 	value := v.Get() & (^uint64(1 << 63))
 	vs.OnInt(int64(value))
@@ -141,7 +140,7 @@ func (v *Float) Add(delta float64) {
 	for {
 		cur := v.f.Load()
 		next := math.Float64bits(math.Float64frombits(cur) + delta)
-		if v.f.CAS(cur, next) {
+		if v.f.CompareAndSwap(cur, next) {
 			return
 		}
 	}
