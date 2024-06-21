@@ -195,6 +195,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
 - Improve robustness and error reporting from packetbeat default route testing. {pull}39757[39757]
 - Move x-pack/filebeat/input/salesforce jwt import to v5. {pull}39823[39823]
+- Drop x-pack/filebeat/input dependency on github.com/lestrrat-go/jwx/v2. {pull}39968[39968]
 
 ==== Deprecated
 
