@@ -17,13 +17,14 @@ import (
 	"slices"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
+
 	"github.com/elastic/go-sfdc"
 	"github.com/elastic/go-sfdc/credentials"
 	"github.com/elastic/go-sfdc/session"
 	"github.com/elastic/go-sfdc/soql"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/hashicorp/go-retryablehttp"
-	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
