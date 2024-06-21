@@ -77,7 +77,15 @@ type InputManager struct {
 // The `Name` method must return an unique name, that will be used to identify
 // the source in the persistent state store.
 type Source interface {
+	// Name returns a unique name that will be used to identify
+	//the source in the persistent store
 	Name() string
+
+	// File returns the complete file path for this source
+	File() string
+
+	// OSID returns the OS ID for this source
+	OSID() string
 }
 
 var errNoInputRunner = errors.New("no input runner available")

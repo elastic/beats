@@ -43,7 +43,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher, config.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}
@@ -54,7 +54,8 @@ func newProspector(config config) (loginp.Prospector, error) {
 	}
 
 	logp.L().
-		With("filestream_id", config.ID).
+		Named("prospector").
+		With("input_id", config.ID).
 		Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{

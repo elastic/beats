@@ -66,9 +66,8 @@ func (c *crawler) Start(
 	configInputs *conf.C,
 	configModules *conf.C,
 ) error {
-	log := c.log
 
-	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
+	c.log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
@@ -103,7 +102,7 @@ func (c *crawler) Start(
 		}()
 	}
 
-	log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
+	c.log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
 
 	return nil
 }
@@ -145,14 +144,30 @@ func (c *crawler) startInput(
 
 	c.inputs[id] = runner
 
-	c.log.Infof("Starting input (ID: %d)", id)
+	idFields := getRunnerID(runner)
+
+	c.log.Infow(fmt.Sprintf("Starting input (ID: %d)", id), idFields...)
 	runner.Start()
 
 	return nil
 }
 
+func getRunnerID(r cfgfile.Runner) []any {
+	type inputIDer interface {
+		InputID() string
+	}
+
+	idFields := []any{}
+	idRunner, ok := r.(inputIDer)
+	if ok {
+		idFields = append(idFields, "input_id", idRunner.InputID())
+	}
+
+	return idFields
+}
+
 func (c *crawler) Stop() {
-	logp.Info("Stopping Crawler")
+	c.log.Info("Stopping Crawler")
 
 	asyncWaitStop := func(stop func()) {
 		c.wg.Add(1)
@@ -162,7 +177,7 @@ func (c *crawler) Stop() {
 		}()
 	}
 
-	logp.Info("Stopping %d inputs", len(c.inputs))
+	c.log.Infof("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
 		id, p := id, p
@@ -182,7 +197,7 @@ func (c *crawler) Stop() {
 
 	c.WaitForCompletion()
 
-	logp.Info("Crawler stopped")
+	c.log.Info("Crawler stopped")
 }
 
 func (c *crawler) WaitForCompletion() {

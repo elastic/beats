@@ -175,7 +175,7 @@ func (p *fileProspector) onFSEvent(
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
-			log.Debugf("A new file %s has been found", event.NewPath)
+			log.Debugw(fmt.Sprintf("A new file %s has been found", event.NewPath), "path", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
 			if err != nil {

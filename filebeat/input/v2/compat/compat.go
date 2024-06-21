@@ -103,12 +103,16 @@ func (f *factory) Create(
 
 	return &runner{
 		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
+		log:       f.log.Named(input.Name()).With("input_id", id),
 		agent:     &f.info,
 		sig:       ctxtool.WithCancelContext(context.Background()),
 		input:     input,
 		connector: p,
 	}, nil
+}
+
+func (r *runner) InputID() string {
+	return r.id
 }
 
 func (r *runner) SetStatusReporter(reported status.StatusReporter) {
