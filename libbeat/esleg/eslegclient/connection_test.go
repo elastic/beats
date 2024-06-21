@@ -116,7 +116,7 @@ func TestUserAgentHeader(t *testing.T) {
 		if !strings.HasPrefix(r.UserAgent(), prefix) {
 			t.Errorf("User-Agent must start with '%s', got '%s'", prefix, r.UserAgent())
 		}
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 	}))
 	defer server.Close()
 	conn, err := NewConnection(ConnectionSettings{
