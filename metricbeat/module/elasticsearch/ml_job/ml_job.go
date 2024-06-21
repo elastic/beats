@@ -18,6 +18,8 @@
 package ml_job
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -53,10 +55,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	shouldSkip, err := m.ShouldSkipFetch()
+	mLAvailability, mlErr := m.checkMLAvailability()
 	if err != nil {
 		return err
 	}
 	if shouldSkip {
+		return nil
+	}
+	if mlErr != nil {
+		return mlErr
+	}
+	if mLAvailability != "" {
 		return nil
 	}
 
@@ -71,4 +80,18 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	return eventsMapping(r, info, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) checkMLAvailability() (message string, err error) {
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return "", fmt.Errorf("error determining xpack features: %w", err)
+	}
+
+	if !xpack.Features.ML.Enabled {
+		message = "the ML feature is not enabled on your Elasticsearch cluster."
+		return message, nil
+	}
+
+	return "", nil
 }
