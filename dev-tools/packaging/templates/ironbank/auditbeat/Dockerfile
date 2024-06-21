@@ -5,7 +5,10 @@
 ARG BASE_REGISTRY=registry1.dsop.io
 ARG BASE_IMAGE=redhat/ubi/ubi9
 ARG BASE_TAG=9.4
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd8ed8a6d5 (Update Ironbank Dockerfile to ubi 9.4 (#39988))
 
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG} as builder
 
