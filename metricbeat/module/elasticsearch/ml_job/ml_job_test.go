@@ -53,7 +53,7 @@ func createEsMuxer(mlEnabled bool) *http.ServeMux {
 		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
 	}
 	xpackHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{ "features": { "ml": { "enabled": ` + strconv.FormatBool(mlEnabled) + `}}}`))
+		w.Write([]byte(`{ "features": { "ml": { "enabled": ` + strconv.FormatBool(mlEnabled) + `}}, "ccr": { "enabled": ` + strconv.FormatBool(true) + `}}`))
 	}
 
 	mux := http.NewServeMux()
@@ -63,6 +63,12 @@ func createEsMuxer(mlEnabled bool) *http.ServeMux {
 	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/_xpack", http.HandlerFunc(xpackHandler))
+	if mlEnabled {
+		// Should call the API
+		mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(`{}`))
+		}))
+	}
 
 	return mux
 }
@@ -82,9 +88,11 @@ func TestMLNotAvailable(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			mux := createEsMuxer(test.mlEnabled)
-			mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				http.Error(w, "this should never have been called", http.StatusTeapot)
-			}))
+			if !test.mlEnabled {
+				mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "this should never have been called", http.StatusTeapot)
+				}))
+			}
 
 			server := httptest.NewServer(mux)
 			defer server.Close()
