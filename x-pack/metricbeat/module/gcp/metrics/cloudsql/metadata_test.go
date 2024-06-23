@@ -11,9 +11,9 @@ import (
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gotest.tools/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
 )
 
 var fake = &monitoring.TimeSeries{
@@ -218,7 +218,7 @@ func TestGetDatabaseNameAndVersion(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			db := getDatabaseNameAndVersion(c.db)
-			assert.DeepEqual(t, db, c.expected)
+			assert.Equal(t, db, c.expected)
 		})
 	}
 }

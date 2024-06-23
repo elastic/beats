@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gotest.tools/assert"
 )
 
 func TestFetchURI(t *testing.T) {
@@ -68,6 +67,6 @@ func TestFetchURI(t *testing.T) {
 		u, err := url.Parse(tc.orig)
 		require.NoError(t, err)
 		got := fetchURI(u, tc.path)
-		assert.Equal(t, tc.want, got)
+		require.Equal(t, tc.want, got)
 	}
 }
