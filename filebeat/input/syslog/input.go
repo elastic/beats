@@ -322,7 +322,6 @@ func NewInput(
 		} else {
 			ev = parseAndCreateEvent3164(data, metadata, time.UTC, log)
 		}
-		log.Error(ev)
 
 		var d = &util.Data{Event: syslogFormatter(ev)}
 		filterAccess := true
