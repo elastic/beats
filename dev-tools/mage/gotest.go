@@ -142,8 +142,12 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		return err
 	}
 
+	type moduleErr struct {
+		name string
+		err  error
+	}
 	foundModule := false
-	failedModules := []string{}
+	failedModules := []moduleErr{}
 	for _, fi := range modulesFileInfo {
 		if !fi.IsDir() {
 			continue
@@ -169,14 +173,23 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		})
 		if err != nil {
 			// err will already be report to stdout, collect failed module to report at end
-			failedModules = append(failedModules, fi.Name())
+			failedModules = append(failedModules, moduleErr{
+				name: fi.Name(),
+				err:  err,
+			})
 		}
 	}
 	if module != "" && !foundModule {
 		return fmt.Errorf("no module %s", module)
 	}
 	if len(failedModules) > 0 {
-		return fmt.Errorf("failed modules: %s", strings.Join(failedModules, ", "))
+		errMsg := strings.Builder{}
+		names := []string{}
+		for _, m := range failedModules {
+			fmt.Fprintf(&errMsg, "Module: %s\nError: %s\n", m.name, m.err.Error())
+			names = append(names, m.name)
+		}
+		return fmt.Errorf("failed modules: %s.\n%s", strings.Join(names, ", "), errMsg.String())
 	}
 	return nil
 }
