@@ -407,7 +407,7 @@ var inputInitializerTests = []struct {
 	wantErr error
 }{
 	{
-		name: "cursor condition check with input url",
+		name: "cursor based url modification",
 		config: map[string]interface{}{
 			"url": "ws://testapi/getresults",
 			"input_initializer_program": `
@@ -426,6 +426,25 @@ var inputInitializerTests = []struct {
 			},
 		},
 		want: "ws://testapi/getresults?since=2017-08-17T14:54:12",
+	},
+	{
+		name: "url modification with no cursor",
+		config: map[string]interface{}{
+			"url": "ws://testapi/getresults",
+			"input_initializer_program": `
+			{
+				"url" : (
+					has(state.cursor) && has(state.cursor.since) ? 
+						state.url+"?since="+ state.cursor.since 
+					: 	
+						state.url+"?since="+ state.initial_start_time
+					)
+			}`,
+			"state": map[string]interface{}{
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
 	},
 }
 

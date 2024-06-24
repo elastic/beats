@@ -158,19 +158,31 @@ program: |
 ==== `input_initializer_program`
 
 The input initializer program is executed once when the input is started. This program is useful for initializing the input URL with custom values. It shares the same state with the main `CEL program` and hence can utilize cursor values or other state defined values to customize the URL at runtime. This program must always
-contain the URL field and should return a single object with the URL field set to the desired URL.
+set the `url` field value and has to be wrapped inside `curly braces` as shown in the example.
 
 ["source","yaml",subs="attributes"]
 ----
+url: ws://testapi:443/v1/streamresults
+state:
+  initial_start_time: "2022-01-01T00:00:00Z"
 input_initializer_program: |
   {
     "url" : (
       has(state.cursor) && has(state.cursor.since) ? 
         state.url+"?since="+ state.cursor.since 
       : 	
-        state.url
-    )
+        state.url+"?since="+ state.initial_start_time
+      )
 	}
+program: |
+  bytes(state.response).decode_json().as(inner_body,{
+    "events": {
+      "message":  inner_body.encode_json(),
+    },
+    "cursor": {
+      "since": inner_body.timestamp
+    }
+  })
 ----
 
 [[state-websocket]]
