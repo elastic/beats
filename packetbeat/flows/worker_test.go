@@ -24,12 +24,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
-	"github.com/stretchr/testify/assert"
 )
 
 // Use `go test -data` to update sample event files.
