@@ -201,6 +201,9 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 	t := time.NewTicker(p.sqsVisibilityTimeout / 2)
 	defer t.Stop()
 
+	log.Debugw("Initializing SQS message visibility timeout.",
+		"visibility_timeout", p.sqsVisibilityTimeout,
+		"expires_at", time.Now().UTC().Add(p.sqsVisibilityTimeout))
 	for {
 		// Renew visibility.
 		if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
@@ -225,7 +228,6 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 				"visibility_timeout", p.sqsVisibilityTimeout,
 				"expires_at", time.Now().UTC().Add(p.sqsVisibilityTimeout))
 			p.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
-
 		}
 	}
 }
