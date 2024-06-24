@@ -369,7 +369,7 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
-		s.Offset += int64(message.Bytes)
+		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
