@@ -34,4 +34,4 @@ steps:
           disk_type: "pd-ssd"
         notify:
           - github_commit_status:
-              context: "agentbeat: Packaging Linux arm64"
+              context: "agentbeat: Packaging"
