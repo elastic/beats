@@ -14,6 +14,8 @@ import (
 )
 
 type config struct {
+	// InputInitializerProgram is the CEL program to be run once before to prep the url.
+	InputInitializerProgram string `config:"input_initializer_program"`
 	// Program is the CEL program to be run for each polling.
 	Program string `config:"program"`
 	// Regexps is the set of regular expression to be made

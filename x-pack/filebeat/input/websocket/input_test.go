@@ -399,6 +399,84 @@ var inputTests = []struct {
 	},
 }
 
+var inputInitializerTests = []struct {
+	name    string
+	config  map[string]interface{}
+	time    func() time.Time
+	want    string
+	wantErr error
+}{
+	{
+		name: "cursor condition check with input url",
+		config: map[string]interface{}{
+			"url": "ws://testapi/getresults",
+			"input_initializer_program": `
+			{
+				"url" : (
+					has(state.cursor) && has(state.cursor.since) ? 
+						state.url+"?since="+ state.cursor.since 
+					: 	
+						state.url
+					)
+			}`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"since": "2017-08-17T14:54:12",
+				},
+			},
+		},
+		want: "ws://testapi/getresults?since=2017-08-17T14:54:12",
+	},
+}
+
+func TestInputInitializer(t *testing.T) {
+	// tests will ignore context cancelled errors, since they are expected
+	ctxCancelledError := fmt.Errorf("context canceled")
+	logp.TestingSetup()
+	for _, test := range inputInitializerTests {
+		t.Run(test.name, func(t *testing.T) {
+
+			cfg := conf.MustNewConfigFrom(test.config)
+
+			conf := config{}
+			conf.Redact = &redact{}
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				if test.wantErr != nil {
+					assert.EqualError(t, err, test.wantErr.Error())
+					return
+				}
+				t.Fatalf("unexpected error unpacking config: %v", err)
+			}
+
+			name := input{}.Name()
+			if name != "websocket" {
+				t.Errorf(`unexpected input name: got:%q want:"websocket"`, name)
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			var state map[string]interface{}
+			if conf.State == nil {
+				state = make(map[string]interface{})
+			} else {
+				state = conf.State
+			}
+
+			response, err := input{test.time, conf}.initializeInputURL(ctx, state, logp.NewLogger("websocket_input_initializer_test"))
+			if (fmt.Sprint(err) != fmt.Sprint(ctxCancelledError)) && (fmt.Sprint(err) != fmt.Sprint(test.wantErr)) {
+				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+			}
+			if test.wantErr != nil {
+				return
+			}
+
+			assert.Equal(t, test.want, response)
+		})
+	}
+}
+
 func TestInput(t *testing.T) {
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
@@ -432,7 +510,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{

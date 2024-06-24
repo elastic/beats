@@ -13,24 +13,8 @@
 # ============================== Filebeat inputs ===============================
 
 filebeat.inputs:
-
-# Each - is an input. Most options can be set at the input level, so
-# you can use different inputs for various configurations.
-# Below are the input-specific configurations.
-
-# filestream is an input for collecting log messages from files.
-- type: filestream
-
-  # Unique ID among all inputs, an ID is required.
-  id: my-filestream-id
-
-  # Change to true to enable this input configuration.
-  enabled: false
-
-  # Paths that should be crawled and fetched. Glob based paths.
-  paths:
-    - /var/log/*.log
-    #- c:\programdata\elasticsearch\logs\*
+- type: websocket
+  url: ws://localhost:8080
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.

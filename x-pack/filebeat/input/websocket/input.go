@@ -97,9 +97,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		state["cursor"] = cursor
 	}
 
+	// initialize the input url with the help of the input_initializer_program.
+	url, err := i.initializeInputURL(ctx, state, log)
+	if err != nil {
+		metrics.errorsTotal.Inc()
+		return err
+	}
+
 	// websocket client
 	headers := formHeader(cfg)
-	url := cfg.URL.String()
 	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
 	if resp != nil && resp.Body != nil {
 		log.Debugw("websocket connection response", "body", resp.Body)
@@ -148,6 +154,39 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+}
+
+// initializeInputURL initializes the input with the help of the input_initializer_program.
+func (i input) initializeInputURL(ctx context.Context, state map[string]interface{}, log *logp.Logger) (string, error) {
+	var url string
+	cfg := i.cfg
+	if cfg.InputInitializerProgram != "" {
+		state["url"] = cfg.URL.String()
+		// CEL program which is used to prime/initialize the input url
+		input_initializer_prg, ast, err := newProgram(ctx, cfg.InputInitializerProgram, root, nil, log)
+		if err != nil {
+			return url, err
+		}
+
+		log.Debugw("cel engine state before input_initializer_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
+		start := i.now().In(time.UTC)
+		state, err := evalWith(ctx, input_initializer_prg, ast, state, start)
+		log.Debugw("cel engine state after input_initializer_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
+		if err != nil {
+			log.Errorw("failed input_initializer evaluation", "error", err)
+			return url, err
+		}
+
+		if u, ok := state["url"].(string); ok {
+			url = u
+		} else {
+			return url, fmt.Errorf("unexpected type returned for evaluation url: %T", state["url"])
+		}
+		delete(state, "url")
+	} else {
+		url = cfg.URL.String()
+	}
+	return url, nil
 }
 
 // processAndPublishData processes the data in state, updates the cursor and publishes it to the publisher.
