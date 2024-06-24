@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+//nolint:gosec // These are test tokens and are not used in production code.
 const (
 	basicToken   = "dXNlcjpwYXNz"
 	bearerToken  = "BXNlcjpwYVVz"
