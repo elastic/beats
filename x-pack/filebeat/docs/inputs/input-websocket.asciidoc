@@ -173,7 +173,7 @@ input_initializer_program: |
       : 	
         state.url+"?since="+ state.initial_start_time
       )
-	}
+  }
 program: |
   bytes(state.response).decode_json().as(inner_body,{
     "events": {

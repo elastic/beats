@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -447,6 +448,67 @@ var inputInitializerTests = []struct {
 		},
 		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
 	},
+	{
+		name: "missing state variable",
+		config: map[string]interface{}{
+			"url": "ws://testapi/getresults",
+			"input_initializer_program": `
+			{
+				"url" : (
+					has(state.cursor) && has(state.cursor.since) ? 
+						state.url+"?since="+ state.cursor.since 
+					: 	
+						state.url+"?since="+ state.start_time
+					)
+			}`,
+			"state": map[string]interface{}{
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		wantErr: fmt.Errorf("failed eval: ERROR: <input>:4:51: no such key: start_time"),
+	},
+	{
+		name: "missing cursor variable",
+		config: map[string]interface{}{
+			"url": "ws://testapi/getresults",
+			"input_initializer_program": `
+			{
+				"url" : (
+					has(state.cursor) ? 
+						state.url+"?since="+ state.cursor.since 
+					: 	
+						state.url+"?since="+ state.initial_start_time
+					)
+			}`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"timestamp": "2017-08-17T14:54:12",
+				},
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		wantErr: fmt.Errorf("failed eval: ERROR: <input>:4:24: no such key: since"),
+	},
+	{
+		name: "missing curly braces in program definition",
+		config: map[string]interface{}{
+			"url": "ws://testapi/getresults",
+			"input_initializer_program": `
+				"url" : (
+					has(state.cursor) && has(state.cursor.since) ?
+						state.url+"?since="+ state.cursor.since
+					:
+						state.url+"?since="+ state.initial_start_time
+					)`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"since": "2017-08-17T14:54:12",
+				},
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		wantErr: fmt.Errorf("failed compilation: ERROR: <input>:2:11: Syntax error: mismatched input ':' expecting <EOF>"),
+	},
 }
 
 func TestInputInitializer(t *testing.T) {
@@ -485,7 +547,7 @@ func TestInputInitializer(t *testing.T) {
 			}
 
 			response, err := input{test.time, conf}.initializeInputURL(ctx, state, logp.NewLogger("websocket_input_initializer_test"))
-			if (fmt.Sprint(err) != fmt.Sprint(ctxCancelledError)) && (fmt.Sprint(err) != fmt.Sprint(test.wantErr)) {
+			if (fmt.Sprint(err) != fmt.Sprint(ctxCancelledError)) && (strings.Split(fmt.Sprint(err), "\n")[0] != fmt.Sprint(test.wantErr)) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
 			if test.wantErr != nil {
