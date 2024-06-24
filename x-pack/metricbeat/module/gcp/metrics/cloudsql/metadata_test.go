@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/assert"
 )
 
 var fake = &monitoring.TimeSeries{
