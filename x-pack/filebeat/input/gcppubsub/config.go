@@ -40,6 +40,11 @@ type config struct {
 
 	// Overrides the default Pub/Sub service address and disables TLS. For testing.
 	AlternativeHost string `config:"alternative_host"`
+
+	// Google Cloud Pub/Sub subscription name. Multiple Filebeats can pull from same subscription.
+	Outlet struct {
+		NumPipelines int `config:"num_pipelines"`
+	} `config:"outlet"`
 }
 
 func (c *config) Validate() error {
@@ -77,5 +82,6 @@ func defaultConfig() config {
 	// Hence max_outstanding_message has to be at least flush.min_events to avoid this blockage.
 	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
+	c.Outlet.NumPipelines = 1
 	return c
 }
