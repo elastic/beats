@@ -202,6 +202,21 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 	defer t.Stop()
 
 	for {
+		// Renew visibility.
+		if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
+			var apiError smithy.APIError
+			if errors.As(err, &apiError) {
+				switch apiError.ErrorCode() {
+				case sqsReceiptHandleIsInvalidErrCode, sqsInvalidParameterValueErrorCode:
+					log.Warnw("Failed to extend message visibility timeout "+
+						"because SQS receipt handle is no longer valid. "+
+						"Stopping SQS message keepalive routine.", "error", err)
+					return
+				}
+			}
+		}
+
+		// Wait for the next timeout
 		select {
 		case <-ctx.Done():
 			return
@@ -211,19 +226,6 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 				"expires_at", time.Now().UTC().Add(p.sqsVisibilityTimeout))
 			p.metrics.sqsVisibilityTimeoutExtensionsTotal.Inc()
 
-			// Renew visibility.
-			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				var apiError smithy.APIError
-				if errors.As(err, &apiError) {
-					switch apiError.ErrorCode() {
-					case sqsReceiptHandleIsInvalidErrCode, sqsInvalidParameterValueErrorCode:
-						log.Warnw("Failed to extend message visibility timeout "+
-							"because SQS receipt handle is no longer valid. "+
-							"Stopping SQS message keepalive routine.", "error", err)
-						return
-					}
-				}
-			}
 		}
 	}
 }
