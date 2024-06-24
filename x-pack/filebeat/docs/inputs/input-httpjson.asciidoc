@@ -146,6 +146,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [float]
 ==== `delete`
@@ -178,6 +179,7 @@ Sets a value.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [[value-templates]]
 ==== Value templates
@@ -619,6 +621,7 @@ does not exist at the root level, please use the clause `.first_response.` to ac
           target: body.page
           value: '[[ .last_response.body.page ]]'
           fail_on_template_error: true
+          do_not_log_failure: true
     chain:
     - step:
           request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info

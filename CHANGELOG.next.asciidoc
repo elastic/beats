@@ -142,6 +142,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
+- Fix filestream not correctly tracking the offset of a file when using the `include_message` parsser. {pull}39873[39873] {issue}39653[39653]
 
 *Heartbeat*
 
@@ -278,6 +279,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
 - Add request trace support for Okta and EntraID entity analytics providers. {pull}39821[39821]
 - Fix handling of infinite rate values in CEL rate limit handling logic. {pull}39940[39940]
+- Allow elision of set and append failure logging. {issue}34544[34544] {pull}39929[39929]
+- Add ability to remove request trace logs from CEL input. {pull}39969[39969]
 
 *Auditbeat*
 
