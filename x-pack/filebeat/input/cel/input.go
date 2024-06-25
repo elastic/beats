@@ -13,9 +13,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -706,7 +708,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	case float64:
 		limit = rate.Limit(r)
 	case string:
-		if !strings.EqualFold(r, "inf") {
+		if !strings.EqualFold(strings.TrimPrefix(r, "+"), "inf") && !strings.EqualFold(strings.TrimPrefix(r, "+"), "infinity") {
 			log.Errorw("unexpected value returned for rate limit "+which, "value", r, "rate_limit", mapstr.M(rateLimit))
 			return limit, false
 		}
@@ -716,6 +718,11 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	}
 	return limit, true
 }
+
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
@@ -740,7 +747,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	var trace *httplog.LoggingRoundTripper
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -758,6 +765,25 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
 		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
+	} else if cfg.Resource.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err = os.Remove(cfg.Resource.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 
 	if reg != nil {
