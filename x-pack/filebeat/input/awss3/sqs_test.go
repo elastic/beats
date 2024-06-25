@@ -9,7 +9,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"testing"
 	"time"
 
