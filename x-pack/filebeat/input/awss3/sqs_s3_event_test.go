@@ -270,6 +270,16 @@ func TestSqsProcessor_getS3Notifications(t *testing.T) {
 		assert.Equal(t, "vpc-flow-logs-ks", events[0].S3.Bucket.Name)
 	})
 
+	t.Run("EventBridge-sqs notification", func(t *testing.T) {
+		msg := newEventBridgeSQSMessage()
+		events, err := p.getS3Notifications(*msg.Body)
+		require.NoError(t, err)
+		assert.Len(t, events, 1)
+		assert.Equal(t, "test-object-key", events[0].S3.Object.Key)
+		assert.Equal(t, "arn:aws:s3:::vpc-flow-logs-ks", events[0].S3.Bucket.ARN)
+		assert.Equal(t, "vpc-flow-logs-ks", events[0].S3.Bucket.Name)
+	})
+
 	t.Run("missing Records fail", func(t *testing.T) {
 		msg := `{"message":"missing records"}`
 		_, err := p.getS3Notifications(msg)
