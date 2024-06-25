@@ -32,7 +32,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/sh"
-	"golang.org/x/tools/go/vcs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -688,7 +687,7 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	}
 
 	for _, srcDir := range srcDirs {
-		_, root, err := vcs.FromDir(cwd, srcDir)
+		root, err := fromDir(cwd, srcDir)
 		if err != nil {
 			// Try the next gopath.
 			errs = append(errs, err.Error())
@@ -719,6 +718,62 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 		SubDir:                  subDir,
 		ImportPath:              filepath.ToSlash(filepath.Join(rootImportPath, subDir)),
 	}, nil
+}
+
+var vcsList = []string{
+	"hg",
+	"git",
+	"svn",
+	"bzr",
+}
+
+func fromDir(dir, srcRoot string) (root string, err error) {
+	// Clean and double-check that dir is in (a subdirectory of) srcRoot.
+	dir = filepath.Clean(dir)
+	srcRoot = filepath.Clean(srcRoot)
+	if len(dir) <= len(srcRoot) || dir[len(srcRoot)] != filepath.Separator {
+		return "", fmt.Errorf("directory %q is outside source root %q", dir, srcRoot)
+	}
+
+	var vcsRet string
+	var rootRet string
+
+	origDir := dir
+	for len(dir) > len(srcRoot) {
+		for _, vcs := range vcsList {
+			if _, err := os.Stat(filepath.Join(dir, "."+vcs)); err == nil {
+				root := filepath.ToSlash(dir[len(srcRoot)+1:])
+				// Record first VCS we find, but keep looking,
+				// to detect mistakes like one kind of VCS inside another.
+				if vcsRet == "" {
+					vcsRet = vcs
+					rootRet = root
+					continue
+				}
+				// Allow .git inside .git, which can arise due to submodules.
+				if vcsRet == vcs && vcs == "git" {
+					continue
+				}
+				// Otherwise, we have one VCS inside a different VCS.
+				return "", fmt.Errorf("directory %q uses %s, but parent %q uses %s",
+					filepath.Join(srcRoot, rootRet), vcsRet, filepath.Join(srcRoot, root), vcs)
+			}
+		}
+
+		// Move to parent.
+		ndir := filepath.Dir(dir)
+		if len(ndir) >= len(dir) {
+			// Shouldn't happen, but just in case, stop.
+			break
+		}
+		dir = ndir
+	}
+
+	if vcsRet != "" {
+		return rootRet, nil
+	}
+
+	return "", fmt.Errorf("directory %q is not using a known version control system", origDir)
 }
 
 func extractCanonicalRootImportPath(rootImportPath string) string {
