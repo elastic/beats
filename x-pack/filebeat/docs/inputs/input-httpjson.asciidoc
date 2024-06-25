@@ -640,16 +640,19 @@ because when pagination does not exist at the parent level `parent_last_response
 NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
-==== `request.tracer.filename`
+==== `request.tracer.enable`
 
-It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
-This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+It is possible to log HTTP requests and responses to a local file-system for debugging configurations.
+This option is enabled by setting `request.tracer.enabled` to true and setting the `request.tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `request.tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+==== `request.tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== `request.tracer.maxsize`
