@@ -23945,11 +23945,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/ecszap@v1.0.2/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/go-licence-detector
-Version: v0.6.0
+Version: v0.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/go-licence-detector@v0.6.1/LICENSE:
 
 
                                  Apache License
@@ -24530,11 +24530,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.17.0
+Version: v0.18.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.17.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.18.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -36407,11 +36407,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cyphar/filepath-securejoin
-Version: v0.2.4
+Version: v0.2.5
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.5/LICENSE:
 
 Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
 Copyright (C) 2017 SUSE LLC. All rights reserved.

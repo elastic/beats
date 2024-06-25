@@ -144,14 +144,14 @@ require (
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71 // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	go.elastic.co/ecszap v1.0.2
-	go.elastic.co/go-licence-detector v0.6.0
+	go.elastic.co/go-licence-detector v0.6.1
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.24.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-	golang.org/x/mod v0.17.0
+	golang.org/x/mod v0.18.0
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.7.0
@@ -272,7 +272,7 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cilium/ebpf v0.13.2 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
