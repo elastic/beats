@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.21.0
+go 1.21.9
 
 toolchain go1.21.11
 
@@ -101,7 +101,7 @@ require (
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.6.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.6.6
