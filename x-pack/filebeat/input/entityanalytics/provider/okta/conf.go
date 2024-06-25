@@ -66,7 +66,16 @@ type conf struct {
 	Request *requestConfig `config:"request"`
 
 	// Tracer allows configuration of request trace logging.
-	Tracer *lumberjack.Logger `config:"tracer"`
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type requestConfig struct {

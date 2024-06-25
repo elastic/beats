@@ -290,6 +290,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.13.0 {pull}40035[40035]
 - Add Jamf entity analytics provider. {pull}39996[39996]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
+- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 
 *Auditbeat*
 
