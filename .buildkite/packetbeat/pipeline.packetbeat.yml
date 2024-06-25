@@ -33,6 +33,7 @@ steps:
     steps:
       - label: "Packetbeat Run check/update"
         command: |
+          set -eo pipefail
           make -C packetbeat check update
           make check-no-changes
         retry:
