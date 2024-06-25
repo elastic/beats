@@ -6,11 +6,11 @@ package websocket
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -401,26 +401,30 @@ var inputTests = []struct {
 	},
 }
 
-var inputInitializerTests = []struct {
-	name    string
-	config  map[string]interface{}
-	time    func() time.Time
-	want    string
-	wantErr error
+var urlEvalTests = []struct {
+	name   string
+	config map[string]interface{}
+	time   func() time.Time
+	want   string
 }{
 	{
 		name: "cursor based url modification",
 		config: map[string]interface{}{
-			"url": "ws://testapi/getresults",
-			"input_initializer_program": `
-			{
-				"url" : (
-					has(state.cursor) && has(state.cursor.since) ? 
-						state.url+"?since="+ state.cursor.since 
-					: 	
-						state.url
-					)
-			}`,
+			"url":         "ws://testapi/getresults",
+			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since : state.url`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"since": "2017-08-17T14:54:12",
+				},
+			},
+		},
+		want: "ws://testapi/getresults?since=2017-08-17T14:54:12",
+	},
+	{
+		name: "cursor based url modification using simplified query",
+		config: map[string]interface{}{
+			"url":         "ws://testapi/getresults",
+			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.url)`,
 			"state": map[string]interface{}{
 				"cursor": map[string]interface{}{
 					"since": "2017-08-17T14:54:12",
@@ -432,16 +436,8 @@ var inputInitializerTests = []struct {
 	{
 		name: "url modification with no cursor",
 		config: map[string]interface{}{
-			"url": "ws://testapi/getresults",
-			"input_initializer_program": `
-			{
-				"url" : (
-					has(state.cursor) && has(state.cursor.since) ? 
-						state.url+"?since="+ state.cursor.since 
-					: 	
-						state.url+"?since="+ state.initial_start_time
-					)
-			}`,
+			"url":         "ws://testapi/getresults",
+			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since: state.url+"?since="+ state.initial_start_time`,
 			"state": map[string]interface{}{
 				"initial_start_time": "2022-01-01T00:00:00Z",
 			},
@@ -449,73 +445,21 @@ var inputInitializerTests = []struct {
 		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
 	},
 	{
-		name: "missing state variable",
+		name: "url modification with no cursor, using simplified query",
 		config: map[string]interface{}{
-			"url": "ws://testapi/getresults",
-			"input_initializer_program": `
-			{
-				"url" : (
-					has(state.cursor) && has(state.cursor.since) ? 
-						state.url+"?since="+ state.cursor.since 
-					: 	
-						state.url+"?since="+ state.start_time
-					)
-			}`,
+			"url":         "ws://testapi/getresults",
+			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.initial_start_time)`,
 			"state": map[string]interface{}{
 				"initial_start_time": "2022-01-01T00:00:00Z",
 			},
 		},
-		wantErr: fmt.Errorf("failed eval: ERROR: <input>:4:51: no such key: start_time"),
-	},
-	{
-		name: "missing cursor variable",
-		config: map[string]interface{}{
-			"url": "ws://testapi/getresults",
-			"input_initializer_program": `
-			{
-				"url" : (
-					has(state.cursor) ? 
-						state.url+"?since="+ state.cursor.since 
-					: 	
-						state.url+"?since="+ state.initial_start_time
-					)
-			}`,
-			"state": map[string]interface{}{
-				"cursor": map[string]interface{}{
-					"timestamp": "2017-08-17T14:54:12",
-				},
-				"initial_start_time": "2022-01-01T00:00:00Z",
-			},
-		},
-		wantErr: fmt.Errorf("failed eval: ERROR: <input>:4:24: no such key: since"),
-	},
-	{
-		name: "missing curly braces in program definition",
-		config: map[string]interface{}{
-			"url": "ws://testapi/getresults",
-			"input_initializer_program": `
-				"url" : (
-					has(state.cursor) && has(state.cursor.since) ?
-						state.url+"?since="+ state.cursor.since
-					:
-						state.url+"?since="+ state.initial_start_time
-					)`,
-			"state": map[string]interface{}{
-				"cursor": map[string]interface{}{
-					"since": "2017-08-17T14:54:12",
-				},
-				"initial_start_time": "2022-01-01T00:00:00Z",
-			},
-		},
-		wantErr: fmt.Errorf("failed compilation: ERROR: <input>:2:11: Syntax error: mismatched input ':' expecting <EOF>"),
+		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
 	},
 }
 
-func TestInputInitializer(t *testing.T) {
-	// tests will ignore context cancelled errors, since they are expected
-	ctxCancelledError := fmt.Errorf("context canceled")
+func TestURLEval(t *testing.T) {
 	logp.TestingSetup()
-	for _, test := range inputInitializerTests {
+	for _, test := range urlEvalTests {
 		t.Run(test.name, func(t *testing.T) {
 
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -524,10 +468,6 @@ func TestInputInitializer(t *testing.T) {
 			conf.Redact = &redact{}
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				if test.wantErr != nil {
-					assert.EqualError(t, err, test.wantErr.Error())
-					return
-				}
 				t.Fatalf("unexpected error unpacking config: %v", err)
 			}
 
@@ -546,12 +486,9 @@ func TestInputInitializer(t *testing.T) {
 				state = conf.State
 			}
 
-			response, err := input{test.time, conf}.initializeInputURL(ctx, state, logp.NewLogger("websocket_input_initializer_test"))
-			if (fmt.Sprint(err) != fmt.Sprint(ctxCancelledError)) && (strings.Split(fmt.Sprint(err), "\n")[0] != fmt.Sprint(test.wantErr)) {
-				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
-			}
-			if test.wantErr != nil {
-				return
+			response, err := input{test.time, conf}.getURL(ctx, state, logp.NewLogger("websocket_url_eval_test"))
+			if err != nil && !errors.Is(err, context.Canceled) {
+				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}
 
 			assert.Equal(t, test.want, response)

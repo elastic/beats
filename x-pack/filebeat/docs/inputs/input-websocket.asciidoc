@@ -153,27 +153,19 @@ program: |
   })
 ----
 
-[[input-initializer-program-websocket]]
+[[input-url-program-websocket]]
 [float]
-==== `input_initializer_program`
+==== `url_program`
 
-The input initializer program is executed once when the input is started. This program is useful for initializing the input URL with custom values. It shares the same state with the main `CEL program` and hence can utilize cursor values or other state defined values to customize the URL at runtime. This program must always
-set the `url` field value and has to be wrapped inside `curly braces` as shown in the example.
+If present, this CEL program is executed before the websocket connection is established using the `state` object, including any stored cursor value. It must evaluate to a valid URL. The returned URL is used to make the websocket connection for processing. The program may use cursor values or other state defined values to customize the URL at runtime.
 
 ["source","yaml",subs="attributes"]
 ----
 url: ws://testapi:443/v1/streamresults
 state:
   initial_start_time: "2022-01-01T00:00:00Z"
-input_initializer_program: |
-  {
-    "url" : (
-      has(state.cursor) && has(state.cursor.since) ? 
-        state.url+"?since="+ state.cursor.since 
-      : 	
-        state.url+"?since="+ state.initial_start_time
-      )
-  }
+url_program: |
+  state.url + "?since=" + state.?cursor.since.orValue(state.initial_start_time)
 program: |
   bytes(state.response).decode_json().as(inner_body,{
     "events": {

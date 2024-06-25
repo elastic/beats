@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"reflect"
 	"time"
 
@@ -97,8 +98,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		state["cursor"] = cursor
 	}
 
-	// initialize the input url with the help of the input_initializer_program.
-	url, err := i.initializeInputURL(ctx, state, log)
+	// initialize the input url with the help of the url_program.
+	url, err := i.getURL(ctx, state, log)
 	if err != nil {
 		metrics.errorsTotal.Inc()
 		return err
@@ -156,37 +157,70 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	}
 }
 
-// initializeInputURL initializes the input with the help of the input_initializer_program.
-func (i input) initializeInputURL(ctx context.Context, state map[string]interface{}, log *logp.Logger) (string, error) {
-	var url string
+// getURL initializes the input URL with the help of the url_program.
+func (i input) getURL(ctx context.Context, state map[string]interface{}, log *logp.Logger) (string, error) {
+	var (
+		url string
+		err error
+	)
 	cfg := i.cfg
-	if cfg.InputInitializerProgram != "" {
+	if cfg.URLProgram != "" {
 		state["url"] = cfg.URL.String()
 		// CEL program which is used to prime/initialize the input url
-		input_initializer_prg, ast, err := newProgram(ctx, cfg.InputInitializerProgram, root, nil, log)
+		url_prg, ast, err := newProgram(ctx, cfg.URLProgram, root, nil, log)
 		if err != nil {
 			return url, err
 		}
 
-		log.Debugw("cel engine state before input_initializer_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
+		log.Debugw("cel engine state before url_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
 		start := i.now().In(time.UTC)
-		state, err := evalWith(ctx, input_initializer_prg, ast, state, start)
-		log.Debugw("cel engine state after input_initializer_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
+		url, err = evalURLWith(ctx, url_prg, ast, state, start)
+		log.Debugw("url_eval result", logp.Namespace("websocket"), "modified_url", url)
 		if err != nil {
-			log.Errorw("failed input_initializer evaluation", "error", err)
+			log.Errorw("failed url evaluation", "error", err)
 			return url, err
 		}
-
-		if u, ok := state["url"].(string); ok {
-			url = u
-		} else {
-			return url, fmt.Errorf("unexpected type returned for evaluation url: %T", state["url"])
-		}
-		delete(state, "url")
 	} else {
 		url = cfg.URL.String()
 	}
-	return url, nil
+	return url, err
+}
+
+func evalURLWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (string, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+		// Replace global program "now" with current time. This is necessary
+		// as the lib.Time now global is static at program instantiation time
+		// which will persist over multiple evaluations. The lib.Time behaviour
+		// is correct for mito where CEL program instances live for only a
+		// single evaluation. Rather than incurring the cost of creating a new
+		// cel.Program for each evaluation, shadow lib.Time's now with a new
+		// value for each eval. We retain the lib.Time now global for
+		// compatibility between CEL programs developed in mito with programs
+		// run in the input.
+		"now": now,
+		root:  state,
+	})
+	if err != nil {
+		err = lib.DecoratedError{AST: ast, Err: err}
+	}
+	if e := ctx.Err(); e != nil {
+		err = e
+	}
+	if err != nil {
+		return "", fmt.Errorf("failed eval: %w", err)
+	}
+	v, err := out.ConvertToNative(reflect.TypeOf(""))
+	if err != nil {
+		return "", fmt.Errorf("failed type conversion: %w", err)
+	}
+	switch v := v.(type) {
+	case string:
+		_, err = url.Parse(v)
+		return v, err
+	default:
+		// This should never happen.
+		return "", fmt.Errorf("unexpected native conversion type: %T", v)
+	}
 }
 
 // processAndPublishData processes the data in state, updates the cursor and publishes it to the publisher.
