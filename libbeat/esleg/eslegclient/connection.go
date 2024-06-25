@@ -86,6 +86,11 @@ type ConnectionSettings struct {
 	IdleConnTimeout time.Duration
 
 	Transport httpcommon.HTTPTransportSettings
+
+	// UserAgentPostfix can be used to report the agent running mode
+	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// then this string will be appended to the user agent.
+	UserAgentPostfix string
 }
 
 type ESPingData struct {
@@ -135,6 +140,10 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	if s.Beatname == "" {
 		s.Beatname = "Libbeat"
 	}
+	if s.UserAgentPostfix != "" {
+		s.Beatname = fmt.Sprintf("%s-%s", s.Beatname, s.UserAgentPostfix)
+	}
+
 	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
