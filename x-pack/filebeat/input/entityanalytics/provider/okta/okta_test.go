@@ -81,7 +81,7 @@ func TestOktaDoFetch(t *testing.T) {
 			}
 			var wantDevices []Device
 			if test.wantDevices {
-				err := json.Unmarshal([]byte(users), &wantDevices)
+				err := json.Unmarshal([]byte(devices), &wantDevices)
 				if err != nil {
 					t.Fatalf("failed to unmarshal device data: %v", err)
 				}
