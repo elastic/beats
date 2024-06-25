@@ -298,6 +298,7 @@ func TestEmitEvent(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
