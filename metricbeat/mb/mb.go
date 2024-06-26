@@ -27,6 +27,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -65,6 +66,8 @@ type Module interface {
 	Name() string                      // Name returns the name of the Module.
 	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
 	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
+	UpdateStatus(status status.Status, msg string)
+	SetStatusReporter(statusReporter status.StatusReporter)
 }
 
 // BaseModule implements the Module interface.
@@ -73,9 +76,10 @@ type Module interface {
 // MetricSets, it can embed this type into another struct to satisfy the
 // Module interface requirements.
 type BaseModule struct {
-	name      string
-	config    ModuleConfig
-	rawConfig *conf.C
+	name           string
+	config         ModuleConfig
+	rawConfig      *conf.C
+	statusReporter status.StatusReporter
 }
 
 func (m *BaseModule) String() string {
@@ -93,6 +97,16 @@ func (m *BaseModule) Config() ModuleConfig { return m.config }
 // UnpackConfig unpacks the raw module config to the given object.
 func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
+}
+
+// UnpackConfig unpacks the raw module config to the given object.
+func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
+	m.statusReporter.UpdateStatus(status, msg)
+}
+
+// UnpackConfig unpacks the raw module config to the given object.
+func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
 }
 
 // WithConfig re-configures the module with the given raw configuration and returns a
@@ -352,6 +366,10 @@ func (b *BaseMetricSet) HostData() HostData {
 // registered with the registry.
 func (b *BaseMetricSet) Registration() MetricSetRegistration {
 	return b.registration
+}
+
+func (b *BaseMetricSet) UpdateStatus(status status.Status, msg string) {
+	b.Module().UpdateStatus(status, msg)
 }
 
 // Configuration types

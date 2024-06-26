@@ -24,6 +24,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -53,6 +54,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
+		base.UpdateStatus(status.Failed, err.Error())
 		return nil, err
 	}
 
@@ -99,6 +101,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	err := m.stats.Init()
 	if err != nil {
+		base.UpdateStatus(status.Failed, err.Error())
 		return nil, err
 	}
 	return m, nil
@@ -127,7 +130,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
 		if err != nil {
+			m.UpdateStatus(status.Degraded, err.Error())
 			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
+		} else {
+			m.UpdateStatus(status.Running, "")
 		}
 		r.Event(mb.Event{
 			MetricSetFields: proc,
