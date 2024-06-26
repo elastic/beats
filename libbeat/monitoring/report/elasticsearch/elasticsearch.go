@@ -125,13 +125,13 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		return nil, errors.New("empty hosts list")
 	}
 
-	var clients []outputs.NetworkClient
-	for _, host := range hosts {
+	clients := make([]outputs.NetworkClient, len(hosts))
+	for i, host := range hosts {
 		client, err := makeClient(host, params, &config, beat)
 		if err != nil {
 			return nil, err
 		}
-		clients = append(clients, client)
+		clients[i] = client
 	}
 
 	monitoring := monitoring.Default.GetRegistry("monitoring")

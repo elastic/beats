@@ -99,7 +99,7 @@ func (beat *Beat) GenerateUserAgent() {
 			comments = append(comments, "Standalone")
 		}
 
-		if info.Unprivileged == true {
+		if info.Unprivileged {
 			comments = append(comments, "Unprivileged")
 		}
 	}
