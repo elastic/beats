@@ -99,12 +99,22 @@ func (r Reader) Next(input.Canceler) (*sdjournal.JournalEntry, error) {
 
 	ts := fields["__REALTIME_TIMESTAMP"]
 	unixTS, err := strconv.ParseUint(ts, 10, 64)
-
 	if err != nil {
 		return nil, fmt.Errorf("could not convert timestamp to uint64: %w", err)
 	}
+
+	monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
+	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("could not convert monotomic timestamp to uint64: %w", err)
+	}
+
+	cursor := fields["__CURSOR"]
+
 	return &sdjournal.JournalEntry{
-		Fields:            fields,
-		RealtimeTimestamp: unixTS,
+		Fields:             fields,
+		RealtimeTimestamp:  unixTS,
+		Cursor:             cursor,
+		MonotonicTimestamp: monotonicTSInt,
 	}, nil
 }
