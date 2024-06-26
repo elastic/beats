@@ -144,7 +144,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
-		return nil, err
+		m.Logger().Warnf("Period has been updated to GCP default value as  %s", err)
+		m.config.period = &durationpb.Duration{
+			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
+		}
 	}
 
 	// Get ingest delay and sample period for each metric type
