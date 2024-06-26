@@ -1,0 +1,200 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+package tests
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/stretchr/testify/require"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+)
+
+func TestSystem(t *testing.T) {
+	unitOneID := mock.NewID()
+	unitOutID := mock.NewID()
+	token := mock.NewID()
+
+	tests.InitBeatsForTest(t, cmd.RootCmd)
+
+	filename := fmt.Sprintf("test-%d", time.Now().Unix())
+	outPath := filepath.Join(os.TempDir(), filename)
+	t.Logf("writing output to file %s", outPath)
+	err := os.Mkdir(outPath, 0775)
+	require.NoError(t, err)
+	defer func() {
+		err := os.RemoveAll(outPath)
+		require.NoError(t, err)
+	}()
+
+	var logOutputStream = []*proto.UnitExpected{
+		{
+			Id:             unitOutID,
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			Config: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Namespace: "default",
+				},
+				Type:     "file",
+				Revision: 1,
+				Meta: &proto.Meta{
+					Package: &proto.Package{
+						Name:    "system",
+						Version: "1.17.0",
+					},
+				},
+				Source: tests.RequireNewStruct(map[string]interface{}{
+					"type":            "file",
+					"enabled":         true,
+					"path":            outPath,
+					"filename":        "beat-out",
+					"number_of_files": 7,
+				}),
+			},
+		},
+		{
+			Id:             unitOneID,
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			Config: &proto.UnitExpectedConfig{
+				DataStream: &proto.DataStream{
+					Namespace: "default",
+				},
+				Streams: []*proto.Stream{{
+					Id: "system/metrics-system.process-default-system",
+					DataStream: &proto.DataStream{
+						Dataset: "system.process",
+						Type:    "metrics",
+					},
+					Source: tests.RequireNewStruct(map[string]interface{}{
+						"metricsets": []interface{}{"process"},
+						// pid -1 doesn't exist. It should report an error AND update state as DEGRADED
+						"process.pid": -1,
+					}),
+				}},
+				Type:     "system/metrics",
+				Id:       "system/metrics-system-default-system",
+				Name:     "system-1",
+				Revision: 1,
+				Meta: &proto.Meta{
+					Package: &proto.Package{
+						Name:    "system",
+						Version: "1.17.0",
+					},
+				},
+			},
+		},
+	}
+
+	// expectedMBStreams.Streams = systemInputStreams
+	// elastic-agent management V2 mock server
+	observedStates := make(chan *proto.CheckinObserved)
+	expectedUnits := make(chan []*proto.UnitExpected)
+	done := make(chan struct{})
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			select {
+			case observedStates <- observed:
+				return &proto.CheckinExpected{
+					Units: <-expectedUnits,
+				}
+			case <-done:
+				return nil
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error {
+			return nil
+		},
+	}
+	server.Start()
+	defer server.Stop()
+
+	// start the client
+	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{
+		Name: "program",
+		Meta: map[string]string{
+			"key": "value",
+		},
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
+		c := management.DefaultConfig()
+		if err := cfg.Unpack(&c); err != nil {
+			return nil, err
+		}
+		return management.NewV2AgentManagerWithClient(c, registry, client, management.WithStopOnEmptyUnits)
+	})
+
+	go func() {
+		t.Logf("Running beats...")
+		err := cmd.RootCmd.Execute()
+		require.NoError(t, err)
+	}()
+	expectedStatus := []proto.State{
+		proto.State_HEALTHY,
+		proto.State_DEGRADED,
+	}
+
+	timer := time.NewTimer(2 * time.Minute)
+	id := 0
+	for id < len(expectedStatus) {
+		time.Sleep(1 * time.Second)
+		select {
+		case observed := <-observedStates:
+			state := extracState(observed.GetUnits(), unitOneID)
+			fmt.Println("state", state, expectedStatus[id])
+			expectedUnits <- logOutputStream
+			if state != expectedStatus[id] {
+				continue
+			}
+			timer.Reset(2 * time.Minute)
+			id++
+		case <-timer.C:
+			t.Fatal("timeout waiting for checkin")
+		default:
+		}
+	}
+}
+
+func extracState(units []*proto.UnitObserved, idx string) proto.State {
+	for _, unit := range units {
+		if unit.Id == idx {
+			return unit.GetState()
+		}
+	}
+	return -1
+}
