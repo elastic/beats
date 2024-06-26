@@ -32,19 +32,6 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-//// ConditionConfig : 用于条件表达式，目前支持=、!=、eq、neq、include、exclude、regex、nregex
-//type ConditionConfig struct {
-//	Key     string `config:"key"`
-//	Op      string `config:"op"`
-//	Value   string `config:"value"`
-//	matcher MatchFunc
-//}
-//
-//func (c *ConditionConfig) GetMatcher() MatchFunc {
-//	return c.matcher
-//}
-
-
 type kafkaInputConfig struct {
 	// Kafka hosts with port, e.g. "localhost:9092"
 	Hosts                    []string          `config:"hosts" validate:"required"`
