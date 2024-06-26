@@ -788,12 +788,14 @@ func extractCanonicalRootImportPath(rootImportPath string) string {
 }
 
 func listSrcGOPATHs() ([]string, error) {
+	gopaths := filepath.SplitList(build.Default.GOPATH)
+
 	var (
 		cwd     = CWD()
 		errs    []string
-		srcDirs []string
+		srcDirs []string = make([]string, 0, len(gopaths))
 	)
-	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
+	for _, gopath := range gopaths {
 		gopath = filepath.Clean(gopath)
 
 		if !strings.HasPrefix(cwd, gopath) {
