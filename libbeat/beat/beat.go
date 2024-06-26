@@ -89,7 +89,7 @@ type Beat struct {
 
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct
 func (beat *Beat) GenerateUserAgent() {
-	// if we're in fleet mode, construct a custom user-agent
+	// if we're in fleet mode, construct some additional elements for the UA comment field
 	comments := []string{}
 	if beat.Manager != nil && beat.Manager.Enabled() {
 		info := beat.Manager.AgentInfo()
