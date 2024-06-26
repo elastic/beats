@@ -879,7 +879,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 //
 // In any other case, the bool is always false and the error will be non nil
 // if any error has occurred.
-func (cm *BeatV2Manager) reloadAPM(unit *client.Unit) {
+func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	apm := cm.registry.GetReloadableAPM()
 	if apm == nil {
