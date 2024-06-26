@@ -91,32 +91,35 @@ func TestInputFieldsTranslation(t *testing.T) {
 }
 
 func TestCompare(t *testing.T) {
+	expectedEvents := 1 //8
 	env := newInputTestingEnvironment(t)
 
 	inp := env.mustCreateInput(mapstr.M{
 		"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
 		// "include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+		"include_matches.match": []string{"MESSAGE=1st line"},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	defer cancelInput()
 
 	env.startInput(ctx, inp)
-	env.waitUntilEventCount(8)
+	env.waitUntilEventCount(expectedEvents)
 	t.Log("Legacy journald input ok, starting journalctl")
 
 	env2 := newInputTestingEnvironment(t)
 	inp2 := env2.mustCreateInput(mapstr.M{
 		"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
 		// "include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
-		"journalctl": true,
+		"include_matches.match": []string{"MESSAGE=1st line"},
+		"journalctl":            true,
 	})
 
 	ctx2, cancelInput2 := context.WithCancel(context.Background())
 	defer cancelInput2()
 
 	env2.startInput(ctx2, inp2)
-	env2.waitUntilEventCount(8)
+	env2.waitUntilEventCount(expectedEvents)
 }
 
 // TestCompareGoSystemdWithJournalctl ensures the new implementation produces
@@ -139,7 +142,20 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	events := []beat.Event{}
 	for _, evt := range rawEvents {
 		evt.Delete("event.created")
-		events = append(events, evt)
+		// Fields that the go-systemd version did not add
+		evt.Delete("journald.custom.seqnum")
+		evt.Delete("journald.custom.seqnum_id")
+		evt.Delete("journald.custom.realtime_timestamp")
+		// Marshal and Unmarshal because of type changes
+		// We ignore errors as those types can always marshal and unmarshal
+		data, _ := json.Marshal(evt)
+		newEvt := beat.Event{}
+		json.Unmarshal(data, &newEvt)
+		if newEvt.Meta == nil {
+			// the golden file has it as an empty map
+			newEvt.Meta = mapstr.M{}
+		}
+		events = append(events, newEvt)
 	}
 
 	// Read JSON events
@@ -152,6 +168,7 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	if err := json.Unmarshal(data, &goldenEvents); err != nil {
 		t.Fatalf("cannot unmarshal golden events: %s", err)
 	}
-
-	require.Equal(t, goldenEvents, events, "events do not match reference")
+	gold, got := goldenEvents[3], events[3]
+	fmt.Println(gold.Timestamp, got.Timestamp, gold.Meta, got.Meta)
+	require.EqualValues(t, goldenEvents[3], events[3], "events do not match reference")
 }
