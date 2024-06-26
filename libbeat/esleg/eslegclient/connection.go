@@ -87,10 +87,10 @@ type ConnectionSettings struct {
 
 	Transport httpcommon.HTTPTransportSettings
 
-	// UserAgentPostfix can be used to report the agent running mode
+	// UserAgent can be used to report the agent running mode
 	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
 	// then this string will be appended to the user agent.
-	UserAgentPostfix string
+	UserAgent string
 }
 
 type ESPingData struct {
@@ -137,14 +137,10 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	if s.Beatname == "" {
-		s.Beatname = "Libbeat"
+	// fall back to a default if nothing has configured the user-agent
+	if s.UserAgent == "" {
+		s.UserAgent = useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	}
-	if s.UserAgentPostfix != "" {
-		s.Beatname = fmt.Sprintf("%s-%s", s.Beatname, s.UserAgentPostfix)
-	}
-
-	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
 	if _, ok := s.Headers[productorigin.Header]; !ok {
@@ -163,7 +159,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
-		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": s.UserAgent}),
 	)
 	if err != nil {
 		return nil, err

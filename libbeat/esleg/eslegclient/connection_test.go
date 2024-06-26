@@ -120,9 +120,9 @@ func TestUserAgentHeader(t *testing.T) {
 	}))
 	defer server.Close()
 	conn, err := NewConnection(ConnectionSettings{
-		URL:              server.URL,
-		Beatname:         "testbeat",
-		UserAgentPostfix: "Agent",
+		URL:       server.URL,
+		Beatname:  "testbeat",
+		UserAgent: "Agent",
 	})
 	require.NoError(t, err)
 	require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
