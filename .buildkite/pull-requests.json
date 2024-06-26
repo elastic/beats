@@ -15,6 +15,7 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": [ ]
+<<<<<<< HEAD
         },
         {
             "enabled": true,
@@ -32,5 +33,8 @@
             "skip_ci_on_only_changed": ["^x-pack/elastic-agent/README.md", "^x-pack/elastic-agent/docs/.*", "^x-pack/elastic-agent/devtools/.*" ],
             "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/x-pack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         }
+=======
+        }        
+>>>>>>> c2b2983c18 ([CI] Remove elastic-agent trigger from pull-requests.json (#40026))
     ]
 }
