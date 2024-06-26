@@ -97,7 +97,6 @@ func TestUserAgentString(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			test.beat.GenerateUserAgent()
-			t.Logf("got: %#v", test.beat.Info.UserAgent)
 			res := uaReg.FindAllStringSubmatch(test.beat.Info.UserAgent, -1)
 			// check to make sure the regex passed, then verify the comments section
 			require.NotEmpty(t, res[0])
