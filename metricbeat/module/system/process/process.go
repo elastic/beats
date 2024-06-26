@@ -114,6 +114,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// monitor either a single PID, or the configured set of processes.
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
+		m.UpdateStatusOnErr(err)
 		if err != nil {
 			return fmt.Errorf("process stats: %w", err)
 		}
@@ -129,11 +130,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
+		m.UpdateStatusOnErr(err)
 		if err != nil {
-			m.UpdateStatus(status.Degraded, err.Error())
 			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
-		} else {
-			m.UpdateStatus(status.Running, "")
 		}
 		r.Event(mb.Event{
 			MetricSetFields: proc,
