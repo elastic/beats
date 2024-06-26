@@ -133,7 +133,7 @@ steps:
           - "winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Winlogbeat: Win 2022 Unit Tests"
+              context: "winlogbeat: Win 2022 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "winlogbeat-extended-win-tests"

@@ -33,7 +33,7 @@ steps:
   - group: "Check/Update"
     key: "metricbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "Metricbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C metricbeat check update

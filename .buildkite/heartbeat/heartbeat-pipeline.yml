@@ -30,7 +30,7 @@ steps:
     key: "heartbeat-check-update"
 
     steps:
-      - label: "Run check/update"
+      - label: "Heartbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C heartbeat check update
@@ -92,7 +92,7 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: RHEL Unit Tests"
+              context: "heartbeat: RHEL9 Unit Tests"
 
       - label: ":windows: Heartbeat: Win 2016 Unit Tests"
         key: "windows-2016"

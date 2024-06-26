@@ -31,7 +31,7 @@ steps:
     key: "x-pack-auditbeat-check-update"
 
     steps:
-      - label: "X-pack/auditbeat: Run check/update"
+      - label: "x-pack/auditbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/auditbeat check update
