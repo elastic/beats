@@ -125,6 +125,10 @@ func TestCompare(t *testing.T) {
 // TestCompareGoSystemdWithJournalctl ensures the new implementation produces
 // events in the same format as the original one. We use the events from the
 // already existing journal file 'input-multiline-parser.journal'
+//
+// The following fields are not currently tested:
+// __MONOTONIC_TIMESTAMP - it seems to be ignored
+// __CURSOR - it will be added to the registry and tested once we have tests for it
 func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	inp := env.mustCreateInput(mapstr.M{
