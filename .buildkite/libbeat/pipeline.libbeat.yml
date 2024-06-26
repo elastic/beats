@@ -11,7 +11,38 @@ env:
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
+  - group: "libbeat Check/Update"
+    key: "libbeat-check-update"
+    steps:
+      - label: "Run check/update"
+        command: |
+          set -eo pipefail
+          make -C libbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: check/update"
+      
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "libbeat-check-update"
+
   - group: "Mandatory Tests"
     key: "mandatory-tests"
     steps:
@@ -21,6 +52,9 @@ steps:
           set -euo pipefail
           cd libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -38,6 +72,9 @@ steps:
           set -euo pipefail
           cd libbeat
           mage goIntegTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -55,6 +92,9 @@ steps:
           set -euo pipefail
           cd libbeat
           mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -72,6 +112,9 @@ steps:
           set -euo pipefail
           cd libbeat
           make crosscompile
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -89,6 +132,9 @@ steps:
           set -euo pipefail
           cd libbeat
           make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -108,6 +154,9 @@ steps:
           set -euo pipefail
           cd libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

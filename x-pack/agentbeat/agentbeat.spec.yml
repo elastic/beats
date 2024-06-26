@@ -39,6 +39,10 @@ inputs:
         - "gc_percent=${AUDITBEAT_GOGC:100}"
         - "-E"
         - "auditbeat.config.modules.enabled=false"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"
   - name: audit/file_integrity
     description: "Audit File Integrity"
     platforms: *platforms
@@ -77,6 +81,10 @@ inputs:
         - "gc_percent=${FILEBEAT_GOGC:100}"
         - "-E"
         - "filebeat.config.modules.enabled=false"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"
   - name: aws-s3
     description: "AWS S3"
     platforms: *platforms
@@ -89,6 +97,11 @@ inputs:
     command: *filebeat_command
   - name: azure-eventhub
     description: "Azure Eventhub"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: benchmark
+    description: "Benchmark Input"
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
@@ -194,6 +207,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
+  - name: salesforce
+    description: "Salesforce input"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
   - name: syslog
     aliases:
       - log/syslog
@@ -261,6 +279,10 @@ inputs:
         - "logging.to_stderr=true"
         - "-E"
         - "gc_percent=${HEARTBEAT_GOGC:100}"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"
   - name: synthetics/http
     description: "Synthetics HTTP Monitor"
     platforms: *platforms
@@ -304,6 +326,10 @@ inputs:
         - "gc_percent=${METRICBEAT_GOGC:100}"
         - "-E"
         - "metricbeat.config.modules.enabled=false"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"
   - name: docker/metrics
     description: "Docker metrics"
     platforms: *platforms
@@ -540,6 +566,10 @@ inputs:
         - "logging.to_stderr=true"
         - "-E"
         - "gc_percent=${OSQUERYBEAT_GOGC:100}"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"
   - name: packet
     description: "Packet Capture"
     platforms: *platforms
@@ -566,3 +596,7 @@ inputs:
         - "logging.to_stderr=true"
         - "-E"
         - "gc_percent=${PACKETBEAT_GOGC:100}"
+        - "-E"
+        - "logging.event_data.to_stderr=true"
+        - "-E"
+        - "logging.event_data.to_files=false"

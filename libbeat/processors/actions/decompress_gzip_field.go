@@ -25,7 +25,6 @@ import (
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -76,9 +75,8 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.decompressGzipField(event)
 	if err != nil {
 		errMsg := fmt.Errorf("Failed to decompress field in decompress_gzip_field processor: %w", err)
-		if management.TraceLevelEnabled() {
-			f.log.Debug(errMsg.Error())
-		}
+		f.log.Debugw(errMsg.Error(), logp.EventType, logp.TypeKey)
+
 		if f.config.FailOnError {
 			event = backup
 			_, _ = event.PutValue("error.message", errMsg.Error())

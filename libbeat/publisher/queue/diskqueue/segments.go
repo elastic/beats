@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"sort"
@@ -95,10 +94,7 @@ type queueSegment struct {
 	// If this segment was loaded from a previous session, schemaVersion
 	// points to the file schema version that was read from its header.
 	// This is only used by queueSegment.headerSize(), which is used in
-	// maybeReadPending to calculate the position of the first data frame,
-	// and by queueSegment.shouldUseJSON(), which is used in the reader
-	// loop to detect old segments that used JSON encoding instead of
-	// the current CBOR.
+	// maybeReadPending to calculate the position of the first data frame.
 	schemaVersion *uint32
 
 	// The number of bytes occupied by this segment on-disk, as of the most
@@ -170,13 +166,19 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
-	files, err := ioutil.ReadDir(pathStr)
+	dirEntries, err := os.ReadDir(pathStr)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read queue directory '%s': %w", pathStr, err)
+		return nil, fmt.Errorf("could not read queue directory '%s': %w", pathStr, err)
 	}
 
 	segments := []*queueSegment{}
-	for _, file := range files {
+	for _, dirEntry := range dirEntries {
+		file, err := dirEntry.Info()
+		if err != nil {
+			logger.Errorf("could not get info for file '%s', skipping. Error: %w", dirEntry.Name(), err)
+			continue
+		}
+
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
@@ -251,11 +253,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	// Version 1 is CBOR, Version 2 could be CBOR or ProtoBuf, the
 	// options control which
 	if header.version > 0 {
-		if (header.options & ENABLE_PROTOBUF) == ENABLE_PROTOBUF {
-			sr.serializationFormat = SerializationProtobuf
-		} else {
-			sr.serializationFormat = SerializationCBOR
-		}
+		sr.serializationFormat = SerializationCBOR
 	}
 
 	if (header.options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
@@ -295,10 +293,6 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 
 	if queueSettings.UseCompression {
 		options = options | ENABLE_COMPRESSION
-	}
-
-	if queueSettings.UseProtobuf {
-		options = options | ENABLE_PROTOBUF
 	}
 
 	sw := &segmentWriter{}

@@ -45985,6 +45985,16 @@ type: keyword
 
 --
 
+*`kubernetes.container.status.last_terminated_timestamp`*::
++
+--
+Last terminated time (epoch) of the container
+
+
+type: double
+
+--
+
 
 *`kubernetes.container.cpu.limit.cores`*::
 +
@@ -46798,6 +46808,26 @@ Kubernetes pod scheduled status (true, false, unknown)
 
 
 type: keyword
+
+--
+
+*`kubernetes.pod.status.reason`*::
++
+--
+The reason the pod is in its current state (Evicted, NodeAffinity, NodeLost, Shutdown or UnexpectedAdmissionError)
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.status.ready_time`*::
++
+--
+Readiness achieved time in unix timestamp for a pod 
+
+
+type: double
 
 --
 
@@ -53628,6 +53658,15 @@ type: long
 Average wait time of the summarized events that are timed
 
 type: long
+
+--
+
+*`mysql.performance.events_statements.schemaname`*::
++
+--
+Schema name.
+
+type: keyword
 
 --
 

@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
-	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
@@ -96,27 +95,27 @@ func openJournal(path string) (*sdjournal.Journal, error) {
 	if path == localSystemJournalID || path == "" {
 		j, err := sdjournal.NewJournal()
 		if err != nil {
-			err = sderr.Wrap(err, "failed to open local journal")
+			err = fmt.Errorf("failed to open local journal: %w", err)
 		}
 		return j, err
 	}
 
 	stat, err := os.Stat(path)
 	if err != nil {
-		return nil, sderr.Wrap(err, "failed to read meta data for %{path}", path)
+		return nil, fmt.Errorf("failed to read meta data for %s: %w", path, err)
 	}
 
 	if stat.IsDir() {
 		j, err := sdjournal.NewJournalFromDir(path)
 		if err != nil {
-			err = sderr.Wrap(err, "failed to open journal directory %{path}", path)
+			err = fmt.Errorf("failed to open journal directory %s: %w", path, err)
 		}
 		return j, err
 	}
 
 	j, err := sdjournal.NewJournalFromFiles(path)
 	if err != nil {
-		err = sderr.Wrap(err, "failed to open journal file %{path}", path)
+		err = fmt.Errorf("failed to open journal file %s: %w", path, err)
 	}
 	return j, err
 }

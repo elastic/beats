@@ -108,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s", //On purpose we added this annotation with typo
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
 						"not.to.include":                       "true",
@@ -125,6 +126,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s",
 						"not.to.include":                       "true",
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
@@ -145,8 +147,9 @@ func TestGenerateHints(t *testing.T) {
 						},
 					},
 					"metrics": mapstr.M{
-						"module": "prometheus",
-						"period": "15s",
+						"module":          "prometheus",
+						"period":          "15s",
+						"timeoutssssssss": "5s",
 					},
 				},
 				"container": mapstr.M{
@@ -230,6 +233,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -251,6 +255,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -268,6 +273,7 @@ func TestGenerateHints(t *testing.T) {
 				"hints": mapstr.M{
 					"metrics": mapstr.M{
 						"module": "prometheus",
+						"hosts":  "127.0.0.1:9090",
 						"period": "15s",
 					},
 				},
@@ -2191,6 +2197,7 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			// #nosec G601
 			config := conf.MustNewConfigFrom(&test.cfg)
 			c := defaultConfig()
 			err = config.Unpack(&c)
@@ -2247,6 +2254,10 @@ func (s *mockUpdaterWatcher) Start() error {
 	return err
 }
 
+func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return nil
+}
+
 func (s *mockUpdaterWatcher) Stop() {
 }
 
@@ -2255,10 +2266,6 @@ func (s *mockUpdaterWatcher) Store() caches.Store {
 }
 
 func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
-}
-
-func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
-	return nil
 }
 
 func (s *mockUpdaterStore) List() []interface{} {

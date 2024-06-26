@@ -20,10 +20,9 @@ package cursor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
-
-	"github.com/urso/sderr"
 
 	"github.com/elastic/go-concert/unison"
 
@@ -108,11 +107,7 @@ func (cim *InputManager) init() error {
 
 // Init starts background processes for deleting old entries from the
 // persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
-	if mode != v2.ModeRun {
-		return nil
-	}
-
+func (cim *InputManager) Init(group unison.Group) error {
 	if err := cim.init(); err != nil {
 		return err
 	}
@@ -135,7 +130,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return sderr.Wrap(err, "Can not start registry cleanup process")
+		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
 	return nil
