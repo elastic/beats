@@ -61,10 +61,11 @@ func TestSystem(t *testing.T) {
 	}()
 
 	/*
-		process with pid=-1 doesn't exist. This should degrade the input for a while
-	*/
+	 * process with pid=-1 doesn't exist. This should degrade the input for a while */
 	inputStreamIncorrectPid := getInputStream(unitOneID, -1, 1)
-	inputStreamCorrectPid := getInputStream(unitOneID, os.Getpid(), 2) // Correct pid. This should turn the input back to healthy
+	/*
+	 * process with valid pid. This should change state to healthy */
+	inputStreamCorrectPid := getInputStream(unitOneID, os.Getpid(), 2)
 	outputExpectedStream := proto.UnitExpected{
 		Id:             unitOutID,
 		Type:           proto.UnitType_OUTPUT,
@@ -136,10 +137,6 @@ func TestSystem(t *testing.T) {
 		err := cmd.RootCmd.Execute()
 		require.NoError(t, err)
 	}()
-	// expectedStatus := []proto.State{
-	// 	proto.State_HEALTHY,
-	// 	proto.State_DEGRADED,
-	// }
 
 	scenarios := []struct {
 		expectedStatus proto.State
