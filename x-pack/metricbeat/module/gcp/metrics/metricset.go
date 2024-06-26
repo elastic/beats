@@ -144,7 +144,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
-		m.Logger().Warnf("Period has been updated to GCP default value as  %s", err)
+		m.Logger().Warnf("Period has been set to default value of 60s: %s", err)
 		m.config.period = &durationpb.Duration{
 			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
 		}
