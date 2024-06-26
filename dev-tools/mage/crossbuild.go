@@ -332,7 +332,6 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		"-v", repoInfo.RootDir+":"+mountPoint,
-		"-v", "/home/alexk/go/src/github.com/elastic/elastic-agent-libs:/go/src/github.com/elastic/elastic-agent-libs/",
 		"-w", workDir,
 	)
 
