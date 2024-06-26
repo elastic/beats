@@ -137,9 +137,13 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	// fall back to a default if nothing has configured the user-agent
+	// fall back to a default if nothing has configured the user-agent field
 	if s.UserAgent == "" {
-		s.UserAgent = useragent.UserAgent("Libbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
+		beatname := "Libbeat"
+		if s.Beatname != "" {
+			beatname = s.Beatname
+		}
+		s.UserAgent = useragent.UserAgent(beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	}
 
 	// Default the product origin header to beats if it wasn't already set.
