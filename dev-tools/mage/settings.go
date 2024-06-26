@@ -792,10 +792,10 @@ func listSrcGOPATHs() ([]string, error) {
 	gopaths := filepath.SplitList(build.Default.GOPATH)
 
 	var (
-		cwd     = CWD()
-		errs    []string
-		srcDirs []string = make([]string, 0, len(gopaths))
+		cwd  = CWD()
+		errs []string
 	)
+	srcDirs := make([]string, 0, len(gopaths))
 	for _, gopath := range gopaths {
 		gopath = filepath.Clean(gopath)
 
