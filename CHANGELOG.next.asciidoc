@@ -286,6 +286,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow elision of set and append failure logging. {issue}34544[34544] {pull}39929[39929]
 - Add ability to remove request trace logs from CEL input. {pull}39969[39969]
 - Add ability to remove request trace logs from HTTPJSON input. {pull}40003[40003]
+- Added out of the box support for Amazon EventBridge notifications over SQS to S3 input {pull}40006[40006]
 
 *Auditbeat*
 
