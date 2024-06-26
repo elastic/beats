@@ -121,6 +121,7 @@ func makeES(
 				EscapeHTML:       esConfig.EscapeHTML,
 				Transport:        esConfig.Transport,
 				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
+				UserAgentPostfix: beatInfo.UserAgentPostfix,
 			},
 			indexSelector:    indexSelector,
 			pipelineSelector: pipelineSelector,
