@@ -31,6 +31,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/sh"
+	"golang.org/x/text/cases"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -92,7 +93,7 @@ var (
 		"elastic_beats_dir": ElasticBeatsDir,
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
-		"title":             strings.Title,
+		"title":             cases.Title,
 		"tolower":           strings.ToLower,
 		"contains":          strings.Contains,
 	}
