@@ -45,7 +45,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -289,7 +289,8 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"
-          MODULE: "aws"
+#          MODULE: "aws"
+          TEST_TAGS: "aws"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

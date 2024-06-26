@@ -15,7 +15,7 @@ exportAwsSecrets() {
   export AWS_ACCESS_KEY_ID=$awsAccessKey
   export AWS_SECRET_ACCESS_KEY=$awsSecretKey
   #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
-  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
+#  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 
   # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
   # - x-pack/metricbeat/module/aws/terraform.tf
