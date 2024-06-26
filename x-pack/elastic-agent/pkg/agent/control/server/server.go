@@ -235,7 +235,7 @@ func (s *Server) ProcMeta(ctx context.Context, _ *cproto.Empty) (*cproto.ProcMet
 				endpoint = "npipe"
 			}
 
-			req, err := http.NewRequestWithContext(ctx, http.MethodGET, "http://"+endpoint+"/", nil)
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+endpoint+"/", nil)
 			if err != nil {
 				procMeta.Error = err.Error()
 				resp.Procs = append(resp.Procs, procMeta)
