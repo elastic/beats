@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package tests
 
 import (
@@ -58,65 +60,35 @@ func TestSystem(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	var logOutputStream = []*proto.UnitExpected{
-		{
-			Id:             unitOutID,
-			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_HEALTHY,
-			Config: &proto.UnitExpectedConfig{
-				DataStream: &proto.DataStream{
-					Namespace: "default",
-				},
-				Type:     "file",
-				Revision: 1,
-				Meta: &proto.Meta{
-					Package: &proto.Package{
-						Name:    "system",
-						Version: "1.17.0",
-					},
-				},
-				Source: tests.RequireNewStruct(map[string]interface{}{
-					"type":            "file",
-					"enabled":         true,
-					"path":            outPath,
-					"filename":        "beat-out",
-					"number_of_files": 7,
-				}),
+	/*
+		process with pid=-1 doesn't exist. This should degrade the input for a while
+	*/
+	inputStreamIncorrectPid := getInputStream(unitOneID, -1, 1)
+	inputStreamCorrectPid := getInputStream(unitOneID, os.Getpid(), 2) // Correct pid. This should turn the input back to healthy
+	outputExpectedStream := proto.UnitExpected{
+		Id:             unitOutID,
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		Config: &proto.UnitExpectedConfig{
+			DataStream: &proto.DataStream{
+				Namespace: "default",
 			},
-		},
-		{
-			Id:             unitOneID,
-			Type:           proto.UnitType_INPUT,
-			ConfigStateIdx: 1,
-			State:          proto.State_HEALTHY,
-			Config: &proto.UnitExpectedConfig{
-				DataStream: &proto.DataStream{
-					Namespace: "default",
-				},
-				Streams: []*proto.Stream{{
-					Id: "system/metrics-system.process-default-system",
-					DataStream: &proto.DataStream{
-						Dataset: "system.process",
-						Type:    "metrics",
-					},
-					Source: tests.RequireNewStruct(map[string]interface{}{
-						"metricsets": []interface{}{"process"},
-						// pid -1 doesn't exist. It should report an error AND update state as DEGRADED
-						"process.pid": -1,
-					}),
-				}},
-				Type:     "system/metrics",
-				Id:       "system/metrics-system-default-system",
-				Name:     "system-1",
-				Revision: 1,
-				Meta: &proto.Meta{
-					Package: &proto.Package{
-						Name:    "system",
-						Version: "1.17.0",
-					},
+			Type:     "file",
+			Revision: 1,
+			Meta: &proto.Meta{
+				Package: &proto.Package{
+					Name:    "system",
+					Version: "1.17.0",
 				},
 			},
+			Source: tests.RequireNewStruct(map[string]interface{}{
+				"type":            "file",
+				"enabled":         true,
+				"path":            outPath,
+				"filename":        "beat-out",
+				"number_of_files": 7,
+			}),
 		},
 	}
 
@@ -164,21 +136,46 @@ func TestSystem(t *testing.T) {
 		err := cmd.RootCmd.Execute()
 		require.NoError(t, err)
 	}()
-	expectedStatus := []proto.State{
-		proto.State_HEALTHY,
-		proto.State_DEGRADED,
+	// expectedStatus := []proto.State{
+	// 	proto.State_HEALTHY,
+	// 	proto.State_DEGRADED,
+	// }
+
+	scenarios := []struct {
+		expectedStatus proto.State
+		nextInputunit  *proto.UnitExpected
+	}{
+		{
+			proto.State_HEALTHY,
+			&inputStreamIncorrectPid,
+		},
+		{
+			proto.State_DEGRADED,
+			&inputStreamCorrectPid,
+		},
+		{
+			proto.State_HEALTHY,
+			&inputStreamCorrectPid,
+		},
+		// wait for one more checkin, just to be sure it's healthy
+		{
+			proto.State_HEALTHY,
+			&inputStreamCorrectPid,
+		},
 	}
 
 	timer := time.NewTimer(2 * time.Minute)
 	id := 0
-	for id < len(expectedStatus) {
-		time.Sleep(1 * time.Second)
+	for id < len(scenarios) {
 		select {
 		case observed := <-observedStates:
 			state := extracState(observed.GetUnits(), unitOneID)
-			fmt.Println("state", state, expectedStatus[id])
-			expectedUnits <- logOutputStream
-			if state != expectedStatus[id] {
+			fmt.Println(id, state, scenarios[id].expectedStatus)
+			expectedUnits <- []*proto.UnitExpected{
+				scenarios[id].nextInputunit,
+				&outputExpectedStream,
+			}
+			if state != scenarios[id].expectedStatus {
 				continue
 			}
 			timer.Reset(2 * time.Minute)
@@ -197,4 +194,39 @@ func extracState(units []*proto.UnitObserved, idx string) proto.State {
 		}
 	}
 	return -1
+}
+
+func getInputStream(id string, pid int, stateIdx int) proto.UnitExpected {
+	return proto.UnitExpected{
+		Id:             id,
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: uint64(stateIdx),
+		State:          proto.State_HEALTHY,
+		Config: &proto.UnitExpectedConfig{
+			DataStream: &proto.DataStream{
+				Namespace: "default",
+			},
+			Streams: []*proto.Stream{{
+				Id: "system/metrics-system.process-default-system",
+				DataStream: &proto.DataStream{
+					Dataset: "system.process",
+					Type:    "metrics",
+				},
+				Source: tests.RequireNewStruct(map[string]interface{}{
+					"metricsets":  []interface{}{"process"},
+					"process.pid": pid,
+				}),
+			}},
+			Type:     "system/metrics",
+			Id:       "system/metrics-system-default-system",
+			Name:     "system-1",
+			Revision: 1,
+			Meta: &proto.Meta{
+				Package: &proto.Package{
+					Name:    "system",
+					Version: "1.17.0",
+				},
+			},
+		},
+	}
 }
