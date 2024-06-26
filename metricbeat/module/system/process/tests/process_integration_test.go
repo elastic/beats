@@ -165,7 +165,7 @@ func TestProcessStatusReporter(t *testing.T) {
 	for id < len(scenarios) {
 		select {
 		case observed := <-observedStates:
-			state := extracState(observed.GetUnits(), unitOneID)
+			state := extractState(observed.GetUnits(), unitOneID)
 			expectedUnits <- []*proto.UnitExpected{
 				scenarios[id].nextInputunit,
 				&outputExpectedStream,
@@ -173,6 +173,10 @@ func TestProcessStatusReporter(t *testing.T) {
 			if state != scenarios[id].expectedStatus {
 				continue
 			}
+			// always ensure that output is healthy
+			outputState := extractState(observed.GetUnits(), unitOutID)
+			require.Equal(t, outputState, proto.State_HEALTHY)
+
 			timer.Reset(2 * time.Minute)
 			id++
 		case <-timer.C:
@@ -182,7 +186,7 @@ func TestProcessStatusReporter(t *testing.T) {
 	}
 }
 
-func extracState(units []*proto.UnitObserved, idx string) proto.State {
+func extractState(units []*proto.UnitObserved, idx string) proto.State {
 	for _, unit := range units {
 		if unit.Id == idx {
 			return unit.GetState()

@@ -63,11 +63,11 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                      // Name returns the name of the Module.
-	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
-	UpdateStatus(status status.Status, msg string)
-	SetStatusReporter(statusReporter status.StatusReporter)
+	Name() string                                           // Name returns the name of the Module.
+	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
+	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
+	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status repoter for the given module.
 }
 
 // BaseModule implements the Module interface.
@@ -99,12 +99,12 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
 }
 
-// UnpackConfig unpacks the raw module config to the given object.
+// UpdateStatus updates the status of the module. Reflected on elastic-agent.
 func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
 	m.statusReporter.UpdateStatus(status, msg)
 }
 
-// UnpackConfig unpacks the raw module config to the given object.
+// SetStatusReporter updates the status of the module. Reflected on elastic-agent.
 func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
 }

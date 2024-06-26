@@ -19,7 +19,7 @@ package helper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -56,7 +56,7 @@ func TestGetAuthHeaderFromToken(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			content := []byte(test.Content)
-			tmpfile, err := ioutil.TempFile("", "token")
+			tmpfile, err := os.CreateTemp("", "token")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -237,6 +237,7 @@ func TestOverUnixSocket(t *testing.T) {
 			fmt.Fprintf(w, "ehlo!")
 		})
 
+		// nolint: errcheck // Ignore the error
 		go http.Serve(l, mux)
 
 		return l
@@ -244,7 +245,7 @@ func TestOverUnixSocket(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			tmpDir, err := ioutil.TempDir("", "testsocket")
+			tmpDir, err := os.MkdirTemp("", "testsocket")
 			require.NoError(t, err)
 			defer os.RemoveAll(tmpDir)
 
@@ -263,7 +264,7 @@ func TestOverUnixSocket(t *testing.T) {
 			r, err := h.FetchResponse()
 			require.NoError(t, err)
 			defer r.Body.Close()
-			content, err := ioutil.ReadAll(r.Body)
+			content, err := io.ReadAll(r.Body)
 			require.NoError(t, err)
 			assert.Equal(t, []byte("ehlo!"), content)
 		})
