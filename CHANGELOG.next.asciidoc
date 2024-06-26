@@ -54,7 +54,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 
-
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
