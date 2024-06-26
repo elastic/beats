@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix `namespace` filter option on `add_kubernetes_metadata` processor. {pull}39934[39934]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
@@ -152,6 +153,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix `namespace` filter option on metricset `state_namespace` enricher. {pull}39934[39934]
 - Fix `namespace` filter option at Kubernetes provider level. {pull}39881[39881]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
