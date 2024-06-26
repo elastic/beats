@@ -75,6 +75,8 @@ type config struct {
 
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
+
+	Journalctl bool `config:"journalctl"`
 }
 
 // bwcIncludeMatches is a wrapper that accepts include_matches configuration

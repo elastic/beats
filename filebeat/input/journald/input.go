@@ -25,6 +25,7 @@ import (
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
 
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -36,6 +37,13 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+type journalReader interface {
+	Close() error
+	Seek(mode journalread.SeekMode, cursor string) (err error)
+	SeekRealtimeUsec(usec uint64) error
+	Next(cancel input.Canceler) (*sdjournal.JournalEntry, error)
+}
 
 type journald struct {
 	Backoff            time.Duration
@@ -49,6 +57,7 @@ type journald struct {
 	Identifiers        []string
 	SaveRemoteHostname bool
 	Parsers            parser.Config
+	Journalctl         bool
 }
 
 type checkpoint struct {
@@ -114,6 +123,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
+		Journalctl:         config.Journalctl,
 	}, nil
 }
 
@@ -173,7 +183,11 @@ func (inp *journald) Run(
 	}
 }
 
-func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
+func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (journalReader, error) {
+	if inp.Journalctl {
+		return inp.openJournalctl(log, canceler, src)
+	}
+
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
 	reader, err := journalread.Open(log, src.Name(), backoff,
 		withFilters(inp.Matches),
@@ -185,6 +199,10 @@ func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.
 	}
 
 	return reader, nil
+}
+
+func (inp *journald) openJournalctl(log *logp.Logger, canceler input.Canceler, src cursor.Source) (journalReader, error) {
+	return journalctl.New(log, canceler, inp.Matches, src.Name())
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
@@ -254,7 +272,7 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 //   - Translates the fields names from the journald format to something
 //     more human friendly
 type readerAdapter struct {
-	r                  *journalread.Reader
+	r                  journalReader
 	canceler           input.Canceler
 	converter          *journalfield.Converter
 	saveRemoteHostname bool
