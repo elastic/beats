@@ -28,6 +28,7 @@ import (
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -155,7 +156,7 @@ func (r *Reader) SeekRealtimeUsec(usec uint64) error {
 
 // Next reads a new journald entry from the journal. It blocks if there is
 // currently no entry available in the journal, or until an error has occurred.
-func (r *Reader) Next(cancel canceler) (*sdjournal.JournalEntry, error) {
+func (r *Reader) Next(cancel input.Canceler) (*sdjournal.JournalEntry, error) {
 	for cancel.Err() == nil {
 		c, err := r.journal.Next()
 		if err != nil && err != io.EOF {

@@ -84,3 +84,33 @@ func TestInputFieldsTranslation(t *testing.T) {
 		})
 	}
 }
+
+func TestCompare(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	inp := env.mustCreateInput(mapstr.M{
+		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
+		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+	})
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(6)
+
+	t.Log("Legacy journald input ok, starting journalctl")
+
+	env2 := newInputTestingEnvironment(t)
+	inp2 := env2.mustCreateInput(mapstr.M{
+		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
+		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+		"journalctl":            true,
+	})
+
+	ctx2, cancelInput2 := context.WithCancel(context.Background())
+	defer cancelInput2()
+
+	env2.startInput(ctx2, inp2)
+	env2.waitUntilEventCount(6)
+}

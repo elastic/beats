@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -37,6 +38,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
+	"github.com/stretchr/testify/assert"
 )
 
 type inputTestingEnvironment struct {
@@ -72,7 +74,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	if err := manager.Init(&e.grp, v2.ModeRun); err != nil {
+	if err := manager.Init(&e.grp); err != nil {
 		e.t.Fatalf("failed to initialise manager: %+v", err)
 	}
 
@@ -98,17 +100,24 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
-	e.t.Helper()
-	for {
+	msg := strings.Builder{}
+	fmt.Fprintf(&msg, "did not find the expected %d events", count)
+	assert.Eventually(e.t, func() bool {
 		sum := len(e.pipeline.GetAllEvents())
 		if sum == count {
-			return
+			return true
 		}
 		if count < sum {
-			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
+			msg.Reset()
+			fmt.Fprintf(&msg, "too many events; expected: %d, actual: %d", count, sum)
+			return false
 		}
-		time.Sleep(10 * time.Millisecond)
-	}
+
+		msg.Reset()
+		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", count, sum)
+
+		return false
+	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
 func (e *inputTestingEnvironment) waitUntilInputStops() {
