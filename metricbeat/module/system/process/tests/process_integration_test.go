@@ -93,11 +93,10 @@ func TestProcessStatusReporter(t *testing.T) {
 		},
 	}
 
-	// expectedMBStreams.Streams = systemInputStreams
-	// elastic-agent management V2 mock server
 	observedStates := make(chan *proto.CheckinObserved)
 	expectedUnits := make(chan []*proto.UnitExpected)
 	done := make(chan struct{})
+	// V2 mock server
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			select {
@@ -167,7 +166,6 @@ func TestProcessStatusReporter(t *testing.T) {
 		select {
 		case observed := <-observedStates:
 			state := extracState(observed.GetUnits(), unitOneID)
-			fmt.Println(id, state, scenarios[id].expectedStatus)
 			expectedUnits <- []*proto.UnitExpected{
 				scenarios[id].nextInputunit,
 				&outputExpectedStream,
