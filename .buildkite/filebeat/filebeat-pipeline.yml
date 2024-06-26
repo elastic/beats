@@ -4,9 +4,11 @@ name: "beats-filebeat"
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
@@ -32,10 +34,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Filebeat Check/Update"
+  - group: "Check/Update"
     key: "filebeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "Filebeat: Run check/update"
         command: |
           set -eo pipefail
           make -C filebeat check update
@@ -59,7 +61,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "filebeat-check-update"
 
-  - group: "Filebeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "filebeat-mandatory-tests"
     steps:
       - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests"
@@ -82,7 +84,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Filebeat Go Integration Tests"
+      - label: ":ubuntu: Filebeat: Go Integration Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -100,9 +102,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Filebeat Go Integration Tests"
+              context: "filebeat: Go Integration Tests"
 
-      - label: ":ubuntu: Filebeat Python Integration Tests"
+      - label: ":ubuntu: Filebeat: Python Integration Tests"
         env:
           GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
@@ -122,7 +124,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
 
-      - label: ":windows: Filebeat Windows 2016 Unit Tests"
+      - label: ":windows: Filebeat: Win 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -143,9 +145,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2016 Unit Tests"
+              context: "filebeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Filebeat Windows 2022 Unit Tests"
+      - label: ":windows: Filebeat: Win 2022 Unit Tests"
         key: "windows-2022-unit-tests"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -166,14 +168,14 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2022 Unit Tests"
+              context: "filebeat: Win 2022 Unit Tests"
 
-  - group: "Filebeat Extended Tests"
+  - group: "Extended Tests"
     key: "filebeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
-      - label: ":mac: Filebeat macOS x86_64 Unit Tests"
+      - label: ":mac: Filebeat: macOS x86_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
@@ -196,7 +198,7 @@ steps:
           - github_commit_status:
               context: "filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Filebeat macOS arm64 Unit Tests"
+      - label: ":mac: Filebeat: macOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         env:
@@ -241,12 +243,12 @@ steps:
           - github_commit_status:
               context: "filebeat: Ubuntu arm64 Unit Tests"
 
-  - group: "Filebeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Filebeat Windows 2019 Unit Tests"
+      - label: ":windows: Filebeat: Win 2019 Unit Tests"
         key: "windows-extended-2019"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -267,9 +269,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2019 Unit Tests"
+              context: "filebeat: Win 2019 Unit Tests"
 
-      - label: ":windows: Filebeat Windows 11 Unit Tests"
+      - label: ":windows: Filebeat: Win 11 Unit Tests"
         key: "windows-extended-11"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -290,9 +292,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 11 Unit Tests"
+              context: "filebeat: Win 11 Unit Tests"
 
-      - label: ":windows: Filebeat Windows 10 Unit Tests"
+      - label: ":windows: Filebeat: Win 10 Unit Tests"
         key: "windows-extended-10"
         env:
           GOX_FLAGS: "${ARCH_MINGW_X86_64}"
@@ -313,7 +315,7 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 10 Unit Tests"
+              context: "filebeat: Win 10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -322,10 +324,10 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "filebeat-mandatory-tests"
 
-  - group: "Filebeat Packaging"
+  - group: "Packaging"
     key: "packaging"
     steps:
-      - label: ":linux: Filebeat Packaging Linux"
+      - label: ":ubuntu: Filebeat: Packaging Linux"
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -347,11 +349,12 @@ steps:
           - github_commit_status:
               context: "filebeat: Packaging Linux"
 
-      - label: ":linux: Filebeat Packaging arm64"
+      - label: ":ubuntu: Filebeat: Packaging arm64"
         key: "packaging-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
+          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd filebeat
           mage package

@@ -20,11 +20,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "libbeat Check/Update"
+  - group: "Check/Update"
     key: "libbeat-check-update"
 
     steps:
-      - label: "Run check/update"
+      - label: "Libbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C libbeat check update
