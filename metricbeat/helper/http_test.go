@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -327,3 +328,5 @@ func (*dummyModule) Config() mb.ModuleConfig {
 func (*dummyModule) UnpackConfig(interface{}) error {
 	return nil
 }
+func (dummyModule) UpdateStatus(_ status.Status, _ string)    {}
+func (dummyModule) SetStatusReporter(_ status.StatusReporter) {}
