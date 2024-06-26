@@ -83,7 +83,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
              AND instance_name = '_Total' )
         OR ( counter_name IN ( 'Page life expectancy', 
                   'Buffer cache hit ratio', 
-	           'Buffer cache hit ratio base',
+	          'Buffer cache hit ratio base',
                   'Target pages', 'Database pages', 
                   'Checkpoint pages/sec' )
              AND object_name LIKE '%:Buffer Manager%' )
