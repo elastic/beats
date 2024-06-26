@@ -22,6 +22,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          set -eo pipefail
           make -C libbeat check update
           make check-no-changes
         retry:
@@ -72,7 +73,7 @@ steps:
         command: |
           set -euo pipefail
           cd libbeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3

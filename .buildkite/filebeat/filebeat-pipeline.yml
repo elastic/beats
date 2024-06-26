@@ -29,6 +29,7 @@ steps:
     steps:
       - label: "Run check/update"
         command: |
+          set -eo pipefail
           make -C filebeat check update
           make check-no-changes
         retry:
@@ -92,7 +93,7 @@ steps:
       - label: ":ubuntu: Filebeat Go Integration Tests"
         command: |
           cd filebeat
-          mage goIntegTest
+          mage -v goIntegTest
         retry:
           automatic:
             - limit: 3
