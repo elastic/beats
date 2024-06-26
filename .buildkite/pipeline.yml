@@ -617,7 +617,7 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Packetbeat"
+  - label: "Triggering Build for Elastic Agent"
     if: build.pull_request.id == null
     trigger: "beats-xpack-elastic-agent"
     build:
