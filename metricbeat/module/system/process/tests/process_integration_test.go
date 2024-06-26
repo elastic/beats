@@ -43,7 +43,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func TestSystem(t *testing.T) {
+func TestProcessStatusReporter(t *testing.T) {
 	unitOneID := mock.NewID()
 	unitOutID := mock.NewID()
 	token := mock.NewID()
