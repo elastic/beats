@@ -7,7 +7,6 @@ package management
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/version"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestManagerV2(t *testing.T) {
