@@ -33,6 +33,64 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestGenerateJournalEntries generates entries in the user's journal.
+// It is kept commented out at the top of the file as reference and
+// easy access.
+//
+// How to generate a journal file with only the entries you want:
+//  1. Get a VM
+//  2. Uncomment and run this test as a normal user just to make sure you
+//     you can write to the journal and find the file
+//  3. Find the journal file, usually at
+//     /var/log/journal/<machine ID>/user-1000.journal
+//  4. Rotate the journal
+//  5. Clean and rotate the journal
+//     sudo journalctl  --vacuum-time=1s
+//     sudo journalctl --rotate
+//  6. Copy the journal file somewhere else
+//     cp /var/log/journal/21282bcb80a74c08a0d14a047372256c/user-1000.journal /tmp/foo.journal
+//  7. Read the journal file:
+//     journalctl --file=/tmp/foo.journal -n 100
+//  8. Read the journal with all fields as JSON
+//     journalctl --file=/tmp/foo.journal -n 100 -o json
+// func TestGenerateJournalEntries(t *testing.T) {
+// 	// To run this test you need to add the necessary imports.
+// 	// 1. Go get:
+// 	//   go get github.com/ssgreg/journald
+// 	// 2. Add the following import:
+// 	//   journaldlogger "github.com/ssgreg/journald"
+// 	// 3. Uncomment and run the test:
+// 	//   go test --tags="withjournald,linux,cgo" -count=1 -run=TestGenerate
+// 	fields := []map[string]any{
+// 		{
+// 			"BAR": "bar",
+// 		},
+// 		{
+// 			"FOO": "foo",
+// 		},
+// 		{
+// 			"BAR": "bar",
+// 			"FOO": "foo",
+// 		},
+// 		{
+// 			"FOO_BAR": "foo bar",
+// 		},
+// 		{
+// 			"ANSWER":   42,
+// 			"BAR":      "bar",
+// 			"FOO":      "foo",
+// 			"FOO_BAR":  "foo bar",
+// 			"QUESTION": "Answer to the Ultimate Question of Life, The Universe, and Everything",
+// 		},
+// 	}
+
+// 	for _, m := range fields {
+// 		if err := journaldlogger.Send("Hello World!", journaldlogger.PriorityInfo, m); err != nil {
+// 			t.Fatal(err)
+// 		}
+// 	}
+// }
+
 func TestInputFieldsTranslation(t *testing.T) {
 	// A few random keys to verify
 	keysToCheck := map[string]string{
