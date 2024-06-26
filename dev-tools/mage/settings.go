@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -490,7 +489,7 @@ func (s *BuildVariableSources) GetBeatVersion() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return "", fmt.Errorf("failed to read beat version file=%v: %w", file, err)
 	}
@@ -508,7 +507,7 @@ func (s *BuildVariableSources) GetGoVersion() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return "", fmt.Errorf("failed to read go version file=%v: %w", file, err)
 	}
@@ -526,7 +525,7 @@ func (s *BuildVariableSources) GetDocBranch() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return "", fmt.Errorf("failed to read doc branch file=%v: %w", file, err)
 	}
