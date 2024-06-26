@@ -675,16 +675,22 @@ The value of the response that specifies the maximum overall resource request ra
 The maximum burst size. Burst is the maximum number of resource requests that can be made above the overall rate limit.
 
 [float]
-==== `resource.tracer.filename`
+==== `resource.tracer.enable`
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations.
-This option is enabled by setting the `resource.tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `resource.tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting
+`resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching
+the filename option to be deleted.
 
 [float]
 ==== `resource.tracer.maxsize`

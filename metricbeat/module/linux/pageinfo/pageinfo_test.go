@@ -18,14 +18,29 @@
 package pageinfo
 
 import (
+	"bufio"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestFileRead(t *testing.T) {
+	fd, err := os.Open("./testdata/pagetypeinfo")
+	require.NoError(t, err)
+
+	reader := bufio.NewReader(fd)
+
+	zones, err := readPageFile(logp.L(), reader)
+	require.NoError(t, err)
+	require.Equal(t, int64(100000), zones.Zones[0].Normal["Movable"][1])
+}
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())

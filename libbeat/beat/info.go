@@ -25,17 +25,18 @@ import (
 
 // Info stores a beats instance meta data.
 type Info struct {
-	Beat            string    // The actual beat's name
-	IndexPrefix     string    // The beat's index prefix in Elasticsearch.
-	Version         string    // The beat version. Defaults to the libbeat version when an implementation does not set a version
-	ElasticLicensed bool      // Whether the beat is licensed under and Elastic License
-	Name            string    // configured beat name
-	Hostname        string    // hostname
-	FQDN            string    // FQDN
-	ID              uuid.UUID // ID assigned to beat machine
-	EphemeralID     uuid.UUID // ID assigned to beat process invocation (PID)
-	FirstStart      time.Time // The time of the first start of the Beat.
-	StartTime       time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
+	Beat             string    // The actual beat's name
+	IndexPrefix      string    // The beat's index prefix in Elasticsearch.
+	Version          string    // The beat version. Defaults to the libbeat version when an implementation does not set a version
+	ElasticLicensed  bool      // Whether the beat is licensed under and Elastic License
+	Name             string    // configured beat name
+	Hostname         string    // hostname
+	FQDN             string    // FQDN
+	ID               uuid.UUID // ID assigned to beat machine
+	EphemeralID      uuid.UUID // ID assigned to beat process invocation (PID)
+	FirstStart       time.Time // The time of the first start of the Beat.
+	StartTime        time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
+	UserAgentPostfix string    // A string postfix that's postfixed to the existing user-agent string used by the elasticsearch output
 
 	// Monitoring-related fields
 	Monitoring struct {

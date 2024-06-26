@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.21.0
+go 1.21.9
 
 toolchain go1.21.11
 
@@ -71,7 +71,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.11.0
+	github.com/elastic/elastic-agent-client/v7 v7.13.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
 	github.com/elastic/go-licenser v0.4.2
@@ -89,7 +89,6 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/go-test/deep v1.0.7
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus/v5 v5.0.6
 	github.com/godror/godror v0.33.2
@@ -102,7 +101,7 @@ require (
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.6.0
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.6.6
@@ -110,7 +109,6 @@ require (
 	github.com/hashicorp/nomad/api v0.0.0-20201203164818-6318a8ac7bf8
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
-	github.com/jarcoal/httpmock v1.0.4
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jonboulle/clockwork v0.2.2
@@ -146,21 +144,21 @@ require (
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71 // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	go.elastic.co/ecszap v1.0.2
-	go.elastic.co/go-licence-detector v0.6.0
+	go.elastic.co/go-licence-detector v0.6.1
 	go.etcd.io/bbolt v1.3.6
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.22.0
+	golang.org/x/crypto v0.24.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-	golang.org/x/mod v0.14.0
-	golang.org/x/net v0.24.0
+	golang.org/x/mod v0.18.0
+	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.10.0
-	golang.org/x/sync v0.6.0
-	golang.org/x/sys v0.20.0
-	golang.org/x/text v0.14.0
+	golang.org/x/sync v0.7.0
+	golang.org/x/sys v0.21.0
+	golang.org/x/text v0.16.0
 	golang.org/x/time v0.5.0
-	golang.org/x/tools v0.16.1
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.3
@@ -171,7 +169,6 @@ require (
 	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools v2.2.0+incompatible
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
 	k8s.io/api v0.29.5
@@ -204,14 +201,14 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.7.0
-	github.com/elastic/elastic-agent-libs v0.9.11
-	github.com/elastic/elastic-agent-system-metrics v0.10.2
+	github.com/elastic/elastic-agent-libs v0.9.13
+	github.com/elastic/elastic-agent-system-metrics v0.10.3
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
+	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
 	github.com/elastic/mito v1.12.2
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
-	github.com/g8rswimmer/go-sfdc v0.0.0-00010101000000-000000000000
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/cel-go v0.19.0
@@ -275,10 +272,9 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cilium/ebpf v0.13.2 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
@@ -359,7 +355,6 @@ require (
 	github.com/rootless-containers/rootlesskit v1.1.0 // indirect
 	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
-	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
@@ -376,7 +371,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
-	golang.org/x/term v0.19.0 // indirect
+	golang.org/x/term v0.21.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect
@@ -414,7 +409,6 @@ replace (
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
-	github.com/g8rswimmer/go-sfdc => github.com/elastic/go-sfdc v0.0.0-20201201191151-3190c381b3e1
 	github.com/godror/godror => github.com/godror/godror v0.33.2 // updating to v0.24.2 caused a breaking change
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
