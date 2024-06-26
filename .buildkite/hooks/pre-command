@@ -6,12 +6,11 @@ source .buildkite/env-scripts/util.sh
 
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" ]]; then
   source .buildkite/env-scripts/env.sh
   if [[ -z "${GO_VERSION-""}" ]]; then
     export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
@@ -75,15 +74,6 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == *"xpack-metricbeat"* || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == *"extended-cloud-test"* ]]; then
-    BEATS_AWS_SECRET_KEY=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
-    export BEATS_AWS_SECRET_KEY
-    BEATS_AWS_ACCESS_KEY=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
-    export BEATS_AWS_ACCESS_KEY
-  fi
-fi
-
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
     PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry_with_count 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
@@ -91,9 +81,3 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
-  source .buildkite/env-scripts/env.sh
-  if [[ "$BUILDKITE_STEP_KEY" == k8s-test* ]]; then
-    .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-  fi
-fi

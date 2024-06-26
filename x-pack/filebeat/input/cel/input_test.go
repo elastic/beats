@@ -47,6 +47,7 @@ var inputTests = []struct {
 	wantCursor    []map[string]interface{}
 	wantErr       error
 	wantFile      string
+	wantNoFile    string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -559,6 +560,142 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name:   "GET_request_check_user_agent_default",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if r.UserAgent() != userAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, userAgent)
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_request_check_user_agent_user_defined",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get_request(state.url).with({
+		"Header": {
+			"User-Agent": ["custom user agent"]
+		}
+	}).do_request().Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			const customUserAgent = "custom user agent"
+
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if r.UserAgent() != customUserAgent {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected user agent was %#q"}`, customUserAgent)
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_request_check_user_agent_none",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get_request(state.url).with({
+		"Header": {
+			"User-Agent": [""]
+		}
+	}).do_request().Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			msg := `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`
+			if _, ok := r.Header["User-Agent"]; ok {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected no user agent header, but got %#q"}`, r.UserAgent())
+			}
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusBadRequest)
+				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
+			}
+
+			w.Write([]byte(msg))
+		},
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
 		name:   "GET_request_TLS",
 		server: newTestServer(httptest.NewTLSServer),
 		config: map[string]interface{}{
@@ -1006,6 +1143,102 @@ var inputTests = []struct {
 		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
+		name: "tracer_filename_sanitization_enabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+	},
+	{
+		name: "tracer_filename_sanitization_disabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  false,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
 		name:   "pagination_cursor_object",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
@@ -1434,7 +1667,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{
@@ -1487,6 +1720,15 @@ func TestInput(t *testing.T) {
 			if test.wantFile != "" {
 				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
 					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 		})
@@ -1576,13 +1818,13 @@ func defaultHandler(expectedMethod, expectedBody string) http.HandlerFunc {
 		switch {
 		case r.Method != expectedMethod:
 			w.WriteHeader(http.StatusBadRequest)
-			msg = fmt.Sprintf(`{"error":"expected method was %q"}`, expectedMethod)
+			msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, expectedMethod)
 		case expectedBody != "":
 			body, _ := io.ReadAll(r.Body)
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected body was %q"}`, expectedBody)
+				msg = fmt.Sprintf(`{"error":"expected body was %#q"}`, expectedBody)
 			}
 		}
 

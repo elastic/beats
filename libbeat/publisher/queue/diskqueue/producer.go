@@ -87,22 +87,17 @@ func (producer *diskQueueProducer) publish(
 		// blocking the core loop.
 		response := <-request.responseChan
 		return response
-	case <-producer.queue.done:
+	case <-producer.queue.close:
 		return false
 	case <-producer.done:
 		return false
 	}
 }
 
-func (producer *diskQueueProducer) Cancel() int {
+func (producer *diskQueueProducer) Close() {
 	if producer.cancelled {
-		return 0
+		return
 	}
 	producer.cancelled = true
 	close(producer.done)
-
-	// TODO (possibly?): message the core loop to remove any pending events that
-	// were sent through this producer. If we do, return the number of cancelled
-	// events here instead of zero.
-	return 0
 }

@@ -30,6 +30,7 @@ type Message struct {
 	Ts      time.Time // timestamp the content was read
 	Content []byte    // actual content read
 	Bytes   int       // total number of bytes read to generate the message
+	Offset  int       // total number of bytes read and discarded prior to generate the message
 	Fields  mapstr.M  // optional fields that can be added by reader
 	Meta    mapstr.M  // deprecated
 	Private interface{}

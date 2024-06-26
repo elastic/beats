@@ -153,6 +153,30 @@ program: |
   })
 ----
 
+[[input-url-program-websocket]]
+[float]
+==== `url_program`
+
+If present, this CEL program is executed before the websocket connection is established using the `state` object, including any stored cursor value. It must evaluate to a valid URL. The returned URL is used to make the websocket connection for processing. The program may use cursor values or other state defined values to customize the URL at runtime.
+
+["source","yaml",subs="attributes"]
+----
+url: ws://testapi:443/v1/streamresults
+state:
+  initial_start_time: "2022-01-01T00:00:00Z"
+url_program: |
+  state.url + "?since=" + state.?cursor.since.orValue(state.initial_start_time)
+program: |
+  bytes(state.response).decode_json().as(inner_body,{
+    "events": {
+      "message":  inner_body.encode_json(),
+    },
+    "cursor": {
+      "since": inner_body.timestamp
+    }
+  })
+----
+
 [[state-websocket]]
 [float]
 ==== `state`

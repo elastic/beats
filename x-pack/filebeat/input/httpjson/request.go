@@ -588,6 +588,10 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	// for each pagination response, we repeat all the chain steps / blocks
 	n, err := p.req.processChainPaginationEvents(ctx, p.trCtx, p.pub, &response, p.idx, p.req.log)
 	if err != nil {
+		if errors.Is(err, notLogged{}) {
+			p.req.log.Debugf("ignored error processing chain event: %w", err)
+			return
+		}
 		p.req.log.Errorf("error processing chain event: %w", err)
 		return
 	}
@@ -600,7 +604,21 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 }
 
 func (p *chainProcessor) handleError(err error) {
+	if errors.Is(err, notLogged{}) {
+		p.req.log.Debugf("ignored error processing response: %v", err)
+		return
+	}
 	p.req.log.Errorf("error processing response: %v", err)
+}
+
+// notLogged is an error that is not logged except at DEBUG.
+type notLogged struct {
+	error
+}
+
+func (notLogged) Is(target error) bool {
+	_, ok := target.(notLogged)
+	return ok
 }
 
 // eventCount returns the number of events that have been processed.
@@ -676,6 +694,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			if err != nil {
 				return -1, fmt.Errorf("failed to collect response: %w", err)
 			}
+
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {
 				finalResps = append(finalResps, httpResp)
@@ -701,12 +720,6 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
-
-	defer func() {
-		if httpResp != nil && httpResp.Body != nil {
-			httpResp.Body.Close()
-		}
-	}()
 
 	return n, nil
 }
@@ -781,6 +794,10 @@ func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 
 // handleError logs err.
 func (p *publisher) handleError(err error) {
+	if errors.Is(err, notLogged{}) {
+		p.log.Debugf("ignored error processing response: %v", err)
+		return
+	}
 	p.log.Errorf("error processing response: %v", err)
 }
 

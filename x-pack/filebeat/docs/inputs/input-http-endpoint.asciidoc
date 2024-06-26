@@ -9,13 +9,12 @@
 <titleabbrev>HTTP Endpoint</titleabbrev>
 ++++
 
-beta[]
-
 The HTTP Endpoint input initializes a listening HTTP server that collects
-incoming HTTP POST requests containing a JSON body. The body must be either an
-object or an array of objects. Any other data types will result in an HTTP 400
-(Bad Request) response. For arrays, one document is created for each object in
-the array.
+incoming HTTP POST requests containing a JSON body. The body must be either
+an object or an array of objects, otherwise a Common Expression Language
+expression that converts the the JSON body to these types can be provided.
+Any other data types will result in an HTTP 400 (Bad Request) response. For
+arrays, one document is created for each object in the array.
 
 gzip encoded request bodies are supported if a `Content-Encoding: gzip` header
 is sent with the request.
@@ -35,13 +34,26 @@ These are the possible response codes from the server.
 |=========================================================================================================================================================
 | HTTP Response Code  | Name                    | Reason
 | 200                 | OK                      | Returned on success.
-| 400                 | Bad Request             | Returned if JSON body decoding fails.
+| 400                 | Bad Request             | Returned if JSON body decoding fails or if `wait_for_completion_timeout` query validation fails.
 | 401                 | Unauthorized            | Returned when basic auth, secret header, or HMAC validation fails.
 | 405                 | Method Not Allowed      | Returned if methods other than POST are used.
 | 406                 | Not Acceptable          | Returned if the POST request does not contain a body.
 | 415                 | Unsupported Media Type  | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip.
 | 500                 | Internal Server Error   | Returned if an I/O error occurs reading the request.
+| 504                 | Gateway Timeout         | Returned if a request publication cannot be ACKed within the required timeout.
 |=========================================================================================================================================================
+
+The endpoint will enforce end-to-end ACK when a URL query parameter
+`wait_for_completion_timeout` with a duration is provided. For example
+`http://localhost:8080/?wait_for_completion_timeout=1m` will wait up
+to 1 minute for the event to be published to the cluster and then return
+the user-defined response message. In the case that the publication
+does not complete within the timeout duration, the HTTP response will
+have a 504 Gateway Timeout status code. The syntax for durations is
+a number followed by units which may be h, m and s. No other HTTP query
+is accepted. If another query parameter is provided or duration syntax
+is incorrect, the request will fail with an HTTP 400 "Bad Request"
+status.
 
 Example configurations:
 
@@ -67,6 +79,17 @@ Custom response example:
   response_body: '{"message": "success"}'
   url: "/"
   prefix: "json"
+----
+
+Map request to root of document example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  prefix: "."
 ----
 
 Multiple endpoints example:
@@ -171,6 +194,40 @@ Preserving original event and including headers in document
   include_headers: ["TestHeader"]
 ----
 
+Common Expression Language example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  program: |
+    obj.records.map(r, {
+     "requestId": obj.requestId,
+     "timestamp": string(obj.timestamp),
+     "event": r,
+    })
+----
+This example would allow handling of a JSON body that is an object containing
+more than one event that each should be ingested as separate documents with
+the common timestamp and request ID:
+["source","json",subs="attributes"]
+----
+{
+  "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f",
+  "timestamp": 1578090901599,
+  "records": [
+    {
+      "data": "event record 1"
+    },
+    {
+      "data": "event record 2"
+    }
+  ]
+}
+----
+
 ==== Configuration options
 
 The `http_endpoint` input supports the following configuration options plus the
@@ -205,6 +262,7 @@ The secret stored in the header name specified by `secret.header`. Certain webho
 ==== `hmac.header`
 
 The name of the header that contains the HMAC signature: `X-Dropbox-Signature`, `X-Hub-Signature-256`, etc.
+HMAC signatures may be encoded as hex or base64.
 
 [float]
 ==== `hmac.key`
@@ -230,7 +288,7 @@ In certain scenarios when the source of the request is not able to do that, it c
 [float]
 ==== `program`
 
-The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
+The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. The name of the object in the CEL program is `obj`. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
 
 [float]
 ==== `response_code`
@@ -260,7 +318,7 @@ This options specific which URL path to accept requests on. Defaults to `/`
 [float]
 ==== `prefix`
 
-This option specifies which prefix the incoming request will be mapped to.
+This option specifies which prefix the incoming request will be mapped to. If `prefix` is "`.`", the request will be mapped to the root of the resulting document.
 
 [float]
 ==== `include_headers`
@@ -346,10 +404,12 @@ observe the activity of the input.
 | `api_errors_total`        | Number of API errors.
 | `batches_received_total`  | Number of event arrays received.
 | `batches_published_total` | Number of event arrays published.
+| `batches_acked_total`     | Number of event arrays ACKed.
 | `events_published_total`  | Number of events published.
 | `size`                    | Histogram of request content lengths.
 | `batch_size`              | Histogram of the received event array length.
 | `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+| `batch_ack_time`          | Histogram of the elapsed successful batch ACKing times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 |=======
 
 [id="{beatname_lc}-input-{type}-common-options"]

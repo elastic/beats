@@ -2,11 +2,9 @@
 name: "beats-xpack-libbeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -14,21 +12,57 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
+  - group: "x-pack/libbeat Check/Update"
+    key: "x-pack-libbeat-check-update"
+    steps:
+      - label: "Run check/update"
+        command: |
+          set -eo pipefail
+          make -C x-pack/libbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: check/update"
+      
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-libbeat-check-update"
+
   - group: "x-pack/libbeat Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
+
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/libbeat
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -38,16 +72,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Ubuntu Unit Tests"
+              context: "x-pack/libbeat: Unit Tests"
 
-      - label: ":go: Go Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
           mage goIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -59,14 +93,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
 
-      - label: ":python: Python Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -78,14 +112,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: x-pack/libbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -97,16 +131,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Windows 2016 Unit Tests"
+              context: "x-pack/libbeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
+      - label: ":windows: x-pack/libbeat Win-2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -118,20 +152,21 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Windows 2022 Unit Tests"
+              context: "x-pack/libbeat: Win-2022 Unit Tests"
 
   - group: "x-pack/libbeat Extended Windows Tests"
     key: "x-pack-libbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
-      - label: ":windows: Windows 10 Unit Tests"
+      - label: ":windows: x-pack/libbeat Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -143,16 +178,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Windows 10 Unit Tests"
+              context: "x-pack/libbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: x-pack/libbeat Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -164,16 +199,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Windows 11 Unit Tests"
+              context: "x-pack/libbeat: Win 11 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: x-pack/libbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -185,27 +220,28 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Windows 2019 Unit Tests"
+              context: "x-pack/libbeat: Win-2019 Unit Tests"
 
-  - group: "x-pack/libbeat Linux arm Extended Tests"
+  - group: "x-pack/libbeat Extended Tests"
     key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+
     steps:
-      - label: ":linux: Ubuntu ARM64 Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           cd x-pack/libbeat
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Ubuntu ARM64 Extended Unit Tests"
+              context: "x-pack/libbeat: Linux arm64 Unit Tests"
