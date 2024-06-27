@@ -9192,19 +9192,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/fatih/color
-<<<<<<< HEAD
-Version: v1.13.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/fatih/color@v1.13.0/LICENSE.md:
-=======
 Version: v1.16.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/fatih/color@v1.16.0/LICENSE.md:
->>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 
 The MIT License (MIT)
 
@@ -13353,11 +13345,11 @@ Contents of probable licence file $GOMODCACHE/github.com/magefile/mage@v1.15.0/L
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mattn/go-colorable
-Version: v0.1.12
+Version: v0.1.13
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mattn/go-colorable@v0.1.12/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mattn/go-colorable@v0.1.13/LICENSE:
 
 The MIT License (MIT)
 
@@ -17556,11 +17548,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.15.0
+Version: v0.20.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.15.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.20.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -31927,19 +31919,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/go-hclog
-<<<<<<< HEAD
-Version: v0.9.2
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-hclog@v0.9.2/LICENSE:
-=======
 Version: v1.6.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-hclog@v1.6.3/LICENSE:
->>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 
 Copyright (c) 2017 HashiCorp, Inc.
 
@@ -35256,19 +35240,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mattn/go-isatty
-<<<<<<< HEAD
-Version: v0.0.17
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/mattn/go-isatty@v0.0.17/LICENSE:
-=======
 Version: v0.0.20
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/mattn/go-isatty@v0.0.20/LICENSE:
->>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 
 Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
 
