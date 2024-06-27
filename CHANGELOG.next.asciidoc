@@ -180,6 +180,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Added status to monitor run log report.
+- Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 
 *Metricbeat*
 
