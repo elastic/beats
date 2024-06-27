@@ -101,7 +101,9 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 
 // UpdateStatus updates the status of the module. Reflected on elastic-agent.
 func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
-	m.statusReporter.UpdateStatus(status, msg)
+	if m.statusReporter != nil {
+		m.statusReporter.UpdateStatus(status, msg)
+	}
 }
 
 // SetStatusReporter updates the status of the module. Reflected on elastic-agent.
