@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix `namespace` filter option on `add_kubernetes_metadata` processor. {pull}39934[39934]
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
@@ -144,6 +145,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Fix filestream not correctly tracking the offset of a file when using the `include_message` parsser. {pull}39873[39873] {issue}39653[39653]
+- Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 
 *Heartbeat*
 
@@ -153,6 +155,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix `namespace` filter option on metricset `state_namespace` enricher. {pull}39934[39934]
 - Fix `namespace` filter option at Kubernetes provider level. {pull}39881[39881]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
@@ -296,6 +299,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Added status to monitor run log report.
+- Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 
 *Metricbeat*
 
