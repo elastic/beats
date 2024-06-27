@@ -241,7 +241,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	waitDeadlineOr5Min := func() time.Duration {
 		deadline, deadileSet := t.Deadline()
 		if deadileSet {
-			left := deadline.Sub(time.Now())
+			left := time.Until(deadline)
 			final := left - 500*time.Millisecond
 			if final <= 0 {
 				return left
