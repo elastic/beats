@@ -105,12 +105,8 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
-<<<<<<< HEAD
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/hashicorp/go-retryablehttp v0.6.6
-=======
 	github.com/hashicorp/go-retryablehttp v0.7.7
->>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/nomad/api v0.0.0-20201203164818-6318a8ac7bf8
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
