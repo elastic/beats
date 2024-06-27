@@ -72,7 +72,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.13.0
-	github.com/elastic/go-concert v0.2.0
+	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
@@ -141,7 +141,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
-	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71 // indirect
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.1
@@ -359,7 +358,6 @@ require (
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
-	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
