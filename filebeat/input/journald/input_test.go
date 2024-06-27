@@ -234,3 +234,128 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	fmt.Println(gold.Timestamp, got.Timestamp, gold.Meta, got.Meta)
 	require.EqualValues(t, goldenEvents[3], events[3], "events do not match reference")
 }
+
+func TestMatchers(t *testing.T) {
+	testCases := []struct {
+		name           string
+		matchers       map[string]any
+		expectedEvents int
+	}{
+		{
+			name: "single marcher",
+			matchers: map[string]any{
+				"match": []string{
+					"FOO=foo",
+				},
+			},
+			expectedEvents: 3,
+		},
+		{
+			name: "two matches, works as AND",
+			matchers: map[string]any{
+				"match": []string{
+					"FOO=foo",
+					"BAR=bar",
+				},
+			},
+			expectedEvents: 2,
+		},
+		{
+			name: "AND matches",
+			matchers: map[string]any{
+				"and": []any{
+					map[string]any{
+						"match": []string{
+							"FOO=foo",
+						},
+					},
+					map[string]any{
+						"match": []string{
+							"BAR=bar",
+						},
+					},
+				},
+			},
+			expectedEvents: 2,
+		},
+		{
+			name: "OR matches",
+			matchers: map[string]any{
+				"or": []any{
+					map[string]any{
+						"match": []string{
+							"FOO=foo",
+						},
+					},
+					map[string]any{
+						"match": []string{
+							"BAR=bar",
+						},
+					},
+				},
+			},
+			expectedEvents: 4,
+		},
+		{
+			name: "OR-EQUALS matches",
+			matchers: map[string]any{
+				"or": []any{
+					map[string]any{
+						"equals": []string{
+							"FOO=foo",
+						},
+					},
+				},
+			},
+			expectedEvents: 4,
+		},
+		{
+			name: "A OR (B AND C)",
+			matchers: map[string]any{
+				"or": []any{
+					map[string]any{
+						"match": []string{
+							"FOO_BAR=foo bar",
+						},
+						"and": []any{
+							map[string]any{
+								"match": []string{
+									"FOO=foo",
+								},
+							},
+							map[string]any{
+								"match": []string{
+									"BAR=bar",
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedEvents: 3,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			fmt.Printf("==================== %s ==========\n", t.Name())
+			env := newInputTestingEnvironment(t)
+			inp := env.mustCreateInput(mapstr.M{
+				"paths":           []string{path.Join("testdata", "matchers.journal")},
+				"include_matches": tc.matchers,
+				// "journalctl": true,
+			})
+
+			ctx, cancelInput2 := context.WithCancel(context.Background())
+			defer cancelInput2()
+
+			env.startInput(ctx, inp)
+			env.waitUntilEventCount(tc.expectedEvents)
+			for _, evt := range env.pipeline.GetAllEvents() {
+				// fmt.Println(evt.Fields.StringToPrint())
+				fields, _ := evt.Fields.GetValue("journald.custom")
+				fmt.Println(fields)
+			}
+		})
+	}
+}
