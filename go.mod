@@ -70,6 +70,7 @@ require (
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
+<<<<<<< HEAD
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.8.1
@@ -78,6 +79,15 @@ require (
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.13.0
+=======
+	github.com/elastic/go-seccomp-bpf v1.4.0
+	github.com/elastic/go-structform v0.0.10
+	github.com/elastic/go-sysinfo v1.14.0
+	github.com/elastic/go-ucfg v0.8.8
+	github.com/elastic/gosigar v0.14.3
+	github.com/fatih/color v1.16.0
+	github.com/fearful-symmetry/gorapl v0.0.4
+>>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -101,8 +111,12 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/h2non/filetype v1.1.1
+<<<<<<< HEAD
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.6.6
+=======
+	github.com/hashicorp/go-retryablehttp v0.7.7
+>>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/nomad/api v0.0.0-20200303134319-e31695b5bbe6
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
@@ -267,10 +281,21 @@ require (
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/klauspost/asmfmt v1.3.2 // indirect
+<<<<<<< HEAD
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
+=======
+	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
+	github.com/kortschak/utter v1.5.0 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/markbates/pkger v0.17.1 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+>>>>>>> e1641ce577 (mod: update github.com/hashicorp/go-retryablehttp to v0.7.7 (#40036))
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
