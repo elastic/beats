@@ -727,6 +727,10 @@ var vcsList = []string{
 	"bzr",
 }
 
+// this method has been adapted from vcs.FromDir from golang.org/x/tools/go/vcs
+//
+// the body of the method was kept as is but the extra return value
+// has been removed since it was unused.
 func fromDir(dir, srcRoot string) (root string, err error) {
 	// Clean and double-check that dir is in (a subdirectory of) srcRoot.
 	dir = filepath.Clean(dir)
