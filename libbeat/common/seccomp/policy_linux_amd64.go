@@ -50,6 +50,7 @@ func init() {
 					"epoll_ctl",
 					"epoll_pwait",
 					"epoll_wait",
+					"exec",
 					"execve",
 					"exit",
 					"exit_group",
