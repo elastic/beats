@@ -27,12 +27,13 @@ import (
 )
 
 var testCases = []struct {
-	name         string
-	setupServer  func(testing.TB, http.HandlerFunc, map[string]interface{})
-	baseConfig   map[string]interface{}
-	handler      http.HandlerFunc
-	expected     []string
-	expectedFile string
+	name           string
+	setupServer    func(testing.TB, http.HandlerFunc, map[string]interface{})
+	baseConfig     map[string]interface{}
+	handler        http.HandlerFunc
+	expected       []string
+	expectedFile   string
+	expectedNoFile string
 
 	skipReason string
 }{
@@ -348,6 +349,90 @@ var testCases = []struct {
 		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
 	},
 	{
+		name: "tracer_filename_sanitization_enabled",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			// mock timeNow func to return a fixed value
+			timeNow = func() time.Time {
+				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+				return t
+			}
+
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+			t.Cleanup(func() { timeNow = time.Now })
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"request.transforms": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":  "url.params.$filter",
+						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+					},
+				},
+			},
+			"cursor": map[string]interface{}{
+				"timestamp": map[string]interface{}{
+					"value": `[[index .last_response.body "@timestamp"]]`,
+				},
+			},
+			"request.tracer.enabled":  true,
+			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+		},
+		handler: dateCursorHandler(),
+		expected: []string{
+			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+		},
+		expectedFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi.ndjson"),
+	},
+	{
+		name: "tracer_filename_sanitization_disabled",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			// mock timeNow func to return a fixed value
+			timeNow = func() time.Time {
+				t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+				return t
+			}
+
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+			t.Cleanup(func() { timeNow = time.Now })
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"request.transforms": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":  "url.params.$filter",
+						"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+						"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+					},
+				},
+			},
+			"cursor": map[string]interface{}{
+				"timestamp": map[string]interface{}{
+					"value": `[[index .last_response.body "@timestamp"]]`,
+				},
+			},
+			"request.tracer.enabled":  false,
+			"request.tracer.filename": "logs/http-request-trace-*.ndjson",
+		},
+		handler: dateCursorHandler(),
+		expected: []string{
+			`{"@timestamp":"2002-10-02T15:00:00Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:01Z","foo":"bar"}`,
+			`{"@timestamp":"2002-10-02T15:00:02Z","foo":"bar"}`,
+		},
+		expectedNoFile: filepath.Join("logs", "http-request-trace-httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248_https_somesource_someapi*"),
+	},
+	{
 		name: "pagination",
 		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 			server := httptest.NewServer(h)
@@ -374,6 +459,44 @@ var testCases = []struct {
 						"target":                 "url.params.page",
 						"value":                  "[[.last_response.body.nextPageToken]]",
 						"fail_on_template_error": true,
+					},
+				},
+			},
+		},
+		handler: paginationHandler(),
+		expected: []string{
+			`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+			`{"foo":"a","page":"0"}`, `{"foo":"b","page":"1"}`, `{"foo":"c","page":"0"}`, `{"foo":"d","page":"0"}`,
+		},
+	},
+	{
+		name: "pagination_not_log_fail",
+		setupServer: func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["request.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		baseConfig: map[string]interface{}{
+			"interval":       time.Millisecond,
+			"request.method": http.MethodGet,
+			"response.split": map[string]interface{}{
+				"target": "body.items",
+				"transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.page",
+							"value":  "[[.last_response.page]]",
+						},
+					},
+				},
+			},
+			"response.pagination": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":                 "url.params.page",
+						"value":                  "[[.last_response.body.nextPageToken]]",
+						"fail_on_template_error": true,
+						"do_not_log_failure":     true,
 					},
 				},
 			},
@@ -749,6 +872,37 @@ var testCases = []struct {
 						"target":                 "url.value",
 						"value":                  "[[.last_response.body.nextLink]]",
 						"fail_on_template_error": true,
+					},
+				},
+			},
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.method": http.MethodGet,
+						"replace":        "$.records[:].id",
+					},
+				},
+			},
+		},
+		handler: defaultHandler(http.MethodGet, "", ""),
+		expected: []string{
+			`{"hello":{"world":"moon"}}`,
+			`{"space":{"cake":"pumpkin"}}`,
+		},
+	},
+	{
+		name:        "pagination_when_used_with_chaining_not_log_fail",
+		setupServer: newChainPaginationTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodGet,
+			"response.pagination": []interface{}{
+				map[string]interface{}{
+					"set": map[string]interface{}{
+						"target":                 "url.value",
+						"value":                  "[[.last_response.body.nextLink]]",
+						"fail_on_template_error": true,
+						"do_not_log_failure":     true,
 					},
 				},
 			},
@@ -1353,6 +1507,15 @@ func TestInput(t *testing.T) {
 					assert.NoError(t, g.Wait())
 				} else {
 					t.Errorf("Expected log filename not found")
+				}
+			}
+			if test.expectedNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.expectedNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.expectedNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 			assert.NoError(t, g.Wait())
