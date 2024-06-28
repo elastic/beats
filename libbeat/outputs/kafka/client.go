@@ -171,7 +171,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
 			ref.done()
-			c.observer.Dropped(1)
+			c.observer.PermanentErrors(1)
 			continue
 		}
 
@@ -214,21 +214,22 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	if msg.topic == "" {
 		topic, err := c.topic.Select(event)
 		if err != nil {
-			return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+			return nil, fmt.Errorf("setting kafka topic failed with %w", err)
 		}
 		if topic == "" {
 			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
 		if _, err := data.Cache.Put("topic", topic); err != nil {
-			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %v", err)
+			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %w", err)
 		}
 	}
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
 		if c.log.IsDebug() {
-			c.log.Debugf("failed event: %v", event)
+			c.log.Debug("failed event logged to event log file")
+			c.log.Debugw(fmt.Sprintf("failed event: %v", event), logp.TypeKey, logp.EventType)
 		}
 		return nil, err
 	}
@@ -270,7 +271,7 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 		msg := errMsg.Msg.Metadata.(*message)
 		msg.ref.fail(msg, errMsg.Err)
 
-		if errMsg.Err == breaker.ErrBreakerOpen {
+		if errors.Is(errMsg.Err, breaker.ErrBreakerOpen) {
 			// ErrBreakerOpen is a very special case in Sarama. It happens only when
 			// there have been repeated critical (broker / topic-level) errors, and it
 			// puts Sarama into a state where it immediately rejects all input
@@ -356,18 +357,18 @@ func (r *msgRef) done() {
 }
 
 func (r *msgRef) fail(msg *message, err error) {
-	switch err {
-	case sarama.ErrInvalidMessage:
+	switch {
+	case errors.Is(err, sarama.ErrInvalidMessage):
 		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
-	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
+	case errors.Is(err, sarama.ErrMessageSizeTooLarge) || errors.Is(err, sarama.ErrInvalidMessageSize):
 		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
-	case breaker.ErrBreakerOpen:
+	case errors.Is(err, breaker.ErrBreakerOpen):
 		// Add this message to the failed list, but don't overwrite r.err since
 		// all the breaker error means is "there were a lot of other errors".
 		r.failed = append(r.failed, msg.data)
@@ -398,20 +399,20 @@ func (r *msgRef) dec() {
 		success := r.total - failed
 		r.batch.RetryEvents(r.failed)
 
-		stats.Failed(failed)
+		stats.RetryableErrors(failed)
 		if success > 0 {
-			stats.Acked(success)
+			stats.AckedEvents(success)
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
-		stats.Acked(r.total)
+		stats.AckedEvents(r.total)
 	}
 }
 
 func (c *client) Test(d testing.Driver) {
-	if c.config.Net.TLS.Enable == true {
+	if c.config.Net.TLS.Enable {
 		d.Warn("TLS", "Kafka output doesn't support TLS testing")
 	}
 

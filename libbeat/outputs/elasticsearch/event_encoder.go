@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type eventEncoder struct {
@@ -135,4 +136,18 @@ func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 		index:     index,
 		encoding:  bytes,
 	}
+}
+
+func (e *encodedEvent) setDeadLetter(
+	deadLetterIndex string, errType int, errMsg string,
+) {
+	e.deadLetter = true
+	e.index = deadLetterIndex
+	deadLetterReencoding := mapstr.M{
+		"@timestamp":    e.timestamp,
+		"message":       string(e.encoding),
+		"error.type":    errType,
+		"error.message": errMsg,
+	}
+	e.encoding = []byte(deadLetterReencoding.String())
 }

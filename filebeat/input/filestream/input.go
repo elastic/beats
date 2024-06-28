@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const pluginName = "filestream"
@@ -61,6 +62,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
 	parsers         parser.Config
+	takeOver        bool
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -101,6 +103,7 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
 		parsers:         config.Reader.Parsers,
+		takeOver:        config.TakeOver,
 	}
 
 	return prospector, filestream, nil
@@ -369,7 +372,7 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
-		s.Offset += int64(message.Bytes)
+		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
@@ -377,6 +380,11 @@ func (inp *filestream) readFromSource(
 		}
 
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
+
+		// add "take_over" tag if `take_over` is set to true
+		if inp.takeOver {
+			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
+		}
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()

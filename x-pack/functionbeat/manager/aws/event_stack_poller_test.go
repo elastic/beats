@@ -7,6 +7,7 @@ package aws
 import (
 	"context"
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -14,7 +15,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/atomic"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -29,7 +29,7 @@ func (m *mockEventHandler) sync(event types.StackEvent) bool {
 	if m.skipCount.Load() >= m.skipEvents {
 		return false
 	}
-	m.skipCount.Inc()
+	m.skipCount.Add(1)
 	return true
 }
 

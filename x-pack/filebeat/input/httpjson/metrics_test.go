@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -28,8 +31,12 @@ func TestMetrics(t *testing.T) {
 		handler        http.HandlerFunc
 		expectedEvents []string
 		assertMetrics  func(reg *monitoring.Registry) error
+
+		skipReason string // GOOS:reason or GOOS,GOOS,...:reason.
 	}{
 		{
+			skipReason: "windows:flakey test on windows - see https://github.com/elastic/beats/issues/39676",
+
 			name: "Test pagination metrics",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 				server := httptest.NewServer(h)
@@ -102,6 +109,9 @@ func TestMetrics(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
+			if reason := skipReason(tc.skipReason); reason != "" {
+				t.Skipf("skipping %s", reason)
+			}
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
 			cfg := conf.MustNewConfigFrom(tc.baseConfig)
@@ -162,4 +172,18 @@ func TestMetrics(t *testing.T) {
 			assert.NoError(t, tc.assertMetrics(reg))
 		})
 	}
+}
+
+func skipReason(s string) string {
+	if s == "" {
+		return ""
+	}
+	goos, reason, ok := strings.Cut(s, ":")
+	if !ok {
+		return s
+	}
+	if slices.Contains(strings.Split(goos, ","), runtime.GOOS) {
+		return reason
+	}
+	return ""
 }

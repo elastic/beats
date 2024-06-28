@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -26,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+//nolint:gosec // These are test tokens and are not used in production code.
 const (
 	basicToken   = "dXNlcjpwYXNz"
 	bearerToken  = "BXNlcjpwYVVz"
@@ -399,6 +401,101 @@ var inputTests = []struct {
 	},
 }
 
+var urlEvalTests = []struct {
+	name   string
+	config map[string]interface{}
+	time   func() time.Time
+	want   string
+}{
+	{
+		name: "cursor based url modification",
+		config: map[string]interface{}{
+			"url":         "ws://testapi/getresults",
+			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since : state.url`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"since": "2017-08-17T14:54:12",
+				},
+			},
+		},
+		want: "ws://testapi/getresults?since=2017-08-17T14:54:12",
+	},
+	{
+		name: "cursor based url modification using simplified query",
+		config: map[string]interface{}{
+			"url":         "ws://testapi/getresults",
+			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.url)`,
+			"state": map[string]interface{}{
+				"cursor": map[string]interface{}{
+					"since": "2017-08-17T14:54:12",
+				},
+			},
+		},
+		want: "ws://testapi/getresults?since=2017-08-17T14:54:12",
+	},
+	{
+		name: "url modification with no cursor",
+		config: map[string]interface{}{
+			"url":         "ws://testapi/getresults",
+			"url_program": `has(state.cursor) && has(state.cursor.since) ? state.url+"?since="+ state.cursor.since: state.url+"?since="+ state.initial_start_time`,
+			"state": map[string]interface{}{
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
+	},
+	{
+		name: "url modification with no cursor, using simplified query",
+		config: map[string]interface{}{
+			"url":         "ws://testapi/getresults",
+			"url_program": `state.url + "?since=" + state.?cursor.since.orValue(state.initial_start_time)`,
+			"state": map[string]interface{}{
+				"initial_start_time": "2022-01-01T00:00:00Z",
+			},
+		},
+		want: "ws://testapi/getresults?since=2022-01-01T00:00:00Z",
+	},
+}
+
+func TestURLEval(t *testing.T) {
+	logp.TestingSetup()
+	for _, test := range urlEvalTests {
+		t.Run(test.name, func(t *testing.T) {
+
+			cfg := conf.MustNewConfigFrom(test.config)
+
+			conf := config{}
+			conf.Redact = &redact{}
+			err := cfg.Unpack(&conf)
+			if err != nil {
+				t.Fatalf("unexpected error unpacking config: %v", err)
+			}
+
+			name := input{}.Name()
+			if name != "websocket" {
+				t.Errorf(`unexpected input name: got:%q want:"websocket"`, name)
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			var state map[string]interface{}
+			if conf.State == nil {
+				state = make(map[string]interface{})
+			} else {
+				state = conf.State
+			}
+
+			response, err := input{test.time, conf}.getURL(ctx, state, logp.NewLogger("websocket_url_eval_test"))
+			if err != nil && !errors.Is(err, context.Canceled) {
+				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
+			}
+
+			assert.Equal(t, test.want, response)
+		})
+	}
+}
+
 func TestInput(t *testing.T) {
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
@@ -432,7 +529,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{

@@ -23,6 +23,8 @@ import (
 	"context"
 	"encoding/base64"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -104,7 +106,26 @@ func TestHeaders(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, req.Header, http.Header(td.expected))
+
 	}
+}
+
+func TestUserAgentHeader(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		prefix := "Elastic-testbeat-Agent"
+		if !strings.HasPrefix(r.UserAgent(), prefix) {
+			t.Errorf("User-Agent must start with '%s', got '%s'", prefix, r.UserAgent())
+		}
+		_, _ = w.Write([]byte("{}"))
+	}))
+	defer server.Close()
+	conn, err := NewConnection(ConnectionSettings{
+		URL:              server.URL,
+		Beatname:         "testbeat",
+		UserAgentPostfix: "Agent",
+	})
+	require.NoError(t, err)
+	require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
 }
 
 func BenchmarkExecHTTPRequest(b *testing.B) {

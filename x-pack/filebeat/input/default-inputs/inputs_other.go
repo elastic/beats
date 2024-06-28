@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/benchmark"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
@@ -31,6 +32,7 @@ import (
 func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
 	return []v2.Plugin{
 		azureblobstorage.Plugin(log, store),
+		azureeventhub.Plugin(log),
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log),

@@ -54,7 +54,7 @@ output.elasticsearch:
 	mockbeat.WriteConfigFile(fmt.Sprintf(cfg, esURL.String(), caPath))
 	mockbeat.Start()
 	mockbeat.WaitForLogs("mockbeat start running.", 60*time.Second)
-	mockbeat.WaitForLogs("PublishEvents: 1 events have been published", 60*time.Second)
+	mockbeat.WaitForLogs("doBulkRequest: 1 events have been sent", 60*time.Second)
 }
 
 func TestCAPinningBadSHA(t *testing.T) {
