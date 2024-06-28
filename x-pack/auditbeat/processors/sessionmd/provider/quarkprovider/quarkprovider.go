@@ -114,7 +114,7 @@ func readPIDNsInode() (uint64, error) {
 func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
 
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_KPROBE | quark.QQ_MIN_AGG
+	attr.Flags = quark.QQ_KPROBE | quark.QQ_MIN_AGG | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %v", err)
@@ -217,7 +217,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	p.fillParent(&ret, qev.Proc.Ppid)
 	p.fillGroupLeader(&ret, qev.Proc.Pgid)
 	p.fillSessionLeader(&ret, qev.Proc.Sid)
-	p.fillEntryLeader(&ret, Init, uint32(1))
+	p.fillEntryLeader(&ret, qev.Proc.EntryLeaderType, qev.Proc.EntryLeader)
 	setEntityID(&ret)
 	return &ret, nil
 }
@@ -323,7 +323,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	process.SessionLeader.EntityID = calculateEntityIDv1(sid, *process.SessionLeader.Start)
 }
 
-func (p prvdr) fillEntryLeader(process *types.Process, entryType EntryType, elid uint32) {
+func (p prvdr) fillEntryLeader(process *types.Process, entryType uint32, elid uint32) {
 	qev := p.qq.Lookup(int(elid))
 	if qev == nil {
 		return
@@ -357,7 +357,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, entryType EntryType, elid
 	}
 
 	process.EntryLeader.EntityID = calculateEntityIDv1(elid, *process.EntryLeader.Start)
-	process.EntryLeader.EntryMeta.Type = string(entryType)
+	process.EntryLeader.EntryMeta.Type = "UNKNOWN" //TODO: use real value
 }
 
 func setEntityID(process *types.Process) {
