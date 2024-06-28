@@ -15,11 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package journalread
+package journalctl
 
 import "fmt"
 
-// SeekMode is used by (*Reader).Seek to decide where to advance the read pointer to.
 type SeekMode uint
 
 const (
@@ -30,16 +29,14 @@ const (
 	// SeekTail option seeks to the tail of a journal
 	SeekTail
 	// SeekCursor option seeks to the position specified in the cursor
-	SeekCursor
 	// SeekSince option seeks to the position specified by the since option
 	SeekSince
 )
 
 var seekModes = map[string]SeekMode{
-	"head":   SeekHead,
-	"tail":   SeekTail,
-	"cursor": SeekCursor,
-	"since":  SeekSince,
+	"head":  SeekHead,
+	"tail":  SeekTail,
+	"since": SeekSince,
 }
 
 // Unpack validates and unpack "seek" config options. It returns an error if

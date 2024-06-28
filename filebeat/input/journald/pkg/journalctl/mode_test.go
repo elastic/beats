@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package journalread
+package journalctl
 
 import (
 	"testing"
@@ -24,10 +24,9 @@ import (
 func TestMode_Unpack(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		tests := map[string]SeekMode{
-			"head":   SeekHead,
-			"tail":   SeekTail,
-			"cursor": SeekCursor,
-			"since":  SeekSince,
+			"head":  SeekHead,
+			"tail":  SeekTail,
+			"since": SeekSince,
 		}
 
 		for str, want := range tests {

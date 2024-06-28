@@ -32,7 +32,6 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -53,13 +52,32 @@ type Reader struct {
 	matchers journalfield.IncludeMatches
 }
 
+func handleSeeAndCursor(args []string, mode SeekMode, since time.Duration, cursor string) []string {
+	if cursor != "" {
+		args = append(args, "--after-cursor", cursor)
+		return args
+	}
+
+	switch mode {
+	case SeekSince:
+		sinceArg := time.Now().Add(since).Format(time.RFC3339)
+		args = append(args, "--since", sinceArg)
+	case SeekTail:
+		args = append(args, "--since", "now")
+	case SeekHead:
+		args = append(args, "--no-tail")
+	}
+
+	return args
+}
+
 func New(
 	logger *logp.Logger,
 	canceler input.Canceler,
 	units []string,
 	syslogIdentifiers []string,
 	matchers journalfield.IncludeMatches,
-	mode journalread.SeekMode,
+	mode SeekMode,
 	cursor string,
 	since time.Duration,
 	file string) (*Reader, error) {
@@ -69,19 +87,7 @@ func New(
 		args = append(args, "--file", file)
 	}
 
-	switch mode {
-	case journalread.SeekSince:
-		sinceArg := time.Now().Add(since).Format(time.RFC3339)
-		args = append(args, "--since", sinceArg)
-	case journalread.SeekCursor:
-		args = append(args, "--after-cursor", cursor)
-	case journalread.SeekTail:
-		args = append(args, "--since", "now")
-	case journalread.SeekHead:
-		// Do not append anything
-	default:
-		return nil, fmt.Errorf("unknown seek mode %v", mode)
-	}
+	args = handleSeeAndCursor(args, mode, since, cursor)
 
 	for _, u := range units {
 		args = append(args, "--unit", u)
@@ -167,10 +173,6 @@ func New(
 
 	return &r, nil
 }
-
-func (r *Reader) Start()                                                    {}
-func (r *Reader) SeekRealtimeUsec(usec uint64) error                        { return nil }
-func (r *Reader) Seek(mode journalread.SeekMode, cursor string) (err error) { return nil }
 
 func (r *Reader) Close() error {
 	if r.cmd == nil {
