@@ -1175,26 +1175,26 @@ filebeat.inputs:
 
 #------------------------------ Journald input --------------------------------
 # Journald input is experimental.
-- type: journald
-  enabled: true
-  id: service-foo
+# - type: journald
+#   enabled: true
+#   id: service-foo
 
   # You may wish to have separate inputs for each service. You can use
   # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
-  include_matches:
-    and:
-      - match:
-          - FOO=foo
-      - match:
-          - BAR=bar
+  # include_matches:
+  #   and:
+  #     - match:
+  #         - FOO=foo
+  #     - match:
+  #         - BAR=bar
 
-  include_matches:
-    or:
-      - match:
-          - FOO=foo
-      - match:
-          - BAR=bar
+  # include_matches:
+  #   or:
+  #     - match:
+  #         - FOO=foo
+  #     - match:
+  #         - BAR=bar
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
 
