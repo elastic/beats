@@ -155,8 +155,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 const (
 	maxWaitLimit      = 1200 * time.Millisecond // Maximum time SyncDB will wait for process
 	combinedWaitLimit = 15 * time.Second        // Multiple SyncDB calls will wait up to this amount within resetDuration
-	backoffDuration   = 10 * time.Second       // SyncDB will stop waiting for processes for this time
-	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
+	backoffDuration   = 10 * time.Second        // SyncDB will stop waiting for processes for this time
+	resetDuration     = 5 * time.Second         // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
 var (
@@ -234,11 +234,11 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	})
 
 	ret := types.Process{
-		PID:        qev.Pid,
-		Start:      timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
-		Name:       basename(qev.Filename),
-		Executable: qev.Filename,
-		Args:  []string{qev.Filename}, // TODO: Fix
+		PID:              qev.Pid,
+		Start:            timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
+		Name:             basename(qev.Filename),
+		Executable:       qev.Filename,
+		Args:             []string{qev.Filename}, // TODO: Fix
 		WorkingDirectory: qev.Cwd,
 		Interactive:      &interactive,
 	}
