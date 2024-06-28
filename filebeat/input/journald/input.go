@@ -146,21 +146,32 @@ func (inp *journald) Run(
 	log := ctx.Logger.With("path", src.Name())
 	currentCheckpoint := initCheckpoint(log, cursor)
 
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, src)
-	if err != nil {
-		return err
+	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
+
+	var reader journalReader
+	var err error
+	if inp.Journalctl {
+		if inp.Since == nil {
+			// TODO: Fix this!
+			inp.Since = new(time.Duration)
+		}
+		reader, err = journalctl.New(log, ctx.Cancelation, inp.Matches, mode, pos, *inp.Since, src.Name())
+	} else {
+		reader, err = inp.open(ctx.Logger, ctx.Cancelation, src)
+		if err != nil {
+			return err
+		}
+
+		if mode == journalread.SeekSince {
+			err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixMicro()))
+		} else {
+			err = reader.Seek(mode, pos)
+		}
+		if err != nil {
+			log.Error("Continue from current position. Seek failed with: %v", err)
+		}
 	}
 	defer reader.Close()
-
-	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
-	if mode == journalread.SeekSince {
-		err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixMicro()))
-	} else {
-		err = reader.Seek(mode, pos)
-	}
-	if err != nil {
-		log.Error("Continue from current position. Seek failed with: %v", err)
-	}
 
 	parser := inp.Parsers.Create(
 		&readerAdapter{
@@ -184,10 +195,6 @@ func (inp *journald) Run(
 }
 
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (journalReader, error) {
-	if inp.Journalctl {
-		return inp.openJournalctl(log, canceler, src)
-	}
-
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
 	reader, err := journalread.Open(log, src.Name(), backoff,
 		withFilters(inp.Matches),
@@ -199,10 +206,6 @@ func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.
 	}
 
 	return reader, nil
-}
-
-func (inp *journald) openJournalctl(log *logp.Logger, canceler input.Canceler, src cursor.Source) (journalReader, error) {
-	return journalctl.New(log, canceler, inp.Matches, src.Name())
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
