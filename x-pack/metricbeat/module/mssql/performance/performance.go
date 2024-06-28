@@ -66,6 +66,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	var err error
 	var rows *sql.Rows
 	var BufferCacheHitRatio = "Buffer cache hit ratio"
+	var BufferCacheHitRatioBase = "Buffer cache hit ratio base"
 	var buffer_cache_hit_ratio int64
 	var buffer_cache_hit_ratio_base int64
 	rows, err = m.db.Query(`SELECT object_name,
@@ -116,15 +117,18 @@ WHERE  counter_name = 'SQL Compilations/sec'
 		row.instanceName = strings.TrimSpace(row.instanceName)
 		row.objectName = strings.TrimSpace(row.objectName)
 
-		if row.counterName == "Buffer cache hit ratio" {
+		if row.counterName == BufferCacheHitRatio {
 			buffer_cache_hit_ratio = *row.counterValue
-		} else if row.counterName == "Buffer cache hit ratio base" {
+		} else if row.counterName == BufferCacheHitRatioBase {
 			buffer_cache_hit_ratio_base = *row.counterValue
 		} else {
 			mapStr[row.counterName] = fmt.Sprintf("%v", *row.counterValue)
 		}
 	}
-	mapStr[BufferCacheHitRatio] = fmt.Sprintf("%v", float64(buffer_cache_hit_ratio/buffer_cache_hit_ratio_base))
+
+	if buffer_cache_hit_ratio_base != 0 {
+		mapStr[BufferCacheHitRatio] = fmt.Sprintf("%v", float64(buffer_cache_hit_ratio/buffer_cache_hit_ratio_base))
+	}
 
 	res, err := schema.Apply(mapStr)
 	if err != nil {
