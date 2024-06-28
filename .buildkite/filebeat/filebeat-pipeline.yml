@@ -24,10 +24,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Filebeat Check/Update"
+  - group: "Check/Update"
     key: "filebeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "Filebeat: Run check/update"
         command: |
           set -eo pipefail
           make -C filebeat check update
@@ -43,7 +43,7 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -51,10 +51,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "filebeat-check-update"
 
-  - group: "Filebeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "filebeat-mandatory-tests"
+
     steps:
-      - label: ":ubuntu: Filebeat Unit Tests"
+      - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests"
         command: |
           cd filebeat
           mage build unitTest
@@ -70,9 +71,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Linux x86_64 Unit Tests"
+              context: "filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":linux: Filebeat arm64 Unit Tests"
+      - label: ":ubuntu: Filebeat: Ubuntu arm64 Unit Tests"
         command: |
           cd filebeat
           mage build unitTest
@@ -88,9 +89,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Linux arm64 Unit Tests"
+              context: "filebeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":ubuntu: Filebeat Go Integration Tests"
+      - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
           cd filebeat
           mage -v goIntegTest
@@ -106,9 +107,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Filebeat Go Integration Tests"
+              context: "filebeat: Filebeat: Go Integration Tests"
 
-      - label: ":ubuntu: Filebeat Python Integration Tests"
+      - label: ":ubuntu: Filebeat: Python Integration Tests"
         command: |
           cd filebeat
           mage pythonIntegTest
@@ -124,9 +125,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Python Integration Tests"
+              context: "filebeat: Python: Integration Tests"
 
-      - label: "Module compat tests: previous minor"
+      - label: ":ubuntu: Filebeat: Module compat tests: previous minor"
         # Runs module integration tests under previous minor of ES to ensure ingest pipeline compatibility
         env:
           STACK_ENVIRONMENT: "prev-minor"
@@ -151,9 +152,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Module compat tests / previous minor"
+              context: "filebeat: Module compat tests: previous minor"
 
-      - label: "Module compat tests: next major"
+      - label: ":ubuntu: Filebeat: Module compat tests: next major"
         # Run module integration tests under next major of Elastic stack.
         env:
           STACK_ENVIRONMENT: "next-major"
@@ -177,9 +178,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Module compat tests / next major"
+              context: "filebeat: Module compat tests: next major"
 
-      - label: ":windows: Filebeat Windows 2019 Unit Tests"
+      - label: ":windows: Filebeat: Win 2019 Unit Tests"
         key: "windows-extended-2019"
         command: |
           Set-Location -Path filebeat
@@ -198,13 +199,13 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2019 Unit Tests"
+              context: "filebeat: Win 2019 Unit Tests"
 
-  - group: "Filebeat Extended Tests"
+  - group: "Extended Tests"
     key: "filebeat-extended-tests"
 
     steps:
-      - label: ":mac: MacOS x64_64 Unit Tests"
+      - label: ":mac: Filebeat: macOS x64_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -230,7 +231,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Filebeat Windows 2016 Unit Tests"
+      - label: ":windows: Filebeat: Win 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         command: |
           Set-Location -Path filebeat
@@ -249,9 +250,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2016 Unit Tests"
+              context: "filebeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Filebeat Windows 10 Unit Tests"
+      - label: ":windows: Filebeat: Win 10 Unit Tests"
         key: "windows-extended-10"
         command: |
           Set-Location -Path filebeat
@@ -270,7 +271,7 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 10 Unit Tests"
+              context: "filebeat: Win 10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -279,10 +280,10 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "filebeat-mandatory-tests"
 
-  - group: "Filebeat Packaging"
+  - group: "Packaging"
     key: "packaging"
     steps:
-      - label: ":linux: Filebeat Packaging Linux"
+      - label: ":ubuntu: Filebeat: Packaging Linux"
         key: "packaging-linux"
         command: |
           cd filebeat
@@ -303,7 +304,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Packaging Linux"
 
-      - label: ":linux: Filebeat Packaging arm64"
+      - label: ":ubuntu: Filebeat: Packaging arm64"
         key: "packaging-arm"
         command: |
           cd filebeat
