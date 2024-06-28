@@ -34,6 +34,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// How to write to journal from CLI:
+// https://www.baeldung.com/linux/systemd-journal-message-terminal
+
 // TestGenerateJournalEntries generates entries in the user's journal.
 // It is kept commented out at the top of the file as reference and
 // easy access.
