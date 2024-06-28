@@ -27,10 +27,8 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
@@ -40,8 +38,6 @@ import (
 
 type journalReader interface {
 	Close() error
-	Seek(mode journalread.SeekMode, cursor string) (err error)
-	SeekRealtimeUsec(usec uint64) error
 	Next(cancel input.Canceler) (*sdjournal.JournalEntry, error)
 }
 
@@ -49,8 +45,7 @@ type journald struct {
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
 	Since              *time.Duration
-	Seek               journalread.SeekMode
-	CursorSeekFallback journalread.SeekMode
+	Seek               journalctl.SeekMode
 	Matches            journalfield.IncludeMatches
 	Units              []string
 	Transports         []string
@@ -116,7 +111,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		MaxBackoff:         config.MaxBackoff,
 		Since:              config.Since,
 		Seek:               config.Seek,
-		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            journalfield.IncludeMatches(config.Matches),
 		Units:              config.Units,
 		Transports:         config.Transports,
@@ -130,7 +124,17 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 func (inp *journald) Name() string { return pluginName }
 
 func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, src)
+	reader, err := journalctl.New(
+		ctx.Logger,
+		ctx.Cancelation,
+		inp.Units,
+		inp.Identifiers,
+		inp.Matches,
+		journalctl.SeekHead,
+		"",
+		*inp.Since,
+		src.Name(),
+	)
 	if err != nil {
 		return err
 	}
@@ -146,41 +150,27 @@ func (inp *journald) Run(
 	logger := ctx.Logger.With("path", src.Name())
 	currentCheckpoint := initCheckpoint(logger, cursor)
 
-	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
-
-	var reader journalReader
-	var err error
-	if inp.Journalctl {
-		if inp.Since == nil {
-			// TODO: Fix this!
-			inp.Since = new(time.Duration)
-		}
-		reader, err = journalctl.New(
-			logger,
-			ctx.Cancelation,
-			inp.Units,
-			inp.Identifiers,
-			inp.Matches,
-			mode,
-			pos,
-			*inp.Since,
-			src.Name(),
-		)
-	} else {
-		reader, err = inp.open(ctx.Logger, ctx.Cancelation, src)
-		if err != nil {
-			return err
-		}
-
-		if mode == journalread.SeekSince {
-			err = reader.SeekRealtimeUsec(uint64(time.Now().Add(*inp.Since).UnixMicro()))
-		} else {
-			err = reader.Seek(mode, pos)
-		}
-		if err != nil {
-			logger.Error("Continue from current position. Seek failed with: %v", err)
-		}
+	mode := inp.Seek
+	pos := currentCheckpoint.Position
+	if inp.Since == nil {
+		// TODO: Fix this!
+		inp.Since = new(time.Duration)
 	}
+	reader, err := journalctl.New(
+		logger,
+		ctx.Cancelation,
+		inp.Units,
+		inp.Identifiers,
+		inp.Matches,
+		mode,
+		pos,
+		*inp.Since,
+		src.Name(),
+	)
+	if err != nil {
+		return fmt.Errorf("could not start jounral reader: %w", err)
+	}
+
 	defer reader.Close()
 
 	parser := inp.Parsers.Create(
@@ -202,20 +192,6 @@ func (inp *journald) Run(
 			return err
 		}
 	}
-}
-
-func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (journalReader, error) {
-	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
-	reader, err := journalread.Open(log, src.Name(), backoff,
-		withFilters(inp.Matches),
-		withUnits(inp.Units),
-		withTransports(inp.Transports),
-		withSyslogIdentifiers(inp.Identifiers))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create reader for %s journal: %w", src.Name(), err)
-	}
-
-	return reader, nil
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
@@ -260,24 +236,6 @@ func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error 
 	return func(j *sdjournal.Journal) error {
 		return journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
 	}
-}
-
-// seekBy tries to find the last known position in the journal, so we can continue collecting
-// from the last known position.
-// The checkpoint is ignored if the user has configured the input to always
-// seek to the head/tail/since of the journal on startup.
-func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekMode) (mode journalread.SeekMode, pos string) {
-	mode = seek
-	if mode == journalread.SeekCursor && cp.Position == "" {
-		mode = defaultSeek
-		switch mode {
-		case journalread.SeekHead, journalread.SeekTail, journalread.SeekSince:
-		default:
-			log.Error("Invalid option for cursor_seek_fallback")
-			mode = journalread.SeekHead
-		}
-	}
-	return mode, cp.Position
 }
 
 // readerAdapter wraps journalread.Reader and adds two functionalities:

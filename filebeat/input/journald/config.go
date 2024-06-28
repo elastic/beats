@@ -26,8 +26,9 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
+
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
@@ -53,10 +54,7 @@ type config struct {
 	Since *time.Duration `config:"since"`
 
 	// Seek is the method to read from journals.
-	Seek journalread.SeekMode `config:"seek"`
-
-	// CursorSeekFallback sets where to seek if registry file is not available.
-	CursorSeekFallback journalread.SeekMode `config:"cursor_seek_fallback"`
+	Seek journalctl.SeekMode `config:"seek"`
 
 	// Matches store the key value pairs to match entries.
 	Matches bwcIncludeMatches `config:"include_matches"`
@@ -116,33 +114,14 @@ func defaultConfig() config {
 	return config{
 		Backoff:            1 * time.Second,
 		MaxBackoff:         20 * time.Second,
-		Seek:               journalread.SeekCursor,
-		CursorSeekFallback: journalread.SeekHead,
+		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
 	}
 }
 
 func (c *config) Validate() error {
-	if c.Seek == journalread.SeekInvalid {
+	if c.Seek == journalctl.SeekInvalid {
 		return errInvalidSeek
-	}
-	switch c.CursorSeekFallback {
-	case journalread.SeekHead, journalread.SeekTail, journalread.SeekSince:
-	default:
-		return errInvalidSeekFallback
-	}
-	if c.Since == nil {
-		switch {
-		case c.Seek == journalread.SeekSince,
-			c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince:
-			return errInvalidSeekSince
-		default:
-			return nil
-		}
-	}
-	needSince := c.Seek == journalread.SeekSince || (c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince)
-	if !needSince {
-		return errInvalidSeekSince
 	}
 	return nil
 }
