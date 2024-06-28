@@ -873,12 +873,10 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	return nil
 }
 
-// reloadAPM reload APM tracing, it returns a bool and an error.
-// The bool, if set, indicates that the output reload requires an restart,
-// in that case the error is always `nil`.
+// reloadAPM reloads APM tracing
 //
-// In any other case, the bool is always false and the error will be non nil
-// if any error has occurred.
+// An error is not returned from this function, because in no case do we want APM trace configuration
+// to cause the beat to fail. The error is logged appropriately in the case of a failure on reload.
 func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
 	apm := cm.registry.GetReloadableAPM()
