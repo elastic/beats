@@ -100,7 +100,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	// https://opensource.apple.com/source/xnu/xnu-1504.3.12/bsd/sys/proc_info.h.auto.html
 	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
 	if n != size {
-		return ProcState{}, fmt.Errorf("could not read process info for pid %d: proc_pidinfo returned %d", int(n), pid)
+		return ProcState{}, fmt.Errorf("could not read process info for pid %d: proc_pidinfo returned %d", pid, int(n))
 	}
 
 	status := ProcState{}
