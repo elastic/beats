@@ -349,16 +349,20 @@ The HTTP method handled by the endpoint. If specified, `method` must be `POST`, 
 The default method is `POST`. If `PUT` or `PATCH` are specified, requests using those method types are accepted, but are treated as `POST` requests and are expected to have a request body containing the request data.
 
 [float]
-==== `tracer.filename`
+==== `tracer.enabled`
 
 It is possible to log HTTP requests to a local file-system for debugging configurations.
-This option is enabled by setting the `tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== `tracer.maxsize`
