@@ -143,7 +143,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
-- Fix filestream not correctly tracking the offset of a file when using the `include_message` parsser. {pull}39873[39873] {issue}39653[39653]
+- Fix filestream not correctly tracking the offset of a file when using the `include_message` parser. {pull}39873[39873] {issue}39653[39653]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 
 *Heartbeat*
@@ -288,6 +288,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from CEL input. {pull}39969[39969]
 - Add ability to remove request trace logs from HTTPJSON input. {pull}40003[40003]
 - Update CEL mito extensions to v1.13.0 {pull}40035[40035]
+- Add Jamf entity analytics provider. {pull}39996[39996]
 
 *Auditbeat*
 
