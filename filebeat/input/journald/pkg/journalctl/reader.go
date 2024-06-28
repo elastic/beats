@@ -42,26 +42,27 @@ func New(
 	mode journalread.SeekMode,
 	cursor string,
 	since time.Duration,
-	src string) (*Reader, error) {
+	file string) (*Reader, error) {
 
 	// --file opens an specific file
 	// If cursor is set, use --after-cursor
 	args := []string{"--utc", "--output=json", "--follow"}
-	if src != "" && src != localSystemJournalID {
-		args = append(args, "--file", src)
+	if file != "" && file != localSystemJournalID {
+		args = append(args, "--file", file)
 	}
 
 	switch mode {
 	case journalread.SeekSince:
-		//since format 2012-10-30 18:17:16
 		sinceArg := time.Now().Add(since).Format(time.RFC3339)
 		args = append(args, "--since", sinceArg)
-	case journalread.SeekTail:
-		args = append(args, "-n", "0")
 	case journalread.SeekCursor:
 		args = append(args, "--after-cursor", cursor)
-	case journalread.SeekHead:
+	case journalread.SeekTail:
 		args = append(args, "--since", "now")
+	case journalread.SeekHead:
+		// Do not append anything
+	default:
+		return nil, fmt.Errorf("unknown seek mode %v", mode)
 	}
 
 	for _, m := range matchers.Matches {
