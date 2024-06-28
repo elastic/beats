@@ -259,6 +259,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.TTY.CharDevice.Minor = uint16(qev.Proc.TtyMinor)
 	if qev.ExitEvent != nil {
 		ret.ExitCode = qev.ExitEvent.ExitCode
+		ret.End = timeutils.TimeFromNsSinceBoot(time.Duration(qev.ExitEvent.ExitTimeEvent))
 	}
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
@@ -406,7 +407,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, entryType uint32, elid ui
 	}
 
 	process.EntryLeader.EntityID = calculateEntityIDv1(elid, *process.EntryLeader.Start)
-	process.EntryLeader.EntryMeta.Type = "UNKNOWN" //TODO: use real value
+	process.EntryLeader.EntryMeta.Type = getEntryTypeName(qev.Proc.EntryLeaderType)
 }
 
 func setEntityID(process *types.Process) {
@@ -507,4 +508,25 @@ func getGroupName(id string) (string, bool) {
 		return "", false
 	}
 	return group.Name, true
+}
+
+func getEntryTypeName(entryType uint32) string {
+	switch int(entryType) {
+	case quark.QUARK_ELT_INIT:
+		return "init"
+	case quark.QUARK_ELT_SSHD:
+		return "sshd"
+	case quark.QUARK_ELT_SSM:
+		return "ssm"
+	case quark.QUARK_ELT_CONTAINER:
+		return "container"
+	case quark.QUARK_ELT_TERM:
+		return "terminal"
+	case quark.QUARK_ELT_CONSOLE:
+		return "console"
+	case quark.QUARK_ELT_KTHREAD:
+		return "kthread"
+	default:
+		return "unknown"
+	}
 }
