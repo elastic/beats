@@ -22,7 +22,6 @@ package journalfield
 import (
 	"testing"
 
-	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +35,7 @@ func TestConversion(t *testing.T) {
 	}{
 		"field name from fields.go": {
 			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_BOOT_ID: "123456",
+				"_BOOT_ID": "123456",
 			},
 			want: mapstr.M{
 				"journald": mapstr.M{
@@ -48,7 +47,7 @@ func TestConversion(t *testing.T) {
 		},
 		"'syslog.pid' field without user append": {
 			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456",
+				"SYSLOG_PID": "123456",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -58,7 +57,7 @@ func TestConversion(t *testing.T) {
 		},
 		"'syslog.priority' field with junk": {
 			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_PRIORITY: "123456, ",
+				"PRIORITY": "123456, ",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -73,7 +72,7 @@ func TestConversion(t *testing.T) {
 		},
 		"'syslog.pid' field with user append": {
 			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456,root",
+				"SYSLOG_PID": "123456,root",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -83,7 +82,7 @@ func TestConversion(t *testing.T) {
 		},
 		"'syslog.pid' field empty": {
 			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "",
+				"SYSLOG_PID": "",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
