@@ -8,7 +8,9 @@ import (
 	"io"
 	"os/exec"
 	"strconv"
-	"sync/atomic"
+	"strings"
+	"sync"
+	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -17,48 +19,104 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// LocalSystemJournalID is the ID of the local system journal.
+const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
+
 type Reader struct {
 	cmd      *exec.Cmd
-	count    *atomic.Uint64
 	dataChan chan []byte
+	errChan  chan error
 	logger   *logp.Logger
 	stdout   io.ReadCloser
 	stderr   io.ReadCloser
 	canceler input.Canceler
+	wg       sync.WaitGroup
 
 	matchers journalfield.IncludeMatches
 }
 
-func New(logger *logp.Logger, canceler input.Canceler, matchers journalfield.IncludeMatches, src string) (Reader, error) {
+func New(
+	logger *logp.Logger,
+	canceler input.Canceler,
+	matchers journalfield.IncludeMatches,
+	mode journalread.SeekMode,
+	cursor string,
+	since time.Duration,
+	src string) (*Reader, error) {
+
 	// --file opens an specific file
-	args := []string{"--output=json", "--follow", "--file", src}
+	// If cursor is set, use --after-cursor
+	args := []string{"--utc", "--output=json", "--follow"}
+	if src != "" && src != localSystemJournalID {
+		args = append(args, "--file", src)
+	}
+
+	switch mode {
+	case journalread.SeekSince:
+		//since format 2012-10-30 18:17:16
+		sinceArg := time.Now().Add(since).Format(time.RFC3339)
+		args = append(args, "--since", sinceArg)
+	case journalread.SeekTail:
+		args = append(args, "-n", "0")
+	case journalread.SeekCursor:
+		args = append(args, "--after-cursor", cursor)
+	case journalread.SeekHead:
+		args = append(args, "--since", "now")
+	}
+
 	for _, m := range matchers.Matches {
 		args = append(args, m.String())
 	}
 
-	fmt.Println(">>>>> Args", args)
+	logger.Debugf("Journalctl command: journalctl %s", strings.Join(args, " "))
 	cmd := exec.Command("journalctl", args...)
 
-	logger.Debug("Starting Journalctl reader")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return Reader{}, fmt.Errorf("cannot get stdout pipe: %w", err)
+		return &Reader{}, fmt.Errorf("cannot get stdout pipe: %w", err)
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return Reader{}, fmt.Errorf("cannot get stderr pipe: %w", err)
+		return &Reader{}, fmt.Errorf("cannot get stderr pipe: %w", err)
 	}
 
 	r := Reader{
 		cmd:      cmd,
 		dataChan: make(chan []byte),
+		errChan:  make(chan error),
 		logger:   logger,
 		stdout:   stdout,
 		stderr:   stderr,
+		canceler: canceler,
 	}
 
+	// Goroutine to read errors from stderr
+	r.wg.Add(1)
 	go func() {
-		fmt.Println("Reader goroutine started")
+		defer r.logger.Debug("stderr goroutine done")
+		defer r.wg.Done()
+		reader := bufio.NewReader(r.stderr)
+		msgs := []string{}
+		for {
+			line, err := reader.ReadString('\n')
+			if errors.Is(err, io.EOF) {
+				if len(msgs) == 0 {
+					return
+				}
+				errMsg := fmt.Sprintf("Journalctl wrote errors: %s", strings.Join(msgs, "\n"))
+				logger.Errorf(errMsg)
+				r.errChan <- errors.New(errMsg)
+				return
+			}
+			msgs = append(msgs, line)
+		}
+	}()
+
+	// Goroutine to read events from stdout
+	r.wg.Add(1)
+	go func() {
+		defer r.logger.Debug("stdout goroutine done")
+		defer r.wg.Done()
 		reader := bufio.NewReader(r.stdout)
 		for {
 			data, err := reader.ReadBytes('\n')
@@ -66,28 +124,42 @@ func New(logger *logp.Logger, canceler input.Canceler, matchers journalfield.Inc
 				close(r.dataChan)
 				return
 			}
-			fmt.Println(">>>>> Got data: ", string(data))
-			r.dataChan <- data
+			logger.Debug(">>>>> Got data: ", string(data))
+
+			select {
+			case <-r.canceler.Done():
+				return
+			case r.dataChan <- data:
+			}
 		}
 	}()
 
 	if err := cmd.Start(); err != nil {
-		return Reader{}, fmt.Errorf("cannot start journalctl: %w", err)
+		return &Reader{}, fmt.Errorf("cannot start journalctl: %w", err)
 	}
 
-	return r, nil
+	return &r, nil
 }
 
-func (r Reader) Start() {
-	r.logger.Debug("Start called")
+func (r *Reader) Start()                                                    {}
+func (r *Reader) SeekRealtimeUsec(usec uint64) error                        { return nil }
+func (r *Reader) Seek(mode journalread.SeekMode, cursor string) (err error) { return nil }
+
+func (r *Reader) Close() error {
+	if r.cmd == nil {
+		return nil
+	}
+
+	if err := r.cmd.Process.Kill(); err != nil {
+		return fmt.Errorf("cannot stop journalctl: %w", err)
+	}
+
+	r.logger.Debug("waiting for all goroutines to finish")
+	r.wg.Wait()
+	return nil
 }
 
-func (r Reader) Close() error                                              { return nil }
-func (r Reader) Seek(mode journalread.SeekMode, cursor string) (err error) { return nil }
-func (r Reader) SeekRealtimeUsec(usec uint64) error                        { return nil }
-func (r Reader) Next(input.Canceler) (*sdjournal.JournalEntry, error) {
-	// TODO: find out why this is not being called any more
-	fmt.Println("Next called")
+func (r *Reader) Next(input.Canceler) (*sdjournal.JournalEntry, error) {
 	d, open := <-r.dataChan
 	if !open {
 		return nil, errors.New("data chan is closed")
