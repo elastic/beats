@@ -28,9 +28,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/require"
 )
 
 // TestGenerateJournalEntries generates entries in the user's journal.

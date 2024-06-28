@@ -143,8 +143,8 @@ func (inp *journald) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	log := ctx.Logger.With("path", src.Name())
-	currentCheckpoint := initCheckpoint(log, cursor)
+	logger := ctx.Logger.With("path", src.Name())
+	currentCheckpoint := initCheckpoint(logger, cursor)
 
 	mode, pos := seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)
 
@@ -155,7 +155,17 @@ func (inp *journald) Run(
 			// TODO: Fix this!
 			inp.Since = new(time.Duration)
 		}
-		reader, err = journalctl.New(log, ctx.Cancelation, inp.Matches, mode, pos, *inp.Since, src.Name())
+		reader, err = journalctl.New(
+			logger,
+			ctx.Cancelation,
+			inp.Units,
+			inp.Identifiers,
+			inp.Matches,
+			mode,
+			pos,
+			*inp.Since,
+			src.Name(),
+		)
 	} else {
 		reader, err = inp.open(ctx.Logger, ctx.Cancelation, src)
 		if err != nil {
@@ -168,7 +178,7 @@ func (inp *journald) Run(
 			err = reader.Seek(mode, pos)
 		}
 		if err != nil {
-			log.Error("Continue from current position. Seek failed with: %v", err)
+			logger.Error("Continue from current position. Seek failed with: %v", err)
 		}
 	}
 	defer reader.Close()
