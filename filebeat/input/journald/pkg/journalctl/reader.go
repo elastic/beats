@@ -29,8 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/coreos/go-systemd/v22/sdjournal"
-
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -38,6 +36,14 @@ import (
 
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
+
+// JournalEntry holds all fields of a journal entry plus cursor and timestamps
+type JournalEntry struct {
+	Fields             map[string]string
+	Cursor             string
+	RealtimeTimestamp  uint64
+	MonotonicTimestamp uint64
+}
 
 type Reader struct {
 	cmd      *exec.Cmd
@@ -188,31 +194,31 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-func (r *Reader) Next(input.Canceler) (*sdjournal.JournalEntry, error) {
+func (r *Reader) Next(input.Canceler) (JournalEntry, error) {
 	d, open := <-r.dataChan
 	if !open {
-		return nil, errors.New("data chan is closed")
+		return JournalEntry{}, errors.New("data chan is closed")
 	}
 	fields := map[string]string{}
 	if err := json.Unmarshal(d, &fields); err != nil {
-		return nil, fmt.Errorf("cannot decode Journald JSON: %w", err)
+		return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
 	}
 
 	ts := fields["__REALTIME_TIMESTAMP"]
 	unixTS, err := strconv.ParseUint(ts, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("could not convert timestamp to uint64: %w", err)
+		return JournalEntry{}, fmt.Errorf("could not convert timestamp to uint64: %w", err)
 	}
 
 	monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
 	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("could not convert monotomic timestamp to uint64: %w", err)
+		return JournalEntry{}, fmt.Errorf("could not convert monotomic timestamp to uint64: %w", err)
 	}
 
 	cursor := fields["__CURSOR"]
 
-	return &sdjournal.JournalEntry{
+	return JournalEntry{
 		Fields:             fields,
 		RealtimeTimestamp:  unixTS,
 		Cursor:             cursor,

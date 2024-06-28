@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coreos/go-systemd/v22/sdjournal"
-
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -38,7 +36,7 @@ import (
 
 type journalReader interface {
 	Close() error
-	Next(cancel input.Canceler) (*sdjournal.JournalEntry, error)
+	Next(cancel input.Canceler) (journalctl.JournalEntry, error)
 }
 
 type journald struct {
@@ -212,30 +210,6 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	}
 
 	return cp
-}
-
-func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) error {
-	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyIncludeMatches(j, filters)
-	}
-}
-
-func withUnits(units []string) func(*sdjournal.Journal) error {
-	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyUnitMatchers(j, units)
-	}
-}
-
-func withTransports(transports []string) func(*sdjournal.Journal) error {
-	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyTransportMatcher(j, transports)
-	}
-}
-
-func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error {
-	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
-	}
 }
 
 // readerAdapter wraps journalread.Reader and adds two functionalities:
