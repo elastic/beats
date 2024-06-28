@@ -134,7 +134,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				continue
 			}
 			for _, qev := range qevs {
-				logger.Debugf("qev: %v", qev)
+				logger.Infof("qev: %v", qev)
 			}
 			if len(qevs) == 0 {
 				err = qq.Block()
@@ -146,31 +146,79 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		}
 	}(qq, logger)
 
+	bootID, _ = readBootID()
+	pidNsInode, _ = readPIDNsInode()
+
 	return &p, nil
 }
 
-func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
-	time.Sleep(100 * time.Millisecond)
-	return nil
+const (
+	maxWaitLimit      = 1200 * time.Millisecond // Maximum time SyncDB will wait for process
+	combinedWaitLimit = 15 * time.Second        // Multiple SyncDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 10 * time.Second       // SyncDB will stop waiting for processes for this time
+	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
+)
 
-	// // TODO: Not working correctly...
-	//
-	//	timeout := 5 * time.Second
-	//	ch := time.After(timeout)
-	//	for {
-	//		select {
-	//		case <- ch:
-	//			p.logger.Errorf("%v not seen after %v", pid, timeout)
-	//			break
-	//		default:
-	//			proc := p.qq.Lookup(int(pid))
-	//			//TODO: check event, eg. make sure exit seen when enriching exit event
-	//			if proc != nil {
-	//				break
-	//			}
-	//			time.Sleep(200 * time.Millisecond)
-	//		}
-	//	}
+var (
+	combinedWait   = 0 * time.Millisecond
+	inBackoff      = false
+	backoffStart   = time.Now()
+	since          = time.Now()
+	backoffSkipped = 0
+)
+
+func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+	if qev := p.qq.Lookup(int(pid)); qev != nil {
+		return nil
+	}
+
+	now := time.Now()
+	if inBackoff {
+		if now.Sub(backoffStart) > backoffDuration {
+			p.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
+			inBackoff = false
+			combinedWait = 0 * time.Millisecond
+		} else {
+			backoffSkipped += 1
+			return nil
+		}
+	} else {
+		if combinedWait > combinedWaitLimit {
+			p.logger.Warn("starting backoff")
+			inBackoff = true
+			backoffStart = now
+			backoffSkipped = 0
+			return nil
+		}
+		// maintain a moving window of time for the delays we track
+		if now.Sub(since) > resetDuration {
+			since = now
+			combinedWait = 0 * time.Millisecond
+		}
+	}
+
+	start := now
+	nextWait := 5 * time.Millisecond
+	for {
+		waited := time.Since(start)
+		if qev := p.qq.Lookup(int(pid)); qev != nil {
+			p.logger.Debugf("got process that was missing after %v", waited)
+			combinedWait = combinedWait + waited
+			return nil
+		}
+		if waited >= maxWaitLimit {
+			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
+			p.logger.Warnf("%w", e)
+			combinedWait = combinedWait + waited
+			return e
+		}
+		time.Sleep(nextWait)
+		if nextWait*2+waited > maxWaitLimit {
+			nextWait = maxWaitLimit - waited
+		} else {
+			nextWait = nextWait * 2
+		}
+	}
 }
 
 func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
@@ -190,7 +238,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Start:      timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
 		Name:       basename(qev.Filename),
 		Executable: qev.Filename,
-		//		Args:             qev.Argv,
+		Args:  []string{qev.Filename}, // TODO: Fix
 		WorkingDirectory: qev.Cwd,
 		Interactive:      &interactive,
 	}
@@ -215,10 +263,11 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
 	p.fillParent(&ret, qev.Proc.Ppid)
-	p.fillGroupLeader(&ret, qev.Proc.Pgid)
+	p.fillGroupLeader(&ret, qev.Pid) //  qev.Proc.Pgid)
 	p.fillSessionLeader(&ret, qev.Proc.Sid)
 	p.fillEntryLeader(&ret, qev.Proc.EntryLeaderType, qev.Proc.EntryLeader)
 	setEntityID(&ret)
+	setSameAsProcess(&ret)
 	return &ret, nil
 }
 
@@ -239,7 +288,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	process.Parent.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.Parent.Name = basename(qev.Filename)
 	process.Parent.Executable = qev.Filename
-	//	process.Parent.Args = qev.Argv
+	process.Parent.Args = []string{qev.Filename} //TODO: FIx
 	process.Parent.WorkingDirectory = qev.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -273,7 +322,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	process.GroupLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.GroupLeader.Name = basename(qev.Filename)
 	process.GroupLeader.Executable = qev.Filename
-	//	process.GroupLeader.Args = qev.Argv
+	process.GroupLeader.Args = []string{qev.Filename} //TODO: fix
 	process.GroupLeader.WorkingDirectory = qev.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -307,7 +356,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	process.SessionLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.SessionLeader.Name = basename(qev.Filename)
 	process.SessionLeader.Executable = qev.Filename
-	//	process.SessionLeader.Args = qev.Argv
+	process.SessionLeader.Args = []string{qev.Filename} //TODO: fix
 	process.SessionLeader.WorkingDirectory = qev.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -342,7 +391,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, entryType uint32, elid ui
 	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.EntryLeader.Name = basename(qev.Filename)
 	process.EntryLeader.Executable = qev.Filename
-	//	process.EntryLeader.Args = qev.Argv
+	process.EntryLeader.Args = []string{qev.Filename} // TODO: Fix
 	process.EntryLeader.WorkingDirectory = qev.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -379,6 +428,23 @@ func setEntityID(process *types.Process) {
 
 	if process.EntryLeader.PID != 0 && process.EntryLeader.Start != nil {
 		process.EntryLeader.EntityID = calculateEntityIDv1(process.EntryLeader.PID, *process.EntryLeader.Start)
+	}
+}
+
+func setSameAsProcess(process *types.Process) {
+	if process.GroupLeader.PID != 0 && process.GroupLeader.Start != nil {
+		sameAsProcess := process.PID == process.GroupLeader.PID
+		process.GroupLeader.SameAsProcess = &sameAsProcess
+	}
+
+	if process.SessionLeader.PID != 0 && process.SessionLeader.Start != nil {
+		sameAsProcess := process.PID == process.SessionLeader.PID
+		process.SessionLeader.SameAsProcess = &sameAsProcess
+	}
+
+	if process.EntryLeader.PID != 0 && process.EntryLeader.Start != nil {
+		sameAsProcess := process.PID == process.EntryLeader.PID
+		process.EntryLeader.SameAsProcess = &sameAsProcess
 	}
 }
 
