@@ -44,8 +44,6 @@ func New(
 	since time.Duration,
 	file string) (*Reader, error) {
 
-	// --file opens an specific file
-	// If cursor is set, use --after-cursor
 	args := []string{"--utc", "--output=json", "--follow"}
 	if file != "" && file != localSystemJournalID {
 		args = append(args, "--file", file)
