@@ -33,7 +33,7 @@ var googleWorkspace = (function () {
             }
         });
         new processor.Fingerprint({
-            fields: keys,
+            fields: keys.sort(),
             target_field: "@metadata._id",
             ignore_missing: true,
             fail_on_error: false,
