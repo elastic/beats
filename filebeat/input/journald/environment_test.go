@@ -101,6 +101,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
+	e.t.Helper()
 	msg := strings.Builder{}
 	fmt.Fprintf(&msg, "did not find the expected %d events", count)
 	assert.Eventually(e.t, func() bool {

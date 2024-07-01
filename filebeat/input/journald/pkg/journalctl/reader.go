@@ -66,7 +66,7 @@ func handleSeeAndCursor(args []string, mode SeekMode, since time.Duration, curso
 
 	switch mode {
 	case SeekSince:
-		sinceArg := time.Now().Add(since).Format(time.RFC3339)
+		sinceArg := time.Now().Add(since).Format(time.RFC3339Nano)
 		args = append(args, "--since", sinceArg)
 	case SeekTail:
 		args = append(args, "--since", "now")
