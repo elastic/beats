@@ -101,9 +101,12 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
 
+			// We are omitting some labels here because they are added separately for services with additional metadata logic.
+			// However, we explicitly include the instance_id label to ensure it is not missed for services without additional metadata logic.
 			if k == TimeSeriesResponsePathForECSInstanceID {
 				_, _ = ecs.Put(ECSCloudInstanceIDKey, v)
 			}
+
 			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}
