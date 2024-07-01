@@ -45234,7 +45234,7 @@ format: bytes
 *`kubernetes.pod.memory.working_set.limit.pct`*::
 +
 --
-Working set memory usage as a percentage of the defined limits sum of the pod containers. If one or more containers of the pod is unlimited, this metric will be missing entirely.
+Working set memory usage as a percentage of the defined limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
 
 type: scaled_float
