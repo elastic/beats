@@ -60,7 +60,6 @@ import (
 //  11. Read the journal with all fields as JSON
 //     journalctl --file=/tmp/foo.journal -n 10 -o json
 // func TestGenerateJournalEntries(t *testing.T) {
-
 // 	fields := []map[string]any{
 // 		{
 // 			"BAR": "bar",
@@ -209,6 +208,7 @@ func TestMatchers(t *testing.T) {
 	testCases := []struct {
 		name           string
 		matchers       map[string]any
+		confiFields    map[string]any
 		expectedEvents int
 	}{
 		{ // FOO=foo
@@ -262,15 +262,41 @@ func TestMatchers(t *testing.T) {
 			},
 			expectedEvents: 0,
 		},
+		{
+			name:     "transport: journal",
+			matchers: map[string]any{},
+			confiFields: map[string]any{
+				"transports": []string{"journal"},
+			},
+			expectedEvents: 6,
+		},
+		{
+			name:     "syslog identifier: sudo",
+			matchers: map[string]any{},
+			confiFields: map[string]any{
+				"syslog_identifiers": []string{"sudo"},
+			},
+			expectedEvents: 1,
+		},
+		{
+			name:     "unit",
+			matchers: map[string]any{},
+			confiFields: map[string]any{
+				"units": []string{"session-15.scope"},
+			},
+			expectedEvents: 7,
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
-			inp := env.mustCreateInput(mapstr.M{
+			cfg := mapstr.M{
 				"paths":           []string{path.Join("testdata", "matchers.journal")},
 				"include_matches": tc.matchers,
-			})
+			}
+			cfg.Update(mapstr.M(tc.confiFields))
+			inp := env.mustCreateInput(cfg)
 
 			ctx, cancelInput2 := context.WithCancel(context.Background())
 			defer cancelInput2()

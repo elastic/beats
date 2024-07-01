@@ -82,6 +82,7 @@ func New(
 	canceler input.Canceler,
 	units []string,
 	syslogIdentifiers []string,
+	transports []string,
 	matchers journalfield.IncludeMatches,
 	mode SeekMode,
 	cursor string,
@@ -105,6 +106,10 @@ func New(
 
 	for _, m := range matchers.Matches {
 		args = append(args, m.String())
+	}
+
+	for _, m := range transports {
+		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
 	logger.Debugf("Journalctl command: journalctl %s", strings.Join(args, " "))
