@@ -42,29 +42,25 @@ import (
 // easy access.
 //
 // How to generate a journal file with only the entries you want:
-//  1. Get a VM
-//  2. Uncomment and run this test as a normal user just to make sure you
-//     you can write to the journal and find the file
-//  3. Find the journal file, usually at
-//     /var/log/journal/<machine ID>/user-1000.journal
-//  4. Rotate the journal
-//  5. Clean and rotate the journal
+//  1. Add the dependencies for this test
+//     go get github.com/ssgreg/journald
+//  2. Uncomment and run the test:
+//  3. Add the following import:
+//     journaldlogger "github.com/ssgreg/journald"
+//  4. Get a VM, ssh into it, make sure you can access the test from it
+//  5. Find the journal file, usually at /var/log/journal/<machine ID>/user-1000.journal
+//  7. Clean and rotate the journal
 //     sudo journalctl  --vacuum-time=1s
 //     sudo journalctl --rotate
-//  6. Copy the journal file somewhere else
+//  8. Run this test: `go test -run=TestGenerateJournalEntries`
+//  9. Copy the journal file somewhere else
 //     cp /var/log/journal/21282bcb80a74c08a0d14a047372256c/user-1000.journal /tmp/foo.journal
-//  7. Read the journal file:
-//     journalctl --file=/tmp/foo.journal -n 100
-//  8. Read the journal with all fields as JSON
-//     journalctl --file=/tmp/foo.journal -n 100 -o json
+//  10. Read the journal file:
+//     journalctl --file=/tmp/foo.journal -n 10
+//  11. Read the journal with all fields as JSON
+//     journalctl --file=/tmp/foo.journal -n 10 -o json
 // func TestGenerateJournalEntries(t *testing.T) {
-// 	// To run this test you need to add the necessary imports.
-// 	// 1. Go get:
-// 	//   go get github.com/ssgreg/journald
-// 	// 2. Add the following import:
-// 	//   journaldlogger "github.com/ssgreg/journald"
-// 	// 3. Uncomment and run the test:
-// 	//   go test -count=1 -run=TestGenerate
+
 // 	fields := []map[string]any{
 // 		{
 // 			"BAR": "bar",
@@ -77,19 +73,17 @@ import (
 // 			"FOO": "foo",
 // 		},
 // 		{
-// 			"FOO_BAR": "foo bar",
+// 			"FOO_BAR": "foo",
 // 		},
 // 		{
-// 			"ANSWER":   42,
-// 			"BAR":      "bar",
-// 			"FOO":      "foo",
-// 			"FOO_BAR":  "foo bar",
-// 			"QUESTION": "Answer to the Ultimate Question of Life, The Universe, and Everything",
+// 			"FOO_BAR": "bar",
+// 		},
+// 		{
+// 			"FOO_BAR": "foo bar",
 // 		},
 // 	}
-
-// 	for _, m := range fields {
-// 		if err := journaldlogger.Send("Hello World!", journaldlogger.PriorityInfo, m); err != nil {
+// 	for i, m := range fields {
+// 		if err := journaldlogger.Send(fmt.Sprintf("message %d", i), journaldlogger.PriorityInfo, m); err != nil {
 // 			t.Fatal(err)
 // 		}
 // 	}
@@ -212,115 +206,70 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 }
 
 func TestMatchers(t *testing.T) {
-	t.Skip("Skipping the tests until we fix the matchers")
 	testCases := []struct {
 		name           string
 		matchers       map[string]any
 		expectedEvents int
 	}{
-		{
+		{ // FOO=foo
 			name: "single marcher",
 			matchers: map[string]any{
 				"match": []string{
 					"FOO=foo",
 				},
 			},
-			expectedEvents: 3,
+			expectedEvents: 2,
 		},
-		{
-			name: "two matches, works as AND",
+		{ // FOO=foo AND BAR=bar
+			name: "different keys work as AND",
 			matchers: map[string]any{
 				"match": []string{
 					"FOO=foo",
 					"BAR=bar",
 				},
 			},
-			expectedEvents: 2,
+			expectedEvents: 1,
 		},
-		{
-			name: "AND matches",
+		{ // FOO_BAR=foo OR FOO_BAR=bar
+			name: "same keys work as OR",
 			matchers: map[string]any{
-				"and": []any{
-					map[string]any{
-						"match": []string{
-							"FOO=foo",
-						},
-					},
-					map[string]any{
-						"match": []string{
-							"BAR=bar",
-						},
-					},
+				"match": []string{
+					"FOO_BAR=foo",
+					"FOO_BAR=bar",
 				},
 			},
 			expectedEvents: 2,
 		},
-		{
-			name: "OR matches",
+		{ // (FOO_BAR=foo OR FOO_BAR=bar) AND message="message 4"
+			name: "same keys work as OR, AND the odd one, one match",
 			matchers: map[string]any{
-				"or": []any{
-					map[string]any{
-						"match": []string{
-							"FOO=foo",
-						},
-					},
-					map[string]any{
-						"match": []string{
-							"BAR=bar",
-						},
-					},
+				"match": []string{
+					"FOO_BAR=foo",
+					"FOO_BAR=bar",
+					"MESSAGE=message 4",
 				},
 			},
-			expectedEvents: 4,
+			expectedEvents: 1,
 		},
-		{
-			name: "OR-EQUALS matches",
+		{ // (FOO_BAR=foo OR FOO_BAR=bar) AND message="message 1"
+			name: "same keys work as OR, AND the odd one. No matches",
 			matchers: map[string]any{
-				"or": []any{
-					map[string]any{
-						"equals": []string{
-							"FOO=foo",
-						},
-					},
+				"match": []string{
+					"FOO_BAR=foo",
+					"FOO_BAR=bar",
+					"MESSAGE=message 1",
 				},
 			},
-			expectedEvents: 4,
-		},
-		{
-			name: "A OR (B AND C)",
-			matchers: map[string]any{
-				"or": []any{
-					map[string]any{
-						"match": []string{
-							"FOO_BAR=foo bar",
-						},
-						"and": []any{
-							map[string]any{
-								"match": []string{
-									"FOO=foo",
-								},
-							},
-							map[string]any{
-								"match": []string{
-									"BAR=bar",
-								},
-							},
-						},
-					},
-				},
-			},
-			expectedEvents: 3,
+			expectedEvents: 0,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			fmt.Printf("==================== %s ==========\n", t.Name())
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
 				"paths":           []string{path.Join("testdata", "matchers.journal")},
 				"include_matches": tc.matchers,
-				// "journalctl": true,
 			})
 
 			ctx, cancelInput2 := context.WithCancel(context.Background())
@@ -328,11 +277,6 @@ func TestMatchers(t *testing.T) {
 
 			env.startInput(ctx, inp)
 			env.waitUntilEventCount(tc.expectedEvents)
-			for _, evt := range env.pipeline.GetAllEvents() {
-				// fmt.Println(evt.Fields.StringToPrint())
-				fields, _ := evt.Fields.GetValue("journald.custom")
-				fmt.Println(fields)
-			}
 		})
 	}
 }
