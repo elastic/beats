@@ -22,10 +22,11 @@ env:
   DOCKER_PULL: 0
 
 steps:
-  - group: "Winlogbeat Check/Update"
+  - group: "Check/Update"
     key: "winlogbeat-check-update"
+
     steps:
-      - label: "Run check/update"
+      - label: "Winlogbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C winlogbeat check update
@@ -41,7 +42,7 @@ steps:
         notify:
           - github_commit_status:
               context: "winlogbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -49,11 +50,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "winlogbeat-check-update"
 
-  - group: "Winlogbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "winlogbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Winlogbeat Crossccompile"
+      - label: ":ubuntu: Winlogbeat: Crossccompile"
         key: "mandatory-cross-compile"
         command: "make -C winlogbeat crosscompile"
         retry:
@@ -70,7 +71,7 @@ steps:
           - github_commit_status:
               context: "winlogbeat: Crosscompile"
 
-      - label: ":windows: Winlogbeat Win-2019 Unit Tests"
+      - label: ":windows: Winlogbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -89,9 +90,9 @@ steps:
           - "winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "winlogbeat: Win-2019 Unit Tests"
+              context: "winlogbeat: Win 2019 Unit Tests"
 
-      - label: ":windows: Winlogbeat Win-2022 Unit Tests"
+      - label: ":windows: Winlogbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -110,14 +111,14 @@ steps:
           - "winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "winlogbeat: Win-2022 Unit Tests"
+              context: "winlogbeat: Win 2022 Unit Tests"
 
-  - group: "Winlogbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "winlogbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Winlogbeat Win-10 Unit Tests"
+      - label: ":windows: Winlogbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -136,9 +137,9 @@ steps:
           - "winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "winlogbeat: Win-10 Unit Tests"
+              context: "winlogbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Winlogbeat Win-2016 Unit Tests"
+      - label: ":windows: Winlogbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -157,7 +158,7 @@ steps:
           - "winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "winlogbeat: Win-2016 Unit Tests"
+              context: "winlogbeat: Win 2016 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -166,11 +167,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "winlogbeat-mandatory-tests"
 
-  - group: "Winlogbeat Packaging"
+  - group: "Packaging"
     key: "winlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Winlogbeat Packaging Linux"
+      - label: ":ubuntu: Winlogbeat: Packaging Linux"
         key: "packaging-linux"
         command: |
           cd winlogbeat

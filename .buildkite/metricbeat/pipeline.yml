@@ -28,10 +28,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Metricbeat Check/Update"
+  - group: "Check/Update"
     key: "metricbeat-check-update"
+
     steps:
-      - label: "Run check/update"
+      - label: "Metricbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C metricbeat check update
@@ -47,7 +48,7 @@ steps:
         notify:
           - github_commit_status:
               context: "metricbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -55,10 +56,10 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "metricbeat-check-update"
 
-  - group: "Metricbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "metricbeat-mandatory-tests"
     steps:
-      - label: ":ubuntu: Metricbeat Linux x86_64 Unit Tests"
+      - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd metricbeat
@@ -75,9 +76,9 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Linux x86_64 Unit Tests"
+              context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Metricbeat Go Integration Tests"
+      - label: ":ubuntu: Metricbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -103,7 +104,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Python Integration Tests"
+      - label: ":ubuntu: Metricbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
@@ -129,7 +130,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Python Integration Tests"
 
-      - label: ":ubuntu: Metricbeat Crosscompile"
+      - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
         command: "make -C metricbeat crosscompile"
         retry:
@@ -146,7 +147,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Crosscompile"
 
-      - label: ":windows: Metricbeat Win-2019 Unit Tests"
+      - label: ":windows: Metricbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -165,14 +166,14 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Win-2019 Unit Tests"
+              context: "metricbeat: Win 2019 Unit Tests"
 
-  - group: "Metricbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "metricbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Metricbeat Win 10 Unit Tests"
+      - label: ":windows: Metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -193,7 +194,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Metricbeat Win-2016 Unit Tests"
+      - label: ":windows: Metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -212,14 +213,14 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Win-2016 Unit Tests"
+              context: "metricbeat: Win 2016 Unit Tests"
 
-  - group: "Metricbeat Extended macOS Tests"
+  - group: "Extended Tests"
     key: "metricbeat-extended-macos-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
-      - label: ":mac: Metricbeat macOS x64_64 Unit Tests"
+      - label: ":mac: Metricbeat: macOS x64_64 Unit Tests"
         key: "extended-macos-x64-64-unit-tests"
         command: |
           set -euo pipefail
@@ -245,10 +246,10 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "metricbeat-mandatory-tests"
 
-  - group: "Metricbeat Packaging"
+  - group: "Packaging"
     key: "metricbeat-packaging"
     steps:
-      - label: ":ubuntu: Metricbeat Packaging Linux"
+      - label: ":ubuntu: Metricbeat: Packaging Linux"
         key: "packaging-linux"
         command: |
           cd metricbeat
@@ -269,7 +270,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Packaging Linux"
 
-      - label: ":ubuntu: Metricbeat Packaging Linux arm64"
+      - label: ":ubuntu: Metricbeat: Packaging Linux arm64"
         key: "packaging-arm"
         command: |
           cd metricbeat
