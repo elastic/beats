@@ -105,8 +105,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	}
 
 	return sources, &journald{
-		Backoff:            config.Backoff,
-		MaxBackoff:         config.MaxBackoff,
 		Since:              config.Since,
 		Seek:               config.Seek,
 		Matches:            journalfield.IncludeMatches(config.Matches),
@@ -115,7 +113,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
-		Journalctl:         config.Journalctl,
 	}, nil
 }
 
