@@ -48,6 +48,7 @@ type kubernetesConfig struct {
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
+	AddKubeAdm          bool                                `config:"add_kubeadm"`
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 	Namespace           string                              `config:"namespace"`
 }
