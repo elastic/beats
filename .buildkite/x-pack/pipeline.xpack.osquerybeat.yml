@@ -257,7 +257,6 @@ steps:
       - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
         command: |
-          .buildkite/scripts/install-msitools.sh
           cd x-pack/osquerybeat
           mage package
         retry:
