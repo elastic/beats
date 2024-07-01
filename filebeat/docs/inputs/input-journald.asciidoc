@@ -81,12 +81,12 @@ an unique ID.
 {beatname_lc}.inputs:
 - type: journald
   id: consul.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=consul.service
 
 - type: journald
   id: vault.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=vault.service
 ----
 
@@ -176,20 +176,30 @@ If the filter expressions apply to different fields, only entries with all field
 If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
 `match`: List of filter expressions to match fields.
-`or`: The filter expressions listed under `or` are connected with a disjunction (or).
-`and`: The filter expressions listed under `and` are connected with a conjunction (and).
 
 Please note that these expressions are limited. You can build complex filtering, but full logical
 expressions are not supported.
 
-The following include matches configuration reads all `systemd` syslog entries:
+The following include matches configuration will ingest entries that
+contain `journald.process.name: systemd` and `systemd.transport: syslog`.
 
 ["source","yaml",subs="attributes"]
 ----
-include_matches.and:
-- match:
-  - "journald.process.name=systemd"
-  - "systemd.transport=syslog"
+include_matches:
+  match:
+    - "journald.process.name=systemd"
+    - "systemd.transport=syslog"
+----
+
+The following include matches configuration will ingest entries that
+contain `systemd.transport: systemd` or `systemd.transport: kernel`.
+
+["source","yaml",subs="attributes"]
+----
+include_matches:
+  match:
+    - "systemd.transport=kernel"
+    - "systemd.transport=syslog"
 ----
 
 To reference fields, use one of the following:
