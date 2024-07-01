@@ -26,10 +26,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/filebeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-filebeat-check-update"
+
     steps:
-      - label: "Run check/update"
+      - label: "x-pack/filebeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/filebeat check update
@@ -54,10 +55,11 @@ steps:
     depends_on: "x-pack-filebeat-check-update"
 
 
-  - group: "x-pack/filebeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "x-pack-filebeat-mandatory-tests"
+
     steps:
-      - label: ":ubuntu: x-pack/filebeat Unit Tests"
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests"
         key: "x-pack-filebeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/filebeat
@@ -74,9 +76,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Unit Tests"
+              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/filebeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
           cd x-pack/filebeat
@@ -95,7 +97,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Go Integration Tests"
 
-      - label: ":ubuntu: x-pack/filebeat Python Integration Tests"
+      - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
           cd x-pack/filebeat
@@ -114,7 +116,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/filebeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -133,9 +135,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2022 Unit Tests"
+              context: "x-pack/filebeat: Win 2022 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -154,14 +156,14 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2016 Unit Tests"
+              context: "x-pack/filebeat: Win 2016 Unit Tests"
 
-  - group: "x-pack/filebeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/filebeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -180,9 +182,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2019 Unit Tests"
+              context: "x-pack/filebeat: Win 2019 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win 10 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -203,7 +205,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win 11 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -224,16 +226,19 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Win 11 Unit Tests"
 
-  - group: "x-pack/filebeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-filebeat-extended-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/filebeat Linux arm64 Unit Tests"
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
         command: |
           cd x-pack/filebeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -243,9 +248,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Linux arm64 Unit Tests"
+              context: "x-pack/filebeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: x-pack/filebeat macOS x86_64 Unit Tests"
+      - label: ":mac: x-pack/filebeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -265,7 +270,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: x-pack/filebeat macOS arm64 Unit Tests"
+      - label: ":mac: x-pack/filebeat: macOS arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -285,7 +290,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: macOS arm64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/filebeat AWS Tests"
+      - label: ":ubuntu: x-pack/filebeat: AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
         skip: "skipping as it was on Jenkins: elastic/ingest-dev#3467"
         # Related issue: https://github.com/elastic/ingest-dev/issues/3467
@@ -321,10 +326,11 @@ steps:
     depends_on:
       - step: "x-pack-filebeat-mandatory-tests"
 
-  - group: "x-pack/filebeat Packaging"
+  - group: "Packaging"
     key: "x-pack-filebeat-packaging"
+
     steps:
-      - label: ":linux: x-pack/filebeat Packaging Linux"
+      - label: ":linux: x-pack/filebeat: Packaging Linux"
         key: "packaging-linux"
         command: |
           cd x-pack/filebeat
@@ -345,7 +351,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux"
 
-      - label: ":linux: x-pack/filebeat Packaging arm64"
+      - label: ":linux: x-pack/filebeat: Packaging arm64"
         key: "packaging-arm"
         command: |
           cd x-pack/filebeat
