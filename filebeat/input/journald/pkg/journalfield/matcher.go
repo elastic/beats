@@ -18,6 +18,7 @@
 package journalfield
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -56,6 +57,13 @@ var (
 	journaldUID    = MustBuildMatcher("journald.uid=0")                              // matcher for messages from root (UID 0)
 	journaldPID    = MustBuildMatcher("journald.pid=1")                              // matcher for messages from init process (PID 1)
 )
+
+func (i IncludeMatches) Validate() error {
+	if len(i.AND) != 0 || len(i.OR) != 0 {
+		return errors.New("'or' and 'and' are not supported at the moment")
+	}
+	return nil
+}
 
 // Build creates a new Matcher using the configured conversion table.
 // If no table has been configured the internal default table will be used.

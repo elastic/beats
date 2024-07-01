@@ -19,6 +19,8 @@
 
 package journalfield
 
+import "testing"
+
 // TODO: Re-write those tests using the new reader and matchers
 // func TestApplyMatchersOr(t *testing.T) {
 // 	cases := map[string]struct {
@@ -95,3 +97,56 @@ package journalfield
 // 	err = ApplyUnitMatchers(journal, []string{"docker.service"})
 // 	require.NoError(t, err)
 // }
+
+func TestValidate(t *testing.T) {
+	cases := []struct {
+		name  string
+		im    IncludeMatches
+		error bool
+	}{
+		{
+			name: "OR condition exists",
+			im: IncludeMatches{
+				OR: []IncludeMatches{
+					{},
+				},
+			},
+			error: true,
+		},
+		{
+			name: "AND condition exists",
+			im: IncludeMatches{
+				AND: []IncludeMatches{
+					{},
+				},
+			},
+			error: true,
+		},
+		{
+			name: "empty include matches succeeds validation",
+			im:   IncludeMatches{},
+		},
+		{
+			name: "matches are allowed",
+			im: IncludeMatches{
+				Matches: []Matcher{
+					{"foo"},
+					{"bar"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.im.Validate()
+			if tc.error && err == nil {
+				t.Fatal("expecting Validate to fail")
+			}
+
+			if !tc.error && err != nil {
+				t.Fatalf("expecting Validate to succeed, but got error: %s", err)
+			}
+		})
+	}
+}
