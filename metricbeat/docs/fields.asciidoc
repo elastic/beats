@@ -45196,7 +45196,7 @@ format: percent
 *`kubernetes.pod.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined memory limits sum of the pod containers. If one or more containers of the pod is unlimited, this metric will be missing entirely.
+Memory usage as a percentage of the defined memory limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
 
 type: scaled_float
