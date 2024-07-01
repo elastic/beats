@@ -25,7 +25,7 @@ var googleWorkspace = (function () {
             "json.id.applicationName",
             "json.id.customerId",
         ];
-        let dynKeyArr = [];
+        var dynKeyArr = [];
         Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
             var key = "json.events."+evtsKey;
             var value = evt.Get(key);
