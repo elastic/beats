@@ -16,10 +16,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-  ARCH_UNIX_ARM_64: "-arch arm"
-
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -61,8 +57,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/libbeat
           mage build unitTest
@@ -82,8 +76,6 @@ steps:
 
       - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
         key: "mandatory-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/libbeat
           mage goIntegTest
@@ -103,8 +95,6 @@ steps:
 
       - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
@@ -123,8 +113,6 @@ steps:
               context: "x-pack/libbeat: Python Integration Tests"
 
       - label: ":windows: x-pack/libbeat: Win 2016 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -146,8 +134,6 @@ steps:
               context: "x-pack/libbeat: Win 2016 Unit Tests"
 
       - label: ":windows: x-pack/libbeat: Win 2022 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -174,8 +160,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/libbeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -197,8 +181,6 @@ steps:
               context: "x-pack/libbeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/libbeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -220,8 +202,6 @@ steps:
               context: "x-pack/libbeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/libbeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -249,8 +229,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd x-pack/libbeat
           mage build unitTest

@@ -15,10 +15,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-  ARCH_UNIX_ARM_64: "-arch arm"
-
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -61,8 +57,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/osquerybeat
           mage build unitTest
@@ -82,8 +76,6 @@ steps:
 
       - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
         key: "mandatory-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/osquerybeat
           mage goIntegTest
@@ -102,8 +94,6 @@ steps:
               context: "x-pack/osquerybeat: Go Integration Tests"
 
       - label: ":windows: x-pack/osquerybeat: Win 2016 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -125,8 +115,6 @@ steps:
               context: "x-pack/osquerybeat: Win 2016 Unit Tests"
 
       - label: ":windows: x-pack/osquerybeat: Win 2022 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -153,8 +141,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/osquerybeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -176,8 +162,6 @@ steps:
               context: "x-pack/osquerybeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/osquerybeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -199,8 +183,6 @@ steps:
               context: "x-pack/osquerybeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/osquerybeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
@@ -227,8 +209,6 @@ steps:
 
     steps:
       - label: ":mac: x-pack/osquerybeat: macOS x86_64 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -247,8 +227,6 @@ steps:
               context: "x-pack/osquerybeat: macOS x86_64 Unit Tests"
 
       - label: ":mac: x-pack/osquerybeat: macOS arm64 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -279,9 +257,6 @@ steps:
     steps:
       - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/osquerybeat
           mage package
@@ -295,6 +270,8 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Packaging Linux"
