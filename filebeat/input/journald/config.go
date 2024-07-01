@@ -42,13 +42,6 @@ type config struct {
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 
-	// Backoff is the current interval to wait before
-	// attempting to read again from the journal.
-	Backoff time.Duration `config:"backoff" validate:"min=0,nonzero"`
-
-	// MaxBackoff is the limit of the backoff time.
-	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
-
 	// Since is the relative time offset from now to provide journal
 	// entries from. If Since is nil, no offset is applied.
 	Since *time.Duration `config:"since"`
