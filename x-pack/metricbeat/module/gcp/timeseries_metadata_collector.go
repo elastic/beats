@@ -100,6 +100,10 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
+
+			if k == TimeSeriesResponsePathForECSInstanceID {
+				_, _ = ecs.Put(ECSCloudInstanceIDKey, v)
+			}
 			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}

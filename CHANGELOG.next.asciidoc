@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
+- Fix GCP omitted labels. {issue}40033[40033] {pull}40062[40062]
 
 *Osquerybeat*
 
