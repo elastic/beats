@@ -125,6 +125,7 @@ type beatConfig struct {
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
+	EventLogging    *config.C              `config:"logging.event_data"`
 	MetricLogging   *config.C              `config:"logging.metrics"`
 	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
@@ -808,7 +809,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
-	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
+	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
@@ -862,6 +863,9 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.Version = b.Manager.AgentInfo().Version
 		version.SetPackageVersion(b.Info.Version)
 	}
+
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err

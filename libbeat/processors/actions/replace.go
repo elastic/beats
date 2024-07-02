@@ -23,7 +23,6 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -86,9 +85,8 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
-			if management.TraceLevelEnabled() {
-				f.log.Debug(errMsg.Error())
-			}
+			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 			if f.config.FailOnError {
 				event = backup
 				_, _ = event.PutValue("error.message", errMsg.Error())

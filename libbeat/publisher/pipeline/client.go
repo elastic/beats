@@ -37,9 +37,8 @@ type client struct {
 	mutex      sync.Mutex
 	waiter     *clientCloseWaiter
 
-	eventFlags     publisher.EventFlags
-	canDrop        bool
-	eventWaitGroup *sync.WaitGroup
+	eventFlags publisher.EventFlags
+	canDrop    bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen    atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
@@ -132,10 +131,8 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
-	// for pending events to be ACKed.
-	c.closeOnce.Do(func() {
-		c.isOpen.Store(false)
+	if c.isOpen.Swap(false) {
+		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 
 		c.logger.Debug("client: closing acker")
@@ -146,8 +143,8 @@ func (c *client) Close() error {
 		c.logger.Debug("client: done closing acker")
 
 		c.logger.Debug("client: close queue producer")
-		cancelledEventCount := c.producer.Cancel()
-		c.onClosed(cancelledEventCount)
+		c.producer.Close()
+		c.onClosed()
 		c.logger.Debug("client: done producer close")
 
 		if c.processors != nil {
@@ -158,7 +155,7 @@ func (c *client) Close() error {
 			}
 			c.logger.Debug("client: done closing processors")
 		}
-	})
+	}
 	return nil
 }
 
@@ -168,16 +165,7 @@ func (c *client) onClosing() {
 	}
 }
 
-func (c *client) onClosed(cancelledEventCount int) {
-	c.logger.Debugf("client: cancelled %v events", cancelledEventCount)
-
-	if c.eventWaitGroup != nil {
-		c.logger.Debugf("client: remove client events")
-		if cancelledEventCount > 0 {
-			c.eventWaitGroup.Add(-cancelledEventCount)
-		}
-	}
-
+func (c *client) onClosed() {
 	c.observer.clientClosed()
 	if c.clientListener != nil {
 		c.clientListener.Closed()
@@ -189,9 +177,6 @@ func (c *client) onNewEvent() {
 }
 
 func (c *client) onPublished() {
-	if c.eventWaitGroup != nil {
-		c.eventWaitGroup.Add(1)
-	}
 	c.observer.publishedEvent()
 	if c.clientListener != nil {
 		c.clientListener.Published()

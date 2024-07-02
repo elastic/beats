@@ -32,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var seed int64
@@ -96,9 +95,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
-		ACK:          func(count int) {},
-		OnDrop:       func(e queue.Entry) {},
-		DropOnCancel: false,
+		ACK: func(count int) {},
 	})
 
 	success := atomic.Bool{}
@@ -170,10 +167,6 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 		ACK: func(count int) {
 			activeEvents.Add(-int64(count))
 		},
-		OnDrop: func(e queue.Entry) {
-			//activeEvents.Add(-1)
-		},
-		DropOnCancel: false,
 	})
 
 	// Asynchronously, send 4 events to the queue.
@@ -209,7 +202,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// Cancel the producer, then read and acknowledge two batches. If the
 	// Publish calls and the queue code are working, activeEvents should
 	// _usually_ end up as 0, but _always_ end up non-negative.
-	p.Cancel()
+	p.Close()
 
 	// The queue reads also need to be done in a goroutine, in case the
 	// producer cancellation signal went through before the Publish
@@ -232,73 +225,6 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 	q.Close()
 	assert.False(t, activeEvents.Load() < 0, "active event count should never be negative")
-}
-
-func TestQueueMetricsDirect(t *testing.T) {
-	eventsToTest := 5
-	maxEvents := 10
-
-	// Test the directEventLoop
-	directSettings := Settings{
-		Events:        maxEvents,
-		MaxGetRequest: 1,
-		FlushTimeout:  0,
-	}
-	t.Logf("Testing directEventLoop")
-	queueTestWithSettings(t, directSettings, eventsToTest, "directEventLoop")
-
-}
-
-func TestQueueMetricsBuffer(t *testing.T) {
-	eventsToTest := 5
-	maxEvents := 10
-	// Test Buffered Event Loop
-	bufferedSettings := Settings{
-		Events:        maxEvents,
-		MaxGetRequest: eventsToTest, // The buffered event loop can only return FlushMinEvents per Get()
-		FlushTimeout:  time.Millisecond,
-	}
-	t.Logf("Testing bufferedEventLoop")
-	queueTestWithSettings(t, bufferedSettings, eventsToTest, "bufferedEventLoop")
-}
-
-func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
-	testQueue := NewQueue(nil, nil, settings, 0, nil)
-	defer testQueue.Close()
-
-	// Send events to queue
-	producer := testQueue.Producer(queue.ProducerConfig{})
-	for i := 0; i < eventsToTest; i++ {
-		producer.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
-	}
-	queueMetricsAreValid(t, testQueue, 5, settings.Events, 0, fmt.Sprintf("%s - First send of metrics to queue", testName))
-
-	// Read events, don't yet ack them
-	batch, err := testQueue.Get(eventsToTest)
-	assert.NoError(t, err, "error in Get")
-	t.Logf("Got batch of %d events", batch.Count())
-
-	queueMetricsAreValid(t, testQueue, 5, settings.Events, 5, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
-
-	// Test metrics after ack
-	batch.Done()
-
-	queueMetricsAreValid(t, testQueue, 0, settings.Events, 0, fmt.Sprintf("%s - Producer Getting events, no ACK", testName))
-
-}
-
-func queueMetricsAreValid(t *testing.T, q queue.Queue, evtCount, evtLimit, occupied int, test string) {
-	// wait briefly to avoid races across all the queue channels
-	time.Sleep(time.Millisecond * 100)
-	testMetrics, err := q.Metrics()
-	assert.NoError(t, err, "error calling metrics for test %s", test)
-	assert.Equal(t, testMetrics.EventCount.ValueOr(0), uint64(evtCount), "incorrect EventCount for %s", test)
-	assert.Equal(t, testMetrics.EventLimit.ValueOr(0), uint64(evtLimit), "incorrect EventLimit for %s", test)
-	assert.Equal(t, testMetrics.UnackedConsumedEvents.ValueOr(0), uint64(occupied), "incorrect OccupiedRead for %s", test)
-}
-
-func TestProducerCancelRemovesEvents(t *testing.T) {
-	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue(1024, 0, 0))
 }
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
@@ -335,202 +261,4 @@ func TestAdjustInputQueueSize(t *testing.T) {
 		mainQueue := 4096
 		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
 	})
-}
-
-func TestEntryIDs(t *testing.T) {
-	entryCount := 100
-
-	testForward := func(q queue.Queue) {
-		waiter := &producerACKWaiter{}
-		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
-		for i := 0; i < entryCount; i++ {
-			id, success := producer.Publish(nil)
-			assert.Equal(t, success, true, "Queue publish should succeed")
-			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
-		}
-
-		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1)
-			assert.NoError(t, err, "Queue read should succeed")
-			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-
-			metrics, err := q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i),
-				fmt.Sprintf("Oldest entry ID before ACKing event %v should be %v", i, i))
-
-			batch.Done()
-			waiter.waitForEvents(1)
-			metrics, err = q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i+1),
-				fmt.Sprintf("Oldest entry ID after ACKing event %v should be %v", i, i+1))
-
-		}
-	}
-
-	testBackward := func(q queue.Queue) {
-		waiter := &producerACKWaiter{}
-		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
-		for i := 0; i < entryCount; i++ {
-			id, success := producer.Publish(nil)
-			assert.Equal(t, success, true, "Queue publish should succeed")
-			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
-		}
-
-		batches := []queue.Batch{}
-
-		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1)
-			assert.NoError(t, err, "Queue read should succeed")
-			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			batches = append(batches, batch)
-		}
-
-		for i := entryCount - 1; i > 0; i-- {
-			batches[i].Done()
-
-			// It's hard to remove this delay since the Done signal is propagated
-			// asynchronously to the queue, and since this test is ensuring that the
-			// queue _doesn't_ advance we can't use a callback to gate the comparison
-			// like we do in testForward. However:
-			// - While this race condition could sometimes let a buggy implementation
-			//   pass, it will not produce a false failure (so it won't contribute
-			//   to general test flakiness)
-			// - That notwithstanding, when the ACK _does_ cause an incorrect
-			//   metrics update, this delay is enough to recognize it approximately
-			//   100% of the time, so this test is still a good signal despite
-			//   the slight nondeterminism.
-			time.Sleep(1 * time.Millisecond)
-			metrics, err := q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(0),
-				fmt.Sprintf("Oldest entry ID after ACKing event %v should be 0", i))
-		}
-		// ACK the first batch, which should unblock all the later ones
-		batches[0].Done()
-		waiter.waitForEvents(100)
-		metrics, err := q.Metrics()
-		assert.NoError(t, err, "Queue metrics call should succeed")
-		assert.Equal(t, metrics.OldestEntryID, queue.EntryID(100),
-			fmt.Sprintf("Oldest entry ID after ACKing event 0 should be %v", queue.EntryID(entryCount)))
-
-	}
-
-	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
-		testForward(testQueue)
-	})
-
-	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
-		testBackward(testQueue)
-	})
-
-	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
-		testForward(testQueue)
-	})
-
-	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
-		testBackward(testQueue)
-	})
-}
-
-func TestBatchFreeEntries(t *testing.T) {
-	const queueSize = 10
-	const batchSize = 5
-	// 1. Add 10 events to the queue, request two batches with 5 events each
-	// 2. Make sure the queue buffer has 10 non-nil events
-	// 3. Call FreeEntries on the second batch
-	// 4. Make sure only events 6-10 are nil
-	// 5. Call FreeEntries on the first batch
-	// 6. Make sure all events are nil
-	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
-	producer := testQueue.Producer(queue.ProducerConfig{})
-	for i := 0; i < queueSize; i++ {
-		_, ok := producer.Publish(i)
-		require.True(t, ok, "Queue publish must succeed")
-	}
-	batch1, err := testQueue.Get(batchSize)
-	require.NoError(t, err, "Queue read must succeed")
-	require.Equal(t, batchSize, batch1.Count(), "Returned batch size must match request")
-	batch2, err := testQueue.Get(batchSize)
-	require.NoError(t, err, "Queue read must succeed")
-	require.Equal(t, batchSize, batch2.Count(), "Returned batch size must match request")
-	// Slight concurrency subtlety: we check events are non-nil after the queue
-	// reads, since if we do it before we have no way to be sure the insert
-	// has been completed.
-	for i := 0; i < queueSize; i++ {
-		require.NotNil(t, testQueue.buf[i].event, "All queue events must be non-nil")
-	}
-	batch2.FreeEntries()
-	for i := 0; i < batchSize; i++ {
-		require.NotNilf(t, testQueue.buf[i].event, "Queue index %v: batch 1's events should be unaffected by calling FreeEntries on Batch 2", i)
-		require.Nilf(t, testQueue.buf[batchSize+i].event, "Queue index %v: batch 2's events should be nil after FreeEntries", batchSize+i)
-	}
-	batch1.FreeEntries()
-	for i := 0; i < queueSize; i++ {
-		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
-	}
-}
-
-// producerACKWaiter is a helper that can listen to queue producer callbacks
-// and wait on them from the test thread, so we can test the queue's asynchronous
-// behavior without relying on time.Sleep.
-type producerACKWaiter struct {
-	sync.Mutex
-
-	// The number of acks received from a producer callback.
-	acked int
-
-	// The number of acks that callers have waited for in waitForEvents.
-	waited int
-
-	// When non-nil, this channel is being listened to by a test thread
-	// blocking on ACKs, and incoming producer callbacks are forwarded
-	// to it.
-	ackChan chan int
-}
-
-func (w *producerACKWaiter) ack(count int) {
-	w.Lock()
-	defer w.Unlock()
-	w.acked += count
-	if w.ackChan != nil {
-		w.ackChan <- count
-	}
-}
-
-func (w *producerACKWaiter) waitForEvents(count int) {
-	w.Lock()
-	defer w.Unlock()
-	if w.ackChan != nil {
-		panic("don't call producerACKWaiter.waitForEvents from multiple goroutines")
-	}
-
-	avail := w.acked - w.waited
-	if count <= avail {
-		w.waited += count
-		return
-	}
-	w.waited = w.acked
-	count -= avail
-	// We have advanced as far as we can, we have to wait for
-	// more incoming ACKs.
-	// Set a listener and unlock, so ACKs can come in on another
-	// goroutine.
-	w.ackChan = make(chan int)
-	w.Unlock()
-
-	newAcked := 0
-	for newAcked < count {
-		newAcked += <-w.ackChan
-	}
-	// When we're done, turn off the listener channel and update
-	// the number of events waited on.
-	w.Lock()
-	w.ackChan = nil
-	w.waited += count
 }

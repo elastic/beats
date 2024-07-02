@@ -40,8 +40,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 	}, nil
 }
 
-// UpdateDB will update the process DB with process info from procfs or the event itself
-func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
+// SyncDB will update the process DB with process info from procfs or the event itself
+func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
 	if err != nil {
 		return fmt.Errorf("event not supported, no syscall data")

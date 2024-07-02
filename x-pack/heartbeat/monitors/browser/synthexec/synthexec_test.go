@@ -16,7 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-test/deep"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 )
 
@@ -90,7 +91,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 				require.NoError(t, err, "for line %s", tt.line)
 			}
 
-			if diff := deep.Equal(gotRes, tt.synthEvent); diff != nil {
+			if diff := cmp.Diff(gotRes, tt.synthEvent, cmpopts.IgnoreUnexported(SynthEvent{})); diff != "" {
 				t.Error(diff)
 			}
 		})
@@ -183,7 +184,7 @@ func runAndCollect(t *testing.T, cmd *exec.Cmd, stdinStr string, cmdTimeout time
 	cmd.Dir = filepath.Join(cwd, "testcmd")
 	ctx := context.WithValue(context.TODO(), SynthexecTimeout, cmdTimeout)
 
-	mpx, err := runCmd(ctx, cmd, &stdinStr, nil, FilterJourneyConfig{})
+	mpx, err := runCmd(ctx, &SynthCmd{cmd}, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

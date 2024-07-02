@@ -58,7 +58,7 @@ func NewInputManager(configure func(*conf.C) (Input, error)) InputManager {
 }
 
 // Init does nothing. Init is required to fullfil the v2.InputManager interface.
-func (m InputManager) Init(_ unison.Group, _ v2.Mode) error { return nil }
+func (m InputManager) Init(_ unison.Group) error { return nil }
 
 // Create configures a transient input and ensures that the final input can be used with
 // with the filebeat input architecture.

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -33,6 +34,9 @@ const InputRegName = "input"
 
 // OutputRegName is the registation name for V2 Outputs
 const OutputRegName = "output"
+
+// APMRegName is the registation name for APM tracing.
+const APMRegName = "apm"
 
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
@@ -47,6 +51,11 @@ type ConfigWithMeta struct {
 
 	// InputUnitID is the unit's ID that generated this ConfigWithMeta
 	InputUnitID string
+
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of a Beat this is
+	// expected to be nil.
+	StatusReporter status.StatusReporter
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities
@@ -140,6 +149,14 @@ func (r *Registry) MustRegisterInput(list ReloadableList) {
 	}
 }
 
+// MustRegisterAPM is a V2-specific registration function
+// that declares a reloadable APM tracing configuration
+func (r *Registry) MustRegisterAPM(list Reloadable) {
+	if err := r.Register(APMRegName, list); err != nil {
+		panic(err)
+	}
+}
+
 // GetInputList is a V2-specific function
 // That returns the reloadable list created for an input
 func (r *Registry) GetInputList() ReloadableList {
@@ -156,11 +173,19 @@ func (r *Registry) GetReloadableOutput() Reloadable {
 	return r.confs[OutputRegName]
 }
 
+// GetReloadableAPM is a V2-specific function
+// That returns the reloader for the registered APM trace
+func (r *Registry) GetReloadableAPM() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[APMRegName]
+}
+
 // GetRegisteredNames returns the list of names registered
 func (r *Registry) GetRegisteredNames() []string {
 	r.RLock()
 	defer r.RUnlock()
-	var names []string
+	names := make([]string, 0, len(r.confs)+len(r.confsLists))
 
 	for name := range r.confs {
 		names = append(names, name)

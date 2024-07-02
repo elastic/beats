@@ -57,8 +57,8 @@ type source struct{ cfg config }
 func (s *source) Name() string { return s.cfg.URL.String() }
 
 // Init initializes both wrapped input managers.
-func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
-	return m.cursor.Init(grp, mode)
+func (m InputManager) Init(grp unison.Group) error {
+	return m.cursor.Init(grp)
 }
 
 // Create creates a cursor input manager.
