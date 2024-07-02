@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 
@@ -337,40 +338,49 @@ func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string)
 	return ok
 }
 
-// inferTypeFromMetrics to organize the output event into 'numeric', 'strings', 'floats' and 'boolean' values
-// so we can dynamically map all fields inside those categories
 func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	ret := mapstr.M{}
 
 	numericMetrics := mapstr.M{}
 	stringMetrics := mapstr.M{}
 	boolMetrics := mapstr.M{}
+	dateMetrics := mapstr.M{}
+	objectMetrics := mapstr.M{}
 
 	for k, v := range ms {
-		switch v.(type) {
-		case float64:
-			numericMetrics[k] = v
+		switch val := v.(type) {
+		case float32, float64, int16, int32, int64, uint32, uint64:
+			numericMetrics[k] = val
 		case string:
-			stringMetrics[k] = v
+			stringMetrics[k] = val
 		case bool:
-			boolMetrics[k] = v
+			boolMetrics[k] = val
+		case time.Time:
+			dateMetrics[k] = val.Format(time.RFC3339Nano)
+		case []interface{}, map[string]interface{}:
+			objectMetrics[k] = val
 		case nil:
-		// Ignore because a nil has no data type and thus cannot be indexed
+			// Ignore nil values as they cannot be indexed
 		default:
-			stringMetrics[k] = v
+			// For any other types, convert to string
+			stringMetrics[k] = fmt.Sprint(val)
 		}
 	}
 
 	if len(numericMetrics) > 0 {
 		ret["numeric"] = numericMetrics
 	}
-
 	if len(stringMetrics) > 0 {
-		ret["string"] = stringMetrics
+		ret["keyword"] = stringMetrics
 	}
-
 	if len(boolMetrics) > 0 {
-		ret["bool"] = boolMetrics
+		ret["boolean"] = boolMetrics
+	}
+	if len(dateMetrics) > 0 {
+		ret["date"] = dateMetrics
+	}
+	if len(objectMetrics) > 0 {
+		ret["object"] = objectMetrics
 	}
 
 	return ret
