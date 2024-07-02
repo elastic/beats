@@ -54,8 +54,6 @@ type Reader struct {
 	stderr   io.ReadCloser
 	canceler input.Canceler
 	wg       sync.WaitGroup
-
-	matchers journalfield.IncludeMatches
 }
 
 func handleSeeAndCursor(args []string, mode SeekMode, since time.Duration, cursor string) []string {

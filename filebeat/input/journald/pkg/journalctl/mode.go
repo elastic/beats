@@ -22,10 +22,8 @@ import "fmt"
 type SeekMode uint
 
 const (
-	// SeekInvalid is an invalid value for seek
-	SeekInvalid SeekMode = iota
 	// SeekHead option seeks to the head of a journal
-	SeekHead
+	SeekHead SeekMode = iota
 	// SeekTail option seeks to the tail of a journal
 	SeekTail
 	// SeekCursor option seeks to the position specified in the cursor
