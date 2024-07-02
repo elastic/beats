@@ -81,10 +81,9 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 			return err
 		}
 		for _, x := range matches {
-			im.OR = append(im.OR, journalfield.IncludeMatches{
-				Matches: []journalfield.Matcher{x},
-			})
+			im.Matches = append(im.Matches, x)
 		}
+
 		includeMatchesWarnOnce.Do(func() {
 			cfgwarn.Deprecate("", "Please migrate your journald input's "+
 				"include_matches config to the new more expressive format.")

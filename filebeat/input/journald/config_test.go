@@ -38,16 +38,15 @@ func TestConfigIncludeMatches(t *testing.T) {
 		config := defaultConfig()
 		require.NoError(t, c.Unpack(&config))
 
-		assert.EqualValues(t, "_SYSTEMD_UNIT=foo.service", config.Matches.OR[0].Matches[0].String())
-		assert.EqualValues(t, "_SYSTEMD_UNIT=bar.service", config.Matches.OR[1].Matches[0].String())
+		assert.EqualValues(t, "_SYSTEMD_UNIT=foo.service", config.Matches.Matches[0].String())
+		assert.EqualValues(t, "_SYSTEMD_UNIT=bar.service", config.Matches.Matches[1].String())
 	}
 
 	t.Run("normal", func(t *testing.T) {
 		const yaml = `
-include_matches:
-  or:
-  - match: _SYSTEMD_UNIT=foo.service
-  - match: _SYSTEMD_UNIT=bar.service
+include_matches.match:
+  - _SYSTEMD_UNIT=foo.service
+  - _SYSTEMD_UNIT=bar.service
 `
 		verify(t, yaml)
 	})
