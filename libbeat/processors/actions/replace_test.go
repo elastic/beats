@@ -22,13 +22,69 @@ import (
 	"regexp"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestBadConfig(t *testing.T) {
+	var cases = []struct {
+		name        string
+		cfg         replaceStringConfig
+		shouldError bool
+	}{
+		{
+			name:        "field-only",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message"}}},
+			shouldError: true,
+		},
+		{
+			name:        "no-regex",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: "new_message"}}},
+			shouldError: true,
+		},
+		{
+			name:        "no-replacement",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Pattern: regexp.MustCompile(`message`)}}},
+			shouldError: true,
+		},
+		{
+			name: "valid-then-invalid",
+			cfg: replaceStringConfig{Fields: []replaceConfig{
+				{Field: "message", Pattern: regexp.MustCompile(`message`), Replacement: "new_message"},
+				{Field: "message", Pattern: regexp.MustCompile(`message`)},
+			},
+			},
+			shouldError: true,
+		},
+		{
+			name:        "no-error",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: "new_message", Pattern: regexp.MustCompile(`message`)}}},
+			shouldError: false,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(testCase.cfg)
+			require.NoError(t, err)
+			unpacked := replaceStringConfig{}
+			err = cfg.Unpack(&unpacked)
+			if testCase.shouldError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+		})
+	}
+
+}
 
 func TestReplaceRun(t *testing.T) {
 	var tests = []struct {

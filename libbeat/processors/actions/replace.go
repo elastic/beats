@@ -43,9 +43,9 @@ type replaceStringConfig struct {
 }
 
 type replaceConfig struct {
-	Field       string         `config:"field"`
-	Pattern     *regexp.Regexp `config:"pattern"`
-	Replacement string         `config:"replacement"`
+	Field       string         `config:"field" validate:"required"`
+	Pattern     *regexp.Regexp `config:"pattern" validate:"required"`
+	Replacement string         `config:"replacement" validate:"required"`
 }
 
 func init() {
