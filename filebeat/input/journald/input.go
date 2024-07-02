@@ -42,7 +42,7 @@ type journalReader interface {
 type journald struct {
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
-	Since              *time.Duration
+	Since              time.Duration
 	Seek               journalctl.SeekMode
 	Matches            journalfield.IncludeMatches
 	Units              []string
@@ -128,7 +128,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Matches,
 		journalctl.SeekHead,
 		"",
-		*inp.Since,
+		inp.Since,
 		src.Name(),
 	)
 	if err != nil {
@@ -148,10 +148,6 @@ func (inp *journald) Run(
 
 	mode := inp.Seek
 	pos := currentCheckpoint.Position
-	if inp.Since == nil {
-		// TODO: Fix this!
-		inp.Since = new(time.Duration)
-	}
 	reader, err := journalctl.New(
 		logger,
 		ctx.Cancelation,
@@ -161,7 +157,7 @@ func (inp *journald) Run(
 		inp.Matches,
 		mode,
 		pos,
-		*inp.Since,
+		inp.Since,
 		src.Name(),
 	)
 	if err != nil {

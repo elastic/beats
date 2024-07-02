@@ -150,20 +150,19 @@ func TestInputFieldsTranslation(t *testing.T) {
 // already existing journal file 'input-multiline-parser.journal'
 //
 // The following fields are not currently tested:
-// __MONOTONIC_TIMESTAMP - it seems to be ignored
-// __CURSOR - it will be added to the registry and tested once we have tests for it
+// __CURSOR - it is added to the registry and there are other tests for it
+// __MONOTONIC_TIMESTAMP - it is part of the cursor
 func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 	inp := env.mustCreateInput(mapstr.M{
-		"paths":      []string{path.Join("testdata", "input-multiline-parser.journal")},
-		"journalctl": true,
-		"seek":       "head",
+		"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
+		"seek":  "head",
 	})
 
-	ctx2, cancelInput2 := context.WithCancel(context.Background())
-	defer cancelInput2()
+	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 
-	env.startInput(ctx2, inp)
+	env.startInput(ctx, inp)
 	env.waitUntilEventCount(8)
 
 	rawEvents := env.pipeline.GetAllEvents()
@@ -298,8 +297,8 @@ func TestMatchers(t *testing.T) {
 			cfg.Update(mapstr.M(tc.confiFields))
 			inp := env.mustCreateInput(cfg)
 
-			ctx, cancelInput2 := context.WithCancel(context.Background())
-			defer cancelInput2()
+			ctx, cancelInput := context.WithCancel(context.Background())
+			defer cancelInput()
 
 			env.startInput(ctx, inp)
 			env.waitUntilEventCount(tc.expectedEvents)

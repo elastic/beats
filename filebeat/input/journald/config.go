@@ -42,8 +42,8 @@ type config struct {
 	Paths []string `config:"paths"`
 
 	// Since is the relative time offset from now to provide journal
-	// entries from. If Since is nil, no offset is applied.
-	Since *time.Duration `config:"since"`
+	// entries from.
+	Since time.Duration `config:"since"`
 
 	// Seek is the method to read from journals.
 	Seek journalctl.SeekMode `config:"seek"`
