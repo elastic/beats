@@ -127,7 +127,7 @@ WHERE  counter_name = 'SQL Compilations/sec'
 	}
 
 	if buffer_cache_hit_ratio_base != 0 {
-		mapStr[BufferCacheHitRatio] = fmt.Sprintf("%v", float64(buffer_cache_hit_ratio/buffer_cache_hit_ratio_base))
+		mapStr[BufferCacheHitRatio] = fmt.Sprintf("%v", float64(buffer_cache_hit_ratio)/float64(buffer_cache_hit_ratio_base))
 	}
 
 	res, err := schema.Apply(mapStr)
