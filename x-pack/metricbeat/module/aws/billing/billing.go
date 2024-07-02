@@ -28,20 +28,23 @@ import (
 )
 
 var (
+	supportedDimensionKeys = costexplorertypes.Dimension("").Values()
+
+	// this module doesn't currently support `COST_CATEGORY`, so we can't use the default aws sdk list
+	// values from https://github.com/aws/aws-sdk-go-v2/blob/main/service/costexplorer/types/enums.go#L455-L470
+	supportedGroupByTypes = []costexplorertypes.GroupDefinitionType{
+		costexplorertypes.GroupDefinitionTypeDimension,
+		costexplorertypes.GroupDefinitionTypeTag,
+	}
+)
+
+const (
 	metricsetName = "billing"
 	regionName    = "us-east-1"
+	dateLayout    = "2006-01-02"
 
-	// This list is from https://github.com/aws/aws-sdk-go-v2/blob/master/service/costexplorer/api_enums.go#L60-L90
-	supportedDimensionKeys = []string{
-		"AZ", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION", "PURCHASE_TYPE",
-		"REGION", "SERVICE", "USAGE_TYPE", "USAGE_TYPE_GROUP", "RECORD_TYPE",
-		"OPERATING_SYSTEM", "TENANCY", "SCOPE", "PLATFORM", "SUBSCRIPTION_ID",
-		"LEGAL_ENTITY_NAME", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
-		"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "BILLING_ENTITY",
-		"RESERVATION_ID",
-	}
-
-	dateLayout = "2006-01-02"
+	defaultGroupByPrimaryType   = string(costexplorertypes.GroupDefinitionTypeDimension)
+	defaultGroupBySecondaryType = string(costexplorertypes.GroupDefinitionTypeTag)
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -66,8 +69,13 @@ type MetricSet struct {
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
-	GroupByDimensionKeys []string `config:"group_by_dimension_keys"`
-	GroupByTagKeys       []string `config:"group_by_tag_keys"`
+	GroupByDimensionKeys []string `config:"group_by_dimension_keys"` // deprecated
+	GroupByTagKeys       []string `config:"group_by_tag_keys"`       // deprecated
+
+	GroupByPrimaryKeys   []string `config:"group_by_primary_keys"`
+	GroupByPrimaryType   string   `config:"group_by_primary_type"`
+	GroupBySecondaryKeys []string `config:"group_by_secondary_keys"`
+	GroupBySecondaryType string   `config:"group_by_secondary_type"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -88,6 +96,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 
+	// handle bwc with old config
+	if len(config.CostExplorerConfig.GroupByPrimaryKeys) == 0 && len(config.CostExplorerConfig.GroupByDimensionKeys) > 0 {
+		config.CostExplorerConfig.GroupByPrimaryKeys = config.CostExplorerConfig.GroupByDimensionKeys
+	}
+	if len(config.CostExplorerConfig.GroupBySecondaryKeys) == 0 && len(config.CostExplorerConfig.GroupByTagKeys) > 0 {
+		config.CostExplorerConfig.GroupBySecondaryKeys = config.CostExplorerConfig.GroupByTagKeys
+	}
+
+	// handle setting default group_by types
+	if config.CostExplorerConfig.GroupByPrimaryType == "" {
+		config.CostExplorerConfig.GroupByPrimaryType = defaultGroupByPrimaryType
+	}
+	if config.CostExplorerConfig.GroupBySecondaryType == "" {
+		config.CostExplorerConfig.GroupBySecondaryType = defaultGroupBySecondaryType
+	}
+
 	logger.Debugf("cost explorer config = %s", config)
 
 	return &MetricSet{
@@ -97,15 +121,64 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Validate checks if given dimension keys are supported.
+// Validate checks if given config is supported.
 func (c CostExplorerConfig) Validate() error {
-	for _, key := range c.GroupByDimensionKeys {
-		supported, _ := aws.StringInSlice(key, supportedDimensionKeys)
-		if !supported {
-			return fmt.Errorf("costexplorer GetCostAndUsageRequest does not support dimension key: %s", key)
+	// validate primary group_by type
+	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType)); !supported {
+		return err
+	}
+
+	// validate secondary group_by type
+	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType)); !supported {
+		return err
+	}
+
+	// validate dimension keys for primary if group_by type is dimension
+	if costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType) == costexplorertypes.GroupDefinitionTypeDimension {
+		for _, key := range c.GroupByPrimaryKeys {
+			supported, err := validateDimensionKey(key)
+			if !supported {
+				return err
+			}
 		}
 	}
+
+	// validate dimension keys for secondary if group_by type is dimension
+	if costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType) == costexplorertypes.GroupDefinitionTypeDimension {
+		for _, key := range c.GroupBySecondaryKeys {
+			supported, err := validateDimensionKey(key)
+			if !supported {
+				return err
+			}
+		}
+	}
+
 	return nil
+}
+
+// validateGroupByType checks if a string value for group_by type is a supported value.
+func validateGroupByType(groupByType costexplorertypes.GroupDefinitionType) (bool, error) {
+	// handle setting a default value in New() call
+	if string(groupByType) == "" {
+		return true, nil
+	}
+	for _, key := range supportedGroupByTypes {
+		if groupByType == key {
+			return true, nil
+		}
+	}
+
+	return false, fmt.Errorf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: %s", groupByType)
+}
+
+// validateDimensionKey checks if a string value for dimension key is a supported value.
+func validateDimensionKey(dimensionKey string) (bool, error) {
+	for _, key := range supportedDimensionKeys {
+		if costexplorertypes.Dimension(dimensionKey) == key {
+			return true, nil
+		}
+	}
+	return false, fmt.Errorf("costexplorer GetCostAndUsageRequest does not support dimension key: %s", dimensionKey)
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -150,8 +223,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	eventsCW := m.getCloudWatchBillingMetrics(svcCloudwatch, startTime, endTime)
 	events = append(events, eventsCW...)
 
-	// Get total cost from Cost Explorer GetCostAndUsage with group by type "DIMENSION" and "TAG"
-	eventsCE := m.getCostGroupBy(svcCostExplorer, m.CostExplorerConfig.GroupByDimensionKeys, m.CostExplorerConfig.GroupByTagKeys, timePeriod, startDate, endDate)
+	// Get total cost from Cost Explorer GetCostAndUsage with group_by type "DIMENSION" and "TAG"
+	eventsCE := m.getCostGroupBy(svcCostExplorer, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupByPrimaryType), m.CostExplorerConfig.GroupByPrimaryKeys, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupBySecondaryType), m.CostExplorerConfig.GroupBySecondaryKeys, timePeriod, startDate, endDate)
 	events = append(events, eventsCE...)
 
 	// report events
@@ -215,7 +288,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	return events
 }
 
-func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByDimKeys []string, groupByTags []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
+func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByPrimaryType costexplorertypes.GroupDefinitionType, groupByPrimaryKeys []string, groupBySecondaryType costexplorertypes.GroupDefinitionType, groupBySecondaryKeys []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
 	// get linked account IDs and names
@@ -225,7 +298,8 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
-	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
+
+	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", append(groupByPrimaryKeys, groupBySecondaryKeys...)); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
 		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
@@ -236,21 +310,21 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 		accounts = m.getAccountName(svcOrg)
 	}
 
-	groupBys := getGroupBys(groupByTags, groupByDimKeys)
+	groupBys := getGroupBys(groupBySecondaryKeys, groupByPrimaryKeys)
 	for _, groupBy := range groupBys {
 		var groupDefs []costexplorertypes.GroupDefinition
 
-		if groupBy.dimension != "" {
+		if groupBy.primary != "" {
 			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
-				Key:  awssdk.String(groupBy.dimension),
-				Type: costexplorertypes.GroupDefinitionTypeDimension,
+				Key:  awssdk.String(groupBy.primary),
+				Type: groupByPrimaryType,
 			})
 		}
 
-		if groupBy.tag != "" {
+		if groupBy.secondary != "" {
 			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
-				Key:  awssdk.String(groupBy.tag),
-				Type: costexplorertypes.GroupDefinitionTypeTag,
+				Key:  awssdk.String(groupBy.secondary),
+				Type: groupBySecondaryType,
 			})
 		}
 
@@ -278,24 +352,58 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 
 				// generate unique event ID for each event
 				eventID := startDate + endDate + *groupByOutput.GroupDefinitions[0].Key + string(groupByOutput.GroupDefinitions[0].Type)
-				for _, key := range group.Keys {
+				for index, key := range group.Keys {
 					eventID += key
-					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
-					if !strings.Contains(key, "$") {
-						_, _ = event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
-						if groupBy.dimension == "LINKED_ACCOUNT" {
-							if name, ok := accounts[key]; ok {
-								_, _ = event.RootFields.Put("aws.linked_account.id", key)
-								_, _ = event.RootFields.Put("aws.linked_account.name", name)
+
+					// index 0 is the key for the primary group_by
+					if index == 0 {
+						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
+							_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
+
+							if groupBy.primary == "LINKED_ACCOUNT" {
+								if name, ok := accounts[key]; ok {
+									_, _ = event.RootFields.Put("aws.linked_account.id", key)
+									_, _ = event.RootFields.Put("aws.linked_account.name", name)
+								}
+							}
+						}
+						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag {
+							// tag key value is separated by $
+							tagKey, tagValue := parseGroupKey(key)
+							if tagValue != "" {
+								_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 							}
 						}
 						continue
 					}
 
-					// tag key value is separated by $
-					tagKey, tagValue := parseGroupKey(key)
-					if tagValue != "" {
-						_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+					// index 1 is the key for the secondary group_by
+					if index == 1 {
+						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
+							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
+
+							if groupBy.secondary == "LINKED_ACCOUNT" {
+								if name, ok := accounts[key]; ok {
+									_, _ = event.RootFields.Put("aws.linked_account.id", key)
+									_, _ = event.RootFields.Put("aws.linked_account.name", name)
+								}
+							}
+						}
+						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
+							// tag key value is separated by $
+							tagKey, tagValue := parseGroupKey(key)
+							if tagValue != "" {
+								_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+							}
+						}
+						continue
+					}
+
+					// there should be no more than 2 keys per metric
+					// this is a safety mechanism to track issues
+					if index > 1 {
+						m.Logger().Errorf("unexpected additional index %d, with key %s, while process metrics", index, key)
+						continue
 					}
 				}
 
@@ -411,25 +519,25 @@ func parseGroupKey(groupKey string) (string, string) {
 }
 
 type groupBy struct {
-	tag       string
-	dimension string
+	secondary string
+	primary   string
 }
 
-func getGroupBys(groupByTags []string, groupByDimKeys []string) []groupBy {
+func getGroupBys(groupBySecondaryKeys []string, groupByPrimaryKeys []string) []groupBy {
 	var groupBys []groupBy
 
-	if len(groupByTags) == 0 {
-		groupByTags = []string{""}
+	if len(groupBySecondaryKeys) == 0 {
+		groupBySecondaryKeys = []string{""}
 	}
-	if len(groupByDimKeys) == 0 {
-		groupByDimKeys = []string{""}
+	if len(groupByPrimaryKeys) == 0 {
+		groupByPrimaryKeys = []string{""}
 	}
 
-	for _, tagKey := range groupByTags {
-		for _, dimKey := range groupByDimKeys {
+	for _, secondaryKey := range groupBySecondaryKeys {
+		for _, primaryKey := range groupByPrimaryKeys {
 			groupBy := groupBy{
-				tag:       tagKey,
-				dimension: dimKey,
+				secondary: secondaryKey,
+				primary:   primaryKey,
 			}
 			groupBys = append(groupBys, groupBy)
 		}

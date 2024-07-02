@@ -323,6 +323,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add last_terminated_timestamp metric in kubernetes module {pull}39200[39200] {issue}3802[3802]
 - Add pod.status.ready_time and pod.status.reason metrics in kubernetes module {pull}39316[39316]
+- Add AWS Billing configurable Group By types {issue}34193[34193] {pull}38755[38755]
 
 
 *Metricbeat*
