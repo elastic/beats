@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
 import (
 	"context"
+	"encoding/json"
 	"path"
 	"testing"
 	"time"
@@ -161,37 +162,6 @@ func TestInputIncludeMatches(t *testing.T) {
 				"Started Outputs some log lines.",
 			},
 		},
-		"and condition": {
-			includeMatches: map[string]interface{}{
-				"and": []map[string]interface{}{
-					{
-						"match": []string{
-							"syslog.facility=3",
-							"message=6th line",
-						},
-					},
-				},
-			},
-			expectedMessages: []string{
-				"6th line",
-			},
-		},
-		"or condition": {
-			includeMatches: map[string]interface{}{
-				"or": []map[string]interface{}{
-					{
-						"match": []string{
-							"message=5th line",
-							"message=6th line",
-						},
-					},
-				},
-			},
-			expectedMessages: []string{
-				"5th line",
-				"6th line",
-			},
-		},
 	}
 
 	for name, testCase := range tests {
@@ -236,6 +206,7 @@ func TestInputSeek(t *testing.T) {
 
 	tests := map[string]struct {
 		config           mapstr.M
+		cursor           string
 		expectedMessages []string
 	}{
 		"seek head": {
@@ -250,19 +221,6 @@ func TestInputSeek(t *testing.T) {
 			},
 			expectedMessages: nil, // No messages are expected for seek=tail.
 		},
-		"seek cursor": {
-			config: map[string]any{
-				"seek": "cursor",
-			},
-			expectedMessages: allMessages,
-		},
-		"seek cursor with tail fallback": {
-			config: map[string]any{
-				"seek":                 "cursor",
-				"cursor_seek_fallback": "tail",
-			},
-			expectedMessages: nil, // No messages are expected because it will fall back to seek=tail.
-		},
 		"seek since": {
 			config: map[string]any{
 				"seek": "since",
@@ -272,24 +230,40 @@ func TestInputSeek(t *testing.T) {
 			},
 			expectedMessages: allMessages[1:],
 		},
-		"seek cursor with since fallback": {
+		"seek with cursor": {
 			config: map[string]any{
-				"seek":                 "cursor",
-				"cursor_seek_fallback": "since",
+				"seek": "since",
 				// Query using one microsecond after the first event so that the first event
 				// is not returned. Note that journald uses microsecond precision for times.
 				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
 			},
-			expectedMessages: allMessages[1:],
+			// This cursor points to the previous last entry in the journal.
+			// You can test the cursor by running:
+			// journalctl --file ./input/journald/testdata/input-multiline-parser.journal --after-cursor="s=c358e9ae507b4a9e96832b98b445558c;i=6a9e1;b=a05ba5675e444581b00ac5adf4340819;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb"
+			cursor:           `{"cursor":{"position":"s=c358e9ae507b4a9e96832b98b445558c;i=6a9e1;b=a05ba5675e444581b00ac5adf4340819;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb","version":1}}`,
+			expectedMessages: allMessages[7:],
 		},
 	}
 
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
+
+			if testCase.cursor != "" {
+				store, _ := env.stateStore.Access()
+				tmp := map[string]any{}
+				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
+					t.Fatal(err)
+				}
+				if err := store.Set("journald::testdata/input-multiline-parser.journal", tmp); err != nil {
+					t.Fatal(err)
+				}
+			}
+
 			conf := mapstr.M{
 				"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
 			}
+
 			conf.DeepUpdate(testCase.config)
 			inp := env.mustCreateInput(conf)
 

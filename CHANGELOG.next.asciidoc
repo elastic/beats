@@ -44,6 +44,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 - Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
+- Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. {pull}40061[40061]
+- Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
 
 *Heartbeat*
 
@@ -147,6 +150,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix filestream not correctly tracking the offset of a file when using the `include_message` parser. {pull}39873[39873] {issue}39653[39653]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
+- Fix filestream not correctly tracking the offset of a file when using the `include_message` parsser. {pull}39873[39873] {issue}39653[39653]
+- Fix a number of crashes in the journald input. {pull}40061[40061]
 
 *Heartbeat*
 

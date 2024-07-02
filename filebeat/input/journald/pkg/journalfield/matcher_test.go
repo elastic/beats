@@ -19,85 +19,57 @@
 
 package journalfield
 
-import (
-	"testing"
+import "testing"
 
-	"github.com/coreos/go-systemd/v22/sdjournal"
-	"github.com/stretchr/testify/require"
-)
-
-func TestApplyMatchersOr(t *testing.T) {
-	cases := map[string]struct {
-		filters []string
-		wantErr bool
+func TestValidate(t *testing.T) {
+	cases := []struct {
+		name  string
+		im    IncludeMatches
+		error bool
 	}{
-		"correct filter expression": {
-			filters: []string{"systemd.unit=nginx"},
-			wantErr: false,
+		{
+			name: "OR condition exists",
+			im: IncludeMatches{
+				OR: []IncludeMatches{
+					{},
+				},
+			},
+			error: true,
 		},
-		"custom field": {
-			filters: []string{"_MY_CUSTOM_FIELD=value"},
-			wantErr: false,
+		{
+			name: "AND condition exists",
+			im: IncludeMatches{
+				AND: []IncludeMatches{
+					{},
+				},
+			},
+			error: true,
 		},
-		"mixed filters": {
-			filters: []string{"systemd.unit=nginx", "_MY_CUSTOM_FIELD=value"},
-			wantErr: false,
+		{
+			name: "empty include matches succeeds validation",
+			im:   IncludeMatches{},
 		},
-		"same field filters": {
-			filters: []string{"systemd.unit=nginx", "systemd.unit=mysql"},
-			wantErr: false,
-		},
-		"incorrect separator": {
-			filters: []string{"systemd.unit~nginx"},
-			wantErr: true,
+		{
+			name: "matches are allowed",
+			im: IncludeMatches{
+				Matches: []Matcher{
+					{"foo"},
+					{"bar"},
+				},
+			},
 		},
 	}
 
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			journal, err := sdjournal.NewJournal()
-			if err != nil {
-				t.Fatalf("error while creating test journal: %v", err)
-			}
-			defer journal.Close()
-
-			matchers := make([]Matcher, len(test.filters))
-			for i, str := range test.filters {
-				m, err := BuildMatcher(str)
-				if err != nil && !test.wantErr {
-					t.Fatalf("unexpected error compiling the filters: %v", err)
-				}
-				matchers[i] = m
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.im.Validate()
+			if tc.error && err == nil {
+				t.Fatal("expecting Validate to fail")
 			}
 
-			// double check if journald likes our filters
-			err = ApplyMatchersOr(journal, matchers)
-			fail := (test.wantErr && err == nil) || (!test.wantErr && err != nil)
-			if fail {
-				t.Errorf("unexpected outcome: error: '%v', expected error: %v", err, test.wantErr)
+			if !tc.error && err != nil {
+				t.Fatalf("expecting Validate to succeed, but got error: %s", err)
 			}
 		})
 	}
-}
-
-func TestApplySyslogIdentifier(t *testing.T) {
-	journal, err := sdjournal.NewJournal()
-	if err != nil {
-		t.Fatalf("error while creating test journal: %v", err)
-	}
-	defer journal.Close()
-
-	err = ApplySyslogIdentifierMatcher(journal, []string{"audit"})
-	require.NoError(t, err)
-}
-
-func TestApplyUnit(t *testing.T) {
-	journal, err := sdjournal.NewJournal()
-	if err != nil {
-		t.Fatalf("error while creating test journal: %v", err)
-	}
-	defer journal.Close()
-
-	err = ApplyUnitMatchers(journal, []string{"docker.service"})
-	require.NoError(t, err)
 }

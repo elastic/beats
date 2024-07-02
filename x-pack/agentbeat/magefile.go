@@ -56,7 +56,7 @@ func init() {
 func Build() error {
 	args := devtools.DefaultBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	} else {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}
@@ -76,7 +76,7 @@ func GolangCrossBuild() error {
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	} else {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}

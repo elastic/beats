@@ -29,3 +29,7 @@ wait4
 
 # Reexec
 execve
+
+# Jounrald input
+exec
+fork
