@@ -35,6 +35,8 @@ import (
 
 func TestNetFlowIntegration(t *testing.T) {
 
+	ctx := context.Background()
+
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
 	esConnectionDetails := integration.GetESURL(t, "http")
@@ -48,7 +50,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	require.NotEmpty(t, outputPassword)
 	outputProtocol := esConnectionDetails.Scheme
 
-	deleted, err := DeleteDataStream(outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
+	deleted, err := DeleteDataStream(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
 	require.NoError(t, err)
 	require.True(t, deleted)
 
@@ -206,8 +208,8 @@ func TestNetFlowIntegration(t *testing.T) {
 
 	packetSource := gopacket.NewPacketSource(f, f.LinkType())
 	for pkt := range packetSource.Packets() {
-		for !limiter.Allow() {
-		}
+		err = limiter.Wait(ctx)
+		require.NoError(t, err)
 
 		payloadData := pkt.TransportLayer().LayerPayload()
 
@@ -225,11 +227,11 @@ func TestNetFlowIntegration(t *testing.T) {
 	}, 10*time.Second, 200*time.Millisecond)
 
 	require.Eventually(t, func() bool {
-		return HasDataStream(outputUsername, outputPassword, outputHost, "logs-netflow.log-default") == nil
+		return HasDataStream(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default") == nil
 	}, 10*time.Second, 200*time.Millisecond)
 
 	require.Eventually(t, func() bool {
-		eventsCount, err := DataStreamEventsCount(outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
+		eventsCount, err := DataStreamEventsCount(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
 		require.NoError(t, err)
 		return eventsCount >= totalPackets
 	}, 10*time.Second, 200*time.Millisecond)
@@ -275,8 +277,8 @@ type DataStreamResult struct {
 	Error       interface{}  `json:"error"`
 }
 
-func HasDataStream(username string, password string, url string, name string) error {
-	resultBytes, err := request(http.MethodGet, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
+func HasDataStream(ctx context.Context, username string, password string, url string, name string) error {
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
 	if err != nil {
 		return err
 	}
@@ -333,8 +335,8 @@ type SearchResults struct {
 	Aggs   map[string]json.RawMessage // model when needed
 }
 
-func DataStreamEventsCount(username string, password string, url string, name string) (int, error) {
-	resultBytes, err := request(http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!error.message:*", url, name))
+func DataStreamEventsCount(ctx context.Context, username string, password string, url string, name string) (int, error) {
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!error.message:*", url, name))
 	if err != nil {
 		return 0, err
 	}
@@ -356,8 +358,8 @@ type DeleteResults struct {
 	Acknowledged bool `json:"acknowledged"`
 }
 
-func DeleteDataStream(username string, password string, url string, name string) (bool, error) {
-	_, err := request(http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
+func DeleteDataStream(ctx context.Context, username string, password string, url string, name string) (bool, error) {
+	_, err := request(ctx, http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
 	if err != nil {
 		return false, err
 	}
@@ -365,8 +367,8 @@ func DeleteDataStream(username string, password string, url string, name string)
 	return true, nil
 }
 
-func request(httpMethod string, username string, password string, url string) ([]byte, error) {
-	req, err := http.NewRequestWithContext(context.TODO(), httpMethod, url, nil)
+func request(ctx context.Context, httpMethod string, username string, password string, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, httpMethod, url, nil)
 	if err != nil {
 		return nil, err
 	}
