@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -93,10 +92,6 @@ func NewWrapper(config *conf.C, r *mb.Register, options ...Option) (*Wrapper, er
 // NewWrapperForMetricSet creates a wrapper for the selected module and metricset.
 func NewWrapperForMetricSet(module mb.Module, metricSet mb.MetricSet, options ...Option) (*Wrapper, error) {
 	return createWrapper(module, []mb.MetricSet{metricSet}, options...)
-}
-
-func (r *Wrapper) UpdateStatus(status status.Status, msg string) {
-	r.Module.UpdateStatus(status, msg)
 }
 
 func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Option) (*Wrapper, error) {
