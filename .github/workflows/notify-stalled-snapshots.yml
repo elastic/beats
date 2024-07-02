@@ -31,7 +31,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: "${{ matrix.branch }}"
@@ -64,7 +64,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@6063705cefe50cb915fc53bb06d4049cae2953b2
+        uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           username: ${{ secrets.MAIL_USERNAME }}
