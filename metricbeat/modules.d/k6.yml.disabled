@@ -1,0 +1,9 @@
+# Module: k6
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-k6.html
+
+- module: k6
+  metricsets:
+    - k6metricset
+  setup.ilm.overwrite: true
+  period: 10s
+  hosts: ["localhost:6565"]
