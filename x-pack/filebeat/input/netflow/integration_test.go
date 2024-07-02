@@ -7,6 +7,7 @@
 package netflow_test
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -355,26 +356,16 @@ type DeleteResults struct {
 }
 
 func DeleteDataStream(username string, password string, url string, name string) (bool, error) {
-	resultBytes, err := request(http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
+	_, err := request(http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
 	if err != nil {
 		return false, err
 	}
 
-	if resultBytes == nil {
-		return true, nil
-	}
-
-	var results DeleteResults
-	err = json.Unmarshal(resultBytes, &results)
-	if err != nil {
-		return false, err
-	}
-
-	return results.Acknowledged, nil
+	return true, nil
 }
 
 func request(httpMethod string, username string, password string, url string) ([]byte, error) {
-	req, err := http.NewRequest(httpMethod, url, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), httpMethod, url, nil)
 	if err != nil {
 		return nil, err
 	}
