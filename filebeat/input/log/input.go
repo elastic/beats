@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -78,6 +79,7 @@ type Input struct {
 	meta                map[string]string
 	stopOnce            sync.Once
 	fileStateIdentifier file.StateIdentifier
+	getStatusReporter   input.GetStatusReporter
 }
 
 // NewInput instantiates a new Log
@@ -157,6 +159,7 @@ func NewInput(
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
+		getStatusReporter:   context.GetStatusReporter,
 	}
 
 	// Create empty harvester to check if configs are fine
@@ -558,6 +561,7 @@ func (p *Input) scan() {
 				continue
 			}
 			if err != nil {
+				p.updateStatus(status.Degraded, fmt.Sprintf(harvesterErrMsg, newState.Source, err))
 				logger.Errorf(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
@@ -832,4 +836,10 @@ func (p *Input) stopWhenDone() {
 	}
 
 	p.Wait()
+}
+
+func (p *Input) updateStatus(status status.Status, msg string) {
+	if reporter := p.getStatusReporter(); reporter != nil {
+		reporter.UpdateStatus(status, msg)
+	}
 }
