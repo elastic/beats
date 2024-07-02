@@ -105,9 +105,10 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 			// However, we explicitly include the instance_id label to ensure it is not missed for services without additional metadata logic.
 			if k == TimeSeriesResponsePathForECSInstanceID {
 				_, _ = ecs.Put(ECSCloudInstanceIDKey, v)
+				continue
 			}
 
-			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
+			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}
 
