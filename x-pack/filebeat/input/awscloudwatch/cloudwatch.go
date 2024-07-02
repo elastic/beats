@@ -187,7 +187,7 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupNames []string, 
 }
 
 // unixMsFromTime converts time to unix milliseconds.
-// Returns 0 both for the init time - time.Time{} (instead of -6795364578871)
+// Returns 0 both the init time `time.Time{}`, instead of -6795364578871
 func unixMsFromTime(v time.Time) int64 {
 	if v.IsZero() {
 		return 0
