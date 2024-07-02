@@ -20,7 +20,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	quark "github.com/elastic/quark/go"
@@ -227,15 +226,16 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
 	}
 
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: qev.Proc.TtyMajor,
 		Minor: qev.Proc.TtyMinor,
 	})
 
+	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+
 	ret := types.Process{
 		PID:              qev.Pid,
-		Start:            timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
+		Start:            &start,
 		Name:             basename(qev.Filename),
 		Executable:       qev.Filename,
 		Args:             []string{qev.Filename}, // TODO: Fix
@@ -258,15 +258,16 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.TTY.CharDevice.Major = uint16(qev.Proc.TtyMajor)
 	ret.TTY.CharDevice.Minor = uint16(qev.Proc.TtyMinor)
 	if qev.ExitEvent != nil {
+		end := time.Unix(0, int64(qev.ExitEvent.ExitTimeEvent))
 		ret.ExitCode = qev.ExitEvent.ExitCode
-		ret.End = timeutils.TimeFromNsSinceBoot(time.Duration(qev.ExitEvent.ExitTimeEvent))
+		ret.End = &end
 	}
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
 	p.fillParent(&ret, qev.Proc.Ppid)
 	p.fillGroupLeader(&ret, qev.Pid) //  qev.Proc.Pgid)
 	p.fillSessionLeader(&ret, qev.Proc.Sid)
-	p.fillEntryLeader(&ret, qev.Proc.EntryLeaderType, qev.Proc.EntryLeader)
+	p.fillEntryLeader(&ret, qev.Proc.EntryLeader)
 	setEntityID(&ret)
 	setSameAsProcess(&ret)
 	return &ret, nil
@@ -278,7 +279,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 		return
 	}
 
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	start := time.Unix(0, int64(qev.Proc.TimeBoot))
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: qev.Proc.TtyMajor,
 		Minor: qev.Proc.TtyMinor,
@@ -286,7 +287,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	euid := qev.Proc.Euid
 	egid := qev.Proc.Egid
 	process.Parent.PID = qev.Proc.Ppid
-	process.Parent.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+	process.Parent.Start = &start
 	process.Parent.Name = basename(qev.Filename)
 	process.Parent.Executable = qev.Filename
 	process.Parent.Args = []string{qev.Filename} //TODO: FIx
@@ -311,7 +312,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 		return
 	}
 
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	start := time.Unix(0, int64(qev.Proc.TimeBoot))
 
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: qev.Proc.TtyMajor,
@@ -320,7 +321,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	euid := qev.Proc.Euid
 	egid := qev.Proc.Egid
 	process.GroupLeader.PID = qev.Pid
-	process.GroupLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+	process.GroupLeader.Start = &start
 	process.GroupLeader.Name = basename(qev.Filename)
 	process.GroupLeader.Executable = qev.Filename
 	process.GroupLeader.Args = []string{qev.Filename} //TODO: fix
@@ -345,7 +346,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 		return
 	}
 
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	start := time.Unix(0, int64(qev.Proc.TimeBoot))
 
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: qev.Proc.TtyMajor,
@@ -354,7 +355,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	euid := qev.Proc.Euid
 	egid := qev.Proc.Egid
 	process.SessionLeader.PID = qev.Pid
-	process.SessionLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+	process.SessionLeader.Start = &start
 	process.SessionLeader.Name = basename(qev.Filename)
 	process.SessionLeader.Executable = qev.Filename
 	process.SessionLeader.Args = []string{qev.Filename} //TODO: fix
@@ -373,13 +374,14 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	process.SessionLeader.EntityID = calculateEntityIDv1(sid, *process.SessionLeader.Start)
 }
 
-func (p prvdr) fillEntryLeader(process *types.Process, entryType uint32, elid uint32) {
+func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	qev := p.qq.Lookup(int(elid))
 	if qev == nil {
 		return
 	}
 
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(qev.Proc.TimeBoot)
+	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+
 
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: qev.Proc.TtyMajor,
@@ -389,10 +391,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, entryType uint32, elid ui
 	euid := qev.Proc.Euid
 	egid := qev.Proc.Egid
 	process.EntryLeader.PID = qev.Pid
-	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
-	process.EntryLeader.Name = basename(qev.Filename)
-	process.EntryLeader.Executable = qev.Filename
-	process.EntryLeader.Args = []string{qev.Filename} // TODO: Fix
+	process.EntryLeader.Start = &start
 	process.EntryLeader.WorkingDirectory = qev.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
