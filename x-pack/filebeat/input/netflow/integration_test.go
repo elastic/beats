@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -127,19 +128,16 @@ func TestNetFlowIntegration(t *testing.T) {
 	}
 
 	healthyChan := make(chan struct{})
+	closeOnce := sync.Once{}
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-
-			if healthyChan != nil {
-				unitState, payload := extractStateAndPayload(observed, "input-unit-1")
-				if unitState == proto.State_HEALTHY {
-					if payload.streamStatusEquals("netflow-netflow.netflow-1e8b33de-d54a-45cd-90da-23ed71c482e2", map[string]interface{}{
-						"status": "HEALTHY",
-						"error":  "",
-					}) {
-						close(healthyChan)
-						healthyChan = nil
-					}
+			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
+			if unitState == proto.State_HEALTHY {
+				if payload.streamStatusEquals("netflow-netflow.netflow-1e8b33de-d54a-45cd-90da-23ed71c482e2", map[string]interface{}{
+					"status": "HEALTHY",
+					"error":  "",
+				}) {
+					closeOnce.Do(func() { close(healthyChan) })
 				}
 			}
 
@@ -179,7 +177,6 @@ func TestNetFlowIntegration(t *testing.T) {
 
 	select {
 	case <-healthyChan:
-		break
 	case err := <-beatRunErr:
 		t.Fatalf("beat run err: %v", err)
 	case <-time.After(10 * time.Second):
