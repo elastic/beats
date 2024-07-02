@@ -53,6 +53,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
 - Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
 - Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
+- Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. {pull}40061[40061]
+- Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
 
 *Heartbeat*
 
@@ -165,6 +168,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
 - Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
+- Fix filestream not correctly tracking the offset of a file when using the `include_message` parsser. {pull}39873[39873] {issue}39653[39653]
+- Fix a number of crashes in the journald input. {pull}40061[40061]
 
 *Heartbeat*
 
