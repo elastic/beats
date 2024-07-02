@@ -12,6 +12,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/aws/aws-sdk-go/service/sqs"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/gofrs/uuid"
@@ -29,7 +33,8 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	require.NoError(t, err)
 
 	const maxMessages = 5
 
@@ -41,7 +46,8 @@ func TestSQSReceiver(t *testing.T) {
 		defer ctrl.Finish()
 		mockSQS := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
-		msg := newSQSMessage(newS3Event("log.json"))
+		msg, err := newSQSMessage(newS3Event("log.json"))
+		require.NoError(t, err)
 
 		// Initial ReceiveMessage for maxMessages.
 		mockSQS.EXPECT().
@@ -127,7 +133,8 @@ func TestSQSReceiver(t *testing.T) {
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	require.NoError(t, err)
 
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
@@ -180,10 +187,10 @@ func TestGetApproximateMessageCount(t *testing.T) {
 	})
 }
 
-func newSQSMessage(events ...s3EventV2) types.Message {
+func newSQSMessage(events ...s3EventV2) (types.Message, error) {
 	body, err := json.Marshal(s3EventsV2{Records: events})
 	if err != nil {
-		panic(err)
+		return types.Message{}, err
 	}
 
 	hash := sha256.Sum256(body)
@@ -196,16 +203,16 @@ func newSQSMessage(events ...s3EventV2) types.Message {
 		Body:          &bodyStr,
 		MessageId:     &messageID,
 		ReceiptHandle: &receipt,
-	}
+	}, nil
 }
 
-func newSNSSQSMessage() types.Message {
+func newSNSSQSMessage() (types.Message, error) {
 	body, err := json.Marshal(s3EventsV2{
 		TopicArn: "arn:aws:sns:us-east-1:1234:sns-topic",
 		Message:  "{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"us-east-1\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"sns-notification-vpc-flow-logs\",\"bucket\":{\"name\":\"vpc-flow-logs-ks\",\"arn\":\"arn:aws:s3:::vpc-flow-logs-ks\"},\"object\":{\"key\":\"test-object-key\"}}}]}",
 	})
 	if err != nil {
-		panic(err)
+		return types.Message{}, err
 	}
 
 	hash := sha256.Sum256(body)
@@ -218,7 +225,28 @@ func newSNSSQSMessage() types.Message {
 		Body:          &bodyStr,
 		MessageId:     &messageID,
 		ReceiptHandle: &receipt,
+	}, nil
+}
+
+func newEventBridgeSQSMessage() (sqs.Message, error) {
+	body, err := json.Marshal(s3EventsV2{
+		Message: "{\"Messages\":[{ \"version\": \"0\", \"id\": \"f17994c0-7cb9-ee01-79fd-ae46df89e3a4\", \"detail-type\": \"Object Created\", \"source\": \"aws.s3\", \"account\": \"952856826737\", \"time\": \"2024-06-24T08:31:26Z\", \"region\": \"eu-west-1\", \"resources\": [\"arn:aws:s3:::vpc-flow-logs-ks\" ], \"detail\": {\"version\": \"0\",\"bucket\": { \"name\": \"vpc-flow-logs-ks\"},\"object\": { \"key\": \"test-object-key\", \"size\": 744, \"etag\": \"2ba6b152f13c75a9155b87b5b072963c\", \"version-id\": \"uoW5awQhqux4rhi4Nuh6il967FzQlsHJ\", \"sequencer\": \"0066792EC46EC0B037\"},\"request-id\": \"Q93BVWXD5G6FKWC2\",\"requester\": \"516635408544\",\"source-ip-address\": \"10.0.27.95\",\"reason\": \"PutObject\" }}]}",
+	})
+	if err != nil {
+		return sqs.Message{}, err
 	}
+
+	hash := sha256.Sum256(body)
+	id, _ := uuid.FromBytes(hash[:16])
+	messageID := id.String()
+	receipt := "receipt-" + messageID
+	bodyStr := string(body)
+
+	return sqs.Message{
+		Body:          &bodyStr,
+		MessageId:     &messageID,
+		ReceiptHandle: &receipt,
+	}, err
 }
 
 func newS3Event(key string) s3EventV2 {
