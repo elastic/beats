@@ -22,8 +22,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 // Creator initializes and configures a new Beater instance used to execute
@@ -82,6 +85,33 @@ type Beat struct {
 	Instrumentation instrumentation.Instrumentation // instrumentation holds an APM agent for capturing and reporting traces
 
 	API *api.Server // API server. This is nil unless the http endpoint is enabled.
+}
+
+// GenerateUserAgent populates the UserAgent field on the beat.Info struct
+func (beat *Beat) GenerateUserAgent() {
+	// if we're in fleet mode, construct some additional elements for the UA comment field
+	comments := []string{}
+	if beat.Manager != nil && beat.Manager.Enabled() {
+		info := beat.Manager.AgentInfo()
+		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
+			comments = append(comments, "Managed")
+		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
+			comments = append(comments, "Standalone")
+		}
+
+		if info.Unprivileged {
+			comments = append(comments, "Unprivileged")
+		}
+	}
+
+	UserAgentProduct := beat.Info.Beat
+	if UserAgentProduct == "" {
+		UserAgentProduct = "Libbeat"
+	}
+
+	finalUserAgent := useragent.UserAgent(UserAgentProduct, version.GetDefaultVersion(),
+		version.Commit(), version.BuildTime().String(), comments...)
+	beat.Info.UserAgent = finalUserAgent
 }
 
 // BeatConfig struct contains the basic configuration of every beat

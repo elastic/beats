@@ -488,7 +488,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		summariesByName      = map[string]map[string]*OpenMetric{}
 		histogramsByName     = map[string]map[string]*OpenMetric{}
 		fam                  *MetricFamily
-		mt                   = textparse.MetricTypeUnknown
+		// metricTypes stores the metric type for each metric name.
+		metricTypes = make(map[string]textparse.MetricType)
 	)
 	var err error
 
@@ -530,7 +531,8 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			} else {
 				fam.Type = t
 			}
-			mt = t
+			// Store the metric type for each base metric name.
+			metricTypes[s] = t
 			continue
 		case textparse.EntryHelp:
 			buf, t := parser.Help()
@@ -610,6 +612,23 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		// lookupMetricName will have the suffixes removed
 		lookupMetricName := metricName
 		var exm *exemplar.Exemplar
+
+		mt, ok := metricTypes[metricName]
+		if !ok {
+			// Splitting is necessary to find the base metric name type in the metricTypes map.
+			// This allows us to group related metrics together under the same base metric name.
+			// For example, the metric family `summary_metric` can have the metrics
+			// `summary_metric_count` and `summary_metric_sum`, all having the same metric type.
+			parts := strings.Split(metricName, "_")
+			baseMetricNamekey := strings.Join(parts[:len(parts)-1], "_")
+
+			// If the metric type is not found, default to unknown
+			if metricTypeFound, ok := metricTypes[baseMetricNamekey]; ok {
+				mt = metricTypeFound
+			} else {
+				mt = textparse.MetricTypeUnknown
+			}
+		}
 
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {

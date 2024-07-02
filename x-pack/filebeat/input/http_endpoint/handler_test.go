@@ -473,7 +473,7 @@ func Test_apiResponse(t *testing.T) {
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-			apiHandler := newHandler(ctx, tracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
+			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()
@@ -491,12 +491,12 @@ func Test_apiResponse(t *testing.T) {
 	}
 }
 
-func tracerConfig(name string, cfg config, withTrace bool) config {
+func newTracerConfig(name string, cfg config, withTrace bool) config {
 	if !withTrace {
 		return cfg
 	}
-	cfg.Tracer = &lumberjack.Logger{
+	cfg.Tracer = &tracerConfig{Logger: lumberjack.Logger{
 		Filename: filepath.Join(traceLogsDir, name+".ndjson"),
-	}
+	}}
 	return cfg
 }
