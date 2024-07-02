@@ -42,25 +42,10 @@ type replaceStringConfig struct {
 	FailOnError   bool            `config:"fail_on_error"`
 }
 
-func (strCfg replaceStringConfig) validate() error {
-	for _, field := range strCfg.Fields {
-		if field.Field == "" {
-			return fmt.Errorf("missing field `field` in replace processor config")
-		}
-		if field.Pattern == nil {
-			return fmt.Errorf("missing field `pattern` in replace processor config")
-		}
-		if field.Replacement == "" {
-			return fmt.Errorf("missing field `replacement` in replace processor config")
-		}
-	}
-	return nil
-}
-
 type replaceConfig struct {
-	Field       string         `config:"field"`
-	Pattern     *regexp.Regexp `config:"pattern"`
-	Replacement string         `config:"replacement"`
+	Field       string         `config:"field" validate:"required"`
+	Pattern     *regexp.Regexp `config:"pattern" validate:"required"`
+	Replacement string         `config:"replacement" validate:"required"`
 }
 
 func init() {
@@ -80,11 +65,6 @@ func NewReplaceString(c *conf.C) (beat.Processor, error) {
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack the replace configuration: %w", err)
-	}
-
-	err = config.validate()
-	if err != nil {
-		return nil, fmt.Errorf("invalid processor config")
 	}
 
 	f := &replaceString{

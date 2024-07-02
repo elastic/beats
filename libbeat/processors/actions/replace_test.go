@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
@@ -70,7 +71,10 @@ func TestBadConfig(t *testing.T) {
 
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			err := testCase.cfg.validate()
+			cfg, err := conf.NewConfigFrom(testCase.cfg)
+			require.NoError(t, err)
+			unpacked := replaceStringConfig{}
+			err = cfg.Unpack(&unpacked)
 			if testCase.shouldError {
 				require.Error(t, err)
 			} else {
