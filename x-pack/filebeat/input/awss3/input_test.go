@@ -76,6 +76,19 @@ func TestRegionSelection(t *testing.T) {
 			want:       "us-east-2",
 		},
 		{
+			name:     "abc.xyz_and_domain_with_matching_s3_endpoint",
+			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://s3.us-east-1.abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:       "abc.xyz_and_domain_with_matching_s3_endpoint_region_override",
+			queueURL:   "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint:   "https://s3.us-east-1.abc.xyz",
+			regionName: "us-west-3",
+			want:       "us-west-3",
+		},
+		{
 			name:     "abc.xyz_and_domain_with_matching_endpoint",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
 			endpoint: "abc.xyz",
