@@ -39,8 +39,12 @@ func TestNetFlowIntegration(t *testing.T) {
 	esConnectionDetails := integration.GetESURL(t, "http")
 	outputHost := fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())
 	outputHosts := []interface{}{outputHost}
-	outputUsername := esConnectionDetails.User.Username()
-	outputPassword, _ := esConnectionDetails.User.Password()
+
+	// we are going to need admin access to query ES about the logs-netflow.log-default data_stream
+	outputUsername := os.Getenv("ES_SUPERUSER_USER")
+	require.NotEmpty(t, outputUsername)
+	outputPassword := os.Getenv("ES_SUPERUSER_PASS")
+	require.NotEmpty(t, outputPassword)
 	outputProtocol := esConnectionDetails.Scheme
 
 	deleted, err := DeleteDataStream(outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
