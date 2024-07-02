@@ -19,10 +19,11 @@ package memqueue
 
 import (
 	"context"
+	"errors"
 	"io"
-	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/fifo"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -45,13 +46,6 @@ type broker struct {
 
 	ctx       context.Context
 	ctxCancel context.CancelFunc
-
-	// The ring buffer backing the queue. All buffer positions should be taken
-	// modulo the size of this array.
-	buf []queueEntry
-
-	// wait group for queue workers (runLoop and ackLoop)
-	wg sync.WaitGroup
 
 	// The factory used to create an event encoder when creating a producer
 	encoderFactory queue.EncoderFactory
@@ -88,7 +82,8 @@ type broker struct {
 	///////////////////////////////
 	// internal goroutine state
 
-	// The goroutine that manages the queue's core run state
+	// The goroutine that manages the queue's core run state and owns its
+	// backing buffer.
 	runLoop *runLoop
 
 	// The goroutine that manages ack notifications and callbacks
@@ -96,8 +91,10 @@ type broker struct {
 }
 
 type Settings struct {
-	// The number of events the queue can hold.
+	// The number of events and bytes the queue can hold. <= zero means no limit.
+	// At least one must be greater than zero.
 	Events int
+	Bytes  int
 
 	// The most events that will ever be returned from one Get request.
 	MaxGetRequest int
@@ -110,30 +107,31 @@ type Settings struct {
 type queueEntry struct {
 	event     queue.Entry
 	eventSize int
-	id        queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
 }
 
 type batch struct {
-	queue *broker
+	// The queue buffer (at the time that this batch was generated --
+	// only the indices corresponding to this batch's events are guaranteed
+	// to be valid).
+	queueBuf circularBuffer
 
-	// Next batch in the containing batchList
-	next *batch
+	// Position of the batch's events within the queue. This is an absolute
+	// index over the lifetime of the queue, to get the position within the
+	// queue's current circular buffer, use (start % len(queue.buf)).
+	start entryIndex
 
-	// Position and length of the events within the queue buffer
-	start, count int
+	// Number of sequential events in this batch.
+	count int
 
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
 	// acknowledgment / cleanup.
 	doneChan chan batchDoneMsg
 }
 
-type batchList struct {
-	head *batch
-	tail *batch
-}
+type batchList = fifo.FIFO[batch]
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
 // Settings object can be wrapped in a queue-agnostic interface for
@@ -145,7 +143,7 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		inputQueueSize int,
 		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory), nil
+		return NewQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 	}
 }
 
@@ -158,21 +156,16 @@ func NewQueue(
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
-) *broker {
-	b := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
+) (*broker, error) {
+	b, err := newQueue(logger, observer, settings, inputQueueSize, encoderFactory)
 
-	// Start the queue workers
-	b.wg.Add(2)
-	go func() {
-		defer b.wg.Done()
-		b.runLoop.run()
-	}()
-	go func() {
-		defer b.wg.Done()
-		b.ackLoop.run()
-	}()
+	if err == nil {
+		// Start the queue workers
+		go b.runLoop.run()
+		go b.ackLoop.run()
+	}
 
-	return b
+	return b, err
 }
 
 // newQueue does most of the work of creating a queue from the given
@@ -185,7 +178,7 @@ func newQueue(
 	settings Settings,
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
-) *broker {
+) (*broker, error) {
 	if observer == nil {
 		observer = queue.NewQueueObserver(nil)
 	}
@@ -200,8 +193,12 @@ func newQueue(
 		settings.MaxGetRequest = (settings.Events + 1) / 2
 	}
 
+	if settings.Bytes > 0 && encoderFactory == nil {
+		return nil, errors.New("queue.mem.bytes is set but the output doesn't support byte-based event buffers")
+	}
+
 	// Can't request more than the full queue
-	if settings.MaxGetRequest > settings.Events {
+	if settings.Events > 0 && settings.MaxGetRequest > settings.Events {
 		settings.MaxGetRequest = settings.Events
 	}
 
@@ -212,8 +209,6 @@ func newQueue(
 	b := &broker{
 		settings: settings,
 		logger:   logger,
-
-		buf: make([]queueEntry, settings.Events),
 
 		encoderFactory: encoderFactory,
 
@@ -234,7 +229,7 @@ func newQueue(
 
 	observer.MaxEvents(settings.Events)
 
-	return b
+	return b, nil
 }
 
 func (b *broker) Close() error {
@@ -252,7 +247,7 @@ func (b *broker) QueueType() string {
 
 func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		MaxEvents: len(b.buf),
+		MaxEvents: b.settings.Events,
 	}
 }
 
@@ -267,13 +262,13 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, encoder)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
-	responseChan := make(chan *batch, 1)
+func (b *broker) Get(count int, bytes int) (queue.Batch, error) {
+	responseChan := make(chan batch, 1)
 	select {
 	case <-b.ctx.Done():
 		return nil, io.EOF
 	case b.getChan <- getRequest{
-		entryCount: count, responseChan: responseChan}:
+		entryCount: count, byteCount: bytes, responseChan: responseChan}:
 	}
 
 	// if request has been sent, we have to wait for a response
@@ -281,93 +276,16 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	return resp, nil
 }
 
-var batchPool = sync.Pool{
-	New: func() interface{} {
-		return &batch{
-			doneChan: make(chan batchDoneMsg, 1),
-		}
-	},
+func (b *broker) useByteLimits() bool {
+	return b.settings.Bytes > 0
 }
 
-func newBatch(queue *broker, start, count int) *batch {
-	batch := batchPool.Get().(*batch)
-	batch.next = nil
-	batch.queue = queue
-	batch.start = start
-	batch.count = count
-	return batch
-}
-
-func releaseBatch(b *batch) {
-	b.next = nil
-	batchPool.Put(b)
-}
-
-func (l *batchList) prepend(b *batch) {
-	b.next = l.head
-	l.head = b
-	if l.tail == nil {
-		l.tail = b
-	}
-}
-
-func (l *batchList) concat(other *batchList) {
-	if other.head == nil {
-		return
-	}
-
-	if l.head == nil {
-		*l = *other
-		return
-	}
-
-	l.tail.next = other.head
-	l.tail = other.tail
-}
-
-func (l *batchList) append(b *batch) {
-	if l.head == nil {
-		l.head = b
-	} else {
-		l.tail.next = b
-	}
-	l.tail = b
-}
-
-func (l *batchList) empty() bool {
-	return l.head == nil
-}
-
-func (l *batchList) front() *batch {
-	return l.head
-}
-
-func (l *batchList) nextBatchChannel() chan batchDoneMsg {
-	if l.head == nil {
-		return nil
-	}
-	return l.head.doneChan
-}
-
-func (l *batchList) pop() *batch {
-	ch := l.head
-	if ch != nil {
-		l.head = ch.next
-		if l.head == nil {
-			l.tail = nil
-		}
-	}
-
-	ch.next = nil
-	return ch
-}
-
-func (l *batchList) reverse() {
-	tmp := *l
-	*l = batchList{}
-
-	for !tmp.empty() {
-		l.prepend(tmp.pop())
+func newBatch(queueBuf circularBuffer, start entryIndex, count int) batch {
+	return batch{
+		doneChan: make(chan batchDoneMsg, 1),
+		queueBuf: queueBuf,
+		start:    start,
+		count:    count,
 	}
 }
 
@@ -383,21 +301,21 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 	return actual
 }
 
-func (b *batch) Count() int {
+func (b batch) Count() int {
 	return b.count
 }
 
 // Return a pointer to the queueEntry for the i-th element of this batch
-func (b *batch) rawEntry(i int) *queueEntry {
-	// Indexes wrap around the end of the queue buffer
-	return &b.queue.buf[(b.start+i)%len(b.queue.buf)]
+func (b batch) entry(i int) *queueEntry {
+	entryIndex := b.start.plus(i)
+	return b.queueBuf.entry(entryIndex)
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) queue.Entry {
-	return b.rawEntry(i).event
+func (b batch) Entry(i int) queue.Entry {
+	return b.entry(i).event
 }
 
-func (b *batch) Done() {
+func (b batch) Done() {
 	b.doneChan <- batchDoneMsg{}
 }

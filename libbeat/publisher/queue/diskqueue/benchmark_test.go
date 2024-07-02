@@ -99,7 +99,7 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 func publishEvents(r *rand.Rand, p queue.Producer, num int) {
 	for i := 0; i < num; i++ {
 		e := makePublisherEvent(r)
-		_, ok := p.Publish(e)
+		ok := p.Publish(e)
 		if !ok {
 			panic("didn't publish")
 		}
@@ -109,7 +109,7 @@ func publishEvents(r *rand.Rand, p queue.Producer, num int) {
 func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 	var received int
 	for {
-		batch, err := q.Get(batch_size)
+		batch, err := q.Get(batch_size, 0)
 		if err != nil {
 			return err
 		}

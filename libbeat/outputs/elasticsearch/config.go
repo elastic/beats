@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -39,6 +40,7 @@ type elasticsearchConfig struct {
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
 	BulkMaxSize        int               `config:"bulk_max_size"`
+	BulkMaxBytes       cfgtype.ByteSize  `config:"bulk_max_bytes"`
 	MaxRetries         int               `config:"max_retries"`
 	Backoff            Backoff           `config:"backoff"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
