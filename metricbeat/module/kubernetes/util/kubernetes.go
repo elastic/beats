@@ -42,13 +42,12 @@ import (
 type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
-
-	Node       string        `config:"node"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	KubeAdm           bool                         `config:"disable_kubeadm"`
+	Node              string                       `config:"node"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
-	AddKubeAdm          bool                                `config:"add_kubeadm"`
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 	Namespace           string                              `config:"namespace"`
 }
@@ -478,9 +477,9 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	}
 
 	var metaGen *metadata.Resource
-
 	namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 	if namespaceMetaWatcher != nil {
+		addResourceMetadata.Namespace.SetBool("disable_kubeadm", -1, true)
 		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceMetaWatcher).watcher.Store(), client)
 		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
@@ -528,6 +527,8 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		}
 		// For example for pod named redis in namespace default, the generator uses the pod watcher for pod metadata,
 		// collects all node metadata using the node watcher's store and all namespace metadata using the namespacewatcher's store.
+		addResourceMetadata.Namespace.SetBool("disable_kubeadm", -1, true)
+		addResourceMetadata.Node.SetBool("disable_kubeadm", -1, true)
 		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
@@ -536,6 +537,8 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		if namespaceMetaWatcher == nil {
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
 		}
+
+		addResourceMetadata.Namespace.SetBool("disable_kubeadm", -1, true)
 		namespaceMeta := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceMetaWatcher).watcher.Store(), client)
 		metaGen = metadata.NewServiceMetadataGenerator(commonConfig, (*resourceMetaWatcher).watcher.Store(),
@@ -575,7 +578,6 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 	commonConfig, _ := conf.NewConfigFrom(&commonMetaConfig)
-
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		log.Errorf("Error creating Kubernetes client: %s", err)
@@ -742,7 +744,8 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 	commonConfig, _ := conf.NewConfigFrom(&commonMetaConfig)
-
+	// log = logp.NewLogger("PASSSSS:")
+	// log.Infof("MYPASS2 %v", config.KubeAdm)
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		log.Errorf("Error creating Kubernetes client: %s", err)
