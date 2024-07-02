@@ -33,6 +33,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	waitFor = 10 * time.Second
+	tick    = 200 * time.Millisecond
+)
+
 func TestNetFlowIntegration(t *testing.T) {
 
 	ctx := context.Background()
@@ -181,7 +186,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	case <-healthyChan:
 	case err := <-beatRunErr:
 		t.Fatalf("beat run err: %v", err)
-	case <-time.After(10 * time.Second):
+	case <-time.After(waitFor):
 		t.Fatalf("timed out waiting for beat to become healthy")
 	}
 
@@ -224,17 +229,17 @@ func TestNetFlowIntegration(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return receivedEventTotalVar.Get() == uint64(totalPackets)
-	}, 10*time.Second, 200*time.Millisecond)
+	}, waitFor, tick)
 
 	require.Eventually(t, func() bool {
 		return HasDataStream(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default") == nil
-	}, 10*time.Second, 200*time.Millisecond)
+	}, waitFor, tick)
 
 	require.Eventually(t, func() bool {
 		eventsCount, err := DataStreamEventsCount(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
 		require.NoError(t, err)
 		return eventsCount >= totalPackets
-	}, 10*time.Second, 200*time.Millisecond)
+	}, waitFor, tick)
 }
 
 type unitPayload map[string]interface{}
