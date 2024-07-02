@@ -37,6 +37,9 @@ import (
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
+// ErrCancelled indicates the read was cancelled
+var ErrCancelled = errors.New("cancelled")
+
 // JournalEntry holds all fields of a journal entry plus cursor and timestamps
 type JournalEntry struct {
 	Fields             map[string]string
@@ -45,6 +48,8 @@ type JournalEntry struct {
 	MonotonicTimestamp uint64
 }
 
+// Reader reads entries from journald by calling `jouranlctl`
+// and reading its output.
 type Reader struct {
 	cmd      *exec.Cmd
 	dataChan chan []byte
@@ -78,6 +83,29 @@ func handleSeekAndCursor(args []string, mode SeekMode, since time.Duration, curs
 	return args
 }
 
+// New instantiates and starts a reader for journald logs.
+//
+// The Reader starts a `journalctl` process with JSON ouput to read the journal
+// entries. Units and syslog identifiers are passed using the corresponding CLI
+// flags, matchers are passed directly to `journalctl` then transports are added
+// as matchers using `_TRANSPORTS` key.
+//
+// `mode` defines the 'seek mode'. It indicates whether the journal should be
+// read from the tail, head or starting from the cursor. If a cursor is passed,
+// then the seek mode is ignored.
+//
+// To start reading from a relative time, use mode: SeekSince and since should
+// be a time.Duration relative to the current time to start reading the
+// journald.
+//
+// File is the journal file to be read, for the system journal use the string
+// `LOCAL_SYSTEM_JOURNAL`.
+//
+// It's the caller's responsibility to call `Close` on the reader to stop
+// the `journalctl` process.
+//
+// If `canceler` is cancelled, the reading goroutine is stopped and subsequent
+// calls to `Next` will return an error.
 func New(
 	logger *logp.Logger,
 	canceler input.Canceler,
@@ -185,6 +213,9 @@ func New(
 	return &r, nil
 }
 
+// Close stops the `journalctl` process and waits for all
+// goroutines to return, the canceller passed to `New` should
+// be cancelled before `Close` is called
 func (r *Reader) Close() error {
 	if r.cmd == nil {
 		return nil
@@ -199,34 +230,43 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-func (r *Reader) Next(input.Canceler) (JournalEntry, error) {
-	d, open := <-r.dataChan
-	if !open {
-		return JournalEntry{}, errors.New("data chan is closed")
-	}
-	fields := map[string]string{}
-	if err := json.Unmarshal(d, &fields); err != nil {
-		return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
-	}
+// Next returns the next journal entry. If there is no entry available
+// next will block until there is an entry or cancel is cancelled.
+//
+// If cancel is cancelled, Next returns a zero value JournalEntry
+// and ErrCancelled.
+func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
+	select {
+	case <-cancel.Done():
+		return JournalEntry{}, ErrCancelled
+	case d, open := <-r.dataChan:
+		if !open {
+			return JournalEntry{}, errors.New("data chan is closed")
+		}
+		fields := map[string]string{}
+		if err := json.Unmarshal(d, &fields); err != nil {
+			return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
+		}
 
-	ts := fields["__REALTIME_TIMESTAMP"]
-	unixTS, err := strconv.ParseUint(ts, 10, 64)
-	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
+		ts := fields["__REALTIME_TIMESTAMP"]
+		unixTS, err := strconv.ParseUint(ts, 10, 64)
+		if err != nil {
+			return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
+		}
+
+		monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
+		monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
+		if err != nil {
+			return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
+		}
+
+		cursor := fields["__CURSOR"]
+
+		return JournalEntry{
+			Fields:             fields,
+			RealtimeTimestamp:  unixTS,
+			Cursor:             cursor,
+			MonotonicTimestamp: monotonicTSInt,
+		}, nil
 	}
-
-	monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
-	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
-	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
-	}
-
-	cursor := fields["__CURSOR"]
-
-	return JournalEntry{
-		Fields:             fields,
-		RealtimeTimestamp:  unixTS,
-		Cursor:             cursor,
-		MonotonicTimestamp: monotonicTSInt,
-	}, nil
 }
