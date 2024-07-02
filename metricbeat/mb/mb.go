@@ -106,7 +106,7 @@ func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
 	}
 }
 
-// SetStatusReporter updates the status of the module. Reflected on elastic-agent.
+// SetStatusReporter sets the status repoter of the module.
 func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
 }

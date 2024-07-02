@@ -20,12 +20,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
