@@ -51,6 +51,9 @@ type ProcessesWatcher struct {
 
 	// watcher is the OS-dependent engine for the ProcessWatcher.
 	watcher processWatcher
+
+	// alternate hostfs root. Provides an alternate filesystem root for linux /proc/ traversal. Also useful for testing
+	hostfs string
 }
 
 // endpoint is a network address/port number complex.
@@ -95,6 +98,9 @@ type processWatcher interface {
 	// GetLocalIPs returns the list of local addresses. If the returned error
 	// is non-nil, the IP slice is nil.
 	GetLocalIPs() ([]net.IP, error)
+
+	// GetSingleLocalPortToPIDMapping returns a single PID for a given IP:port combination
+	GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error)
 }
 
 // init sets up the necessary data structures for the ProcessWatcher.
@@ -103,6 +109,10 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) e
 	proc.portProcMap = map[applayer.Transport]map[endpoint]portProcMapping{
 		applayer.TransportUDP: make(map[endpoint]portProcMapping),
 		applayer.TransportTCP: make(map[endpoint]portProcMapping),
+	}
+
+	if proc.hostfs != "" {
+		logp.Info("Using custom hostfs root: %s", proc.hostfs)
 	}
 
 	proc.processCache = make(map[int]*process)
@@ -122,6 +132,9 @@ func (proc *ProcessesWatcher) init(config ProcsConfig, watcher processWatcher) e
 	}
 
 	proc.monitored = config.Monitored
+	// initialize now, to avoid repeated calls to UpdateMapForEndpoint()
+	proc.updateMap(applayer.TransportTCP)
+	proc.updateMap(applayer.TransportUDP)
 
 	return nil
 }
@@ -171,6 +184,7 @@ func (proc *ProcessesWatcher) enrich(dst *common.Process, ip net.IP, port uint16
 	}
 }
 
+// checks to see if the IP is a loopback, or a known local address
 func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
 	if ip.IsLoopback() {
 		return true
@@ -183,6 +197,7 @@ func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
 	return false
 }
 
+// findProc finds a process that matches the given endpoint. This will refresh the cache of known map->PIDs
 func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport applayer.Transport) *process {
 	proc.mu.Lock()
 	procMap, ok := proc.portProcMap[transport]
@@ -196,16 +211,18 @@ func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport ap
 		return p.proc
 	}
 
-	proc.updateMap(transport)
+	//proc.updateMap(transport)
+	foundProc := proc.UpdateMapForEndpoint(address, port, transport)
 
-	p, exists = lookupMapping(address, port, procMap)
-	if exists {
-		return p.proc
-	}
+	// p, exists = lookupMapping(address, port, procMap)
+	// if exists {
+	// 	return p.proc
+	// }
 
-	return nil
+	return foundProc
 }
 
+// lookupMapping checks the given map for a process that matches the address:port
 func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMapping) (p portProcMapping, found bool) {
 	// Precedence when one socket is bound to a specific IP:port and another one
 	// to INADDR_ANY and same port is not clear. Seems that the last one to bind
@@ -224,6 +241,7 @@ func lookupMapping(address net.IP, port uint16, procMap map[endpoint]portProcMap
 	return p, found
 }
 
+// updateMap refreshes the map of endpoints to PIDs.
 func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	if logp.HasSelector("procsdetailed") {
 		start := time.Now()
@@ -244,6 +262,28 @@ func (proc *ProcessesWatcher) updateMap(transport applayer.Transport) {
 	}
 }
 
+// UpdateMapForEndpoint updates the internal endpoint->PID map with the data for the requested endpoint, then returns the
+// process for that endpoint
+func (proc *ProcessesWatcher) UpdateMapForEndpoint(address net.IP, port uint16, transport applayer.Transport) *process {
+	pid, found, err := proc.watcher.GetSingleLocalPortToPIDMapping(transport, address, port)
+	if err != nil {
+		logp.Err("error fetching details for connection %s:%d: %s", address, port, err)
+	}
+	if !found {
+		return nil
+	}
+
+	foundProc := proc.getProcessInfo(pid)
+	if foundProc == nil {
+		return nil
+	}
+	proc.expireProcessCache()
+
+	proc.updateMappingEntry(transport, endpoint{address: address.String(), port: port}, pid)
+	return foundProc
+}
+
+// expireProcessCache deletes the processCache
 func (proc *ProcessesWatcher) expireProcessCache() {
 	now := time.Now()
 	for pid, info := range proc.processCache {
@@ -253,6 +293,7 @@ func (proc *ProcessesWatcher) expireProcessCache() {
 	}
 }
 
+// updateMappingEntry updates the portProcMap for the given endpoint/pid combination
 func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e endpoint, pid int) {
 	proc.mu.Lock()
 	defer proc.mu.Unlock()
