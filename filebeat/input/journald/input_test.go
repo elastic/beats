@@ -169,16 +169,16 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	rawEvents := env.pipeline.GetAllEvents()
 	events := []beat.Event{}
 	for _, evt := range rawEvents {
-		evt.Delete("event.created")
+		_ = evt.Delete("event.created")
 		// Fields that the go-systemd version did not add
-		evt.Delete("journald.custom.seqnum")
-		evt.Delete("journald.custom.seqnum_id")
-		evt.Delete("journald.custom.realtime_timestamp")
+		_ = evt.Delete("journald.custom.seqnum")
+		_ = evt.Delete("journald.custom.seqnum_id")
+		_ = evt.Delete("journald.custom.realtime_timestamp")
 		// Marshal and Unmarshal because of type changes
 		// We ignore errors as those types can always marshal and unmarshal
 		data, _ := json.Marshal(evt)
 		newEvt := beat.Event{}
-		json.Unmarshal(data, &newEvt)
+		json.Unmarshal(data, &newEvt) //nolint: errcheck // this will never fail
 		if newEvt.Meta == nil {
 			// the golden file has it as an empty map
 			newEvt.Meta = mapstr.M{}

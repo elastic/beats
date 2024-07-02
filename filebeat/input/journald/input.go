@@ -165,7 +165,7 @@ func (inp *journald) Run(
 		src.Name(),
 	)
 	if err != nil {
-		return fmt.Errorf("could not start jounral reader: %w", err)
+		return fmt.Errorf("could not start journal reader: %w", err)
 	}
 
 	defer reader.Close()
