@@ -162,37 +162,6 @@ func TestInputIncludeMatches(t *testing.T) {
 				"Started Outputs some log lines.",
 			},
 		},
-		// "and condition": {
-		// 	includeMatches: map[string]interface{}{
-		// 		"and": []map[string]interface{}{
-		// 			{
-		// 				"match": []string{
-		// 					"syslog.facility=3",
-		// 					"message=6th line",
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	expectedMessages: []string{
-		// 		"6th line",
-		// 	},
-		// },
-		// "or condition": {
-		// 	includeMatches: map[string]interface{}{
-		// 		"or": []map[string]interface{}{
-		// 			{
-		// 				"match": []string{
-		// 					"message=5th line",
-		// 					"message=6th line",
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	expectedMessages: []string{
-		// 		"5th line",
-		// 		"6th line",
-		// 	},
-		// },
 	}
 
 	for name, testCase := range tests {

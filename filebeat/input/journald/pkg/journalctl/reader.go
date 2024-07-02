@@ -56,7 +56,10 @@ type Reader struct {
 	wg       sync.WaitGroup
 }
 
-func handleSeeAndCursor(args []string, mode SeekMode, since time.Duration, cursor string) []string {
+// handleSeekAndCursor adds the correct arguments for seek and cursor.
+// If there is a cursor, only the cursor is used, seek is ignored.
+// If there is no cursor, then seek is used
+func handleSeekAndCursor(args []string, mode SeekMode, since time.Duration, cursor string) []string {
 	if cursor != "" {
 		args = append(args, "--after-cursor", cursor)
 		return args
@@ -92,7 +95,7 @@ func New(
 		args = append(args, "--file", file)
 	}
 
-	args = handleSeeAndCursor(args, mode, since, cursor)
+	args = handleSeekAndCursor(args, mode, since, cursor)
 
 	for _, u := range units {
 		args = append(args, "--unit", u)
@@ -166,7 +169,6 @@ func New(
 				close(r.dataChan)
 				return
 			}
-			logger.Debug(">>>>> Got data: ", string(data))
 
 			select {
 			case <-r.canceler.Done():
@@ -210,13 +212,13 @@ func (r *Reader) Next(input.Canceler) (JournalEntry, error) {
 	ts := fields["__REALTIME_TIMESTAMP"]
 	unixTS, err := strconv.ParseUint(ts, 10, 64)
 	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert timestamp to uint64: %w", err)
+		return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
 	}
 
 	monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
 	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
 	if err != nil {
-		return JournalEntry{}, fmt.Errorf("could not convert monotomic timestamp to uint64: %w", err)
+		return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
 	}
 
 	cursor := fields["__CURSOR"]
