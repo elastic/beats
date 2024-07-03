@@ -219,6 +219,12 @@ func New(
 		return &Reader{}, fmt.Errorf("cannot start journalctl: %w", err)
 	}
 
+	go func() {
+		if err := cmd.Wait(); err != nil {
+			r.logger.Errorf("journalclt exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
+		}
+	}()
+
 	return &r, nil
 }
 
@@ -250,7 +256,7 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		return JournalEntry{}, ErrCancelled
 	case d, open := <-r.dataChan:
 		if !open {
-			return JournalEntry{}, errors.New("data chan is closed")
+			return JournalEntry{}, errors.New("no more data to read, journalctl might have exited unexpectedly")
 		}
 		fields := map[string]any{}
 		if err := json.Unmarshal(d, &fields); err != nil {

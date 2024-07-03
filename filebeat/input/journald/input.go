@@ -183,11 +183,13 @@ func (inp *journald) Run(
 			if errors.Is(err, journalctl.ErrCancelled) {
 				return nil
 			}
+			logger.Errorf("could not read event: %s", err)
 			return err
 		}
 
 		event := entry.ToEvent()
 		if err := publisher.Publish(event, event.Private); err != nil {
+			logger.Errorf("could not publish event: %s", err)
 			return err
 		}
 	}
