@@ -42,7 +42,7 @@ var ErrCancelled = errors.New("cancelled")
 
 // JournalEntry holds all fields of a journal entry plus cursor and timestamps
 type JournalEntry struct {
-	Fields             map[string]string
+	Fields             map[string]any
 	Cursor             string
 	RealtimeTimestamp  uint64
 	MonotonicTimestamp uint64
@@ -243,24 +243,36 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		if !open {
 			return JournalEntry{}, errors.New("data chan is closed")
 		}
-		fields := map[string]string{}
+		fields := map[string]any{}
 		if err := json.Unmarshal(d, &fields); err != nil {
+			r.logger.Error("journal event cannot be parsed as map[string]any, look at the events log file for the raw journal event")
+			// Log raw data to events log file
+			r.logger.Errorw("data cannot be parsed as map[string]any JSON: '%s'", logp.TypeKey, logp.EventType, string(d), "error.message", err.Error())
 			return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
 		}
 
-		ts := fields["__REALTIME_TIMESTAMP"]
+		ts, isString := fields["__REALTIME_TIMESTAMP"].(string)
+		if !isString {
+			return JournalEntry{}, fmt.Errorf("'__REALTIME_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__REALTIME_TIMESTAMP"])
+		}
 		unixTS, err := strconv.ParseUint(ts, 10, 64)
 		if err != nil {
 			return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
 		}
 
-		monotomicTs := fields["__MONOTONIC_TIMESTAMP"]
+		monotomicTs, isString := fields["__MONOTONIC_TIMESTAMP"].(string)
+		if !isString {
+			return JournalEntry{}, fmt.Errorf("'__MONOTONIC_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__MONOTONIC_TIMESTAMP"])
+		}
 		monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
 		if err != nil {
 			return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
 		}
 
-		cursor := fields["__CURSOR"]
+		cursor, isString := fields["__CURSOR"].(string)
+		if !isString {
+			return JournalEntry{}, fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string", fields["_CURSOR"])
+		}
 
 		return JournalEntry{
 			Fields:             fields,

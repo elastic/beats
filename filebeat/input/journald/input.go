@@ -20,6 +20,7 @@
 package journald
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -177,6 +178,10 @@ func (inp *journald) Run(
 	for {
 		entry, err := parser.Next()
 		if err != nil {
+			// The input has been cancelled, gracefully return
+			if errors.Is(err, journalctl.ErrCancelled) {
+				return nil
+			}
 			return err
 		}
 
@@ -230,7 +235,11 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 
 	created := time.Now()
 
-	content := []byte(data.Fields["MESSAGE"])
+	strContent, isString := data.Fields["MESSAGE"].(string)
+	if !isString {
+		return reader.Message{}, fmt.Errorf("Message '%[1]v', type %[1]T is not a string", data.Fields["MESSAGE"])
+	}
+	content := []byte(strContent)
 	delete(data.Fields, "MESSAGE")
 
 	fields := r.converter.Convert(data.Fields)
