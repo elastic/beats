@@ -235,12 +235,17 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 
 	created := time.Now()
 
-	// In some cases the message is not a string, so just convert it
-	// using fmt.Sprintf and let the user deal with it.
+	// Journald documents that 'MESSAGE' is always a string,
+	// see https://www.man7.org/linux/man-pages/man7/systemd.journal-fields.7.html.
+	// However while testing 'journalctl -o json' outputs the 'MESSAGE'
+	// like [1, 2, 3, 4]. Which seems to be the result of a binary encoding
+	// of a journal field (see https://systemd.io/JOURNAL_NATIVE_PROTOCOL/).
+	//
 	// Trying to be smart and convert the contents into string
 	// byte by byte did not work well because one test case contained
-	// control characters. To avoid issues later in the ingetstion
-	// pipeline we just convert the whole thing to a string.
+	// control characters and new line characters.
+	// To avoid issues later in the ingestion pipeline we just convert
+	// the whole thing to a string using fmt.Sprint.
 	//
 	// Look at 'pkg/journalctl/testdata/corner-cases.json'
 	// for some real world examples.

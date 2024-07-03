@@ -50,6 +50,15 @@ type JournalEntry struct {
 
 // Reader reads entries from journald by calling `jouranlctl`
 // and reading its output.
+//
+// We call `journalctl` because it prooved to be the most resilient way of
+// reading journal entries. We have tried to use
+// `github.com/coreos/go-systemd/v22/sdjournal`, however due to a bug in
+// libsystemd (https://github.com/systemd/systemd/pull/29456) Filebeat
+// would crash during journal rotation on high throughput systems.
+//
+// More details can be found in the PR introducing this feature and related
+// issues. PR: https://github.com/elastic/beats/pull/40061.
 type Reader struct {
 	cmd      *exec.Cmd
 	dataChan chan []byte
