@@ -183,7 +183,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 			client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
-		agentClient, _, err = client.NewV2FromReader(os.Stdin, versionInfo)
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, versionInfo, client.WithEmitComponentChanges(true))
 		if err != nil {
 			return nil, fmt.Errorf("error reading control config from agent: %w", err)
 		}
@@ -293,6 +293,7 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
+	go cm.componentListen()
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -468,6 +469,41 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 				cm.logger.Errorf("elastic-agent-client error: %s", err)
 			}
 
+		}
+	}
+}
+
+func (cm *BeatV2Manager) componentListen() {
+	// register signal handler
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+	cm.logger.Info("Listening for agent component changes")
+	for {
+		select {
+		// The stopChan channel comes from the Manager interface Stop() method
+		case <-cm.stopChan:
+			cm.stopBeat()
+		case sig := <-sigc:
+			// we can't duplicate the same logic used by stopChan here.
+			// A beat will also watch for sigint and shut down, if we call the stopFunc
+			// callback, either the V2 client or the beat will get a panic,
+			// as the stopFunc sent by the beats is usually unsafe.
+			switch sig {
+			case syscall.SIGINT, syscall.SIGTERM:
+				cm.logger.Debug("Received sigterm/sigint, stopping")
+			case syscall.SIGHUP:
+				cm.logger.Debug("Received sighup, stopping")
+			}
+			cm.isRunning = false
+			cm.UpdateStatus(status.Stopping, "Stopping")
+			return
+		case change := <-cm.client.ComponentChanges():
+			cm.logger.Infof(
+				"BeatV2Manager.componentListen ComponentConfigIdx(%d)",
+				change.ConfigIdx)
+
+			// TODO handle GlobalProcessorConfig
 		}
 	}
 }
