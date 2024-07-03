@@ -65,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	var err error
 	var rows *sql.Rows
-	var buffer_cache_hit_ratio, buffer_cache_hit_ratio_base int64
+	var bufferCacheHitRatioValue, bufferCacheHitRatioBaseValue int64
 	bufferCacheHitRatio := "Buffer cache hit ratio"
 	bufferCacheHitRatioBase := "Buffer cache hit ratio base"
 	rows, err = m.db.Query(`SELECT object_name,
@@ -118,16 +118,16 @@ WHERE  counter_name = 'SQL Compilations/sec'
 
 		switch row.counterName {
 		case bufferCacheHitRatio:
-			buffer_cache_hit_ratio = *row.counterValue
+			bufferCacheHitRatioValue = *row.counterValue
 		case bufferCacheHitRatioBase:
-			buffer_cache_hit_ratio_base = *row.counterValue
+			bufferCacheHitRatioBaseValue = *row.counterValue
 		default:
 			mapStr[row.counterName] = fmt.Sprintf("%v", *row.counterValue)
 		}
 	}
 
-	if buffer_cache_hit_ratio_base != 0 {
-		mapStr[bufferCacheHitRatio] = fmt.Sprintf("%f", float64(buffer_cache_hit_ratio)/float64(buffer_cache_hit_ratio_base))
+	if bufferCacheHitRatioBaseValue != 0 {
+		mapStr[bufferCacheHitRatio] = fmt.Sprintf("%f", float64(bufferCacheHitRatioValue)/float64(bufferCacheHitRatioBaseValue))
 	}
 
 	res, err := schema.Apply(mapStr)
