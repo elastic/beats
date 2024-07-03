@@ -233,6 +233,7 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
 				s.log.Errorf("adding failed job %s to job list caused an error: %w", err)
+				continue
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name

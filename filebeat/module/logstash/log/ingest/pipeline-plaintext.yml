@@ -13,6 +13,8 @@ processors:
         (.|
         )*
     patterns:
+    - \[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\]\[%{LOGSTASH_LOGLEVEL:log.level}\s?\]\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\s*\]\[%{NOTSPACE:logstash.log.pipeline_id}\]\[%{NOTSPACE:logstash.log.plugin_id}\]
+      %{GREEDYMULTILINE:message}
     - \[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\]\[%{LOGSTASH_LOGLEVEL:log.level}\s?\]\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\s*\]\[%{NOTSPACE:logstash.log.pipeline_id}\]
       %{GREEDYMULTILINE:message}
     - \[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\]\[%{LOGSTASH_LOGLEVEL:log.level}\s?\]\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\s*\]

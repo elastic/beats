@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"context"
 	"errors"
 	"io"
 	"sync"
@@ -61,65 +60,27 @@ func TestClient(t *testing.T) {
 		// Note: no asserts. If closing fails we have a deadlock, because Publish
 		// would block forever
 
-		cases := map[string]struct {
-			context bool
-			close   func(client beat.Client, cancel func())
-		}{
-			"close unblocks client without context": {
-				context: false,
-				close: func(client beat.Client, _ func()) {
-					client.Close()
-				},
-			},
-			"close unblocks client with context": {
-				context: true,
-				close: func(client beat.Client, _ func()) {
-					client.Close()
-				},
-			},
-			"context cancel unblocks client": {
-				context: true,
-				close: func(client beat.Client, cancel func()) {
-					cancel()
-				},
-			},
-		}
-
 		logp.TestingSetup()
+		routinesChecker := resources.NewGoroutinesChecker()
+		defer routinesChecker.Check(t)
 
-		for name, test := range cases {
-			t.Run(name, func(t *testing.T) {
-				routinesChecker := resources.NewGoroutinesChecker()
-				defer routinesChecker.Check(t)
+		pipeline := makePipeline(t, Settings{}, makeTestQueue())
+		defer pipeline.Close()
 
-				pipeline := makePipeline(t, Settings{}, makeTestQueue())
-				defer pipeline.Close()
-
-				var ctx context.Context
-				var cancel func()
-				if test.context {
-					ctx, cancel = context.WithCancel(context.Background())
-				}
-
-				client, err := pipeline.ConnectWith(beat.ClientConfig{
-					CloseRef: ctx,
-				})
-				if err != nil {
-					t.Fatal(err)
-				}
-				defer client.Close()
-
-				var wg sync.WaitGroup
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
-					client.Publish(beat.Event{})
-				}()
-
-				test.close(client, cancel)
-				wg.Wait()
-			})
+		client, err := pipeline.ConnectWith(beat.ClientConfig{})
+		if err != nil {
+			t.Fatal(err)
 		}
+
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			client.Publish(beat.Event{})
+		}()
+
+		client.Close()
+		wg.Wait()
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
@@ -128,10 +89,10 @@ func TestClient(t *testing.T) {
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue(l, nil, memqueue.Settings{
-			Events:         5,
-			FlushMinEvents: 1,
-			FlushTimeout:   time.Millisecond,
-		}, 5)
+			Events:        5,
+			MaxGetRequest: 1,
+			FlushTimeout:  time.Millisecond,
+		}, 5, nil)
 
 		// model a processor that we're going to make produce errors after
 		p := &testProcessor{}
@@ -223,9 +184,6 @@ func TestClient(t *testing.T) {
 }
 
 func TestClientWaitClose(t *testing.T) {
-	routinesChecker := resources.NewGoroutinesChecker()
-	defer routinesChecker.Check(t)
-
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
@@ -243,11 +201,14 @@ func TestClientWaitClose(t *testing.T) {
 	}
 	logp.TestingSetup()
 
-	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0)
+	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 
 	t.Run("WaitClose blocks", func(t *testing.T) {
+		routinesChecker := resources.NewGoroutinesChecker()
+		defer routinesChecker.Check(t)
+
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			WaitClose: 500 * time.Millisecond,
 		})
@@ -279,6 +240,8 @@ func TestClientWaitClose(t *testing.T) {
 	})
 
 	t.Run("ACKing events unblocks WaitClose", func(t *testing.T) {
+		routinesChecker := resources.NewGoroutinesChecker()
+		defer routinesChecker.Check(t)
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
 			WaitClose: time.Minute,
 		})
@@ -350,9 +313,6 @@ func TestMonitoring(t *testing.T) {
 	)
 	require.NoError(t, err)
 	defer pipeline.Close()
-
-	metricsSnapshot := monitoring.CollectFlatSnapshot(metrics, monitoring.Full, true)
-	assert.Equal(t, int64(maxEvents), metricsSnapshot.Ints["pipeline.queue.max_events"])
 
 	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
 	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])

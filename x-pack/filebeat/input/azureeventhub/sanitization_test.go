@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -31,15 +30,16 @@ func TestParseMultipleRecordsSanitization(t *testing.T) {
 	metrics := newInputMetrics("test", reg)
 	defer metrics.Close()
 
-	input := azureInput{
+	input := eventHubInputV1{
 		config: azureInputConfig{
 			SanitizeOptions: []string{"SINGLE_QUOTES", "NEW_LINES"},
 		},
-		metrics: metrics,
-		log:     logp.NewLogger(fmt.Sprintf("%s test for input", inputName)),
+		log:            logp.NewLogger(fmt.Sprintf("%s test for input", inputName)),
+		metrics:        metrics,
+		pipelineClient: &fakeClient{},
 	}
 
-	messages := input.parseMultipleRecords([]byte(msg))
+	messages := input.unpackRecords([]byte(msg))
 	assert.NotNil(t, messages)
 	assert.Equal(t, len(messages), 3)
 	for _, ms := range messages {

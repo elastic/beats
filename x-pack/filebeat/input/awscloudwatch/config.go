@@ -49,7 +49,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.LogGroupARN == "" && c.LogGroupName == "" && c.LogGroupNamePrefix == "" {
-		return errors.New("log_group_arn, log_group_name and log_group_name_prefix config parameter" +
+		return errors.New("log_group_arn, log_group_name and log_group_name_prefix config parameter " +
 			"cannot all be empty")
 	}
 

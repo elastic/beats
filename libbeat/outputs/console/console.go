@@ -85,7 +85,7 @@ func makeConsole(
 		}
 	}
 
-	return outputs.Success(config.Queue, config.BatchSize, 0, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, nil, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*console, error) {
@@ -111,8 +111,8 @@ func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 	c.writer.Flush()
 	batch.ACK()
 
-	st.Dropped(dropped)
-	st.Acked(len(events) - dropped)
+	st.PermanentErrors(dropped)
+	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }

@@ -72,11 +72,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	// what caused it is going through Filebeat's logs.
 	integration.EnsureESIsRunning(t)
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
 	generateLogFile(t, logFilePath)
@@ -245,7 +241,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	waitDeadlineOr5Min := func() time.Duration {
 		deadline, deadileSet := t.Deadline()
 		if deadileSet {
-			left := deadline.Sub(time.Now())
+			left := time.Until(deadline)
 			final := left - 500*time.Millisecond
 			if final <= 0 {
 				return left
@@ -290,11 +286,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 	// If ES is not running, the test will timeout and the only way to know
 	// what caused it is going through Filebeat's logs.
 	integration.EnsureESIsRunning(t)
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	finalStateReached := atomic.Bool{}
 	var units = []*proto.UnitExpected{
@@ -375,11 +367,7 @@ func TestFailedOutputReportsUnhealthy(t *testing.T) {
 }
 
 func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	// Having the log file enables the inputs to start, while it is not
 	// strictly necessary for testing output issues, it allows for the
@@ -480,20 +468,37 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	// Those are the 'states' Filebeat will go through.
 	// After each state is reached the mockServer will
 	// send the next.
-	protoUnits := [][]*proto.UnitExpected{
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	protos := []*proto.CheckinExpected{
 		{
-			&healthyOutput,
-			&filestreamInputHealthy,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&healthyOutput,
+				&filestreamInputHealthy,
+			},
 		},
 		{
-			&brokenOutput,
-			&filestreamInputStarting,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&brokenOutput,
+				&filestreamInputStarting,
+			},
 		},
 		{
-			&healthyOutput,
-			&filestreamInputHealthy,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&healthyOutput,
+				&filestreamInputHealthy,
+			},
 		},
-		{}, // An empty one makes the Beat exit
+		{
+			AgentInfo: agentInfo,
+			Units:     []*proto.UnitExpected{}, // An empty one makes the Beat exit
+		},
 	}
 
 	// We use `success` to signal the test has ended successfully
@@ -501,15 +506,13 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	success := make(chan struct{})
 	// The test is successful when we reach the last element of `protoUnits`
 	onObserved := func(observed *proto.CheckinObserved, protoUnitsIdx int) {
-		if protoUnitsIdx == len(protoUnits)-1 {
+		if protoUnitsIdx == len(protos)-1 {
 			close(success)
 		}
 	}
 
 	server := integration.NewMockServer(
-		protoUnits,
-		[]uint64{0, 0, 0, 0},
-		[]*proto.Features{nil, nil, nil, nil},
+		protos,
 		onObserved,
 		100*time.Millisecond,
 	)
@@ -533,11 +536,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	wantVersion := "8.13.0+build20131123"
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
 	generateLogFile(t, logFilePath)

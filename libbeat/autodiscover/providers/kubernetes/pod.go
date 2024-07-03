@@ -59,7 +59,7 @@ type pod struct {
 func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
-	var replicaSetWatcher, jobWatcher kubernetes.Watcher
+	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -96,31 +96,40 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
-	options := kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		Namespace:   config.Namespace,
-	}
-
 	metaConf := config.AddResourceMetadata
-	nodeWatcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-	}
-	namespaceWatcher, err := kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+
+	if metaConf.Node.Enabled() || config.Hints.Enabled() {
+		options := kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Node:         config.Node,
+			HonorReSyncs: true,
+		}
+		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
 	}
 
-	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
+		}, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
+	}
+
+	// Resource is Pod, so we need to create watchers for Replicasets and Jobs that it might belong to
 	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
 	if metaConf.Deployment {
 		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
@@ -128,7 +137,9 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	}
 	if metaConf.CronJob {
 		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
@@ -246,7 +257,11 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	cname := utils.GetContainerName(container)
 
 	// Generate hints based on the cumulative of both namespace and pod annotations.
-	hints := utils.GenerateHints(annotations, cname, p.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, cname, p.config.Prefix, true, AllSupportedHints)
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	for _, value := range incorrecthints {
+		p.logger.Debugf("provided hint: %s/%s is not in the supported list", p.config.Prefix, value)
+	}
 	p.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {

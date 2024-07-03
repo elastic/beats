@@ -352,6 +352,109 @@ var fileStoreTests = []struct {
 			{Key: "three", Value: 3.0},
 		},
 	},
+	{
+		name: "periodic_write",
+		cfg: config{
+			Store: &storeConfig{
+				File:     &fileConfig{ID: "test"},
+				Capacity: 1000,
+				Effort:   10,
+			},
+			Get: &getConfig{},
+		},
+		want: &fileStore{path: "testdata/periodic_write", memStore: memStore{
+			id:    "test",
+			cache: map[string]*CacheEntry{},
+			refs:  1,
+			// TTL, capacity and effort are set only by put.
+			ttl:    -1,
+			cap:    -1,
+			effort: -1,
+		}},
+		steps: []fileStoreTestSteps{
+			0: {
+				doTo: func(s *fileStore) error {
+					putCfg := config{
+						Store: &storeConfig{
+							File:     &fileConfig{ID: "test"},
+							Capacity: 1000,
+							Effort:   10,
+						},
+						Put: &putConfig{
+							TTL: ptrTo(time.Second),
+						},
+					}
+					s.add(putCfg)
+					return nil
+				},
+				want: &fileStore{path: "testdata/periodic_write", memStore: memStore{
+					id:     "test",
+					cache:  map[string]*CacheEntry{},
+					refs:   2,
+					dirty:  false,
+					ttl:    time.Second,
+					cap:    1000,
+					effort: 10,
+				}},
+			},
+			1: {
+				doTo: func(s *fileStore) error {
+					s.Put("one", 1)
+					s.Put("two", 2)
+					s.Put("three", 3)
+					return nil
+				},
+				want: &fileStore{path: "testdata/periodic_write", memStore: memStore{
+					id: "test",
+					cache: map[string]*CacheEntry{
+						"one":   {Key: "one", Value: int(1), index: 0},
+						"two":   {Key: "two", Value: int(2), index: 1},
+						"three": {Key: "three", Value: int(3), index: 2},
+					},
+					expiries: expiryHeap{
+						{Key: "one", Value: int(1), index: 0},
+						{Key: "two", Value: int(2), index: 1},
+						{Key: "three", Value: int(3), index: 2},
+					},
+					refs:   2,
+					dirty:  true,
+					ttl:    time.Second,
+					cap:    1000,
+					effort: 10,
+				}},
+			},
+			2: {
+				doTo: func(s *fileStore) error {
+					s.writeState(false)
+					return nil
+				},
+				want: &fileStore{path: "testdata/periodic_write", memStore: memStore{
+					id: "test",
+					cache: map[string]*CacheEntry{
+						"one":   {Key: "one", Value: int(1), index: 0},
+						"two":   {Key: "two", Value: int(2), index: 1},
+						"three": {Key: "three", Value: int(3), index: 2},
+					},
+					expiries: expiryHeap{
+						{Key: "one", Value: int(1), index: 0},
+						{Key: "two", Value: int(2), index: 1},
+						{Key: "three", Value: int(3), index: 2},
+					},
+					refs:   2,
+					dirty:  false,
+					ttl:    time.Second,
+					cap:    1000,
+					effort: 10,
+				}},
+			},
+		},
+		wantPersisted: []*CacheEntry{
+			// Numeric values are float due to JSON round-trip.
+			{Key: "one", Value: 1.0},
+			{Key: "two", Value: 2.0},
+			{Key: "three", Value: 3.0},
+		},
+	},
 }
 
 func TestFileStore(t *testing.T) {

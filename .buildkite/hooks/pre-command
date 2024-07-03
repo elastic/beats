@@ -2,20 +2,33 @@
 
 set -euo pipefail
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
-  source .buildkite/env-scripts/env.sh
-  source .buildkite/env-scripts/util.sh
-  source .buildkite/env-scripts/win-env.sh
+# Secrets must be redacted
+# https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
+PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
-  if [[ -z "${GOLANG_VERSION-""}" ]]; then
-    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+ENABLED_BEATS_PIPELINES_SLUGS=(
+  "auditbeat"
+  "heartbeat"
+  "filebeat"
+  "beats-metricbeat"
+  "beats-winlogbeat"
+  "beats-xpack-winlogbeat"
+  "beats-xpack-dockerlogbeat"
+  "beats-xpack-auditbeat"
+  "beats-xpack-metricbeat"
+  "beats-xpack-heartbeat"
+  "deploy-k8s"
+)
+
+for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
+    source .buildkite/scripts/setenv.sh
+    break
   fi
+done
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
+    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+    export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
-  source .buildkite/scripts/setenv.sh
-  if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
-    echo "Skipped pre-command when running the Upload pipeline"
-    exit 0
-  fi
-fi

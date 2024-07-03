@@ -236,18 +236,16 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 
 func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(ctx, func() (*http.Response, error) {
-		return c.client.Do(req)
+		resp, err := c.client.Do(req)
+		if err == nil {
+			// Read the whole resp.Body so we can release the connection.
+			// This implementation is inspired by httputil.DumpResponse
+			resp.Body, err = drainBody(resp.Body)
+		}
+		return resp, err
 	})
 	if err != nil {
 		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// Read the whole resp.Body so we can release the connection.
-	// This implementation is inspired by httputil.DumpResponse
-	resp.Body, err = drainBody(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
@@ -442,7 +440,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	req := transformable{}
 	req.setURL(rf.url)
 
-	if rf.body != nil && len(*rf.body) > 0 {
+	if rf.body != nil {
 		req.setBody(rf.body.Clone())
 	}
 
@@ -590,6 +588,10 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	// for each pagination response, we repeat all the chain steps / blocks
 	n, err := p.req.processChainPaginationEvents(ctx, p.trCtx, p.pub, &response, p.idx, p.req.log)
 	if err != nil {
+		if errors.Is(err, notLogged{}) {
+			p.req.log.Debugf("ignored error processing chain event: %w", err)
+			return
+		}
 		p.req.log.Errorf("error processing chain event: %w", err)
 		return
 	}
@@ -602,7 +604,21 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 }
 
 func (p *chainProcessor) handleError(err error) {
+	if errors.Is(err, notLogged{}) {
+		p.req.log.Debugf("ignored error processing response: %v", err)
+		return
+	}
 	p.req.log.Errorf("error processing response: %v", err)
+}
+
+// notLogged is an error that is not logged except at DEBUG.
+type notLogged struct {
+	error
+}
+
+func (notLogged) Is(target error) bool {
+	_, ok := target.(notLogged)
+	return ok
 }
 
 // eventCount returns the number of events that have been processed.
@@ -678,6 +694,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			if err != nil {
 				return -1, fmt.Errorf("failed to collect response: %w", err)
 			}
+
 			// store data according to response type
 			if i == len(r.requestFactories)-1 && len(ids) != 0 {
 				finalResps = append(finalResps, httpResp)
@@ -703,12 +720,6 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
-
-	defer func() {
-		if httpResp != nil && httpResp.Body != nil {
-			httpResp.Body.Close()
-		}
-	}()
 
 	return n, nil
 }
@@ -783,6 +794,10 @@ func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 
 // handleError logs err.
 func (p *publisher) handleError(err error) {
+	if errors.Is(err, notLogged{}) {
+		p.log.Debugf("ignored error processing response: %v", err)
+		return
+	}
 	p.log.Errorf("error processing response: %v", err)
 }
 
@@ -939,6 +954,8 @@ func cloneResponse(source *http.Response) (*http.Response, error) {
 //
 // This function is a modified version of drainBody from the http/httputil package.
 func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
+	defer b.Close()
+
 	if b == nil || b == http.NoBody {
 		// No copying needed. Preserve the magic sentinel meaning of NoBody.
 		return http.NoBody, nil
@@ -946,10 +963,10 @@ func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
 
 	var buf bytes.Buffer
 	if _, err = buf.ReadFrom(b); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to read http.response.body: %w", err)
 	}
 	if err = b.Close(); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to close http.response.body: %w", err)
 	}
 
 	return io.NopCloser(&buf), nil

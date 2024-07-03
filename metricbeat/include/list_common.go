@@ -20,7 +20,7 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike"
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/v7/metricbeat/module/apache"

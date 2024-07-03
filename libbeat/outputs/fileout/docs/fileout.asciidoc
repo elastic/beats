@@ -49,6 +49,14 @@ The default value is `true`.
 The path to the directory where the generated files will be saved. This option is
 mandatory.
 
+The path may include the timestamp when the file output is initialized using the `+FORMAT` syntax where `FORMAT` is a
+valid https://github.com/elastic/beats/blob/{doc-branch}/libbeat/common/dtfmt/doc.go[time format],
+and enclosed with expansion braces: `%{+FORMAT}`. For example:
+
+```
+path: 'fileoutput-%{+yyyy.MM.dd}'
+```
+
 ===== `filename`
 
 The name of the generated files. The default is set to the Beat name. For example, the files

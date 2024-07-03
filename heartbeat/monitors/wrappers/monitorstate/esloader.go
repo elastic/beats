@@ -32,13 +32,21 @@ import (
 
 var DefaultDataStreams = "synthetics-*,heartbeat-*"
 
+type LoaderError struct {
+	err   error
+	Retry bool
+}
+
+func (e LoaderError) Error() string {
+	return e.err.Error()
+}
+
 func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
 		logp.L().Warn("ES state loader initialized with no index pattern, will not load states from ES")
 		return NilStateLoader
 	}
-
 	return func(sf stdfields.StdMonitorFields) (*State, error) {
 		var runFromID string
 		if sf.RunFrom != nil {
@@ -74,10 +82,11 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 				},
 			},
 		}
-
 		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
 		if err != nil || status > 299 {
-			return nil, fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err)
+			sErr := fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err)
+			retry := shouldRetry(status)
+			return nil, LoaderError{err: sErr, Retry: retry}
 		}
 
 		type stateHits struct {
@@ -94,7 +103,8 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		sh := stateHits{}
 		err = json.Unmarshal(body, &sh)
 		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
+			sErr := fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
+			return nil, LoaderError{err: sErr, Retry: false}
 		}
 
 		if len(sh.Hits.Hits) == 0 {
@@ -106,4 +116,8 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 
 		return state, nil
 	}
+}
+
+func shouldRetry(status int) bool {
+	return status >= 500
 }

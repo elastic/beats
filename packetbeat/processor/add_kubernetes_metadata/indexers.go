@@ -22,7 +22,8 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// Register default indexers
 	cfg := conf.NewConfig()
 

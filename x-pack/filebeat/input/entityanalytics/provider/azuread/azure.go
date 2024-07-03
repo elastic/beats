@@ -48,6 +48,8 @@ type azure struct {
 	logger  *logp.Logger
 	auth    authenticator.Authenticator
 	fetcher fetcher.Fetcher
+
+	ctx v2.Context
 }
 
 // Name returns the name of this provider.
@@ -71,6 +73,7 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 // Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
+	p.ctx = inputCtx
 	p.auth.SetLogger(p.logger)
 	p.fetcher.SetLogger(p.logger)
 	p.metrics = newMetrics(inputCtx.ID, nil)
@@ -575,7 +578,7 @@ func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
 	if p.auth, err = oauth2.New(cfg, p.Manager.Logger); err != nil {
 		return nil, fmt.Errorf("unable to create authenticator: %w", err)
 	}
-	if p.fetcher, err = graph.New(cfg, p.Manager.Logger, p.auth); err != nil {
+	if p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, cfg, p.Manager.Logger, p.auth); err != nil {
 		return nil, fmt.Errorf("unable to create fetcher: %w", err)
 	}
 

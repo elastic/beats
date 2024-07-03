@@ -32,20 +32,32 @@ The memory queue waits for the output to acknowledge or drop events. If
 the queue is full, no new events can be inserted into the memory queue. Only
 after the signal from the output will the queue free up space for more events to be accepted.
 
-The memory queue is controlled by the parameters `flush.min_events` and `flush.timeout`. If
-`flush.timeout` is `0s` or `flush.min_events` is `0` or `1` then events can be sent by the output as
-soon as they are available. If the output supports a `bulk_max_size` parameter it controls the
-maximum batch size that can be sent.
+The memory queue is controlled by the parameters `flush.min_events` and `flush.timeout`.
+`flush.min_events` gives a limit on the number of events that can be included in a
+single batch, and `flush.timeout` specifies how long the queue should wait to completely
+fill an event request. If the output supports a `bulk_max_size` parameter, the maximum
+batch size will be the smaller of `bulk_max_size` and `flush.min_events`.
 
-If `flush.min_events` is greater than `1` and `flush.timeout` is greater than `0s`, events will only
-be sent to the output when the queue contains at least `flush.min_events` events or the
-`flush.timeout` period has expired. In this mode the maximum size batch that that can be sent by the
-output is `flush.min_events`. If the output supports a `bulk_max_size` parameter, values of
-`bulk_max_size` greater than `flush.min_events` have no effect. The value of `flush.min_events`
-should be evenly divisible by `bulk_max_size` to avoid sending partial batches to the output.
+`flush.min_events` is a legacy parameter, and new configurations should prefer to control
+batch size with `bulk_max_size`. As of 8.13, there is never a performance advantage to
+limiting batch size with `flush.min_events` instead of `bulk_max_size`.
 
-This sample configuration forwards events to the output if 512 events are available or the oldest
-available event has been waiting for 5s in the queue:
+In synchronous mode, an event request is always filled as soon as events are available,
+even if there are not enough events to fill the requested batch. This is useful when
+latency must be minimized. To use synchronous mode, set `flush.timeout` to 0.
+
+For backwards compatibility, synchronous mode can also be activated by setting `flush.min_events`
+to 0 or 1. In this case, batch size will be capped at 1/2 the queue capacity.
+
+In asynchronous mode, an event request will wait up to the specified timeout to try
+and fill the requested batch completely. If the timeout expires, the queue returns a
+partial batch with all available events. To use asynchronous mode, set `flush.timeout`
+to a positive duration, e.g. `5s`.
+
+This sample configuration forwards events to the output when there are enough events
+to fill the output's request (usually controlled by `bulk_max_size`, and limited to at
+most 512 events by `flush.min_events`), or when events have been waiting for 5s without
+filling the requested size:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -64,8 +76,7 @@ You can specify the following options in the `queue.mem` section of the +{beatna
 [[queue-mem-events-option]]
 ===== `events`
 
-Number of events the queue can store. This value should be evenly divisible by `flush.min_events` to
-avoid sending partial batches to the output.
+Number of events the queue can store.
 
 The default value is 3200 events.
 
@@ -73,11 +84,13 @@ The default value is 3200 events.
 [[queue-mem-flush-min-events-option]]
 ===== `flush.min_events`
 
-Minimum number of events required for publishing. If this value is set to 0 or 1, events are
-available to the output immediately. If this value is greater than 1 the output must wait for the
-queue to accumulate this minimum number of events or for `flush.timeout` to expire before
-publishing. When greater than `1` this value also defines the maximum possible batch that can be
-sent by the output.
+If greater than 1, specifies the maximum number of events per batch. In this case the
+output must wait for the
+queue to accumulate the requested number of events or for `flush.timeout` to expire before
+publishing.
+
+If 0 or 1, sets the maximum number of events per batch to half the queue size, and sets
+the queue to synchronous mode (equivalent to `flush.timeout` of 0).
 
 The default value is 1600.
 
@@ -85,8 +98,7 @@ The default value is 1600.
 [[queue-mem-flush-timeout-option]]
 ===== `flush.timeout`
 
-Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events are available to the
-output immediately.
+Maximum wait time for event requests from the output to be fulfilled. If set to 0s, events are returned immediately.
 
 The default value is 10s.
 

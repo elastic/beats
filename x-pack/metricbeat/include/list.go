@@ -7,10 +7,11 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/airflow"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/awshealth"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"

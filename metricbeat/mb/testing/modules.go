@@ -89,7 +89,13 @@ func NewTestModule(t testing.TB, config interface{}) *TestModule {
 // The ModuleFactory and MetricSetFactory are obtained from the global
 // Registry.
 func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
-	metricsets := NewMetricSets(t, config)
+	return NewMetricSetWithRegistry(t, config, mb.Registry)
+}
+
+// NewMetricSetWithRegistry instantiates a new MetricSet using the given configuration.
+// The ModuleFactory and MetricSetFactory are obtained from the passed in registry.
+func NewMetricSetWithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.MetricSet {
+	metricsets := NewMetricSetsWithRegistry(t, config, registry)
 
 	if len(metricsets) != 1 {
 		t.Fatal("invalid number of metricsets instantiated")
@@ -105,11 +111,17 @@ func NewMetricSet(t testing.TB, config interface{}) mb.MetricSet {
 // NewMetricSets instantiates a list of new MetricSets using the given
 // module configuration.
 func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
+	return NewMetricSetsWithRegistry(t, config, mb.Registry)
+}
+
+// NewMetricSetsWithRegistry instantiates a list of new MetricSets using the given
+// module configuration and provided registry.
+func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Register) []mb.MetricSet {
 	c, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, metricsets, err := mb.NewModule(c, mb.Registry)
+	m, metricsets, err := mb.NewModule(c, registry)
 	if err != nil {
 		t.Fatal("failed to create new MetricSet", err)
 	}
@@ -142,7 +154,13 @@ func ReportingFetch(metricSet mb.ReportingMetricSet) ([]mapstr.M, []error) {
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
 func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
-	metricSet := NewMetricSet(t, config)
+	return NewReportingMetricSetV2WithRegistry(t, config, mb.Registry)
+}
+
+// NewReportingMetricSetV2WithRegistry returns a new ReportingMetricSetV2 instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2WithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.ReportingMetricSetV2 {
+	metricSet := NewMetricSetWithRegistry(t, config, registry)
 
 	reportingMetricSetV2, ok := metricSet.(mb.ReportingMetricSetV2)
 	if !ok {
@@ -322,6 +340,20 @@ func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]map
 // global Registry.
 func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 	metricSet := NewMetricSet(t, config)
+
+	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
+	if !ok {
+		t.Fatal("MetricSet does not implement PushMetricSetV2")
+	}
+
+	return pushMetricSet
+}
+
+// NewPushMetricSetV2WithRegistry instantiates a new PushMetricSetV2 using the given
+// configuration. The ModuleFactory and MetricSetFactory are obtained from the
+// passed in the registry.
+func NewPushMetricSetV2WithRegistry(t testing.TB, config interface{}, registry *mb.Register) mb.PushMetricSetV2 {
+	metricSet := NewMetricSetWithRegistry(t, config, registry)
 
 	pushMetricSet, ok := metricSet.(mb.PushMetricSetV2)
 	if !ok {

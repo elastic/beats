@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -20,8 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lestrrat-go/jwx/v2/jwa"
-	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -158,34 +158,38 @@ func (i *base64int) UnmarshalJSON(b []byte) error {
 }
 
 func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
-	blk, rest := pem.Decode([]byte(pemdata))
-	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return "", fmt.Errorf("PEM text has trailing data: %s", rest)
-	}
-	key, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
+	key, err := pemPKCS8PrivateKey([]byte(pemdata))
 	if err != nil {
 		return "", err
 	}
 	return signJWT(cnf, key)
 }
 
+func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+	blk, rest := pem.Decode(pemdata)
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	return x509.ParsePKCS8PrivateKey(blk.Bytes)
+}
+
 // signJWT creates a JWT token using required claims and sign it with the private key.
 func signJWT(cnf *oauth2.Config, key any) (string, error) {
 	now := time.Now()
-	tok, err := jwt.NewBuilder().Audience([]string{cnf.Endpoint.TokenURL}).
-		Issuer(cnf.ClientID).
-		Subject(cnf.ClientID).
-		IssuedAt(now).
-		Expiration(now.Add(time.Hour)).
-		Build()
-	if err != nil {
-		return "", err
-	}
-	signedToken, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, key))
+	signed, err := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.RegisteredClaims{
+		Audience:  []string{cnf.Endpoint.TokenURL},
+		Issuer:    cnf.ClientID,
+		Subject:   cnf.ClientID,
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour)),
+	}).SignedString(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign token: %w", err)
 	}
-	return string(signedToken), nil
+	return signed, nil
 }
 
 // exchangeForBearerToken exchanges the Okta JWT for a bearer token.

@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -20,7 +19,6 @@ type logProcessor struct {
 	log       *logp.Logger
 	metrics   *inputMetrics
 	publisher beat.Client
-	ack       *awscommon.EventACKTracker
 }
 
 func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
@@ -31,22 +29,15 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 		log:       log,
 		metrics:   metrics,
 		publisher: publisher,
-		ack:       awscommon.NewEventACKTracker(ctx),
 	}
 }
 
 func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroup string, regionName string) {
 	for _, logEvent := range logEvents {
 		event := createEvent(logEvent, logGroup, regionName)
-		p.publish(p.ack, &event)
+		p.metrics.cloudwatchEventsCreatedTotal.Inc()
+		p.publisher.Publish(event)
 	}
-}
-
-func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
-	ack.Add()
-	event.Private = ack
-	p.metrics.cloudwatchEventsCreatedTotal.Inc()
-	p.publisher.Publish(*event)
 }
 
 func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {

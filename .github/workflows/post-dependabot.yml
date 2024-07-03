@@ -9,6 +9,9 @@ on:
     branches:
       - 'dependabot/go_modules/**'
 
+permissions:
+  contents: read
+
 jobs:
   update-notice:
     permissions:

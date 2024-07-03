@@ -23,7 +23,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: buildkite-pipeline-beats
-  description: 'Beats Main pipeline'
+  description: "Beats Main pipeline"
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats
@@ -37,12 +37,13 @@ spec:
     kind: Pipeline
     metadata:
       name: beats
-      description: 'Beats Main pipeline'
+      description: "Beats Main pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
         build_pull_request_forks: false
+        build_pull_request_labels_changed: true # automatically re trigger build if GH labels change
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
         filter_enabled: true
@@ -50,17 +51,21 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: '!main !7.* !8.*'
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: '!main !7.* !8.*'
-      # TODO uncomment this environment variable when pipeline definition is updated
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+        SLACK_NOTIFICATIONS_ALL_BRANCHES: "false"  # only notify for failures on `main` or \d+.\d+ (release) branches
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -68,7 +73,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: buildkite-pipeline-metricbeat
-  description: 'Beats: Metricbeat pipeline'
+  description: "Beats: Metricbeat pipeline"
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats-metricbeat
@@ -82,12 +87,13 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-metricbeat
-      description: 'Beats Metricbeat pipeline'
+      description: "Beats Metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -96,19 +102,20 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: '!main !7.* !8.*'
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: '!main !7.* !8.*'
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
       env:
-        ELASTIC_PR_COMMENTS_ENABLED: 'true'
+        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -129,10 +136,11 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -145,15 +153,16 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
       env:
-        ELASTIC_PR_COMMENTS_ENABLED: "true"
+        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -174,10 +183,11 @@ spec:
       name: auditbeat
       description: "Auditbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/auditbeat/auditbeat-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -189,16 +199,17 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -219,10 +230,11 @@ spec:
       name: heartbeat
       description: "Heartbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -234,16 +246,17 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -264,10 +277,11 @@ spec:
       name: deploy-k8s
       description: "Deploy K8S pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -279,16 +293,17 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -309,10 +324,11 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -321,19 +337,20 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       env:
-        ELASTIC_PR_COMMENTS_ENABLED: "true"
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -354,10 +371,11 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-#      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
-#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -369,16 +387,17 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -402,6 +421,7 @@ spec:
       branch_configuration: "7.17"
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml"
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -413,16 +433,17 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/e57ee3bed7a6f73077a3f55a38e76e40ec87a7cf/rre.schema.json
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
@@ -443,10 +464,11 @@ spec:
       name: beats-winlogbeat
       description: "Beats winlogbeat pipeline"
     spec:
-#      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
-#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -458,10 +480,683 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-winlogbeat
+  description: "Beats x-pack winlogbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-winlogbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-winlogbeat
+      description: "Beats x-pack winlogbeat pipeline"
+    spec:
+      branch_configuration: "main 7.17 8.*"
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-packetbeat
+  description: "Beats x-pack packetbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-packetbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-packetbeat
+      description: "Beats x-pack packetbeat pipeline"
+    spec:
+      branch_configuration: "main 7.17 8.*"
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.packetbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-libbeat
+  description: "Beats x-pack libbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-libbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-libbeat
+      description: "Beats x-pack libbeat pipeline"
+    spec:
+      branch_configuration: "main 7.17 8.*"
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.libbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-metricbeat
+  description: "Beats x-pack metricbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-metricbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-metricbeat
+      description: "Beats x-pack metricbeat pipeline"
+    spec:
+      branch_configuration: "main 7.17 8.*"
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-xpack-elastic-agent-package-7-17
+  description: Buildkite pipeline for packaging Elastic Agent v7.17 package
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-elastic-agent-package-7-17
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-elastic-agent-package-7-17
+      description: Buildkite pipeline for packaging Elastic Agent package
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.package.yml"
+      provider_settings:
+        trigger_mode: none # this pipeline is only triggered remotely
+      cancel_intermediate_builds: false
+      skip_intermediate_builds: false
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-elastic-agent-binary-dra-7-17
+  description: Buildkite pipeline for packaging Elastic Agent core binary and publish it to DRA
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/buildkite-elastic-agent-binary-dra-7-17
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: buildkite-elastic-agent-binary-dra-7-17
+      description: Buildkite pipeline for packaging Elastic Agent core binary and publish it to DRA
+    spec:
+      pipeline_file: ".buildkite/x-pack/elastic-agent/.buildkite/pipeline.xpack.elastic-agent-binary-dra.yml"
+      provider_settings:
+        build_branches: true
+        build_pull_requests: true
+        cancel_deleted_branch_builds: true
+        filter_condition: 'build.branch == "7.17" || build.pull_request.base_branch == "7.17"'
+        filter_enabled: true
+      repository: elastic/beats
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-auditbeat
+  description: "Beats x-pack auditbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-auditbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-auditbeat
+      description: "Beats x-pack auditbeat pipeline"
+    spec:
+      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.auditbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-dockerlogbeat
+  description: "Beats x-pack dockerlogbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-dockerlogbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-dockerlogbeat
+      description: "Beats x-pack dockerlogbeat pipeline"
+    spec:
+      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-filebeat
+  description: "Beats x-pack filebeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-filebeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-filebeat
+      description: "Beats x-pack filebeat pipeline"
+    spec:
+      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.filebeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-heartbeat
+  description: "Beats x-pack heartbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-heartbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-heartbeat
+      description: "Beats x-pack heartbeat pipeline"
+    spec:
+      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.heartbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-osquerybeat
+  description: "Beats x-pack osquerybeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-osquerybeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-osquerybeat
+      description: "Beats x-pack osquerybeat pipeline"
+    spec:
+      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.osquerybeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: buildkite-pipeline-beats-xpack-agentbeat
+  description: "Beats x-pack agentbeat pipeline"
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-xpack-agentbeat
+
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-xpack-agentbeat
+      description: "Beats x-pack agentbeat pipeline"
+    spec:
+      # branch_configuration: "main 8.*"         #TODO: uncomment after tests
+      pipeline_file: ".buildkite/x-pack/pipeline.xpack.agentbeat.yml"
+      maximum_timeout_in_minutes: 120
+      provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
+        build_pull_request_forks: false
+        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
+        build_tags: true
+        filter_enabled: true
+        filter_condition: >-
+          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+      repository: elastic/beats
+      cancel_intermediate_builds: true
+      cancel_intermediate_builds_branch_filter: "!main !8.*"
+      skip_intermediate_builds: true
+      skip_intermediate_builds_branch_filter: "!main !8.*"
+      env:
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        ELASTIC_PR_COMMENTS_ENABLED: "false"
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-packaging-pipeline
+  description: Buildkite pipeline for packaging and publishing to DRA
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-packaging-pipeline
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-packaging-pipeline
+      description: Pipeline for Beats packaging and publishing DRA artifacts
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/packaging.pipeline.yml"
+      branch_configuration: "main 8.* 7.17"
+      cancel_intermediate_builds: false
+      skip_intermediate_builds: false
+      maximum_timeout_in_minutes: 90
+      provider_settings:
+        build_branches: true
+        build_pull_request_forks: false
+        build_pull_requests: false
+        build_tags: false
+        filter_condition: >-
+          build.branch =~ /^[0-9]+\.[0-9]+$$/ || build.branch == "main"
+        filter_enabled: true
+        trigger_mode: code
+      env:
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'        
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-ironbank-validation
+  description: Buildkite pipeline for validating the Ironbank docker context
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-ironbank-validation
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-ironbank-validation
+      description: Buildkite pipeline for validating the Ironbank docker context
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/ironbank-validation.yml"
+      branch_configuration: "main 8.* 7.17"
+      cancel_intermediate_builds: false
+      skip_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-pipeline-scheduler
+  description: 'Scheduled runs of various Beats pipelines per release branch'
+  links:
+    - title: 'Scheduled runs of Beats pipelines per release branch'
+      url: https://buildkite.com/elastic/logstash-pipeline-scheduler
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-pipeline-scheduler
+      description: ':alarm_clock: Scheduled runs of various Beats pipelines per release branch'
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/pipeline-scheduler.yml"
+      maximum_timeout_in_minutes: 240
+      schedules:
+        Daily run of Iron Bank validation:
+          branch: main
+          cronline: 30 02 * * *
+          message: Daily trigger of Iron Bank validation Pipeline per branch
+          env:
+            PIPELINES_TO_TRIGGER: 'beats-ironbank-validation'
+      skip_intermediate_builds: true
+      provider_settings:
+        trigger_mode: none
+      env:
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ

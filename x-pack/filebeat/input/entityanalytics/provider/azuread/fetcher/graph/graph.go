@@ -13,15 +13,23 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
+	"go.elastic.co/ecszap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,9 +39,10 @@ import (
 const (
 	defaultAPIEndpoint = "https://graph.microsoft.com/v1.0"
 
-	defaultGroupsQuery  = "$select=displayName,members"
-	defaultUsersQuery   = "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
-	defaultDevicesQuery = "$select=accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
+	queryName           = "$select"
+	defaultGroupsQuery  = "displayName,members"
+	defaultUsersQuery   = "accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
+	defaultDevicesQuery = "accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
 
 	apiGroupType  = "#microsoft.graph.group"
 	apiUserType   = "#microsoft.graph.user"
@@ -103,6 +112,18 @@ type graphConf struct {
 	Select      selection `config:"select"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+
+	// Tracer allows configuration of request trace logging.
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type selection struct {
@@ -206,7 +227,7 @@ func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, s
 		for _, v := range response.Users {
 			user, err := newUserFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse user from API: %w", err)
+				f.logger.Errorw("Unable to parse user from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got user %q from API", user.ID)
@@ -258,7 +279,7 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 		for _, v := range response.Devices {
 			device, err := newDeviceFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse device from API: %w", err)
+				f.logger.Errorw("Unable to parse device from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got device %q from API", device.ID)
@@ -290,7 +311,7 @@ func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ s
 	switch {
 	case err == nil, errors.Is(err, nextLinkLoopError{"users"}), errors.Is(err, missingLinkError{"users"}):
 	default:
-		f.logger.Errorf("Failed to obtain some registered user data: %w", err)
+		f.logger.Errorw("Failed to obtain some registered user data", "error", err)
 	}
 	for _, u := range users {
 		set.Add(u.ID)
@@ -328,16 +349,22 @@ func (f *graph) doRequest(ctx context.Context, method, url string, body io.Reade
 }
 
 // New creates a new instance of the graph fetcher.
-func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
+func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (fetcher.Fetcher, error) {
 	var c graphConf
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("unable to unpack Graph API Fetcher config: %w", err)
+	}
+
+	if c.Tracer != nil {
+		id = sanitizeFileName(id)
+		c.Tracer.Filename = strings.ReplaceAll(c.Tracer.Filename, "*", id)
 	}
 
 	client, err := c.Transport.Client()
 	if err != nil {
 		return nil, fmt.Errorf("unable to create HTTP client: %w", err)
 	}
+	client = requestTrace(ctx, client, c, logger)
 
 	f := graph{
 		conf:   c,
@@ -353,21 +380,21 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	if err != nil {
 		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
 	}
-	groupsURL.RawQuery = url.QueryEscape(formatQuery(c.Select.GroupQuery, defaultGroupsQuery))
+	groupsURL.RawQuery = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery)
 	f.groupsURL = groupsURL.String()
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
-	usersURL.RawQuery = url.QueryEscape(formatQuery(c.Select.UserQuery, defaultUsersQuery))
+	usersURL.RawQuery = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery)
 	f.usersURL = usersURL.String()
 
 	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
 	}
-	devicesURL.RawQuery = url.QueryEscape(formatQuery(c.Select.DeviceQuery, defaultDevicesQuery))
+	devicesURL.RawQuery = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery)
 	f.devicesURL = devicesURL.String()
 
 	// The API takes a departure from the query approach here, so we
@@ -382,11 +409,74 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	return &f, nil
 }
 
-func formatQuery(query []string, dflt string) string {
-	if len(query) == 0 {
-		return dflt
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
+// requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
+// is non-nil.
+func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *logp.Logger) *http.Client {
+	if cfg.Tracer == nil {
+		return cli
 	}
-	return "$select=" + strings.Join(query, ",")
+	if !cfg.Tracer.enabled() {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err := os.Remove(cfg.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
+		return cli
+	}
+
+	w := zapcore.AddSync(cfg.Tracer)
+	go func() {
+		// Close the logger when we are done.
+		<-ctx.Done()
+		cfg.Tracer.Close()
+	}()
+	core := ecszap.NewCore(
+		ecszap.NewDefaultEncoderConfig(),
+		w,
+		zap.DebugLevel,
+	)
+	traceLogger := zap.New(core)
+
+	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+	maxSize := cfg.Tracer.MaxSize * 1e6
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
+	return cli
+}
+
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
+// repeated instances. The request.tracer.filename may have ":" when an input
+// has cursor config and the macOS Finder will treat this as path-separator and
+// causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
+func formatQuery(name string, query []string, dflt string) string {
+	q := dflt
+	if len(query) != 0 {
+		q = strings.Join(query, ",")
+	}
+	return url.Values{name: []string{q}}.Encode()
 }
 
 // newUserFromAPI translates an API-representation of a user to a fetcher.User.

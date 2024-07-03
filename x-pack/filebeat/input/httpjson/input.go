@@ -7,10 +7,13 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -163,6 +166,12 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
+		defer func() {
+			// Clear response bodies between evaluations.
+			trCtx.firstResponse.body = nil
+			trCtx.lastResponse.body = nil
+		}()
+
 		log.Info("Process another repeated request.")
 
 		startTime := time.Now()
@@ -233,13 +242,18 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *mo
 	return &httpClient{client: client, limiter: limiter}, nil
 }
 
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.Tracer != nil {
+	if cfg.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -253,12 +267,31 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
 		maxSize := cfg.Tracer.MaxSize*1e6 - margin
 		if maxSize < 0 {
 			maxSize = 0
 		}
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize)
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
+	} else if cfg.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err = os.Remove(cfg.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 
 	if reg != nil {
@@ -350,6 +383,11 @@ type socketDialer struct {
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
 	return net.Dial("unix", d.path)
+}
+
+func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
+	var nd net.Dialer
+	return nd.DialContext(ctx, "unix", d.path)
 }
 
 func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {

@@ -172,6 +172,10 @@ func SystemTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, args)
 }
 
+func getBucketName() string {
+	return "ingest-buildkite-ci"
+}
+
 // getNpcapInstaller gets the installer from the Google Cloud Storage service.
 //
 // On Windows platforms, if getNpcapInstaller is invoked with the environment variables
@@ -198,7 +202,8 @@ func getNpcapInstaller() error {
 			return err
 		}
 	}
+	ciBucketName := getBucketName()
 
 	fmt.Printf("getting %s from private cache\n", installer)
-	return sh.RunV("gsutil", "cp", "gs://obs-ci-cache/private/"+installer, dstPath)
+	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }

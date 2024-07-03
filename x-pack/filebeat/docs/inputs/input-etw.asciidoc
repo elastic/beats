@@ -1,0 +1,202 @@
+[role="xpack"]
+
+:type: etw
+
+[id="{beatname_lc}-input-{type}"]
+=== ETW input
+
+++++
+<titleabbrev>ETW</titleabbrev>
+++++
+
+beta[]
+
+https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal[Event
+Tracing for Windows] is a powerful logging and tracing mechanism built into the
+Windows operating system. It provides a detailed view of application and system
+behavior, performance issues, and runtime diagnostics. Trace events contain an
+event header and provider-defined data that describes the current state of an
+application or operation. You can use the events to debug an application and
+perform capacity and performance analysis.
+
+The ETW input can interact with ETW in three distinct ways: it can create a new
+session to capture events from user-mode providers, attach to an already
+existing session to collect ongoing event data, or read events from a
+pre-recorded .etl file. This functionality enables the module to adapt to
+different scenarios, such as real-time event monitoring or analyzing historical
+data.
+
+This input currently supports manifest-based, MOF (classic) and TraceLogging
+providers while WPP providers are not supported.
+https://learn.microsoft.com/en-us/windows/win32/etw/about-event-tracing#types-of-providers[Here]
+you can find more information about the available types of providers.
+
+It has been tested in the Windows versions supported by {beatname_uc}, starting
+from Windows 10 and Windows Server 2016. In addition, administrative privileges
+are required to control event tracing sessions.
+
+Example configurations:
+
+Read from a provider by name:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: etw
+  id: etw-dnsserver
+  enabled: true
+  provider.name: Microsoft-Windows-DNSServer
+  session_name: DNSServer-Analytical
+  trace_level: verbose
+  match_any_keyword: 0x8000000000000000
+  match_all_keyword: 0
+----
+
+Read from a provider by its GUID:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: etw
+  id: etw-dnsserver
+  enabled: true
+  provider.guid: {EB79061A-A566-4698-9119-3ED2807060E7}
+  session_name: DNSServer-Analytical
+  trace_level: verbose
+  match_any_keyword: 0x8000000000000000
+  match_all_keyword: 0
+----
+
+Read from an existing session:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: etw
+  enabled: true
+  id: etw-dnsserver-session
+  session: UAL_Usermode_Provider
+----
+
+Read from a .etl file:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: etw
+  enabled: true
+  id: etw-dnsserver-session
+  file: "C\Windows\System32\Winevt\Logs\Logfile.etl"
+----
+
+NOTE: Examples shown above are mutually exclusive, the options
+`provider.name`, `provider.guid`, `session` and `file` cannot be present at the
+same time. Nevertheless, it is a requirement that one of them is present.
+
+Multiple providers example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: etw
+  id: etw-dnsserver
+  enabled: true
+  provider.name: Microsoft-Windows-DNSServer
+  session_name: DNSServer-Analytical
+  trace_level: verbose
+  match_any_keyword: 0xffffffffffffffff
+  match_all_keyword: 0
+- type: etw
+  id: etw-security
+  enabled: true
+  provider.name: Microsoft-Windows-Security-Auditing
+  session_name: Security-Auditing
+  trace_level: warning
+  match_any_keyword: 0xfffffffffffffff
+  match_all_keyword: 0
+----
+
+==== Configuration options
+
+The `etw` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `file`
+
+Specifies the path to an .etl file for reading ETW events. This file format is
+commonly used for storing ETW event logs.
+
+[float]
+==== `provider.guid`
+
+Identifies the GUID of an ETW provider. To see available providers, use the
+command `logman query providers`.
+
+[float]
+==== `provider.name`
+
+Specifies the name of the ETW provider. Available providers can be listed using
+`logman query providers`.
+
+[float]
+==== `session_name`
+
+When specifying a provider, a new session is created. This controls the name for
+the new ETW session it will create. If not specified, the session will be named
+using the provider ID prefixed by 'Elastic-'.
+
+[float]
+==== `trace_level`
+
+Defines the filtering level for events based on severity. Valid options include
+critical, error, warning, information, and verbose.
+
+[float]
+==== `match_any_keyword`
+
+An 8-byte bitmask used for filtering events from specific provider subcomponents
+based on keyword matching. Any matching keyword will enable the event to be
+written. Default value is `0xffffffffffffffff` so it matches every available
+keyword.
+
+Run `logman query providers "<provider.name>"` to list the available keywords
+for a specific provider.
+
+[float]
+==== `match_all_keyword`
+
+Similar to MatchAnyKeyword, this 8-byte bitmask filters events that match all
+specified keyword bits. Default value is `0` to let every event pass.
+
+Run `logman query providers "<provider.name>"` to list the available keywords
+for a specific provider.
+
+[float]
+==== `session`
+
+Names an existing ETW session to read from. Existing sessions can be listed
+using `logman query -ets`.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs/` path. They can be used to
+observe the activity of the input.
+
+You must assign a unique `id` to the input to expose metrics.
+
+[options="header"]
+|=======
+| Metric                   | Description
+| `session`                | Name of the ETW session.
+| `received_events_total`  | Total number of events received.
+| `discarded_events_total` | Total number of discarded events.
+| `errors_total`           | Total number of errors.
+| `source_lag_time`        | Histogram of the difference between timestamped event's creation and reading.
+| `arrival_period`         | Histogram of the elapsed time between event notification callbacks.
+| `processing_time`        | Histogram of the elapsed time between event notification callback and publication to the internal queue.
+|=======
+
+Histogram metrics are aggregated over the previous 1024 events.
+
+:type!:
