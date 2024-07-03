@@ -12,7 +12,7 @@ import (
 	"os"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -97,7 +97,7 @@ func (c authConfig) Validate() error {
 	}
 
 	// Application Default Credentials (ADC)
-	_, err := google.FindDefaultCredentials(context.Background(), pubsub.ScopePubSub)
+	_, err := google.FindDefaultCredentials(context.Background(), storage.ScopeReadOnly)
 	if err == nil {
 		return nil
 	}
