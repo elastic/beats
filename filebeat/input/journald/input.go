@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+//go:generate moq -out journalReadMock_test.go . journalReader
 type journalReader interface {
 	Close() error
 	Next(cancel input.Canceler) (journalctl.JournalEntry, error)
