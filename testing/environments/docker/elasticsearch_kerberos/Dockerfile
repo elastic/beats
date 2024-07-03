@@ -1,4 +1,4 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.22-SNAPSHOT
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.15.2-SNAPSHOT
 
 ADD scripts /scripts
 ADD config /config
