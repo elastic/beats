@@ -23,8 +23,6 @@ var (
 	ErrUsers                    = errors.New("failed to get user details")
 )
 
-var cnUsers = &ldap.RelativeDN{Attributes: []*ldap.AttributeTypeAndValue{{Type: "CN", Value: "Users"}}}
-
 // Entry is an Active Directory user entry with associated group membership.
 type Entry struct {
 	ID          string         `json:"id"`
@@ -44,10 +42,6 @@ type Entry struct {
 func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
 	if base == nil || len(base.RDNs) == 0 {
 		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
-	}
-	baseDN := base.String()
-	if !base.RDNs[0].Equal(cnUsers) {
-		return nil, fmt.Errorf("%w: %s does not have %s", ErrInvalidDistinguishedName, baseDN, cnUsers)
 	}
 
 	var opts []ldap.DialOpt
@@ -76,6 +70,8 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSi
 		const denseTimeLayout = "20060102150405.0Z" // Differs from the const below in resolution and behaviour.
 		sinceFmtd = since.Format(denseTimeLayout)
 	}
+
+	baseDN := base.String()
 
 	// Get groups in the directory. Get all groups independent of the
 	// since parameter as they may not have changed for changed users.
