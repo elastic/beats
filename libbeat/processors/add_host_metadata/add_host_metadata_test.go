@@ -53,7 +53,7 @@ func TestConfigDefault(t *testing.T) {
 
 	p, err := New(testConfig)
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux", "solaris":
+	case "windows", "darwin", "linux", "solaris", "illumos":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -100,7 +100,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 
 	p, err := New(testConfig)
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux", "solaris":
+	case "windows", "darwin", "linux", "solaris", "illumos":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -226,7 +226,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 	p, err := New(testConfig)
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux", "solaris":
+	case "windows", "darwin", "linux", "solaris", "illumos":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
@@ -306,7 +306,7 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 	p, err := New(testConfig)
 	switch runtime.GOOS {
-	case "windows", "darwin", "linux", "solaris":
+	case "windows", "darwin", "linux", "solaris", "illumos":
 		assert.NoError(t, err)
 	default:
 		assert.IsType(t, types.ErrNotImplemented, err)
