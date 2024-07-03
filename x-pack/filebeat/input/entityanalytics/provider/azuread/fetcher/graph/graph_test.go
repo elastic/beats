@@ -318,9 +318,10 @@ func TestGraph_Groups(t *testing.T) {
 		APIEndpoint: "http://" + testSrv.addr,
 	}
 	if *trace {
-		rawConf.Tracer = &lumberjack.Logger{
+		// Use legacy behaviour; nil enabled setting.
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
 			Filename: "test_trace-*.ndjson",
-		}
+		}}
 	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
@@ -382,9 +383,9 @@ func TestGraph_Users(t *testing.T) {
 		APIEndpoint: "http://" + testSrv.addr,
 	}
 	if *trace {
-		rawConf.Tracer = &lumberjack.Logger{
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
 			Filename: "test_trace-*.ndjson",
-		}
+		}}
 	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
@@ -492,9 +493,9 @@ func TestGraph_Devices(t *testing.T) {
 				Select:      test.selection,
 			}
 			if *trace {
-				rawConf.Tracer = &lumberjack.Logger{
+				rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
 					Filename: "test_trace-*.ndjson",
-				}
+				}}
 			}
 			c, err := config.NewConfigFrom(&rawConf)
 			require.NoError(t, err)

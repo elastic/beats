@@ -26,10 +26,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/metricbeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-metricbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "x-pack/metricbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/metricbeat check update
@@ -53,11 +53,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "x-pack-metricbeat-check-update"
 
-  - group: "x-pack/metricbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "x-pack-metricbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/metricbeat Linux x86_64 Unit Tests"
+      - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/metricbeat
@@ -74,9 +74,9 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Linux x86_64 Unit Tests"
+              context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat Go (MODULE) Integration Tests"
+      - label: ":ubuntu: x-pack/metricbeat: Go (MODULE) Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -99,7 +99,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Go (MODULE) Integration Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat Python (MODULE) Integration Tests"
+      - label: ":ubuntu: x-pack/metricbeat: Python (MODULE) Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
@@ -122,7 +122,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Python (MODULE) Integration Tests"
 
-      - label: ":windows: x-pack/metricbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -141,9 +141,9 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Win-2016 Unit Tests"
+              context: "x-pack/metricbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -162,14 +162,14 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Win-2022 Unit Tests"
+              context: "x-pack/metricbeat: Win 2022 Unit Tests"
 
-  - group: "x-pack/metricbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-metricbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/metricbeat Win 10 Unit Tests"
+      - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -190,7 +190,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat Win 11 Unit Tests"
+      - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -211,7 +211,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -230,14 +230,14 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Win-2019 Unit Tests"
+              context: "x-pack/metricbeat: Win 2019 Unit Tests"
 
-  - group: "x-pack/metricbeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
 
     steps:
-      - label: ":mac: x-pack/metricbeat macOS x86_64 Unit Tests"
+      - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -256,7 +256,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: x-pack/metricbeat macOS arm64 Unit Tests"
+      - label: ":mac: x-pack/metricbeat: macOS arm64 Unit Tests"
         skip: "Skipping due to elastic/beats#33036 & elastic/ingest-dev#3400"
         # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/ingest-dev/issues/3400
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -277,7 +277,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS arm64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat AWS Tests"
+      - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
@@ -311,10 +311,11 @@ steps:
     depends_on:
       - step: "x-pack-metricbeat-mandatory-tests"
 
-  - group: "x-pack/metricbeat Packaging"
+  - group: "Packaging"
     key: "x-pack-metricbeat-packaging"
+
     steps:
-      - label: ":ubuntu: x-pack/metricbeat Packaging Linux"
+      - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
         key: "packaging-linux"
         command: |
           cd x-pack/metricbeat
@@ -335,7 +336,7 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/metricbeat Packaging linux arm64"
+      - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
         key: "packaging-arm"
         command: |
           cd x-pack/metricbeat
