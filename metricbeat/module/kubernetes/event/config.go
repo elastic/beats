@@ -25,6 +25,7 @@ import (
 
 type kubeEventsConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
+	KubeAdm           bool                         `config:"disable_kubeadm"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 	Namespace         string                       `config:"namespace"`
 	SyncPeriod        time.Duration                `config:"sync_period"`
