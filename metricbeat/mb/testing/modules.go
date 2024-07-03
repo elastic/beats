@@ -53,6 +53,7 @@ that Metricbeat does it and with the same validations.
 		}
 	}
 */
+//nolint:errcheck // It's a test file
 package testing
 
 import (
@@ -134,9 +135,6 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 
 	return metricsets
 }
-
-/* eslint-disable */
-// Following methods returns deprecated metricsets for testing. Disable eslint as it complains
 
 func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
 	metricSet := NewMetricSet(t, config)
@@ -445,8 +443,6 @@ func (r *CapturingPushReporterV2) BlockingCapture(waitEvents int) []mb.Event {
 		}
 	}
 }
-
-/* eslint-enable */
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
