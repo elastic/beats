@@ -26,6 +26,7 @@ data:
                   hosts: ["kube-state-metrics:8080"]
                   period: 10s
                   add_metadata: true
+                  # disable_kubeadm: true
                   metricsets:
                     - state_node
                     - state_deployment
@@ -33,6 +34,7 @@ data:
                     - state_replicaset
                     - state_pod
                     - state_container
+                    - state_job
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
@@ -45,14 +47,16 @@ data:
                   metricsets:
                     - apiserver
                   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
+                  # disable_kubeadm: true
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   ssl.certificate_authorities:
                     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                   period: 30s
                 # Uncomment this to get k8s events:
-                #- module: kubernetes
-                #  metricsets:
+                # - module: kubernetes
+                #   metricsets:
                 #    - event
+                #   disable_kubeadm: true 
         # To enable hints based autodiscover uncomment this:
         #- type: kubernetes
         #  node: ${NODE_NAME}
@@ -65,7 +69,8 @@ data:
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      hosts: ['https://elasticsearch:9200']
+      ssl.verification_mode: none
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
 ---
@@ -113,6 +118,7 @@ data:
         - volume
       period: 10s
       host: ${NODE_NAME}
+      # disable_kubeadm: true
       hosts: ["https://${NODE_NAME}:10250"]
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.verification_mode: "none"
@@ -125,6 +131,7 @@ data:
       metricsets:
         - proxy
       period: 10s
+      # disable_kubeadm: true
       host: ${NODE_NAME}
       hosts: ["localhost:10249"]
 ---
@@ -151,12 +158,12 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: metricbeat
-          image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
+          image: docker.elastic.co/beats/metricbeat:8.15.0-SNAPSHOT
           command: [ "sleep" ]
           args: [ "infinity" ]
           env:
             - name: ELASTICSEARCH_HOST
-              value: elasticsearch.default.svc.cluster.local
+              value: elasticsearch
             - name: ELASTICSEARCH_PORT
               value: "9200"
             - name: ELASTICSEARCH_USERNAME
