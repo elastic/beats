@@ -11,5 +11,9 @@ ENV BUILD_ZONE elastic
 ENV ELASTIC_ZONE $BUILD_ZONE
 
 USER root
-RUN /scripts/installkdc.sh && /scripts/addprincs.sh
+## Centos 7 EOL reached
+## This fixes "Could not resolve host: mirrorlist.centos.org" error
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && \
+    /scripts/installkdc.sh && /scripts/addprincs.sh
 USER elasticsearch
