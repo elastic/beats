@@ -235,11 +235,21 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 
 	created := time.Now()
 
-	strContent, isString := data.Fields["MESSAGE"].(string)
+	// In some cases the message is not a string, so just convert it
+	// using fmt.Sprintf and let the user deal with it.
+	// Trying to be smart and convert the contents into string
+	// byte by byte did not work well because one test case contained
+	// control characters. To avoid issues later in the ingetstion
+	// pipeline we just convert the whole thing to a string.
+	//
+	// Look at 'pkg/journalctl/testdata/corner-cases.json'
+	// for some real world examples.
+	msg := data.Fields["MESSAGE"]
+	msgStr, isString := msg.(string)
 	if !isString {
-		return reader.Message{}, fmt.Errorf("Message '%[1]v', type %[1]T is not a string", data.Fields["MESSAGE"])
+		msgStr = fmt.Sprint(msg)
 	}
-	content := []byte(strContent)
+	content := []byte(msgStr)
 	delete(data.Fields, "MESSAGE")
 
 	fields := r.converter.Convert(data.Fields)

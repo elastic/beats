@@ -21,6 +21,7 @@ package journald
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -30,7 +31,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -302,6 +307,40 @@ func TestMatchers(t *testing.T) {
 
 			env.startInput(ctx, inp)
 			env.waitUntilEventCount(tc.expectedEvents)
+		})
+	}
+}
+
+//go:embed pkg/journalctl/testdata/corner-cases.json
+var msgByteArrayJSON []byte
+
+func TestReaderAdapterCanHandleNonStringFields(t *testing.T) {
+	testCases := []map[string]any{}
+	if err := json.Unmarshal(msgByteArrayJSON, &testCases); err != nil {
+		t.Fatalf("could not unmarshal the contents from 'testdata/message-byte-array.json' into map[string]any: %s", err)
+	}
+
+	for idx, event := range testCases {
+		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
+			mock := journalReaderMock{
+				NextFunc: func(cancel v2.Canceler) (journalctl.JournalEntry, error) {
+					return journalctl.JournalEntry{
+						Fields: event,
+					}, nil
+				}}
+			ra := readerAdapter{
+				r:         &mock,
+				converter: journalfield.NewConverter(logp.L(), nil),
+				canceler:  context.Background(),
+			}
+
+			evt, err := ra.Next()
+			if err != nil {
+				t.Fatalf("readerAdapter.Next must succeed, got an error: %s", err)
+			}
+			if len(evt.Content) == 0 {
+				t.Fatal("event.Content must be populated")
+			}
 		})
 	}
 }

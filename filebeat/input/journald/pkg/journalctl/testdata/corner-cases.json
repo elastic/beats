@@ -1,3 +1,4 @@
+[
 {
   "COREDUMP_UNIT": "user@1000.service",
   "COREDUMP_CWD": "/home/tiago",
@@ -55,4 +56,41 @@
   "_BOOT_ID": "62c460d8931346bf85d24dfe22d2d2fb",
   "_HOSTNAME": "millennium-falcon",
   "COREDUMP_OWNER_UID": "1000"
+},
+{
+  "CODE_FILE": "../pulseaudio/src/modules/bluetooth/backend-native.c",
+  "CODE_FUNC": "hfp_rfcomm_handle",
+  "CODE_LINE": "658",
+  "MESSAGE": [85,110,97,98,108,101,32,116,111,32,112,97,114,115,101,32,105,110,100,105,99,97,116,111,114,32,111,102,32,65,84,43,66,73,65,32,99,111,109,109,97,110,100,58,32,65,84,43,66,73,65,61,49,44,49,44,48,44,48,44,48,13,65,84,43,66,67,83,61,50],
+  "PRIORITY": "3",
+  "PULSE_BACKTRACE": "",
+  "SYSLOG_IDENTIFIER": "pulseaudio",
+  "_AUDIT_LOGINUID": "1000",
+  "_AUDIT_SESSION": "1",
+  "_BOOT_ID": "62c460d8931346bf85d24dfe22d2d2fb",
+  "_CAP_EFFECTIVE": "0",
+  "_CMDLINE": "/usr/bin/pulseaudio --daemonize=no --log-target=journal",
+  "_COMM": "pulseaudio",
+  "_EXE": "/usr/bin/pulseaudio",
+  "_GID": "1000",
+  "_HOSTNAME": "millennium-falcon",
+  "_MACHINE_ID": "851f339d77174301b29e417ecb2ec6a8",
+  "_PID": "3728",
+  "_RUNTIME_SCOPE": "system",
+  "_SOURCE_REALTIME_TIMESTAMP": "1719859366807129",
+  "_SYSTEMD_CGROUP": "/user.slice/user-1000.slice/user@1000.service/session.slice/pulseaudio.service",
+  "_SYSTEMD_INVOCATION_ID": "32f844397218489cae1daca4427f8ed6",
+  "_SYSTEMD_OWNER_UID": "1000",
+  "_SYSTEMD_SLICE": "user-1000.slice",
+  "_SYSTEMD_UNIT": "user@1000.service",
+  "_SYSTEMD_USER_SLICE": "session.slice",
+  "_SYSTEMD_USER_UNIT": "pulseaudio.service",
+  "_TRANSPORT": "journal",
+  "_UID": "1000",
+  "__CURSOR": "s=e82795fad4ce42b79fb3da0866d91f7e;i=4b454d;b=62c460d8931346bf85d24dfe22d2d2fb;m=39c3b04e4;t=61c33f69f4665;x=8dd4baba5585d42b",
+  "__MONOTONIC_TIMESTAMP": "15506015460",
+  "__REALTIME_TIMESTAMP": "1719859366807141",
+  "__SEQNUM": "4932941",
+  "__SEQNUM_ID": "e82795fad4ce42b79fb3da0866d91f7e"
 }
+]
