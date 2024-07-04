@@ -212,6 +212,7 @@ func TestNetFlowIntegration(t *testing.T) {
 		Flows []beat.Event `json:"events,omitempty"`
 	}
 	err = json.Unmarshal(data, &expectedFlows)
+	require.NoError(t, err)
 
 	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.pcap")
 	require.NoError(t, err)
