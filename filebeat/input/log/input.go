@@ -80,6 +80,7 @@ type Input struct {
 	stopOnce            sync.Once
 	fileStateIdentifier file.StateIdentifier
 	getStatusReporter   input.GetStatusReporter
+	healthy             bool
 }
 
 // NewInput instantiates a new Log
@@ -227,6 +228,8 @@ func (p *Input) loadStates(states []file.State) error {
 
 // Run runs the input
 func (p *Input) Run() {
+	p.healthy = true
+	p.updateStatus(status.Starting, "starting the scan")
 	logger := p.logger
 	logger.Debug("Start next scan")
 
@@ -286,6 +289,10 @@ func (p *Input) Run() {
 			logger.Debugf("%v entries marked as removed. Trigger state cleanup.", removed)
 			p.cleanupStates()
 		}
+	}
+
+	if p.healthy {
+		p.updateStatus(status.Running, "finished the scan")
 	}
 }
 
@@ -498,6 +505,7 @@ func (p *Input) scan() {
 	var files []string
 
 	paths := p.getFiles()
+	fmt.Println("HELLLLLLO ", paths)
 
 	var err error
 
@@ -561,6 +569,7 @@ func (p *Input) scan() {
 				continue
 			}
 			if err != nil {
+				p.healthy = false
 				p.updateStatus(status.Degraded, fmt.Sprintf(harvesterErrMsg, newState.Source, err))
 				logger.Errorf(harvesterErrMsg, newState.Source, err)
 			}
