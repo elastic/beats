@@ -41,6 +41,7 @@ type config struct {
 	IdleTimeout               time.Duration     `config:"idle_timeout"`
 	Network                   string            `config:"network"`
 	MaxConn                   int               `config:"maxconn" validate:"min=1"`
+	Username                  string            `config:"username"`
 	Password                  string            `config:"password"`
 	TLS                       *tlscommon.Config `config:"ssl"`
 	tlsConfig                 *tls.Config

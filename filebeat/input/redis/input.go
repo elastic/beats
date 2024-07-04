@@ -134,6 +134,7 @@ func CreatePool(host string, cfg config) *rd.Pool {
 		IdleTimeout: cfg.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
 			dialOptions := []rd.DialOption{
+				rd.DialUsername(cfg.Username),
 				rd.DialConnectTimeout(cfg.IdleTimeout),
 				rd.DialReadTimeout(cfg.IdleTimeout),
 				rd.DialWriteTimeout(cfg.IdleTimeout),
