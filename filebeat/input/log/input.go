@@ -848,6 +848,9 @@ func (p *Input) stopWhenDone() {
 }
 
 func (p *Input) updateStatus(status status.Status, msg string) {
+	if p.getStatusReporter == nil {
+		return
+	}
 	if reporter := p.getStatusReporter(); reporter != nil {
 		reporter.UpdateStatus(status, msg)
 	}
