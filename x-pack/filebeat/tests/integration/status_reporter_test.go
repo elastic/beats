@@ -165,7 +165,6 @@ func TestLogStatusReporter(t *testing.T) {
 			if state != scenarios[id].expectedStatus {
 				continue
 			}
-			fmt.Println("WHATSPUPP", state, scenarios[id].expectedStatus)
 			// always ensure that output is healthy
 			outputState := extractState(observed.GetUnits(), unitOutID)
 			require.Equal(t, outputState, proto.State_HEALTHY)
