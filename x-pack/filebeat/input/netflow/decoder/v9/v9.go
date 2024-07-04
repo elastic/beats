@@ -28,6 +28,7 @@ type NetflowV9Protocol struct {
 	logger         *log.Logger
 	Session        SessionMap
 	timeout        time.Duration
+	cache          *pendingTemplatesCache
 	done           chan struct{}
 	detectReset    bool
 	shareTemplates bool
@@ -43,13 +44,19 @@ func New(config config.Config) protocol.Protocol {
 }
 
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
-	return &NetflowV9Protocol{
+	pd := &NetflowV9Protocol{
 		decoder:     decoder,
-		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
 		logger:      logger,
+		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
 		timeout:     config.ExpirationTimeout(),
 		detectReset: config.SequenceResetEnabled(),
 	}
+
+	if config.Cache() {
+		pd.cache = newPendingTemplatesCache()
+	}
+
+	return pd
 }
 
 func (*NetflowV9Protocol) Version() uint16 {
@@ -60,6 +67,10 @@ func (p *NetflowV9Protocol) Start() error {
 	p.done = make(chan struct{})
 	if p.timeout != time.Duration(0) {
 		go p.Session.CleanupLoop(p.timeout, p.done)
+	}
+
+	if p.cache != nil {
+		p.cache.start(p.done, 30*time.Second, 10*time.Second)
 	}
 	return nil
 }
@@ -123,11 +134,14 @@ func (p *NetflowV9Protocol) parseSet(
 ) {
 	if setID >= 256 {
 		// Flow of Options record, lookup template and generate flows
-		if template := session.GetTemplate(setID); template != nil {
-			return template.Apply(buf, 0)
+		template := session.GetTemplate(setID)
+
+		if template == nil {
+			p.cache.Add(setID, buf)
+			return nil, nil
 		}
-		p.logger.Printf("No template for ID %d", setID)
-		return nil, nil
+
+		return template.Apply(buf, 0)
 	}
 
 	// Template sets
@@ -137,6 +151,15 @@ func (p *NetflowV9Protocol) parseSet(
 	}
 	for _, template := range templates {
 		session.AddTemplate(template)
+		events := p.cache.GetAndRemove(template.ID)
+		for _, e := range events {
+			f, err := template.Apply(e, 0)
+			if err != nil {
+				continue
+			}
+			flows = append(flows, f...)
+		}
 	}
+
 	return flows, nil
 }

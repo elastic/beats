@@ -23,6 +23,7 @@ type config struct {
 	CustomDefinitions         []string      `config:"custom_definitions"`
 	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
 	ShareTemplates            bool          `config:"share_templates"`
+	WorkersNumber             uint32        `config:"workers_number"`
 }
 
 var defaultConfig = config{
@@ -40,4 +41,5 @@ var defaultConfig = config{
 	PacketQueueSize:     8192,
 	DetectSequenceReset: true,
 	ShareTemplates:      false,
+	WorkersNumber:       1,
 }
