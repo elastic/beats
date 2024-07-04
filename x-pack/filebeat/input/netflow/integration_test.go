@@ -22,6 +22,7 @@ import (
 
 	"golang.org/x/time/rate"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -204,6 +205,14 @@ func TestNetFlowIntegration(t *testing.T) {
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	require.NoError(t, err)
 
+	data, err := os.ReadFile("testdata/golden/ipfix_cisco.pcap.golden.json")
+	require.NoError(t, err)
+
+	var expectedFlows struct {
+		Flows []beat.Event `json:"events,omitempty"`
+	}
+	err = json.Unmarshal(data, &expectedFlows)
+
 	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.pcap")
 	require.NoError(t, err)
 	defer f.Close()
@@ -242,7 +251,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	require.Eventually(t, func() bool {
 		eventsCount, err := DataStreamEventsCount(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
 		require.NoError(t, err)
-		return eventsCount >= totalPackets
+		return eventsCount == uint64(len(expectedFlows.Flows))
 	}, waitFor, tick)
 }
 
@@ -330,10 +339,14 @@ type Hit struct {
 	Source map[string]interface{} `json:"_source"`
 }
 
+type Total struct {
+	Value uint64 `json:"value"`
+}
+
 // Hits are the collections of search hits.
 type Hits struct {
-	Total json.RawMessage // model when needed
-	Hits  []Hit           `json:"hits"`
+	Total Total // model when needed
+	Hits  []Hit `json:"hits"`
 }
 
 // SearchResults are the results returned from a _search.
@@ -359,7 +372,7 @@ func DataStreamEventsCount(ctx context.Context, username string, password string
 	if err != nil {
 		return 0, err
 	}
-	return len(results.Hits.Hits), nil
+	return results.Hits.Total.Value, nil
 }
 
 // DeleteResults are the results returned from a _data_stream delete.
