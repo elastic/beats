@@ -25,15 +25,16 @@ var googleWorkspace = (function () {
             "json.id.applicationName",
             "json.id.customerId",
         ];
+        var dynKeyArr = [];
         Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
             var key = "json.events."+evtsKey;
             var value = evt.Get(key);
             if (!Array.isArray(value) && !(typeof value === "object")) {
-                keys.push(key);
+                dynKeyArr.push(key);
             }
         });
         new processor.Fingerprint({
-            fields: keys,
+            fields: keys.concat(dynKeyArr.sort()),
             target_field: "@metadata._id",
             ignore_missing: true,
             fail_on_error: false,
