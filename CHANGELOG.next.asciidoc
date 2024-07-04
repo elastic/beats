@@ -300,7 +300,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
 - Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
-- Add SSL support for Redis input. {pull}40111[40111]
+- Add SSL and username support for Redis input, now the input includes support for Redis 6.0+. {pull}40111[40111]
 
 *Auditbeat*
 
