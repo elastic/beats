@@ -209,12 +209,16 @@ func TestNetFlowIntegration(t *testing.T) {
 	defer f.Close()
 
 	var totalBytes, totalPackets int
-	limiter := rate.NewLimiter(rate.Limit(10000), 1)
+	rateLimit := 10000
+	limiter := rate.NewLimiter(rate.Limit(rateLimit), rateLimit)
 
 	packetSource := gopacket.NewPacketSource(f, f.LinkType())
 	for pkt := range packetSource.Packets() {
-		err = limiter.Wait(ctx)
-		require.NoError(t, err)
+
+		if totalPackets%rateLimit == 0 {
+			err = limiter.WaitN(ctx, rateLimit)
+			require.NoError(t, err)
+		}
 
 		payloadData := pkt.TransportLayer().LayerPayload()
 
