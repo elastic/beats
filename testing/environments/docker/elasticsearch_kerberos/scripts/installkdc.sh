@@ -48,10 +48,12 @@ touch $LOGDIR/krb5kdc.log
 touch $LOGDIR/krb5lib.log
 
 # Update package manager
-yum update -qqy
+#yum update -qqy
+apt-get update -qqy
 
 # Install krb5 packages
-yum install -qqy krb5-{server,libs,workstation} sudo
+#yum install -qqy krb5-{server,libs,workstation} sudo
+apt-get install -qqy krb5-{kdc,admin-server,user} sudo
 
 # Create kerberos database with stash file and garbage password
 kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876
@@ -72,7 +74,6 @@ chown -R elasticsearch:elasticsearch $LOGDIR
 chown -R elasticsearch:elasticsearch $KDC_CONFIG
 chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5.conf
 chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
-
 
 # Create a link so addprinc.sh is on path
 ln -s /scripts/addprinc.sh /usr/bin/
