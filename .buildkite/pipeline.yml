@@ -139,7 +139,7 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Xpack/Dockerlogbeat"
+  - label: "Trigger x-pack/dockerlogbeat"
     if: build.pull_request.id != null
     plugins:
       - monorepo-diff#v1.0.1:
@@ -250,7 +250,7 @@ steps:
           watch:
             - path:
                 - x-pack/osquerybeat/**
-                - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
+                - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
                 - .buildkite/scripts/**
                 - .buildkite/hooks/**
                 # x-pack
@@ -279,7 +279,7 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Xpack/Winlogbeat"
+  - label: "Trigger x-pack/winlogbeat"
     if: build.pull_request.id != null
     plugins:
       - monorepo-diff#v1.0.1:
@@ -306,7 +306,7 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Xpack/Winlogbeat"
+  - label: "Triggering Build for x-pack/winlogbeat"
     if: build.pull_request.id == null
     trigger: "beats-xpack-winlogbeat"
     build:
@@ -581,3 +581,38 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Triggering Build for Elastic-agent"
+    if: build.pull_request.id == null
+    trigger: "beats-xpack-elastic-agent"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Trigger Elastic-agent"
+    if: build.pull_request.id != null
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - x-pack/elastic-agent/
+                - .buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml
+                - .buildkite/scripts/
+                - .buildkite/hooks/
+                # x-pack
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/
+                - testing/
+                - x-pack/libbeat/
+              config:
+                trigger: "beats-xpack-elastic-agent"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}

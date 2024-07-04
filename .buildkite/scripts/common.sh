@@ -24,14 +24,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run cloud-specific tests for the particular beat
 [ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
 
-winlogbeat_changeset=(
-  "^winlogbeat/.*"
-  )
-
-xpack_dockerlogbeat_changeset=(
-  "^x-pack/dockerlogbeat/.*"
-  )
-
 ci_changeset=(
   "^.buildkite/.*"
   )
@@ -72,7 +64,8 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
 esac
 
 check_and_set_beat_vars() {
-  if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
+  local BEATS_PROJECT_NAME=${BEATS_PROJECT_NAME:=""}
+  if [[ "${BEATS_PROJECT_NAME:=""}" == *"x-pack/"* ]]; then
     BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
     BEATS_XPACK_PROJECT_NAME=${BEATS_XPACK_PROJECT_NAME//\//_}      #replace / to _
     BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
@@ -385,7 +378,7 @@ startCloudTestEnv() {
   local dir=$1
   withAWS
   echo "--- Run docker-compose services for emulated cloud env"
-  docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
   with_Terraform
   terraformInit "$dir"
   export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
@@ -447,10 +440,10 @@ installNodeJsDependencies() {
 teardown() {
   # Teardown resources after using them
   echo "---Terraform Cleanup"
-  .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  .buildkite/scripts/terraform-cleanup.sh "${MODULE_DIR}"
 
   echo "---Docker Compose Cleanup"
-  docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
 
 unset_secrets () {
@@ -476,7 +469,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
 fi
 
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi

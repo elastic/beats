@@ -7,6 +7,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	goerrors "errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -26,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/cproto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -608,7 +609,9 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 
 func (c *enrollCmd) stopAgent() {
 	if c.agentProc != nil {
-		_ = c.agentProc.StopWait()
+		if err := c.agentProc.StopWait(); err != nil {
+			c.log.Warnf("Error stopping agent: %v", err)
+		}
 		c.agentProc = nil
 	}
 }
@@ -670,7 +673,7 @@ func waitForAgent(ctx context.Context, timeout time.Duration) error {
 		for {
 			backOff.Wait()
 			_, err := getDaemonStatus(innerCtx)
-			if errors.Is(err, context.Canceled) {
+			if goerrors.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -720,7 +723,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 		for {
 			backExp.Wait()
 			status, err := getDaemonStatus(innerCtx)
-			if errors.Is(err, context.Canceled) {
+			if goerrors.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -757,7 +760,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 				continue
 			}
 			log.Debugf("%s: %s - %s", waitingForFleetServer, app.Status, app.Message)
-			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
+			if app.Status == cproto.Status_DEGRADED || app.Status == cproto.Status_HEALTHY {
 				// app has started and is running
 				if app.Message != "" {
 					log.Infof("Fleet Server - %s", app.Message)
@@ -833,7 +836,7 @@ func safelyStoreAgentInfo(s saver, reader io.Reader) error {
 	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
 		backExp.Wait()
 		err = storeAgentInfo(s, reader)
-		if !errors.Is(err, filelock.ErrAppAlreadyRunning) {
+		if !goerrors.Is(err, filelock.ErrAppAlreadyRunning) {
 			break
 		}
 	}

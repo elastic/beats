@@ -20,8 +20,9 @@ package memlog
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -102,11 +103,11 @@ const (
 	checkpointTmpFileName = "checkpoint.new"
 
 	storeVersion = "1"
-
-	keyField = "_key"
 )
 
-// newDiskStore initializes the disk store stucture only. The store must have
+var ErrCorruptStore = errors.New("corrupted data file")
+
+// newDiskStore initializes the disk store structure only. The store must have
 // been opened already.  It tries to open the update log file for append
 // operations. If opening the update log file fails, it is marked as
 // 'corrupted', triggering a checkpoint operation on the first update to the store.
@@ -180,7 +181,7 @@ func (s *diskstore) tryOpenLog() error {
 		f.Close()
 	})
 
-	_, err = f.Seek(0, os.SEEK_END)
+	_, err = f.Seek(0, io.SeekEnd)
 	if err != nil {
 		return err
 	}
@@ -261,12 +262,16 @@ func (s *diskstore) LogOperation(op op) error {
 	if err := enc.Encode(logAction{Op: op.name(), ID: s.nextTxID}); err != nil {
 		return err
 	}
-	writer.WriteByte('\n')
+	if err := writer.WriteByte('\n'); err != nil {
+		s.log.Errorf("could not write to registry log file: %s", err)
+	}
 
 	if err := enc.Encode(op); err != nil {
 		return err
 	}
-	writer.WriteByte('\n')
+	if err := writer.WriteByte('\n'); err != nil {
+		s.log.Errorf("could not write to registry log file: %s", err)
+	}
 
 	if err := writer.Flush(); err != nil {
 		return err
@@ -327,7 +332,10 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	}
 
 	// delete old transaction files
-	updateActiveMarker(s.log, s.home, s.activeDataFile.path)
+	if err := updateActiveMarker(s.log, s.home, s.activeDataFile.path); err != nil {
+		s.log.Warnf("could not update active marker: %s", err)
+	}
+
 	s.removeOldDataFiles()
 
 	trySyncPath(s.home)
@@ -399,7 +407,8 @@ func (s *diskstore) checkpointClearLog() {
 
 	err := s.logFile.Truncate(0)
 	if err == nil {
-		_, err = s.logFile.Seek(0, os.SEEK_SET)
+		_, err = s.logFile.Seek(0, io.SeekStart)
+		s.logInvalid = false
 	}
 
 	if err != nil {
@@ -436,7 +445,7 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
-	if err := ioutil.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
+	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
 		log.Errorf("Failed to write temporary pointer file: %v", err)
 		return err
 	}
@@ -534,7 +543,7 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 	var states []map[string]interface{}
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&states); err != nil {
-		return fmt.Errorf("corrupted data file: %v", err)
+		return fmt.Errorf("%w: %w", ErrCorruptStore, err)
 	}
 
 	for _, state := range states {
@@ -555,7 +564,7 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 // memStore.
 // The txid is the transaction ID of the last known valid data file.
 // Transactions older then txid will be ignored.
-// loadLogFile returns the last commited txid in logTxid and the total number
+// loadLogFile returns the last committed txid in logTxid and the total number
 // of operations in logCount.
 func loadLogFile(
 	store *memstore,
@@ -679,7 +688,7 @@ func readMetaFile(home string) (storeMeta, error) {
 
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&meta); err != nil {
-		return meta, fmt.Errorf("can not read store meta file: %v", err)
+		return meta, fmt.Errorf("can not read store meta file: %w", err)
 	}
 
 	return meta, nil

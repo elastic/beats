@@ -4,30 +4,65 @@ name: "beats-packetbeat"
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
+  - group: "Packetbeat Check/Update"
+    key: "packetbeat-check-update"
+    steps:
+      - label: "Run check/update"
+        command: |
+          set -eo pipefail
+          make -C packetbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "packetbeat: check/update"
+      
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "packetbeat-check-update"
+
   - group: "packetbeat Mandatory Tests"
     key: "packetbeat-mandatory-tests"
+
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: Packetbeat Linux x86_64 Unit Tests"
         command: |
           cd packetbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -37,11 +72,16 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Ubuntu Unit Tests"
+              context: "packetbeat: Linux x86_64 Unit Tests"
 
-      - label: ":linux: Ubuntu ARM Unit Tests"
+      - label: ":ubuntu: Packetbeat Linux arm64 Unit Tests"
         key: "linux-arm64-unit-tests"
-        command: "cd packetbeat && mage build unitTest"
+        command: |
+          cd packetbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -51,12 +91,15 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Ubuntu ARM Unit Tests"
+              context: "packetbeat: Linux arm64 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: Packetbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -68,17 +111,20 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Windows 2019 Unit Tests"
+              context: "packetbeat: Win-2019 Unit Tests"
 
-
-  - group: "Extended Windows Tests"
+  - group: "Packetbeat Extended Windows Tests"
     key: "packetbeat-extended-windows-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: Packetbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -90,29 +136,15 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended Windows 2016 Unit Tests"
+              context: "packetbeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
+      - label: ":windows: Packetbeat Win 10 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended Windows 2022 Unit Tests"
-
-      - label: ":windows: Windows 10 Unit Tests"
-        command: |
-          Set-Location -Path packetbeat
-          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -124,30 +156,13 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended Windows 10 Unit Tests"
+              context: "packetbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
-        command: |
-          Set-Location -Path packetbeat
-          mage build unitTest
-        key: "extended-win-11-unit-tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended Windows 11 Unit Tests"
-
-  - group: "Extended Tests"
+  - group: "Packetbeat Extended Tests"
     key: "extended-tests"
+
     steps:
-      - label: ":mac: MacOS x86_64 Unit Tests"
+      - label: ":mac: Packetbeat macOS x86_64 Unit Tests"
         key: "macos-x86-64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -155,6 +170,9 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd packetbeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -163,7 +181,7 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended MacOS x86_64 Unit Tests"
+              context: "packetbeat: macOS x86_64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -175,11 +193,15 @@ steps:
   - group: "Packetbeat Packaging"
     key: "packaging"
     steps:
-      - label: ":linux: Packaging Linux"
+      - label: ":ubuntu: Packetbeat Packaging Linux"
         key: "packaging-linux"
         command: |
           cd packetbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -192,11 +214,15 @@ steps:
           - github_commit_status:
               context: "packetbeat: Packaging Linux"
 
-      - label: ":linux: Packaging ARM"
+      - label: ":ubuntu: Packetbeat Packaging arm64"
         key: "packaging-arm"
         command: |
           cd packetbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -206,4 +232,4 @@ steps:
           PACKAGES: "docker"
         notify:
           - github_commit_status:
-              context: "packetbeat: Packaging Linux ARM"
+              context: "packetbeat: Packaging Linux arm64"
