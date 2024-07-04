@@ -505,7 +505,6 @@ func (p *Input) scan() {
 	var files []string
 
 	paths := p.getFiles()
-	fmt.Println("HELLLLLLO ", paths)
 
 	var err error
 
