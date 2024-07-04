@@ -344,8 +344,8 @@ type SearchResults struct {
 	Aggs   map[string]json.RawMessage // model when needed
 }
 
-func DataStreamEventsCount(ctx context.Context, username string, password string, url string, name string) (int, error) {
-	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!error.message:*", url, name))
+func DataStreamEventsCount(ctx context.Context, username string, password string, url string, name string) (uint64, error) {
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!_ignored:*+AND+!event.message:*", url, name))
 	if err != nil {
 		return 0, err
 	}
