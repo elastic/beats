@@ -100,7 +100,7 @@ func TestProcessStatusReporter(t *testing.T) {
 			return nil
 		},
 	}
-	server.Start()
+	require.NoError(t, server.Start())
 	defer server.Stop()
 
 	// start the client
