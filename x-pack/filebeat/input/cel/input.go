@@ -382,7 +382,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return nil
 				}
 				log.Errorw("single event object returned by evaluation", "event", e)
-				env.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+				if err, ok := e["error"]; ok {
+					env.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
+				} else {
+					env.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+				}
 				isDegraded = true
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
