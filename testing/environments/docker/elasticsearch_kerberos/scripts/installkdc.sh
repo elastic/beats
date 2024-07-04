@@ -20,7 +20,6 @@
 set -e
 
 LOCALSTATEDIR=/etc
-KDC_CONFIG=/var/kerberos
 LOGDIR=/var/log/krb5
 
 #MARKER_FILE=/etc/marker
@@ -34,11 +33,11 @@ sed -i 's/${ELASTIC_ZONE}/'$ELASTIC_ZONE'/g' $LOCALSTATEDIR/krb5.conf
 
 
 # Transfer and interpolate the kdc.conf
-mkdir -p $KDC_CONFIG/krb5kdc
-cp /config/kdc.conf.template $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${REALM_NAME}/'$REALM_NAME'/g' $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${KDC_NAME}/'$KDC_NAME'/g' $KDC_CONFIG/krb5kdc/kdc.conf
-sed -i 's/${BUILD_ZONE}/'$BUILD_ZONE'/g' $KDC_CONFIG/krb5kdc/kdc.conf
+mkdir -p $LOCALSTATEDIR/krb5kdc
+cp /config/kdc.conf.template $LOCALSTATEDIR/krb5kdc/kdc.conf
+sed -i 's/${REALM_NAME}/'$REALM_NAME'/g' $LOCALSTATEDIR/krb5kdc/kdc.conf
+sed -i 's/${KDC_NAME}/'$KDC_NAME'/g' $LOCALSTATEDIR/krb5kdc/kdc.conf
+sed -i 's/${BUILD_ZONE}/'$BUILD_ZONE'/g' $LOCALSTATEDIR/krb5kdc/kdc.conf
 sed -i 's/${ELASTIC_ZONE}/'$ELASTIC_ZONE'/g' $LOCALSTATEDIR/krb5.conf
 
 # Touch logging locations
@@ -49,17 +48,17 @@ touch $LOGDIR/krb5lib.log
 
 # Update package manager
 #yum update -qqy
+export DEBIAN_FRONTEND=noninteractive
 apt-get update -qqy
 
 # Install krb5 packages
-#yum install -qqy krb5-{server,libs,workstation} sudo
-apt-get install -qqy krb5-{kdc,admin-server,user} sudo
+apt-get install -qqy krb5-{kdc,admin-server,config} sudo
 
 # Create kerberos database with stash file and garbage password
 kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876
 
 # Set up admin acls
-cat << EOF > /var/kerberos/krb5kdc/kadm5.acl
+cat << EOF > /etc/krb5kdc/kadm5.acl
 */admin@$REALM_NAME	*
 *@$REALM_NAME   	*
 */*@$REALM_NAME	    i
@@ -71,7 +70,7 @@ kadmin.local -q "ktadd -k /etc/admin.keytab admin/admin@$REALM_NAME"
 
 # set ownership for ES
 chown -R elasticsearch:elasticsearch $LOGDIR
-chown -R elasticsearch:elasticsearch $KDC_CONFIG
+chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5kdc/
 chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/krb5.conf
 chown -R elasticsearch:elasticsearch $LOCALSTATEDIR/admin.keytab
 
