@@ -3,6 +3,42 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.14.2]]
+=== Beats version 8.14.2
+https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Fix high I/O and handling of a corrupted registry log file. {pull}35893[35893]
+
+==== Bugfixes
+
+*Filebeat*
+- Fix request trace filename handling in `http_endpoint` input. {pull}39410[39410]
+- Fix filestream not correctly tracking the offset of a file when using the `include_message` parser. {pull}39873[39873] {issue}39653[39653]
+- Upgrade `github.com/hashicorp/go-retryablehttp` to mitigate CVE-2024-6104. {pull}40036[40036]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.21.11. {pull}39851[39851]
+
+*Filebeat*
+
+- Fix handling of infinite rate values in CEL rate limit handling logic. {pull}39940[39940]
+
+*Heartbeat*
+
+- Upgrade Node version to the latest LTS v18.20.3. {pull}40038[40038]
+
+*Winlogbeat*
+
+- Add ERROR_INVALID_PARAMETER to the list of recoverable errors. {pull}39781[39781]
+
+
 [[release-notes-8.14.1]]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
