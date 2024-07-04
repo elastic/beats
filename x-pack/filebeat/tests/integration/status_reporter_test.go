@@ -13,17 +13,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/elastic/beats/v7/libbeat/common/reload"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/filebeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -102,7 +103,7 @@ func TestLogStatusReporter(t *testing.T) {
 			return nil
 		},
 	}
-	server.Start()
+	require.NoError(t, server.Start())
 	defer server.Stop()
 
 	// start the client
