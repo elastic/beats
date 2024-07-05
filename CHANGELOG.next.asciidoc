@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 - Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 - Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
+- Validate config of the `replace` processor {pull}40047[40047]
 
 *Auditbeat*
 
@@ -298,6 +299,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
+- Implement Elastic Agent status and health reporting for Netflow Filebeat input. {pull}40080[40080]
 - Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
 
