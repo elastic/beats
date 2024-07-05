@@ -39,5 +39,6 @@ func setpgid() *syscall.SysProcAttr {
 // For clean process tree kill
 func killProcessGroup(cmd *exec.Cmd) error {
 	// https://github.com/golang/dep/pull/857
+	//nolint:gosec // works as expected
 	return exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
 }
