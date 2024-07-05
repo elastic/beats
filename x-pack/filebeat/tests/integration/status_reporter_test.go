@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -56,7 +57,11 @@ func TestLogStatusReporter(t *testing.T) {
 	 * try to open an irregular file.
 	 * This should throw "Tried to open non regular file:" and status to degraded
 	 */
-	inputStreamIrregular := getInputStream(unitOneID, "/dev/null", 1)
+	nullDeviceFile := "/dev/null"
+	if runtime.GOOS == "windows" {
+		nullDeviceFile = "NUL"
+	}
+	inputStreamIrregular := getInputStream(unitOneID, nullDeviceFile, 1)
 
 	outputExpectedStream := proto.UnitExpected{
 		Id:             unitOutID,
