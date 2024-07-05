@@ -200,9 +200,18 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
+<<<<<<< HEAD
 		if management.TraceLevelEnabled() {
 			mux.Lock()
 			defer mux.Unlock()
+=======
+		if !log.IsDebug() {
+			return event, nil
+		}
+
+		mux.Lock()
+		defer mux.Unlock()
+>>>>>>> 58f4fc8579 (fix: exit directly in debugPrintProcessor when log doesn't have debug level enabled (#40081))
 
 			b, err := encoder.Encode(info.Beat, event)
 			if err != nil {
