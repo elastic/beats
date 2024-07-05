@@ -196,9 +196,61 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/golang/protobuf v1.5.4
+=======
+	cloud.google.com/go v0.110.8
+	cloud.google.com/go/compute v1.23.0
+	cloud.google.com/go/redis v1.13.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.12.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.3.2
+	github.com/Azure/go-autorest/autorest/adal v0.9.21
+	github.com/apache/arrow/go/v14 v14.0.2
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.1
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.16.15
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.50.0
+	github.com/aws/aws-sdk-go-v2/service/health v1.24.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.27.4
+	github.com/aws/smithy-go v1.20.2
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/ebpfevents v0.6.0
+	github.com/elastic/elastic-agent-autodiscover v0.7.0
+	github.com/elastic/elastic-agent-libs v0.9.13
+	github.com/elastic/elastic-agent-system-metrics v0.10.3
+	github.com/elastic/go-elasticsearch/v8 v8.14.0
+	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
+	github.com/elastic/mito v1.13.0
+	github.com/elastic/tk-btf v0.1.0
+	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
+	github.com/go-ldap/ldap/v3 v3.4.6
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/cel-go v0.19.0
+	github.com/googleapis/gax-go/v2 v2.12.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/websocket v1.5.0
+	github.com/icholy/digest v0.1.22
+	github.com/otiai10/copy v1.12.0
+	github.com/pierrec/lz4/v4 v4.1.18
+	github.com/pkg/xattr v0.4.9
+	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/tklauser/go-sysconf v0.3.10
+	github.com/xdg-go/scram v1.1.2
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
+	go.elastic.co/apm/v2 v2.6.0
+	go.mongodb.org/mongo-driver v1.5.1
+>>>>>>> b226be2322 ([security] Bump azidentity to 1.7.0 to address CVE-2024-35255 (#40093))
 	golang.org/x/tools/go/vcs v0.1.0-deprecated
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98
 )
@@ -209,9 +261,17 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.1 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
+<<<<<<< HEAD
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
 	github.com/Azure/go-amqp v0.16.0 // indirect
+=======
+	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
+	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
+	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.9.1 // indirect
+	github.com/Azure/go-amqp v1.0.5 // indirect
+>>>>>>> b226be2322 ([security] Bump azidentity to 1.7.0 to address CVE-2024-35255 (#40093))
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.3.1 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
