@@ -127,29 +127,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Update to Go 1.21.12. {pull}40114[40114]
-- Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
-- The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
-- Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
-- Add persistent volume claim name to volume if available {pull}38839[38839]
-- Raw events are now logged to a different file, this prevents potentially sensitive information from leaking into log files {pull}38767[38767]
-- Websocket input: Added runtime URL modification support based on state and cursor values {issue}39858[39858] {pull}39997[39997]
-
-*Auditbeat*
-
-- Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
-- Add linux capabilities to processes in the system/process. {pull}37453[37453]
-- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
-- Add linux capabilities to processes in the system/process. {pull}37453[37453]
-- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
-- Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
-- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
-- Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
-- Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
-- Reduce data size for add_session_metadata processor by removing unneeded fields {pull}39500[39500]
-- Enrich process events with user and group names, with add_session_metadata processor  {pull}39537[39537]
-
-*Auditbeat*
-
 
 *Auditbeat*
 
