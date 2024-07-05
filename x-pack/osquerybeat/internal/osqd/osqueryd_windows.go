@@ -28,9 +28,7 @@ func SocketPath(dir string) string {
 }
 
 func platformArgs() map[string]interface{} {
-	return map[string]interface{}{
-		"allow_unsafe": true,
-	}
+	return nil
 }
 
 func setpgid() *syscall.SysProcAttr {
