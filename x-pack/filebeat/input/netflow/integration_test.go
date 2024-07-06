@@ -41,7 +41,8 @@ const (
 
 func TestNetFlowIntegration(t *testing.T) {
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
@@ -206,7 +207,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	require.NoError(t, err)
 
-	data, err := os.ReadFile("testdata/golden/ipfix_cisco.pcap.golden.json")
+	data, err := os.ReadFile("testdata/golden/ipfix_cisco.reversed.pcap.golden.json")
 	require.NoError(t, err)
 
 	var expectedFlows struct {
@@ -215,7 +216,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	err = json.Unmarshal(data, &expectedFlows)
 	require.NoError(t, err)
 
-	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.pcap")
+	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.reversed.pcap")
 	require.NoError(t, err)
 	defer f.Close()
 
