@@ -69,15 +69,15 @@ func (p *NetflowV9Protocol) Start() error {
 		go p.Session.CleanupLoop(p.timeout, p.done)
 	}
 
-	if p.cache != nil {
-		p.cache.start(p.done, 30*time.Second, 10*time.Second)
-	}
+	p.cache.start(p.done, 30*time.Second, 10*time.Second)
+
 	return nil
 }
 
 func (p *NetflowV9Protocol) Stop() error {
 	if p.done != nil {
 		close(p.done)
+		p.cache.stop()
 	}
 	return nil
 }
