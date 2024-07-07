@@ -32,6 +32,7 @@ import (
 
 	"github.com/magefile/mage/sh"
 	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -84,6 +85,8 @@ var (
 	versionQualified bool
 	versionQualifier string
 
+	caser = cases.Title(language.English)
+
 	FuncMap = map[string]interface{}{
 		"beat_doc_branch":   BeatDocBranch,
 		"beat_version":      BeatQualifiedVersion,
@@ -93,7 +96,7 @@ var (
 		"elastic_beats_dir": ElasticBeatsDir,
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
-		"title":             cases.Title,
+		"title":             caser.String,
 		"tolower":           strings.ToLower,
 		"contains":          strings.Contains,
 	}
