@@ -36,7 +36,7 @@ import (
 const logName = "processor.dns"
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.Uint32{}
+var instanceID atomic.Uint32
 
 func init() {
 	processors.RegisterPlugin("dns", New)

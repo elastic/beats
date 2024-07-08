@@ -76,8 +76,7 @@ func (fr *fakeRunner) String() string {
 }
 
 func TestStartStop(t *testing.T) {
-	startCounter := atomic.Int64{}
-	stopCounter := atomic.Int64{}
+	var startCounter, stopCounter atomic.Int64
 
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
 	for i := 0; i < fakeRunnersNum; i++ {

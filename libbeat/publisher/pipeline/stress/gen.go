@@ -97,7 +97,7 @@ func generate(
 	done := make(chan struct{})
 	defer close(done)
 
-	count := atomic.Uint64{}
+	var count atomic.Uint64
 
 	var wg sync.WaitGroup
 	defer wg.Wait()

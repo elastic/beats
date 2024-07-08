@@ -36,7 +36,7 @@ import (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.Uint32{}
+var instanceID atomic.Uint32
 
 const processorName = "rate_limit"
 const logName = "processor." + processorName

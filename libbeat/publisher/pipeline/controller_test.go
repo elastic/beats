@@ -221,7 +221,7 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	// block, because there is no queue, but they should become unblocked
 	// once we set a nonempty output.
 	const producerCount = 10
-	remaining := atomic.Int64{}
+	var remaining atomic.Int64
 	remaining.Store(producerCount)
 	for i := 0; i < producerCount; i++ {
 		go func() {

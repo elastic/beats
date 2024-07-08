@@ -184,7 +184,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.Bool{}
+	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)

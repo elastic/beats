@@ -21,11 +21,11 @@ import "sync/atomic"
 
 var (
 	// underAgent is set to true with this beat is being ran under the elastic-agent
-	underAgent = atomic.Bool{}
+	underAgent atomic.Bool
 
 	// underAgentTrace is set to true when the elastic-agent has placed this beat into
 	// trace mode (which enables logging of published events)
-	underAgentTrace = atomic.Bool{}
+	underAgentTrace atomic.Bool
 )
 
 // SetUnderAgent sets that the processing pipeline is being ran under the elastic-agent.

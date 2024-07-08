@@ -79,7 +79,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 // close method is called, this ID is returned
 func makeDiscardQueue() queue.Queue {
 	var wg sync.WaitGroup
-	producerID := atomic.Int64{}
+	var producerID atomic.Int64
 
 	return &testQueue{
 		close: func() error {
@@ -231,7 +231,7 @@ func makeTestQueue() queue.Queue {
 
 func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	sig := make(chan struct{})
-	waiting := atomic.Int64{}
+	var waiting atomic.Int64
 
 	return &testProducer{
 		publish: func(_ bool, _ queue.Entry) (queue.EntryID, bool) {

@@ -266,7 +266,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.Uint64{}
+		var count atomic.Uint64
 		start := time.Now()
 		b.ResetTimer()
 

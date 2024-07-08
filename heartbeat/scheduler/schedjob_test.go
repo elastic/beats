@@ -102,7 +102,7 @@ func TestRecursiveForkingJob(t *testing.T) {
 	s := Create(1000, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
 		"atype": {Limit: 1},
 	}, false)
-	ran := &atomic.Int64{}
+	var ran atomic.Int64
 
 	var terminalTf TaskFunc = func(ctx context.Context) []TaskFunc {
 		ran.Add(1)

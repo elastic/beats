@@ -43,7 +43,7 @@ const (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.Uint32{}
+var instanceID atomic.Uint32
 
 // config defines the configuration for this processor.
 type config struct {
