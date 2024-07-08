@@ -205,6 +205,22 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 		t.Fatalf("expecting %d events, got %d", len(goldenEvents), len(events))
 	}
 
+	// The timestamps can have different locations set, but still be equal,
+	// this causes the require.EqualValues to fail, so we compare them manually
+	// and set them all to the same time.
+	for i, goldEvent := range goldenEvents {
+		// We have compared the length already, both slices have
+		// have the same number of elements
+		evt := events[i]
+		if !goldEvent.Timestamp.Equal(evt.Timestamp) {
+			t.Errorf(
+				"event %d timestamp is different than expected. Expecting %s, got %s",
+				i, goldEvent.Timestamp.String(), evt.Timestamp.String())
+		}
+
+		events[i].Timestamp = goldEvent.Timestamp
+	}
+
 	require.EqualValues(t, goldenEvents, events, "events do not match reference")
 }
 
