@@ -33,7 +33,7 @@ func newCloseSignaler() *closeSignaler {
 }
 
 func (s *closeSignaler) Close() {
-	if s.active.CompareAndSwap(true, false) {
+	if s.active.Swap(false) {
 		close(s.done)
 	}
 }

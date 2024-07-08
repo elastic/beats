@@ -131,7 +131,7 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	if c.isOpen.CompareAndSwap(true, false) {
+	if c.isOpen.Swap(false) {
 		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 

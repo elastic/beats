@@ -39,7 +39,7 @@ func newOutlet(client beat.Client) *outlet {
 }
 
 func (o *outlet) Close() error {
-	if o.isOpen.CompareAndSwap(true, false) {
+	if o.isOpen.Swap(false) {
 		close(o.done)
 		return o.client.Close()
 	}
