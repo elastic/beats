@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
 - Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
 
 *Heartbeat*
 
