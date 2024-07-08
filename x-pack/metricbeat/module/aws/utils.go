@@ -81,14 +81,12 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 		}
 
 		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
-		if page.OwningAccounts == nil {
-			for _, metric := range page.Metrics {
-				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+		for i, metric := range page.Metrics {
+			owningAccount := monitoringAccountID
+			if page.OwningAccounts != nil {
+				owningAccount = page.OwningAccounts[i]
 			}
-		} else {
-			for i, metric := range page.Metrics {
-				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
-			}
+			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, owningAccount})
 		}
 	}
 	return metricWithAccountID, nil
