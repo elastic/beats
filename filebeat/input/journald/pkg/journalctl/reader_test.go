@@ -51,7 +51,7 @@ func TestEventWithNonStringData(t *testing.T) {
 			r := Reader{
 				logger:   logp.L(),
 				dataChan: make(chan []byte),
-				errChan:  make(chan error),
+				errChan:  make(chan string),
 				stdout:   stdout,
 				stderr:   stderr,
 			}
