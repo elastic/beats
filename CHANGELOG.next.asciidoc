@@ -103,7 +103,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
-- Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 
 *Osquerybeat*
