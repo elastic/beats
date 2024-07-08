@@ -153,7 +153,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 
 	var prg *program
 	if e.config.Program != "" {
-		prg, err = newProgram(e.config.Program)
+		prg, err = newProgram(e.config.Program, log)
 		if err != nil {
 			return err
 		}

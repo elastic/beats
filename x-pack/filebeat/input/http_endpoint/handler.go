@@ -141,7 +141,55 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.metrics.batchesPublished.Add(1)
 }
 
+<<<<<<< HEAD
 func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+=======
+var errTookTooLong = errors.New("could not publish event within timeout")
+
+func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
+	q := u.Query()
+	switch len(q) {
+	case 0:
+		return 0, nil
+	case 1:
+		if _, ok := q["wait_for_completion_timeout"]; !ok {
+			// Get the only key in q. We don't know what it is, so iterate
+			// over the first one of one.
+			var k string
+			for k = range q {
+				break
+			}
+			return 0, fmt.Errorf("unexpected URL query: %s", k)
+		}
+	default:
+		delete(q, "wait_for_completion_timeout")
+		keys := make([]string, 0, len(q))
+		for k := range q {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		return 0, fmt.Errorf("unexpected URL query: %s", strings.Join(keys, ", "))
+	}
+	p := q.Get("wait_for_completion_timeout")
+	if p == "" {
+		// This will never happen; it is already handled in the check switch above.
+		return 0, nil
+	}
+	log.Debugw("wait_for_completion_timeout parameter", "value", p)
+	t, err := time.ParseDuration(p)
+	if err != nil {
+		return 0, fmt.Errorf("could not parse wait_for_completion_timeout parameter: %w", err)
+	}
+	if t < 0 {
+		return 0, fmt.Errorf("negative wait_for_completion_timeout parameter: %w", err)
+	}
+	return t, nil
+}
+
+func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	log.Errorw("request error", "tx_id", txID, "status_code", status, "error", apiError)
+
+>>>>>>> f0401c6bd5 (x-pack/filebeat/input/http_endpoint: fix handling of deeply nested numeric values (#40115))
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 
@@ -292,7 +340,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []js
 			objs = append(objs, nobjs...)
 			rawMessages = append(rawMessages, nrawMessages...)
 		default:
-			return nil, nil, errUnsupportedType
+			return nil, nil, fmt.Errorf("%w: %T", errUnsupportedType, v)
 		}
 	}
 	for i := range objs {
@@ -306,7 +354,7 @@ type program struct {
 	ast *cel.Ast
 }
 
-func newProgram(src string) (*program, error) {
+func newProgram(src string, log *logp.Logger) (*program, error) {
 	if src == "" {
 		return nil, nil
 	}
@@ -320,6 +368,7 @@ func newProgram(src string) (*program, error) {
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		cel.CustomTypeAdapter(&numberAdapter{registry}),
 		cel.CustomTypeProvider(registry),
+		lib.Debug(debug(log)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create env: %w", err)
@@ -337,6 +386,17 @@ func newProgram(src string) (*program, error) {
 	return &program{prg: prg, ast: ast}, nil
 }
 
+func debug(log *logp.Logger) func(string, any) {
+	log = log.Named("http_endpoint_cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		log.Debugw(level, "tag", tag, "value", value)
+	}
+}
+
 var _ types.Adapter = (*numberAdapter)(nil)
 
 type numberAdapter struct {
@@ -344,15 +404,36 @@ type numberAdapter struct {
 }
 
 func (a *numberAdapter) NativeToValue(value any) ref.Val {
-	if n, ok := value.(json.Number); ok {
+	switch value := value.(type) {
+	case []any:
+		for i, v := range value {
+			value[i] = a.NativeToValue(v)
+		}
+	case map[string]any:
+		for k, v := range value {
+			value[k] = a.NativeToValue(v)
+		}
+	case json.Number:
 		var errs []error
-		i, err := n.Int64()
+		i, err := value.Int64()
 		if err == nil {
 			return types.Int(i)
 		}
 		errs = append(errs, err)
-		f, err := n.Float64()
+		f, err := value.Float64()
 		if err == nil {
+			// Literalise floats that could have been an integer greater than
+			// can be stored without loss of precision in a double.
+			// This is any integer wider than the IEEE-754 double mantissa.
+			// As a heuristic, allow anything that includes a decimal point
+			// or uses scientific notation. We could be more careful, but
+			// it is likely not important, and other languages use the same
+			// rule.
+			if f >= 0x1p53 && !strings.ContainsFunc(string(value), func(r rune) bool {
+				return r == '.' || r == 'e' || r == 'E'
+			}) {
+				return types.String(value)
+			}
 			return types.Double(f)
 		}
 		errs = append(errs, err)
