@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/cel-go/cel"
@@ -141,55 +142,9 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.metrics.batchesPublished.Add(1)
 }
 
-<<<<<<< HEAD
 func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
-=======
-var errTookTooLong = errors.New("could not publish event within timeout")
+	log.Errorw("request error", "status_code", status, "error", apiError)
 
-func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
-	q := u.Query()
-	switch len(q) {
-	case 0:
-		return 0, nil
-	case 1:
-		if _, ok := q["wait_for_completion_timeout"]; !ok {
-			// Get the only key in q. We don't know what it is, so iterate
-			// over the first one of one.
-			var k string
-			for k = range q {
-				break
-			}
-			return 0, fmt.Errorf("unexpected URL query: %s", k)
-		}
-	default:
-		delete(q, "wait_for_completion_timeout")
-		keys := make([]string, 0, len(q))
-		for k := range q {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		return 0, fmt.Errorf("unexpected URL query: %s", strings.Join(keys, ", "))
-	}
-	p := q.Get("wait_for_completion_timeout")
-	if p == "" {
-		// This will never happen; it is already handled in the check switch above.
-		return 0, nil
-	}
-	log.Debugw("wait_for_completion_timeout parameter", "value", p)
-	t, err := time.ParseDuration(p)
-	if err != nil {
-		return 0, fmt.Errorf("could not parse wait_for_completion_timeout parameter: %w", err)
-	}
-	if t < 0 {
-		return 0, fmt.Errorf("negative wait_for_completion_timeout parameter: %w", err)
-	}
-	return t, nil
-}
-
-func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
-	log.Errorw("request error", "tx_id", txID, "status_code", status, "error", apiError)
-
->>>>>>> f0401c6bd5 (x-pack/filebeat/input/http_endpoint: fix handling of deeply nested numeric values (#40115))
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 
