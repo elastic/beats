@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-
 package integration
 
 import (
@@ -158,6 +156,7 @@ func TestLogStatusReporter(t *testing.T) {
 		select {
 		case observed := <-observedStates:
 			state := extractState(observed.GetUnits(), unitOneID)
+			fmt.Println(id, state)
 			expectedUnits <- []*proto.UnitExpected{
 				scenarios[id].nextInputunit,
 				&outputExpectedStream,
@@ -197,10 +196,10 @@ func getInputStream(id string, path string, stateIdx int) proto.UnitExpected {
 			Streams: []*proto.Stream{{
 				Id: "filebeat/filestream-default-system",
 				Source: tests.RequireNewStruct(map[string]interface{}{
-					"enabled":  true,
-					"symlinks": true,
-					"type":     "filestream",
-					"paths":    []interface{}{path},
+					"enabled": true,
+					"type":    "filestream",
+					"id":      "filestream-id",
+					"paths":   path,
 				}),
 			}},
 			Type:     "filestream",
