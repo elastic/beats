@@ -150,7 +150,7 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
-	logger.Debugf("Journalctl command: journalctl %s", strings.Join(args, " "))
+	logger.Infof("Journalctl command: journalctl %s", strings.Join(args, " "))
 	cmd := exec.Command("journalctl", args...)
 
 	stdout, err := cmd.StdoutPipe()
@@ -198,12 +198,12 @@ func New(
 	r.wg.Add(1)
 	go func() {
 		defer r.logger.Debug("stdout goroutine done")
+		defer close(r.dataChan)
 		defer r.wg.Done()
 		reader := bufio.NewReader(r.stdout)
 		for {
 			data, err := reader.ReadBytes('\n')
 			if errors.Is(err, io.EOF) {
-				close(r.dataChan)
 				return
 			}
 
@@ -221,7 +221,7 @@ func New(
 
 	go func() {
 		if err := cmd.Wait(); err != nil {
-			r.logger.Errorf("journalclt exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
+			r.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
 		}
 	}()
 
