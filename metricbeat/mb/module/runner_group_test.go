@@ -19,13 +19,13 @@ package module
 
 import (
 	"fmt"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 )
 
@@ -55,19 +55,19 @@ func (fr *fakeRunnerDiag) Diagnostics() []diagnostics.DiagnosticSetup {
 type fakeRunner struct {
 	id int
 
-	startCounter *atomic.Int
-	stopCounter  *atomic.Int
+	startCounter *atomic.Int64
+	stopCounter  *atomic.Int64
 }
 
 func (fr *fakeRunner) Start() {
 	if fr.startCounter != nil {
-		fr.startCounter.Inc()
+		fr.startCounter.Add(1)
 	}
 }
 
 func (fr *fakeRunner) Stop() {
 	if fr.stopCounter != nil {
-		fr.stopCounter.Inc()
+		fr.stopCounter.Add(1)
 	}
 }
 
@@ -76,15 +76,15 @@ func (fr *fakeRunner) String() string {
 }
 
 func TestStartStop(t *testing.T) {
-	startCounter := atomic.NewInt(0)
-	stopCounter := atomic.NewInt(0)
+	startCounter := atomic.Int64{}
+	stopCounter := atomic.Int64{}
 
 	runners := make([]cfgfile.Runner, 0, fakeRunnersNum)
 	for i := 0; i < fakeRunnersNum; i++ {
 		runners = append(runners, &fakeRunner{
 			id:           i,
-			startCounter: startCounter,
-			stopCounter:  stopCounter,
+			startCounter: &startCounter,
+			stopCounter:  &stopCounter,
 		})
 	}
 
@@ -102,8 +102,8 @@ func TestDiagnosticsUnsupported(t *testing.T) {
 	for i := 0; i < fakeRunnersNum; i++ {
 		runners = append(runners, &fakeRunner{
 			id:           i,
-			startCounter: atomic.NewInt(0),
-			stopCounter:  atomic.NewInt(0),
+			startCounter: &atomic.Int64{},
+			stopCounter:  &atomic.Int64{},
 		})
 	}
 

@@ -20,10 +20,10 @@ package pipeline
 import (
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -79,7 +79,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 // close method is called, this ID is returned
 func makeDiscardQueue() queue.Queue {
 	var wg sync.WaitGroup
-	producerID := atomic.NewInt(0)
+	producerID := atomic.Int64{}
 
 	return &testQueue{
 		close: func() error {
@@ -92,7 +92,7 @@ func makeDiscardQueue() queue.Queue {
 		},
 
 		producer: func(cfg queue.ProducerConfig) queue.Producer {
-			producerID.Inc()
+			producerID.Add(1)
 
 			// count is a counter that increments on every published event
 			// it's also the returned Event ID
@@ -231,11 +231,11 @@ func makeTestQueue() queue.Queue {
 
 func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	sig := make(chan struct{})
-	waiting := atomic.MakeInt(0)
+	waiting := atomic.Int64{}
 
 	return &testProducer{
 		publish: func(_ bool, _ queue.Entry) (queue.EntryID, bool) {
-			waiting.Inc()
+			waiting.Add(1)
 			<-sig
 			return 0, false
 		},

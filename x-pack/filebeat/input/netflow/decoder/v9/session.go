@@ -8,9 +8,9 @@ import (
 	"log"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/atomic"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
@@ -83,7 +83,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	var toDelete []TemplateKey
 	s.mutex.RLock()
 	for id, template := range s.Templates {
-		if !template.Delete.CAS(false, true) {
+		if !template.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, id)
 		}
 	}

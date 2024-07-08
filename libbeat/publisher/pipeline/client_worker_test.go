@@ -22,6 +22,7 @@ import (
 	"math"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"testing/quick"
 	"time"
@@ -30,7 +31,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -48,7 +48,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 			err := quick.Check(func(i uint) bool {
 				numBatches := 300 + (i % 100) // between 300 and 399
-				var numEvents uint
+				var numEvents uint64
 
 				logger := makeBufLogger(t)
 
@@ -56,9 +56,9 @@ func TestMakeClientWorker(t *testing.T) {
 				retryer := newStandaloneRetryer(workQueue)
 				defer retryer.close()
 
-				var published atomic.Uint
+				var published atomic.Uint64
 				publishFn := func(batch publisher.Batch) error {
-					published.Add(uint(len(batch.Events())))
+					published.Add(uint64(len(batch.Events())))
 					return nil
 				}
 
@@ -69,7 +69,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				for i := uint(0); i < numBatches; i++ {
 					batch := randomBatch(50, 150).withRetryer(retryer)
-					numEvents += uint(len(batch.Events()))
+					numEvents += uint64(len(batch.Events()))
 					workQueue <- batch
 				}
 
@@ -82,7 +82,7 @@ func TestMakeClientWorker(t *testing.T) {
 				})
 				if !success {
 					logger.Flush()
-					t.Logf("numBatches = %v, numEvents = %v, published = %v", numBatches, numEvents, published)
+					t.Logf("numBatches = %v, numEvents = %v, published = %v", numBatches, numEvents, published.Load())
 				}
 				return success
 			}, nil)
@@ -140,9 +140,9 @@ func TestReplaceClientWorker(t *testing.T) {
 				}()
 
 				// Publish at least 1 batch worth of events but no more than 20% events
-				publishLimit := uint(math.Max(minEventsInBatch, float64(numEvents)*0.2))
+				publishLimit := uint64(math.Max(minEventsInBatch, float64(numEvents)*0.2))
 
-				var publishedFirst atomic.Uint
+				var publishedFirst atomic.Uint64
 				blockCtrl := make(chan struct{})
 				blockingPublishFn := func(batch publisher.Batch) error {
 					// Emulate blocking. Upon unblocking the in-flight batch that was
@@ -152,7 +152,7 @@ func TestReplaceClientWorker(t *testing.T) {
 					}
 
 					count := len(batch.Events())
-					publishedFirst.Add(uint(count))
+					publishedFirst.Add(uint64(count))
 					t.Logf("#1 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
 					return nil
 				}
@@ -176,10 +176,10 @@ func TestReplaceClientWorker(t *testing.T) {
 				close(blockCtrl)
 
 				// Start new worker to drain work queue
-				var publishedLater atomic.Uint
+				var publishedLater atomic.Uint64
 				countingPublishFn := func(batch publisher.Batch) error {
 					count := len(batch.Events())
-					publishedLater.Add(uint(count))
+					publishedLater.Add(uint64(count))
 					t.Logf("#2 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
 					return nil
 				}

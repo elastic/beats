@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"runtime/pprof"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type generateConfig struct {
@@ -97,7 +97,7 @@ func generate(
 	done := make(chan struct{})
 	defer close(done)
 
-	count := atomic.MakeUint64(0)
+	count := atomic.Uint64{}
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
@@ -148,7 +148,7 @@ func generate(
 			Fields: mapstr.M{
 				"id":    id,
 				"hello": "world",
-				"count": count,
+				"count": count.Load(),
 
 				// TODO: more custom event generation?
 			},
@@ -156,7 +156,7 @@ func generate(
 
 		client.Publish(event)
 
-		total := count.Inc()
+		total := count.Add(1)
 		if config.MaxEvents > 0 && total == config.MaxEvents {
 			break
 		}

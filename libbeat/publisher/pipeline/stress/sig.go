@@ -17,7 +17,7 @@
 
 package stress
 
-import "github.com/elastic/beats/v7/libbeat/common/atomic"
+import "sync/atomic"
 
 type closeSignaler struct {
 	active atomic.Bool
@@ -25,14 +25,15 @@ type closeSignaler struct {
 }
 
 func newCloseSignaler() *closeSignaler {
-	return &closeSignaler{
-		active: atomic.MakeBool(true),
-		done:   make(chan struct{}),
+	cs := &closeSignaler{
+		done: make(chan struct{}),
 	}
+	cs.active.Store(true)
+	return cs
 }
 
 func (s *closeSignaler) Close() {
-	if act := s.active.Swap(false); act {
+	if s.active.CompareAndSwap(true, false) {
 		close(s.done)
 	}
 }

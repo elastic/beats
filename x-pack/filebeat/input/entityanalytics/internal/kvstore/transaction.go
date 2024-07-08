@@ -8,10 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync/atomic"
 
 	"go.etcd.io/bbolt"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 var (
@@ -126,7 +125,7 @@ func (t *Transaction) Delete(bucket, key []byte) error {
 // Commit will write any changes to disk. For read-only transactions, calling
 // Commit will route to Rollback.
 func (t *Transaction) Commit() error {
-	if !t.closed.CAS(false, true) {
+	if !t.closed.CompareAndSwap(false, true) {
 		return nil
 	}
 	if !t.writeable {
@@ -138,7 +137,7 @@ func (t *Transaction) Commit() error {
 // Rollback closes the transaction. For write transactions, all updates made
 // within the transaction will be discarded.
 func (t *Transaction) Rollback() error {
-	if !t.closed.CAS(false, true) {
+	if !t.closed.CompareAndSwap(false, true) {
 		return nil
 	}
 	return t.tx.Rollback()

@@ -22,6 +22,7 @@ import (
 	"errors"
 	"runtime"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -29,7 +30,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -111,12 +111,12 @@ func TestStateless_Run(t *testing.T) {
 		defer cancel()
 
 		// connector creates a client the blocks forever until the shutdown signal is received
-		var publishCalls atomic.Int
+		var publishCalls atomic.Int64
 		connector := pubtest.FakeConnector{
 			ConnectFunc: func(config beat.ClientConfig) (beat.Client, error) {
 				return &pubtest.FakeClient{
 					PublishFunc: func(event beat.Event) {
-						publishCalls.Inc()
+						publishCalls.Add(1)
 						// Unlock Publish once the input has been cancelled
 						<-ctx.Done()
 					},
@@ -148,10 +148,10 @@ func TestStateless_Run(t *testing.T) {
 		errOpps := errors.New("oops")
 		connector := pubtest.FailingConnector(errOpps)
 
-		var run atomic.Int
+		var run atomic.Int64
 		input := createConfiguredInput(t, constInputManager(&fakeStatelessInput{
 			OnRun: func(_ v2.Context, publisher stateless.Publisher) error {
-				run.Inc()
+				run.Add(1)
 				return nil
 			},
 		}), nil)

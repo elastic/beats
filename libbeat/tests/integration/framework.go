@@ -40,7 +40,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
@@ -185,7 +184,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.MakeBool(false)
+	done := atomic.Bool{}
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)

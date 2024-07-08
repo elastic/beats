@@ -19,10 +19,10 @@ package pipeline
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -131,7 +131,7 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	if c.isOpen.Swap(false) {
+	if c.isOpen.CompareAndSwap(true, false) {
 		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 

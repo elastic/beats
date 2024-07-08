@@ -26,6 +26,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"text/template"
 	"time"
@@ -34,7 +35,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -237,7 +237,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		count := atomic.Uint64{}
 		start := time.Now()
 		b.ResetTimer()
 
@@ -254,7 +254,7 @@ func BenchmarkRenderer(b *testing.B) {
 				b.Fatal(err)
 			}
 
-			count.Inc()
+			count.Add(1)
 		}
 
 		elapsed := time.Since(start)
@@ -266,7 +266,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		count := atomic.Uint64{}
 		start := time.Now()
 		b.ResetTimer()
 
@@ -283,7 +283,7 @@ func BenchmarkRenderer(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				count.Inc()
+				count.Add(1)
 			}
 		})
 

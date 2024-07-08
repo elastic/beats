@@ -25,9 +25,9 @@ import (
 	"io"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Shopify/sarama"
@@ -392,9 +392,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 	messages := l.parseMultipleMessages(msg.Value)
 
-	neededAcks := atomic.MakeInt(len(messages))
+	neededAcks := atomic.Int64{}
+	neededAcks.Add(int64(len(messages)))
 	ackHandler := func() {
-		if neededAcks.Dec() == 0 {
+		if neededAcks.Add(-1) == 0 {
 			l.groupHandler.ack(msg)
 		}
 	}

@@ -18,8 +18,9 @@
 package channel
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type outlet struct {
@@ -31,15 +32,14 @@ type outlet struct {
 func newOutlet(client beat.Client) *outlet {
 	o := &outlet{
 		client: client,
-		isOpen: atomic.MakeBool(true),
 		done:   make(chan struct{}),
 	}
+	o.isOpen.Store(true)
 	return o
 }
 
 func (o *outlet) Close() error {
-	isOpen := o.isOpen.Swap(false)
-	if isOpen {
+	if o.isOpen.CompareAndSwap(true, false) {
 		close(o.done)
 		return o.client.Close()
 	}

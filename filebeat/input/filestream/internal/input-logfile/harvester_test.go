@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -31,7 +32,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -128,7 +128,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 	t.Run("assert a harvester is only started if harvester limit haven't been reached", func(t *testing.T) {
 		var wg sync.WaitGroup
-		var harvesterRunningCount atomic.Int
+		var harvesterRunningCount atomic.Int64
 		var harvester1Finished, harvester2Finished atomic.Bool
 		done1, done2 := make(chan struct{}), make(chan struct{})
 

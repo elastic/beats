@@ -25,6 +25,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/gopacket"
@@ -33,7 +34,6 @@ import (
 	"github.com/google/gopacket/pcapgo"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
@@ -51,7 +51,7 @@ type Sniffer struct {
 type sniffer struct {
 	config config.InterfaceConfig
 
-	state atomic.Int32 // store snifferState
+	state *atomic.Int32 // store snifferState
 
 	// device is the first active device after calling New.
 	// It is not updated by default route polling.
@@ -103,13 +103,14 @@ func New(id string, testMode bool, _ string, decoders map[string]Decoders, inter
 			return nil, fmt.Errorf("no decoder for %s", iface.Device)
 		}
 		child := sniffer{
-			state:         atomic.MakeInt32(snifferInactive),
+			state:         &atomic.Int32{},
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
 			id:            id,
 			idx:           i,
 			decoders:      dec,
 			log:           s.log,
 		}
+		child.state.Store(snifferInactive)
 
 		s.log.Debugf("interface: %d, BPF filter: '%s'", i, iface.BpfFilter)
 

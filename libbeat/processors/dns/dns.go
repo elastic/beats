@@ -22,9 +22,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -36,7 +36,7 @@ import (
 const logName = "processor.dns"
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID = atomic.Uint32{}
 
 func init() {
 	processors.RegisterPlugin("dns", New)
@@ -58,7 +58,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id      = int(instanceID.Inc())
+		id      = int(instanceID.Add(1))
 		log     = logp.NewLogger(logName).With("instance_id", id)
 		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)

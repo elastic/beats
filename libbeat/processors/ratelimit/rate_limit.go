@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +36,7 @@ import (
 )
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID = atomic.Uint32{}
 
 const processorName = "rate_limit"
 const logName = "processor." + processorName
@@ -79,7 +79,7 @@ func new(cfg *c.C) (beat.Processor, error) {
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
+		id  = int(instanceID.Add(1))
 		log = logp.NewLogger(logName).With("instance_id", id)
 		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)

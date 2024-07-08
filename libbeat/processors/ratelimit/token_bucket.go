@@ -20,13 +20,13 @@ package ratelimit
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jonboulle/clockwork"
 
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -50,7 +50,7 @@ type tokenBucket struct {
 	gc struct {
 		thresholds tokenBucketGCConfig
 		metrics    struct {
-			numCalls atomic.Uint
+			numCalls atomic.Uint64
 		}
 	}
 
@@ -93,7 +93,7 @@ func newTokenBucket(config algoConfig) (algorithm, error) {
 		gc: struct {
 			thresholds tokenBucketGCConfig
 			metrics    struct {
-				numCalls atomic.Uint
+				numCalls atomic.Uint64
 			}
 		}{
 			thresholds: tokenBucketGCConfig{
@@ -112,7 +112,7 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 	b := t.getBucket(key)
 	allowed := b.withdraw()
 
-	t.gc.metrics.numCalls.Inc()
+	t.gc.metrics.numCalls.Add(1)
 	return allowed
 }
 
@@ -154,7 +154,7 @@ func (b *bucket) replenish(rate rate, clock clockwork.Clock) {
 
 func (t *tokenBucket) runGC() {
 	// Don't run GC if thresholds haven't been crossed.
-	if t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls {
+	if t.gc.metrics.numCalls.Load() < uint64(t.gc.thresholds.NumCalls) {
 		return
 	}
 
@@ -190,7 +190,7 @@ func (t *tokenBucket) runGC() {
 		}
 
 		// Reset GC metrics
-		t.gc.metrics.numCalls = atomic.MakeUint(0)
+		t.gc.metrics.numCalls = atomic.Uint64{}
 
 		gcDuration := time.Now().Sub(gcStartTime)
 		numBucketsDeleted := len(toDelete)

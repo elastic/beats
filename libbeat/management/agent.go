@@ -17,17 +17,15 @@
 
 package management
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-)
+import "sync/atomic"
 
 var (
 	// underAgent is set to true with this beat is being ran under the elastic-agent
-	underAgent = atomic.MakeBool(false)
+	underAgent = atomic.Bool{}
 
 	// underAgentTrace is set to true when the elastic-agent has placed this beat into
 	// trace mode (which enables logging of published events)
-	underAgentTrace = atomic.MakeBool(false)
+	underAgentTrace = atomic.Bool{}
 )
 
 // SetUnderAgent sets that the processing pipeline is being ran under the elastic-agent.

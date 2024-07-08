@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -35,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -726,8 +726,8 @@ func (p *Input) createHarvester(logger *logp.Logger, state file.State, onTermina
 // startHarvester starts a new harvester with the given offset
 // In case the HarvesterLimit is reached, an error is returned
 func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int64) error {
-	if p.numHarvesters.Inc() > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
-		p.numHarvesters.Dec()
+	if p.numHarvesters.Add(1) > p.config.HarvesterLimit && p.config.HarvesterLimit > 0 {
+		p.numHarvesters.Add(^uint32(0))
 		harvesterSkipped.Add(1)
 		return errHarvesterLimit
 	}
@@ -736,15 +736,15 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	state.Offset = offset
 
 	// Create harvester with state
-	h, err := p.createHarvester(logger, state, func() { p.numHarvesters.Dec() })
+	h, err := p.createHarvester(logger, state, func() { p.numHarvesters.Add(^uint32(0)) })
 	if err != nil {
-		p.numHarvesters.Dec()
+		p.numHarvesters.Add(^uint32(0))
 		return err
 	}
 
 	err = h.Setup()
 	if err != nil {
-		p.numHarvesters.Dec()
+		p.numHarvesters.Add(^uint32(0))
 		return fmt.Errorf("error setting up harvester: %w", err)
 	}
 
@@ -754,7 +754,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	h.SendStateUpdate()
 
 	if err = p.harvesters.Start(h); err != nil {
-		p.numHarvesters.Dec()
+		p.numHarvesters.Add(^uint32(0))
 	}
 	return err
 }
