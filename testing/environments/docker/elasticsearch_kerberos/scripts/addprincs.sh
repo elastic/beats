@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 krb5kdc
