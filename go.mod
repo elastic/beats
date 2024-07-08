@@ -1,8 +1,8 @@
 module github.com/elastic/beats/v7
 
-go 1.21.9
+go 1.21.0
 
-toolchain go1.21.11
+toolchain go1.21.12
 
 require (
 	cloud.google.com/go/bigquery v1.55.0
@@ -226,7 +226,6 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
-	golang.org/x/tools/go/vcs v0.1.0-deprecated
 	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
