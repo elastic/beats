@@ -35,6 +35,8 @@ var withTraces = flag.Bool("log-traces", false, "specify logging request traces 
 const traceLogsDir = "trace_logs"
 
 func Test_httpReadJSON(t *testing.T) {
+	log := logp.NewLogger("http_endpoint_test")
+
 	tests := []struct {
 		name           string
 		body           string
@@ -143,32 +145,52 @@ func Test_httpReadJSON(t *testing.T) {
   "timestamp": 1578090901599,
   "records": [
     {
-      "data": "aGVsbG8="
+      "data": "aGVsbG8=",
+      "number": 1
     },
     {
-      "data": "aGVsbG8gd29ybGQ="
+      "data": "c21hbGwgd29ybGQ=",
+      "number": 9007199254740991
+    },
+    {
+      "data": "aGVsbG8gd29ybGQ=",
+      "number": 9007199254740992
+    },
+    {
+      "data": "YmlnIHdvcmxk",
+      "number": 9223372036854775808
+    },
+    {
+      "data": "d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=",
+      "number": 3.14
     }
   ]
 }`,
 			program: `obj.records.map(r, {
-				"requestId": obj.requestId,
+				"requestId": debug("REQID", obj.requestId),
 				"timestamp": string(obj.timestamp), // leave timestamp in unix milli for ingest to handle.
 				"event": r,
 			})`,
 			wantRawMessage: []json.RawMessage{
-				[]byte(`{"event":{"data":"aGVsbG8="},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"aGVsbG8gd29ybGQ="},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
+				[]byte(`{"event":{"data":"aGVsbG8=","number":1},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
+				[]byte(`{"event":{"data":"c21hbGwgd29ybGQ=","number":9007199254740991},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
+				[]byte(`{"event":{"data":"aGVsbG8gd29ybGQ=","number":"9007199254740992"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
+				[]byte(`{"event":{"data":"YmlnIHdvcmxk","number":"9223372036854775808"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
+				[]byte(`{"event":{"data":"d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=","number":3.14},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
 			},
 			wantObjs: []mapstr.M{
-				{"event": map[string]any{"data": "aGVsbG8="}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
-				{"event": map[string]any{"data": "aGVsbG8gd29ybGQ="}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
+				{"event": map[string]any{"data": "aGVsbG8=", "number": int64(1)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
+				{"event": map[string]any{"data": "c21hbGwgd29ybGQ=", "number": int64(9007199254740991)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
+				{"event": map[string]any{"data": "aGVsbG8gd29ybGQ=", "number": "9007199254740992"}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
+				{"event": map[string]any{"data": "YmlnIHdvcmxk", "number": "9223372036854775808"}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
+				{"event": map[string]any{"data": "d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=", "number": 3.14}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
 			},
 			wantStatus: http.StatusOK,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			prg, err := newProgram(tt.program)
+			prg, err := newProgram(tt.program, log)
 			if err != nil {
 				t.Fatalf("failed to compile program: %v", err)
 			}
