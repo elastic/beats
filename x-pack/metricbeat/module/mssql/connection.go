@@ -21,9 +21,9 @@ func NewConnection(uri string) (*sql.DB, error) {
 
 	// Check the connection before executing all queries to reduce the number
 	// of connection errors that we might encounter.
-	//if err = db.Ping(); err != nil {
-	//	err = fmt.Errorf("error doing ping to db: %w", err)
-	//}
+	if err = db.Ping(); err != nil {
+		err = fmt.Errorf("error doing ping to db: %w", err)
+	}
 
 	return db, err
 }
