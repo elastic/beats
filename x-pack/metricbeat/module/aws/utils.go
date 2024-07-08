@@ -85,11 +85,10 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 			for _, metric := range page.Metrics {
 				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
 			}
-			return metricWithAccountID, nil
-		}
-
-		for i, metric := range page.Metrics {
-			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
+		} else {
+			for i, metric := range page.Metrics {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
+			}
 		}
 	}
 	return metricWithAccountID, nil
