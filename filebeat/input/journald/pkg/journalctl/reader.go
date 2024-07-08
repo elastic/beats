@@ -19,6 +19,7 @@ package journalctl
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -62,7 +63,7 @@ type JournalEntry struct {
 type Reader struct {
 	cmd      *exec.Cmd
 	dataChan chan []byte
-	errChan  chan error
+	errChan  chan string
 	logger   *logp.Logger
 	stdout   io.ReadCloser
 	stderr   io.ReadCloser
@@ -165,7 +166,7 @@ func New(
 	r := Reader{
 		cmd:      cmd,
 		dataChan: make(chan []byte),
-		errChan:  make(chan error),
+		errChan:  make(chan string),
 		logger:   logger,
 		stdout:   stdout,
 		stderr:   stderr,
@@ -175,29 +176,28 @@ func New(
 	// Goroutine to read errors from stderr
 	r.wg.Add(1)
 	go func() {
-		defer r.logger.Debug("stderr goroutine done")
+		defer r.logger.Debug("stderr reader goroutine done")
+		defer close(r.errChan)
 		defer r.wg.Done()
 		reader := bufio.NewReader(r.stderr)
-		msgs := []string{}
 		for {
 			line, err := reader.ReadString('\n')
-			if errors.Is(err, io.EOF) {
-				if len(msgs) == 0 {
+			if err != nil {
+				if errors.Is(err, io.EOF) {
 					return
 				}
-				errMsg := fmt.Sprintf("Journalctl wrote errors: %s", strings.Join(msgs, "\n"))
-				logger.Errorf(errMsg)
-				r.errChan <- errors.New(errMsg)
+				logger.Errorf("cannot read from journalctl stderr: %s", err)
 				return
 			}
-			msgs = append(msgs, line)
+
+			r.errChan <- fmt.Sprintf("Journalctl wrote to stderr: %s", line)
 		}
 	}()
 
 	// Goroutine to read events from stdout
 	r.wg.Add(1)
 	go func() {
-		defer r.logger.Debug("stdout goroutine done")
+		defer r.logger.Debug("stdout reader goroutine done")
 		defer close(r.dataChan)
 		defer r.wg.Done()
 		reader := bufio.NewReader(r.stdout)
@@ -234,6 +234,21 @@ func New(
 func (r *Reader) Close() error {
 	if r.cmd == nil {
 		return nil
+	}
+
+	// Try reading stderr until EOF. If there is too much data to read,
+	// timeout after 1 minute and proceed to kill the journalctl process.
+	readStderrTimeout, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+ReadErrForLoop:
+	for stderrLine := range r.errChan {
+		r.logger.Errorf("Journalctl wrote to stderr: %s", stderrLine)
+		select {
+		case <-readStderrTimeout.Done():
+			r.logger.Error("timedout while reading stderr from journalctl, the process will be killed")
+			break ReadErrForLoop
+		}
 	}
 
 	if err := r.cmd.Process.Kill(); err != nil {
