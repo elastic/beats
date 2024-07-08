@@ -51,11 +51,28 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 	}
 
 	// List metrics of a given namespace for each region
+<<<<<<< HEAD
 	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 	paginator := cloudwatch.NewListMetricsPaginator(req)
 	for paginator.Next(context.TODO()) {
 		page := paginator.CurrentPage()
 		metricsTotal = append(metricsTotal, page.Metrics...)
+=======
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.TODO())
+		if err != nil {
+			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+		}
+
+		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
+		for i, metric := range page.Metrics {
+			owningAccount := monitoringAccountID
+			if page.OwningAccounts != nil {
+				owningAccount = page.OwningAccounts[i]
+			}
+			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, owningAccount})
+		}
+>>>>>>> 8da898fb47 ([aws] Fix missing metrics bug when include_linked_accounts set to false (#40135))
 	}
 
 	if err := paginator.Err(); err != nil {

@@ -6,7 +6,11 @@ package aws
 
 import (
 	"context"
+<<<<<<< HEAD
 	"net/http"
+=======
+	"strconv"
+>>>>>>> 8da898fb47 ([aws] Fix missing metrics bug when include_linked_accounts set to false (#40135))
 	"testing"
 	"time"
 
@@ -80,7 +84,19 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 	}
 }
 
+<<<<<<< HEAD
 func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
+=======
+// MockCloudwatchClientCrossAccounts struct is used for unit tests.
+type MockCloudwatchClientCrossAccounts struct{}
+
+// MockCloudwatchClientMultiplePages struct is used for unit tests.
+type MockCloudwatchClientMultiplePages struct{}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
+func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+>>>>>>> 8da898fb47 ([aws] Fix missing metrics bug when include_linked_accounts set to false (#40135))
 	value1 := 0.25
 	value2 := 0.0
 	value3 := 0.0
@@ -95,8 +111,160 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				Name:      "GetMetricData",
 				Paginator: nil,
 			},
+<<<<<<< HEAD
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
+=======
+			{
+				Id:     &id2,
+				Label:  &label2,
+				Values: []float64{value2},
+			},
+			{
+				Id:     &id3,
+				Label:  &label3,
+				Values: []float64{value3},
+			},
+			{
+				Id:     &id4,
+				Label:  &label4,
+				Values: []float64{value4},
+			},
+		},
+		NextToken: &emptyString,
+	}, nil
+}
+
+// GetMetricData implements cloudwatch.GetMetricDataAPIClient interface for cross accounts
+func (m *MockCloudwatchClientCrossAccounts) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
+	emptyString := ""
+	value1 := 0.25
+	value2 := 0.15
+
+	return &cloudwatch.GetMetricDataOutput{
+		Messages: nil,
+		MetricDataResults: []cloudwatchtypes.MetricDataResult{
+			{
+				Id:     &id1,
+				Label:  &label1,
+				Values: []float64{value1},
+			},
+			{
+				Id:     &id5,
+				Label:  &label5,
+				Values: []float64{value2},
+			},
+		},
+		NextToken: &emptyString,
+	}, nil
+}
+
+func (m *MockCloudWatchClient) ListMetrics(context.Context, *cloudwatch.ListMetricsInput, ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	dim1 := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID1,
+	}
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics: []cloudwatchtypes.Metric{
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim1},
+			},
+		},
+		NextToken: awssdk.String(""),
+	}, nil
+}
+
+func (m *MockCloudwatchClientCrossAccounts) ListMetrics(context.Context, *cloudwatch.ListMetricsInput, ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	dim1 := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID1,
+	}
+	dim2 := cloudwatchtypes.Dimension{
+		Name:  &dimName,
+		Value: &instanceID2,
+	}
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics: []cloudwatchtypes.Metric{
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim1},
+			},
+			{
+				MetricName: &metricName,
+				Namespace:  &namespace,
+				Dimensions: []cloudwatchtypes.Dimension{dim2},
+			},
+		},
+		OwningAccounts: []string{
+			"123",
+			"456",
+		},
+		NextToken: awssdk.String(""),
+	}, nil
+}
+
+func (m *MockCloudwatchClientMultiplePages) ListMetrics(ctx context.Context, input *cloudwatch.ListMetricsInput, opts ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	var allMetrics = []cloudwatchtypes.Metric{
+		{
+			MetricName: &metricName,
+			Namespace:  &namespace,
+			Dimensions: []cloudwatchtypes.Dimension{
+				{Name: &dimName, Value: &instanceID1},
+			},
+		},
+		{
+			MetricName: awssdk.String("NetworkIn"),
+			Namespace:  &namespace,
+			Dimensions: []cloudwatchtypes.Dimension{
+				{Name: &dimName, Value: &instanceID1},
+			},
+		},
+	}
+
+	pageSize := 1 // Change this to control the number of metrics per page
+	startIndex := 0
+
+	if input.NextToken != nil {
+		index, err := strconv.Atoi(*input.NextToken)
+		if err != nil {
+			return nil, err
+		}
+		startIndex = index
+	}
+
+	endIndex := startIndex + pageSize
+	if endIndex > len(allMetrics) {
+		endIndex = len(allMetrics)
+	}
+
+	nextToken := ""
+	if endIndex < len(allMetrics) {
+		nextToken = strconv.Itoa(endIndex)
+	}
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics:   allMetrics[startIndex:endIndex],
+		NextToken: awssdk.String(nextToken),
+	}, nil
+}
+
+// MockResourceGroupsTaggingClient is used for unit tests.
+type MockResourceGroupsTaggingClient struct{}
+
+// GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
+func (m *MockResourceGroupsTaggingClient) GetResources(_ context.Context, _ *resourcegroupstaggingapi.GetResourcesInput, _ ...func(*resourcegroupstaggingapi.Options)) (*resourcegroupstaggingapi.GetResourcesOutput, error) {
+	return &resourcegroupstaggingapi.GetResourcesOutput{
+		PaginationToken: awssdk.String(""),
+		ResourceTagMappingList: []resourcegroupstaggingapitypes.ResourceTagMapping{
+			{
+				ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
+				Tags: []resourcegroupstaggingapitypes.Tag{
+>>>>>>> 8da898fb47 ([aws] Fix missing metrics bug when include_linked_accounts set to false (#40135))
 					{
 						Id:     &id1,
 						Label:  &label1,
@@ -207,6 +375,13 @@ func TestGetListMetricsOutput(t *testing.T) {
 	assert.Equal(t, 1, len(listMetricsOutput[0].Dimensions))
 	assert.Equal(t, dimName, *listMetricsOutput[0].Dimensions[0].Name)
 	assert.Equal(t, instanceID, *listMetricsOutput[0].Dimensions[0].Value)
+}
+
+func TestGetListMetricsOutputWithMultiplePages(t *testing.T) {
+	svcCloudwatch := &MockCloudwatchClientMultiplePages{}
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, false, "123", svcCloudwatch)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(listMetricsOutput))
 }
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
