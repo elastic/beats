@@ -13,8 +13,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -112,7 +114,16 @@ type graphConf struct {
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
 	// Tracer allows configuration of request trace logging.
-	Tracer *lumberjack.Logger `config:"tracer"`
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type selection struct {
@@ -398,12 +409,39 @@ func New(ctx context.Context, id string, cfg *config.C, logger *logp.Logger, aut
 	return &f, nil
 }
 
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
 // requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
 // is non-nil.
 func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *logp.Logger) *http.Client {
 	if cfg.Tracer == nil {
 		return cli
 	}
+	if !cfg.Tracer.enabled() {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err := os.Remove(cfg.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
+		return cli
+	}
+
 	w := zapcore.AddSync(cfg.Tracer)
 	go func() {
 		// Close the logger when we are done.
