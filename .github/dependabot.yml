@@ -46,7 +46,7 @@ updates:
       gcp-sdks:
         patterns:
           - "cloud.google.com/go/*"
-          - "google.golang.org/*"      
+          - "google.golang.org/*"
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
