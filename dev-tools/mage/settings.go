@@ -85,7 +85,7 @@ var (
 	versionQualified bool
 	versionQualifier string
 
-	caser = cases.Title(language.English)
+	caser = cases.Title(language.English, cases.NoLower)
 
 	FuncMap = map[string]interface{}{
 		"beat_doc_branch":   BeatDocBranch,
