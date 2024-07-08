@@ -290,7 +290,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 	}
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
+		if !strings.HasPrefix(key, keyPrefix) {
 			return true, nil
 		}
 
