@@ -11,7 +11,13 @@ experimental[]
 
 https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[`journald`]
 is a system service that collects and stores logging data. The `journald` input
-reads this log data and the metadata associated with it.
+reads this log data and the metadata associated with it. To read this
+log data {beatname_uc} calls `journalctl` to read from the journal, therefore
+{beatname_uc} needs permission to execute `journalctl`.
+
+If the `journalctl` process exits unexpectedly the {type} input will
+terminate with an error and {beatname_uc} will need to be
+restarted to start reading from the jouranl again.
 
 The simplest configuration example is one that reads all logs from the default
 journal.
