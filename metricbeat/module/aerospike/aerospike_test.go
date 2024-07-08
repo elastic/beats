@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
-	as "github.com/aerospike/aerospike-client-go"
+	as "github.com/aerospike/aerospike-client-go/v7"
 )
 
 func TestParseHost(t *testing.T) {
