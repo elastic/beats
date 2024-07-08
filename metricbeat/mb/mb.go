@@ -370,21 +370,6 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 	return b.registration
 }
 
-func (b *BaseMetricSet) UpdateStatus(status status.Status, msg string) {
-	b.Module().UpdateStatus(status, msg)
-}
-
-// UpdateStatusOnErr is a helper which will:
-//   - set status to DEGRADED if error is encountered
-//   - set status to RUNNING otherwise
-func (b *BaseMetricSet) UpdateStatusOnErr(err error) {
-	if err != nil {
-		b.UpdateStatus(status.Degraded, err.Error())
-	} else {
-		b.UpdateStatus(status.Running, "")
-	}
-}
-
 // Configuration types
 
 // ModuleConfig is the base configuration data for all Modules.

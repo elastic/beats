@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -376,8 +377,10 @@ func (r reporterV2) Event(event mb.Event) bool {
 
 	if event.Error == nil {
 		r.msw.stats.success.Add(1)
+		r.msw.Module().UpdateStatus(status.Running, "")
 	} else {
 		r.msw.stats.failures.Add(1)
+		r.msw.Module().UpdateStatus(status.Degraded, event.Error.Error())
 	}
 
 	if event.Namespace == "" {
