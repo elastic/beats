@@ -30,7 +30,7 @@ class Test(XPackTest):
         self.render_config_template(modules=[{
             "name": "sql",
             "metricsets": ["query"],
-            "hosts": ['sqlserver://{}:{}@{}'.format(self.get_username(), self.get_password(), self.compose_host())],
+            "hosts": ['sqlserver://{}:{}@{};encrypt=false'.format(self.get_username(), self.get_password(), self.compose_host())],
             "period": "5s",
             "additional_content": f"""
   driver: mssql
