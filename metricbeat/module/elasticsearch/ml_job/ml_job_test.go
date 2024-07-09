@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
-
 package ml_job
 
 import (
@@ -27,18 +25,15 @@ import (
 	"strings"
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestMapper(t *testing.T) {
-	elasticsearch.TestMapperWithInfo(t, "./_meta/test/ml.*.json", eventsMapping)
-}
-
-func TestData(t *testing.T) {
+func createEsMuxer(mlEnabled bool) *http.ServeMux {
 	license := "platinum"
-
 	nodesLocalHandler := func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"nodes": { "foobar": {}}}`))
 	}
@@ -58,7 +53,7 @@ func TestData(t *testing.T) {
 		w.Write([]byte(`{ "license": { "type": "` + license + `" } }`))
 	}
 	xpackHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`{ "features": { "ccr": { "enabled": ` + strconv.FormatBool(true) + `}}}`))
+		w.Write([]byte(`{ "features": { "ml": { "enabled": ` + strconv.FormatBool(mlEnabled) + `}}, "ccr": { "enabled": ` + strconv.FormatBool(true) + `}}`))
 	}
 
 	mux := http.NewServeMux()
@@ -68,17 +63,53 @@ func TestData(t *testing.T) {
 	mux.Handle("/_license", http.HandlerFunc(licenseHandler))       // for 7.0 and above
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/_xpack", http.HandlerFunc(xpackHandler))
+	if mlEnabled {
+		// Should call the API
+		mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(`{}`))
+		}))
+	}
 
-	mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		input, _ := ioutil.ReadFile("./_meta/test/ml.711.json")
-		w.Write(input)
-	}))
+	return mux
+}
 
-	server := httptest.NewServer(mux)
-	defer server.Close()
+func TestMLNotAvailable(t *testing.T) {
+	tests := map[string]struct {
+		mlEnabled bool
+	}{
+		"feature_available": {
+			true,
+		},
+		"feature_unavailable": {
+			false,
+		},
+	}
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
-	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
-		t.Fatal("error trying to write event:", err)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			mux := createEsMuxer(test.mlEnabled)
+			if !test.mlEnabled {
+				mux.Handle("/_ml/anomaly_detectors/_all/_stats", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					http.Error(w, "this should never have been called", http.StatusTeapot)
+				}))
+			}
+
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
+			events, errs := mbtest.ReportingFetchV2Error(ms)
+
+			require.Empty(t, errs)
+			require.Empty(t, events)
+		})
+	}
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     elasticsearch.ModuleName,
+		"metricsets": []string{"ml_job"},
+		"hosts":      []string{host},
 	}
 }
