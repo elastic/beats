@@ -65,13 +65,13 @@ func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	return c
 }
 
-// WithCache
+// WithCache toggles the packet cache.
 func (c *Config) WithCache(enabled bool) *Config {
 	c.withCache = enabled
 	return c
 }
 
-// WithCache
+// Cache returns if the packet cache is enabled.
 func (c *Config) Cache() bool {
 	return c.withCache
 }
