@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"strconv"
 	"testing"
 	"time"
 
@@ -48,6 +49,9 @@ type MockCloudWatchClient struct{}
 
 // MockCloudwatchClientCrossAccounts struct is used for unit tests.
 type MockCloudwatchClientCrossAccounts struct{}
+
+// MockCloudwatchClientMultiplePages struct is used for unit tests.
+type MockCloudwatchClientMultiplePages struct{}
 
 // GetMetricData implements cloudwatch.GetMetricDataAPIClient interface
 func (m *MockCloudWatchClient) GetMetricData(context.Context, *cloudwatch.GetMetricDataInput, ...func(*cloudwatch.Options)) (*cloudwatch.GetMetricDataOutput, error) {
@@ -158,6 +162,51 @@ func (m *MockCloudwatchClientCrossAccounts) ListMetrics(context.Context, *cloudw
 	}, nil
 }
 
+func (m *MockCloudwatchClientMultiplePages) ListMetrics(ctx context.Context, input *cloudwatch.ListMetricsInput, opts ...func(*cloudwatch.Options)) (*cloudwatch.ListMetricsOutput, error) {
+	var allMetrics = []cloudwatchtypes.Metric{
+		{
+			MetricName: &metricName,
+			Namespace:  &namespace,
+			Dimensions: []cloudwatchtypes.Dimension{
+				{Name: &dimName, Value: &instanceID1},
+			},
+		},
+		{
+			MetricName: awssdk.String("NetworkIn"),
+			Namespace:  &namespace,
+			Dimensions: []cloudwatchtypes.Dimension{
+				{Name: &dimName, Value: &instanceID1},
+			},
+		},
+	}
+
+	pageSize := 1 // Change this to control the number of metrics per page
+	startIndex := 0
+
+	if input.NextToken != nil {
+		index, err := strconv.Atoi(*input.NextToken)
+		if err != nil {
+			return nil, err
+		}
+		startIndex = index
+	}
+
+	endIndex := startIndex + pageSize
+	if endIndex > len(allMetrics) {
+		endIndex = len(allMetrics)
+	}
+
+	nextToken := ""
+	if endIndex < len(allMetrics) {
+		nextToken = strconv.Itoa(endIndex)
+	}
+
+	return &cloudwatch.ListMetricsOutput{
+		Metrics:   allMetrics[startIndex:endIndex],
+		NextToken: awssdk.String(nextToken),
+	}, nil
+}
+
 // MockResourceGroupsTaggingClient is used for unit tests.
 type MockResourceGroupsTaggingClient struct{}
 
@@ -219,6 +268,13 @@ func TestGetListMetricsCrossAccountsOutput(t *testing.T) {
 	assert.Equal(t, dimName, *listMetricsOutput[0].Metric.Dimensions[0].Name)
 	assert.Equal(t, instanceID1, *listMetricsOutput[0].Metric.Dimensions[0].Value)
 	assert.Equal(t, instanceID2, *listMetricsOutput[1].Metric.Dimensions[0].Value)
+}
+
+func TestGetListMetricsOutputWithMultiplePages(t *testing.T) {
+	svcCloudwatch := &MockCloudwatchClientMultiplePages{}
+	listMetricsOutput, err := GetListMetricsOutput("AWS/EC2", "us-west-1", time.Minute*5, false, "123", svcCloudwatch)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, len(listMetricsOutput))
 }
 
 func TestGetListMetricsOutputWithWildcard(t *testing.T) {
