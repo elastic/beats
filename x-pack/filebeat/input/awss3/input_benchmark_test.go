@@ -11,8 +11,10 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
+	"text/tabwriter"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -25,7 +27,6 @@ import (
 	s3Types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	sqsTypes "github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/dustin/go-humanize"
-	"github.com/olekukonko/tablewriter"
 
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -269,11 +270,11 @@ func TestBenchmarkInputSQS(t *testing.T) {
 	}
 
 	headers := []string{
-		"Max Msgs Inflight",
-		"Events per sec",
-		"S3 Bytes per sec",
-		"Time (sec)",
-		"CPUs",
+		"MAX MSGS INFLIGHT",
+		"EVENTS PER SEC",
+		"S3 BYTES PER SEC",
+		"TIME (SEC)",
+		"CPUS",
 	}
 	data := make([][]string, 0)
 	for _, r := range results {
@@ -286,10 +287,12 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		})
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(headers)
-	table.AppendBulk(data)
-	table.Render()
+	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, strings.Join(headers, "\t"))
+	for _, d := range data {
+		fmt.Fprintln(w, strings.Join(d, "\t"))
+	}
+	require.NoError(t, w.Flush())
 }
 
 func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
@@ -405,19 +408,19 @@ func TestBenchmarkInputS3(t *testing.T) {
 	}
 
 	headers := []string{
-		"Number of workers",
-		"Objects listed total",
-		"Objects listed per sec",
-		"Objects processed total",
-		"Objects processed per sec",
-		"Objects acked total",
-		"Objects acked per sec",
-		"Events total",
-		"Events per sec",
-		"S3 Bytes total",
-		"S3 Bytes per sec",
-		"Time (sec)",
-		"CPUs",
+		"NUMBER OF WORKERS",
+		"OBJECTS LISTED TOTAL",
+		"OBJECTS LISTED PER SEC",
+		"OBJECTS PROCESSED TOTAL",
+		"OBJECTS PROCESSED PER SEC",
+		"OBJECTS ACKED TOTAL",
+		"OBJECTS ACKED PER SEC",
+		"EVENTS TOTAL",
+		"EVENTS PER SEC",
+		"S3 BYTES TOTAL",
+		"S3 BYTES PER SEC",
+		"TIME (SEC)",
+		"CPUS",
 	}
 	data := make([][]string, 0)
 	for _, r := range results {
@@ -438,8 +441,10 @@ func TestBenchmarkInputS3(t *testing.T) {
 		})
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader(headers)
-	table.AppendBulk(data)
-	table.Render()
+	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', tabwriter.Debug)
+	fmt.Fprintln(w, strings.Join(headers, "\t"))
+	for _, d := range data {
+		fmt.Fprintln(w, strings.Join(d, "\t"))
+	}
+	require.NoError(t, w.Flush())
 }
