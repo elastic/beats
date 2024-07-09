@@ -142,7 +142,6 @@ func (inp *filestream) Run(
 
 	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
-		ctx.UpdateStatus(status.Degraded, fmt.Sprintf("File could not be opened for reading: %v", err))
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
 	}
