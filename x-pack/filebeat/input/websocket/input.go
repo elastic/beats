@@ -119,41 +119,26 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	}
 	defer c.Close()
 
-	done := make(chan error)
-
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				metrics.errorsTotal.Inc()
-				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-					log.Errorw("websocket connection closed", "error", err)
-				} else {
-					log.Errorw("failed to read websocket data", "error", err)
-				}
-				done <- err
-				return
+	for {
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			metrics.errorsTotal.Inc()
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				log.Errorw("websocket connection closed", "error", err)
+			} else {
+				log.Errorw("failed to read websocket data", "error", err)
 			}
-			metrics.receivedBytesTotal.Add(uint64(len(message)))
-			state["response"] = message
-			log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
-			err = i.processAndPublishData(ctx, metrics, prg, ast, state, cursor, pub, log)
-			if err != nil {
-				metrics.errorsTotal.Inc()
-				log.Errorw("failed to process and publish data", "error", err)
-				done <- err
-				return
-			}
+			return err
 		}
-	}()
-
-	// blocks until done is closed, context is cancelled or an error is received
-	select {
-	case err := <-done:
-		return err
-	case <-ctx.Done():
-		return ctx.Err()
+		metrics.receivedBytesTotal.Add(uint64(len(message)))
+		state["response"] = message
+		log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
+		err = i.processAndPublishData(ctx, metrics, prg, ast, state, cursor, pub, log)
+		if err != nil {
+			metrics.errorsTotal.Inc()
+			log.Errorw("failed to process and publish data", "error", err)
+			return err
+		}
 	}
 }
 
