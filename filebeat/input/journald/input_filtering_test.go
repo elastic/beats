@@ -190,8 +190,9 @@ func TestInputIncludeMatches(t *testing.T) {
 // TestInputSeek test the output of various seek modes while reading
 // from input-multiline-parser.journal.
 func TestInputSeek(t *testing.T) {
-	// timeOfFirstEvent is the @timestamp on the "pam_unix" message.
-	var timeOfFirstEvent = time.Date(2021, time.November, 22, 17, 10, 4, 51729000, time.UTC)
+	// timeAfterFirstEvent is a timestamp after the first event in the journal,
+	//but before the secon done
+	var timeAfterFirstEvent = time.Date(2021, time.November, 22, 17, 10, 20, 0, time.UTC)
 
 	var allMessages = []string{
 		"pam_unix(sudo:session): session closed for user root",
@@ -226,7 +227,7 @@ func TestInputSeek(t *testing.T) {
 				"seek": "since",
 				// Query using one microsecond after the first event so that the first event
 				// is not returned. Note that journald uses microsecond precision for times.
-				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+				"since": -1 * time.Since(timeAfterFirstEvent),
 			},
 			expectedMessages: allMessages[1:],
 		},
@@ -235,7 +236,7 @@ func TestInputSeek(t *testing.T) {
 				"seek": "since",
 				// Query using one microsecond after the first event so that the first event
 				// is not returned. Note that journald uses microsecond precision for times.
-				"since": -1 * time.Since(timeOfFirstEvent.Add(time.Microsecond)),
+				"since": -1 * time.Since(timeAfterFirstEvent),
 			},
 			// This cursor points to the previous last entry in the journal.
 			// You can test the cursor by running:
