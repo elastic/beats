@@ -75,7 +75,7 @@ of traffic.
 
 
 [float]
-[[custom_definitions]]
+[[number_of_workers]]
 ==== `number_of_workers`
 
 The number of workers to read and decode concurrently netflow packets.
