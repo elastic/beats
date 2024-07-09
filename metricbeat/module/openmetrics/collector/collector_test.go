@@ -22,8 +22,8 @@ package collector
 import (
 	"testing"
 
-	prometheuslabels "github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
+	prometheuslabels "github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/model/textparse"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 

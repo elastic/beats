@@ -28,10 +28,10 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/pkg/exemplar"
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
-	"github.com/prometheus/prometheus/pkg/timestamp"
+	"github.com/prometheus/prometheus/model/exemplar"
+	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/model/textparse"
+	"github.com/prometheus/prometheus/model/timestamp"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -482,7 +482,8 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
 	var (
-		parser               = textparse.New(b, contentType)
+		// parser, _            =
+		parser               textparse.Parser
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
 		summariesByName      = map[string]map[string]*OpenMetric{}
@@ -491,8 +492,12 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 		// metricTypes stores the metric type for each metric name.
 		metricTypes = make(map[string]textparse.MetricType)
 	)
-	var err error
 
+	var err error
+	parser, err = textparse.New(b, contentType)
+	if err != nil {
+		return []*MetricFamily{}, err
+	}
 	for {
 		var (
 			et textparse.Entry
