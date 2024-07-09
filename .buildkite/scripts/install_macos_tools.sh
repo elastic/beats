@@ -68,7 +68,7 @@ with_mage() {
 with_go() {
   echo "Setting up the Go environment..."
   create_workspace
-  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${go_arch_type}"
+  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${GO_ARCH_TYPE}"
   chmod +x "${BIN}/gvm"
   eval "$(gvm $GO_VERSION)"
   go version
