@@ -19,10 +19,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-  ARCH_UNIX_ARM_64: "-arch arm"
-
   # pipeline specific
   ELASTIC_SYNTHETICS_CAPABLE: "true"
 
@@ -69,8 +65,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -94,8 +88,6 @@ steps:
 
       - label: ":ubuntu: x-pack/heartbeat: Go Integration Tests"
         key: "mandatory-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -120,8 +112,6 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
@@ -145,8 +135,6 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 2022 Unit Tests"
         key: "mandatory-win-2022-unit-tests"
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
@@ -173,8 +161,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/heartbeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
@@ -197,8 +183,6 @@ steps:
 
       # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
@@ -220,8 +204,6 @@ steps:
               context: "x-pack/heartbeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/heartbeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
@@ -248,8 +230,6 @@ steps:
 
     steps:
       - label: ":mac: x-pack/heartbeat: macOS x86_64 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -271,8 +251,6 @@ steps:
               context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
 
       - label: ":mac: x-pack/heartbeat: macOS arm64 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -310,7 +288,6 @@ steps:
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/heartbeat
           mage package
@@ -333,7 +310,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd x-pack/heartbeat
           mage package
