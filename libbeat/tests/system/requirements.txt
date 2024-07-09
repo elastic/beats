@@ -71,4 +71,4 @@ typing_extensions==4.9.0
 wcwidth==0.2.5
 websocket-client==0.47.0
 wrapt==1.16.0
-zipp==3.1.0
+zipp==3.19.1
