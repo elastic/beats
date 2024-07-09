@@ -177,7 +177,7 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 		}
 	}
 
-	var ts []tags.Tag
+	ts := make([]tags.Tag, 0, len(lambdaConfig.Tags))
 	for name, val := range lambdaConfig.Tags {
 		tag := tags.Tag{
 			Key:   name,
