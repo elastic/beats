@@ -150,7 +150,7 @@ For example:
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
-  --mount type=tmpfs,destination=/usr/share/{beatname_lc}/data
+  --mount type=source=$(pwd}/data,destination=/usr/share/{beatname_lc}/data
   --read-only
   {dockerimage}
 --------------------------------------------
