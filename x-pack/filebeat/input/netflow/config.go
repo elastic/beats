@@ -23,7 +23,7 @@ type config struct {
 	CustomDefinitions         []string      `config:"custom_definitions"`
 	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
 	ShareTemplates            bool          `config:"share_templates"`
-	NumberOfWorkers           uint32        `config:"number_of_workers"`
+	NumberOfWorkers           uint32        `config:"workers"`
 }
 
 var defaultConfig = config{

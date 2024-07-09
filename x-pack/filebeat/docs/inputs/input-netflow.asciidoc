@@ -75,8 +75,8 @@ of traffic.
 
 
 [float]
-[[number_of_workers]]
-==== `number_of_workers`
+[[workers]]
+==== `workers`
 
 The number of workers to read and decode concurrently netflow packets.
 Default is `1`. Note that in order to maximize the performance gains of multiple
