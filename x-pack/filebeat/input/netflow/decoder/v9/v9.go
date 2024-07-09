@@ -90,7 +90,9 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	}
 	buf = payload
 
-	session := p.Session.GetOrCreate(MakeSessionKey(source, header.SourceID, p.shareTemplates))
+	sessionKey := MakeSessionKey(source, header.SourceID, p.shareTemplates)
+
+	session := p.Session.GetOrCreate(sessionKey)
 	remote := source.String()
 
 	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
@@ -112,7 +114,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 		body := bytes.NewBuffer(buf.Next(set.BodyLength()))
 		p.logger.Printf("FlowSet ID %d length %d", set.SetID, set.BodyLength())
 
-		f, err := p.parseSet(set.SetID, session, body)
+		f, err := p.parseSet(set.SetID, sessionKey, session, body)
 		if err != nil {
 			p.logger.Printf("Error parsing set %d: %v", set.SetID, err)
 			return nil, fmt.Errorf("error parsing set: %w", err)
@@ -129,6 +131,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 
 func (p *NetflowV9Protocol) parseSet(
 	setID uint16,
+	key SessionKey,
 	session *SessionState,
 	buf *bytes.Buffer) (flows []record.Record, err error,
 ) {
@@ -137,7 +140,7 @@ func (p *NetflowV9Protocol) parseSet(
 		template := session.GetTemplate(setID)
 
 		if template == nil {
-			p.cache.Add(setID, buf)
+			p.cache.Add(key, buf)
 			return nil, nil
 		}
 
@@ -151,7 +154,7 @@ func (p *NetflowV9Protocol) parseSet(
 	}
 	for _, template := range templates {
 		session.AddTemplate(template)
-		events := p.cache.GetAndRemove(template.ID)
+		events := p.cache.GetAndRemove(key)
 		for _, e := range events {
 			f, err := template.Apply(e, 0)
 			if err != nil {

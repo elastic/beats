@@ -14,7 +14,7 @@ import (
 )
 
 type eventWithMissingTemplate struct {
-	setID     uint16
+	key       SessionKey
 	entryTime time.Time
 }
 
@@ -53,18 +53,18 @@ type pendingTemplatesCache struct {
 	isEmpty atomic.Bool
 	hp      pendingEventsHeap
 	started bool
-	events  map[uint16][]*bytes.Buffer
+	events  map[SessionKey][]*bytes.Buffer
 }
 
 func newPendingTemplatesCache() *pendingTemplatesCache {
 	cache := &pendingTemplatesCache{
-		events: make(map[uint16][]*bytes.Buffer),
+		events: make(map[SessionKey][]*bytes.Buffer),
 		hp:     pendingEventsHeap{},
 	}
 	return cache
 }
 
-func (h *pendingTemplatesCache) GetAndRemove(setID uint16) []*bytes.Buffer {
+func (h *pendingTemplatesCache) GetAndRemove(key SessionKey) []*bytes.Buffer {
 	if h == nil {
 		return nil
 	}
@@ -75,16 +75,16 @@ func (h *pendingTemplatesCache) GetAndRemove(setID uint16) []*bytes.Buffer {
 
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
-	events, ok := h.events[setID]
+	events, ok := h.events[key]
 	if !ok {
 		return nil
 	}
-	delete(h.events, setID)
+	delete(h.events, key)
 	h.isEmpty.Store(len(h.events) == 0)
 	return events
 }
 
-func (h *pendingTemplatesCache) Add(setID uint16, events *bytes.Buffer) {
+func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 	if h == nil {
 		return
 	}
@@ -92,8 +92,8 @@ func (h *pendingTemplatesCache) Add(setID uint16, events *bytes.Buffer) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 
-	h.events[setID] = append(h.events[setID], events)
-	h.hp.Push(eventWithMissingTemplate{setID: setID, entryTime: time.Now()})
+	h.events[key] = append(h.events[key], events)
+	h.hp.Push(eventWithMissingTemplate{key: key, entryTime: time.Now()})
 	h.isEmpty.Store(false)
 }
 
@@ -149,7 +149,7 @@ func (h *pendingTemplatesCache) start(done <-chan struct{}, cleanInterval time.D
 						break
 					}
 					// we can remove the pending events
-					delete(n.events, c.setID)
+					delete(n.events, c.key)
 				}
 				h.isEmpty.Store(len(h.events) == 0)
 				n.mtx.Unlock()
