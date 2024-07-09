@@ -18,6 +18,7 @@ if [ "${CPU_ARCH}" == "x86_64" ]; then
   case "${PLATFORM_TYPE}" in
     Linux|Darwin)
       export GOX_FLAGS="-arch amd64"
+      export GO_ARCH_TYPE="amd64"
       ;;
     MINGW*)
       export GOX_FLAGS="-arch 386"
@@ -25,6 +26,7 @@ if [ "${CPU_ARCH}" == "x86_64" ]; then
   esac
 elif [[ "${CPU_ARCH}" == "aarch64" || "${CPU_ARCH}" == "arm64" ]]; then
   export GOX_FLAGS="-arch arm"
+  export GO_ARCH_TYPE="arm64"
 else
   echo "Unsupported OS"
   exit 1
