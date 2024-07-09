@@ -78,6 +78,7 @@ steps:
 
       - label: ":ubuntu: x-pack/metricbeat: Go (MODULE) Integration Tests"
         key: "mandatory-int-test"
+        env:
           TEST_TAGS: "oracle"
         command: |
           set -euo pipefail
