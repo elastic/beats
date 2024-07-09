@@ -5,15 +5,18 @@
 package websocket
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/url"
 	"reflect"
 	"time"
 
 	"github.com/google/cel-go/cel"
 	"github.com/gorilla/websocket"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -109,7 +112,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	headers := formHeader(cfg)
 	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
 	if resp != nil && resp.Body != nil {
-		log.Debugw("websocket connection response", "body", resp.Body)
+		var buf bytes.Buffer
+		if log.Core().Enabled(zapcore.DebugLevel) {
+			const limit = 1e4
+			io.CopyN(&buf, resp.Body, limit)
+		}
+		if n, _ := io.Copy(io.Discard, resp.Body); n != 0 && buf.Len() != 0 {
+			buf.WriteString("... truncated")
+		}
+		log.Debugw("websocket connection response", "body", &buf)
 		resp.Body.Close()
 	}
 	if err != nil {
