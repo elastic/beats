@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -247,6 +248,7 @@ func TestInputSeek(t *testing.T) {
 	}
 
 	for name, testCase := range tests {
+		logp.DevelopmentSetup()
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
@@ -272,6 +274,7 @@ func TestInputSeek(t *testing.T) {
 			env.startInput(ctx, inp)
 			defer cancelInput()
 
+			t.Log("Current Time:", time.Now().Format(time.RFC3339))
 			env.waitUntilEventCount(len(testCase.expectedMessages))
 
 			for idx, event := range env.pipeline.GetAllEvents() {
