@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
 
 *Packetbeat*
 
@@ -149,6 +150,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
 - Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
+- Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 
 *Heartbeat*
 
