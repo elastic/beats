@@ -18,10 +18,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-  ARCH_UNIX_ARM_64: "-arch arm"
-
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -65,8 +61,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests"
         key: "x-pack-filebeat-mandatory-linux-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/filebeat
           mage build unitTest
@@ -86,8 +80,6 @@ steps:
 
       - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/filebeat
           mage goIntegTest
@@ -107,8 +99,6 @@ steps:
 
       - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/filebeat
           mage pythonIntegTest
@@ -127,8 +117,6 @@ steps:
               context: "x-pack/filebeat: Python Integration Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -150,8 +138,6 @@ steps:
               context: "x-pack/filebeat: Win 2022 Unit Tests"
 
       - label: ":windows: x-pack/filebeat: Win 2016 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -178,8 +164,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/filebeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -201,8 +185,6 @@ steps:
               context: "x-pack/filebeat: Win 2019 Unit Tests"
 
       - label: ":windows: x-pack/filebeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -224,8 +206,6 @@ steps:
               context: "x-pack/filebeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/filebeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -253,8 +233,6 @@ steps:
       - label: ":ubuntu: x-pack/filebeat: Ubuntu arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd x-pack/filebeat
           mage build unitTest
@@ -274,8 +252,6 @@ steps:
 
       - label: ":mac: x-pack/filebeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -296,8 +272,6 @@ steps:
 
       - label: ":mac: x-pack/filebeat: macOS arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -324,7 +298,6 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/filebeat/input/awss3/_meta/terraform"
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
           MODULE: "aws"
           #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
           TEST_TAGS: "aws"
@@ -361,7 +334,6 @@ steps:
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/filebeat
           mage package
@@ -384,7 +356,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd x-pack/filebeat
           mage package

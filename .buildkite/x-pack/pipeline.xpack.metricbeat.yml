@@ -18,10 +18,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-  ARCH_UNIX_ARM_64: "-arch arm"
-
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -63,8 +59,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/metricbeat
           mage build unitTest
@@ -84,8 +78,6 @@ steps:
 
       - label: ":ubuntu: x-pack/metricbeat: Go (MODULE) Integration Tests"
         key: "mandatory-int-test"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
           TEST_TAGS: "oracle"
         command: |
           set -euo pipefail
@@ -111,7 +103,6 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Python (MODULE) Integration Tests"
         key: "mandatory-python-int-test"
         env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
           TEST_TAGS: "oracle"
         command: |
           set -euo pipefail
@@ -135,8 +126,6 @@ steps:
               context: "x-pack/metricbeat: Python (MODULE) Integration Tests"
 
       - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -158,8 +147,6 @@ steps:
               context: "x-pack/metricbeat: Win 2016 Unit Tests"
 
       - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -186,8 +173,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -209,8 +194,6 @@ steps:
               context: "x-pack/metricbeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -232,8 +215,6 @@ steps:
               context: "x-pack/metricbeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
@@ -261,8 +242,6 @@ steps:
     steps:
       - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -284,8 +263,6 @@ steps:
         skip: "Skipping due to elastic/beats#33036 & elastic/ingest-dev#3400"
         # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/ingest-dev/issues/3400
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -309,7 +286,6 @@ steps:
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"
-#          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
           MODULE: "aws"
           #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
           TEST_TAGS: "aws"
@@ -346,7 +322,6 @@ steps:
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd x-pack/metricbeat
           mage package
@@ -369,7 +344,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          GOX_FLAGS: "${ARCH_UNIX_ARM_64}"
         command: |
           cd x-pack/metricbeat
           mage package

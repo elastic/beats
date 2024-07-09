@@ -13,9 +13,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  ARCH_UNIX_X86_64: "-arch amd64"
-  ARCH_MINGW_X86_64: "-arch 386"
-
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -60,8 +57,6 @@ steps:
     steps:
       - label: ":ubuntu: Winlogbeat: Crossccompile"
         key: "mandatory-cross-compile"
-        env:
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: "make -C winlogbeat crosscompile"
         retry:
           automatic:
@@ -78,8 +73,6 @@ steps:
               context: "winlogbeat: Crosscompile"
 
       - label: ":windows: Winlogbeat: Win 2016 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -101,8 +94,6 @@ steps:
               context: "winlogbeat: Win 2016 Unit Tests"
 
       - label: ":windows: Winlogbeat: Win 2019 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -124,8 +115,6 @@ steps:
               context: "winlogbeat: Win 2019 Unit Tests"
 
       - label: ":windows: Winlogbeat: Win 2022 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -152,8 +141,6 @@ steps:
 
     steps:
       - label: ":windows: Winlogbeat: Win 10 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -175,8 +162,6 @@ steps:
               context: "winlogbeat: Win 10 Unit Tests"
 
       - label: ":windows: Winlogbeat: Win 11 Unit Tests"
-        env:
-          GOX_FLAGS: "${ARCH_MINGW_X86_64}"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -211,7 +196,6 @@ steps:
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          GOX_FLAGS: "${ARCH_UNIX_X86_64}"
         command: |
           cd winlogbeat
           mage package
