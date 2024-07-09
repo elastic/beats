@@ -94,7 +94,7 @@ func TestNetFlow(t *testing.T) {
 			if isReversed {
 				// if pcap is reversed packet order we need to have multiple workers
 				// and thus enable the input packets lru
-				err = pluginCfg.SetInt("workers_number", -1, 2)
+				err = pluginCfg.SetInt("number_of_workers", -1, 2)
 				require.NoError(t, err)
 			}
 

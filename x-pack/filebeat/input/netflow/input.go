@@ -136,7 +136,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
 		WithSharedTemplates(n.cfg.ShareTemplates).
 		WithActiveSessionsMetric(n.metrics.ActiveSessions()).
-		WithCache(n.cfg.WorkersNumber > 1))
+		WithCache(n.cfg.NumberOfWorkers > 1))
 	if err != nil {
 		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed to initialize netflow decoder: %v", err))
 		return fmt.Errorf("error initializing netflow decoder: %w", err)
@@ -151,7 +151,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	}
 
 	n.queueC = make(chan packet, n.queueSize)
-	for i := uint32(0); i < n.cfg.WorkersNumber; i++ {
+	for i := uint32(0); i < n.cfg.NumberOfWorkers; i++ {
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{

@@ -129,7 +129,7 @@ func TestNetFlowIntegration(t *testing.T) {
 							"queue_size":            2 * 4 * 1600,
 							"detect_sequence_reset": true,
 							"max_message_size":      "10KiB",
-							"workers_number":        100,
+							"number_of_workers":     100,
 						}),
 					},
 				},
