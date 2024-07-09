@@ -380,7 +380,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 		r.msw.Module().UpdateStatus(status.Running, "")
 	} else {
 		r.msw.stats.failures.Add(1)
-		r.msw.Module().UpdateStatus(status.Degraded, event.Error.Error())
+		r.msw.Module().UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %s", r.msw.module.Name(), r.msw.MetricSet.Name(), event.Error))
 	}
 
 	if event.Namespace == "" {
