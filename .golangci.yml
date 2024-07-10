@@ -121,6 +121,11 @@ linters-settings:
               - errors
               - fmt
             reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+        - github.com/google/uuid:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - github.com/gofrs/uuid/v5
+            reason: "Use one uuid library consistently across the codebase"
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
