@@ -272,7 +272,6 @@ func TestInputSeek(t *testing.T) {
 			env.startInput(ctx, inp)
 			defer cancelInput()
 
-			t.Log("Current Time:", time.Now().Format(time.RFC3339))
 			env.waitUntilEventCount(len(testCase.expectedMessages))
 
 			for idx, event := range env.pipeline.GetAllEvents() {

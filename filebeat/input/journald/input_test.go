@@ -225,6 +225,8 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 }
 
 func TestMatchers(t *testing.T) {
+	// If this test fails, uncomment the following line to see the debug logs
+	// logp.DevelopmentSetup()
 	testCases := []struct {
 		name           string
 		matchers       map[string]any
@@ -302,7 +304,7 @@ func TestMatchers(t *testing.T) {
 			name:     "unit",
 			matchers: map[string]any{},
 			confiFields: map[string]any{
-				"units": []string{"session-15.scope"},
+				"units": []string{"session-39.scope"},
 			},
 			expectedEvents: 7,
 		},

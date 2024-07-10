@@ -252,7 +252,7 @@ ReadErrForLoop:
 			r.logger.Error("timedout while reading stderr from journalctl, the process will be killed")
 			break ReadErrForLoop
 		case stderrLine, isOpen := <-r.errChan:
-			r.logger.Errorf("Journalctl wrote to stderr: %s", stderrLine)
+			r.logger.Error(stderrLine)
 			if !isOpen {
 				break ReadErrForLoop
 			}
