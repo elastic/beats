@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 

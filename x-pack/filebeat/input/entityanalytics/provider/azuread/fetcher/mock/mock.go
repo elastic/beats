@@ -8,7 +8,7 @@ package mock
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/logp"

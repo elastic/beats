@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/natefinch/lumberjack.v2"
 

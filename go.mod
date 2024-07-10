@@ -93,7 +93,7 @@ require (
 	github.com/godbus/dbus/v5 v5.0.6
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
-	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
@@ -101,7 +101,7 @@ require (
 	github.com/google/flatbuffers v23.5.26+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
-	github.com/google/uuid v1.6.0
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-retryablehttp v0.7.7
@@ -208,6 +208,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
+	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/cel-go v0.19.0
 	github.com/googleapis/gax-go/v2 v2.12.0

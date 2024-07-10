@@ -20,7 +20,7 @@ import (
 	_ "embed"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")

@@ -19,7 +19,7 @@ import (
 	_ "embed"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"

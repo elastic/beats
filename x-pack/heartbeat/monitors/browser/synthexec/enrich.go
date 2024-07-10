@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"

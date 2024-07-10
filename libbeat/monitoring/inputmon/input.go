@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"

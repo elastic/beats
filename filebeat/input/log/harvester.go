@@ -37,7 +37,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

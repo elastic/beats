@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"

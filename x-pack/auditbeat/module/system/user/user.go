@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
