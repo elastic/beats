@@ -40,6 +40,10 @@ type eventlogRunner struct{}
 
 const pluginName = "winlog"
 
+const channelNotFoundError = "Encountered channel not found error when opening Windows Event Log"
+const eventLogReadingError = "Error occurred while reading from Windows Event Log"
+const resetError = "Error resetting Windows Event Log handle"
+
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 	return input.Plugin{
@@ -117,16 +121,16 @@ runLoop:
 
 		switch {
 		case eventlog.IsRecoverable(openErr):
-			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
+			log.Errorw(channelNotFoundError, "error", openErr)
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
 			if !channelNotFoundErrDetected {
-				log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+				log.Errorw(channelNotFoundError, "error", openErr)
 			} else {
-				log.Debugw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+				log.Debugw(channelNotFoundError, "error", openErr)
 			}
-			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Encountered channel not found error when opening Windows Event Log: %v", openErr))
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", channelNotFoundError, openErr))
 			channelNotFoundErrDetected = true
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
@@ -144,14 +148,16 @@ runLoop:
 			if eventlog.IsRecoverable(err) {
 				log.Errorw("Encountered recoverable error when reading from Windows Event Log", "error", err)
 				if resetErr := api.Reset(); resetErr != nil {
-					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
+					log.Errorw(resetError, "error", resetErr)
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", resetError, resetErr))
 				}
 				continue runLoop
 			}
 			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
 				log.Errorw("Encountered channel not found error when reading from Windows Event Log", "error", err)
 				if resetErr := api.Reset(); resetErr != nil {
-					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
+					log.Errorw(resetError, "error", resetErr)
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", resetError, resetErr))
 				}
 				continue runLoop
 			}
@@ -167,8 +173,8 @@ runLoop:
 					return nil
 				}
 
-				log.Errorw("Error occurred while reading from Windows Event Log", "error", err)
-				ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Error occurred while reading from Windows Event Log: %v", err))
+				log.Errorw(eventLogReadingError, "error", err)
+				ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", eventLogReadingError, err))
 				return err
 			}
 			if len(records) == 0 {
