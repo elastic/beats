@@ -483,7 +483,7 @@ func hexDecode(enc string) string {
 }
 
 func uuidString() string {
-	uuid, err := uuid.NewRandom()
+	uuid, err := uuid.NewV4()
 	if err != nil {
 		return ""
 	}

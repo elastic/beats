@@ -118,7 +118,7 @@ func testContext() (tenant string, username string, password string, client *htt
 			w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 			return
 		}
-		tok.Token = uuid.New().String()
+		tok.Token = uuid.Must(uuid.NewV4()).String()
 		tok.Expires = time.Now().In(time.UTC).Add(time.Hour)
 		fmt.Fprintf(w, "{\n  \"token\" : \"%s\",\n  \"expires\" : \"%s\"\n}", tok.Token, tok.Expires.Format(time.RFC3339))
 	}))
