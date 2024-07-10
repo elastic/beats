@@ -7,167 +7,30 @@
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 
 *Filebeat*
 - Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
-
-*Heartbeat*
-
-
-*Heartbeat*
-
 
 *Metricbeat*
 
 - Fix `namespace` filter option on metricset `state_namespace` enricher. {pull}39934[39934]
 - Fix `namespace` filter option at Kubernetes provider level. {pull}39881[39881]
-- Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
-- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
-- rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
-- Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
-- Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
-- Fix handling of access errors when reading process metrics {pull}39627[39627]
-- Fix behavior of cgroups path discovery when monitoring the host system from within a container {pull}39627[39627]
-- Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
+- Fix handling of access errors when reading process metrics. {pull}39627[39627]
+- Fix behavior of cgroups path discovery when monitoring the host system from within a container. {pull}39627[39627]
+- Fix issue where beats may report incorrect metrics for its own process when running inside a container. {pull}39627[39627]
 - Fix for MySQL/Performance - Query failure for MySQL versions below v8.0.1, for performance metric `quantile_95`. {pull}38710[38710]
 - Fix Prometheus helper text parser to store each metric family type. {pull}39743[39743]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
-- Fix behavior of pagetypeinfo metrics {pull}39985[39985]
+- Fix behavior of pagetypeinfo metrics. {pull}39985[39985]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
 *Affecting all Beats*
 
-- Update to Go 1.21.12. {pull}40114[40114]
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
+- Update Go version to 1.21.12. {pull}40114[40114]
 
 
 [[release-notes-8.14.2]]
