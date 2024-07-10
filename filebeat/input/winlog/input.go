@@ -121,7 +121,7 @@ runLoop:
 
 		switch {
 		case eventlog.IsRecoverable(openErr):
-			log.Errorw(channelNotFoundError, "error", openErr)
+			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
