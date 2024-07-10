@@ -30,6 +30,7 @@ import (
 )
 
 func init() {
+	//nolint:errcheck init function
 	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
 }
 
@@ -42,7 +43,6 @@ type DiscoveryProber interface {
 
 // Provider is the Jolokia Discovery autodiscover provider
 type Provider struct {
-	config    *Config
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders

@@ -108,8 +108,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 
 func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 	var (
-		errs       multierror.Errors
-		metricsets []MetricSet
+		errs multierror.Errors
 	)
 
 	bms, err := newBaseMetricSets(r, m)
@@ -117,6 +116,7 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 		return nil, err
 	}
 
+	metricsets := make([]MetricSet, 0, len(bms))
 	for _, bm := range bms {
 		registration, err := r.metricSetRegistration(bm.Module().Name(), bm.Name())
 		if err != nil {

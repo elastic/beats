@@ -15,6 +15,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	api "github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
@@ -31,6 +32,7 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 		payload, err := json.Marshal([]interface{}{node})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			//nolint:errcheck ignore
 			w.Write([]byte(err.Error()))
 		}
 
@@ -42,10 +44,12 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 		payload, err := json.Marshal(allocs)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			//nolint:errcheck ignore
 			w.Write([]byte(err.Error()))
 		}
 
 		w.Header().Add(NomadIndexHeader, fmt.Sprint(waitIndex))
+		//nolint:errcheck ignore
 		w.Write(payload)
 	})
 
@@ -300,7 +304,8 @@ func TestAllocationWatcher(t *testing.T) {
 			goroutines := resources.NewGoroutinesChecker()
 			defer goroutines.Check(t)
 
-			watcher.Start()
+			err = watcher.Start()
+			require.NoError(t, err)
 			defer watcher.Stop()
 
 			assert.Equal(t, tt.expected, events)

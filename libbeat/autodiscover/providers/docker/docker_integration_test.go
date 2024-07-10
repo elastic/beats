@@ -73,12 +73,18 @@ func TestDockerStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer d.ContainerRemove(ID)
+	defer func() {
+		if err := d.ContainerRemove(ID); err != nil {
+			t.Error(err)
+		}
+	}()
 
 	checkEvent(t, listener, ID, true)
 
 	// Kill
-	d.ContainerKill(ID)
+	if err := d.ContainerKill(ID); err != nil {
+		t.Error(err)
+	}
 	checkEvent(t, listener, ID, false)
 }
 

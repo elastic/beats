@@ -40,6 +40,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	var bodyMetrics []insights.MetricsPostBodySchema
 	var result insights.ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
+		metrics := metrics
 		var aggregations []insights.MetricsAggregation
 		var segments []insights.MetricsSegment
 		for _, agg := range metrics.Aggregation {

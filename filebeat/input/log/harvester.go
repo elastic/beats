@@ -191,7 +191,7 @@ func (h *Harvester) ID() uuid.UUID {
 func (h *Harvester) Setup() error {
 	err := h.open()
 	if err != nil {
-		return fmt.Errorf("Harvester setup failed. Unexpected file opening error: %s", err)
+		return fmt.Errorf("Harvester setup failed. Unexpected file opening error: %w", err)
 	}
 
 	h.reader, err = h.newLogFileReader()
@@ -199,7 +199,7 @@ func (h *Harvester) Setup() error {
 		if h.source != nil {
 			h.source.Close()
 		}
-		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
+		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %w", err)
 	}
 
 	h.metrics = newHarvesterProgressMetrics(h.id.String())
@@ -325,20 +325,20 @@ func (h *Harvester) Run() error {
 
 		message, err := h.reader.Next()
 		if err != nil {
-			switch err {
-			case ErrFileTruncate:
+			switch {
+			case errors.Is(err, ErrFileTruncate):
 				logger.Info("File was truncated. Begin reading file from offset 0.")
 				h.state.Offset = 0
 				filesTruncated.Add(1)
-			case ErrRemoved:
+			case errors.Is(err, ErrRemoved):
 				logger.Info("File was removed. Closing because close_removed is enabled.")
-			case ErrRenamed:
+			case errors.Is(err, ErrRenamed):
 				logger.Info("File was renamed. Closing because close_renamed is enabled.")
-			case ErrClosed:
+			case errors.Is(err, ErrClosed):
 				logger.Info("Reader was closed. Closing.")
-			case io.EOF:
+			case errors.Is(err, io.EOF):
 				logger.Info("End of file reached. Closing because close_eof is enabled.")
-			case ErrInactive:
+			case errors.Is(err, ErrInactive):
 				logger.Infof("File is inactive. Closing because close_inactive of %v reached.", h.config.CloseInactive)
 			default:
 				logger.Errorf("Read line error: %v", err)
@@ -519,7 +519,7 @@ func (h *Harvester) shouldExportLine(line string) bool {
 func (h *Harvester) openFile() error {
 	fi, err := os.Stat(h.state.Source)
 	if err != nil {
-		return fmt.Errorf("failed to stat source file %s: %v", h.state.Source, err)
+		return fmt.Errorf("failed to stat source file %s: %w", h.state.Source, err)
 	}
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		return fmt.Errorf("failed to open file %s, named pipes are not supported", h.state.Source)
@@ -563,8 +563,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 
 	h.encoding, err = h.encodingFactory(f)
 	if err != nil {
-
-		if err == transform.ErrShortSrc {
+		if errors.Is(err, transform.ErrShortSrc) {
 			logger.Infof("Initialising encoding for '%v' failed due to file being too short", f)
 		} else {
 			logger.Errorf("Initialising encoding for '%v' failed: %v", f, err)
@@ -588,12 +587,12 @@ func (h *Harvester) initFileOffset(file *os.File) (int64, error) {
 	// continue from last known offset
 	if h.state.Offset > 0 {
 		h.logger.Debugf("Set previous offset: %d ", h.state.Offset)
-		return file.Seek(h.state.Offset, os.SEEK_SET)
+		return file.Seek(h.state.Offset, io.SeekStart)
 	}
 
 	// get offset from file in case of encoding factory was required to read some data.
 	h.logger.Debug("Setting offset to: 0")
-	return file.Seek(0, os.SEEK_CUR)
+	return file.Seek(0, io.SeekCurrent)
 }
 
 // getState returns an updated copy of the harvester state

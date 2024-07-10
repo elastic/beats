@@ -6,7 +6,6 @@ package persistentcache
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -277,6 +276,7 @@ func BenchmarkPut(b *testing.B) {
 					for i := 0; i < b.N; i++ {
 						cache := c.factory(b, b.Name())
 						for _, object := range objects {
+							//nolint:errcheck benchmarks
 							cache.Put(object.ID, object)
 						}
 						cache.Close()
@@ -392,6 +392,7 @@ func BenchmarkGet(b *testing.B) {
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
 						expected := objects[rand.Intn(size)]
+						//nolint:errcheck benchmarks
 						cache.Get(expected.ID, &result)
 						if expected.ID != result.ID {
 							b.Fatalf("%s != %s", expected.ID, result.ID)
@@ -408,29 +409,7 @@ func BenchmarkGet(b *testing.B) {
 func testOptions(t testing.TB) Options {
 	t.Helper()
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
-	require.NoError(t, err)
-
-	t.Cleanup(func() { os.RemoveAll(tempDir) })
-
 	return Options{
-		RootPath: filepath.Join(tempDir, cacheFile),
+		RootPath: filepath.Join(t.TempDir(), cacheFile),
 	}
-}
-
-func dirSize(tb testing.TB, path string) int64 {
-	var size int64
-
-	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return nil
-	})
-	require.NoError(tb, err)
-
-	return size
 }
