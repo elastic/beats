@@ -165,7 +165,7 @@ func (inp *filestream) Run(
 	defer streamCancel()
 
 	if err := inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics); err != nil {
-		ctx.UpdateStatus(status.Degraded, err.Error())
+		ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while reading from source: %v", err))
 		return err
 	}
 	return nil
