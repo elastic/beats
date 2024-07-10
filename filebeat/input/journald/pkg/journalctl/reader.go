@@ -38,6 +38,11 @@ import (
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
+// sinceTimeFormat is a time formatting string for the --since flag passed
+// to journalctl, it follows a pattern accepted by multiple versions of
+// Systemd/Journald.
+const sinceTimeFormat = "2006-01-02 15:04:05.999999999"
+
 // ErrCancelled indicates the read was cancelled
 var ErrCancelled = errors.New("cancelled")
 
@@ -82,8 +87,7 @@ func handleSeekAndCursor(args []string, mode SeekMode, since time.Duration, curs
 
 	switch mode {
 	case SeekSince:
-		sinceArg := time.Now().Add(since).Format(time.RFC3339Nano)
-		args = append(args, "--since", sinceArg)
+		args = append(args, "--since", time.Now().Add(since).Format(sinceTimeFormat))
 	case SeekTail:
 		args = append(args, "--since", "now")
 	case SeekHead:

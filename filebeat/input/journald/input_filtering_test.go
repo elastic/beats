@@ -26,7 +26,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -191,11 +190,11 @@ func TestInputIncludeMatches(t *testing.T) {
 // TestInputSeek test the output of various seek modes while reading
 // from input-multiline-parser.journal.
 func TestInputSeek(t *testing.T) {
-	// timeAfterFirstEvent is a timestamp after the first event in the journal,
-	//but before the secon done
-	var timeAfterFirstEvent = time.Date(2021, time.November, 22, 17, 10, 20, 0, time.UTC)
+	// Uncomment the following line to see all logs during the test execution
+	// logp.DevelopmentSetup()
+	timeAfterFirstEvent := time.Date(2021, time.November, 22, 17, 10, 20, 0, time.UTC).In(time.Local)
 
-	var allMessages = []string{
+	allMessages := []string{
 		"pam_unix(sudo:session): session closed for user root",
 		"Started Outputs some log lines.",
 		"1st line",
@@ -248,7 +247,6 @@ func TestInputSeek(t *testing.T) {
 	}
 
 	for name, testCase := range tests {
-		logp.DevelopmentSetup()
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
