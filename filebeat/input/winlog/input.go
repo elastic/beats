@@ -26,6 +26,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
@@ -99,6 +100,7 @@ func (eventlogRunner) Run(
 
 	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
 	channelNotFoundErrDetected := false
+	ctx.UpdateStatus(status.Running, "")
 
 runLoop:
 	for {
@@ -161,6 +163,7 @@ runLoop:
 				}
 
 				log.Errorw("Error occurred while reading from Windows Event Log", "error", err)
+				ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Error occurred while reading from Windows Event Log: %v", err))
 				return err
 			}
 			if len(records) == 0 {
@@ -173,6 +176,7 @@ runLoop:
 				if err := publisher.Publish(event, record.Offset); err != nil {
 					// Publisher indicates disconnect when returning an error.
 					// stop trying to publish records and quit
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Error occurred while publishing from winlog: %v", err))
 					return err
 				}
 			}
