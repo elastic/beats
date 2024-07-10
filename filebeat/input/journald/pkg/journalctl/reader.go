@@ -57,7 +57,7 @@ type JournalEntry struct {
 // Reader reads entries from journald by calling `jouranlctl`
 // and reading its output.
 //
-// We call `journalctl` because it prooved to be the most resilient way of
+// We call `journalctl` because it proved to be the most resilient way of
 // reading journal entries. We have tried to use
 // `github.com/coreos/go-systemd/v22/sdjournal`, however due to a bug in
 // libsystemd (https://github.com/systemd/systemd/pull/29456) Filebeat
@@ -99,7 +99,7 @@ func handleSeekAndCursor(args []string, mode SeekMode, since time.Duration, curs
 
 // New instantiates and starts a reader for journald logs.
 //
-// The Reader starts a `journalctl` process with JSON ouput to read the journal
+// The Reader starts a `journalctl` process with JSON output to read the journal
 // entries. Units and syslog identifiers are passed using the corresponding CLI
 // flags, matchers are passed directly to `journalctl` then transports are added
 // as matchers using `_TRANSPORTS` key.
