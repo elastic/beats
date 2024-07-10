@@ -115,9 +115,9 @@ type Process struct {
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
 	h := xxhash.New()
-	//nolint:errcheck always return nil err
+	//nolint:errcheck // always return nil err
 	h.WriteString(strconv.Itoa(p.Info.PID))
-	//nolint:errcheck always return nil err
+	//nolint:errcheck // always return nil err
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
 }
@@ -141,9 +141,9 @@ func (p Process) toMapStr() mapstr.M {
 func (p Process) entityID(hostID string) string {
 	h := system.NewEntityHash()
 	h.Write([]byte(hostID))
-	//nolint:errcheck no error handling
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
-	//nolint:errcheck no error handling
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
 	return h.Sum()
 }

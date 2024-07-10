@@ -527,7 +527,7 @@ func (h *Harvester) openFile() error {
 
 	f, err := file_helper.ReadOpen(h.state.Source)
 	if err != nil {
-		return fmt.Errorf("Failed opening %s: %s", h.state.Source, err)
+		return fmt.Errorf("Failed opening %s: %w", h.state.Source, err)
 	}
 
 	harvesterOpenFiles.Add(1)
@@ -549,7 +549,7 @@ func (h *Harvester) validateFile(f *os.File) error {
 
 	info, err := f.Stat()
 	if err != nil {
-		return fmt.Errorf("Failed getting stats for file %s: %s", h.state.Source, err)
+		return fmt.Errorf("Failed getting stats for file %s: %w", h.state.Source, err)
 	}
 
 	if !info.Mode().IsRegular() {

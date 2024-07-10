@@ -32,7 +32,7 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 		payload, err := json.Marshal([]interface{}{node})
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			//nolint:errcheck ignore
+			//nolint:errcheck // ignore
 			w.Write([]byte(err.Error()))
 		}
 
@@ -44,12 +44,12 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 		payload, err := json.Marshal(allocs)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			//nolint:errcheck ignore
+			//nolint:errcheck // ignore
 			w.Write([]byte(err.Error()))
 		}
 
 		w.Header().Add(NomadIndexHeader, fmt.Sprint(waitIndex))
-		//nolint:errcheck ignore
+		//nolint:errcheck // ignore
 		w.Write(payload)
 	})
 

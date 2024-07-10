@@ -251,7 +251,7 @@ func (d *Discovery) sendProbe(config InterfaceConfig) {
 			for {
 				n, _, err := conn.ReadFrom(b)
 				if err != nil {
-					//nolint:errcheck false positive
+					//nolint:errcheck // false positive
 					if netErr, ok := err.(net.Error); !ok || !netErr.Timeout() {
 						log.Error(err.Error())
 					}

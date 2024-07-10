@@ -18,8 +18,8 @@ import (
 
 	_ "embed"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
@@ -39,13 +39,13 @@ func TestJamfDoFetch(t *testing.T) {
 	})
 
 	var (
-		wantComputers []*Computer
 		rawComputers  jamf.Computers
 	)
 	err := json.Unmarshal(computers, &rawComputers)
 	if err != nil {
 		t.Fatalf("failed to unmarshal device data: %v", err)
 	}
+	wantComputers := make([]*Computer, 0, len(rawComputers.Results))
 	for _, c := range rawComputers.Results {
 		wantComputers = append(wantComputers, &Computer{
 			Computer: c,

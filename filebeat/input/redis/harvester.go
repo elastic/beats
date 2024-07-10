@@ -95,7 +95,7 @@ func (h *Harvester) Run() error {
 	// Receives first reply from redis which is the one from GET
 	logs, err := rd.Values(h.conn.Receive())
 	if err != nil {
-		return fmt.Errorf("error receiving slowlog data: %s", err)
+		return fmt.Errorf("error receiving slowlog data: %w", err)
 	}
 
 	// Read reply from RESET

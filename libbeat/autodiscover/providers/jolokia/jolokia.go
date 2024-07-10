@@ -30,7 +30,7 @@ import (
 )
 
 func init() {
-	//nolint:errcheck init function
+	//nolint:errcheck // init function
 	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
 }
 
