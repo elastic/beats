@@ -242,12 +242,16 @@ func (r *Reader) Close() error {
 	defer cancel()
 
 ReadErrForLoop:
-	for stderrLine := range r.errChan {
-		r.logger.Errorf("Journalctl wrote to stderr: %s", stderrLine)
+	for {
 		select {
 		case <-readStderrTimeout.Done():
 			r.logger.Error("timedout while reading stderr from journalctl, the process will be killed")
 			break ReadErrForLoop
+		case stderrLine, isOpen := <-r.errChan:
+			r.logger.Errorf("Journalctl wrote to stderr: %s", stderrLine)
+			if !isOpen {
+				break ReadErrForLoop
+			}
 		}
 	}
 
