@@ -81,10 +81,6 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          # docker-compose problem debugging
-          which docker-compose
-          docker-compose --version
-          pwd
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/metricbeat
