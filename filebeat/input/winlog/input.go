@@ -111,6 +111,9 @@ runLoop:
 
 		evtCheckpoint := initCheckpoint(log, cursor)
 		openErr := api.Open(evtCheckpoint)
+		// Mark the input running.
+		// Status will be changed to "Degraded" if any error are encounterd during opening/reading
+		ctx.UpdateStatus(status.Running, "")
 
 		switch {
 		case eventlog.IsRecoverable(openErr):
@@ -123,10 +126,12 @@ runLoop:
 			} else {
 				log.Debugw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
 			}
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Encountered channel not found error when opening Windows Event Log: %v", openErr))
 			channelNotFoundErrDetected = true
 			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		case openErr != nil:
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("failed to open Windows Event Log channel %q: %v", api.Channel(), openErr))
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
 		channelNotFoundErrDetected = false
