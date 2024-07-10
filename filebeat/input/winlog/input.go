@@ -112,7 +112,7 @@ runLoop:
 		evtCheckpoint := initCheckpoint(log, cursor)
 		openErr := api.Open(evtCheckpoint)
 		// Mark the input running.
-		// Status will be changed to "Degraded" if any error are encounterd during opening/reading
+		// Status will be changed to "Degraded" if any error are encountered during opening/reading
 		ctx.UpdateStatus(status.Running, "")
 
 		switch {
