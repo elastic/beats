@@ -163,6 +163,8 @@ func NewInput(
 		getStatusReporter:   context.GetStatusReporter,
 	}
 
+	p.updateStatus(status.Starting, "starting the log input")
+
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
 	_, err = p.createHarvester(logger, file.State{}, nil)
@@ -229,7 +231,9 @@ func (p *Input) loadStates(states []file.State) error {
 // Run runs the input
 func (p *Input) Run() {
 	p.healthy = true
-	p.updateStatus(status.Starting, "starting the scan")
+	// Mark it Running for now.
+	// Any errors encountered in this loop will change state to degraded
+	p.updateStatus(status.Running, "")
 	logger := p.logger
 	logger.Debug("Start next scan")
 
