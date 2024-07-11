@@ -9,7 +9,6 @@ services:
       kafka:         { condition: service_healthy }
       kibana:        { condition: service_healthy }
       mosquitto:     { condition: service_healthy }
-      redis:         { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -45,7 +44,9 @@ services:
     ports:
       - 1883:1883
 
-  redis:
-    build: ${PWD}/input/redis/_meta
+  redis-tls:
+    build:
+      context: ${PWD}/input/redis/_meta
+      dockerfile: Dockerfile-tls
     ports:
       - 6379:6379
