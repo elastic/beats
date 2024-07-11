@@ -725,12 +725,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/gofrs/uuid
-Version: v4.4.0+incompatible
+Dependency : github.com/gofrs/uuid/v5
+Version: v5.2.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/gofrs/uuid@v4.4.0+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/gofrs/uuid/v5@v5.2.0/LICENSE:
 
 Copyright (C) 2013-2018 by Maxim Bublis <b@codemonkey.ru>
 

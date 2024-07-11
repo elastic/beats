@@ -9,7 +9,7 @@ require (
 	github.com/elastic/go-ucfg v0.8.5
 	github.com/elastic/pkcs8 v1.0.0
 	github.com/fatih/color v1.13.0
-	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-colorable v0.1.12
 	github.com/mitchellh/hashstructure v1.1.0
