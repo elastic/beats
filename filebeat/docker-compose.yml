@@ -9,6 +9,7 @@ services:
       kafka:         { condition: service_healthy }
       kibana:        { condition: service_healthy }
       mosquitto:     { condition: service_healthy }
+      redis:         { condition: service_healthy }
       redis-tls:     { condition: service_healthy }
 
   elasticsearch:
@@ -45,12 +46,17 @@ services:
     ports:
       - 1883:1883
 
+  redis:
+    build: ${PWD}/input/redis/_meta
+    ports:
+      - 6379:6379
+
   redis-tls:
     build:
       context: ${PWD}/input/redis/_meta
       dockerfile: Dockerfile-tls
     ports:
-      - 6379:6379
+      - 6380:6379
     healthcheck:
       test: ["CMD", "redis-cli", "-h", "localhost", "-p", "6379", "--tls", "--cert", "/certs/server-cert.pem", "--key", "/certs/server-key.pem", "--cacert", "/certs/root-ca.pem", "ping"]
       interval: 10s

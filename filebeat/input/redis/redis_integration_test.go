@@ -42,7 +42,7 @@ var (
 	message  = "AUTH (redacted)"
 	hostPort = fmt.Sprintf("%s:%s",
 		getOrDefault(os.Getenv("REDIS_HOST"), "localhost"),
-		getOrDefault(os.Getenv("REDIS_PORT"), "6379"))
+		getOrDefault(os.Getenv("REDIS_PORT"), "6380"))
 )
 
 type eventCaptor struct {
