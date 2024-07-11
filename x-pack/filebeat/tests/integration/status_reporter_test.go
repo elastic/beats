@@ -164,7 +164,6 @@ func TestLogStatusReporter(t *testing.T) {
 	}
 	require.Eventually(t, func() bool {
 		events := tests.ReadLogLines(t, outPath)
-		fmt.Println(events, outPath)
 		return events > 0 // wait until we see one output event
 	}, 15*time.Second, 1*time.Second)
 }
