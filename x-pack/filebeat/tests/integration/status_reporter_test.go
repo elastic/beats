@@ -43,10 +43,6 @@ func TestLogStatusReporter(t *testing.T) {
 	t.Logf("writing output to file %s", outPath)
 	err := os.Mkdir(outPath, 0775)
 	require.NoError(t, err)
-	defer func() {
-		err := os.RemoveAll(outPath)
-		require.NoError(t, err)
-	}()
 
 	/*
 	 * valid input stream, shouldn't raise any error.
@@ -69,17 +65,7 @@ func TestLogStatusReporter(t *testing.T) {
 		ConfigStateIdx: 1,
 		State:          proto.State_HEALTHY,
 		Config: &proto.UnitExpectedConfig{
-			DataStream: &proto.DataStream{
-				Namespace: "default",
-			},
-			Type:     "file",
-			Revision: 1,
-			Meta: &proto.Meta{
-				Package: &proto.Package{
-					Name:    "system",
-					Version: "1.17.0",
-				},
-			},
+			Type: "file",
 			Source: tests.RequireNewStruct(map[string]interface{}{
 				"type":            "file",
 				"enabled":         true,
@@ -115,9 +101,6 @@ func TestLogStatusReporter(t *testing.T) {
 	// start the client
 	client := client.NewV2(fmt.Sprintf(":%d", server.Port), token, client.VersionInfo{
 		Name: "program",
-		Meta: map[string]string{
-			"key": "value",
-		},
 	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	lbmanagement.SetManagerFactory(func(cfg *conf.C, registry *reload.Registry) (lbmanagement.Manager, error) {
