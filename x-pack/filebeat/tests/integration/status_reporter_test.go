@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration
-
 package integration
 
 import (
@@ -47,8 +45,8 @@ func TestLogStatusReporter(t *testing.T) {
 	/*
 	 * valid input stream, shouldn't raise any error.
 	 */
-	inputStream := getInputStream(unitOneID, filepath.Join(tmpDir, "*"), 2)
-
+	inputStream := getInputStream(unitOneID, filepath.Join(tmpDir, "*.log"), 2)
+	require.NoError(t, os.WriteFile(filepath.Join(tmpDir, "test.log"), []byte("Line1\nLine2\nLine3\n"), 0777))
 	/*
 	 * try to open an irregular file.
 	 * This should throw "Tried to open non regular file:" and status to degraded
@@ -164,6 +162,11 @@ func TestLogStatusReporter(t *testing.T) {
 		default:
 		}
 	}
+	require.Eventually(t, func() bool {
+		events := tests.ReadLogLines(t, outPath)
+		fmt.Println(events, outPath)
+		return events > 0 // wait until we see one output event
+	}, 15*time.Second, 1*time.Second)
 }
 
 func extractState(units []*proto.UnitObserved, idx string) proto.State {
@@ -185,10 +188,11 @@ func getInputStream(id string, path string, stateIdx int) proto.UnitExpected {
 			Streams: []*proto.Stream{{
 				Id: "filebeat/log-default-system",
 				Source: tests.RequireNewStruct(map[string]interface{}{
-					"enabled":  true,
-					"symlinks": true,
-					"type":     "log",
-					"paths":    []interface{}{path},
+					"enabled":        true,
+					"symlinks":       true,
+					"type":           "log",
+					"paths":          []interface{}{path},
+					"scan_frequency": "500ms",
 				}),
 			}},
 			Type:     "log",
