@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 - Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
+- Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
 
 *Heartbeat*
 
