@@ -39,7 +39,7 @@ import (
 )
 
 var (
-	message  = "EVAL local i = 0 for j=1,500000 do i = i + j end return i 0"
+	message  = "AUTH (redacted)"
 	hostPort = fmt.Sprintf("%s:%s",
 		getOrDefault(os.Getenv("REDIS_HOST"), "localhost"),
 		getOrDefault(os.Getenv("REDIS_PORT"), "6379"))
@@ -81,11 +81,12 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
-		"network":  "tcp",
-		"type":     "redis",
-		"hosts":    []string{hostPort},
-		"password": "password",
-		"maxconn":  10,
+		"network":      "tcp",
+		"type":         "redis",
+		"hosts":        []string{hostPort},
+		"password":     "password",
+		"maxconn":      10,
+		"idle_timeout": 60 * time.Second,
 		"ssl": mapstr.M{
 			"enabled":                 true,
 			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
