@@ -101,7 +101,7 @@ func (h *Harvester) Run() error {
 	// Read reply from RESET
 	_, err = h.conn.Receive()
 	if err != nil {
-		return fmt.Errorf("error receiving reset data: %s", err)
+		return fmt.Errorf("error receiving reset data: %w", err)
 	}
 
 	for _, item := range logs {

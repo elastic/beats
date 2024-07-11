@@ -129,8 +129,8 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setLbls([]*lbListener{})
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 	events.waitForNumEvents(t, 2, time.Second)
 
 	require.Equal(t, 2, events.len())
@@ -148,8 +148,8 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setError(errors.New("oops"))
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 
 	assert.Equal(t, preErrorEventCount, events.len())
 }

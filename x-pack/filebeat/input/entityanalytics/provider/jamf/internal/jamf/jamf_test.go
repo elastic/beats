@@ -19,8 +19,8 @@ import (
 
 	_ "embed"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/gofrs/uuid/v5"
+	"github.com/google/go-cmp/cmp"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")
@@ -68,14 +68,20 @@ var jamfTests = []struct {
 			mux.Handle("/api/v1/auth/token", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				user, pass, ok := r.BasicAuth()
 				if !ok || user != username || pass != password {
+					//nolint:errcheck // no error handling
 					w.WriteHeader(http.StatusUnauthorized)
+					//nolint:errcheck // no error handling
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ ]\n}"))
 					return
 				}
 				if r.Method != http.MethodPost {
+					//nolint:errcheck // no error handling
 					w.WriteHeader(http.StatusMethodNotAllowed)
+					//nolint:errcheck // no error handling
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 					return
 				}
