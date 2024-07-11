@@ -19,11 +19,7 @@ package details
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
-	"strings"
-
-	"github.com/docker/go-units"
 )
 
 // DownloadRate is a float64 that can be safely marshalled to JSON
@@ -33,32 +29,10 @@ type DownloadRate float64
 func (dr *DownloadRate) MarshalJSON() ([]byte, error) {
 	downloadRateBytesPerSecond := float64(*dr)
 	if math.IsInf(downloadRateBytesPerSecond, 0) {
-		return json.Marshal("+Inf bps")
+		return json.Marshal(math.MaxFloat64)
 	}
 
 	return json.Marshal(
-		fmt.Sprintf("%sps", units.HumanSizeWithPrecision(downloadRateBytesPerSecond, 10)),
+		downloadRateBytesPerSecond,
 	)
-}
-
-func (dr *DownloadRate) UnmarshalJSON(data []byte) error {
-	var downloadRateStr string
-	err := json.Unmarshal(data, &downloadRateStr)
-	if err != nil {
-		return err
-	}
-
-	if downloadRateStr == "+Inf bps" {
-		*dr = DownloadRate(math.Inf(1))
-		return nil
-	}
-
-	downloadRateStr = strings.TrimSuffix(downloadRateStr, "ps")
-	downloadRateBytesPerSecond, err := units.FromHumanSize(downloadRateStr)
-	if err != nil {
-		return err
-	}
-
-	*dr = DownloadRate(downloadRateBytesPerSecond)
-	return nil
 }

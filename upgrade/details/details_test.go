@@ -36,7 +36,7 @@ func TestDownloadRateJSON(t *testing.T) {
 		var unmarshalledDownloadRate DownloadRate
 		err = json.Unmarshal(data, &unmarshalledDownloadRate)
 		require.NoError(t, err)
-		require.Equal(t, float64(1794), float64(unmarshalledDownloadRate))
+		require.Equal(t, float64(1794.7), float64(unmarshalledDownloadRate))
 	})
 
 	// Infinity download rate
@@ -49,6 +49,6 @@ func TestDownloadRateJSON(t *testing.T) {
 		var unmarshalledDownloadRate DownloadRate
 		err = json.Unmarshal(data, &unmarshalledDownloadRate)
 		require.NoError(t, err)
-		require.Equal(t, math.Inf(1), float64(unmarshalledDownloadRate))
+		require.Equal(t, math.MaxFloat64, float64(unmarshalledDownloadRate))
 	})
 }
