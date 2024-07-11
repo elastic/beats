@@ -8,11 +8,8 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
-<<<<<<< HEAD
-=======
 * <<release-notes-8.14.3>>
 * <<release-notes-8.14.2>>
->>>>>>> d8e83d2c89 (docs: Prepare Changelog for 8.14.3 (#40176))
 * <<release-notes-8.14.1>>
 * <<release-notes-8.14.0>>
 * <<release-notes-8.13.4>>
