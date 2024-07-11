@@ -26,6 +26,9 @@ import (
 	"testing"
 	"time"
 
+	rd "github.com/gomodule/redigo/redis"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -33,8 +36,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
-	rd "github.com/gomodule/redigo/redis"
-	"github.com/stretchr/testify/require"
 )
 
 var (
