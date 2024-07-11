@@ -10,7 +10,7 @@ env:
 
 steps:
   - group: "Deploy/K8S"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
     - label: "Checks"
