@@ -25,6 +25,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -53,6 +54,7 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
@@ -84,6 +86,10 @@ func (inp *managedInput) Run(
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
 	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+
+	// Mark it as running for now.
+	// Any errors encountered by harverter will change state to Degraded
+	ctx.UpdateStatus(status.Running, "")
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
