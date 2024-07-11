@@ -864,6 +864,9 @@ func (b *Beat) configure(settings Settings) error {
 		version.SetPackageVersion(b.Info.Version)
 	}
 
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
+
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
 	}

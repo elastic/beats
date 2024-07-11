@@ -123,7 +123,7 @@ RUN echo \
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=18.18.2
+ENV NODE_VERSION=18.20.3
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -152,7 +152,7 @@ RUN cd /usr/share/heartbeat/.node \
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
-RUN npm i -g --loglevel verbose --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
+RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH 
 USER root
 
