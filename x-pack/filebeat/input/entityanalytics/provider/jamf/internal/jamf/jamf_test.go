@@ -124,13 +124,7 @@ var jamfTests = []struct {
 			}
 			tenant = u.Host
 
-			cli := &http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: true,
-					},
-				},
-			}
+			cli := srv.Client()
 
 			return tenant, username, password, cli, srv.Close, nil
 		},

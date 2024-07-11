@@ -38,9 +38,7 @@ func TestJamfDoFetch(t *testing.T) {
 		testCleanupStore(store, dbFilename)
 	})
 
-	var (
-		rawComputers  jamf.Computers
-	)
+	var rawComputers jamf.Computers
 	err := json.Unmarshal(computers, &rawComputers)
 	if err != nil {
 		t.Fatalf("failed to unmarshal device data: %v", err)
@@ -109,12 +107,14 @@ func testContext() (tenant string, username string, password string, client *htt
 		if !ok || user != username || pass != password {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ ]\n}"))
 			return
 		}
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 			return
 		}
@@ -126,15 +126,18 @@ func testContext() (tenant string, username string, password string, client *htt
 		if r.Header.Get("Authorization") != "Bearer "+tok.Token || !tok.IsValidFor(0) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ {\n    \"code\" : \"INVALID_TOKEN\",\n    \"description\" : \"Unauthorized\",\n    \"id\" : \"0\",\n    \"field\" : null\n  } ]\n}"))
 			return
 		}
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 			return
 		}
+		//nolint:errcheck // ignore
 		w.Write(computers)
 	}))
 
@@ -146,13 +149,7 @@ func testContext() (tenant string, username string, password string, client *htt
 	}
 	tenant = u.Host
 
-	cli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
+	cli := srv.Client()
 
 	return tenant, username, password, cli, srv.Close, nil
 }
