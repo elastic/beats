@@ -59,8 +59,8 @@ func Test_internalBuilder(t *testing.T) {
 
 	// Let run twice to ensure that duplicates don't create two start events
 	// Since we're turning a list of assets into a list of changes the second once() call should be a noop
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 	events.WaitForNumEvents(t, 1, time.Second)
 
 	assert.Equal(t, 1, events.Len())

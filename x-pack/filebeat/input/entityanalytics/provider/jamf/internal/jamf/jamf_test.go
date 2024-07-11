@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net/http"
@@ -68,18 +69,14 @@ var jamfTests = []struct {
 			mux.Handle("/api/v1/auth/token", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				user, pass, ok := r.BasicAuth()
 				if !ok || user != username || pass != password {
-					//nolint:errcheck // no error handling
 					w.WriteHeader(http.StatusUnauthorized)
-					//nolint:errcheck // no error handling
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
 					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ ]\n}"))
 					return
 				}
 				if r.Method != http.MethodPost {
-					//nolint:errcheck // no error handling
 					w.WriteHeader(http.StatusMethodNotAllowed)
-					//nolint:errcheck // no error handling
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
 					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
@@ -93,12 +90,14 @@ var jamfTests = []struct {
 				if r.Header.Get("Authorization") != "Bearer "+tok.Token || !tok.IsValidFor(0) {
 					w.WriteHeader(http.StatusUnauthorized)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ {\n    \"code\" : \"INVALID_TOKEN\",\n    \"description\" : \"Unauthorized\",\n    \"id\" : \"0\",\n    \"field\" : null\n  } ]\n}"))
 					return false
 				}
 				if r.Method != http.MethodGet {
 					w.WriteHeader(http.StatusMethodNotAllowed)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 					return false
 				}
@@ -106,11 +105,13 @@ var jamfTests = []struct {
 			}
 			mux.Handle("/api/preview/computers", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if isValidRequest(w, r) {
+					//nolint:errcheck // no error handling
 					w.Write(computers)
 				}
 			}))
 			mux.Handle("/JSSResource/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if isValidRequest(w, r) {
+					//nolint:errcheck // no error handling
 					w.Write(users)
 				}
 			}))
@@ -153,9 +154,9 @@ func TestJamf(t *testing.T) {
 	for _, test := range jamfTests {
 		t.Run(test.name, func(t *testing.T) {
 			tenant, username, password, client, cleanup, err := test.context()
-			switch err := err.(type) {
-			case nil:
-			case skipError:
+			switch {
+			case err == nil:
+			case errors.Is(err, skipError("")):
 				t.Skip(err)
 			default:
 				t.Fatalf("unexpected error getting env context: %v", err)
