@@ -22,43 +22,43 @@ var (
 
 var GroupResponse = []*fetcher.Group{
 	{
-		ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+		ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 		Name: "group1",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 				Type: fetcher.MemberUser,
 			},
 			{
-				ID:   uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+				ID:   uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
 				Type: fetcher.MemberDevice,
 			},
 		},
 	},
 	{
-		ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+		ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 		Name: "group2",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+				ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 				Type: fetcher.MemberGroup,
 			},
 			{
-				ID:   uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+				ID:   uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 				Type: fetcher.MemberUser,
 			},
 			{
-				ID:   uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+				ID:   uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
 				Type: fetcher.MemberDevice,
 			},
 		},
 	},
 	{
-		ID:   uuid.MustParse("10db9800-3908-40cc-81c5-511fa8ccf7fd"),
+		ID:   uuid.Must(uuid.FromString("10db9800-3908-40cc-81c5-511fa8ccf7fd")),
 		Name: "group3",
 		Members: []fetcher.Member{
 			{
-				ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+				ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 				Type: fetcher.MemberGroup,
 			},
 		},
@@ -67,7 +67,7 @@ var GroupResponse = []*fetcher.Group{
 
 var UserResponse = []*fetcher.User{
 	{
-		ID: uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+		ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 		Fields: map[string]interface{}{
 			"userPrincipalName": "user.one@example.com",
 			"mail":              "user.one@example.com",
@@ -80,7 +80,7 @@ var UserResponse = []*fetcher.User{
 		},
 	},
 	{
-		ID: uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+		ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 		Fields: map[string]interface{}{
 			"userPrincipalName": "user.two@example.com",
 			"mail":              "user.two@example.com",
@@ -96,7 +96,7 @@ var UserResponse = []*fetcher.User{
 
 var DeviceResponse = []*fetcher.Device{
 	{
-		ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+		ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
 		Fields: map[string]interface{}{
 			"accountEnabled":         true,
 			"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
@@ -120,7 +120,7 @@ var DeviceResponse = []*fetcher.Device{
 		},
 	},
 	{
-		ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+		ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
 		Fields: map[string]interface{}{
 			"accountEnabled":         true,
 			"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
