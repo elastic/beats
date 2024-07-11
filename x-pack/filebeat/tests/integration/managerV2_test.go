@@ -504,9 +504,17 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	// We use `success` to signal the test has ended successfully
 	// if `success` is never closed, then the test will fail with a timeout.
 	success := make(chan struct{})
+
+	// succeededChannelClosed is set to true whenever the `success`
+	// channel is closed. The Filestream input now is reporting its state
+	// to the Elastic-Agent, which cases more checkins to happen, thus the
+	// `success` channel was being close twice. `succeededChannelClosed`
+	// prevents that from happening.
+	succeededChannelClosed := atomic.Bool{}
 	// The test is successful when we reach the last element of `protoUnits`
 	onObserved := func(observed *proto.CheckinObserved, protoUnitsIdx int) {
-		if protoUnitsIdx == len(protos)-1 {
+		if protoUnitsIdx == len(protos)-1 && !succeededChannelClosed.Load() {
+			succeededChannelClosed.Store(true)
 			close(success)
 		}
 	}
