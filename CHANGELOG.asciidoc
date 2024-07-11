@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.14.3]]
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
@@ -71,7 +69,6 @@ https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
 - Add ERROR_INVALID_PARAMETER to the list of recoverable errors. {pull}39781[39781]
 
 
->>>>>>> d8e83d2c89 (docs: Prepare Changelog for 8.14.3 (#40176))
 [[release-notes-8.14.1]]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
