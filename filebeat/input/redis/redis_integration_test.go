@@ -20,6 +20,7 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -97,10 +98,13 @@ func TestInput(t *testing.T) {
 
 	// Route input events through our captor instead of sending through ES.
 	eventsCh := make(chan beat.Event)
-	defer close(eventsCh)
 
 	captor := newEventCaptor(eventsCh)
-	defer captor.Close()
+
+	t.Cleanup(func() {
+		close(eventsCh)
+		captor.Close()
+	})
 
 	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
@@ -117,27 +121,32 @@ func TestInput(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
+	t.Cleanup(func() {
+		input.Stop()
+	})
+
 	// Run the input.
 	input.Run()
 
 	// Create Redis Client
 	redisClient := createRedisClient(t)
 
-	// Verify that event has been received
-	verifiedCh := make(chan struct{})
-	defer close(verifiedCh)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	emitInputData(t, verifiedCh, redisClient)
+	emitInputData(t, ctx, redisClient)
 
-	event := <-eventsCh
-	verifiedCh <- struct{}{}
-
-	val, err := event.GetValue("message")
-	require.NoError(t, err)
-	require.Equal(t, message, val)
+	select {
+	case event := <-eventsCh:
+		val, err := event.GetValue("message")
+		require.NoError(t, err)
+		require.Equal(t, message, val)
+	case <-time.After(30 * time.Second):
+		t.Fatal("Timeout waiting for event")
+	}
 }
 
-func emitInputData(t *testing.T, verifiedCh <-chan struct{}, pool *rd.Pool) {
+func emitInputData(t *testing.T, ctx context.Context, pool *rd.Pool) {
 	script := "local i = 0 for j=1,500000 do i = i + j end return i"
 
 	go func() {
@@ -145,11 +154,14 @@ func emitInputData(t *testing.T, verifiedCh <-chan struct{}, pool *rd.Pool) {
 		defer ticker.Stop()
 
 		conn := pool.Get()
-		defer conn.Close()
+		defer func() {
+			err := conn.Close()
+			require.NoError(t, err)
+		}()
 
 		for {
 			select {
-			case <-verifiedCh:
+			case <-ctx.Done():
 				return
 			case <-ticker.C:
 				_, err := conn.Do("EVAL", script, 0)
@@ -177,11 +189,12 @@ func createRedisClient(t *testing.T) *rd.Pool {
 	}
 
 	return &rd.Pool{
+		MaxActive:   10,
 		MaxIdle:     10,
+		Wait:        true,
 		IdleTimeout: idleTimeout,
 		Dial: func() (rd.Conn, error) {
 			dialOptions := []rd.DialOption{
-				// rd.DialUsername("username"),
 				rd.DialPassword("password"),
 				rd.DialConnectTimeout(idleTimeout),
 				rd.DialReadTimeout(idleTimeout),
