@@ -86,8 +86,8 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setEC2s([]*ec2Instance{})
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 	events.WaitForNumEvents(t, 2, time.Second)
 
 	require.Equal(t, 2, events.Len())
@@ -105,8 +105,8 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setError(errors.New("oops"))
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 
 	assert.Equal(t, preErrorEventCount, events.Len())
 }

@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
 	"os/user"
@@ -136,17 +137,27 @@ type User struct {
 func (user User) Hash() uint64 {
 	h := xxhash.New()
 	// Use everything except userInfo
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Name)
+	//nolint:errcheck // err always nil
 	binary.Write(h, binary.BigEndian, uint8(user.PasswordType))
+	//nolint:errcheck // err always nil
 	h.WriteString(user.PasswordChanged.String())
+	//nolint:errcheck // err always nil
 	h.Write(user.PasswordHashHash)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.UID)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.GID)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Dir)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Shell)
 
 	for _, group := range user.Groups {
+		//nolint:errcheck // err always nil
 		h.WriteString(group.Name)
+		//nolint:errcheck // err always nil
 		h.WriteString(group.Gid)
 	}
 
@@ -199,11 +210,11 @@ func (user User) PrimaryGroup() *user.Group {
 }
 
 // entityID creates an ID that uniquely identifies this user across machines.
-func (u User) entityID(hostID string) string {
+func (user User) entityID(hostID string) string {
 	h := system.NewEntityHash()
 	h.Write([]byte(hostID))
-	h.Write([]byte(u.Name))
-	h.Write([]byte(u.UID))
+	h.Write([]byte(user.Name))
+	h.Write([]byte(user.UID))
 	return h.Sum()
 }
 
@@ -555,7 +566,7 @@ func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 			err = decoder.Decode(user)
 			if err == nil {
 				users = append(users, user)
-			} else if err == io.EOF {
+			} else if errors.Is(err, io.EOF) {
 				// Read all users
 				break
 			} else {
@@ -594,6 +605,7 @@ func (ms *MetricSet) haveFilesChanged() (bool, error) {
 			return true, fmt.Errorf("failed to stat %v: %w", path, err)
 		}
 
+		//nolint:unconvert // false positive
 		ctime := time.Unix(int64(stats.Ctim.Sec), int64(stats.Ctim.Nsec))
 		if ms.lastRead.Before(ctime) {
 			ms.log.Debugf("File changed: %v (lastRead=%v, ctime=%v)", path, ms.lastRead, ctime)

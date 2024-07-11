@@ -37,6 +37,7 @@ func nomadRoutes(node api.Node, allocs []api.Allocation, waitIndex uint64) *http
 		}
 
 		w.Header().Add(NomadIndexHeader, fmt.Sprint(time.Now().Unix()))
+		//nolint:errcheck // ignore
 		w.Write(payload)
 	})
 
