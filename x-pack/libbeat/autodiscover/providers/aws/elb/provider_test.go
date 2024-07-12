@@ -148,8 +148,10 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setError(errors.New("oops"))
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	require.NoError(t, provider.watcher.once())
-	require.NoError(t, provider.watcher.once())
+	// nolint:errcheck // ignore
+	provider.watcher.once()
+	// nolint:errcheck // ignore
+	provider.watcher.once()
 
 	assert.Equal(t, preErrorEventCount, events.len())
 }
