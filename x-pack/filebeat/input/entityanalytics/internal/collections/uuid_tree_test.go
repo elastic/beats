@@ -36,7 +36,7 @@ func TestUUIDTree_UnmarshalJSON(t *testing.T) {
 		},
 		"err-bad-uuid-key": {
 			In:      []byte(fmt.Sprintf(`{"1":["%s"]}`, testUUID1)),
-			WantErr: "invalid UUID length: 1",
+			WantErr: "uuid: incorrect UUID length 1 in string \"1\"",
 		},
 		"err-bad-uuid-set": {
 			In:      []byte(fmt.Sprintf(`{"%s":[1]}`, testUUID1)),
