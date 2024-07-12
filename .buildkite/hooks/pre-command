@@ -6,29 +6,28 @@ set -euo pipefail
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
-ENABLED_BEATS_PIPELINES_SLUGS=(
-  "auditbeat"
-  "heartbeat"
-  "filebeat"
-  "beats-metricbeat"
-  "beats-winlogbeat"
-  "beats-xpack-winlogbeat"
-  "beats-xpack-dockerlogbeat"
-  "beats-xpack-auditbeat"
-  "beats-xpack-metricbeat"
-  "beats-xpack-heartbeat"
-  "deploy-k8s"
-)
-
-for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
-  if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
-    source .buildkite/scripts/setenv.sh
-    break
-  fi
-done
-
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
     PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
+CPU_ARCH=$(uname -m)
+PLATFORM_TYPE=$(uname)
+
+if [[ "${CPU_ARCH}" == "x86_64" ]]; then
+  case "${PLATFORM_TYPE}" in
+    Linux|Darwin)
+      export GOX_FLAGS="-arch amd64"
+      export GO_ARCH_TYPE="amd64"
+      ;;
+    MINGW*)
+      export GOX_FLAGS="-arch 386"
+      ;;
+  esac
+elif [[ "${CPU_ARCH}" == "aarch64" || "${CPU_ARCH}" == "arm64" ]]; then
+  export GOX_FLAGS="-arch arm"
+  export GO_ARCH_TYPE="arm64"
+else
+  echo "Unsupported OS"
+  exit 1
+fi
