@@ -108,7 +108,6 @@ steps:
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
         command: |
           cd x-pack/dockerlogbeat
           mage package
@@ -129,7 +128,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd x-pack/dockerlogbeat
           mage package
