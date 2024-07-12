@@ -275,7 +275,7 @@ func BenchmarkPut(b *testing.B) {
 					for i := 0; i < b.N; i++ {
 						cache := c.factory(b, b.Name())
 						for _, object := range objects {
-							//nolint:errcheck benchmarks
+							//nolint:errcheck // benchmarks
 							cache.Put(object.ID, object)
 						}
 						cache.Close()
@@ -391,7 +391,7 @@ func BenchmarkGet(b *testing.B) {
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
 						expected := objects[rand.Intn(size)]
-						//nolint:errcheck benchmarks
+						//nolint:errcheck // benchmarks
 						cache.Get(expected.ID, &result)
 						if expected.ID != result.ID {
 							b.Fatalf("%s != %s", expected.ID, result.ID)
