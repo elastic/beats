@@ -1061,7 +1061,7 @@ spec:
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
-        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'        
+        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -1115,7 +1115,7 @@ metadata:
   description: 'Scheduled runs of various Beats pipelines per release branch'
   links:
     - title: 'Scheduled runs of Beats pipelines per release branch'
-      url: https://buildkite.com/elastic/logstash-pipeline-scheduler
+      url: https://buildkite.com/elastic/beats-pipeline-scheduler
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
