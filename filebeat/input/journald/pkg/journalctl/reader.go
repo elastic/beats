@@ -245,6 +245,7 @@ func (r *Reader) Close() error {
 	readStderrTimeout, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
+	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
 ReadErrForLoop:
 	for {
 		select {
