@@ -147,6 +147,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
+			msw.module.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
 			msw.run(done, out)
 		}(msw)
 	}
@@ -254,14 +255,20 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.MetricSet.Name(), err))
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.MetricSet.Name(), err))
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
@@ -377,10 +384,8 @@ func (r reporterV2) Event(event mb.Event) bool {
 
 	if event.Error == nil {
 		r.msw.stats.success.Add(1)
-		r.msw.Module().UpdateStatus(status.Running, "")
 	} else {
 		r.msw.stats.failures.Add(1)
-		r.msw.Module().UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %s", r.msw.module.Name(), r.msw.MetricSet.Name(), event.Error))
 	}
 
 	if event.Namespace == "" {
