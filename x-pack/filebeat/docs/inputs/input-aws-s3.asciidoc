@@ -268,7 +268,8 @@ The default is `10 MiB`.
 ==== `max_number_of_messages`
 
 The maximum number of SQS messages that can be inflight at any time. Defaults
-to 5.
+to 5. When this parameter sets too high, it can cause the input to process too
+many messages concurrently, overload the agent and cause ingest failure.
 
 [id="input-{type}-parsers"]
 [float]
