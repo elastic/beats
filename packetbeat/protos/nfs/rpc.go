@@ -207,7 +207,6 @@ func getRPCConnection(private protos.ProtocolData) *rpcConnectionData {
 // length in bytes of the fragment's data.  The boolean value is the
 // highest-order bit of the header; the length is the 31 low-order bits.
 // (Note that this record specification is NOT in XDR standard form!)
-//
 func parseFragment(rawData []byte) (partialMessage []byte, fragmentSize int, isLast bool) {
 	if len(rawData) < 4 {
 		debugf("Waiting for more data")
