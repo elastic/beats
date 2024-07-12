@@ -324,6 +324,7 @@ steps:
                 - .buildkite/hooks/
                 - .buildkite/scripts
                 - deploy/kubernetes/**
+                - metricbeat/module/kubernetes/**
                 - libbeat/docs/version.asciidoc
               config:
                 trigger: "deploy-k8s"
