@@ -214,7 +214,7 @@ func parseFragment(rawData []byte) (partialMessage []byte, fragmentSize int, isL
 		return nil, 0, false
 	}
 
-	header := uint32(binary.BigEndian.Uint32(rawData[0:4]))
+	header := binary.BigEndian.Uint32(rawData[0:4])
 	fragmentSize = 4 + int(header&rpcSizeMask)
 	isLast = (header & rpcLastFrag) != 0
 
