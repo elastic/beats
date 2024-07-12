@@ -7,7 +7,6 @@ package persistentcache
 import (
 	"fmt"
 	"math/rand"
-	"os"
 	"path/filepath"
 	"strconv"
 	"testing"

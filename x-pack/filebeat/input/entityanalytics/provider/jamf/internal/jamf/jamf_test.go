@@ -6,7 +6,6 @@ package jamf
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"flag"
