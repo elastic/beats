@@ -111,6 +111,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - filebeat/
                 - x-pack/filebeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.filebeat.yml
@@ -214,6 +215,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - metricbeat/
                 - x-pack/metricbeat/
                 - x-pack/libbeat/common/aws
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
@@ -286,6 +288,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - winlogbeat/
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
                 - .buildkite/scripts
@@ -383,6 +386,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - libbeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
                 - .buildkite/scripts
@@ -417,6 +421,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - auditbeat/
                 - x-pack/auditbeat/
                 - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
                 - .buildkite/scripts/
@@ -452,6 +457,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - heartbeat/
                 - x-pack/heartbeat/
                 - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
                 - .buildkite/scripts/
@@ -487,6 +493,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - packetbeat/
                 - x-pack/packetbeat/
                 - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
                 - .buildkite/scripts/
