@@ -110,10 +110,9 @@ func (r *rpc) init(results protos.Reporter, config *rpcConfig) error {
 	return nil
 }
 
-func (r *rpc) setFromConfig(config *rpcConfig) error {
+func (r *rpc) setFromConfig(config *rpcConfig) {
 	r.ports = config.Ports
 	r.transactionTimeout = config.TransactionTimeout
-	return nil
 }
 
 func (r *rpc) GetPorts() []int {
