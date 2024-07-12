@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
+AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_ingest_ci"
 
 exportAwsSecrets() {
   local awsSecretKey
