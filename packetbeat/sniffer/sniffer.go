@@ -374,7 +374,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 	// Mark inactive sniffer as active. In case of the sniffer/packetbeat closing
 	// before/while Run is executed, the state will be snifferClosing.
 	// => return if state is already snifferClosing.
-	if !s.state.CAS(snifferInactive, snifferActive) {
+	if !s.state.CompareAndSwap(snifferInactive, snifferActive) {
 		return nil
 	}
 	defer s.state.Store(snifferInactive)

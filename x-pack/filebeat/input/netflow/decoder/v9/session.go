@@ -183,7 +183,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 		a, r := session.ExpireTemplates()
 		aliveTemplates += a
 		removedTemplates += r
-		if !session.Delete.CAS(false, true) {
+		if !session.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, key)
 		}
 	}

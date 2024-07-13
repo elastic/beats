@@ -204,12 +204,12 @@ func newClientCloseWaiter(timeout time.Duration) *clientCloseWaiter {
 
 func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 	if published {
-		w.events.Inc()
+		w.events.Add(1)
 	}
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Sub(uint32(n))
+	value := w.events.Add(^uint32(n-1))
 	if value != 0 {
 		return
 	}
