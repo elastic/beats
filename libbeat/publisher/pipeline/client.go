@@ -209,7 +209,7 @@ func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Add(^uint32(n-1))
+	value := w.events.Add(^uint32(n - 1))
 	if value != 0 {
 		return
 	}
