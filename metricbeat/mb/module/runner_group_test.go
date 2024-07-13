@@ -92,8 +92,8 @@ func TestStartStop(t *testing.T) {
 
 	runnerGroup.Stop()
 
-	assert.Equal(t, fakeRunnersNum, startCounter.Load())
-	assert.Equal(t, fakeRunnersNum, stopCounter.Load())
+	assert.Equal(t, int64(fakeRunnersNum), startCounter.Load())
+	assert.Equal(t, int64(fakeRunnersNum), stopCounter.Load())
 }
 
 func TestDiagnosticsUnsupported(t *testing.T) {
