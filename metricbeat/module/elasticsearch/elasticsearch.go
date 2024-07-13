@@ -351,6 +351,9 @@ type XPack struct {
 		CCR struct {
 			Enabled bool `json:"enabled"`
 		} `json:"CCR"`
+		ML struct {
+			Enabled bool `json:"enabled"`
+		} `json:"ml"`
 	} `json:"features"`
 }
 
