@@ -118,6 +118,6 @@ func TestRecursiveForkingJob(t *testing.T) {
 	sj := newSchedJob(context.Background(), s, "myid", "atype", forkingTf)
 
 	sj.run()
-	require.Equal(t, 4, ran.Load())
+	require.Equal(t, int64(4), ran.Load())
 
 }

@@ -141,7 +141,7 @@ func TestStateless_Run(t *testing.T) {
 
 		// validate
 		require.Equal(t, context.Canceled, err)
-		require.Equal(t, 1, publishCalls.Load())
+		require.Equal(t, int64(1), publishCalls.Load())
 	})
 
 	t.Run("do not start input of pipeline connection fails", func(t *testing.T) {
@@ -158,7 +158,7 @@ func TestStateless_Run(t *testing.T) {
 
 		err := input.Run(v2.Context{}, connector)
 		require.True(t, errors.Is(err, errOpps))
-		require.Equal(t, 0, run.Load())
+		require.Equal(t, int64(0), run.Load())
 	})
 }
 

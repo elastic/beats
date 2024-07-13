@@ -15,7 +15,7 @@ import (
 
 func TestTxTracker_Ack(t *testing.T) {
 	txTracker := NewTxTracker(context.Background())
-	txTracker.pending.Inc()
+	txTracker.pending.Add(1)
 
 	txTracker.Ack()
 

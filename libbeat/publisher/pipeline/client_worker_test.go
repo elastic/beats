@@ -212,7 +212,7 @@ func TestMakeClientTracer(t *testing.T) {
 	testutil.SeedPRNG(t)
 
 	numBatches := 10
-	var numEvents uint
+	var numEvents uint64
 
 	logger := makeBufLogger(t)
 
@@ -220,9 +220,9 @@ func TestMakeClientTracer(t *testing.T) {
 	retryer := newStandaloneRetryer(workQueue)
 	defer retryer.close()
 
-	var published atomic.Uint
+	var published atomic.Uint64
 	publishFn := func(batch publisher.Batch) error {
-		published.Add(uint(len(batch.Events())))
+		published.Add(uint64(len(batch.Events())))
 		return nil
 	}
 
@@ -236,7 +236,7 @@ func TestMakeClientTracer(t *testing.T) {
 
 	for i := 0; i < numBatches; i++ {
 		batch := randomBatch(10, 15).withRetryer(retryer)
-		numEvents += uint(len(batch.Events()))
+		numEvents += uint64(len(batch.Events()))
 		workQueue <- batch
 	}
 
@@ -248,7 +248,7 @@ func TestMakeClientTracer(t *testing.T) {
 		return numEvents == published.Load()
 	})
 	if !matches {
-		t.Errorf("expected %d events, got %d", numEvents, published)
+		t.Errorf("expected %d events, got %d", numEvents, published.Load())
 	}
 	recorder.Flush(nil)
 
