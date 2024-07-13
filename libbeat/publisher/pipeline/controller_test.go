@@ -233,7 +233,7 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		return len(controller.pendingRequests) == producerCount
 	})
 	assert.True(t, allStarted, "All queueProducer requests should be saved as pending requests by outputController")
-	assert.Equal(t, producerCount, remaining.Load(), "No queueProducer request should return before an output is set")
+	assert.Equal(t, int64(producerCount), remaining.Load(), "No queueProducer request should return before an output is set")
 
 	// Set the output, then ensure that it unblocks all the waiting goroutines.
 	controller.Set(outputs.Group{
