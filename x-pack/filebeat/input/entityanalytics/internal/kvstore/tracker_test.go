@@ -25,9 +25,9 @@ func TestTxTracker_Ack(t *testing.T) {
 func TestTxTracker_Add(t *testing.T) {
 	txTracker := NewTxTracker(context.Background())
 
-	require.Equal(t, 0, txTracker.pending.Load())
+	require.Equal(t, int64(0), txTracker.pending.Load())
 	txTracker.Add()
-	require.Equal(t, 1, txTracker.pending.Load())
+	require.Equal(t, int64(1), txTracker.pending.Load())
 }
 
 func TestTxTracker_Wait(t *testing.T) {
@@ -43,7 +43,7 @@ func TestTxACKHandler(t *testing.T) {
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		require.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, int64(1), txTracker.pending.Load())
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -63,7 +63,7 @@ func TestTxACKHandler(t *testing.T) {
 		handler := NewTxACKHandler()
 
 		txTracker.Add()
-		require.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, int64(1), txTracker.pending.Load())
 
 		handler.AddEvent(beat.Event{
 			Private: txTracker,
@@ -71,6 +71,6 @@ func TestTxACKHandler(t *testing.T) {
 
 		txTracker.Wait()
 
-		require.Equal(t, 1, txTracker.pending.Load())
+		require.Equal(t, int64(1), txTracker.pending.Load())
 	})
 }
