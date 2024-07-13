@@ -42,7 +42,6 @@ type client struct {
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen    atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
-	closeOnce sync.Once   // closeOnce ensure that the client shutdown sequence is only executed once
 
 	observer       observer
 	eventListener  beat.EventListener
