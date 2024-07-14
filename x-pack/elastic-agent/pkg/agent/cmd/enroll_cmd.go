@@ -284,6 +284,9 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig map[string]interface{}) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
+	if c.options.FleetServer.InternalPort == 0 {
+		c.options.FleetServer.InternalPort = defaultFleetServerInternalPort
+	}
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		if !c.options.FleetServer.SpawnAgent {
@@ -321,6 +324,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 	if err != nil {
 		return "", err
 	}
+	c.options.FleetServer.InternalPort = fleetConfig.Server.InternalPort
 
 	configToStore := map[string]interface{}{
 		"agent": agentConfig,
@@ -360,7 +364,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 func (c *enrollCmd) prepareFleetTLS() error {
 	host := c.options.FleetServer.Host
 	if host == "" {
-		host = "localhost"
+		host = defaultFleetServerInternalHost
 	}
 	port := c.options.FleetServer.Port
 	if port == 0 {
@@ -376,7 +380,7 @@ func (c *enrollCmd) prepareFleetTLS() error {
 		if c.options.FleetServer.Insecure {
 			// running insecure, force the binding to localhost (unless specified)
 			if c.options.FleetServer.Host == "" {
-				c.options.FleetServer.Host = "localhost"
+				c.options.FleetServer.Host = defaultFleetServerInternalHost
 			}
 			c.options.URL = fmt.Sprintf("http://%s:%d", host, port)
 			c.options.Insecure = true
@@ -531,6 +535,9 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		// use internal URL for future requests
 		if c.options.InternalURL != "" {
 			fleetConfig.Client.Host = c.options.InternalURL
+			// fleet-server will bind the internal listenter to localhost:8221
+			// InternalURL is localhost:8221, however cert uses $HOSTNAME, so we need to disable hostname verification.
+			fleetConfig.Client.Transport.TLS.VerificationMode = tlscommon.VerifyCertificate
 		}
 	}
 
@@ -843,7 +850,9 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	if err := fileLock.TryLock(); err != nil {
 		return err
 	}
-	defer fileLock.Unlock() //nolint:errcheck // defered call
+	defer func() {
+		_ = fileLock.Unlock()
+	}()
 
 	if err := s.Save(reader); err != nil {
 		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
