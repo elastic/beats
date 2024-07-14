@@ -41,7 +41,7 @@ type client struct {
 	canDrop    bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen    atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
+	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
 	observer       observer
 	eventListener  beat.EventListener
