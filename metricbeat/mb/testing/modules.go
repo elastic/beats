@@ -57,6 +57,7 @@ package testing
 
 import (
 	"context"
+	"github.com/elastic/go-concert/timed"
 	"sync"
 	"testing"
 	"time"
@@ -256,6 +257,35 @@ func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, 
 	if err != nil {
 		r.errs = append(r.errs, err)
 	}
+	return r.events, r.errs
+}
+
+// PeriodicReportingFetchV2Error runs the given metricset and returns all the
+// events and errors that occur during that period.
+func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, period time.Duration, timeout time.Duration) ([]mb.Event, []error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	r := &CapturingReporterV2{}
+	_ = timed.Periodic(ctx, period, func() error {
+		// Fetch the metrics and store them in the
+		// reporter.
+		if err := metricSet.Fetch(r); err != nil {
+			r.errs = append(r.errs, err)
+			return err
+		}
+
+		if len(r.events) > 0 {
+			// We have metrics, stop the periodic
+			// and return the metrics.
+			cancel()
+		}
+
+		// No metrics yet, retry again
+		// in the next period.
+		return nil
+	})
+
 	return r.events, r.errs
 }
 
