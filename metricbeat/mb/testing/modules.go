@@ -167,7 +167,7 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 // NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
 func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
 	metricSets := NewMetricSets(t, config)
-	var reportingMetricSets []mb.ReportingMetricSetV2Error
+	reportingMetricSets := make([]mb.ReportingMetricSetV2Error, 0, len(metricSets))
 	for _, metricSet := range metricSets {
 		rMS, ok := metricSet.(mb.ReportingMetricSetV2Error)
 		if !ok {
@@ -374,15 +374,15 @@ func (r *CapturingPushReporterV2) capture(waitEvents int) []mb.Event {
 // BlockingCapture blocks until waitEvents n of events are captured
 func (r *CapturingPushReporterV2) BlockingCapture(waitEvents int) []mb.Event {
 	var events []mb.Event
-	for {
-		select {
-		case e := <-r.eventsC:
-			events = append(events, e)
-			if waitEvents > 0 && len(events) >= waitEvents {
-				return events
-			}
+
+	for e := range r.eventsC {
+		events = append(events, e)
+		if waitEvents > 0 && len(events) >= waitEvents {
+			return events
 		}
 	}
+
+	return events
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
