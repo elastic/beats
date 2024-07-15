@@ -373,7 +373,7 @@ func (r *CapturingPushReporterV2) capture(waitEvents int) []mb.Event {
 
 // BlockingCapture blocks until waitEvents n of events are captured
 func (r *CapturingPushReporterV2) BlockingCapture(waitEvents int) []mb.Event {
-	var events []mb.Event
+	events := make([]mb.Event, 0, waitEvents)
 
 	for e := range r.eventsC {
 		events = append(events, e)
