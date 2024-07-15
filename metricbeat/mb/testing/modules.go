@@ -57,10 +57,11 @@ package testing
 
 import (
 	"context"
-	"github.com/elastic/go-concert/timed"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/go-concert/timed"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
