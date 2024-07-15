@@ -25,7 +25,7 @@ func TestFetch(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 
-	retries := 2
+	retries := 5
 	for i := 0; i < retries; i++ {
 		// The CloudWatch metrics can take a few minutes to appear,
 		// so we retry a few times
@@ -39,7 +39,7 @@ func TestFetch(t *testing.T) {
 		}
 
 		// No metrics yet, wait and retry
-		time.Sleep(5 * time.Minute)
+		time.Sleep(1 * time.Minute)
 	}
 
 	assert.NotEmpty(t, events)
