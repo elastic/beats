@@ -129,8 +129,7 @@ require (
 	github.com/prometheus/procfs v0.13.0
 	github.com/prometheus/prometheus v1.8.2-0.20210701133801-b0944590a1c9
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
-	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
-	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
+	github.com/samuel/go-thrift v0.0.0-20210915161234-7b67f98e972f
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5

@@ -22207,11 +22207,11 @@ official policies, either expressed or implied, of Richard Crowley.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/samuel/go-thrift
-Version: v0.0.0-20140522043831-2187045faa54
+Version: v0.0.0-20210915161234-7b67f98e972f
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/samuel/go-thrift@v0.0.0-20140522043831-2187045faa54/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/samuel/go-thrift@v0.0.0-20210915161234-7b67f98e972f/LICENSE:
 
 Copyright (c) 2012, Samuel Stauffer <samuel@descolada.com>
 All rights reserved.
@@ -49944,14 +49944,6 @@ Contents of probable licence file $GOMODCACHE/github.com/rootless-containers/roo
    See the License for the specific language governing permissions and
    limitations under the License.
 
-
---------------------------------------------------------------------------------
-Dependency : github.com/samuel/go-parser
-Version: v0.0.0-20130731160455-ca8abbf65d0e
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-No licence file provided.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/sergi/go-diff
