@@ -8,8 +8,7 @@ package sqs
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
+	"time"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -18,11 +17,23 @@ import (
 
 func TestFetch(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
-
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+
+	retries := 2
+	for i := 0; i < retries; i++ {
+		// The CloudWatch metrics can take a few minutes to appear,
+		// so we retry a few times
+		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+		if len(errs) > 0 {
+			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+		}
+
+		if len(events) > 0 {
+			break
+		}
+
+		// No metrics yet, wait and retry
+		time.Sleep(5 * time.Minute)
 	}
 
 	assert.NotEmpty(t, events)
