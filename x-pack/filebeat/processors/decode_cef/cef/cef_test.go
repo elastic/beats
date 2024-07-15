@@ -58,6 +58,8 @@ const (
 
 	truncatedHeader = "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT"
 
+	equalsSignWithNoValueInHeader = `CEF:26|security|threat=manager|1.0|100|trojan successfully stopped|10|src= dst=12.121.122.82 spt=`
+
 	// Found by fuzzing but minimised by hand.
 	fuzz0 = `CEF:0|a=\\ b|`
 	fuzz1 = `CEF:0|\|a=|b=`
@@ -84,6 +86,7 @@ var testMessages = []string{
 	tabMessage,
 	escapedMessage,
 	truncatedHeader,
+	equalsSignWithNoValueInHeader,
 	fuzz0,
 	fuzz1,
 	fuzz2,
@@ -158,6 +161,22 @@ func TestEventUnpack(t *testing.T) {
 			"src": IPField("10.0.0.192"),
 			"dst": IPField("12.121.122.82"),
 			"spt": IntegerField(1232),
+		}, e.Extensions)
+	})
+
+	t.Run("equalsSignWithNoValueInHeader", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(equalsSignWithNoValueInHeader, WithRemoveEmptyValues())
+		assert.NoError(t, err)
+		assert.Equal(t, 26, e.Version)
+		assert.Equal(t, "security", e.DeviceVendor)
+		assert.Equal(t, "threat=manager", e.DeviceProduct)
+		assert.Equal(t, "1.0", e.DeviceVersion)
+		assert.Equal(t, "100", e.DeviceEventClassID)
+		assert.Equal(t, "trojan successfully stopped", e.Name)
+		assert.Equal(t, "10", e.Severity)
+		assert.Equal(t, map[string]*Field{
+			"dst": IPField("12.121.122.82"),
 		}, e.Extensions)
 	})
 
