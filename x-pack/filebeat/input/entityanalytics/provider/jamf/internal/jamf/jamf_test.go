@@ -147,9 +147,10 @@ func TestJamf(t *testing.T) {
 	for _, test := range jamfTests {
 		t.Run(test.name, func(t *testing.T) {
 			tenant, username, password, client, cleanup, err := test.context()
-			switch {
-			case err == nil:
-			case errors.Is(err, skipError("")):
+			//nolint:errorlint // false positive
+			switch err := err.(type) {
+			case nil:
+			case skipError:
 				t.Skip(err)
 			default:
 				t.Fatalf("unexpected error getting env context: %v", err)
