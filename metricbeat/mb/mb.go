@@ -67,7 +67,7 @@ type Module interface {
 	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
 	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
 	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
-	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status repoter for the given module.
+	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
 }
 
 // BaseModule implements the Module interface.
