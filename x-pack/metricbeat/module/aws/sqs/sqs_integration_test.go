@@ -13,11 +13,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
+	var events []mb.Event
+	var errs []error
+
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 
@@ -25,7 +29,7 @@ func TestFetch(t *testing.T) {
 	for i := 0; i < retries; i++ {
 		// The CloudWatch metrics can take a few minutes to appear,
 		// so we retry a few times
-		events, errs := mbtest.ReportingFetchV2Error(metricSet)
+		events, errs = mbtest.ReportingFetchV2Error(metricSet)
 		if len(errs) > 0 {
 			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 		}
