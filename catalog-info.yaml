@@ -1120,6 +1120,41 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
+  name: beats-aws-tests-daily
+  description: 'Scheduled runs of Beats AWS tests'
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-aws-tests-daily
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-aws-tests-daily
+      description: ':alarm_clock: Scheduled runs of Beats AWS tests'
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/daily-aws-pipeline.yml"
+      ranch_configuration: "main 8.* 7.17"
+      cancel_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: BUILD_AND_READ
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
   name: beats-pipeline-scheduler
   description: 'Scheduled runs of various Beats pipelines per release branch'
   links:
@@ -1146,50 +1181,12 @@ spec:
           message: Daily trigger of Iron Bank validation Pipeline per branch
           env:
             PIPELINES_TO_TRIGGER: 'beats-ironbank-validation'
-      skip_intermediate_builds: true
-      provider_settings:
-        trigger_mode: none
-      env:
-        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
-        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
-        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
-      teams:
-        ingest-fp:
-          access_level: MANAGE_BUILD_AND_READ
-        release-eng:
-          access_level: BUILD_AND_READ
-        everyone:
-          access_level: BUILD_AND_READ
-
----
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
-apiVersion: backstage.io/v1alpha1
-kind: Resource
-metadata:
-  name: beats-aws-tests-daily
-  description: 'Scheduled runs of Beats AWS tests'
-  links:
-    - title: 'Scheduled runs of Beats AWS tests'
-      url: https://buildkite.com/elastic/beats-aws-tests-daily
-spec:
-  type: buildkite-pipeline
-  owner: group:ingest-fp
-  system: buildkite
-  implementation:
-    apiVersion: buildkite.elastic.dev/v1
-    kind: Pipeline
-    metadata:
-      name: beats-aws-tests-daily
-      description: ':alarm_clock: Scheduled runs of Beats AWS tests'
-    spec:
-      repository: elastic/beats
-      pipeline_file: ".buildkite/daily-aws-pipeline.yml"
-      maximum_timeout_in_minutes: 240
-      schedules:
         Daily run of AWS tests:
           branch: main
           cronline: 0 */12 * * *
           message: Daily trigger of Beats AWS tests
+          env:
+            PIPELINES_TO_TRIGGER: 'beats-aws-tests-daily'
       skip_intermediate_builds: true
       provider_settings:
         trigger_mode: none
