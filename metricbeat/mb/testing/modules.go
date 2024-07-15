@@ -64,7 +64,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type TestModule struct {
@@ -279,46 +278,6 @@ func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) (
 		r.errs = append(r.errs, err)
 	}
 	return r.events, r.errs
-}
-
-// NewPushMetricSet instantiates a new PushMetricSet using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewPushMetricSet(t testing.TB, config interface{}) mb.PushMetricSet {
-	metricSet := NewMetricSet(t, config)
-
-	pushMetricSet, ok := metricSet.(mb.PushMetricSet)
-	if !ok {
-		t.Fatal("MetricSet does not implement PushMetricSet")
-	}
-
-	return pushMetricSet
-}
-
-type capturingReporter struct {
-	events []mapstr.M
-	errs   []error
-	done   chan struct{}
-}
-
-func (r *capturingReporter) Event(event mapstr.M) bool {
-	r.events = append(r.events, event)
-	return true
-}
-
-func (r *capturingReporter) ErrorWith(err error, meta mapstr.M) bool {
-	r.events = append(r.events, meta)
-	r.errs = append(r.errs, err)
-	return true
-}
-
-func (r *capturingReporter) Error(err error) bool {
-	r.errs = append(r.errs, err)
-	return true
-}
-
-func (r *capturingReporter) Done() <-chan struct{} {
-	return r.done
 }
 
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
