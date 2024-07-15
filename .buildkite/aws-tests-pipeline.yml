@@ -28,7 +28,7 @@ steps:
       source .buildkite/scripts/initCloudEnv.sh
       echo "~~~ Running tests"
       cd x-pack/filebeat
-      mage build test goIntegTest
+      mage build test
     agents:
       provider: "aws"
       imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -49,7 +49,7 @@ steps:
       source .buildkite/scripts/initCloudEnv.sh
       echo "~~~ Running tests"
       cd x-pack/metricbeat
-      mage build test goIntegTest
+      mage build test
     agents:
       provider: "aws"
       imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
