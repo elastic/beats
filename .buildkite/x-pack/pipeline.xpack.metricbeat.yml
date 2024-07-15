@@ -25,6 +25,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module tests
+  BEAT_PATH: "x-pack/metricbeat"
+
 steps:
   - group: "Check/Update"
     key: "x-pack-metricbeat-check-update"
@@ -76,17 +79,13 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat: Go (MODULE) Integration Tests"
+      - label: ":ubuntu: x-pack/metricbeat: Go Integration Tests (Module)"
         key: "mandatory-int-test"
         env:
           TEST_TAGS: "oracle"
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/metricbeat
-          echo "~~~ Running tests"
-          cd x-pack/metricbeat && mage goIntegTest
+          cd x-pack/metricbeat
+          mage goIntegTest
         retry:
           automatic:
             - limit: 3
@@ -99,19 +98,15 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Go (MODULE) Integration Tests"
+              context: "x-pack/metricbeat: Go Integration Tests (Module)"
 
-      - label: ":ubuntu: x-pack/metricbeat: Python (MODULE) Integration Tests"
+      - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         env:
           TEST_TAGS: "oracle"
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/metricbeat
-          echo "~~~ Running tests"
-          cd x-pack/metricbeat && mage pythonIntegTest
+          cd x-pack/metricbeat
+          mage pythonIntegTest
         retry:
           automatic:
             - limit: 3
@@ -124,7 +119,7 @@ steps:
           - "x-pack/metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Python (MODULE) Integration Tests"
+              context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
       - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
         command: |

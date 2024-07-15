@@ -7,6 +7,7 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"testing"
@@ -21,6 +22,7 @@ import (
 )
 
 func TestHomebrew(t *testing.T) {
+	fmt.Println("DELETEME")
 	defer abtest.SetupDataDir(t)()
 
 	oldPath := homebrewCellarPath

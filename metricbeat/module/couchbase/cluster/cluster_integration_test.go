@@ -20,6 +20,7 @@
 package cluster
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,6 +31,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	fmt.Println("DELETEME")
 	service := compose.EnsureUpWithTimeout(t, 120, "couchbase")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
