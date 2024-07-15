@@ -1,0 +1,6 @@
+- module: k6
+  metricsets:
+    - k6metricset
+  setup.ilm.overwrite: true
+  period: 10s
+  hosts: ["localhost:6565"]
