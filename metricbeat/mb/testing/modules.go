@@ -57,7 +57,6 @@ package testing
 
 import (
 	"context"
-	"sync"
 	"testing"
 	"time"
 
@@ -132,25 +131,6 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 	}
 
 	return metricsets
-}
-
-func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
-	metricSet := NewMetricSet(t, config)
-
-	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSet)
-	if !ok {
-		t.Fatal("MetricSet does not implement ReportingMetricSet")
-	}
-
-	return reportingMetricSet
-}
-
-// ReportingFetch runs the given reporting metricset and returns all of the
-// events and errors that occur during that period.
-func ReportingFetch(metricSet mb.ReportingMetricSet) ([]mapstr.M, []error) {
-	r := &capturingReporter{}
-	metricSet.Fetch(r)
-	return r.events, r.errs
 }
 
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
@@ -339,31 +319,6 @@ func (r *capturingReporter) Error(err error) bool {
 
 func (r *capturingReporter) Done() <-chan struct{} {
 	return r.done
-}
-
-// RunPushMetricSet run the given push metricset for the specific amount of time
-// and returns all of the events and errors that occur during that period.
-func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]mapstr.M, []error) {
-	r := &capturingReporter{done: make(chan struct{})}
-
-	// Run the metricset.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		metricSet.Run(r)
-	}()
-
-	// Let it run for some period, then stop it by closing the done channel.
-	time.AfterFunc(duration, func() {
-		close(r.done)
-	})
-
-	// Wait for the PushMetricSet to completely stop.
-	wg.Wait()
-
-	// Return all events and errors that were collected.
-	return r.events, r.errs
 }
 
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
