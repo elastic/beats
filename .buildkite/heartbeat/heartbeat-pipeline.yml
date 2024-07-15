@@ -20,6 +20,7 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
+  ASDF_NODEJS_VERSION: 18.17.1
 
   # Unit tests
   RACE_DETECTOR: "true"
@@ -269,7 +270,6 @@ steps:
         key: "heartbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-          SNAPSHOT: true
         command: |
           cd heartbeat
           mage package
@@ -290,7 +290,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd heartbeat
           mage package
