@@ -194,6 +194,8 @@ steps:
     steps:
       - label: ":ubuntu: Winlogbeat: Packaging Linux"
         key: "packaging-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           cd winlogbeat
           mage package
@@ -205,8 +207,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "winlogbeat: Packaging Linux"

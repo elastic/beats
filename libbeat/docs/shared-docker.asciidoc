@@ -137,6 +137,24 @@ using this syntax:
 
 endif::apm-server[]
 
+==== Run {beatname_uc} on a read-only file system
+
+If you'd like to run {beatname_uc} in a Docker container on a read-only file 
+system, you can do so by specifying the `--read-only` option.
+{beatname_uc} requires a stateful directory to store application data, so
+with the `--read-only` option you also need to use the `--mount` option to
+specify a path to where that data can be stored.
+
+For example:
+
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run \
+  --mount type=source=$(pwd}/data,destination=/usr/share/{beatname_lc}/data
+  --read-only
+  {dockerimage}
+--------------------------------------------
+
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
