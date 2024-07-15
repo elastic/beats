@@ -1121,7 +1121,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: beats-aws-tests
-  description: 'Scheduled runs of Beats AWS tests'
+  description: 'Runs of Beats AWS tests'
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats-aws-tests
@@ -1134,7 +1134,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-aws-tests
-      description: ':alarm_clock: Scheduled runs of Beats AWS tests'
+      description: 'Runs of Beats AWS tests'
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/aws-tests-pipeline.yml"
