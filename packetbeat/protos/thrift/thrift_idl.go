@@ -91,7 +91,7 @@ func readFiles(files []string) (map[string]parser.Thrift, error) {
 	for _, file := range files {
 		filesMap, _, err := thriftParser.ParseFile(file)
 		if err != nil {
-			return output, fmt.Errorf("Error parsing Thrift IDL file %s: %s", file, err)
+			return output, fmt.Errorf("Error parsing Thrift IDL file %s: %w", file, err)
 		}
 
 		for fname, parsedFile := range filesMap {
