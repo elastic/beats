@@ -58,7 +58,7 @@ const (
 
 	truncatedHeader = "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT"
 
-	equalsSignWithNoValueInHeader = `CEF:26|security|threat=manager|1.0|100|trojan successfully stopped|10|src= dst=12.121.122.82 spt=`
+	noValueInExtension = `CEF:26|security|threat=manager|1.0|100|trojan successfully stopped|10|src= dst=12.121.122.82 spt=`
 
 	// Found by fuzzing but minimised by hand.
 	fuzz0 = `CEF:0|a=\\ b|`
@@ -86,7 +86,7 @@ var testMessages = []string{
 	tabMessage,
 	escapedMessage,
 	truncatedHeader,
-	equalsSignWithNoValueInHeader,
+	noValueInExtension,
 	fuzz0,
 	fuzz1,
 	fuzz2,
@@ -164,9 +164,9 @@ func TestEventUnpack(t *testing.T) {
 		}, e.Extensions)
 	})
 
-	t.Run("equalsSignWithNoValueInHeader", func(t *testing.T) {
+	t.Run("noValueInExtension", func(t *testing.T) {
 		var e Event
-		err := e.Unpack(equalsSignWithNoValueInHeader, WithRemoveEmptyValues())
+		err := e.Unpack(noValueInExtension, WithRemoveEmptyValues())
 		assert.NoError(t, err)
 		assert.Equal(t, 26, e.Version)
 		assert.Equal(t, "security", e.DeviceVendor)
