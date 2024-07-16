@@ -46,8 +46,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.6
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
-	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
-	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
+	github.com/cavaliergopher/rpm v1.2.0
 	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
 	github.com/cloudfoundry/noaa v2.1.0+incompatible
@@ -55,11 +54,10 @@ require (
 	github.com/containerd/fifo v1.0.0
 	github.com/coreos/go-systemd/v22 v22.3.2
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
-	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.1
-	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
+	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
 	github.com/docker/docker v24.0.9+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
@@ -108,7 +106,6 @@ require (
 	github.com/hashicorp/nomad/api v0.0.0-20201203164818-6318a8ac7bf8
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
-	github.com/jmoiron/sqlx v1.3.1
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
@@ -146,15 +143,15 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.24.0
-	golang.org/x/mod v0.18.0
-	golang.org/x/net v0.26.0
+	golang.org/x/crypto v0.25.0
+	golang.org/x/mod v0.19.0
+	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.21.0
+	golang.org/x/sys v0.22.0
 	golang.org/x/text v0.16.0
 	golang.org/x/time v0.5.0
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
+	golang.org/x/tools v0.23.0
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.3
@@ -366,7 +363,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
-	golang.org/x/term v0.21.0 // indirect
+	golang.org/x/term v0.22.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect
@@ -395,23 +392,15 @@ replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
 
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
-	github.com/Microsoft/hcsshim => github.com/Microsoft/hcsshim v0.9.8
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
-	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/dgraph-io/ristretto => github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3 // Removes glog dependency. See https://github.com/elastic/beats/issues/31810.
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
-	github.com/godror/godror => github.com/godror/godror v0.33.2 // updating to v0.24.2 caused a breaking change
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
-	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
-	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
 )
-
-// Exclude this version because the version has an invalid checksum.
-exclude github.com/docker/distribution v2.8.0+incompatible
