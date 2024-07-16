@@ -17,34 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
-//func TestFetch(t *testing.T) {
-//	var events []mb.Event
-//	var errs []error
-//
-//	config := mtest.GetConfigForTest(t, "sqs", "300s")
-//	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-//
-//	retries := 5
-//	for i := 0; i < retries; i++ {
-//		// The CloudWatch metrics can take a few minutes to appear,
-//		// so we retry a few times
-//		events, errs = mbtest.ReportingFetchV2Error(metricSet)
-//		if len(errs) > 0 {
-//			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-//		}
-//
-//		if len(events) > 0 {
-//			break
-//		}
-//
-//		// No metrics yet, wait and retry
-//		time.Sleep(1 * time.Minute)
-//	}
-//
-//	assert.NotEmpty(t, events)
-//	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
-//}
-
 func TestFetch(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
