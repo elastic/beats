@@ -12,7 +12,7 @@ if [[ ! -d "${BIN}" ]]; then
 fi
 export PATH="${PATH}:${BIN}"
 
-echo "--- Installing kind & kubectl"
+echo "~~~ Installing kind & kubectl"
 asdf plugin add kind
 asdf install kind "$ASDF_KIND_VERSION"
 

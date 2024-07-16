@@ -25,7 +25,7 @@ terraformApply() {
   TF_VAR_CREATED_DATE=$(date +%s)
   export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
   export TF_VAR_ENVIRONMENT="ci"
-  export TF_VAR_REPO="${REPO}"
+  export TF_VAR_REPO="beats"
   export TF_VAR_BRANCH
   export TF_VAR_CREATED_DATE
 

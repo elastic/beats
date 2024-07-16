@@ -124,8 +124,6 @@ steps:
       - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
           make -C auditbeat crosscompile
-        env:
-          GOX_FLAGS: "-arch amd64"
         retry:
           automatic:
             - limit: 3
@@ -244,7 +242,6 @@ steps:
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-          SNAPSHOT: true
         command: |
           cd auditbeat
           mage package
@@ -265,7 +262,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd auditbeat
           mage package
