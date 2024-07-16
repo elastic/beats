@@ -240,8 +240,14 @@ func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, 
 	return r.events, r.errs
 }
 
-// PeriodicReportingFetchV2Error runs the given metricset and returns all the
-// events and errors that occur during that period.
+// PeriodicReportingFetchV2Error runs the given metricset and returns
+// the first batch of events or errors that occur during that period.
+//
+// `period` is the time between each fetch.
+// `timeout` is the maximum time to wait for the first event.
+//
+// The function tries to fetch the metrics every `period` until it gets
+// the first batch of metrics or the `timeout` is reached.
 func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, period time.Duration, timeout time.Duration) ([]mb.Event, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
