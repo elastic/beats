@@ -130,5 +130,5 @@ func checkCleanResource(started, now time.Time, resource *resource) bool {
 		reference = started
 	}
 
-	return (ttl > 0 && reference.Add(ttl).Before(now)) && resource.stored
+	return (ttl >= 0 && reference.Add(ttl).Before(now)) && resource.stored
 }

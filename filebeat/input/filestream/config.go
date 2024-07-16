@@ -38,7 +38,7 @@ type config struct {
 	Close          closerConfig       `config:"close"`
 	FileWatcher    *conf.Namespace    `config:"prospector"`
 	FileIdentity   *conf.Namespace    `config:"file_identity"`
-	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
@@ -98,7 +98,7 @@ func defaultConfig() config {
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
-		CleanInactive:  0,
+		CleanInactive:  -1,
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
@@ -138,8 +138,8 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
-	if c.CleanInactive < 0 {
-		return fmt.Errorf("clean_inactive is negative, use a positive integer or 0 to disable the behaviour")
+	if c.CleanInactive < -1 {
+		return fmt.Errorf("clean_inactive is invalid, use integers greater than -1")
 	}
 	return nil
 }
