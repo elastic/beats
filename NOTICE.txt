@@ -11095,11 +11095,11 @@ Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v3@v3.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/digitalocean/go-libvirt
-Version: v0.0.0-20180301200012-6075ea3c39a1
+Version: v0.0.0-20240709142323-d8406205c752
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/digitalocean/go-libvirt@v0.0.0-20180301200012-6075ea3c39a1/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/digitalocean/go-libvirt@v0.0.0-20240709142323-d8406205c752/LICENSE.md:
 
 Apache License
 ==============
@@ -24425,11 +24425,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.24.0
+Version: v0.25.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.24.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.25.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24462,11 +24462,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.18.0
+Version: v0.19.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.18.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.19.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24499,11 +24499,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.26.0
+Version: v0.27.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.26.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.27.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24610,11 +24610,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24721,11 +24721,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.21.1-0.20240508182429-e35e4ccd0d2d
+Version: v0.23.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.21.1-0.20240508182429-e35e4ccd0d2d/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.23.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -36333,28 +36333,6 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
---------------------------------------------------------------------------------
-Dependency : github.com/davecgh/go-xdr
-Version: v0.0.0-20161123171359-e6a2ba005892
-Licence type (autodetected): ISC
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/davecgh/go-xdr@v0.0.0-20161123171359-e6a2ba005892/LICENSE:
-
-Copyright (c) 2012-2014 Dave Collins <dave@davec.name>
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/devigned/tab
@@ -52692,11 +52670,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
