@@ -138,5 +138,8 @@ func (c *config) Validate() error {
 		return fmt.Errorf("no path is configured")
 	}
 
+	if c.CleanInactive < 0 {
+		return fmt.Errorf("clean_inactive is negative, use a positive integer or 0 to disable the behaviour")
+	}
 	return nil
 }
