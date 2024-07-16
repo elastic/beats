@@ -153,7 +153,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 		// Mark the data type and do the actual conversion.
 		field.Type = mapping.Type
 
-		if settings.removeEmptyValues && strings.EqualFold(field.String, "") {
+		if settings.removeEmptyValues && field.String == "" {
 			// Drop the key because the value is empty field.
 			delete(e.Extensions, key)
 			continue

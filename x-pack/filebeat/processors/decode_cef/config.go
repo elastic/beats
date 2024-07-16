@@ -11,7 +11,7 @@ type config struct {
 	TargetField       string            `config:"target_field"`        // Target field for the CEF object.
 	IgnoreMissing     bool              `config:"ignore_missing"`      // Ignore missing source field.
 	IgnoreFailure     bool              `config:"ignore_failure"`      // Ignore failures when the source field does not contain a CEF message. Parse errors do not cause failures, but are added to error.message.
-	IgnoreEmptyValues bool              `config:"ignore_empty_values"` // Ignore missing values from CEF extension fields.
+	IgnoreEmptyValues bool              `config:"ignore_empty_values"` // Ignore CEF extensions with empty values
 	ID                string            `config:"id"`                  // Instance ID for debugging purposes.
 	ECS               bool              `config:"ecs"`                 // Generate ECS fields.
 	Timezone          *cfgtype.Timezone `config:"timezone"`            // Timezone used when parsing timestamps that do not contain a time zone or offset.
