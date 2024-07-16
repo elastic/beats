@@ -160,7 +160,7 @@ func TestGCStore(t *testing.T) {
 		checkEqualStoreState(t, want, backend.snapshot())
 	})
 
-	t.Run("state never removed with ttl=0", func(t *testing.T) {
+	t.Run("state never removed with ttl=-1", func(t *testing.T) {
 
 		// keep started as a large value
 		started := time.Now().Add(-1 * time.Hour * 24 * 356) // cleanup process is running for a while already
