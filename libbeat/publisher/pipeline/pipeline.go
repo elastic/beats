@@ -22,6 +22,7 @@ package pipeline
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -68,6 +69,8 @@ type Pipeline struct {
 	waitCloseTimeout time.Duration
 
 	processors processing.Supporter
+
+	clientTracker *clientTracker
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -81,6 +84,49 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
+}
+
+type clientTracker struct {
+	log *logp.Logger
+	// clients holds the pointers to all the connected clients
+	clients   map[*client]beat.ClientConfig
+	clientsMx sync.Mutex
+}
+
+func (ct *clientTracker) RegisterClient(clt *client, cfg beat.ClientConfig) {
+	ct.log.Debug("Registering new client %x", clt)
+	ct.clientsMx.Lock()
+	defer ct.clientsMx.Unlock()
+	ct.clients[clt] = cfg
+	ct.log.Debug("Registered new client %x", clt)
+}
+
+func (ct *clientTracker) UnregisterClient(clt *client) {
+	ct.log.Debug("Unregistering client %x", clt)
+	ct.clientsMx.Lock()
+	defer ct.clientsMx.Unlock()
+	delete(ct.clients, clt)
+	ct.log.Debug("Unregistered client %x", clt)
+}
+
+type clientAction func(clt *client, cfg beat.ClientConfig) error
+
+func (ct *clientTracker) ApplyToAllClients(action clientAction) error {
+	ct.clientsMx.Lock()
+	defer ct.clientsMx.Unlock()
+
+	for clt, cfg := range ct.clients {
+		if clt == nil {
+			// should never happen
+			ct.log.Warn("encountered nil client pointer while iterating over connected pipeline clients. Skipping...")
+			continue
+		}
+		err := action(clt, cfg)
+		if err != nil {
+			return fmt.Errorf("error applying action to clients: %w", err)
+		}
+	}
+	return nil
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -110,7 +156,7 @@ type OutputReloader interface {
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.
 func New(
-	beat beat.Info,
+	beatInfo beat.Info,
 	monitors Monitors,
 	userQueueConfig conf.Namespace,
 	out outputs.Group,
@@ -121,11 +167,16 @@ func New(
 	}
 
 	p := &Pipeline{
-		beatInfo:         beat,
+		beatInfo:         beatInfo,
 		monitors:         monitors,
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+		clientTracker: &clientTracker{
+			log:       monitors.Logger,
+			clients:   make(map[*client]beat.ClientConfig),
+			clientsMx: sync.Mutex{},
+		},
 	}
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
 		p.waitCloseTimeout = settings.WaitClose
@@ -147,7 +198,7 @@ func New(
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	output, err := newOutputController(beatInfo, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +260,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
-	client := &client{
+	clt := &client{
 		logger:         p.monitors.Logger,
 		isOpen:         atomic.MakeBool(true),
 		clientListener: cfg.ClientListener,
@@ -217,6 +268,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
+		unregisterer:   p.clientTracker,
 	}
 
 	ackHandler := cfg.EventListener
@@ -233,7 +285,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	producerCfg := queue.ProducerConfig{
 		ACK: func(count int) {
-			client.observer.eventsACKed(count)
+			clt.observer.eventsACKed(count)
 			if ackHandler != nil {
 				ackHandler.ACKEvents(count)
 			}
@@ -244,17 +296,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		ackHandler = acker.Nil()
 	}
 
-	client.eventListener = ackHandler
-	client.waiter = waiter
-	client.producer = p.outputController.queueProducer(producerCfg)
-	if client.producer == nil {
+	clt.eventListener = ackHandler
+	clt.waiter = waiter
+	clt.producer = p.outputController.queueProducer(producerCfg)
+	if clt.producer == nil {
 		// This can only happen if the pipeline was shut down while clients
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
 
+	p.clientTracker.RegisterClient(clt, cfg)
+
 	p.observer.clientConnected()
-	return client, nil
+
+	return clt, nil
 }
 
 func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
