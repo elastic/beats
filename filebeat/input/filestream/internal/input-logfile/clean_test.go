@@ -159,4 +159,25 @@ func TestGCStore(t *testing.T) {
 		want := map[string]state{}
 		checkEqualStoreState(t, want, backend.snapshot())
 	})
+
+	t.Run("state never removed with ttl=0", func(t *testing.T) {
+		const ttl = 0
+
+		// keep started as a large value
+		started := time.Now().Add(-1 * time.Hour * 24 * 356) // cleanup process is running for a while already
+
+		initState := map[string]state{
+			"test::key": {
+				TTL:     ttl,
+				Updated: started.Add(-ttl),
+			},
+		}
+
+		backend := createSampleStore(t, initState)
+		store := testOpenStore(t, "test", backend)
+		defer store.Release()
+
+		gcStore(logp.NewLogger("test"), started, store)
+		checkEqualStoreState(t, initState, backend.snapshot())
+	})
 }
