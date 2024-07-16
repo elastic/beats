@@ -185,7 +185,6 @@ func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
 		event.PutValue("observer.vendor", cefEvent.DeviceVendor)
 	}
 	if cefEvent.DeviceProduct != "" {
-		// TODO: observer.product is not officially part of ECS.
 		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("observer.product", cefEvent.DeviceProduct)
 	}
