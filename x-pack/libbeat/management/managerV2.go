@@ -503,7 +503,14 @@ func (cm *BeatV2Manager) componentListen() {
 				"BeatV2Manager.componentListen ComponentConfigIdx(%d)",
 				change.ConfigIdx)
 
-			// TODO handle GlobalProcessorConfig
+			processors := cm.registry.GetReloadableGlobalProcessors()
+			if processors == nil {
+				cm.logger.Debug("Unable to reload global processors: no global processors reloadable registered")
+				continue
+			}
+
+			//FIXME we need to map the Global Processor config into a proper ConfigWithMeta object
+			processors.Reload(change.GlobalProcessors)
 		}
 	}
 }

@@ -71,6 +71,8 @@ type Pipeline struct {
 	processors processing.Supporter
 
 	clientTracker *clientTracker
+
+	processorReloader *GlobalProcessorReloader
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -126,6 +128,17 @@ func (ct *clientTracker) ApplyToAllClients(action clientAction) error {
 			return fmt.Errorf("error applying action to clients: %w", err)
 		}
 	}
+	return nil
+}
+
+type GlobalProcessorReloader struct {
+	p *Pipeline
+}
+
+func (g GlobalProcessorReloader) Reload(config *reload.ConfigWithMeta) error {
+	log := g.p.monitors.Logger
+
+	log.Error("we should reload global processors with %v", config.Config)
 	return nil
 }
 
@@ -322,6 +335,10 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.outputController
+}
+
+func (p *Pipeline) GlobalProcessorsReloader() reload.Reloadable {
+	return p.processorReloader
 }
 
 // Parses the given config and returns a QueueFactory based on it.
