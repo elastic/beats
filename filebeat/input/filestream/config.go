@@ -139,7 +139,7 @@ func (c *config) Validate() error {
 	}
 
 	if c.CleanInactive < -1 {
-		return fmt.Errorf("clean_inactive is invalid, use integers greater than -1")
+		return fmt.Errorf("clean_inactive is invalid, use integers greater than -1 to enable and -1 to disable")
 	}
 	return nil
 }
