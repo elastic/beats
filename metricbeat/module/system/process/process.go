@@ -20,6 +20,7 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -30,9 +31,11 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/joeshaw/multierror"
 )
 
 var debugf = logp.NewLogger("system.process").Debugf
+var typeMultiError *multierror.MultiError
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
@@ -111,7 +114,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// monitor either a single PID, or the configured set of processes.
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
-		if err != nil {
+		if errors.As(err, &typeMultiError) && err != nil {
 			return fmt.Errorf("process stats: %w", err)
 		}
 
@@ -124,6 +127,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				return nil
 			}
 		}
+		return err
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
 		if err != nil {
@@ -133,7 +137,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: proc,
 			RootFields:      root,
 		})
+		return err
 	}
-
-	return nil
 }
