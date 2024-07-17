@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -204,4 +206,38 @@ func TestReceive(t *testing.T) {
 		}
 		cancel()
 	}
+}
+
+type filterLogEventsTestCase struct {
+	name      string
+	logGroup  string
+	startTime time.Time
+	endTime   time.Time
+	expected  *cloudwatchlogs.FilterLogEventsInput
+}
+
+func TestFilterLogEventsInput(t *testing.T) {
+	now, _ := time.Parse(time.RFC3339, "2024-07-12T13:00:00+00:00")
+	testCases := []filterLogEventsTestCase{
+		{
+			name:     "StartPosition: beginning, first iteration",
+			logGroup: "a",
+			// The zero value of type time.Time{} is January 1, year 1, 00:00:00.000000000 UTC
+			// Events with a timestamp before the time - January 1, 1970, 00:00:00 UTC are not returned by AWS API
+			// make sure zero value of time.Time{} was converted
+			startTime: time.Time{},
+			endTime:   now,
+			expected: &cloudwatchlogs.FilterLogEventsInput{
+				LogGroupName: awssdk.String("a"),
+				StartTime:    awssdk.Int64(0),
+				EndTime:      awssdk.Int64(1720789200000),
+			},
+		},
+	}
+	for _, test := range testCases {
+		p := cloudwatchPoller{}
+		result := p.constructFilterLogEventsInput(test.startTime, test.endTime, test.logGroup)
+		assert.Equal(t, test.expected, result)
+	}
+
 }

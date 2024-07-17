@@ -142,6 +142,7 @@ https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 - Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 - Expand ID patterns in request trace logger for HTTP Endpoint. {pull}39656[39656]
+- Fix awscloudwarch input: set startTime to `0` for the first iteration of retrieving log events from CloudWatch. {pull}40079[40079]
 
 *Heartbeat*
 
