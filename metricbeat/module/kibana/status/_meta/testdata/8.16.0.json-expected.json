@@ -1,0 +1,37 @@
+[
+    {
+        "event": {
+            "dataset": "kibana.status",
+            "duration": 115000,
+            "module": "kibana"
+        },
+        "kibana": {
+            "status": {
+                "metrics": {
+                    "concurrent_connections": 6,
+                    "requests": {
+                        "disconnects": 0,
+                        "total": 312
+                    }
+                },
+                "name": "kibana",
+                "status": {
+                    "overall": {
+                        "level": "available"
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "id": "8faaec19-e37d-410c-9335-377b016c7aa3",
+            "name": "kibana",
+            "type": "kibana",
+            "version": "8.16.0"
+        }
+    }
+]
