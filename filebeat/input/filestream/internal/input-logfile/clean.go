@@ -131,6 +131,6 @@ func checkCleanResource(started, now time.Time, resource *resource) bool {
 	}
 
 	// if ttl is negative, we never delete the entry
-	// else check for time elasped
+	// else check for time elapsed
 	return ttl >= 0 && reference.Add(ttl).Before(now) && resource.stored
 }
