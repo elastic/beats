@@ -55,12 +55,18 @@ package testing
 
 import (
 	"context"
-	"sync"
 	"testing"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+=======
+	"github.com/elastic/go-concert/timed"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
+>>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 )
 
 type TestModule struct {
@@ -117,6 +123,7 @@ func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	return metricsets
 }
 
+<<<<<<< HEAD
 // NewEventFetcher instantiates a new EventFetcher using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
@@ -164,6 +171,8 @@ func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) 
 	return r.events, r.errs
 }
 
+=======
+>>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
 func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
@@ -193,7 +202,7 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 // NewReportingMetricSetV2Errors returns an array of new ReportingMetricSetV2 instances.
 func NewReportingMetricSetV2Errors(t testing.TB, config interface{}) []mb.ReportingMetricSetV2Error {
 	metricSets := NewMetricSets(t, config)
-	var reportingMetricSets []mb.ReportingMetricSetV2Error
+	reportingMetricSets := make([]mb.ReportingMetricSetV2Error, 0, len(metricSets))
 	for _, metricSet := range metricSets {
 		rMS, ok := metricSet.(mb.ReportingMetricSetV2Error)
 		if !ok {
@@ -266,6 +275,41 @@ func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, 
 	return r.events, r.errs
 }
 
+// PeriodicReportingFetchV2Error runs the given metricset and returns
+// the first batch of events or errors that occur during that period.
+//
+// `period` is the time between each fetch.
+// `timeout` is the maximum time to wait for the first event.
+//
+// The function tries to fetch the metrics every `period` until it gets
+// the first batch of metrics or the `timeout` is reached.
+func PeriodicReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error, period time.Duration, timeout time.Duration) ([]mb.Event, []error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	r := &CapturingReporterV2{}
+	_ = timed.Periodic(ctx, period, func() error {
+		// Fetch the metrics and store them in the
+		// reporter.
+		if err := metricSet.Fetch(r); err != nil {
+			r.errs = append(r.errs, err)
+			return err
+		}
+
+		if len(r.events) > 0 {
+			// We have metrics, stop the periodic
+			// and return the metrics.
+			cancel()
+		}
+
+		// No metrics yet, retry again
+		// in the next period.
+		return nil
+	})
+
+	return r.events, r.errs
+}
+
 // ReportingFetchV2WithContext runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) ([]mb.Event, []error) {
@@ -277,6 +321,7 @@ func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) (
 	return r.events, r.errs
 }
 
+<<<<<<< HEAD
 // NewPushMetricSet instantiates a new PushMetricSet using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
@@ -342,6 +387,8 @@ func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]com
 	return r.events, r.errs
 }
 
+=======
+>>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
@@ -421,16 +468,16 @@ func (r *CapturingPushReporterV2) capture(waitEvents int) []mb.Event {
 
 // BlockingCapture blocks until waitEvents n of events are captured
 func (r *CapturingPushReporterV2) BlockingCapture(waitEvents int) []mb.Event {
-	var events []mb.Event
-	for {
-		select {
-		case e := <-r.eventsC:
-			events = append(events, e)
-			if waitEvents > 0 && len(events) >= waitEvents {
-				return events
-			}
+	events := make([]mb.Event, 0, waitEvents)
+
+	for e := range r.eventsC {
+		events = append(events, e)
+		if waitEvents > 0 && len(events) >= waitEvents {
+			return events
 		}
 	}
+
+	return events
 }
 
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
