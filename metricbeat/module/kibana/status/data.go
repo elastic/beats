@@ -42,6 +42,16 @@ var (
 				"level":   c.Str("level"),
 				"summary": c.Str("summary"),
 			}),
+			"core": c.Dict("core", s.Schema{
+				"elasticsearch": c.Dict("elasticsearch", s.Schema{
+					"level":   c.Str("level"),
+					"summary": c.Str("summary"),
+				}),
+				"savedObjects": c.Dict("savedObjects", s.Schema{
+					"level":   c.Str("level"),
+					"summary": c.Str("summary"),
+				}),
+			}),
 		}),
 		"metrics": c.Dict("metrics", s.Schema{
 			"requests": c.Dict("requests", s.Schema{

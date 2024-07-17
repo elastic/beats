@@ -32,6 +32,22 @@
       type: text
       description: >
         Kibana overall state in a human-readable format.
+    - name: status.core.elasticsearch.level
+      type: keyword
+      description: >
+        Kibana Elasticsearch client's status
+    - name: status.core.elasticsearch.summary
+      type: text
+      description: >
+        Kibana Elasticsearch client's status in a human-readable format.
+    - name: status.core.savedObjects.level
+      type: keyword
+      description: >
+        Kibana Saved Objects client's status
+    - name: status.core.savedObjects.summary
+      type: text
+      description: >
+        Kibana Saved Objects client's status in a human-readable format.
     - name: metrics
       type: group
       description: >
