@@ -16507,7 +16507,7 @@ type: keyword
 *`synthetics.index`*::
 +
 --
-Indexed used for creating total order of all events in this invocation.
+Index count used for creating total order of all events during invocation.
 
 
 type: integer
@@ -16606,6 +16606,21 @@ type: keyword
 Tags used for grouping journeys
 
 type: keyword
+
+--
+
+[float]
+=== duration
+
+Duration required to complete the journey.
+
+
+*`synthetics.journey.duration.us`*::
++
+--
+Duration in microseconds
+
+type: integer
 
 --
 
