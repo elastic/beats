@@ -38,7 +38,9 @@ var (
 		}),
 		"status": c.Dict("status", s.Schema{
 			"overall": c.Dict("overall", s.Schema{
-				"state": c.Str("state"),
+				"state":   c.Str("state"),
+				"level":   c.Str("level"),
+				"summary": c.Str("summary"),
 			}),
 		}),
 		"metrics": c.Dict("metrics", s.Schema{

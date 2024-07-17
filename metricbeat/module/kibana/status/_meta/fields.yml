@@ -28,6 +28,10 @@
       type: keyword
       description: >
         Kibana overall level (v8 format).
+    - name: status.overall.summary
+      type: text
+      description: >
+        Kibana overall state in a human-readable format.
     - name: metrics
       type: group
       description: >
