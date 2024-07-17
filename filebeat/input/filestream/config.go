@@ -33,11 +33,13 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID             string             `config:"id"`
-	Paths          []string           `config:"paths"`
-	Close          closerConfig       `config:"close"`
-	FileWatcher    *conf.Namespace    `config:"prospector"`
-	FileIdentity   *conf.Namespace    `config:"file_identity"`
+	ID           string          `config:"id"`
+	Paths        []string        `config:"paths"`
+	Close        closerConfig    `config:"close"`
+	FileWatcher  *conf.Namespace `config:"prospector"`
+	FileIdentity *conf.Namespace `config:"file_identity"`
+
+	// -1 means that registry will never be cleaned
 	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
