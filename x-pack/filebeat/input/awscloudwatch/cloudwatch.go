@@ -110,8 +110,13 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.Cl
 func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTime int64, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: awssdk.String(logGroup),
+<<<<<<< HEAD
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
+=======
+		StartTime:    awssdk.Int64(unixMsFromTime(startTime)),
+		EndTime:      awssdk.Int64(unixMsFromTime(endTime)),
+>>>>>>> c00345ffc1 ([input/awscloudwatch] Set startTime to 0 for the first iteration of retrieving log events from CloudWatch (#40079))
 	}
 
 	if len(p.logStreams) > 0 {
@@ -123,3 +128,81 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 	}
 	return filterLogEventsInput
 }
+<<<<<<< HEAD
+=======
+
+func (p *cloudwatchPoller) startWorkers(
+	ctx context.Context,
+	svc *cloudwatchlogs.Client,
+	logProcessor *logProcessor,
+) {
+	for i := 0; i < p.config.NumberOfWorkers; i++ {
+		p.workerWg.Add(1)
+		go func() {
+			defer p.workerWg.Done()
+			for {
+				var work workResponse
+				select {
+				case <-ctx.Done():
+					return
+				case p.workRequestChan <- struct{}{}:
+					work = <-p.workResponseChan
+				}
+
+				p.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", work.logGroup)
+				p.run(svc, work.logGroup, work.startTime, work.endTime, logProcessor)
+				p.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", work.logGroup)
+			}
+		}()
+	}
+}
+
+// receive implements the main run loop that distributes tasks to the worker
+// goroutines. It accepts a "clock" callback (which on a live input should
+// equal time.Now) to allow deterministic unit tests.
+func (p *cloudwatchPoller) receive(ctx context.Context, logGroupNames []string, clock func() time.Time) {
+	defer p.workerWg.Wait()
+	// startTime and endTime are the bounds of the current scanning interval.
+	// If we're starting at the end of the logs, advance the start time to the
+	// most recent scan window
+	var startTime time.Time
+	endTime := clock().Add(-p.config.Latency)
+	if p.config.StartPosition == "end" {
+		startTime = endTime.Add(-p.config.ScanFrequency)
+	}
+	for ctx.Err() == nil {
+		for _, lg := range logGroupNames {
+			select {
+			case <-ctx.Done():
+				return
+			case <-p.workRequestChan:
+				p.workResponseChan <- workResponse{
+					logGroup:  lg,
+					startTime: startTime,
+					endTime:   endTime,
+				}
+			}
+		}
+
+		// Delay for ScanFrequency after finishing a time span
+		p.log.Debugf("sleeping for %v before checking new logs", p.config.ScanFrequency)
+		select {
+		case <-time.After(p.config.ScanFrequency):
+		case <-ctx.Done():
+		}
+		p.log.Debug("done sleeping")
+
+		// Advance to the next time span
+		startTime, endTime = endTime, clock().Add(-p.config.Latency)
+	}
+}
+
+// unixMsFromTime converts time to unix milliseconds.
+// Returns 0 both the init time `time.Time{}`, instead of -6795364578871
+func unixMsFromTime(v time.Time) int64 {
+	if v.IsZero() {
+		return 0
+	}
+	return v.UnixNano() / int64(time.Millisecond)
+}
+>>>>>>> c00345ffc1 ([input/awscloudwatch] Set startTime to 0 for the first iteration of retrieving log events from CloudWatch (#40079))
