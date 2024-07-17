@@ -42787,10 +42787,70 @@ alias to: service.version
 *`kibana.status.status.overall.state`*::
 +
 --
-Kibana overall state.
+Kibana overall state (v7 format).
 
 
 type: keyword
+
+--
+
+*`kibana.status.status.overall.level`*::
++
+--
+Kibana overall level (v8 format).
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.overall.summary`*::
++
+--
+Kibana overall state in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.elasticsearch.level`*::
++
+--
+Kibana Elasticsearch client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.elasticsearch.summary`*::
++
+--
+Kibana Elasticsearch client's status in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.savedObjects.level`*::
++
+--
+Kibana Saved Objects client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.savedObjects.summary`*::
++
+--
+Kibana Saved Objects client's status in a human-readable format.
+
+
+type: text
 
 --
 
