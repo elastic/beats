@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 - Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
 - Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
 
 *Heartbeat*
 
@@ -55,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
 
 *Osquerybeat*
 
@@ -179,6 +181,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
 - Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
 - Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 
@@ -320,6 +323,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
+- Add journey duration to synthetics browser events. {pull}40230[40230]
 
 *Metricbeat*
 
