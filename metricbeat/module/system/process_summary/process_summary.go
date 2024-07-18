@@ -69,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	procList, degradeErr := process.ListStates(m.sys)
-	if degradeErr != nil && !process.IsDegradable(degradeErr) {
+	if degradeErr != nil && !process.CanDegrade(degradeErr) {
 		return fmt.Errorf("error fetching process list: %w", degradeErr)
 	}
 

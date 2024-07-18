@@ -38,7 +38,7 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	for _, err := range errs {
-		assert.True(t, process.IsDegradable(err))
+		assert.True(t, process.CanDegrade(err))
 	}
 	assert.NotEmpty(t, events)
 
@@ -46,7 +46,7 @@ func TestFetch(t *testing.T) {
 
 	events, errs = mbtest.ReportingFetchV2Error(f)
 	for _, err := range errs {
-		assert.True(t, process.IsDegradable(err))
+		assert.True(t, process.CanDegrade(err))
 	}
 	assert.NotEmpty(t, events)
 

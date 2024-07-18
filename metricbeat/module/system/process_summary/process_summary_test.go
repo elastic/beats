@@ -47,7 +47,7 @@ func TestFetch(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.True(t, process.IsDegradable(err))
+		assert.True(t, process.CanDegrade(err))
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
@@ -65,7 +65,7 @@ func TestStateNames(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.True(t, process.IsDegradable(err))
+		assert.True(t, process.CanDegrade(err))
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
