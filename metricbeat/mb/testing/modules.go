@@ -58,15 +58,10 @@ import (
 	"testing"
 	"time"
 
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-=======
 	"github.com/elastic/go-concert/timed"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	conf "github.com/elastic/elastic-agent-libs/config"
->>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 )
 
 type TestModule struct {
@@ -123,7 +118,6 @@ func NewMetricSets(t testing.TB, config interface{}) []mb.MetricSet {
 	return metricsets
 }
 
-<<<<<<< HEAD
 // NewEventFetcher instantiates a new EventFetcher using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
@@ -152,27 +146,6 @@ func NewEventsFetcher(t testing.TB, config interface{}) mb.EventsFetcher {
 	return fetcher
 }
 
-func NewReportingMetricSet(t testing.TB, config interface{}) mb.ReportingMetricSet {
-	metricSet := NewMetricSet(t, config)
-
-	reportingMetricSet, ok := metricSet.(mb.ReportingMetricSet)
-	if !ok {
-		t.Fatal("MetricSet does not implement ReportingMetricSet")
-	}
-
-	return reportingMetricSet
-}
-
-// ReportingFetch runs the given reporting metricset and returns all of the
-// events and errors that occur during that period.
-func ReportingFetch(metricSet mb.ReportingMetricSet) ([]common.MapStr, []error) {
-	r := &capturingReporter{}
-	metricSet.Fetch(r)
-	return r.events, r.errs
-}
-
-=======
->>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 // NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
 func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetricSetV2 {
@@ -321,74 +294,6 @@ func ReportingFetchV2WithContext(metricSet mb.ReportingMetricSetV2WithContext) (
 	return r.events, r.errs
 }
 
-<<<<<<< HEAD
-// NewPushMetricSet instantiates a new PushMetricSet using the given
-// configuration. The ModuleFactory and MetricSetFactory are obtained from the
-// global Registry.
-func NewPushMetricSet(t testing.TB, config interface{}) mb.PushMetricSet {
-	metricSet := NewMetricSet(t, config)
-
-	pushMetricSet, ok := metricSet.(mb.PushMetricSet)
-	if !ok {
-		t.Fatal("MetricSet does not implement PushMetricSet")
-	}
-
-	return pushMetricSet
-}
-
-type capturingReporter struct {
-	events []common.MapStr
-	errs   []error
-	done   chan struct{}
-}
-
-func (r *capturingReporter) Event(event common.MapStr) bool {
-	r.events = append(r.events, event)
-	return true
-}
-
-func (r *capturingReporter) ErrorWith(err error, meta common.MapStr) bool {
-	r.events = append(r.events, meta)
-	r.errs = append(r.errs, err)
-	return true
-}
-
-func (r *capturingReporter) Error(err error) bool {
-	r.errs = append(r.errs, err)
-	return true
-}
-
-func (r *capturingReporter) Done() <-chan struct{} {
-	return r.done
-}
-
-// RunPushMetricSet run the given push metricset for the specific amount of time
-// and returns all of the events and errors that occur during that period.
-func RunPushMetricSet(duration time.Duration, metricSet mb.PushMetricSet) ([]common.MapStr, []error) {
-	r := &capturingReporter{done: make(chan struct{})}
-
-	// Run the metricset.
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		metricSet.Run(r)
-	}()
-
-	// Let it run for some period, then stop it by closing the done channel.
-	time.AfterFunc(duration, func() {
-		close(r.done)
-	})
-
-	// Wait for the PushMetricSet to completely stop.
-	wg.Wait()
-
-	// Return all events and errors that were collected.
-	return r.events, r.errs
-}
-
-=======
->>>>>>> 532133b1ad (Add PeriodicReportingFetchV2Error to fetch metrics multiple times (#40251))
 // NewPushMetricSetV2 instantiates a new PushMetricSetV2 using the given
 // configuration. The ModuleFactory and MetricSetFactory are obtained from the
 // global Registry.
