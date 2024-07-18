@@ -592,6 +592,7 @@ func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, ol
 		logger.Debugf("Resuming harvesting of file: %s, offset: %d, new size: %d", newState.Source, oldState.Offset, newState.Fileinfo.Size())
 		err := p.startHarvester(logger, newState, oldState.Offset)
 		if err != nil {
+			p.updateStatus(status.Degraded, fmt.Sprintf("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err))
 			logger.Errorf("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
 		return
@@ -602,6 +603,7 @@ func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, ol
 		logger.Debugf("Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Offset, newState.Fileinfo.Size())
 		err := p.startHarvester(logger, newState, 0)
 		if err != nil {
+			p.updateStatus(status.Degraded, fmt.Sprintf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err))
 			logger.Errorf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
