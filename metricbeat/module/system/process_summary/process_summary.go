@@ -68,9 +68,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
-	procList, err := process.ListStates(m.sys)
-	if err != nil {
-		return fmt.Errorf("error fetching process list: %w", err)
+	procList, degradeErr := process.ListStates(m.sys)
+	if degradeErr != nil && !process.IsDegradable(degradeErr) {
+		return fmt.Errorf("error fetching process list: %w", degradeErr)
 	}
 
 	procStates := map[string]int{}
@@ -83,7 +83,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	outMap := mapstr.M{}
-	err = typeconv.Convert(&outMap, procStates)
+	err := typeconv.Convert(&outMap, procStates)
 	if err != nil {
 		return fmt.Errorf("error formatting process stats: %w", err)
 	}
@@ -101,7 +101,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		MetricSetFields: outMap,
 	})
 
-	return nil
+	return degradeErr
 }
 
 // threadStats returns a map of state counts for running threads on a system
