@@ -470,10 +470,19 @@ func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
 // but return the last retry attempt's response and a nil error to allow the retryablehttp.Client
 // evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
-// is returned unaltered.
+// is returned unaltered. Despite not being documented so, the error handler may be passed
+// a nil resp. retryErrorHandler will handle this case.
 func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
-		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		if resp != nil && resp.Request != nil {
+			reqURL := "unavailable"
+			if resp.Request.URL != nil {
+				reqURL = resp.Request.URL.String()
+			}
+			log.Warnw("giving up retries", "method", resp.Request.Method, "url", reqURL, "retries", max+1)
+		} else {
+			log.Warnw("giving up retries: no response available", "retries", max+1)
+		}
 		return resp, err
 	}
 }

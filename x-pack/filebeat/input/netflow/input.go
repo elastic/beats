@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
@@ -110,6 +111,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 	n.started = true
 	n.mtx.Unlock()
 
+	ctx.UpdateStatus(status.Starting, "Starting netflow input")
 	n.logger.Info("Starting netflow input")
 
 	n.logger.Info("Connecting to beat event publishing")
@@ -121,6 +123,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		EventListener: nil,
 	})
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, fmt.Sprintf("Failed connecting to beat event publishing: %v", err))
 		n.logger.Errorw("Failed connecting to beat event publishing", "error", err)
 		n.stop()
 		return err
@@ -142,11 +145,13 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		WithSharedTemplates(n.cfg.ShareTemplates).
 		WithActiveSessionsMetric(flowMetrics.ActiveSessions()))
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, fmt.Sprintf("Failed to initialize netflow decoder: %v", err))
 		return fmt.Errorf("error initializing netflow decoder: %w", err)
 	}
 
 	n.logger.Info("Starting netflow decoder")
 	if err := n.decoder.Start(); err != nil {
+		ctx.UpdateStatus(status.Failed, fmt.Sprintf("Failed to start netflow decoder: %v", err))
 		n.logger.Errorw("Failed to start netflow decoder", "error", err)
 		n.stop()
 		return err
@@ -167,7 +172,9 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 	})
 	err = udpServer.Start()
 	if err != nil {
-		n.logger.Errorf("Failed to start udp server: %v", err)
+		errorMsg := fmt.Sprintf("Failed to start udp server: %v", err)
+		n.logger.Errorf(errorMsg)
+		ctx.UpdateStatus(status.Failed, errorMsg)
 		n.stop()
 		return err
 	}
@@ -177,6 +184,8 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		<-ctx.Cancelation.Done()
 		n.stop()
 	}()
+
+	ctx.UpdateStatus(status.Running, "")
 
 	for packet := range n.queueC {
 		flows, err := n.decoder.Read(bytes.NewBuffer(packet.data), packet.source)
