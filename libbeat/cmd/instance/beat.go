@@ -68,7 +68,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/filewatcher"
@@ -865,17 +864,8 @@ func (b *Beat) configure(settings Settings) error {
 		version.SetPackageVersion(b.Info.Version)
 	}
 
-	// if we're in fleet mode, construct a custom user-agent
-	if fleetmode.Enabled() {
-		userAgent := ""
-		info := b.Manager.AgentInfo()
-		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
-			userAgent = "Agent-Managed"
-		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
-			userAgent = "Agent-Standalone"
-		}
-		b.Info.UserAgentPostfix = userAgent
-	}
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err

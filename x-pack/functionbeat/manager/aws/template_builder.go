@@ -10,11 +10,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/awslabs/goformation/v4/cloudformation"
-	"github.com/awslabs/goformation/v4/cloudformation/iam"
-	"github.com/awslabs/goformation/v4/cloudformation/lambda"
-	"github.com/awslabs/goformation/v4/cloudformation/logs"
-	"github.com/awslabs/goformation/v4/cloudformation/tags"
+	"github.com/awslabs/goformation/v7/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation/iam"
+	"github.com/awslabs/goformation/v7/cloudformation/lambda"
+	"github.com/awslabs/goformation/v7/cloudformation/logs"
+	"github.com/awslabs/goformation/v7/cloudformation/tags"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
@@ -164,7 +164,7 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 	var dlc *lambda.Function_DeadLetterConfig
 	if lambdaConfig.DeadLetterConfig != nil && len(lambdaConfig.DeadLetterConfig.TargetArn) != 0 {
 		dlc = &lambda.Function_DeadLetterConfig{
-			TargetArn: lambdaConfig.DeadLetterConfig.TargetArn,
+			TargetArn: cloudformation.String(lambdaConfig.DeadLetterConfig.TargetArn),
 		}
 	}
 
@@ -177,7 +177,7 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 		}
 	}
 
-	var ts []tags.Tag
+	ts := make([]tags.Tag, 0, len(lambdaConfig.Tags))
 	for name, val := range lambdaConfig.Tags {
 		tag := tags.Tag{
 			Key:   name,
@@ -191,10 +191,10 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 	template.Resources[prefix("")] = &AWSLambdaFunction{
 		Function: &lambda.Function{
 			Code: &lambda.Function_Code{
-				S3Bucket: d.bucket,
-				S3Key:    codeLoc,
+				S3Bucket: cloudformation.String(d.bucket),
+				S3Key:    cloudformation.String(codeLoc),
 			},
-			Description: lambdaConfig.Description,
+			Description: cloudformation.String(lambdaConfig.Description),
 			Environment: &lambda.Function_Environment{
 				// Configure which function need to be run by the lambda function.
 				Variables: map[string]string{
@@ -204,13 +204,13 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 			},
 			DeadLetterConfig:             dlc,
 			VpcConfig:                    vcpConf,
-			FunctionName:                 name,
+			FunctionName:                 cloudformation.String(name),
 			Role:                         role,
-			Runtime:                      runtime,
-			Handler:                      handlerName,
-			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
-			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
-			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
+			Runtime:                      cloudformation.String(runtime),
+			Handler:                      cloudformation.String(handlerName),
+			MemorySize:                   cloudformation.Int(lambdaConfig.MemorySize.Megabytes()),
+			ReservedConcurrentExecutions: cloudformation.Int(lambdaConfig.Concurrency),
+			Timeout:                      cloudformation.Int(int(lambdaConfig.Timeout.Seconds())),
 			Tags:                         ts,
 		},
 		DependsOn: dependsOn,
@@ -218,7 +218,7 @@ func (d *defaultTemplateBuilder) template(function installer, name, codeLoc stri
 
 	// Create the log group for the specific function lambda.
 	template.Resources[prefix("LogGroup")] = &logs.LogGroup{
-		LogGroupName: "/aws/lambda/" + name,
+		LogGroupName: cloudformation.String("/aws/lambda/" + name),
 	}
 
 	return template
@@ -263,8 +263,8 @@ func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *
 				},
 			},
 		},
-		Path:     "/",
-		RoleName: "functionbeat-lambda-" + name + "-" + cloudformation.Ref("AWS::Region"),
+		Path:     cloudformation.String("/"),
+		RoleName: cloudformation.String("functionbeat-lambda-" + name + "-" + cloudformation.Ref("AWS::Region")),
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: policies,
@@ -277,18 +277,18 @@ func (d *defaultTemplateBuilder) RawTemplate(name string) (string, error) {
 	return string(data.json), err
 }
 
+func merge[M1 ~map[K]V, M2 ~map[K]V, K comparable, V any](m1 M1, m2 M2) error {
+	for k, v := range m2 {
+		if _, ok := m1[k]; ok {
+			return fmt.Errorf("key %v already exist in the template map", k)
+		}
+		m1[k] = v
+	}
+	return nil
+}
+
 // mergeTemplate takes two cloudformation and merge them, if a key already exist we return an error.
 func mergeTemplate(to, from *cloudformation.Template) error {
-	merge := func(m1 map[string]interface{}, m2 map[string]interface{}) error {
-		for k, v := range m2 {
-			if _, ok := m1[k]; ok {
-				return fmt.Errorf("key %s already exist in the template map", k)
-			}
-			m1[k] = v
-		}
-		return nil
-	}
-
 	err := merge(to.Parameters, from.Parameters)
 	if err != nil {
 		return err

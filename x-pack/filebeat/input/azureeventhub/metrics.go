@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -15,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
-// newInputMetrics creates a new `*inputMetrics` to track metrics.
+// newInputMetrics creates a new `*inputMetrics` to track input metrics.
 func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
 	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
 	inputMetrics := inputMetrics{

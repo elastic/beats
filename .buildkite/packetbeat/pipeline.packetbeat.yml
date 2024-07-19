@@ -27,11 +27,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Packetbeat Check/Update"
+  - group: "Check/Update"
     key: "packetbeat-check-update"
 
     steps:
-      - label: "Packetbeat Run check/update"
+      - label: "Packetbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C packetbeat check update
@@ -55,11 +55,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "packetbeat-check-update"
 
-  - group: "packetbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "packetbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Packetbeat Linux x86_64 Unit Tests"
+      - label: ":ubuntu: Packetbeat: Ubuntu x86_64 Unit Tests"
         command: |
           cd packetbeat
           mage build unitTest
@@ -75,9 +75,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Linux x86_64 Unit Tests"
+              context: "packetbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":rhel: Packetbeat RHEL9 Unit Tests"
+      - label: ":rhel: Packetbeat: RHEL9 Unit Tests"
         command: |
           cd packetbeat
           mage build unitTest
@@ -95,7 +95,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: RHEL9 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2016 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -113,9 +113,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2016 Unit Tests"
+              context: "packetbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2022 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -133,14 +133,14 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2022 Unit Tests"
+              context: "packetbeat: Win 2022 Unit Tests"
 
-  - group: " Packetbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "packetbeat-extended-windows-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Packetbeat Win 10 Unit Tests"
+      - label: ":windows: Packetbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -158,9 +158,9 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended Windows 10 Unit Tests"
+              context: "packetbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Packetbeat Win 11 Unit Tests"
+      - label: ":windows: Packetbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -181,7 +181,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: Win 11 Unit Tests"
 
-      - label: ":windows: Packetbeat Win-2019 Unit Tests"
+      - label: ":windows: Packetbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
@@ -200,13 +200,13 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Win-2019 Unit Tests"
+              context: "packetbeat: Win 2019 Unit Tests"
 
-  - group: "Packetbeat Extended Tests"
+  - group: "Extended Tests"
     key: "extended-tests"
 
     steps:
-      - label: ":mac: Packetbeat macOS x86_64 Unit Tests"
+      - label: ":mac: Packetbeat: macOS x86_64 Unit Tests"
         key: "macos-x86-64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -227,7 +227,7 @@ steps:
           - github_commit_status:
               context: "packetbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Packetbeat macOS arm64 Unit Tests"
+      - label: ":mac: Packetbeat: macOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
         command: |
@@ -246,14 +246,14 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Extended MacOS arm64 Unit Tests"
+              context: "packetbeat: macOS arm64 Unit Tests"
 
-      - label: ":ubuntu: Linux arm64 Unit Tests"
+      - label: ":ubuntu: Packetbeat: Ubuntu arm64 Unit Tests"
         key: "linux-arm64-unit-tests-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd packetbeat
           mage build unitTest
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         retry:
           automatic:
             - limit: 3
@@ -266,7 +266,7 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Linux arm64 Unit Tests"
+              context: "packetbeat: Ubuntu arm64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -278,8 +278,10 @@ steps:
   - group: "Packetbeat Packaging"
     key: "packaging"
     steps:
-      - label: ":ubuntu: Packetbeat Packaging Linux"
+      - label: ":ubuntu: Packetbeat: Packaging Linux"
         key: "packaging-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           cd packetbeat
           mage package
@@ -293,14 +295,15 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "packetbeat: Packaging Linux"
 
-      - label: ":ubuntu: Packaging Linux arm64"
+      - label: ":ubuntu: Packetbeat: Packaging Linux arm64"
         key: "packaging-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
         command: |
           cd packetbeat
           mage package
@@ -312,9 +315,6 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
         notify:
           - github_commit_status:
               context: "packetbeat: Packaging Linux arm64"

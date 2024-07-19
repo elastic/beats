@@ -162,9 +162,10 @@ func TestOktaDoFetch(t *testing.T) {
 				if name == "" {
 					name = "default"
 				}
-				a.cfg.Tracer = &lumberjack.Logger{
+				// Use legacy behaviour; nil enabled setting.
+				a.cfg.Tracer = &tracerConfig{Logger: lumberjack.Logger{
 					Filename: fmt.Sprintf("test_trace_%s.ndjson", name),
-				}
+				}}
 			}
 			a.client = requestTrace(context.Background(), a.client, a.cfg, a.logger)
 

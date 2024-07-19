@@ -290,6 +290,8 @@ In certain scenarios when the source of the request is not able to do that, it c
 
 The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. The name of the object in the CEL program is `obj`. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
 
+Note that during evaluation, numbers that are not representable exactly within a double floating point value will be converted to a string to avoid data corruption.
+
 [float]
 ==== `response_code`
 
@@ -349,16 +351,20 @@ The HTTP method handled by the endpoint. If specified, `method` must be `POST`, 
 The default method is `POST`. If `PUT` or `PATCH` are specified, requests using those method types are accepted, but are treated as `POST` requests and are expected to have a request body containing the request data.
 
 [float]
-==== `tracer.filename`
+==== `tracer.enabled`
 
 It is possible to log HTTP requests to a local file-system for debugging configurations.
-This option is enabled by setting the `tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== `tracer.maxsize`

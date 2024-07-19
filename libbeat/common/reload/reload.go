@@ -35,6 +35,9 @@ const InputRegName = "input"
 // OutputRegName is the registation name for V2 Outputs
 const OutputRegName = "output"
 
+// APMRegName is the registation name for APM tracing.
+const APMRegName = "apm"
+
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
 	// Config to store
@@ -146,6 +149,14 @@ func (r *Registry) MustRegisterInput(list ReloadableList) {
 	}
 }
 
+// MustRegisterAPM is a V2-specific registration function
+// that declares a reloadable APM tracing configuration
+func (r *Registry) MustRegisterAPM(list Reloadable) {
+	if err := r.Register(APMRegName, list); err != nil {
+		panic(err)
+	}
+}
+
 // GetInputList is a V2-specific function
 // That returns the reloadable list created for an input
 func (r *Registry) GetInputList() ReloadableList {
@@ -160,6 +171,14 @@ func (r *Registry) GetReloadableOutput() Reloadable {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confs[OutputRegName]
+}
+
+// GetReloadableAPM is a V2-specific function
+// That returns the reloader for the registered APM trace
+func (r *Registry) GetReloadableAPM() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[APMRegName]
 }
 
 // GetRegisteredNames returns the list of names registered
