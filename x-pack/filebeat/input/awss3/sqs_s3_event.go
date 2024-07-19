@@ -87,10 +87,6 @@ type s3EventV2 struct {
 // At the moment it doesn't seem to have a version
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/ev-events.html
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html
-type eventBridgeEvents struct {
-	Messages []eventBridgeEvent `json:"messages"`
-}
-
 // Object created event.
 type eventBridgeEvent struct {
 	Version    string   `json:"version"`
@@ -117,7 +113,7 @@ type eventBridgeEvent struct {
 		Requester       string `json:"requester"`
 		SourceIpAddress string `json:"source-ip-address"`
 		Reason          string `json:"reason"`
-	}
+	} `json:"detail"`
 }
 
 type sqsS3EventProcessor struct {
@@ -290,13 +286,13 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 	}
 
 	// Check if the notification is from S3 -> EventBridge -> SQS
-	var eventBridgeEvents eventBridgeEvents
 	if events.Records == nil {
-		dec := json.NewDecoder(strings.NewReader(events.Message))
-		if err := dec.Decode(&eventBridgeEvents); err != nil {
-			p.log.Debugw("Could not parse message as EventBridge payload", "sqs_message_body", body)
+		var eventBridgeEvent eventBridgeEvent
+		dec := json.NewDecoder(strings.NewReader(body))
+		if err := dec.Decode(&eventBridgeEvent); err != nil {
+			p.log.Debugw("Could not parse message as EventBridge payload", "sqs_message_body", body, "error", err)
 		} else {
-			convertEventBridge(&eventBridgeEvents, &events)
+			convertEventBridge(&eventBridgeEvent, &events)
 		}
 	}
 
@@ -308,10 +304,8 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 	return p.getS3Info(events)
 }
 
-func convertEventBridge(eventBridgeEvents *eventBridgeEvents, s3Events *s3EventsV2) {
-	for i := range eventBridgeEvents.Messages {
-		s3Events.Records = append(s3Events.Records, convertEventBridgeEvent(&eventBridgeEvents.Messages[i]))
-	}
+func convertEventBridge(eventBridgeEvent *eventBridgeEvent, s3Events *s3EventsV2) {
+	s3Events.Records = append(s3Events.Records, convertEventBridgeEvent(eventBridgeEvent))
 }
 
 func convertEventBridgeEvent(message *eventBridgeEvent) s3EventV2 {
