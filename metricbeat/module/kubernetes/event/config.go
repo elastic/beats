@@ -25,7 +25,7 @@ import (
 
 type kubeEventsConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
-	KubeAdm           bool                         `config:"disable_kubeadm"`
+	KubeAdm           bool                         `config:"use_kubeadm"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 	Namespace         string                       `config:"namespace"`
 	SyncPeriod        time.Duration                `config:"sync_period"`
@@ -41,6 +41,7 @@ type Enabled struct {
 func defaultKubernetesEventsConfig() kubeEventsConfig {
 	return kubeEventsConfig{
 		SyncPeriod:       10 * time.Minute,
+		KubeAdm:          true,
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
 		SkipOlder:        true,
