@@ -27,11 +27,11 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Auditbeat Check/Update"
+  - group: "Check/Update"
     key: "auditbeat-check-update"
 
     steps:
-      - label: "Run check/update"
+      - label: "Auditbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C auditbeat check update
@@ -47,7 +47,7 @@ steps:
         notify:
           - github_commit_status:
               context: "auditbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -55,11 +55,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "auditbeat-check-update"
 
-  - group: "Auditbeat Mandatory Testing"
+  - group: "Mandatory Testing"
     key: "auditbeat-mandatory-tests"
 
     steps:
-      - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
+      - label: ":ubuntu: Auditbeat: Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
         command: |
           cd auditbeat
@@ -76,9 +76,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Linux arm64 Unit Tests"
+              context: "auditbeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":ubuntu: Auditbeat Unit Tests"
+      - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Unit Tests"
         command: |
           cd auditbeat
           mage build unitTest
@@ -94,9 +94,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Ubuntu Unit Tests"
+              context: "auditbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: "Module compat tests: next major"
+      - label: ":ubuntu: Auditbeat: Module compat tests: next major"
         # Run module integration tests under next major of Elastic stack.
         env:
           STACK_ENVIRONMENT: "next-major"
@@ -121,11 +121,9 @@ steps:
           - github_commit_status:
               context: "auditbeat: Module compat tests / next major"
 
-      - label: ":linux: Auditbeat Crosscompile"
+      - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
           make -C auditbeat crosscompile
-        env:
-          GOX_FLAGS: "-arch amd64"
         retry:
           automatic:
             - limit: 3
@@ -137,7 +135,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Crosscompile"
 
-      - label: ":windows: Auditbeat Win-2019 Unit Tests"
+      - label: ":windows: Auditbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
@@ -155,14 +153,14 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Windows 2019 Unit Tests"
+              context: "auditbeat: Win 2019 Unit Tests"
 
-  - group: "Auditbeat Extended Tests"
+  - group: "Extended Tests"
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
 
     steps:
-      - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
+      - label: ":mac: Auditbeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -182,12 +180,12 @@ steps:
           - github_commit_status:
               context: "auditbeat: macOS x86_64 Unit Tests"
 
-  - group: "Auditbeat Windows Extended Testing"
+  - group: "Windows Extended Testing"
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Auditbeat Win-2016 Unit Tests"
+      - label: ":windows: Auditbeat: Win 2016 Unit Tests"
         key: "auditbeat-extended-win-2016-unit-tests"
         command: |
           Set-Location -Path auditbeat
@@ -206,9 +204,9 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Extended Windows 2019 Unit Tests"
+              context: "auditbeat: Extended Win 2019 Unit Tests"
 
-      - label: ":windows: Auditbeat Win-10 Unit Tests"
+      - label: ":windows: Auditbeat: Win 10 Unit Tests"
         key: "auditbeat-extended-win-10-unit-tests"
         command: |
           Set-Location -Path auditbeat
@@ -227,7 +225,7 @@ steps:
           - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Extended Windows 10 Unit Tests"
+              context: "auditbeat: Extended Win 10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -236,14 +234,14 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "auditbeat-mandatory-tests"
 
-  - group: "Auditbeat Packaging"
+  - group: "Packaging"
     key: "auditbeat-packaging"
+
     steps:
-      - label: ":ubuntu: Auditbeat/Packaging Linux"
+      - label: ":ubuntu: Auditbeat: Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-          SNAPSHOT: true
         command: |
           cd auditbeat
           mage package
@@ -259,12 +257,11 @@ steps:
           - github_commit_status:
               context: "auditbeat: Packaging Linux"
 
-      - label: ":linux: Auditbeat/Packaging Linux arm64"
+      - label: ":linux: Auditbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd auditbeat
           mage package

@@ -17,10 +17,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "libbeat Check/Update"
+  - group: "Check/Update"
     key: "libbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "Libbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C libbeat check update
@@ -36,7 +36,7 @@ steps:
         notify:
           - github_commit_status:
               context: "libbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -48,7 +48,7 @@ steps:
     key: "mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Libbeat Ubuntu Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
@@ -66,9 +66,9 @@ steps:
           - "libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "libbeat: Linux x86_64 Unit Tests"
+              context: "libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Libbeat Go Integration Tests"
+      - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -88,7 +88,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Libbeat Python Integration Tests"
+      - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
@@ -108,7 +108,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
 
-      - label: ":ubuntu: Libbeat Module compat tests - next major"
+      - label: ":ubuntu: Libbeat: Module compat tests: next major"
         # Run module integration tests under next major of Elastic stack.
         env:
           STACK_ENVIRONMENT: "next-major"
@@ -131,9 +131,9 @@ steps:
           - "libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "libbeat: Module compat tests / next major"
+              context: "libbeat: Module compat tests: next major"
 
-      - label: ":ubuntu: Libbeat Crosscompile"
+      - label: ":ubuntu: Libbeat: Crosscompile"
         key: "mandatory-cross-compile"
         command: |
           set -euo pipefail
@@ -153,7 +153,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Crosscompile"
 
-      - label: ":ubuntu: Libbeat Stress Tests"
+      - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
         command: |
           set -euo pipefail
@@ -171,12 +171,12 @@ steps:
           - github_commit_status:
               context: "libbeat: Stress Tests"
 
-  - group: "Libbeat Extended Tests"
+  - group: "Extended Tests"
     key: "extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
-      - label: ":ubuntu: Libbeat Linux arm64 Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           set -euo pipefail
@@ -194,4 +194,4 @@ steps:
           - "libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "libbeat: Linux arm64 Unit Tests"
+              context: "libbeat: Ubuntu arm64 Unit Tests"

@@ -23,7 +23,7 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/packetbeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-packetbeat-check-update"
     steps:
       - label: "Run check/update"
@@ -42,15 +42,15 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
     # this allows building DRA artifacts even if there is flakiness in check/update step
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "x-pack-packetbeat-check-update"
-    
-  - group: "x-pack/packetbeat Mandatory Tests"
+
+  - group: "Mandatory Tests"
     key: "x-pack-packetbeat-mandatory-tests"
 
     steps:
@@ -114,7 +114,7 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Win-2019 Unit Tests"
 
-  - group: "x-pack/packetbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-packetbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
@@ -161,7 +161,7 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Win-2016 Unit Tests"
 
-  - group: "x-pack/packetbeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-packetbeat-extended-macos-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
@@ -186,7 +186,7 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: MacOS Unit Tests"
 
-  - group: "x-pack/packetbeat Packaging"
+  - group: "Packaging"
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:

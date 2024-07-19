@@ -19,10 +19,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/libbeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-libbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "x-pack/libbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/libbeat check update
@@ -38,7 +38,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -46,11 +46,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "x-pack-libbeat-check-update"
 
-  - group: "x-pack/libbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/libbeat
@@ -67,9 +67,9 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Unit Tests"
+              context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
@@ -88,7 +88,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Python Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           cd x-pack/libbeat
@@ -107,12 +107,12 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-  - group: "x-pack/libbeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat arm64 Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           cd x-pack/libbeat
@@ -129,4 +129,4 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Linux arm64 Unit Tests"
+              context: "x-pack/libbeat: Ubuntu arm64 Unit Tests"
