@@ -514,7 +514,7 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			config := conf.MustNewConfigFrom(&test.cfg)
 
-			eventer, err := NewServiceEventer(uuid, config, client, nil)
+			eventer, err := NewServiceEventer(uuid, config, true, client, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
