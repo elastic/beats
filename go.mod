@@ -68,7 +68,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.13.0
+	github.com/elastic/elastic-agent-client/v7 v7.14.0
 	github.com/elastic/go-concert v0.3.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
 	github.com/elastic/go-licenser v0.4.2
@@ -291,6 +291,7 @@ require (
 	github.com/gobuffalo/here v0.6.7 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
+	github.com/gofrs/uuid/v5 v5.2.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
