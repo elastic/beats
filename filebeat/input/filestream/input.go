@@ -74,10 +74,11 @@ func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
 		Manager: &loginp.InputManager{
-			Logger:     log,
-			StateStore: store,
-			Type:       pluginName,
-			Configure:  configure,
+			Logger:              log,
+			StateStore:          store,
+			Type:                pluginName,
+			Configure:           configure,
+			DefaultCleanTimeout: -1,
 		},
 	}
 }
