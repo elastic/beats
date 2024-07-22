@@ -9,7 +9,7 @@ backoff==2.2.1
 backports.ssl-match-hostname==3.5.0.1
 bcrypt==4.1.2
 cached-property==1.4.2
-certifi==2023.7.22
+certifi==2024.7.4
 cffi==1.16.0
 chardet==3.0.4
 charset-normalizer==3.3.2
@@ -71,4 +71,4 @@ typing_extensions==4.9.0
 wcwidth==0.2.5
 websocket-client==0.47.0
 wrapt==1.16.0
-zipp==3.1.0
+zipp==3.19.1

@@ -19,6 +19,7 @@ env:
 steps:
   - group: "Check/Update"
     key: "libbeat-check-update"
+
     steps:
       - label: "Libbeat: Run check/update"
         command: |
@@ -46,6 +47,7 @@ steps:
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
+
     steps:
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
