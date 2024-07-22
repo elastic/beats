@@ -154,7 +154,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
-      # Heartbeat has no modules
+      # Heartbeat has no modules yet
       - label: ":ubuntu: Heartbeat: Python Integration Tests"
         command: |
           cd heartbeat

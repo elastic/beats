@@ -68,7 +68,7 @@ steps:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
 
-      # x-pack/dockerlogbeat has no modules
+      # x-pack/dockerlogbeat has no modules yet
       - label: ":ubuntu: x-pack/dockerlogbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |

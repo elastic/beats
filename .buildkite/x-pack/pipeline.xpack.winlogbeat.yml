@@ -74,7 +74,7 @@ steps:
           - github_commit_status:
               context: "x-pack/winlogbeat Win 2019 Unit Tests (Module)"
 
-      - label: ":windows: x-pack/winlogbeat: Win 2016 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2016 Unit Tests (Module)"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -93,9 +93,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Win 2016 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2016 Unit Tests (Module)"
 
-      - label: ":windows: x-pack/winlogbeat: Win 2022 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2022 Unit Tests (Module)"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -114,14 +114,14 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Win 2022 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2022 Unit Tests (Module)"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/winlogbeat: Win 10 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 10 Unit Tests (Module)"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -140,9 +140,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Win 10 Unit Tests"
+              context: "x-pack/winlogbeat: Win 10 Unit Tests (Module)"
 
-      - label: ":windows: x-pack/winlogbeat: Win 11 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 11 Unit Tests (Module)"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -163,7 +163,7 @@ steps:
           - github_commit_status:
               context: "x-pack/winlogbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/winlogbeat: Win 2019 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2019 Unit Tests (Module)"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -182,7 +182,7 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Win 2019 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2019 Unit Tests (Module)"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed

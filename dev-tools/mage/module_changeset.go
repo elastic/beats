@@ -29,16 +29,10 @@ import (
 func DefineModules() {
 	beatPath := os.Getenv("BEAT_PATH")
 	if beatPath == "" {
-		fmt.Errorf("argument required: beatPath")
-		os.Exit(1)
+		panic(fmt.Errorf("argument required: beatPath"))
 	}
 
 	var modulePattern string
-	//if strings.Contains(beatPath, "x-pack") {
-	//	modulePattern = "^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
-	//} else {
-	//	modulePattern = "^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
-	//}
 	modulePattern = fmt.Sprintf("^%s\\/module\\/([^\\/]+)\\/.*", beatPath)
 
 	moduleRegex, err := regexp.Compile(modulePattern)
