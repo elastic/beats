@@ -543,8 +543,8 @@ github.com/elastic/ebpfevents v0.6.0 h1:BrL3m7JFK7U6h2jkbk3xAWWs//IZnugCHEDds5u2
 github.com/elastic/ebpfevents v0.6.0/go.mod h1:ESG9gw7N+n5yCCMgdg1IIJENKWSmX7+X0Fi9GUs9nvU=
 github.com/elastic/elastic-agent-autodiscover v0.7.0 h1:FCrHXh5AZGrPlpAx8kBu/s/guw9d/EXt+GKlFCnrgsc=
 github.com/elastic/elastic-agent-autodiscover v0.7.0/go.mod h1:zLf0SDdQXisVZxzXPxKXdj3Fa+H4bsu4HHbTEQImDz8=
-github.com/elastic/elastic-agent-client/v7 v7.14.0 h1:X6S2RyjZNKsDCvA2igch2I5dgHrkfldVe0ZanH/DRCM=
-github.com/elastic/elastic-agent-client/v7 v7.14.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
+github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
+github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
 github.com/elastic/elastic-agent-libs v0.9.13 h1:D1rh1s67zlkDWmixWQaNWzn+qy6DafIDPTQnLpBNBUA=
 github.com/elastic/elastic-agent-libs v0.9.13/go.mod h1:G9ljFvDE+muOOOQBf2eRituF0fE4suGkv25rfjTwY+c=
 github.com/elastic/elastic-agent-system-metrics v0.10.3 h1:8pWdj8DeY8PBG/BA0DJalRpJWruDoP5QrIP/YKug5dE=
