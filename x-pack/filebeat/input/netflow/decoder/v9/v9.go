@@ -6,6 +6,7 @@ package v9
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -17,19 +18,22 @@ import (
 )
 
 const (
-	ProtocolName                 = "v9"
-	LogPrefix                    = "[netflow-v9] "
-	ProtocolID            uint16 = 9
-	MaxSequenceDifference        = 1000
+	ProtocolName                      = "v9"
+	LogPrefix                         = "[netflow-v9] "
+	ProtocolID                 uint16 = 9
+	MaxSequenceDifference             = 1000
+	cacheCleanupInterval              = 30 * time.Second
+	cacheCleanupEntryThreshold        = 10 * time.Second
 )
 
 type NetflowV9Protocol struct {
+	ctx            context.Context
+	cancel         context.CancelFunc
 	decoder        Decoder
 	logger         *log.Logger
 	Session        SessionMap
 	timeout        time.Duration
 	cache          *pendingTemplatesCache
-	done           chan struct{}
 	detectReset    bool
 	shareTemplates bool
 }
@@ -44,7 +48,10 @@ func New(config config.Config) protocol.Protocol {
 }
 
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
+	ctx, cancel := context.WithCancel(context.Background())
 	pd := &NetflowV9Protocol{
+		ctx:         ctx,
+		cancel:      cancel,
 		decoder:     decoder,
 		logger:      logger,
 		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
@@ -64,19 +71,20 @@ func (*NetflowV9Protocol) Version() uint16 {
 }
 
 func (p *NetflowV9Protocol) Start() error {
-	p.done = make(chan struct{})
 	if p.timeout != time.Duration(0) {
-		go p.Session.CleanupLoop(p.timeout, p.done)
+		go p.Session.CleanupLoop(p.timeout, p.ctx.Done())
 	}
 
-	p.cache.start(p.done, 30*time.Second, 10*time.Second)
+	if p.cache != nil {
+		p.cache.start(p.ctx.Done(), cacheCleanupInterval, cacheCleanupEntryThreshold)
+	}
 
 	return nil
 }
 
 func (p *NetflowV9Protocol) Stop() error {
-	if p.done != nil {
-		close(p.done)
+	p.cancel()
+	if p.cache != nil {
 		p.cache.stop()
 	}
 	return nil
@@ -140,7 +148,11 @@ func (p *NetflowV9Protocol) parseSet(
 		template := session.GetTemplate(setID)
 
 		if template == nil {
-			p.cache.Add(key, buf)
+			if p.cache != nil {
+				p.cache.Add(key, buf)
+			} else {
+				p.logger.Printf("No template for ID %d", setID)
+			}
 			return nil, nil
 		}
 
@@ -154,6 +166,10 @@ func (p *NetflowV9Protocol) parseSet(
 	}
 	for _, template := range templates {
 		session.AddTemplate(template)
+
+		if p.cache == nil {
+			continue
+		}
 		events := p.cache.GetAndRemove(key)
 		for _, e := range events {
 			f, err := template.Apply(e, 0)

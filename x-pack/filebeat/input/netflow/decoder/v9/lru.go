@@ -65,10 +65,6 @@ func newPendingTemplatesCache() *pendingTemplatesCache {
 
 // GetAndRemove returns all events for a given session key and removes them from the cache
 func (h *pendingTemplatesCache) GetAndRemove(key SessionKey) []*bytes.Buffer {
-	if h == nil {
-		return nil
-	}
-
 	if h.isEmpty.Load() {
 		return nil
 	}
@@ -86,10 +82,6 @@ func (h *pendingTemplatesCache) GetAndRemove(key SessionKey) []*bytes.Buffer {
 
 // Add adds an event to the pending templates cache
 func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
-	if h == nil {
-		return
-	}
-
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 
@@ -100,10 +92,6 @@ func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 
 // start starts the pending templates cache cleaner
 func (h *pendingTemplatesCache) start(done <-chan struct{}, cleanInterval time.Duration, removalThreshold time.Duration) {
-	if h == nil {
-		return
-	}
-
 	h.mtx.Lock()
 	if h.started {
 		h.mtx.Unlock()
@@ -172,9 +160,5 @@ func (h *pendingTemplatesCache) cleanup(removalThreshold time.Duration) {
 
 // stop stops the pending templates cache cleaner
 func (h *pendingTemplatesCache) stop() {
-	if h == nil {
-		return
-	}
-
 	h.wg.Wait()
 }
