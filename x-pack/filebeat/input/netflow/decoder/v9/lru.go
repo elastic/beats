@@ -8,9 +8,8 @@ import (
 	"bytes"
 	"container/heap"
 	"sync"
+	"sync/atomic"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type eventWithMissingTemplate struct {
