@@ -22,6 +22,7 @@ package pipeline
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -135,10 +136,8 @@ type GlobalProcessorReloader struct {
 	p *Pipeline
 }
 
-func (g GlobalProcessorReloader) Reload(config *reload.ConfigWithMeta) error {
-	log := g.p.monitors.Logger
-
-	log.Error("we should reload global processors with %v", config.Config)
+func (g *GlobalProcessorReloader) Reload(config *reload.ConfigWithMeta) error {
+	fmt.Fprintf(os.Stderr, "GlobalProcessorReloader %v should reload global processors with %v", g, config.Config)
 	return nil
 }
 

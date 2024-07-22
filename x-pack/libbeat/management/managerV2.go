@@ -105,6 +105,9 @@ type BeatV2Manager struct {
 	// set with the last applied APM config
 	lastAPMCfg *proto.APMConfig
 
+	// set with the last applied global processors config
+	lastGlobalProcessorsConfig *proto.GlobalProcessorsConfig
+
 	// used for the debug callback to report as-running config
 	lastBeatOutputCfg   *reload.ConfigWithMeta
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
@@ -499,18 +502,11 @@ func (cm *BeatV2Manager) componentListen() {
 			cm.UpdateStatus(status.Stopping, "Stopping")
 			return
 		case change := <-cm.client.ComponentChanges():
-			cm.logger.Infof(
-				"BeatV2Manager.componentListen ComponentConfigIdx(%d)",
-				change.ConfigIdx)
-
-			processors := cm.registry.GetReloadableGlobalProcessors()
-			if processors == nil {
-				cm.logger.Debug("Unable to reload global processors: no global processors reloadable registered")
-				continue
+			cm.logger.Debugw("received component change event", "event", change)
+			err := cm.reloadGlobalProcessors(change)
+			if err != nil {
+				cm.logger.Errorw("Error reloading global processors", "error", err)
 			}
-
-			//FIXME we need to map the Global Processor config into a proper ConfigWithMeta object
-			processors.Reload(change.GlobalProcessors)
 		}
 	}
 }
@@ -1037,6 +1033,42 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		return nil
 	}
 	return data
+}
+
+func (cm *BeatV2Manager) reloadGlobalProcessors(change client.Component) error {
+	cm.logger.Debug("Reloading global processors config")
+	processors := cm.registry.GetReloadableGlobalProcessors()
+	if processors == nil {
+		return fmt.Errorf("reloading global processors: no global processors reloadable registered")
+	}
+
+	if change.Config == nil {
+		cm.logger.Debug("Component changes contain a nil config, skipping global processors reload")
+		return nil
+	}
+
+	if gproto.Equal(cm.lastGlobalProcessorsConfig, change.Config.Processors) {
+		cm.logger.Debug("Global processor config is the same as the last applied, skipping reload")
+		return nil
+	}
+
+	var newProcessorConfig *conf.C
+	if change.Config.Processors != nil {
+		newConf, err := conf.NewConfigFrom(change.Config.Processors)
+		if err != nil {
+			return fmt.Errorf("creating new global processor config: %w", err)
+		}
+		newProcessorConfig = newConf
+	}
+
+	err := processors.Reload(&reload.ConfigWithMeta{Config: newProcessorConfig})
+	if err != nil {
+		return fmt.Errorf("reloading global processor config: %w", err)
+	}
+
+	cm.lastGlobalProcessorsConfig = change.Config.Processors
+	cm.logger.Debug("Global processors config reloaded")
+	return nil
 }
 
 func getZapcoreLevel(ll client.UnitLogLevel) (zapcore.Level, bool) {
