@@ -115,50 +115,59 @@ func (h *pendingTemplatesCache) start(done <-chan struct{}, cleanInterval time.D
 	h.wg.Add(1)
 	go func(n *pendingTemplatesCache) {
 		defer n.wg.Done()
-		ticker := time.NewTicker(cleanInterval)
-		defer ticker.Stop()
+		timer := time.NewTimer(cleanInterval)
+		defer timer.Stop()
 
 		for {
 			select {
-			case <-ticker.C:
-				n.mtx.Lock()
-				if len(n.hp) == 0 {
-					// lru is empty do not proceed further
-					n.mtx.Unlock()
-					continue
-				} else if len(n.events) == 0 {
-					// all pending events have been cleaned by GetAndRemove
-					// thus reset lru since it is not empty (look above) and continue
-					n.hp = pendingEventsHeap{}
-					n.mtx.Unlock()
-					continue
-				}
-
-				hp := &n.hp
-				now := time.Now()
-				for {
-					v := heap.Pop(hp)
-					c, ok := v.(eventWithMissingTemplate)
-					if !ok {
-						// weirdly enough we should never get here
-						continue
-					}
-					if now.Sub(c.entryTime) < removalThreshold {
-						// we have events that are not old enough
-						// to be removed thus stop looping
-						heap.Push(hp, c)
-						break
-					}
-					// we can remove the pending events
-					delete(n.events, c.key)
-				}
-				h.isEmpty.Store(len(h.events) == 0)
-				n.mtx.Unlock()
+			case <-timer.C:
+				h.cleanup(removalThreshold)
+				timer.Reset(cleanInterval)
 			case <-done:
 				return
 			}
 		}
 	}(h)
+}
+
+func (h *pendingTemplatesCache) cleanup(removalThreshold time.Duration) {
+	h.mtx.Lock()
+	defer h.mtx.Unlock()
+
+	if len(h.hp) == 0 {
+		// lru is empty do not proceed further
+		return
+	} else if len(h.events) == 0 {
+		// all pending events have been cleaned by GetAndRemove
+		// thus reset lru since it is not empty (look above) and continue
+		h.hp = pendingEventsHeap{}
+		return
+	}
+
+	hp := &h.hp
+	now := time.Now()
+	for {
+		v := heap.Pop(hp)
+		c, ok := v.(eventWithMissingTemplate)
+		if !ok {
+			// weirdly enough we should never get here
+			continue
+		}
+		if now.Sub(c.entryTime) < removalThreshold {
+			// we have events that are not old enough
+			// to be removed thus stop looping
+			heap.Push(hp, c)
+			break
+		}
+		// we can remove the pending events
+		delete(h.events, c.key)
+
+		if len(h.hp) == 0 {
+			break
+		}
+	}
+
+	h.isEmpty.Store(len(h.events) == 0)
 }
 
 // stop stops the pending templates cache cleaner
