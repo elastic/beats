@@ -292,7 +292,7 @@ steps:
 
       - label: ":ubuntu: x-pack/filebeat: AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
-        skip: "skipping as it was on Jenkins: elastic/ingest-dev#3467"
+#        skip: "skipping as it was on Jenkins: elastic/ingest-dev#3467"
         # Related issue: https://github.com/elastic/ingest-dev/issues/3467
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         env:
