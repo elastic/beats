@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -296,7 +297,6 @@ func (cm *BeatV2Manager) Start() error {
 		"application/yaml",
 		cm.handleDebugYaml)
 
-	go cm.componentListen()
 	go cm.unitListen()
 	cm.isRunning = true
 	return nil
@@ -476,41 +476,6 @@ func (cm *BeatV2Manager) watchErrChan(ctx context.Context) {
 	}
 }
 
-func (cm *BeatV2Manager) componentListen() {
-	// register signal handler
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-
-	cm.logger.Info("Listening for agent component changes")
-	for {
-		select {
-		// The stopChan channel comes from the Manager interface Stop() method
-		case <-cm.stopChan:
-			cm.stopBeat()
-		case sig := <-sigc:
-			// we can't duplicate the same logic used by stopChan here.
-			// A beat will also watch for sigint and shut down, if we call the stopFunc
-			// callback, either the V2 client or the beat will get a panic,
-			// as the stopFunc sent by the beats is usually unsafe.
-			switch sig {
-			case syscall.SIGINT, syscall.SIGTERM:
-				cm.logger.Debug("Received sigterm/sigint, stopping")
-			case syscall.SIGHUP:
-				cm.logger.Debug("Received sighup, stopping")
-			}
-			cm.isRunning = false
-			cm.UpdateStatus(status.Stopping, "Stopping")
-			return
-		case change := <-cm.client.ComponentChanges():
-			cm.logger.Debugw("received component change event", "event", change)
-			err := cm.reloadGlobalProcessors(change)
-			if err != nil {
-				cm.logger.Errorw("Error reloading global processors", "error", err)
-			}
-		}
-	}
-}
-
 func (cm *BeatV2Manager) unitListen() {
 	// register signal handler
 	sigc := make(chan os.Signal, 1)
@@ -541,6 +506,12 @@ func (cm *BeatV2Manager) unitListen() {
 			cm.isRunning = false
 			cm.UpdateStatus(status.Stopping, "Stopping")
 			return
+		case change := <-cm.client.ComponentChanges():
+			cm.logger.Debugw("received component change event", "event", change)
+			err := cm.reloadGlobalProcessors(change)
+			if err != nil {
+				cm.logger.Errorw("Error reloading global processors", "error", err)
+			}
 		case change := <-cm.client.UnitChanges():
 			cm.logger.Infof(
 				"BeatV2Manager.unitListen UnitChanged.ID(%s), UnitChanged.Type(%s), UnitChanged.Trigger(%d): %s/%s",
@@ -1062,6 +1033,14 @@ func (cm *BeatV2Manager) reloadGlobalProcessors(change client.Component) error {
 	}
 
 	err := processors.Reload(&reload.ConfigWithMeta{Config: newProcessorConfig})
+
+	if errors.Is(err, pipeline.ErrNoReloadPipelineAlreadyBuilt) {
+		// Pipeline is already instantiated, need to restart
+		cm.logger.Info("beat is restarting because global processor configuration changed")
+		cm.Stop()
+		return nil
+	}
+
 	if err != nil {
 		return fmt.Errorf("reloading global processor config: %w", err)
 	}
