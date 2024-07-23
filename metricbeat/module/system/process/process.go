@@ -20,6 +20,7 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -111,7 +112,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// monitor either a single PID, or the configured set of processes.
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
-		if err != nil && !process.CanDegrade(err) {
+		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
 			return fmt.Errorf("process stats: %w", err)
 		}
 

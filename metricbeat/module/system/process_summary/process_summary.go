@@ -20,6 +20,7 @@
 package process_summary
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"runtime"
@@ -69,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	procList, degradeErr := process.ListStates(m.sys)
-	if degradeErr != nil && !process.CanDegrade(degradeErr) {
+	if degradeErr != nil && !errors.Is(degradeErr, process.NonFatalErr{}) {
 		return fmt.Errorf("error fetching process list: %w", degradeErr)
 	}
 
