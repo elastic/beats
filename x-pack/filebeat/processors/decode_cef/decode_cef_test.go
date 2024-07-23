@@ -59,6 +59,33 @@ func TestProcessorRun(t *testing.T) {
 				"source.user.name": "admin",
 			},
 		},
+		"empty_field_values": {
+			config: func() config {
+				c := defaultConfig()
+				c.TargetField = ""
+				c.IgnoreEmptyValues = true
+				return c
+			},
+			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src= suser= target=admin msg=User signed in from 2001:db8::5",
+			fields: mapstr.M{
+				"version":               "1",
+				"device.event_class_id": "600",
+				"device.product":        "Deep Security Manager",
+				"device.vendor":         "Trend Micro",
+				"device.version":        "1.2.3",
+				"name":                  "User Signed In",
+				"severity":              "3",
+				"event.severity":        3,
+				"extensions.message":    "User signed in from 2001:db8::5",
+				"extensions.target":     "admin",
+				// ECS
+				"event.code":       "600",
+				"message":          "User signed in from 2001:db8::5",
+				"observer.product": "Deep Security Manager",
+				"observer.vendor":  "Trend Micro",
+				"observer.version": "1.2.3",
+			},
+		},
 		"parse_errors": {
 			message: "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|Low|msg=User signed in with =xyz",
 			fields: mapstr.M{
