@@ -408,3 +408,7 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 )
+
+replace github.com/elastic/go-sysinfo => github.com/AndersonQ/go-sysinfo v0.0.0-20240723133639-576a5a94e18c
+
+replace github.com/elastic/elastic-agent-system-metrics => github.com/AndersonQ/elastic-agent-system-metrics v0.0.0-20240723150030-6f29b3f88b68
