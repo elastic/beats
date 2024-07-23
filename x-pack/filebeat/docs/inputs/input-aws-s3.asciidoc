@@ -271,9 +271,9 @@ The maximum number of SQS messages that can be inflight at any time. Defaults
 to 5. When processing large amount of large size S3 objects and each object has
 large amount of events, if this parameter sets too high, it can cause the input
 to process too many messages concurrently, overload the agent and cause ingest failure.
-Please keep the default value 5 for this field for majority of the use cases.
-The only time we recommend using a large number for this field is when processing
-large amount of small size S3 objects.
+We recommend to keep the default value 5 and use the https://www.elastic.co/guide/en/fleet/current/es-output-settings.html#es-output-settings-performance-tuning-settings[preset] option to tune your
+Elastic Agent performance. You can optimize for throughput, scale, latency, or
+you can choose a balanced (the default) set of performance specifications.
 
 [id="input-{type}-parsers"]
 [float]
