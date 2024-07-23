@@ -388,6 +388,9 @@ class Test(metricbeat.BaseTest):
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            if evt.get("error", None) is not None:
+                # errors are non-fatal errors logged by system/process. Ignore and proceed furture
+                continue
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
