@@ -37,7 +37,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -275,7 +275,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metricreport.EphemeralID(),
+			EphemeralID:     uuid.UUID(metricreport.EphemeralID()),
 		},
 		Fields: fields,
 	}

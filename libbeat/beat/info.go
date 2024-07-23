@@ -20,7 +20,7 @@ package beat
 import (
 	"time"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid"
 )
 
 // Info stores a beats instance meta data.
