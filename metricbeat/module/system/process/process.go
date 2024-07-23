@@ -113,6 +113,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
 		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
+			// return only if the error is fatal in nature
 			return fmt.Errorf("process stats: %w", err)
 		}
 
