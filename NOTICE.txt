@@ -15785,11 +15785,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.13.0
+Version: v1.15.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.13.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.15.0/LICENSE:
 
 
                                  Apache License
