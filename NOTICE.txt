@@ -2014,11 +2014,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-storage-bl
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest
-Version: v0.11.28
+Version: v0.11.29
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest@v0.11.28/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest@v0.11.29/LICENSE:
 
 
                                  Apache License
@@ -2215,11 +2215,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/adal
-Version: v0.9.21
+Version: v0.9.22
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.21/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.22/LICENSE:
 
 
                                  Apache License
