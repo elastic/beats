@@ -9749,12 +9749,12 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/cavaliercoder/go-rpm
-Version: v0.0.0-20190131055624-7a9c54e3d83e
+Dependency : github.com/cavaliergopher/rpm
+Version: v1.2.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cavaliercoder/go-rpm@v0.0.0-20190131055624-7a9c54e3d83e/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/cavaliergopher/rpm@v1.2.0/LICENSE:
 
 Copyright (c) 2017 Ryan Armstrong. All rights reserved.
 
@@ -11095,11 +11095,11 @@ Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v3@v3.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/digitalocean/go-libvirt
-Version: v0.0.0-20180301200012-6075ea3c39a1
+Version: v0.0.0-20240709142323-d8406205c752
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/digitalocean/go-libvirt@v0.0.0-20180301200012-6075ea3c39a1/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/digitalocean/go-libvirt@v0.0.0-20240709142323-d8406205c752/LICENSE.md:
 
 Apache License
 ==============
@@ -12736,11 +12736,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-client/v7
-Version: v7.13.0
+Version: v7.15.0
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.13.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.15.0/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
@@ -12969,11 +12969,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.9.13
+Version: v0.9.15
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.9.13/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.9.15/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -20125,39 +20125,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/jmoiron/sqlx
-Version: v1.3.1
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/jmoiron/sqlx@v1.3.1/LICENSE:
-
- Copyright (c) 2013, Jason Moiron
-
- Permission is hereby granted, free of charge, to any person
- obtaining a copy of this software and associated documentation
- files (the "Software"), to deal in the Software without
- restriction, including without limitation the rights to use,
- copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the
- Software is furnished to do so, subject to the following
- conditions:
-
- The above copyright notice and this permission notice shall be
- included in all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- OTHER DEALINGS IN THE SOFTWARE.
-
-
-
---------------------------------------------------------------------------------
 Dependency : github.com/joeshaw/multierror
 Version: v0.0.0-20140124173710-69b34d4ec901
 Licence type (autodetected): MIT
@@ -24458,11 +24425,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.24.0
+Version: v0.25.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.24.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.25.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24495,11 +24462,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/mod
-Version: v0.18.0
+Version: v0.19.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.18.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/mod@v0.19.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24532,11 +24499,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.26.0
+Version: v0.27.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.26.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.27.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24643,11 +24610,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -24754,11 +24721,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.21.1-0.20240508182429-e35e4ccd0d2d
+Version: v0.23.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.21.1-0.20240508182429-e35e4ccd0d2d/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.23.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35976,34 +35943,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/cavaliercoder/badio
-Version: v0.0.0-20160213150051-ce5280129e9e
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/cavaliercoder/badio@v0.0.0-20160213150051-ce5280129e9e/LICENSE:
-
-Copyright (c) 2015 Ryan Armstrong
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
---------------------------------------------------------------------------------
 Dependency : github.com/cespare/xxhash
 Version: v1.1.0
 Licence type (autodetected): MIT
@@ -36394,28 +36333,6 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
---------------------------------------------------------------------------------
-Dependency : github.com/davecgh/go-xdr
-Version: v0.0.0-20161123171359-e6a2ba005892
-Licence type (autodetected): ISC
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/davecgh/go-xdr@v0.0.0-20161123171359-e6a2ba005892/LICENSE:
-
-Copyright (c) 2012-2014 Dave Collins <dave@davec.name>
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/devigned/tab
@@ -39896,6 +39813,36 @@ Contents of probable licence file $GOMODCACHE/github.com/godror/knownpb@v0.1.0/L
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+--------------------------------------------------------------------------------
+Dependency : github.com/gofrs/uuid/v5
+Version: v5.2.0
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/gofrs/uuid/v5@v5.2.0/LICENSE:
+
+Copyright (C) 2013-2018 by Maxim Bublis <b@codemonkey.ru>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
@@ -46588,37 +46535,6 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/mattn/go-sqlite3
-Version: v1.14.14
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/mattn/go-sqlite3@v1.14.14/LICENSE:
-
-The MIT License (MIT)
-
-Copyright (c) 2014 Yasuhiro Matsumoto
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
---------------------------------------------------------------------------------
 Dependency : github.com/matttproud/golang_protobuf_extensions
 Version: v1.0.2-0.20181231171920-c182affec369
 Licence type (autodetected): Apache-2.0
@@ -52784,11 +52700,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
