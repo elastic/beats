@@ -10,6 +10,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update Go version to 1.22.5. {pull}40082[40082]
+
+*Auditbeat*
 
 *Auditbeat*
 

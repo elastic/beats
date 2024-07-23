@@ -1,6 +1,10 @@
 module github.com/elastic/beats/v7
 
+<<<<<<< HEAD
 go 1.21
+=======
+go 1.22.5
+>>>>>>> c0f8ae3b25 (Update to Go 1.22.5 (#40082))
 
 require (
 	cloud.google.com/go/bigquery v1.52.0
