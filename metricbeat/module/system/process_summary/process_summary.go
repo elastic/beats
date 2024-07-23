@@ -22,7 +22,7 @@ package process_summary
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // threadStats returns a map of state counts for running threads on a system
 func threadStats(sys resolve.Resolver) (mapstr.M, error) {
 	statPath := sys.ResolveHostFS("/proc/stat")
-	procData, err := ioutil.ReadFile(statPath)
+	procData, err := os.ReadFile(statPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
 	}
