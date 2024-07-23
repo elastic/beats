@@ -423,6 +423,9 @@ class Test(metricbeat.BaseTest):
 
         found_cmdline = False
         for evt in output:
+            if evt.get("error", None) is not None:
+                # errors are non-fatal errors logged by system/process. Ignore and proceed furture
+                continue
             process = evt["system"]["process"]
             # Not all process will have 'cmdline' due to permission issues,
             # especially on Windows. Therefore we ensure at least some of
@@ -481,6 +484,9 @@ class Test(metricbeat.BaseTest):
         found_env = False
         found_cwd = not sys.platform.startswith("linux")
         for evt in output:
+            if evt.get("error", None) is not None:
+                # errors are non-fatal errors logged by system/process. Ignore and proceed furture
+                continue
             found_cwd |= "working_directory" in evt["process"]
 
             process = evt["system"]["process"]
