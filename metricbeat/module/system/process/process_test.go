@@ -20,6 +20,7 @@
 package process
 
 import (
+	"errors"
 	"os"
 	"testing"
 	"time"
@@ -38,7 +39,7 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	for _, err := range errs {
-		assert.True(t, process.CanDegrade(err))
+		assert.True(t, errors.Is(err, process.NonFatalErr{}))
 	}
 	assert.NotEmpty(t, events)
 
@@ -46,7 +47,7 @@ func TestFetch(t *testing.T) {
 
 	events, errs = mbtest.ReportingFetchV2Error(f)
 	for _, err := range errs {
-		assert.True(t, process.CanDegrade(err))
+		assert.True(t, errors.Is(err, process.NonFatalErr{}))
 	}
 	assert.NotEmpty(t, events)
 
