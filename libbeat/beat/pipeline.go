@@ -30,12 +30,6 @@ type Pipeline interface {
 	Connect() (Client, error)
 }
 
-// PipelineBuilder provide a way to build a Pipeline lazily (as late as possible)
-type PipelineBuilder interface {
-	Pipeline
-	Build() (Pipeline, error)
-}
-
 // PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 

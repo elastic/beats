@@ -22,7 +22,6 @@ package pipeline
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -69,8 +68,6 @@ type Pipeline struct {
 	waitCloseTimeout time.Duration
 
 	processors processing.Supporter
-
-	clientTracker *clientTracker
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -84,49 +81,6 @@ type Settings struct {
 	Processors processing.Supporter
 
 	InputQueueSize int
-}
-
-type clientTracker struct {
-	log *logp.Logger
-	// clients holds the pointers to all the connected clients
-	clients   map[*client]beat.ClientConfig
-	clientsMx sync.Mutex
-}
-
-func (ct *clientTracker) RegisterClient(clt *client, cfg beat.ClientConfig) {
-	ct.log.Debug("Registering new client %x", clt)
-	ct.clientsMx.Lock()
-	defer ct.clientsMx.Unlock()
-	ct.clients[clt] = cfg
-	ct.log.Debug("Registered new client %x", clt)
-}
-
-func (ct *clientTracker) UnregisterClient(clt *client) {
-	ct.log.Debug("Unregistering client %x", clt)
-	ct.clientsMx.Lock()
-	defer ct.clientsMx.Unlock()
-	delete(ct.clients, clt)
-	ct.log.Debug("Unregistered client %x", clt)
-}
-
-type clientAction func(clt *client, cfg beat.ClientConfig) error
-
-func (ct *clientTracker) ApplyToAllClients(action clientAction) error {
-	ct.clientsMx.Lock()
-	defer ct.clientsMx.Unlock()
-
-	for clt, cfg := range ct.clients {
-		if clt == nil {
-			// should never happen
-			ct.log.Warn("encountered nil client pointer while iterating over connected pipeline clients. Skipping...")
-			continue
-		}
-		err := action(clt, cfg)
-		if err != nil {
-			return fmt.Errorf("error applying action to clients: %w", err)
-		}
-	}
-	return nil
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -172,11 +126,6 @@ func New(
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
-		clientTracker: &clientTracker{
-			log:       monitors.Logger,
-			clients:   make(map[*client]beat.ClientConfig),
-			clientsMx: sync.Mutex{},
-		},
 	}
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
 		p.waitCloseTimeout = settings.WaitClose
@@ -268,7 +217,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
-		unregisterer:   p.clientTracker,
 	}
 
 	ackHandler := cfg.EventListener
@@ -304,8 +252,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
-
-	p.clientTracker.RegisterClient(clt, cfg)
 
 	p.observer.clientConnected()
 
