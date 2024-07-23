@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 
 	psutil "github.com/shirou/gopsutil/v3/process"
@@ -54,11 +55,11 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 
 	// actually fetch the PIDs from the OS-specific code
 	_, plist, err := init.FetchPids()
-	if err != nil {
+	if err != nil && !isNonFatal(err) {
 		return nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
 
-	return plist, nil
+	return plist, toNonFatal(err)
 }
 
 // GetPIDState returns the state of a given PID
@@ -90,10 +91,10 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	}
 
 	// actually fetch the PIDs from the OS-specific code
-	pidMap, plist, err := procStats.FetchPids()
+	pidMap, plist, wrappedErr := procStats.FetchPids()
 
-	if err != nil {
-		return nil, nil, fmt.Errorf("error gathering PIDs: %w", err)
+	if wrappedErr != nil && !isNonFatal(wrappedErr) {
+		return nil, nil, fmt.Errorf("error gathering PIDs: %w", wrappedErr)
 	}
 	// We use this to track processes over time.
 	procStats.ProcsMap.SetMap(pidMap)
@@ -133,13 +134,13 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		rootEvents = append(rootEvents, rootMap)
 	}
 
-	return procs, rootEvents, nil
+	return procs, rootEvents, toNonFatal(wrappedErr)
 }
 
 // GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
 func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 	pidStat, _, err := procStats.pidFill(pid, false)
-	if err != nil {
+	if err != nil && !isNonFatal(err) {
 		return nil, fmt.Errorf("error fetching PID %d: %w", pid, err)
 	}
 
@@ -151,9 +152,9 @@ func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 // GetOneRootEvent is the same as `GetOne()` but it returns an
 // event formatted as expected by ECS
 func (procStats *Stats) GetOneRootEvent(pid int) (mapstr.M, mapstr.M, error) {
-	pidStat, _, err := procStats.pidFill(pid, false)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error fetching PID %d: %w", pid, err)
+	pidStat, _, wrappedErr := procStats.pidFill(pid, false)
+	if wrappedErr != nil && !isNonFatal(wrappedErr) {
+		return nil, nil, fmt.Errorf("error fetching PID %d: %w", pid, wrappedErr)
 	}
 
 	procStats.ProcsMap.SetPid(pid, pidStat)
@@ -165,7 +166,7 @@ func (procStats *Stats) GetOneRootEvent(pid int) (mapstr.M, mapstr.M, error) {
 
 	rootMap := processRootEvent(&pidStat)
 
-	return procMap, rootMap, err
+	return procMap, rootMap, toNonFatal(wrappedErr)
 }
 
 // GetSelf gets process info for the beat itself
@@ -180,34 +181,41 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	}
 
 	pidStat, _, err := procStats.pidFill(self, false)
-	if err != nil {
+	if err != nil && !isNonFatal(err) {
 		return ProcState{}, fmt.Errorf("error fetching PID %d: %w", self, err)
 	}
 
 	procStats.ProcsMap.SetPid(self, pidStat)
 
-	return pidStat, nil
+	return pidStat, toNonFatal(err)
 }
 
 // pidIter wraps a few lines of generic code that all OS-specific FetchPids() functions must call.
 // this also handles the process of adding to the maps/lists in order to limit the code duplication in all the OS implementations
-func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState) (ProcsMap, []ProcState) {
+func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState) (ProcsMap, []ProcState, error) {
 	status, saved, err := procStats.pidFill(pid, true)
+	var nonFatalErr error
 	if err != nil {
 		if !errors.Is(err, NonFatalErr{}) {
 			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
-			return procMap, proclist
+			// While monitoring a set of processes, some processes might get killed after we get all the PIDs
+			// So, there's no need to capture "process not found" error.
+			if errors.Is(err, syscall.ESRCH) {
+				return procMap, proclist, nil
+			}
+			return procMap, proclist, err
 		}
-		procStats.logger.Debugf("Non fatal error fetching PID some info for %d, metrics are valid, but partial: %s", pid, err)
+		nonFatalErr = fmt.Errorf("non fatal error fetching PID some info for %d, metrics are valid, but partial: %w", pid, err)
+		procStats.logger.Debugf(err.Error())
 	}
 	if !saved {
 		procStats.logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
-		return procMap, proclist
+		return procMap, proclist, nonFatalErr
 	}
 	procMap[pid] = status
 	proclist = append(proclist, status)
 
-	return procMap, proclist
+	return procMap, proclist, nonFatalErr
 }
 
 // NonFatalErr is returned when there was an error
@@ -232,13 +240,17 @@ func (c NonFatalErr) Is(other error) bool {
 	return is
 }
 
+func (c NonFatalErr) Unwrap() error {
+	return c.Err
+}
+
 // pidFill is an entrypoint used by OS-specific code to fill out a pid.
 // This in turn calls various OS-specific code to fill out the various bits of PID data
 // This is done to minimize the code duplication between different OS implementations
 // The second return value will only be false if an event has been filtered out.
 func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// Fetch proc state so we can get the name for filtering based on user's filter.
-
+	var wrappedErr error
 	// OS-specific entrypoint, get basic info so we can at least run matchProcess
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
@@ -265,7 +277,8 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		if !errors.Is(err, NonFatalErr{}) {
 			return status, true, fmt.Errorf("FillPidMetrics: %w", err)
 		}
-		procStats.logger.Debugf("Non-fatal error fetching PID metrics for %d, metrics are valid, but partial: %s", pid, err)
+		wrappedErr = errors.Join(wrappedErr, fmt.Errorf("non-fatal error fetching PID metrics for %d, metrics are valid, but partial: %w", pid, err))
+		procStats.logger.Debugf(wrappedErr.Error())
 	}
 
 	if status.CPU.Total.Ticks.Exists() {
@@ -320,7 +333,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		}
 	}
 
-	return status, true, nil
+	return status, true, wrappedErr
 }
 
 // cacheCmdLine fills out Env and arg metrics from any stored previous metrics for the pid
