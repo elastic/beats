@@ -218,32 +218,6 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 	return procMap, proclist, nonFatalErr
 }
 
-// NonFatalErr is returned when there was an error
-// collecting metrics, however the metrics already
-// gathered and returned are still valid.
-// This error can be safely ignored, this will result
-// in having partial metrics for a process rather than
-// no metrics at all.
-//
-// It was introduced to allow for partial metrics collection
-// on privileged process on Windows.
-type NonFatalErr struct {
-	Err error
-}
-
-func (c NonFatalErr) Error() string {
-	return "Not enough privileges to fetch information: " + c.Err.Error()
-}
-
-func (c NonFatalErr) Is(other error) bool {
-	_, is := other.(NonFatalErr)
-	return is
-}
-
-func (c NonFatalErr) Unwrap() error {
-	return c.Err
-}
-
 // pidFill is an entrypoint used by OS-specific code to fill out a pid.
 // This in turn calls various OS-specific code to fill out the various bits of PID data
 // This is done to minimize the code duplication between different OS implementations
