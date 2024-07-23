@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/go-connections/tlsconfig"
@@ -111,7 +112,7 @@ type Container struct {
 
 // Client for docker interface
 type Client interface {
-	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error)
 	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
 	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
 }
@@ -214,7 +215,7 @@ func (w *watcher) Start() error {
 
 	w.Lock()
 	defer w.Unlock()
-	containers, err := w.listContainers(types.ContainerListOptions{})
+	containers, err := w.listContainers(container.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -330,7 +331,7 @@ func (w *watcher) containerUpdate(event events.Message) {
 	filter := filters.NewArgs()
 	filter.Add("id", event.Actor.ID)
 
-	containers, err := w.listContainers(types.ContainerListOptions{
+	containers, err := w.listContainers(container.ListOptions{
 		Filters: filter,
 	})
 	if err != nil || len(containers) != 1 {
@@ -369,7 +370,7 @@ func (w *watcher) containerDelete(event events.Message) {
 	}
 }
 
-func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Container, error) {
+func (w *watcher) listContainers(options container.ListOptions) ([]*Container, error) {
 	log := w.log
 
 	log.Debug("List containers")

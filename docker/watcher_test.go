@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -44,7 +45,7 @@ type MockClient struct {
 	done chan interface{}
 }
 
-func (m *MockClient) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
+func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
 	res := m.containers[0]
 	m.containers = m.containers[1:]
 	return res, nil
