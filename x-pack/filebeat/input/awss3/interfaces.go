@@ -30,6 +30,8 @@ import (
 //go:generate go install github.com/golang/mock/mockgen@v1.6.0
 //go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
 //go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
+//go:generate go-licenser -license Elastic .
+//go:generate goimports -w -local github.com/elastic .
 
 // ------
 // SQS interfaces
@@ -79,12 +81,12 @@ type s3API interface {
 }
 
 type s3Getter interface {
-	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error)
+	GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error)
 }
 
 type s3Mover interface {
-	CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error)
-	DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error)
+	CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error)
+	DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error)
 }
 
 type s3Lister interface {
@@ -229,8 +231,8 @@ type awsS3API struct {
 	client *s3.Client
 }
 
-func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
-	getObjectOutput, err := a.client.GetObject(ctx, &s3.GetObjectInput{
+func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
+	getObjectOutput, err := a.clientFor(region).GetObject(ctx, &s3.GetObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
 	}, s3.WithAPIOptions(
@@ -262,8 +264,8 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	return getObjectOutput, nil
 }
 
-func (a *awsS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
-	copyObjectOutput, err := a.client.CopyObject(ctx, &s3.CopyObjectInput{
+func (a *awsS3API) CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	copyObjectOutput, err := a.clientFor(region).CopyObject(ctx, &s3.CopyObjectInput{
 		Bucket:     awssdk.String(to_bucket),
 		CopySource: awssdk.String(fmt.Sprintf("%s/%s", from_bucket, from_key)),
 		Key:        awssdk.String(to_key),
@@ -274,8 +276,8 @@ func (a *awsS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_
 	return copyObjectOutput, nil
 }
 
-func (a *awsS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
-	deleteObjectOutput, err := a.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+func (a *awsS3API) DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	deleteObjectOutput, err := a.clientFor(region).DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
 	})
@@ -283,6 +285,17 @@ func (a *awsS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.De
 		return nil, fmt.Errorf("s3 DeleteObject failed: %w", err)
 	}
 	return deleteObjectOutput, nil
+}
+
+func (a *awsS3API) clientFor(region string) *s3.Client {
+	// Conditionally replace the client if the region of
+	// the request does not match the pre-prepared client.
+	opts := a.client.Options()
+	if opts.Region == region {
+		return a.client
+	}
+	opts.Region = region
+	return s3.New(opts)
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
