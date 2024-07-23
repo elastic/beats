@@ -1550,14 +1550,32 @@ var inputTests = []struct {
 
 	// Programmer error.
 	{
-		name:   "type_error_message",
+		name:   "type_error_message_compile_time",
 		server: newChainTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-	bytes(get(state.url).Body).decode_json().records.map(r,
-		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
-	//                          ^~~~ r.id not converted to string: can't add integer to string.
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id converted to incorrect type.
+			"events": events,
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: fmt.Errorf(`failed to check program: failed compilation: ERROR: <input>:3:20: found no matching overload for '_+_' applied to '(string, int)'
+ |   get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+ | ...................^ accessing config`),
+	},
+	{
+		name:   "type_error_message_run_time",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id not converted to string: can't add integer to string.
 			"events": events,
 	})
 	`,
@@ -1566,10 +1584,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					// This is the best we get for some errors from CEL.
-					"message": `failed eval: ERROR: <input>:3:56: no such overload
- |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
- | .......................................................^`,
+					"message": `failed eval: ERROR: <input>:3:26: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | .........................^`,
 				},
 			},
 		},
@@ -1648,7 +1665,10 @@ func TestInput(t *testing.T) {
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				t.Fatalf("unexpected error unpacking config: %v", err)
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
 			}
 
 			var tempDir string
