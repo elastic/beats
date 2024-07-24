@@ -24,7 +24,7 @@ func (h pendingEventsHeap) Len() int {
 }
 
 func (h pendingEventsHeap) Less(i, j int) bool {
-	return h[i].entryTime.Sub(h[j].entryTime) < 0
+	return h[i].entryTime.Before(h[j].entryTime)
 }
 
 func (h pendingEventsHeap) Swap(i, j int) {
