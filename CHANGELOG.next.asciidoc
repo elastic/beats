@@ -87,6 +87,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
 
 *Osquerybeat*
 
