@@ -107,6 +107,9 @@ func TestPendingTemplatesCache(t *testing.T) {
 			cache.mtx.Unlock()
 			require.Zero(t, lruLen)
 			require.Zero(t, lruCap)
+
+			cancelFunc()
+			cache.wait()
 		})
 	}
 }

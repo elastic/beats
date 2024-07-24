@@ -85,7 +85,7 @@ func (p *NetflowV9Protocol) Start() error {
 func (p *NetflowV9Protocol) Stop() error {
 	p.cancel()
 	if p.cache != nil {
-		p.cache.stop()
+		p.cache.wait()
 	}
 	return nil
 }

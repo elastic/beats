@@ -153,6 +153,6 @@ func (h *pendingTemplatesCache) cleanup(removalThreshold time.Duration) {
 }
 
 // stop stops the pending templates cache cleaner
-func (h *pendingTemplatesCache) stop() {
+func (h *pendingTemplatesCache) wait() {
 	h.wg.Wait()
 }
