@@ -2215,11 +2215,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/adal
-Version: v0.9.22
+Version: v0.9.24
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.22/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.24/LICENSE:
 
 
                                  Apache License
@@ -16209,11 +16209,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/tk-btf@v0.1.0/L
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/toutoumomoma
-Version: v0.0.0-20221026030040-594ef30cb640
+Version: v0.0.0-20240626215117-76e39db18dfb
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20221026030040-594ef30cb640/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20240626215117-76e39db18dfb/LICENSE:
 
 Copyright ©2022 Elastic N.V. All rights reserved.
 Copyright ©2021 Dan Kortschak. All rights reserved.
@@ -36319,6 +36319,37 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/bluekeyes/go-gitdiff
+Version: v0.7.1
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/bluekeyes/go-gitdiff@v0.7.1/LICENSE:
+
+MIT License
+
+Copyright (c) 2019 Billy Keyes
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/cespare/xxhash
 Version: v1.1.0
 Licence type (autodetected): MIT
@@ -38549,11 +38580,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/frankban/quicktest
-Version: v1.14.3
+Version: v1.14.6
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/frankban/quicktest@v1.14.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/frankban/quicktest@v1.14.6/LICENSE:
 
 MIT License
 
@@ -53497,11 +53528,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/exp
-Version: v0.0.0-20231127185646-65229373498e
+Version: v0.0.0-20240205201215-2c58cdc269a3
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20231127185646-65229373498e/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20240205201215-2c58cdc269a3/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -56163,11 +56194,11 @@ Public License instead of this License.
 
 --------------------------------------------------------------------------------
 Dependency : mvdan.cc/garble
-Version: v0.7.1
+Version: v0.12.1
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/mvdan.cc/garble@v0.7.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/mvdan.cc/garble@v0.12.1/LICENSE:
 
 Copyright (c) 2019, The Garble Authors.
 
