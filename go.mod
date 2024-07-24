@@ -4,7 +4,7 @@ go 1.22.5
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
-	cloud.google.com/go/monitoring v1.20.1
+	cloud.google.com/go/monitoring v1.20.2
 	cloud.google.com/go/pubsub v1.40.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
@@ -170,8 +170,8 @@ require (
 
 require (
 	cloud.google.com/go v0.115.0
-	cloud.google.com/go/compute v1.27.2
-	cloud.google.com/go/redis v1.16.2
+	cloud.google.com/go/compute v1.27.3
+	cloud.google.com/go/redis v1.16.3
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.12.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
@@ -225,11 +225,11 @@ require (
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
-	cloud.google.com/go/auth v0.7.0 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/compute/metadata v0.4.0 // indirect
-	cloud.google.com/go/iam v1.1.10 // indirect
-	cloud.google.com/go/longrunning v0.5.9 // indirect
+	cloud.google.com/go/auth v0.7.2 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
+	cloud.google.com/go/compute/metadata v0.5.0 // indirect
+	cloud.google.com/go/iam v1.1.11 // indirect
+	cloud.google.com/go/longrunning v0.5.10 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
@@ -383,7 +383,7 @@ require (
 )
 
 require (
-	cloud.google.com/go/storage v1.42.0
+	cloud.google.com/go/storage v1.43.0
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
