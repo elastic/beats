@@ -389,7 +389,9 @@ class Test(metricbeat.BaseTest):
         for evt in output:
             self.assert_fields_are_documented(evt)
             if evt.get("error", None) is not None:
-                # "error" is a non-fatal error logged by system/process. Ignore and proceed further
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
                 continue
 
             summary = evt["system"]["process"]["summary"]
@@ -424,7 +426,9 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         for evt in output:
             if evt.get("error", None) is not None:
-                # "error" is a non-fatal error logged by system/process. Ignore and proceed further
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
                 continue
             process = evt["system"]["process"]
             # Not all process will have 'cmdline' due to permission issues,
@@ -485,7 +489,9 @@ class Test(metricbeat.BaseTest):
         found_cwd = not sys.platform.startswith("linux")
         for evt in output:
             if evt.get("error", None) is not None:
-                # "error" is a non-fatal error logged by system/process. Ignore and proceed further
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
                 continue
             found_cwd |= "working_directory" in evt["process"]
 
