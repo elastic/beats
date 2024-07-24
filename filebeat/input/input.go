@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -48,12 +49,13 @@ type Input interface {
 
 // Runner encapsulate the lifecycle of the input
 type Runner struct {
-	config   inputConfig
-	input    Input
-	done     chan struct{}
-	wg       *sync.WaitGroup
-	Once     bool
-	beatDone chan struct{}
+	config         inputConfig
+	input          Input
+	done           chan struct{}
+	wg             *sync.WaitGroup
+	Once           bool
+	beatDone       chan struct{}
+	statusReporter status.StatusReporter
 }
 
 // New instantiates a new Runner
@@ -83,10 +85,11 @@ func New(
 	}
 
 	context := Context{
-		States:   states,
-		Done:     input.done,
-		BeatDone: input.beatDone,
-		Meta:     nil,
+		States:            states,
+		Done:              input.done,
+		BeatDone:          input.beatDone,
+		Meta:              nil,
+		GetStatusReporter: input.GetStatusReporter,
 	}
 	var ipt Input
 	ipt, err = f(conf, connector, context)
@@ -163,4 +166,12 @@ func (p *Runner) stop() {
 
 func (p *Runner) String() string {
 	return fmt.Sprintf("input [type=%s]", p.config.Type)
+}
+
+func (p *Runner) SetStatusReporter(statusReporter status.StatusReporter) {
+	p.statusReporter = statusReporter
+}
+
+func (p *Runner) GetStatusReporter() status.StatusReporter {
+	return p.statusReporter
 }

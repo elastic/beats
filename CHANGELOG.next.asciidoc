@@ -44,9 +44,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 - Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Enable file ingestion to report detailed status to Elastic Agent {pull}40075[40075]
 - Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
 - Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
 - Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
 
 *Heartbeat*
 
@@ -57,6 +59,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
 
 *Osquerybeat*
 
