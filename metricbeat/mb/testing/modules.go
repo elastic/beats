@@ -53,7 +53,7 @@ that Metricbeat does it and with the same validations.
 		}
 	}
 */
-//nolint:all // It's a test file
+
 package testing
 
 import (
