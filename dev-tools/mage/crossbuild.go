@@ -120,21 +120,21 @@ func AddPlatforms(expressions ...string) func(params *crossBuildParams) {
 	}
 }
 
-// OmitTargetPlatform specifies whether the docker crossbuild container
-// should use the target platform at runtime or not.
-func OmitTargetPlatform() func(params *crossBuildParams) {
+// UseHostPlatform specifies whether the docker crossbuild container
+// should use the host platform at runtime or not.
+func UseHostPlatform() func(params *crossBuildParams) {
 	return func(params *crossBuildParams) {
-		params.OmitTargetPlatform = true
+		params.UseHostPlatform = true
 	}
 }
 
 type crossBuildParams struct {
-	Platforms          BuildPlatformList
-	Target             string
-	Serial             bool
-	InDir              string
-	ImageSelector      ImageSelectorFunc
-	OmitTargetPlatform bool
+	Platforms       BuildPlatformList
+	Target          string
+	Serial          bool
+	InDir           string
+	ImageSelector   ImageSelectorFunc
+	UseHostPlatform bool
 }
 
 // CrossBuild executes a given build target once for each target platform.
@@ -190,7 +190,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
 		}
-		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector, params.OmitTargetPlatform}
+		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector, params.UseHostPlatform}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
 				return fmt.Errorf("failed cross-building target=%s for platform=%s: %w",
@@ -264,11 +264,11 @@ func CrossBuildImage(platform string) (string, error) {
 // GolangCrossBuilder executes the specified mage target inside of the
 // associated golang-crossbuild container image for the platform.
 type GolangCrossBuilder struct {
-	Platform           string
-	Target             string
-	InDir              string
-	ImageSelector      ImageSelectorFunc
-	OmitTargetPlatform bool
+	Platform        string
+	Target          string
+	InDir           string
+	ImageSelector   ImageSelectorFunc
+	UseHostPlatform bool
 }
 
 // Build executes the build inside of Docker.
@@ -349,9 +349,13 @@ func (b GolangCrossBuilder) Build() error {
 	// This fixes an issue where during arm64 linux build for the currently used docker image
 	// docker.elastic.co/beats-dev/golang-crossbuild:1.22.5-arm the image for amd64 arch is pulled
 	// and causes problems when using native arch tools on the binaries that are built for arm64 arch.
-	if strings.HasPrefix(b.Platform, "linux/") && !b.OmitTargetPlatform {
+	if strings.HasPrefix(b.Platform, "linux/") && !b.UseHostPlatform {
 		args = append(args,
 			"--platform", b.Platform,
+		)
+	} else if strings.HasPrefix(b.Platform, "linux/") && b.UseHostPlatform {
+		args = append(args,
+			"--platform", "linux/"+runtime.GOARCH,
 		)
 	}
 
