@@ -314,7 +314,7 @@ func TestCheckinV2(t *testing.T) {
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -339,11 +339,11 @@ func TestCheckinV2(t *testing.T) {
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
 				},
 			}, payload) {
@@ -394,7 +394,7 @@ func TestCheckinV2(t *testing.T) {
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:63: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | ..............................................................^",
 					},
 				},
 			}, payload) {
