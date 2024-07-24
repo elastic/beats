@@ -59,7 +59,8 @@ auditbeat.modules:
        backend: "auto"
 -------------------------------------
 
-. Add audit rules in the modules configuration section of `auditbeat.yml`:
+. Add audit rules in the modules configuration section of `auditbeat.yml` or the
+`audit.rules.d` config file, depending on your configuration:
 
 [source,yaml]
 -------------------------------------
