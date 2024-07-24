@@ -4853,7 +4853,7 @@ type: long
 *`aws.sqs.oldest_message_age.sec`*::
 +
 --
-The approximate age of the oldest non-deleted message in the queue.
+The maximum approximate age of the oldest non-deleted message in the queue.
 
 
 type: long
@@ -4895,7 +4895,7 @@ type: long
 *`aws.sqs.messages.deleted`*::
 +
 --
-The number of messages deleted from the queue.
+The total number of messages deleted from the queue.
 
 
 type: long
@@ -4905,7 +4905,7 @@ type: long
 *`aws.sqs.messages.received`*::
 +
 --
-The number of messages returned by calls to the ReceiveMessage action.
+The total number of messages returned by calls to the ReceiveMessage action.
 
 
 type: long
@@ -4915,7 +4915,7 @@ type: long
 *`aws.sqs.messages.sent`*::
 +
 --
-The number of messages added to a queue.
+The total number of messages added to a queue.
 
 
 type: long
@@ -4925,7 +4925,7 @@ type: long
 *`aws.sqs.empty_receives`*::
 +
 --
-The number of ReceiveMessage API calls that did not return a message.
+The total number of ReceiveMessage API calls that did not return a message.
 
 
 type: long
