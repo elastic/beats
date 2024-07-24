@@ -7,6 +7,7 @@ RUN \
          python3 \
          python3-pip \
          python3-venv \
+         tzdata \
       && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
