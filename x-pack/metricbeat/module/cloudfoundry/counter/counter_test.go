@@ -7,7 +7,6 @@
 package counter
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -38,7 +37,6 @@ func newTestMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 func TestMetricSet(t *testing.T) {
-	fmt.Println("DELETEME")
 	logp.TestingSetup(logp.WithSelectors("cloudfoundry"))
 
 	config := map[string]interface{}{

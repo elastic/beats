@@ -9,7 +9,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/mg"
 
@@ -50,10 +49,6 @@ func RegisterPythonTestDeps(deps ...interface{}) {
 
 // UnitTest executes the unit tests (Go and Python).
 func UnitTest() {
-	if os.Getenv("CI") == "true" {
-		mg.Deps(devtools.DefineModules)
-	}
-
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
 }
 

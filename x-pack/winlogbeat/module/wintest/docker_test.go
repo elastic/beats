@@ -13,7 +13,6 @@ package wintest_test
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -33,7 +32,6 @@ import (
 )
 
 func TestDocker(t *testing.T) {
-	fmt.Println("DELETEME")
 	const (
 		host        = "http://localhost:9200"
 		user        = "admin"
