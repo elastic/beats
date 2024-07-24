@@ -309,22 +309,6 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", fmt.Sprintf("DEV=%v", DevBuild),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
-<<<<<<< HEAD
-=======
-	)
-
-	// Ensure the proper platform is passed
-	// This fixes an issue where during arm64 linux build for the currently used docker image
-	// docker.elastic.co/beats-dev/golang-crossbuild:1.22.5-arm the image for amd64 arch is pulled
-	// and causes problems when using native arch tools on the binaries that are built for arm64 arch.
-	if strings.HasPrefix(b.Platform, "linux/") {
-		args = append(args,
-			"--platform", b.Platform,
-		)
-	}
-
-	args = append(args,
->>>>>>> c0f8ae3b25 (Update to Go 1.22.5 (#40082))
 		image,
 		"--build-cmd", buildCmd+" "+b.Target,
 		"-p", b.Platform,

@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-FROM golang:1.21.12
-COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker /usr/local/bin/
-=======
 FROM golang:1.22.5
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
->>>>>>> c0f8ae3b25 (Update to Go 1.22.5 (#40082))
 
 RUN \
     apt update \
