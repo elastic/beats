@@ -402,6 +402,7 @@ class Test(metricbeat.BaseTest):
             if sys.platform.startswith("windows"):
                 assert isinstance(summary["running"], int)
                 assert isinstance(summary["total"], int)
+        # make sure we receive events as well
         assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
@@ -456,6 +457,7 @@ class Test(metricbeat.BaseTest):
         # the 'cmdline' set.
         self.assertTrue(
             found_cmdline, "cmdline not found in any process events")
+        # make sure we receive events as well
         assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
@@ -522,6 +524,7 @@ class Test(metricbeat.BaseTest):
         if not sys.platform.startswith("darwin"):
             self.assertTrue(found_fd, "fd not found in any process events")
 
+        # make sure we receive events as well
         assert not only_errors_encountered
         self.assertTrue(found_env, "env not found in any process events")
         self.assertTrue(
