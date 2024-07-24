@@ -355,7 +355,7 @@ func (b GolangCrossBuilder) Build() error {
 		)
 	} else if strings.HasPrefix(b.Platform, "linux/") && b.UseHostPlatform {
 		args = append(args,
-			"--platform", "linux/"+runtime.GOARCH,
+			"--platform", dockerHostPlatform(),
 		)
 	}
 
@@ -369,6 +369,16 @@ func (b GolangCrossBuilder) Build() error {
 	)
 
 	return dockerRun(args...)
+}
+
+func dockerHostPlatform() string {
+	os := runtime.GOOS
+	// darwin docker runs inside a linux vm
+	if os == "darwin" {
+		os = "linux"
+	}
+
+	return os + "/" + runtime.GOARCH
 }
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must
