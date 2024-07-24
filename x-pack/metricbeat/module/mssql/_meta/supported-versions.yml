@@ -1,2 +1,2 @@
 variants:
-  - MSSQL_VERSION: 2017-GA-ubuntu
+  - MSSQL_VERSION: 2017-CU31-GDR2-ubuntu-18.04
