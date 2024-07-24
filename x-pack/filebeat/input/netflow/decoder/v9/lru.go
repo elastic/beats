@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"container/heap"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -49,7 +48,6 @@ func (h *pendingEventsHeap) Pop() any {
 type pendingTemplatesCache struct {
 	mtx     sync.RWMutex
 	wg      sync.WaitGroup
-	isEmpty atomic.Bool
 	hp      pendingEventsHeap
 	started bool
 	events  map[SessionKey][]*bytes.Buffer
@@ -65,18 +63,17 @@ func newPendingTemplatesCache() *pendingTemplatesCache {
 
 // GetAndRemove returns all events for a given session key and removes them from the cache
 func (h *pendingTemplatesCache) GetAndRemove(key SessionKey) []*bytes.Buffer {
-	if h.isEmpty.Load() {
+	h.mtx.Lock()
+	defer h.mtx.Unlock()
+	if len(h.events) == 0 {
 		return nil
 	}
 
-	h.mtx.Lock()
-	defer h.mtx.Unlock()
 	events, ok := h.events[key]
 	if !ok {
 		return nil
 	}
 	delete(h.events, key)
-	h.isEmpty.Store(len(h.events) == 0)
 	return events
 }
 
@@ -87,7 +84,6 @@ func (h *pendingTemplatesCache) Add(key SessionKey, events *bytes.Buffer) {
 
 	h.events[key] = append(h.events[key], events)
 	h.hp.Push(eventWithMissingTemplate{key: key, entryTime: time.Now()})
-	h.isEmpty.Store(false)
 }
 
 // start starts the pending templates cache cleaner
@@ -154,8 +150,6 @@ func (h *pendingTemplatesCache) cleanup(removalThreshold time.Duration) {
 			break
 		}
 	}
-
-	h.isEmpty.Store(len(h.events) == 0)
 }
 
 // stop stops the pending templates cache cleaner
