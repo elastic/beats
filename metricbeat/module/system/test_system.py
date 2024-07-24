@@ -529,7 +529,6 @@ class Test(metricbeat.BaseTest):
         self.assertTrue(found_env, "env not found in any process events")
         self.assertTrue(
             found_cwd, "working_directory not found in any process events")
-        
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process_metricbeat(self):
