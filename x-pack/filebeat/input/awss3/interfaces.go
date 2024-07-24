@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"sync"
 	"time"
 
 	smithyhttp "github.com/aws/smithy-go/transport/http"
@@ -229,6 +230,19 @@ func (a *awsSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAt
 
 type awsS3API struct {
 	client *s3.Client
+
+	// others is the set of other clients referred
+	// to by notifications seen by API the connection.
+	// The number of cached elements is limited to
+	// awsS3APIcacheMax.
+	mu     sync.RWMutex
+	others map[string]*s3.Client
+}
+
+const awsS3APIcacheMax = 100
+
+func newAWSs3API(cli *s3.Client) *awsS3API {
+	return &awsS3API{client: cli, others: make(map[string]*s3.Client)}
 }
 
 func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
@@ -294,8 +308,40 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	if opts.Region == region {
 		return a.client
 	}
+	// Use a cached client if we have already seen this region.
+	a.mu.RLock()
+	cli, ok := a.others[region]
+	a.mu.RUnlock()
+	if ok {
+		return cli
+	}
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Check that another writer did not beat us here.
+	cli, ok = a.others[region]
+	if ok {
+		// ... they did.
+		return cli
+	}
+
+	// Otherwise create a new client and cache it.
 	opts.Region = region
-	return s3.New(opts)
+	cli = s3.New(opts)
+	// We should never be in the situation that the cache
+	// grows unbounded, but ensure this is the case.
+	if len(a.others) >= awsS3APIcacheMax {
+		// Do a single iteration delete to perform a
+		// random cache eviction.
+		for r := range a.others {
+			delete(a.others, r)
+			break
+		}
+	}
+	a.others[region] = cli
+
+	return cli
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
