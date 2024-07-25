@@ -36,6 +36,8 @@ updates:
       - dependency-name: github.com/elastic/toutoumomoma
       - dependency-name: github.com/elastic/ebpfevents
       # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
+      # AWS SDK dependencies
+      - dependency-name: github.com/aws/aws-sdk-go-v2/*
       # Azure SDK dependencies
       - dependency-name: github.com/Azure/azure-sdk-for-go/*
       - dependency-name: github.com/Azure/azure-event-hubs-go/*
