@@ -232,7 +232,7 @@ type awsS3API struct {
 	client *s3.Client
 
 	// others is the set of other clients referred
-	// to by notifications seen by API the connection.
+	// to by notifications seen by the API connection.
 	// The number of cached elements is limited to
 	// awsS3APIcacheMax.
 	mu     sync.RWMutex
