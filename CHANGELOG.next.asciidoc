@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update Go version to 1.22.5. {pull}40082[40082]
+Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull}40096[40096]
 
 *Auditbeat*
 
@@ -50,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
 
 *Packetbeat*
 
