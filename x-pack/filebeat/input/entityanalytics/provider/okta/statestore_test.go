@@ -104,11 +104,11 @@ func TestStateStore(t *testing.T) {
 					Type: map[string]interface{}{
 						"id": "typeid",
 					},
-					Profile: okta.Profile{
-						Login:     "name.surname@example.com",
-						Email:     "name.surname@example.com",
-						FirstName: ptr("name"),
-						LastName:  ptr("surname"),
+					Profile: map[string]interface{}{
+						"login":     "name.surname@example.com",
+						"email":     "name.surname@example.com",
+						"firstName": "name",
+						"lastName":  "surname",
 					},
 					Credentials: &okta.Credentials{
 						Password: &struct{}{}, // Had a password: not retained.

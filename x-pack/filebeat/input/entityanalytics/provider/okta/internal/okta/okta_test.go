@@ -117,14 +117,15 @@ func Test(t *testing.T) {
 			})
 
 			t.Run("user", func(t *testing.T) {
-				if me.Profile.Login == "" {
+				login, _ := me.Profile["login"].(string)
+				if login == "" {
 					b, _ := json.Marshal(me)
 					t.Skipf("cannot run user test without profile.login field set: %s", b)
 				}
 
 				query := make(url.Values)
 				query.Set("limit", "200")
-				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, me.Profile.Login, query, omit, limiter, window, logger)
+				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, login, query, omit, limiter, window, logger)
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
 				}
@@ -132,7 +133,7 @@ func Test(t *testing.T) {
 					t.Fatalf("unexpected len(users): got:%d want:1", len(users))
 				}
 				if !cmp.Equal(me, users[0]) {
-					t.Errorf("unexpected result:\n-'me'\n+'%s'\n%s", me.Profile.Login, cmp.Diff(me, users[0]))
+					t.Errorf("unexpected result:\n-'me'\n+'%s'\n%s", login, cmp.Diff(me, users[0]))
 				}
 			})
 
