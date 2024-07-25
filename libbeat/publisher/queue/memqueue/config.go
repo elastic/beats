@@ -22,30 +22,46 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
-	Events int `config:"events" validate:"min=32"`
-	// This field is named MaxGetRequest because its logical effect is to give
+	Events *int              `config:"events" validate:"min=32"`
+	Bytes  *cfgtype.ByteSize `config:"bytes"`
+
+	// This field is named MaxGetEvents because its logical effect is to give
 	// a maximum on the number of events a Get request can return, but the
 	// user-exposed name is "flush.min_events" for backwards compatibility,
 	// since it used to control buffer size in the internal buffer chain.
-	MaxGetRequest int           `config:"flush.min_events" validate:"min=0"`
-	FlushTimeout  time.Duration `config:"flush.timeout"`
+	// Ignored if a byte limit is set in the queue or the get request.
+	MaxGetEvents int           `config:"flush.min_events" validate:"min=0"`
+	FlushTimeout time.Duration `config:"flush.timeout"`
+}
+
+const minQueueBytes = 32768
+const minQueueEvents = 32
+const defaultMaxQueueEvents = 3200
+
+func (c *config) Validate() error {
+	if c.Bytes != nil && *c.Bytes < minQueueBytes {
+		return fmt.Errorf("queue byte size must be at least %v", minQueueBytes)
+	}
+	if c.Events != nil && *c.Events < minQueueEvents {
+		return fmt.Errorf("queue event size must be at least %v", minQueueEvents)
+	}
+	if c.Events != nil && c.Bytes != nil {
+		return errors.New("memory queue can only have an event limit or a byte limit, not both")
+	}
+	if c.Events != nil && c.MaxGetEvents > *c.Events {
+		return errors.New("flush.min_events must be less than events")
+	}
+	return nil
 }
 
 var defaultConfig = config{
-	Events:        3200,
-	MaxGetRequest: 1600,
-	FlushTimeout:  10 * time.Second,
-}
-
-func (c *config) Validate() error {
-	if c.MaxGetRequest > c.Events {
-		return errors.New("flush.min_events must be less events")
-	}
-	return nil
+	MaxGetEvents: 1600,
+	FlushTimeout: 10 * time.Second,
 }
 
 // SettingsForUserConfig unpacks a ucfg config from a Beats queue
@@ -57,10 +73,20 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
 		}
 	}
-	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
-	return Settings{
-		Events:        config.Events,
-		MaxGetRequest: config.MaxGetRequest,
+	result := Settings{
+		MaxGetRequest: config.MaxGetEvents,
 		FlushTimeout:  config.FlushTimeout,
-	}, nil
+	}
+
+	if config.Events != nil {
+		result.Events = *config.Events
+	}
+	if config.Bytes != nil {
+		result.Bytes = int(*config.Bytes)
+	}
+	// If no size constraint was given, fall back on the default event cap
+	if config.Events == nil && config.Bytes == nil {
+		result.Events = defaultMaxQueueEvents
+	}
+	return result, nil
 }
