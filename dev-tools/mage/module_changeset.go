@@ -21,19 +21,21 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 )
 
 func DefineModules() {
-	beatPath := os.Getenv("BEAT_PATH")
-	if beatPath == "" {
-		panic(fmt.Errorf("argument required: beatPath"))
+	if mg.Verbose() {
+		fmt.Printf("Detecting changes in modules\n")
 	}
 
-	var modulePattern string
-	modulePattern = fmt.Sprintf("^%s\\/module\\/([^\\/]+)\\/.*", beatPath)
+	beatPath := os.Getenv("BEAT_PATH")
+
+	var modulePattern = fmt.Sprintf("^%s\\/module\\/([^\\/]+)\\/.*", beatPath)
 
 	moduleRegex, err := regexp.Compile(modulePattern)
 	if err != nil {
@@ -57,7 +59,14 @@ func DefineModules() {
 		i++
 	}
 
-	err = os.Setenv("MODULE", strings.Join(keys, ","))
+	moduleVar := strings.Join(keys, ",")
+
+	err = os.Setenv("MODULE", moduleVar)
+	if err != nil {
+		return
+	}
+
+	_, _ = fmt.Fprintf(os.Stderr, "Detected changes in module(s): %s\n", moduleVar)
 }
 
 func isAsciiOrPng(file string) bool {
@@ -66,14 +75,13 @@ func isAsciiOrPng(file string) bool {
 
 func getDiff() []string {
 	commitRange := getCommitRange()
-	cmd := exec.Command("git", "diff", "--name-only", commitRange)
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("Failed to execute 'git diff --name-only %s': %s", commitRange, err)
-		os.Exit(1)
+	var output, _ = sh.Output("git", "diff", "--name-only", commitRange)
+
+	if mg.Verbose() {
+		_ = fmt.Sprintf("Git Diff result: %s\n", output)
 	}
 
-	return strings.Split(string(output), "\n")
+	return strings.Split(output, "\n")
 }
 
 func getFromCommit() string {
@@ -94,18 +102,20 @@ func getFromCommit() string {
 		return previousCommit
 	}
 
+	if mg.Verbose() {
+		_ = fmt.Sprintf("Git from commit: %s", commit)
+	}
+
 	return commit
 }
 
 func getPreviousCommit() string {
-	cmd := exec.Command("git", "rev-parse", "HEAD^")
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Println("Failed to execute 'git rev-parse HEAD^': ", err)
-		os.Exit(1)
+	var output, _ = sh.Output("git", "rev-parse", "HEAD^")
+	if mg.Verbose() {
+		_ = fmt.Sprintf("Git previous commit: %s\n", output)
 	}
 
-	return strings.TrimSpace(string(output))
+	return strings.TrimSpace(output)
 }
 
 func getCommitRange() string {
