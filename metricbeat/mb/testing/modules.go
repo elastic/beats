@@ -53,7 +53,6 @@ that Metricbeat does it and with the same validations.
 		}
 	}
 */
-
 package testing
 
 import (
@@ -61,7 +60,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/timed"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -74,11 +72,9 @@ type TestModule struct {
 	RawConfig *conf.C
 }
 
-func (m *TestModule) Name() string                              { return m.ModName }
-func (m *TestModule) Config() mb.ModuleConfig                   { return m.ModConfig }
-func (m *TestModule) UnpackConfig(to interface{}) error         { return m.RawConfig.Unpack(to) }
-func (m *TestModule) UpdateStatus(_ status.Status, _ string)    {}
-func (m *TestModule) SetStatusReporter(_ status.StatusReporter) {}
+func (m *TestModule) Name() string                      { return m.ModName }
+func (m *TestModule) Config() mb.ModuleConfig           { return m.ModConfig }
+func (m *TestModule) UnpackConfig(to interface{}) error { return m.RawConfig.Unpack(to) }
 
 func NewTestModule(t testing.TB, config interface{}) *TestModule {
 	c, err := conf.NewConfigFrom(config)
