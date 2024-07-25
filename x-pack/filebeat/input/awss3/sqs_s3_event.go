@@ -305,15 +305,17 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 }
 
 func convertEventBridge(eventBridgeEvent *eventBridgeEvent, s3Events *s3EventsV2) {
-	s3Events.Records = append(s3Events.Records, convertEventBridgeEvent(eventBridgeEvent))
+	for _, resource := range eventBridgeEvent.Resources {
+		s3Events.Records = append(s3Events.Records, convertEventBridgeEvent(resource, eventBridgeEvent))
+	}
 }
 
-func convertEventBridgeEvent(message *eventBridgeEvent) s3EventV2 {
+func convertEventBridgeEvent(resource string, message *eventBridgeEvent) s3EventV2 {
 	var event = s3EventV2{}
 	if message.DetailType == "Object Created" {
 		event.SetEventName("ObjectCreated:Put")
 	}
-	event.SetS3BucketARN(message.Resources[0])
+	event.SetS3BucketARN(resource)
 	event.SetAWSRegion(message.Region)
 	if message.Source == "aws.s3" {
 		event.SetEventSource("aws:s3")
