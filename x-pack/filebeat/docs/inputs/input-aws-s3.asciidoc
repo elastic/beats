@@ -266,7 +266,13 @@ The default is `10 MiB`.
 ==== `max_number_of_messages`
 
 The maximum number of SQS messages that can be inflight at any time. Defaults
-to 5.
+to 5. When processing large amount of large size S3 objects and each object has
+large amount of events, if this parameter sets too high, it can cause the input
+to process too many messages concurrently, overload the agent and cause ingest failure.
+We recommend to keep the default value 5 and use the
+{fleet-guide}/es-output-settings.html#es-output-settings-performance-tuning-settings[preset]
+option to tune your Elastic Agent performance. You can optimize for throughput,
+scale, latency, or you can choose a balanced (the default) set of performance specifications.
 
 [id="input-{type}-parsers"]
 [float]
