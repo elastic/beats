@@ -20,6 +20,7 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -111,7 +112,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// monitor either a single PID, or the configured set of processes.
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
-		if err != nil {
+		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
+			// return only if the error is fatal in nature
 			return fmt.Errorf("process stats: %w", err)
 		}
 
@@ -121,9 +123,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				RootFields:      roots[evtI],
 			})
 			if !isOpen {
-				return nil
+				return err
 			}
 		}
+		return err
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
 		if err != nil {

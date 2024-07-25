@@ -275,7 +275,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metricreport.EphemeralID(),
+			EphemeralID:     uuid.UUID(metricreport.EphemeralID()),
 		},
 		Fields: fields,
 	}
