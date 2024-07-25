@@ -20,6 +20,8 @@ import (
 )
 
 func TestStateStore(t *testing.T) {
+	logp.TestingSetup()
+
 	lastSync, err := time.Parse(time.RFC3339Nano, "2023-01-12T08:47:23.296794-05:00")
 	if err != nil {
 		t.Fatalf("failed to parse lastSync")
