@@ -35,18 +35,23 @@ updates:
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
       - dependency-name: github.com/elastic/ebpfevents
+      # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
+      # Azure SDK dependencies
+      - dependency-name: github.com/Azure/azure-sdk-for-go/*
+      - dependency-name: github.com/Azure/azure-event-hubs-go/*
+      - dependency-name: github.com/Azure/azure-storage-blob-go/*
+      - dependency-name: github.com/Azure/go-autorest/*
+      # GCP SDK dependencies
+      - dependency-name: cloud.google.com/go/*
     groups:
       # Cloud providers' SDK dependencies
       azure-sdks:
         patterns:
-          - "github.com/Azure/azure-sdk-for-go/*"
-          - "github.com/Azure/azure-event-hubs-go/*"
+          - "github.com/Azure/azure-*-go"
           - "github.com/Azure/go-autorest/*"
-          - "github.com/Azure/azure-storage-blob-go/*"
       gcp-sdks:
         patterns:
           - "cloud.google.com/go/*"
-          - "google.golang.org/*"
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
