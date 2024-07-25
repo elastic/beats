@@ -38,6 +38,9 @@ const OutputRegName = "output"
 // APMRegName is the registation name for APM tracing.
 const APMRegName = "apm"
 
+// GlobalProcessorRegName is the registration name for global processors config
+const GlobalProcessorRegName = "global_processors"
+
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
 	// Config to store
@@ -157,6 +160,14 @@ func (r *Registry) MustRegisterAPM(list Reloadable) {
 	}
 }
 
+// MustRegisterGlobalProcessors is a V2-specific registration function
+// that declares a reloadable global processor configuration
+func (r *Registry) MustRegisterGlobalProcessors(obj Reloadable) {
+	if err := r.Register(GlobalProcessorRegName, obj); err != nil {
+		panic(err)
+	}
+}
+
 // GetInputList is a V2-specific function
 // That returns the reloadable list created for an input
 func (r *Registry) GetInputList() ReloadableList {
@@ -179,6 +190,14 @@ func (r *Registry) GetReloadableAPM() Reloadable {
 	r.RLock()
 	defer r.RUnlock()
 	return r.confs[APMRegName]
+}
+
+// GetReloadableGlobalProcessors is a V2-specific function
+// That returns the reloader for the registered global processor reloadable object
+func (r *Registry) GetReloadableGlobalProcessors() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[GlobalProcessorRegName]
 }
 
 // GetRegisteredNames returns the list of names registered

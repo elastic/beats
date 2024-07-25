@@ -29,6 +29,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type clientUnregisterer interface {
+	UnregisterClient(*client)
+}
+
 // client connects a beat with the processors and pipeline queue.
 type client struct {
 	logger     *logp.Logger
