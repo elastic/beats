@@ -14,7 +14,7 @@ env:
   
   # ID values for the Area property + its options
   AREA_FIELD_ID: 'PVTSSF_lADOAGc3Zs4AEzn4zgEgZSo'
-  ELASTIC_AGENT_OPTION_ID: 'c1e1a30a'
+  DATA_PLANE_OPTION_ID: '4f6b61c3'
   
 permissions:
   contents: read
@@ -54,6 +54,6 @@ jobs:
           item_id: ${{ fromJSON(steps.add_to_project.outputs.data).addProjectV2ItemById.item.id }}
           project_id: ${{ env.INGEST_PROJECT_ID }}
           area_field_id: ${{ env.AREA_FIELD_ID }}
-          area_id: ${{ env.ELASTIC_AGENT_OPTION_ID }}
+          area_id: ${{ env.DATA_PLANE_OPTION_ID }}
         env:
           GITHUB_TOKEN: ${{ secrets.PROJECT_ASSIGNER_TOKEN }}
