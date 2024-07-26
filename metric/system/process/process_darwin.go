@@ -34,7 +34,6 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -74,8 +73,6 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	procMap := make(ProcsMap, num)
 	plist := make([]ProcState, 0, num)
-	var wrappedErr error
-	var err error
 
 	for i := 0; i < num; i++ {
 		if err := binary.Read(bbuf, binary.LittleEndian, &pid); err != nil {
@@ -85,11 +82,10 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		if pid == 0 {
 			continue
 		}
-		procMap, plist, err = procStats.pidIter(int(pid), procMap, plist)
-		wrappedErr = errors.Join(wrappedErr, err)
+		procMap, plist = procStats.pidIter(int(pid), procMap, plist)
 	}
 
-	return procMap, plist, toNonFatal(wrappedErr)
+	return procMap, plist, nil
 }
 
 // GetInfoForPid returns basic info for the process
@@ -102,9 +98,9 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	// For docs, see the link below. Check the `proc_taskallinfo` struct, which
 	// is a composition of `proc_bsdinfo` and `proc_taskinfo`.
 	// https://opensource.apple.com/source/xnu/xnu-1504.3.12/bsd/sys/proc_info.h.auto.html
-	n, err := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
+	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
 	if n != size {
-		return ProcState{}, fmt.Errorf("could not read process info for pid %d: proc_pidinfo returned %d, err: %w", pid, int(n), err)
+		return ProcState{}, fmt.Errorf("could not read process info for pid %d: proc_pidinfo returned %d", pid, int(n))
 	}
 
 	status := ProcState{}

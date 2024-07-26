@@ -46,7 +46,6 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	pid := C.pid_t(0)
 
 	procMap := make(ProcsMap, 0)
-	var wrappedErr err
 	var plist []ProcState
 	for {
 		// getprocs first argument is a void*
@@ -54,14 +53,13 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		if err != nil {
 			return nil, nil, fmt.Errorf("error fetching PIDs: %w", err)
 		}
-		procMap, plist, err = procStats.pidIter(int(pid), procMap, plist)
-		wrappedErr = errors.Join(wrappedErr, err)
+		procMap, plist = procStats.pidIter(int(info.pi_pid), procMap, plist)
 
 		if num == 0 {
 			break
 		}
 	}
-	return procMap, plist, toNonFatal(wrappedErr)
+	return procMap, plist, nil
 }
 
 // GetInfoForPid returns basic info for the process
