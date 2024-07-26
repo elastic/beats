@@ -38,6 +38,8 @@ updates:
       # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
       # AWS SDK dependencies
       - dependency-name: github.com/aws/aws-sdk-go-v2/*
+      - dependency-name: github.com/aws/aws-lambda-go/*
+      - dependency-name: github.com/aws/smithy-go/*
       # Azure SDK dependencies
       - dependency-name: github.com/Azure/azure-sdk-for-go/*
       - dependency-name: github.com/Azure/azure-event-hubs-go/*
