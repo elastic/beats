@@ -6,12 +6,11 @@ package azure
 
 import (
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -119,19 +118,46 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	return nil
 }
 
+// buildTimespan returns the timespan for the metric values.
+func buildTimespan(referenceTime time.Time, timeGrain string, collectionPeriod time.Duration) string {
+	//interval := period
+	//
+	//// Some metrics have a high latency, so we need to fetch the data
+	//// with a larger interval.
+	//if t := convertTimeGrainToDuration(timeGrain); t > interval {
+	//	interval = t
+	//}
+
+	interval := max(collectionPeriod, convertTimeGrainToDuration(timeGrain))
+
+	endTime := referenceTime
+	startTime := endTime.Add(interval * -1)
+
+	return fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
+}
+
 // GetMetricValues returns the metric values for the given cloud resources.
 func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
 	var result []Metric
 
-	// Same end time for all metrics in the same batch.
-	interval := client.Config.Period
-
-	// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-	endTime := referenceTime.Add(interval * (-1))
-	startTime := endTime.Add(interval * (-1))
-	timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 	for _, metric := range metrics {
+		//// Same end time for all metrics in the same batch.
+		//interval := client.Config.Period
+		//
+		//// Some metrics have a high latency, so we need to fetch the data
+		//// with a larger interval.
+		//if t := convertTimeGrainToDuration(metric.TimeGrain); t > interval*2 {
+		//	interval = t
+		//}
+		//
+		//// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
+		//endTime := referenceTime.Add(interval * (-1))
+		//startTime := endTime.Add(interval * (-1))
+		//
+		//timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
+
+		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config.Period)
+
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
