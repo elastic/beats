@@ -80,7 +80,7 @@ of traffic.
 
 The number of workers to read and decode concurrently netflow packets.
 Default is `1`. Note that in order to maximize the performance gains of multiple
-workers you also have to increase the number of output workers.
+workers it is advised to switch the output to `throughput` preset (https://www.elastic.co/guide/en/beats/filebeat/current/elasticsearch-output.html#_preset[link]).
 
 [float]
 [[custom_definitions]]
