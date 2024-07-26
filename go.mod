@@ -75,7 +75,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.14.0
+	github.com/elastic/go-sysinfo v1.14.1
 	github.com/elastic/go-ucfg v0.8.8
 	github.com/elastic/gosigar v0.14.3
 	github.com/fatih/color v1.16.0
@@ -194,7 +194,7 @@ require (
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.7.0
 	github.com/elastic/elastic-agent-libs v0.9.15
-	github.com/elastic/elastic-agent-system-metrics v0.10.3
+	github.com/elastic/elastic-agent-system-metrics v0.10.6
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
 	github.com/elastic/mito v1.15.0
