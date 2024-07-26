@@ -133,12 +133,12 @@ func (Dev) Package() {
 
 // InstallGoLicenser install go-licenser to check license of the files.
 func (Prepare) InstallGoLicenser() error {
-	return GoGet(goLicenserRepo)
+	return GoInstall(goLicenserRepo)
 }
 
 // InstallGoLint for the code.
 func (Prepare) InstallGoLint() error {
-	return GoGet(goLintRepo)
+	return GoInstall(goLintRepo)
 }
 
 // All build all the things for the current projects.
@@ -424,9 +424,9 @@ func RunGo(args ...string) error {
 	return sh.RunV(mg.GoCmd(), args...)
 }
 
-// GoGet fetch a remote dependencies.
-func GoGet(link string) error {
-	_, err := sh.Exec(map[string]string{"GO111MODULE": "off"}, os.Stdout, os.Stderr, "go", "get", link)
+// GoInstall installs a tool by calling `go install <link>
+func GoInstall(link string) error {
+	_, err := sh.Exec(map[string]string{}, os.Stdout, os.Stderr, "go", "install", link)
 	return err
 }
 

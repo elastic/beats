@@ -66,7 +66,7 @@ require (
 	github.com/elastic/elastic-agent-client/v7 v7.8.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.1
-	github.com/elastic/go-licenser v0.4.0
+	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
