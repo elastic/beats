@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -123,8 +122,4 @@ func (mr *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 
 func (mr *runner) String() string {
 	return fmt.Sprintf("%s [metricsets=%d]", mr.mod.Name(), len(mr.mod.metricSets))
-}
-
-func (mr *runner) SetStatusReporter(reporter status.StatusReporter) {
-	mr.mod.SetStatusReporter(reporter)
 }
