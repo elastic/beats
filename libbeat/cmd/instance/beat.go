@@ -264,6 +264,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 		return nil, err
 	}
 
+	eid, err := uuid.FromString(metricreport.EphemeralID().String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate EphemeralID from UUID string: %w", err)
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:            name,
@@ -275,7 +280,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metricreport.EphemeralID(),
+			EphemeralID:     eid,
 		},
 		Fields: fields,
 	}
