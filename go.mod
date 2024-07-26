@@ -7,7 +7,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.9.13
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-structform v0.0.9
-	github.com/elastic/go-sysinfo v1.14.0
+	github.com/elastic/go-sysinfo v1.14.1
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/gofrs/uuid/v5 v5.2.0

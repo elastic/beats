@@ -18,6 +18,8 @@
 package host
 
 import (
+	"strings"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-sysinfo"
@@ -33,7 +35,7 @@ func MapHostInfo(info types.HostInfo, fqdn string) mapstr.M {
 
 	data := mapstr.M{
 		"host": mapstr.M{
-			"name":         name,
+			"name":         strings.ToLower(name),
 			"hostname":     info.Hostname,
 			"architecture": info.Architecture,
 			"os": mapstr.M{

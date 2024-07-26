@@ -46,7 +46,7 @@ func TestMapHostInfo(t *testing.T) {
 		Architecture:      "x86_64",
 		BootTime:          bootTime,
 		Containerized:     &containerized,
-		Hostname:          "foo",
+		Hostname:          "fOo",
 		IPs:               []string{"1.2.3.4", "192.168.1.1"},
 		KernelVersion:     "22.3.0",
 		MACs:              []string{"56:9c:17:54:19:15", "5c:e9:1e:c4:37:66"},
@@ -66,7 +66,7 @@ func TestMapHostInfo(t *testing.T) {
 				"host": mapstr.M{
 					"architecture":  "x86_64",
 					"containerized": true,
-					"hostname":      "foo",
+					"hostname":      "fOo",
 					"id":            "a39b4c1ee4",
 					"name":          "foo.bar.local",
 					"os": mapstr.M{
@@ -87,7 +87,7 @@ func TestMapHostInfo(t *testing.T) {
 				"host": mapstr.M{
 					"architecture":  "x86_64",
 					"containerized": true,
-					"hostname":      "foo",
+					"hostname":      "fOo",
 					"id":            "a39b4c1ee4",
 					"name":          "foo",
 					"os": mapstr.M{
