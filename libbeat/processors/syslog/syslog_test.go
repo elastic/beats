@@ -88,6 +88,9 @@ var syslogCases = map[string]struct {
 				},
 			},
 			"message": "this is the message",
+			"process": mapstr.M{
+				"name": "su",
+			},
 		},
 		wantTime: mustParseTime(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
 	},
@@ -124,6 +127,9 @@ var syslogCases = map[string]struct {
 						},
 					},
 				},
+			},
+			"process": mapstr.M{
+				"name": "evntslog",
 			},
 			"message": "this is the message",
 		},

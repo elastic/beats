@@ -215,6 +215,7 @@ func (m message) fields() mapstr.M {
 	}
 	if m.process != "" {
 		_, _ = f.Put("log.syslog.appname", m.process)
+		_, _ = f.Put("process.name", m.process)
 		if m.pid != "" {
 			_, _ = f.Put("log.syslog.procid", m.pid)
 		}
