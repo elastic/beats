@@ -29,6 +29,11 @@ import (
 )
 
 func DefineModules() {
+	// If MODULE is set in Buildkite pipeline step, skip variable further definition
+	if os.Getenv("MODULE") != "" {
+		return
+	}
+
 	if mg.Verbose() {
 		fmt.Printf("Detecting changes in modules\n")
 	}
