@@ -608,6 +608,9 @@ func TestMessage_Fields(t *testing.T) {
 						},
 					},
 				},
+				"process": mapstr.M{
+					"name": "su",
+				},
 				"message": "this is a test message",
 			},
 		},
@@ -642,6 +645,9 @@ func TestMessage_Fields(t *testing.T) {
 						"msgid":    "msg123",
 						"version":  "1",
 					},
+				},
+				"process": mapstr.M{
+					"name": "su",
 				},
 				"message": `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
 			},
@@ -678,6 +684,9 @@ func TestMessage_Fields(t *testing.T) {
 						"msgid":    "msg123",
 						"version":  "1",
 					},
+				},
+				"process": mapstr.M{
+					"name": "su",
 				},
 				"message": `[action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"] This is a test message`,
 			},

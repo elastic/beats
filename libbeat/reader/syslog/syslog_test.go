@@ -111,6 +111,9 @@ func TestNewParser(t *testing.T) {
 								},
 							},
 						},
+						"process": mapstr.M{
+							"name": "evntslog",
+						},
 						"message": "this is the message",
 					},
 				},
@@ -133,6 +136,9 @@ func TestNewParser(t *testing.T) {
 								"appname":  "su",
 								"procid":   "1024",
 							},
+						},
+						"process": mapstr.M{
+							"name": "su",
 						},
 						"message": "this is the message",
 					},
