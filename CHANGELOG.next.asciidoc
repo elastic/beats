@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Heartbeat*
 
@@ -43,14 +42,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
-- Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 
 *Heartbeat*
 
 
 *Metricbeat*
 
-- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
 
 *Packetbeat*
 
@@ -67,7 +64,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.12. {pull}40113[40113]
 
 *Auditbeat*
 
@@ -113,6 +109,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
