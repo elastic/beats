@@ -93,7 +93,7 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 	return nil
 }
 
-// checkAndMigratePartition checks if the v1 checkpoint information for the
+// checkAndMigratePartition checks if the v1 checkpoint information for the `partitionID` exists
 // `partitionID` partition.
 func (m *migrationAssistant) checkAndMigratePartition(
 	ctx context.Context,
@@ -132,7 +132,7 @@ func (m *migrationAssistant) checkAndMigratePartition(
 
 	// 4KB buffer should be enough to read
 	// the checkpoint v1 information.
-	buff := [4000]byte{}
+	buff := [4096]byte{}
 
 	size, err := cln.DownloadBuffer(ctx, buff[:], nil)
 	if err != nil {
