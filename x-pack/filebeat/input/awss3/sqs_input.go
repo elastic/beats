@@ -103,9 +103,7 @@ func (in *sqsReaderInput) setup(
 		longPollWaitTime:  in.config.SQSWaitTime,
 	}
 
-	in.s3 = &awsS3API{
-		client: s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier),
-	}
+	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
 
