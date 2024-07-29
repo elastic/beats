@@ -45,7 +45,7 @@ steps:
         command: |
           set -euo pipefail
           echo "~~~ Downloading artifacts"
-          buildkite-agent artifact download x-pack/agentbeat/build/distributions/**/* . --step 'agentbeat-package-linux'
+          buildkite-agent artifact download x-pack/agentbeat/build/distributions/** . --step 'agentbeat-package-linux'
           ls -lah x-pack/agentbeat/build/distributions/
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
@@ -68,4 +68,4 @@ steps:
           disk_type: "pd-ssd"
         notify:
           - github_commit_status:
-              context: "agentbeat: Packaging Linux arm64"
+              context: "agentbeat: Integration tests"
