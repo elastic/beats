@@ -103,8 +103,15 @@ func (m *migrationAssistant) checkAndMigratePartition(
 	eventHubName,
 	consumerGroup string) error {
 
-	// v2 checkpoint information path
-	// mbranca-general.servicebus.windows.net/sdh4552/$Default/checkpoint/0
+	// Build the blob path (in the v2 checkpoint format) for the partition `partitionID`
+	// using the fully qualified namespace, event hub name, consumer group, and partition ID.
+	//
+	// The blob path is in the format:
+	//     {fullyQualifiedNamespace}/{eventHubName}/{consumerGroup}/checkpoint/{partitionID}
+	//
+	// Here is an example of the blob path:
+	//     mbranca-general.servicebus.windows.net/mbrancalogs/$Default/checkpoint/0
+	//
 	blob := fmt.Sprintf("%s/%s/%s/checkpoint/%s", fullyQualifiedNamespace, eventHubName, consumerGroup, partitionID)
 
 	// Check if v2 checkpoint information exists
