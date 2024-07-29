@@ -66,12 +66,14 @@ func DefineModules() {
 
 	moduleVar := strings.Join(keys, ",")
 
-	err = os.Setenv("MODULE", moduleVar)
-	if err != nil {
-		return
-	}
+	if moduleVar != "" {
+		err = os.Setenv("MODULE", moduleVar)
+		if err != nil {
+			return
+		}
 
-	_, _ = fmt.Fprintf(os.Stderr, "Detected changes in module(s): %s\n", moduleVar)
+		_, _ = fmt.Fprintf(os.Stderr, "Detected changes in module(s): %s\n", moduleVar)
+	}
 }
 
 func isAsciiOrPng(file string) bool {
