@@ -22,6 +22,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
+- Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
+
 *Osquerybeat*
 
 
