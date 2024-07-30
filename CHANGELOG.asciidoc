@@ -7,19 +7,12 @@
 === Beats version 7.17.23
 https://github.com/elastic/beats/compare/v7.17.22\...v7.17.23[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-*Filebeat*
-
-- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
-
 ==== Bugfixes
 
 *Filebeat*
 
 - Upgrade github.com/hashicorp/go-retryablehttp version. {pull}40036[40036]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Metricbeat*
 
