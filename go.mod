@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.21
+go 1.22.5
 
 require (
 	cloud.google.com/go/bigquery v1.52.0
@@ -66,7 +66,7 @@ require (
 	github.com/elastic/elastic-agent-client/v7 v7.8.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.3.1
-	github.com/elastic/go-licenser v0.4.0
+	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v0.3.0
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
@@ -119,7 +119,7 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/miekg/dns v1.1.41
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v1.1.0
@@ -224,7 +224,7 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/containerd/containerd v1.5.13 // indirect
+	github.com/containerd/containerd v1.5.18 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect

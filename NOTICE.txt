@@ -7229,11 +7229,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-licenser
-Version: v0.4.0
+Version: v0.4.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-licenser@v0.4.2/LICENSE:
 
 
                                  Apache License
@@ -26610,11 +26610,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.13
+Version: v1.5.18
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.13/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.18/LICENSE:
 
 
                                  Apache License
@@ -35321,11 +35321,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/matttproud/golang_protobuf_extensions
-Version: v1.0.2-0.20181231171920-c182affec369
+Version: v1.0.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/matttproud/golang_protobuf_extensions@v1.0.2-0.20181231171920-c182affec369/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/matttproud/golang_protobuf_extensions@v1.0.4/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
