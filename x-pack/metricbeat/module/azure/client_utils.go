@@ -222,28 +222,3 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 	}
 	return VmResource{}, false
 }
-
-// convertTimeGrainToDuration will convert azure timegrain options to actual duration values
-func convertTimeGrainToDuration(timegrain string) time.Duration {
-	var duration time.Duration
-	switch timegrain {
-	case "PT1M":
-		duration = time.Minute
-	case "PT5M":
-		duration = 5 * time.Minute
-	case "PT15M":
-		duration = 15 * time.Minute
-	case "PT30M":
-		duration = 30 * time.Minute
-	case "PT1H":
-		duration = time.Hour
-	case "PT6H":
-		duration = 6 * time.Hour
-	case "PT12H":
-		duration = 12 * time.Hour
-	case "PT1D":
-		duration = 24 * time.Hour
-	default:
-	}
-	return duration
-}
