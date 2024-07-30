@@ -41,9 +41,7 @@ linters:
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
-    - structcheck # finds unused struct fields
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
-    - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
@@ -102,7 +100,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.12"
+    go: "1.22.5"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -120,19 +118,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.12"
+    go: "1.22.5"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.12"
+    go: "1.22.5"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.12"
+    go: "1.22.5"
 
   gosec:
     excludes:

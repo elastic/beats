@@ -1,5 +1,5 @@
-FROM golang:1.21.12
-COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker /usr/local/bin/
+FROM golang:1.22.5
+COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
     apt update \

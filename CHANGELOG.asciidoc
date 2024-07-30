@@ -3,6 +3,28 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.23]]
+=== Beats version 7.17.23
+https://github.com/elastic/beats/compare/v7.17.22\...v7.17.23[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Upgrade github.com/hashicorp/go-retryablehttp version. {pull}40036[40036]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+
+*Metricbeat*
+
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+
+==== Added
+
+*Affecting all Beats*
+
+- Upgrade Go version to 1.21.12. {pull}40113[40113]
+
+
 [[release-notes-7.17.22]]
 === Beats version 7.17.22
 https://github.com/elastic/beats/compare/v7.17.21\...v7.17.22[View commits]

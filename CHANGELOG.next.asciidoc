@@ -10,12 +10,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update Go version to 1.22.5. {pull}40082[40082]
+Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull}40096[40096]
+- Update github.com/containerd/containerd version to v1.5.18 {pull}40096[40096]
 
 *Auditbeat*
 
 *Filebeat*
 
-- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
 *Heartbeat*
 
@@ -42,7 +44,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
-- Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 
 *Heartbeat*
 
@@ -65,7 +66,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.12. {pull}40113[40113]
 
 *Auditbeat*
 
@@ -111,6 +111,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
