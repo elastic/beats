@@ -31,7 +31,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
@@ -96,7 +96,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
@@ -111,7 +111,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -158,7 +158,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
@@ -221,7 +221,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         # Update both log files, only 1 change should be picked up
