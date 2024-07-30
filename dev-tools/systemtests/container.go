@@ -28,8 +28,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/stretchr/testify/assert"
@@ -165,7 +165,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 	require.NoError(tr.Runner, err)
 	defer apiClient.Close()
 
-	_, err = apiClient.ContainerList(ctx, types.ContainerListOptions{})
+	_, err = apiClient.ContainerList(ctx, container.ListOptions{})
 	if err != nil {
 		tr.Runner.Skipf("got error in container list, docker isn't installed or not running: %s", err)
 	}
@@ -208,7 +208,7 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 
 // createTestContainer creates a container with the given test path and test name
 func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *client.Client) container.CreateResponse {
-	reader, err := apiClient.ImagePull(ctx, tr.Container, types.ImagePullOptions{})
+	reader, err := apiClient.ImagePull(ctx, tr.Container, image.PullOptions{})
 	require.NoError(tr.Runner, err, "error pulling image")
 	defer reader.Close()
 
@@ -258,7 +258,7 @@ func (tr *DockerTestRunner) createTestContainer(ctx context.Context, apiClient *
 }
 
 func (tr *DockerTestRunner) runContainerTest(ctx context.Context, apiClient *client.Client, resp container.CreateResponse) RunResult {
-	err := apiClient.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
+	err := apiClient.ContainerStart(ctx, resp.ID, container.StartOptions{})
 	require.NoError(tr.Runner, err, "error starting container")
 
 	res := RunResult{}
@@ -271,7 +271,7 @@ func (tr *DockerTestRunner) runContainerTest(ctx context.Context, apiClient *cli
 		res.ReturnCode = status.StatusCode
 	}
 
-	out, err := apiClient.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+	out, err := apiClient.ContainerLogs(ctx, resp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
 	require.NoError(tr.Runner, err, "error fetching logs")
 
 	stdout := bytes.NewBufferString("")
