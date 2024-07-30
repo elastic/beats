@@ -65,9 +65,9 @@ func TestActions(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
-	skipOnBuildkiteWindows(t)
+	//skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
+	//skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -162,9 +162,9 @@ func TestExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
-	skipOnBuildkiteWindows(t)
+	//skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
+	//skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -214,9 +214,9 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
-	skipOnBuildkiteWindows(t)
+	//skipOnBuildkiteWindows(t)
 	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
-	skipOnBuildkiteDarwinArm(t)
+	//skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
