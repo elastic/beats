@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 - Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
 
 *Packetbeat*
 
@@ -317,6 +318,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
 - Add scaling up support for Netflow input. {issue}37761[37761] {pull}40122[40122]
 - Update CEL mito extensions to v1.15.0. {pull}40294[40294]
+- Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 
 *Auditbeat*
 
