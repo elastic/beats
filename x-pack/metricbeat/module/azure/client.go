@@ -122,14 +122,6 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 // buildTimespan returns the timespan for the metric values.
 func buildTimespan(referenceTime time.Time, timeGrain string, collectionPeriod time.Duration) string {
-	//interval := period
-	//
-	//// Some metrics have a high latency, so we need to fetch the data
-	//// with a larger interval.
-	//if t := convertTimeGrainToDuration(timeGrain); t > interval {
-	//	interval = t
-	//}
-
 	interval := max(collectionPeriod, convertTimeGrainToDuration(timeGrain))
 
 	endTime := referenceTime
@@ -143,21 +135,6 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	var result []Metric
 
 	for _, metric := range metrics {
-		//// Same end time for all metrics in the same batch.
-		//interval := client.Config.Period
-		//
-		//// Some metrics have a high latency, so we need to fetch the data
-		//// with a larger interval.
-		//if t := convertTimeGrainToDuration(metric.TimeGrain); t > interval*2 {
-		//	interval = t
-		//}
-		//
-		//// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		//endTime := referenceTime.Add(interval * (-1))
-		//startTime := endTime.Add(interval * (-1))
-		//
-		//timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config.Period)
 
 		//
