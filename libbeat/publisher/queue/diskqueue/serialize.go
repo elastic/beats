@@ -44,6 +44,7 @@ const (
 type eventEncoder struct {
 	buf                 bytes.Buffer
 	folder              *gotype.Iterator
+	typeCodecs          []any
 	serializationFormat SerializationFormat
 }
 
@@ -62,8 +63,16 @@ type entry struct {
 	Fields    mapstr.M
 }
 
-func newEventEncoder(format SerializationFormat) *eventEncoder {
-	e := &eventEncoder{}
+func newEventEncoder(format SerializationFormat, customTypeCodec ...any) *eventEncoder {
+	e := &eventEncoder{
+		typeCodecs: []any{
+			codec.MakeTimestampEncoder(),
+			codec.MakeBCTimestampEncoder(),
+		},
+	}
+	if len(customTypeCodec) > 0 {
+		e.typeCodecs = append(e.typeCodecs, customTypeCodec...)
+	}
 	e.serializationFormat = format
 	e.reset()
 	return e
@@ -78,10 +87,7 @@ func (e *eventEncoder) reset() {
 	// this case the options are hard-coded to fixed values, so they are
 	// guaranteed to be valid and we can safely proceed.
 	folder, _ := gotype.NewIterator(visitor,
-		gotype.Folders(
-			codec.MakeTimestampEncoder(),
-			codec.MakeBCTimestampEncoder(),
-		),
+		gotype.Folders(e.typeCodecs...),
 	)
 
 	e.folder = folder
