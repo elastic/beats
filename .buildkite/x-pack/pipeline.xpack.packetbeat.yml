@@ -160,7 +160,7 @@ steps:
 
       - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
-        skip: "skipping due to elastic/beats#38142"
+#        skip: "skipping due to elastic/beats#38142"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage systemTest
