@@ -7,7 +7,7 @@ set -euo pipefail
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
-    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
