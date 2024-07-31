@@ -17,8 +17,10 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/cespare/xxhash/v2"
@@ -481,26 +483,47 @@ func storePackages(bucket datastore.Bucket, packages []*Package) error {
 	return nil
 }
 
-func (ms *MetricSet) getPackages() (packages []*Package, err error) {
+func (ms *MetricSet) getPackages() ([]*Package, error) {
+	packages := []*Package{}
 	var foundPackageManager bool
-
-	_, err = os.Stat(rpmPath)
-	if err == nil {
+	_, statErr := os.Stat(rpmPath)
+	if statErr == nil {
 		foundPackageManager = true
 
-		rpmPackages, err := listRPMPackages()
-		if err != nil {
-			return nil, fmt.Errorf("error getting RPM packages: %w", err)
-		}
-		ms.log.Debugf("RPM packages: %v", len(rpmPackages))
+		pkgUpdate := make(chan []*Package)
+		pkgErr := make(chan error)
 
-		packages = append(packages, rpmPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", rpmPath, err)
+		go func(chUpdate chan []*Package, chErr chan error) {
+			// lock to a system thread and drop permissions
+			runtime.LockOSThread()
+			_, _, serr := syscall.Syscall(syscall.SYS_SETUID, 1000, 0, 0)
+			if serr != 0 {
+				ms.log.Infof("setuid failed, running as current user")
+			}
+			rpmPackages, err := listRPMPackages()
+			if err != nil {
+				//return nil, fmt.Errorf("error getting RPM packages: %w", err)
+				ms.log.Infof("error listing RPM packages: %w", err)
+				pkgErr <- err
+			}
+			pkgUpdate <- rpmPackages
+			ms.log.Debugf("RPM packages: %v", len(rpmPackages))
+		}(pkgUpdate, pkgErr)
+
+		select {
+		case err := <-pkgErr:
+			return nil, fmt.Errorf("error collecting packages: %w", err)
+		case update := <-pkgUpdate:
+			packages = append(packages, update...)
+		}
+
+		//packages = append(packages, rpmPackages...)
+	} else if statErr != nil && !os.IsNotExist(statErr) {
+		return nil, fmt.Errorf("error opening %v: %w", rpmPath, statErr)
 	}
 
-	_, err = os.Stat(dpkgPath)
-	if err == nil {
+	_, statErr = os.Stat(dpkgPath)
+	if statErr == nil {
 		foundPackageManager = true
 
 		dpkgPackages, err := ms.listDebPackages()
@@ -510,17 +533,17 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 		ms.log.Debugf("DEB packages: %v", len(dpkgPackages))
 
 		packages = append(packages, dpkgPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, err)
+	} else if statErr != nil && !os.IsNotExist(statErr) {
+		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, statErr)
 	}
 
 	for _, path := range homebrewCellarPath {
-		_, err = os.Stat(path)
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
+		_, statErr = os.Stat(path)
+		if statErr != nil {
+			if errors.Is(statErr, fs.ErrNotExist) {
 				continue
 			}
-			return nil, fmt.Errorf("error opening %v: %w", path, err)
+			return nil, fmt.Errorf("error opening %v: %w", path, statErr)
 		}
 		foundPackageManager = true
 		homebrewPackages, err := listBrewPackages(path)

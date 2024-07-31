@@ -10,7 +10,6 @@ import (
 	"debug/elf"
 	"errors"
 	"fmt"
-	"runtime"
 	"strings"
 	"time"
 	"unsafe"
@@ -19,6 +18,14 @@ import (
 )
 
 /*
+#cgo LDFLAGS: -lseccomp
+
+#define SCMP_CMP_STR(a,b,c) \
+  ((struct scmp_arg_cmp) {(a),(b),(intptr_t)(void*)(c),0})
+
+#include <seccomp.h>
+#include <errno.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,6 +33,29 @@ import (
 #include <rpm/header.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
+
+
+
+int setup_seccomp() {
+	scmp_filter_ctx ctx;
+	int rc;
+	ctx = seccomp_init(SCMP_ACT_ALLOW);
+
+	if (ctx == NULL) {
+		return -1;
+	}
+
+	rc = seccomp_rule_add(ctx, SCMP_ACT_ERRNO(EACCES), SCMP_SYS(open), 1, SCMP_CMP_STR(0, SCMP_CMP_EQ, (scmp_datum_t)"/var/lib/rpm/.dbenv.lock"));
+	if (rc != 0) {
+		return rc;
+	}
+
+	rc = seccomp_load(ctx);
+    if (rc != 0) {
+		return rc;
+	}
+
+}
 
 rpmts
 my_rpmtsCreate(void *f) {
@@ -330,8 +360,8 @@ func listRPMPackages() ([]*Package, error) {
 	// traps. To make sure our settings remain in effect throughout
 	// our function calls we have to lock the OS thread here, since
 	// Golang can otherwise use any thread it likes for each C.* call.
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
+	// runtime.LockOSThread()
+	// defer runtime.UnlockOSThread()
 
 	if openedLibrpm == nil {
 		var err error
