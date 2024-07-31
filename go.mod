@@ -3,7 +3,7 @@ module github.com/elastic/elastic-agent-autodiscover
 go 1.21
 
 require (
-	github.com/docker/docker v26.1.4+incompatible
+	github.com/docker/docker v26.1.5+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/elastic/elastic-agent-libs v0.3.3
 	github.com/magefile/mage v1.13.0
