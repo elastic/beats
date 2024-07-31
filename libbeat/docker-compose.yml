@@ -9,6 +9,7 @@ services:
       elasticsearchssl:               { condition: service_healthy }
       logstash:                       { condition: service_healthy }
       kafka:                          { condition: service_healthy }
+      proxy:                          { condition: service_healthy }
       redis:                          { condition: service_healthy }
       sredis:                         { condition: service_healthy }
       kibana:                         { condition: service_healthy }
@@ -26,6 +27,9 @@ services:
       interval: 1s
     ports:
       - 9200:9200
+      # Squid listens on 3128 (HTTP) and 3129 (HTTPS) from the proxy service container.
+      - 3128:3128
+      - 3129:3129
 
   elasticsearchssl:
     extends:
@@ -66,6 +70,10 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
+
+  proxy:
+    build: ${ES_BEATS}/testing/environments/docker/proxy
+    network_mode: service:elasticsearch
 
   redis:
     build: ${ES_BEATS}/testing/environments/docker/redis
