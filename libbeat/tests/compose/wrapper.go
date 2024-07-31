@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
@@ -319,7 +320,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, container.ListOptions{
 			All:     true,
 			Filters: f,
 		})
@@ -343,10 +344,20 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 // running containers.
 // It kills all containers not related to services in `except`.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return errors.Wrap(err, "listing containers to be killed")
 	}
+<<<<<<< HEAD
+=======
+
+	rmOpts := container.RemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+		RemoveLinks:   true,
+	}
+
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 	for _, container := range list {
 		container := wrapperContainer{info: container}
 		serviceName, ok := container.info.Labels[labelComposeService]
@@ -374,7 +385,7 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 
 // Inspect a container.
 func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return "", errors.Wrap(err, "listing containers to be inspected")
 	}

@@ -22,6 +22,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -220,12 +221,12 @@ func BuildContainer(ctx context.Context) error {
 
 func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.Client) error {
 	fmt.Printf("Removing container %s\n", containerID)
-	err := cli.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	err := cli.ContainerRemove(ctx, containerID, container.RemoveOptions{RemoveVolumes: true, Force: true})
 	if err != nil {
 		return errors.Wrap(err, "error removing container")
 	}
 
-	resp, err := cli.ImageRemove(ctx, rootImageName, types.ImageRemoveOptions{Force: true})
+	resp, err := cli.ImageRemove(ctx, rootImageName, image.RemoveOptions{Force: true})
 	if err != nil {
 		return errors.Wrap(err, "error removing image")
 	}

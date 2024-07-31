@@ -20,20 +20,26 @@ package image
 import (
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 )
 
+<<<<<<< HEAD
 func eventsMapping(imagesList []types.ImageSummary, dedot bool) []common.MapStr {
 	events := []common.MapStr{}
+=======
+func eventsMapping(imagesList []image.Summary, dedot bool) []mapstr.M {
+	events := []mapstr.M{}
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 	for _, image := range imagesList {
 		events = append(events, eventMapping(&image, dedot))
 	}
 	return events
 }
 
+<<<<<<< HEAD
 func eventMapping(image *types.ImageSummary, dedot bool) common.MapStr {
 	event := common.MapStr{
 		"id": common.MapStr{
@@ -44,11 +50,23 @@ func eventMapping(image *types.ImageSummary, dedot bool) common.MapStr {
 		"size": common.MapStr{
 			"regular": image.Size,
 			"virtual": image.VirtualSize,
+=======
+func eventMapping(img *image.Summary, dedot bool) mapstr.M {
+	event := mapstr.M{
+		"id": mapstr.M{
+			"current": img.ID,
+			"parent":  img.ParentID,
 		},
-		"tags": image.RepoTags,
+		"created": common.Time(time.Unix(img.Created, 0)),
+		"size": mapstr.M{
+			"regular": img.Size,
+			"virtual": img.VirtualSize,
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
+		},
+		"tags": img.RepoTags,
 	}
-	if len(image.Labels) > 0 {
-		labels := docker.DeDotLabels(image.Labels, dedot)
+	if len(img.Labels) > 0 {
+		labels := docker.DeDotLabels(img.Labels, dedot)
 		event["labels"] = labels
 	}
 	return event

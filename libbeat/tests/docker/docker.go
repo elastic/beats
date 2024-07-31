@@ -26,6 +26,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/libbeat/common/docker"
@@ -59,33 +60,46 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		return "", errors.Wrap(err, "creating container")
 	}
 
+<<<<<<< HEAD
 	if err := c.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return "", errors.Wrap(err, "starting container")
+=======
+	if err := c.cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+		return "", fmt.Errorf("starting container: %w", err)
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 	}
 
 	return resp.ID, nil
 }
 
 // imagePull pulls an image
-func (c Client) imagePull(image string) (err error) {
+func (c Client) imagePull(img string) (err error) {
 	ctx := context.Background()
-	_, _, err = c.cli.ImageInspectWithRaw(ctx, image)
+	_, _, err = c.cli.ImageInspectWithRaw(ctx, img)
 	if err == nil {
 		// Image already available, do nothing
 		return nil
 	}
 	for retry := 0; retry < 3; retry++ {
 		err = func() error {
-			respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
+			respBody, err := c.cli.ImagePull(ctx, img, image.PullOptions{})
 			if err != nil {
+<<<<<<< HEAD
 				return errors.Wrapf(err, "pullling image %s", image)
+=======
+				return fmt.Errorf("pullling image %s: %w", img, err)
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 			}
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
 			_, err = io.Copy(ioutil.Discard, respBody)
 			if err != nil {
+<<<<<<< HEAD
 				return errors.Wrapf(err, "reading response for image %s", image)
+=======
+				return fmt.Errorf("reading response for image %s: %w", img, err)
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 			}
 			return nil
 		}()
@@ -123,7 +137,7 @@ func (c Client) ContainerKill(ID string) error {
 // ContainerRemove kills and removes the given container
 func (c Client) ContainerRemove(ID string) error {
 	ctx := context.Background()
-	return c.cli.ContainerRemove(ctx, ID, types.ContainerRemoveOptions{
+	return c.cli.ContainerRemove(ctx, ID, container.RemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 	})

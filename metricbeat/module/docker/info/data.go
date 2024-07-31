@@ -18,13 +18,18 @@
 package info
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/system"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+<<<<<<< HEAD
 func eventMapping(info *types.Info) common.MapStr {
 	event := common.MapStr{
+=======
+func eventMapping(info *system.Info) mapstr.M {
+	event := mapstr.M{
+>>>>>>> 3c65545078 (Upgrad elastic-agent-system-metrics to v0.10.7. (#40397))
 		"id": info.ID,
 		"containers": common.MapStr{
 			"total":   info.Containers,
