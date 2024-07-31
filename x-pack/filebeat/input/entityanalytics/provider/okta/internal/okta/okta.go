@@ -51,9 +51,12 @@ type User struct {
 //
 // See https://developer.okta.com/docs/reference/api/users/#credentials-object for details.
 type Credentials struct {
-	Password         *struct{} `json:"password,omitempty"`          // Contains "value"; omit but mark.
-	RecoveryQuestion *struct{} `json:"recovery_question,omitempty"` // Contains "question" and "answer"; omit but mark.
-	Provider         Provider  `json:"provider"`
+	Password         *struct{} `json:"password,omitempty"` // Contains "value"; omit but mark.
+	RecoveryQuestion *struct {
+		// Also contains "answer""; intentionally omitted.
+		Question string `json:"question"`
+	} `json:"recovery_question,omitempty"`
+	Provider Provider `json:"provider"`
 }
 
 // Provider is an Okta credential provider.
