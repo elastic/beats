@@ -78,7 +78,7 @@ func GolangCrossBuild() error {
 	if devtools.Platform.GOOS == "linux" {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
 
-		// Work around two different CGO packages generating the same C functionm, resulting in an error like:
+		// Work around two different CGO packages generating the same C function, resulting in an error like:
 		// /usr/bin/ld.gold: error: /tmp/go-link-1159962577/000059.o: multiple definition of 'my_strlen'.
 		//
 		// Newer versions of go-systemd contain the file: https://github.com/coreos/go-systemd/blob/v22.5.0/internal/dlopen/dlopen_example.go
