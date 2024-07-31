@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
 - Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
 - Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Disable event normalisation for netflow input {pull}40399[40399]
 
 *Heartbeat*
 
