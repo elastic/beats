@@ -77,6 +77,16 @@ func GolangCrossBuild() error {
 	args := packetbeat.GolangCrossBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+
+		// Work around two different CGO packages generating the same C functionm, resulting in an error like:
+		// /usr/bin/ld.gold: error: /tmp/go-link-1159962577/000059.o: multiple definition of 'my_strlen'.
+		//
+		// Newer versions of go-systemd contain the file: https://github.com/coreos/go-systemd/blob/v22.5.0/internal/dlopen/dlopen_example.go
+		// Which is copied from coreos/pkg: https://github.com/coreos/pkg/blob/bbd7aa9bf6fb51acc905bd45a5363ebecf065f30/dlopen/dlopen_example.go
+		// Agentbeat will import both go-systemd and coreos/pkg, resulting in two definitions of my_strlen from the two identical files.
+		//
+		// This can likely be removed once https://github.com/elastic/beats/pull/40061 is merged removing the need to use CGO for jounrald support.
+		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--allow-multiple-definition")
 	} else {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}
