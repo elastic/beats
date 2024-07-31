@@ -50,7 +50,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -81,7 +81,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -109,7 +109,7 @@ class Test(BaseTest):
 
         os.mkdir(self.working_dir + "/configs/")
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -134,7 +134,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/system.yml.test", 'w') as f:
-            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(moduleConfigTemplate.format(self.working_dir + "/logs/*.log"))
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
@@ -150,7 +150,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'test (test)' has stopped"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
