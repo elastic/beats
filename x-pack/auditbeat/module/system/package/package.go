@@ -509,23 +509,21 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 			pkgErr := make(chan error)
 
 			go func(chUpdate chan []*Package, chErr chan error) {
-				fmt.Printf("in thread before call, I am user: %d\n", os.Getuid())
 				// lock to a system thread and drop permissions
 				// we don't need to release the OS thread, since this goroutine will die anyway
 				runtime.LockOSThread()
 				_, _, serr := syscall.Syscall(syscall.SYS_SETUID, uintptr(*ms.config.PackageSuidDrop), 0, 0)
 				if serr != 0 {
-					ms.log.Infof("setuid failed, running as current user")
+					pkgErr <- fmt.Errorf("error calling setuid: %w", serr)
+					return
 				}
-				fmt.Printf("in thread after call, I am user: %d\n", os.Getuid())
+
 				rpmPackages, err := listRPMPackages()
 				if err != nil {
-					//return nil, fmt.Errorf("error getting RPM packages: %w", err)
-					ms.log.Infof("error listing RPM packages: %w", err)
 					pkgErr <- err
+					return
 				}
 				pkgUpdate <- rpmPackages
-				ms.log.Debugf("RPM packages: %v", len(rpmPackages))
 			}(pkgUpdate, pkgErr)
 
 			select {
@@ -535,7 +533,6 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 			case update := <-pkgUpdate:
 				packages = append(packages, update...)
 			}
-			fmt.Printf("in main after select, I am user: %d\n", os.Getuid())
 		} else {
 			rpmPackages, err := listRPMPackages()
 			if err != nil {
