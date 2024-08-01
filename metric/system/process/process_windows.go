@@ -41,14 +41,16 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	procMap := make(ProcsMap, len(pids))
 	plist := make([]ProcState, 0, len(pids))
+	var wrappedErr error
 	// This is probably the only implementation that doesn't benefit from our
 	// little fillPid callback system. We'll need to iterate over everything
 	// manually.
 	for _, pid := range pids {
-		procMap, plist = procStats.pidIter(int(pid), procMap, plist)
+		procMap, plist, err = procStats.pidIter(int(pid), procMap, plist)
+		wrappedErr = errors.Join(wrappedErr, err)
 	}
 
-	return procMap, plist, nil
+	return procMap, plist, toNonFatal(wrappedErr)
 }
 
 // GetSelfPid is the darwin implementation; see the linux version in

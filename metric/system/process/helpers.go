@@ -98,3 +98,40 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	return s1
 
 }
+
+// NonFatalErr indicates an error occurred during metrics
+// collection, however the metrics already
+// gathered and returned are still valid.
+// This error can be safely ignored, this will result
+// in having partial metrics for a process rather than
+// no metrics at all.
+//
+// It was introduced to allow for partial metrics collection
+// on privileged process on Windows.
+type NonFatalErr struct {
+	Err error
+}
+
+func (c NonFatalErr) Error() string {
+	return "Not enough privileges to fetch information: " + c.Err.Error()
+}
+
+func (c NonFatalErr) Is(other error) bool {
+	_, is := other.(NonFatalErr)
+	return is
+}
+
+func (c NonFatalErr) Unwrap() error {
+	return c.Err
+}
+
+// Wraps a NonFatalError around a generic error, if given error is non-fatal in nature
+func toNonFatal(err error) error {
+	if err == nil {
+		return nil
+	}
+	if !isNonFatal(err) {
+		return err
+	}
+	return NonFatalErr{Err: err}
+}
