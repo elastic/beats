@@ -17,10 +17,6 @@
 
 package fifo
 
-import "errors"
-
-var errFIFOEmpty = errors.New("tried to read from an empty FIFO queue")
-
 // FIFO is a minimal first-in first-out queue based on a singly linked list.
 type FIFO[T any] struct {
 	first *node[T]
@@ -55,6 +51,15 @@ func (f *FIFO[T]) First() T {
 		return none
 	}
 	return f.first.value
+}
+
+// Return the first value (if present) and remove it from the queue.
+// If the queue is empty a default value is returned, to detect this case
+// use f.Empty().
+func (f *FIFO[T]) ConsumeFirst() T {
+	result := f.First()
+	f.Remove()
+	return result
 }
 
 // Remove the first entry in the queue. Does nothing if the FIFO is empty.

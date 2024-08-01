@@ -48,7 +48,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message) error
+	ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(e beat.Event)) error
 }
 
 // ------
@@ -88,7 +88,7 @@ type s3ObjectHandlerFactory interface {
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
-	// sends them to the given channel. It returns when processing finishes or
+	// passes to the given callback. It returns when processing finishes or
 	// when it encounters an unrecoverable error.
 	ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error
 

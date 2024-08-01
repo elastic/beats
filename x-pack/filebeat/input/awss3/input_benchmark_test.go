@@ -218,7 +218,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
 		sqsReader.sqs = newConstantSQS()
 		sqsReader.s3 = newConstantS3(t)
-		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
 		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
