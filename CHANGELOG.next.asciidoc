@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Update Go version to 1.22.5. {pull}40082[40082]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
+- Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
 
 *Auditbeat*
 
@@ -189,6 +190,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 
 *Osquerybeat*
 
@@ -316,6 +318,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Implement Elastic Agent status and health reporting for Netflow Filebeat input. {pull}40080[40080]
 - Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
+- Add SSL and username support for Redis input, now the input includes support for Redis 6.0+. {pull}40111[40111]
 - Add scaling up support for Netflow input. {issue}37761[37761] {pull}40122[40122]
 - Update CEL mito extensions to v1.15.0. {pull}40294[40294]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
