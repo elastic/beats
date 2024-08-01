@@ -9,6 +9,7 @@ package pkg
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/gob"
 	"errors"
@@ -490,35 +491,61 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 	if statErr == nil {
 		foundPackageManager = true
 
-		pkgUpdate := make(chan []*Package)
-		pkgErr := make(chan error)
+		if ms.config.PackageSuidDrop != nil {
+			ms.log.Infof("Dropping to pid %d for RPM API calls", *ms.config.PackageSuidDrop)
+			// This is rather horrible.
+			// Basically, older RPM setups will use BDB as a database for the RPM state, and
+			// BDB is incredibly easy to corrupt and does not handle parallel operations well.
+			// see https://github.com/rpm-software-management/rpm/issues/232
+			// The easiest way around this is to drop perms to non-root, so librpm can't write to any of the DB files.
+			// this means we can't corrupt anything, and it also means that BDB won't perform any of the failchk()
+			// operations that exibit some parallel access issues
+			//
+			// We could potentially make the SYS_SETUID call just in getPackages() without spawning a child thread,
+			// but suid() is irreversible, and I'd rather have control over the context that we're running it in
+			time, cancel := context.WithTimeout(context.Background(), time.Minute*2)
+			defer cancel()
+			pkgUpdate := make(chan []*Package)
+			pkgErr := make(chan error)
 
-		go func(chUpdate chan []*Package, chErr chan error) {
-			// lock to a system thread and drop permissions
-			runtime.LockOSThread()
-			_, _, serr := syscall.Syscall(syscall.SYS_SETUID, 1000, 0, 0)
-			if serr != 0 {
-				ms.log.Infof("setuid failed, running as current user")
+			go func(chUpdate chan []*Package, chErr chan error) {
+				fmt.Printf("in thread before call, I am user: %d\n", os.Getuid())
+				// lock to a system thread and drop permissions
+				// we don't need to release the OS thread, since this goroutine will die anyway
+				runtime.LockOSThread()
+				_, _, serr := syscall.Syscall(syscall.SYS_SETUID, uintptr(*ms.config.PackageSuidDrop), 0, 0)
+				if serr != 0 {
+					ms.log.Infof("setuid failed, running as current user")
+				}
+				fmt.Printf("in thread after call, I am user: %d\n", os.Getuid())
+				rpmPackages, err := listRPMPackages()
+				if err != nil {
+					//return nil, fmt.Errorf("error getting RPM packages: %w", err)
+					ms.log.Infof("error listing RPM packages: %w", err)
+					pkgErr <- err
+				}
+				pkgUpdate <- rpmPackages
+				ms.log.Debugf("RPM packages: %v", len(rpmPackages))
+			}(pkgUpdate, pkgErr)
+
+			select {
+			case <-time.Done():
+			case err := <-pkgErr:
+				return nil, fmt.Errorf("error collecting packages: %w", err)
+			case update := <-pkgUpdate:
+				packages = append(packages, update...)
 			}
+			fmt.Printf("in main after select, I am user: %d\n", os.Getuid())
+		} else {
 			rpmPackages, err := listRPMPackages()
 			if err != nil {
 				//return nil, fmt.Errorf("error getting RPM packages: %w", err)
-				ms.log.Infof("error listing RPM packages: %w", err)
-				pkgErr <- err
+				return nil, fmt.Errorf("error listing RPM packages: %w", err)
 			}
-			pkgUpdate <- rpmPackages
-			ms.log.Debugf("RPM packages: %v", len(rpmPackages))
-		}(pkgUpdate, pkgErr)
-
-		select {
-		case err := <-pkgErr:
-			return nil, fmt.Errorf("error collecting packages: %w", err)
-		case update := <-pkgUpdate:
-			packages = append(packages, update...)
+			packages = append(packages, rpmPackages...)
 		}
 
-		//packages = append(packages, rpmPackages...)
-	} else if statErr != nil && !os.IsNotExist(statErr) {
+	} else if !os.IsNotExist(statErr) {
 		return nil, fmt.Errorf("error opening %v: %w", rpmPath, statErr)
 	}
 
@@ -533,7 +560,7 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 		ms.log.Debugf("DEB packages: %v", len(dpkgPackages))
 
 		packages = append(packages, dpkgPackages...)
-	} else if statErr != nil && !os.IsNotExist(statErr) {
+	} else if !os.IsNotExist(statErr) {
 		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, statErr)
 	}
 

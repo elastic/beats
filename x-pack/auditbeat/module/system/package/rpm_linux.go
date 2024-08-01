@@ -18,13 +18,6 @@ import (
 )
 
 /*
-#cgo LDFLAGS: -lseccomp
-
-#define SCMP_CMP_STR(a,b,c) \
-  ((struct scmp_arg_cmp) {(a),(b),(intptr_t)(void*)(c),0})
-
-#include <seccomp.h>
-#include <errno.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,28 +27,6 @@ import (
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
 
-
-
-int setup_seccomp() {
-	scmp_filter_ctx ctx;
-	int rc;
-	ctx = seccomp_init(SCMP_ACT_ALLOW);
-
-	if (ctx == NULL) {
-		return -1;
-	}
-
-	rc = seccomp_rule_add(ctx, SCMP_ACT_ERRNO(EACCES), SCMP_SYS(open), 1, SCMP_CMP_STR(0, SCMP_CMP_EQ, (scmp_datum_t)"/var/lib/rpm/.dbenv.lock"));
-	if (rc != 0) {
-		return rc;
-	}
-
-	rc = seccomp_load(ctx);
-    if (rc != 0) {
-		return rc;
-	}
-
-}
 
 rpmts
 my_rpmtsCreate(void *f) {
@@ -371,6 +342,15 @@ func listRPMPackages() ([]*Package, error) {
 		}
 	}
 
+	res := C.my_rpmReadConfigFiles(openedLibrpm.rpmReadConfigFiles)
+	if int(res) != 0 {
+		return nil, fmt.Errorf("Error: %d", int(res))
+	}
+	defer C.my_rpmFreeRpmrc(openedLibrpm.rpmFreeRpmrc)
+	if openedLibrpm.rpmFreeMacros != nil {
+		defer C.my_rpmFreeMacros(openedLibrpm.rpmFreeMacros)
+	}
+
 	if openedLibrpm.rpmsqSetInterruptSafety != nil {
 		C.my_rpmsqSetInterruptSafety(openedLibrpm.rpmsqSetInterruptSafety, 0)
 	}
@@ -380,15 +360,6 @@ func listRPMPackages() ([]*Package, error) {
 		return nil, fmt.Errorf("Failed to get rpmts")
 	}
 	defer C.my_rpmtsFree(openedLibrpm.rpmtsFree, rpmts)
-
-	res := C.my_rpmReadConfigFiles(openedLibrpm.rpmReadConfigFiles)
-	if int(res) != 0 {
-		return nil, fmt.Errorf("Error: %d", int(res))
-	}
-	defer C.my_rpmFreeRpmrc(openedLibrpm.rpmFreeRpmrc)
-	if openedLibrpm.rpmFreeMacros != nil {
-		defer C.my_rpmFreeMacros(openedLibrpm.rpmFreeMacros)
-	}
 
 	mi := C.my_rpmtsInitIterator(openedLibrpm.rpmtsInitIterator, rpmts)
 	if mi == nil {
