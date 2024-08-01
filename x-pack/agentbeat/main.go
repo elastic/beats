@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd"
