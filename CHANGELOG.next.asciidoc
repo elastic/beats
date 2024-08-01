@@ -93,6 +93,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
+- Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
+- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 
 *Osquerybeat*
 
