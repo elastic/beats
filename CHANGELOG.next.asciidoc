@@ -220,6 +220,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add persistent volume claim name to volume if available {pull}38839[38839]
 - Raw events are now logged to a different file, this prevents potentially sensitive information from leaking into log files {pull}38767[38767]
 - Websocket input: Added runtime URL modification support based on state and cursor values {issue}39858[39858] {pull}39997[39997]
+- Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 
 *Auditbeat*
 
