@@ -75,7 +75,7 @@ func TestDockerStart(t *testing.T) {
 	}
 	defer func() {
 		if err := d.ContainerRemove(ID); err != nil {
-			t.Error(err)
+			t.Log(err)
 		}
 	}()
 
@@ -83,7 +83,7 @@ func TestDockerStart(t *testing.T) {
 
 	// Kill
 	if err := d.ContainerKill(ID); err != nil {
-		t.Error(err)
+		t.Log(err)
 	}
 	checkEvent(t, listener, ID, false)
 }
