@@ -237,7 +237,7 @@ func TestOverUnixSocket(t *testing.T) {
 			fmt.Fprintf(w, "ehlo!")
 		})
 
-		go http.Serve(l, mux) //nolint:errcheck // Ignore the error, it's a test file
+		go http.Serve(l, mux) //nolint:errcheck,gosec // Ignore the error, it's a test file
 
 		return l
 	}
