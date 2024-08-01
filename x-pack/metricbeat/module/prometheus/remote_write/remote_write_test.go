@@ -18,6 +18,70 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func BenchmarkGenerateEvents(b *testing.B) {
+	// Create a sample set of metrics
+	metrics := createSampleMetrics()
+
+	// Create an instance of remoteWriteTypedGenerator
+	generator := remoteWriteTypedGenerator{
+		// Initialize with appropriate values
+		countMetrics: true,
+		// Add other necessary fields
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		generator.GenerateEvents(metrics)
+	}
+}
+
+func createSampleMetrics() model.Samples {
+	now := model.TimeFromUnix(time.Now().Unix())
+	return model.Samples{
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "http_requests_total",
+				"method":   "GET",
+				"status":   "200",
+			},
+			Value:     1234,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "http_request_duration_seconds",
+				"method":   "POST",
+				"path":     "/api/v1/users",
+			},
+			Value:     0.543,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "node_cpu_seconds_total",
+				"cpu":      "0",
+				"mode":     "idle",
+			},
+			Value:     3600.5,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "go_goroutines",
+			},
+			Value:     42,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "process_resident_memory_bytes",
+			},
+			Value:     2.5e+7,
+			Timestamp: now,
+		},
+	}
+}
+
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
 

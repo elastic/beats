@@ -58258,6 +58258,16 @@ Stats scraped from a Prometheus endpoint.
 
 
 
+*`metrics_count`*::
++
+--
+Count the number of metrics
+
+
+type: long
+
+--
+
 
 *`prometheus.labels.*`*::
 +

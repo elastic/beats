@@ -27,17 +27,20 @@ import (
 )
 
 // DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
-func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error) {
-	return &remoteWriteEventGenerator{}, nil
+func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, countMetrics bool) (RemoteWriteEventsGenerator, error) {
+	return &remoteWriteEventGenerator{countMetrics: countMetrics}, nil
 }
 
-type remoteWriteEventGenerator struct{}
+type remoteWriteEventGenerator struct {
+	countMetrics bool
+}
 
 func (p *remoteWriteEventGenerator) Start() {}
 func (p *remoteWriteEventGenerator) Stop()  {}
 
 func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
+	metricCounter := make(map[string]int64, len(metrics)/2)
 
 	for _, metric := range metrics {
 		labels := mapstr.M{}
@@ -61,6 +64,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
+				RootFields: make(mapstr.M, 1),
 				ModuleFields: mapstr.M{
 					"metrics": mapstr.M{},
 				},
@@ -75,9 +79,13 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
-		data := mapstr.M{
-			name: val,
+
+		if p.countMetrics {
+			metricCounter[labelsHash]++
+			e.RootFields["metrics_count"] = metricCounter[labelsHash]
 		}
+
+		data := mapstr.M{name: val}
 		e.ModuleFields["metrics"].(mapstr.M).Update(data)
 	}
 
