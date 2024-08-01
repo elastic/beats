@@ -91,10 +91,6 @@ type sqsS3EventProcessor struct {
 	warnOnce             sync.Once
 	metrics              *inputMetrics
 	script               *script
-
-	// Finalizer callbacks for the returned S3 events, invoked via
-	// finalizeS3Objects after all events are acknowledged.
-	s3Finalizers []func() error
 }
 
 func newSQSS3EventProcessor(
@@ -122,9 +118,14 @@ func newSQSS3EventProcessor(
 }
 
 type sqsProcessingResult struct {
+	processor       *sqsS3EventProcessor
 	msg             *types.Message
 	keepaliveCancel context.CancelFunc
 	processingErr   error
+
+	// Finalizer callbacks for the returned S3 events, invoked via
+	// finalizeS3Objects after all events are acknowledged.
+	s3Finalizers []func() error
 }
 
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(beat.Event)) sqsProcessingResult {
