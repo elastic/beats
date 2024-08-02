@@ -87,6 +87,7 @@ func TestWithSuid(t *testing.T) {
 	require.NoError(t, err)
 
 	require.NotZero(t, packages)
+	t.Logf("got %d packages", len(packages))
 }
 
 func TestData(t *testing.T) {
