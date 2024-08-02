@@ -20,13 +20,72 @@
 package procs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+func TestGetSingleLocalPort(t *testing.T) {
+	logp.TestingSetup()
+
+	pathPrefix := "./testdata"
+	procFake := []testProcFile{
+		{path: "/proc/766/fd/15", isLink: true, contents: "socket:[10141101]"},
+		{path: "proc/123/fd/10", isLink: true, contents: "socket:[29766]"},
+	}
+	err := createFakeDirectoryStructure(pathPrefix, procFake)
+	defer func() {
+		os.RemoveAll("testdata/proc/766")
+		os.RemoveAll("testdata/proc/123")
+	}()
+	require.NoError(t, err)
+
+	err = os.Setenv("HOST_PROC", "./testdata")
+	require.NoError(t, err)
+
+	proc := &ProcessesWatcher{hostfs: pathPrefix}
+	err = proc.Init(ProcsConfig{Enabled: true})
+	require.NoError(t, err)
+
+	for _, testCase := range []struct {
+		name         string
+		netstatTuple string
+		foundPid     int
+	}{
+		{
+			name:         "basic_lookup",
+			netstatTuple: "0100007F:D7CA",
+			foundPid:     766,
+		},
+		{
+			name:         "lookup_INADDR_ANY",
+			netstatTuple: "00000000:0016",
+			foundPid:     123,
+		},
+		{
+			name:         "lookup_to_INADDR_ANY",
+			netstatTuple: "017AA8C1:0016",
+			foundPid:     123,
+		},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			ip, port, err := hexToIPPort([]byte(testCase.netstatTuple), false)
+			require.NoError(t, err)
+
+			pid, found, err := proc.GetSingleLocalPortToPIDMapping(applayer.TransportTCP, ip, port)
+			require.True(t, found)
+			require.NoError(t, err)
+
+			require.Equal(t, testCase.foundPid, pid)
+		})
+
+	}
+}
 
 func TestFindSocketsOfPid(t *testing.T) {
 	logp.TestingSetup()
@@ -44,7 +103,7 @@ func TestFindSocketsOfPid(t *testing.T) {
 	}
 
 	// Create fake proc file system
-	pathPrefix, err := ioutil.TempDir("", "find-sockets")
+	pathPrefix, err := os.MkdirTemp("", "find-sockets")
 	if err != nil {
 		t.Error("TempDir failed:", err)
 		return
@@ -116,7 +175,7 @@ func createFakeDirectoryStructure(prefix string, files []testProcFile) error {
 		}
 
 		if !file.isLink {
-			err = ioutil.WriteFile(filepath.Join(prefix, file.path),
+			err = os.WriteFile(filepath.Join(prefix, file.path),
 				[]byte(file.contents), 0o644)
 			if err != nil {
 				return err
