@@ -88,13 +88,12 @@ func (in *eventHubInputV2) Run(
 	defer inputMetrics.Close()
 	in.metrics = inputMetrics
 
-	// Initialize the components needed to process events,
-	// in particular the consumerClient.
+	// Initialize the components needed to process events.
 	err = in.setup(ctx)
 	if err != nil {
 		return err
 	}
-	defer in.consumerClient.Close(context.Background())
+	defer in.teardown(ctx)
 
 	// Store a reference to the pipeline, so we
 	// can create a new pipeline client for each
@@ -118,18 +117,18 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		metrics: in.metrics,
 	}
 
-	// FIXME: check more pipelineClient creation options.
 	containerClient, err := container.NewClientFromConnectionString(
 		in.config.SAConnectionString,
 		in.config.SAContainer,
 		&container.ClientOptions{
 			ClientOptions: azcore.ClientOptions{
+				// FIXME: check more pipelineClient creation options.
 				Cloud: cloud.AzurePublic,
 			},
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create blob container pipelineClient: %w", err)
+		return fmt.Errorf("failed to create blob container client: %w", err)
 	}
 
 	// The modern event hub SDK does not create the container
@@ -144,8 +143,11 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		return fmt.Errorf("failed to ensure blob container exists: %w", err)
 	}
 
-	// The checkpoint store is used to store the checkpoint information
-	// in the blob container.
+	// Create the checkpoint store.
+	//
+	// The processor uses the checkpoint store to persist
+	// checkpoint information in the container using blobs (one blob
+	// for each event hub partition).
 	checkpointStore, err := checkpoints.NewBlobStore(containerClient, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create checkpoint store: %w", err)
@@ -160,7 +162,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create consumer pipelineClient: %w", err)
+		return fmt.Errorf("failed to create consumer client: %w", err)
 	}
 	in.consumerClient = consumerClient
 
@@ -174,6 +176,21 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	)
 
 	return nil
+}
+
+// teardown releases the resources used by the input.
+func (in *eventHubInputV2) teardown(ctx context.Context) {
+	if in.consumerClient == nil {
+		return
+	}
+
+	err := in.consumerClient.Close(ctx)
+	if err != nil {
+		in.log.Errorw(
+			"error closing consumer client",
+			"error", err,
+		)
+	}
 }
 
 // run starts the main loop for processing events.
@@ -321,7 +338,14 @@ func (in *eventHubInputV2) ensureContainerExists(ctx context.Context, blobContai
 			return fmt.Errorf("failed to create blob container: %w", err)
 		}
 
-		in.log.Debugw("blob container already exists, no need to create a new one", "container", in.config.SAContainer)
+		// The container already exists, we can ignore the error.
+		//
+		// This is a possible scenario when another process created
+		// the container after we checked if it exists.
+		in.log.Debugw(
+			"blob container already exists, no need to create a new one",
+			"container", in.config.SAContainer,
+		)
 	}
 
 	in.log.Infow("blob container created successfully", "response", r)
