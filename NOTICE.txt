@@ -1864,11 +1864,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement
-Version: v1.1.0
+Version: v1.1.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement@v1.1.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement@v1.1.1/LICENSE.txt:
 
 MIT License
 
