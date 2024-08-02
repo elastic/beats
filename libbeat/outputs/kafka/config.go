@@ -113,7 +113,7 @@ var compressionModes = map[string]sarama.CompressionCodec{
 // when running under Elastic-Agent. The regexp is taken from:
 // https://github.com/apache/kafka/blob/a126e3a622f2b7142f3543b9dbee54b6412ba9d8/clients/src/main/java/org/apache/kafka/common/internals/Topic.java#L33
 // also allowing a format string that contains a field name %{[FIELD]}
-var validTopicRegExp = regexp.MustCompile("^(?:%\\{\\[)?[a-zA-Z0-9._-]+(?:\\]\\})?$")
+var validTopicRegExp = regexp.MustCompile(`^(?:%\{\[)?[a-zA-Z0-9._-]+(?:\]\})?$`)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
