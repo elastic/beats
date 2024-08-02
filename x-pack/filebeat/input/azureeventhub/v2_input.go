@@ -502,9 +502,31 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 	// database connection.
 	return pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acker.LastEventPrivateReporter(func(acked int, data any) {
-			err := partitionClient.UpdateCheckpoint(ctx, data.(*azeventhubs.ReceivedEventData), nil)
+			// Update the checkpoint for the given partition.
+			//
+			// The pipeline calls this function when events have been
+			// successfully published and acknowledged by the output.
+			//
+			// The data parameter contains the private data of the last
+			// acknowledged event.
+			receivedEventData, ok := data.(*azeventhubs.ReceivedEventData)
+			if !ok {
+				log.Errorw(
+					"error updating checkpoint",
+					"partition", partitionClient.PartitionID(),
+					"acked", acked,
+					"error", "invalid data type",
+					"type", fmt.Sprintf("%T", data),
+				)
+				return
+			}
+
+			err := partitionClient.UpdateCheckpoint(ctx, receivedEventData, nil)
 			if err != nil {
-				log.Errorw("error updating checkpoint", "error", err)
+				log.Errorw(
+					"error updating checkpoint",
+					"error", err,
+				)
 			}
 
 			log.Debugw(
