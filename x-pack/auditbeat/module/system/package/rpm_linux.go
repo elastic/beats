@@ -28,6 +28,14 @@ import (
 #include <rpm/rpmdb.h>
 
 
+int
+my_rpmtsSetRootDir(void *f, rpmts ts) {
+	int (*rpmtsSetRootDir)(rpmts, const char*);
+	rpmtsSetRootDir = (int (*)(rpmts, const char*))f;
+
+	return rpmtsSetRootDir(ts, "/");
+}
+
 rpmts
 my_rpmtsCreate(void *f) {
   rpmts (*rpmtsCreate)();
@@ -197,6 +205,7 @@ type librpm struct {
 	rpmsqSetInterruptSafety unsafe.Pointer
 	rpmFreeRpmrc            unsafe.Pointer
 	rpmFreeMacros           unsafe.Pointer
+	rpmtsSetRootDir         unsafe.Pointer
 }
 
 func (lib *librpm) close() error {
@@ -322,6 +331,11 @@ func openLibrpm() (*librpm, error) {
 	librpm.rpmFreeMacros, err = librpm.handle.GetSymbolPointer("rpmFreeMacros")
 	// no error check
 
+	librpm.rpmtsSetRootDir, err = librpm.handle.GetSymbolPointer("rpmtsSetRootDir")
+	if err != nil {
+		return nil, err
+	}
+
 	return &librpm, nil
 }
 
@@ -331,6 +345,8 @@ func listRPMPackages() ([]*Package, error) {
 	// traps. To make sure our settings remain in effect throughout
 	// our function calls we have to lock the OS thread here, since
 	// Golang can otherwise use any thread it likes for each C.* call.
+
+	// TODO: have this be aware of our setuid state
 	// runtime.LockOSThread()
 	// defer runtime.UnlockOSThread()
 
@@ -360,6 +376,9 @@ func listRPMPackages() ([]*Package, error) {
 		return nil, fmt.Errorf("Failed to get rpmts")
 	}
 	defer C.my_rpmtsFree(openedLibrpm.rpmtsFree, rpmts)
+
+	// setup root dir, used if librpm has to resolve a macro that contains a path
+	C.my_rpmtsSetRootDir(openedLibrpm.rpmtsSetRootDir, rpmts)
 
 	mi := C.my_rpmtsInitIterator(openedLibrpm.rpmtsInitIterator, rpmts)
 	if mi == nil {

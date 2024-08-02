@@ -489,10 +489,10 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 	var foundPackageManager bool
 	_, statErr := os.Stat(rpmPath)
 	if statErr == nil {
-		foundPackageManager = true
 
+		foundPackageManager = true
 		if ms.config.PackageSuidDrop != nil {
-			ms.log.Infof("Dropping to pid %d for RPM API calls", *ms.config.PackageSuidDrop)
+			ms.log.Debugf("Dropping to pid %d for RPM API calls", *ms.config.PackageSuidDrop)
 			// This is rather horrible.
 			// Basically, older RPM setups will use BDB as a database for the RPM state, and
 			// BDB is incredibly easy to corrupt and does not handle parallel operations well.
@@ -512,9 +512,11 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 				// lock to a system thread and drop permissions
 				// we don't need to release the OS thread, since this goroutine will die anyway
 				runtime.LockOSThread()
-				_, _, serr := syscall.Syscall(syscall.SYS_SETUID, uintptr(*ms.config.PackageSuidDrop), 0, 0)
+				minus1 := -1
+				//_, _, serr := syscall.Syscall(syscall.SYS_SETUID, uintptr(*ms.config.PackageSuidDrop), 0, 0)
+				_, _, serr := syscall.Syscall(syscall.SYS_SETREUID, uintptr(minus1), uintptr(*ms.config.PackageSuidDrop), uintptr(minus1))
 				if serr != 0 {
-					pkgErr <- fmt.Errorf("error calling setuid: %w", serr)
+					pkgErr <- fmt.Errorf("error calling setresuid: %w", serr)
 					return
 				}
 

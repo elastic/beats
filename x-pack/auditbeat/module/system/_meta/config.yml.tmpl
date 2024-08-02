@@ -45,6 +45,13 @@
   # user.state.period: 12h
   {{- end }}
 
+  # Use suid() to drop out of root before making any calls to the RPM backend.
+  # This is primarily useful for older rpm versions that rely on BDB as a backend;
+  # when running with elevated permissions, BDB will read/write from a number 
+  # of database state files, which can conflict with other applications
+  # that may be using librpm in parallel.
+  # package.rpm_drop_to_suid: 1000
+
   # Average file read rate for hashing of the process executable. Default is "50 MiB".
   process.hash.scan_rate_per_sec: 50 MiB
 
