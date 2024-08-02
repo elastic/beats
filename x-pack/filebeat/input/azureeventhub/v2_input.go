@@ -533,6 +533,9 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 				"checkpoint updated",
 				"partition", partitionClient.PartitionID(),
 				"acked", acked,
+				"sequence_number", receivedEventData.SequenceNumber,
+				"offset", receivedEventData.Offset,
+				"enqueued_time", receivedEventData.EnqueuedTime,
 			)
 		}),
 		Processing: beat.ProcessingConfig{
