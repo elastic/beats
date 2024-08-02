@@ -38,22 +38,31 @@ type azureInputConfig struct {
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
-	// Controls if the input should perform the checkpoint information
-	// migration from v1 to v2 (processor v2 only).
+	// MigrateCheckpoint controls if the input should perform the checkpoint information
+	// migration from v1 to v2 (processor v2 only). Default is false.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
-	// Processor version to use (v1 or v2). Default is v1.
+	// ProcessorVersion controls the processor version to use.
+	// Possible values are v1 and v2 (processor v2 only). Default is v1.
 	ProcessorVersion string `config:"processor_version"`
-	//
+	// ProcessorUpdateInterval controls how often attempt to claim
+	// partitions (processor v2 only). The default value is 10 seconds.
 	ProcessorUpdateInterval time.Duration `config:"processor_update_interval"`
-	// Controls the start position for all partitions (processor v2 only).
+	// ProcessorStartPosition Controls the start position for all partitions
+	// (processor v2 only). Default is "earliest".
 	ProcessorStartPosition string `config:"processor_start_position"`
-	// Processor receive timeout (processor v2 only).
-	// Wait up to `PartitionReceiveTimeout` for `PartitionReceiveCount` events,
-	// otherwise returns whatever we collected during that time.
+	// PartitionReceiveTimeout controls the batching of incoming messages together
+	// with `PartitionReceiveCount` (processor v2 only). Default is 5s.
+	//
+	// The partition client waits up to `PartitionReceiveTimeout` or
+	// for at least `PartitionReceiveCount` events, then it returns
+	// the events it has received.
 	PartitionReceiveTimeout time.Duration `config:"partition_receive_timeout"`
-	// Processor receive count (processor v2 only).
-	// Wait up to `PartitionReceiveTimeout` for `PartitionReceiveCount` events,
-	// otherwise returns whatever we collected during that time.
+	// PartitionReceiveCount controls the batching of incoming messages together
+	// with `PartitionReceiveTimeout` (processor v2 only). Default is 100.
+	//
+	// The partition client waits up to `PartitionReceiveTimeout` or
+	// for at least `PartitionReceiveCount` events, then it returns
+	// the events it has received.
 	PartitionReceiveCount int `config:"partition_receive_count"`
 }
 
@@ -62,7 +71,7 @@ func defaultConfig() azureInputConfig {
 		// For this release, we continue to use
 		// the processor v1 as the default.
 		ProcessorVersion: processorV1,
-		//
+		// Controls how often attempt to claim partitions.
 		ProcessorUpdateInterval: 10 * time.Second,
 		// For backward compatibility with v1,
 		// the default start position is "earliest".
@@ -119,6 +128,24 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	}
 
+	if conf.ProcessorUpdateInterval < 1*time.Second {
+		return errors.New("processor_update_interval must be at least 1 second")
+	}
+	if conf.PartitionReceiveTimeout < 1*time.Second {
+		return errors.New("partition_receive_timeout must be at least 1 second")
+	}
+	if conf.PartitionReceiveCount < 1 {
+		return errors.New("partition_receive_count must be at least 1")
+	}
+	if conf.ProcessorStartPosition != startPositionEarliest && conf.ProcessorStartPosition != startPositionLatest {
+		return fmt.Errorf(
+			"invalid processor_start_position: %s (available positions: %s, %s)",
+			conf.ProcessorStartPosition,
+			startPositionEarliest,
+			startPositionLatest,
+		)
+	}
+
 	switch conf.ProcessorVersion {
 	case processorV1:
 		if conf.SAKey == "" {
@@ -132,7 +159,12 @@ func (conf *azureInputConfig) Validate() error {
 			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 		}
 	default:
-		return fmt.Errorf("invalid azure-eventhub processor version: %s (available versions: v1, v2)", conf.ProcessorVersion)
+		return fmt.Errorf(
+			"invalid processor_version: %s (available versions: %s, %s)",
+			conf.ProcessorVersion,
+			processorV1,
+			processorV2,
+		)
 	}
 
 	return nil
