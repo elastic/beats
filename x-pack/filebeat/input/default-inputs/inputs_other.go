@@ -45,6 +45,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		lumberjack.Plugin(),
 		salesforce.Plugin(log, store),
 		streaming.Plugin(log, store),
+		streaming.PluginWebsocketAlias(log, store),
 		netflow.Plugin(log),
 		benchmark.Plugin(),
 	}
