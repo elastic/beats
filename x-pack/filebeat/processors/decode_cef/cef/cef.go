@@ -13,9 +13,9 @@ import (
 )
 
 // Parser is generated from a ragel state machine using the following command:
-//go:generate ragel -Z -G1 parser.rl -o parser.go
+//go:generate ragel-go -G1 parser.rl -o parser.go
 //go:generate goimports -l -w parser.go
-//go:generate ragel -Z -G1 parser_recover.rl -o parser_recover.go
+//go:generate ragel-go -G1 parser_recover.rl -o parser_recover.go
 //go:generate goimports -l -w parser_recover.go
 //
 // Run go vet and remove any unreachable code in the generated parser.go.
