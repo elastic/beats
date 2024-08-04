@@ -60,7 +60,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 1:
 			if (p) == eof {
 				goto _ctr1
-				goto _again
 
 			} else {
 				if (data[(p)]) == 67 {
@@ -73,7 +72,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 0:
 			if (p) == eof {
 				goto _ctr0
-				goto _again
 
 			} else {
 				goto _again
@@ -82,7 +80,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 2:
 			if (p) == eof {
 				goto _ctr2
-				goto _again
 
 			} else {
 				if (data[(p)]) == 69 {
@@ -95,7 +92,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 3:
 			if (p) == eof {
 				goto _ctr3
-				goto _again
 
 			} else {
 				if (data[(p)]) == 70 {
@@ -108,7 +104,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 4:
 			if (p) == eof {
 				goto _ctr4
-				goto _again
 
 			} else {
 				if (data[(p)]) == 58 {
@@ -121,7 +116,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 5:
 			if (p) == eof {
 				goto _ctr5
-				goto _again
 
 			} else {
 				if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
@@ -134,7 +128,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 6:
 			if (p) == eof {
 				goto _ctr7
-				goto _again
 
 			} else {
 				if (data[(p)]) == 124 {
@@ -151,7 +144,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 7:
 			if (p) == eof {
 				goto _ctr9
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -199,7 +191,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 8:
 			if (p) == eof {
 				goto _ctr10
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -221,7 +212,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 9:
 			if (p) == eof {
 				goto _ctr15
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -243,7 +233,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 10:
 			if (p) == eof {
 				goto _ctr16
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -265,7 +254,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 11:
 			if (p) == eof {
 				goto _ctr14
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -313,7 +301,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 12:
 			if (p) == eof {
 				goto _ctr20
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -335,7 +322,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 13:
 			if (p) == eof {
 				goto _ctr25
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -357,7 +343,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 14:
 			if (p) == eof {
 				goto _ctr26
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -379,7 +364,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 15:
 			if (p) == eof {
 				goto _ctr24
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -427,7 +411,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 16:
 			if (p) == eof {
 				goto _ctr30
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -449,7 +432,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 17:
 			if (p) == eof {
 				goto _ctr35
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -471,7 +453,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 18:
 			if (p) == eof {
 				goto _ctr36
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -493,7 +474,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 19:
 			if (p) == eof {
 				goto _ctr34
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -541,7 +521,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 20:
 			if (p) == eof {
 				goto _ctr40
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -563,7 +542,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 21:
 			if (p) == eof {
 				goto _ctr45
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -585,7 +563,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 22:
 			if (p) == eof {
 				goto _ctr46
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -607,7 +584,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 23:
 			if (p) == eof {
 				goto _ctr44
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -655,7 +631,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 24:
 			if (p) == eof {
 				goto _ctr50
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -677,7 +652,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 25:
 			if (p) == eof {
 				goto _ctr55
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -699,7 +673,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 26:
 			if (p) == eof {
 				goto _ctr56
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -721,7 +694,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 27:
 			if (p) == eof {
 				goto _ctr54
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -769,7 +741,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 28:
 			if (p) == eof {
 				goto _ctr65
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -807,7 +778,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 29:
 			if (p) == eof {
 				goto _ctr67
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -856,7 +826,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 58:
 			if (p) == eof {
 				goto _ctr120
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -887,7 +856,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 59:
 			if (p) == eof {
 				goto _ctr125
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -918,7 +886,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 60:
 			if (p) == eof {
 				goto _ctr130
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -972,7 +939,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 61:
 			if (p) == eof {
 				goto _ctr132
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1032,7 +998,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 62:
 			if (p) == eof {
 				goto _ctr135
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1063,7 +1028,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 63:
 			if (p) == eof {
 				goto _ctr140
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1094,7 +1058,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 64:
 			if (p) == eof {
 				goto _ctr145
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1148,7 +1111,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 65:
 			if (p) == eof {
 				goto _ctr147
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1208,7 +1170,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 30:
 			if (p) == eof {
 				goto _ctr69
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1240,7 +1201,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 66:
 			if (p) == eof {
 				goto _ctr149
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1271,7 +1231,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 31:
 			if (p) == eof {
 				goto _ctr72
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1303,7 +1262,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 67:
 			if (p) == eof {
 				goto _ctr154
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1334,7 +1292,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 32:
 			if (p) == eof {
 				goto _ctr61
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1372,7 +1329,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 33:
 			if (p) == eof {
 				goto _ctr64
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1410,7 +1366,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 34:
 			if (p) == eof {
 				goto _ctr74
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1474,7 +1429,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 35:
 			if (p) == eof {
 				goto _ctr75
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1522,7 +1476,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 36:
 			if (p) == eof {
 				goto _ctr77
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1576,7 +1529,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 68:
 			if (p) == eof {
 				goto _ctr159
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1612,7 +1564,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 69:
 			if (p) == eof {
 				goto _ctr165
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1648,7 +1599,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 70:
 			if (p) == eof {
 				goto _ctr171
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1707,7 +1657,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 71:
 			if (p) == eof {
 				goto _ctr173
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1772,7 +1721,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 72:
 			if (p) == eof {
 				goto _ctr176
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1808,7 +1756,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 73:
 			if (p) == eof {
 				goto _ctr182
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1844,7 +1791,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 74:
 			if (p) == eof {
 				goto _ctr188
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1903,7 +1849,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 75:
 			if (p) == eof {
 				goto _ctr190
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1968,7 +1913,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 37:
 			if (p) == eof {
 				goto _ctr79
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2005,7 +1949,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 76:
 			if (p) == eof {
 				goto _ctr192
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2041,7 +1984,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 77:
 			if (p) == eof {
 				goto _ctr198
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2105,7 +2047,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 78:
 			if (p) == eof {
 				goto _ctr204
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2159,7 +2100,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 79:
 			if (p) == eof {
 				goto _ctr207
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2219,7 +2159,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 80:
 			if (p) == eof {
 				goto _ctr209
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2278,7 +2217,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 81:
 			if (p) == eof {
 				goto _ctr210
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2332,7 +2270,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 82:
 			if (p) == eof {
 				goto _ctr211
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2408,7 +2345,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 38:
 			if (p) == eof {
 				goto _ctr81
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2445,7 +2381,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 83:
 			if (p) == eof {
 				goto _ctr213
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2481,7 +2416,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 84:
 			if (p) == eof {
 				goto _ctr219
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2545,7 +2479,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 85:
 			if (p) == eof {
 				goto _ctr225
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2599,7 +2532,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 86:
 			if (p) == eof {
 				goto _ctr228
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2659,7 +2591,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 87:
 			if (p) == eof {
 				goto _ctr230
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2718,7 +2649,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 88:
 			if (p) == eof {
 				goto _ctr231
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2772,7 +2702,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 89:
 			if (p) == eof {
 				goto _ctr232
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2848,7 +2777,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 39:
 			if (p) == eof {
 				goto _ctr83
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2896,7 +2824,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 40:
 			if (p) == eof {
 				goto _ctr85
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2950,7 +2877,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 90:
 			if (p) == eof {
 				goto _ctr234
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -2986,7 +2912,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 91:
 			if (p) == eof {
 				goto _ctr240
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3022,7 +2947,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 92:
 			if (p) == eof {
 				goto _ctr246
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3081,7 +3005,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 93:
 			if (p) == eof {
 				goto _ctr248
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3146,7 +3069,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 94:
 			if (p) == eof {
 				goto _ctr251
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3182,7 +3104,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 95:
 			if (p) == eof {
 				goto _ctr257
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3218,7 +3139,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 96:
 			if (p) == eof {
 				goto _ctr263
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3277,7 +3197,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 97:
 			if (p) == eof {
 				goto _ctr265
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3342,7 +3261,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 41:
 			if (p) == eof {
 				goto _ctr87
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3379,7 +3297,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 98:
 			if (p) == eof {
 				goto _ctr267
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3415,7 +3332,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 99:
 			if (p) == eof {
 				goto _ctr273
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3474,7 +3390,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 100:
 			if (p) == eof {
 				goto _ctr276
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3533,7 +3448,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 101:
 			if (p) == eof {
 				goto _ctr279
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3598,7 +3512,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 42:
 			if (p) == eof {
 				goto _ctr89
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3635,7 +3548,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 102:
 			if (p) == eof {
 				goto _ctr281
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3671,7 +3583,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 103:
 			if (p) == eof {
 				goto _ctr287
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3730,7 +3641,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 104:
 			if (p) == eof {
 				goto _ctr290
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3789,7 +3699,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 105:
 			if (p) == eof {
 				goto _ctr293
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3854,7 +3763,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 43:
 			if (p) == eof {
 				goto _ctr91
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3902,7 +3810,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 44:
 			if (p) == eof {
 				goto _ctr93
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3956,7 +3863,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 106:
 			if (p) == eof {
 				goto _ctr295
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -3992,7 +3898,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 107:
 			if (p) == eof {
 				goto _ctr301
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4028,7 +3933,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 108:
 			if (p) == eof {
 				goto _ctr307
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4087,7 +3991,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 109:
 			if (p) == eof {
 				goto _ctr309
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4152,7 +4055,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 110:
 			if (p) == eof {
 				goto _ctr312
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4188,7 +4090,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 111:
 			if (p) == eof {
 				goto _ctr318
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4224,7 +4125,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 112:
 			if (p) == eof {
 				goto _ctr324
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4283,7 +4183,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 113:
 			if (p) == eof {
 				goto _ctr326
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4348,7 +4247,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 45:
 			if (p) == eof {
 				goto _ctr95
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4385,7 +4283,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 114:
 			if (p) == eof {
 				goto _ctr328
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4421,7 +4318,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 115:
 			if (p) == eof {
 				goto _ctr334
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4480,7 +4376,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 116:
 			if (p) == eof {
 				goto _ctr337
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4539,7 +4434,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 117:
 			if (p) == eof {
 				goto _ctr340
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4604,7 +4498,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 46:
 			if (p) == eof {
 				goto _ctr97
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4641,7 +4534,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 118:
 			if (p) == eof {
 				goto _ctr342
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4677,7 +4569,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 119:
 			if (p) == eof {
 				goto _ctr348
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4736,7 +4627,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 120:
 			if (p) == eof {
 				goto _ctr351
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4795,7 +4685,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 121:
 			if (p) == eof {
 				goto _ctr354
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4860,7 +4749,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 47:
 			if (p) == eof {
 				goto _ctr99
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4908,7 +4796,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 48:
 			if (p) == eof {
 				goto _ctr101
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4962,7 +4849,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 122:
 			if (p) == eof {
 				goto _ctr356
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -4998,7 +4884,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 123:
 			if (p) == eof {
 				goto _ctr362
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5034,7 +4919,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 124:
 			if (p) == eof {
 				goto _ctr368
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5093,7 +4977,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 125:
 			if (p) == eof {
 				goto _ctr370
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5158,7 +5041,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 126:
 			if (p) == eof {
 				goto _ctr373
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5194,7 +5076,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 127:
 			if (p) == eof {
 				goto _ctr379
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5230,7 +5111,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 128:
 			if (p) == eof {
 				goto _ctr385
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5289,7 +5169,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 129:
 			if (p) == eof {
 				goto _ctr387
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5354,7 +5233,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 49:
 			if (p) == eof {
 				goto _ctr103
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5391,7 +5269,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 130:
 			if (p) == eof {
 				goto _ctr389
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5427,7 +5304,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 131:
 			if (p) == eof {
 				goto _ctr395
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5486,7 +5362,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 132:
 			if (p) == eof {
 				goto _ctr398
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5545,7 +5420,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 133:
 			if (p) == eof {
 				goto _ctr401
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5610,7 +5484,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 50:
 			if (p) == eof {
 				goto _ctr105
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5647,7 +5520,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 134:
 			if (p) == eof {
 				goto _ctr403
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5683,7 +5555,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 135:
 			if (p) == eof {
 				goto _ctr409
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5742,7 +5613,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 136:
 			if (p) == eof {
 				goto _ctr412
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5801,7 +5671,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 137:
 			if (p) == eof {
 				goto _ctr415
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5866,7 +5735,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 51:
 			if (p) == eof {
 				goto _ctr107
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5914,7 +5782,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 52:
 			if (p) == eof {
 				goto _ctr109
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -5968,7 +5835,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 138:
 			if (p) == eof {
 				goto _ctr417
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6004,7 +5870,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 139:
 			if (p) == eof {
 				goto _ctr423
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6040,7 +5905,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 140:
 			if (p) == eof {
 				goto _ctr429
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6099,7 +5963,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 141:
 			if (p) == eof {
 				goto _ctr431
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6164,7 +6027,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 142:
 			if (p) == eof {
 				goto _ctr434
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6200,7 +6062,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 143:
 			if (p) == eof {
 				goto _ctr440
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6236,7 +6097,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 144:
 			if (p) == eof {
 				goto _ctr446
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6295,7 +6155,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 145:
 			if (p) == eof {
 				goto _ctr448
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6360,7 +6219,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 53:
 			if (p) == eof {
 				goto _ctr111
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6397,7 +6255,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 146:
 			if (p) == eof {
 				goto _ctr450
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6433,7 +6290,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 147:
 			if (p) == eof {
 				goto _ctr456
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6492,7 +6348,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 148:
 			if (p) == eof {
 				goto _ctr459
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6551,7 +6406,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 149:
 			if (p) == eof {
 				goto _ctr462
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6616,7 +6470,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 54:
 			if (p) == eof {
 				goto _ctr113
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6653,7 +6506,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 150:
 			if (p) == eof {
 				goto _ctr464
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6689,7 +6541,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 151:
 			if (p) == eof {
 				goto _ctr470
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6748,7 +6599,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 152:
 			if (p) == eof {
 				goto _ctr473
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6807,7 +6657,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 153:
 			if (p) == eof {
 				goto _ctr476
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6872,7 +6721,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 55:
 			if (p) == eof {
 				goto _ctr115
-				goto _again
 
 			} else {
 				if (data[(p)]) == 32 {
@@ -6885,7 +6733,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 56:
 			if (p) == eof {
 				goto _ctr117
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6923,7 +6770,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 57:
 			if (p) == eof {
 				goto _ctr118
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -6977,7 +6823,6 @@ func (e *Event) recoverExtensions(data string) error {
 		case 154:
 			if (p) == eof {
 				goto _ctr478
-				goto _again
 
 			} else {
 				if (data[(p)]) == 32 {

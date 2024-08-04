@@ -60,7 +60,6 @@ func (e *Event) unpack(data string) error {
 		case 1:
 			if (p) == eof {
 				goto _ctr1
-				goto _again
 
 			} else {
 				if (data[(p)]) == 67 {
@@ -73,7 +72,6 @@ func (e *Event) unpack(data string) error {
 		case 0:
 			if (p) == eof {
 				goto _ctr0
-				goto _again
 
 			} else {
 				goto _again
@@ -82,7 +80,6 @@ func (e *Event) unpack(data string) error {
 		case 2:
 			if (p) == eof {
 				goto _ctr2
-				goto _again
 
 			} else {
 				if (data[(p)]) == 69 {
@@ -95,7 +92,6 @@ func (e *Event) unpack(data string) error {
 		case 3:
 			if (p) == eof {
 				goto _ctr3
-				goto _again
 
 			} else {
 				if (data[(p)]) == 70 {
@@ -108,7 +104,6 @@ func (e *Event) unpack(data string) error {
 		case 4:
 			if (p) == eof {
 				goto _ctr4
-				goto _again
 
 			} else {
 				if (data[(p)]) == 58 {
@@ -121,7 +116,6 @@ func (e *Event) unpack(data string) error {
 		case 5:
 			if (p) == eof {
 				goto _ctr5
-				goto _again
 
 			} else {
 				if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
@@ -134,7 +128,6 @@ func (e *Event) unpack(data string) error {
 		case 6:
 			if (p) == eof {
 				goto _ctr7
-				goto _again
 
 			} else {
 				if (data[(p)]) == 124 {
@@ -151,7 +144,6 @@ func (e *Event) unpack(data string) error {
 		case 7:
 			if (p) == eof {
 				goto _ctr9
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -173,7 +165,6 @@ func (e *Event) unpack(data string) error {
 		case 8:
 			if (p) == eof {
 				goto _ctr13
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -195,7 +186,6 @@ func (e *Event) unpack(data string) error {
 		case 9:
 			if (p) == eof {
 				goto _ctr16
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -217,7 +207,6 @@ func (e *Event) unpack(data string) error {
 		case 10:
 			if (p) == eof {
 				goto _ctr17
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -239,7 +228,6 @@ func (e *Event) unpack(data string) error {
 		case 11:
 			if (p) == eof {
 				goto _ctr21
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -261,7 +249,6 @@ func (e *Event) unpack(data string) error {
 		case 12:
 			if (p) == eof {
 				goto _ctr25
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -283,7 +270,6 @@ func (e *Event) unpack(data string) error {
 		case 13:
 			if (p) == eof {
 				goto _ctr28
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -305,7 +291,6 @@ func (e *Event) unpack(data string) error {
 		case 14:
 			if (p) == eof {
 				goto _ctr29
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -327,7 +312,6 @@ func (e *Event) unpack(data string) error {
 		case 15:
 			if (p) == eof {
 				goto _ctr33
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -349,7 +333,6 @@ func (e *Event) unpack(data string) error {
 		case 16:
 			if (p) == eof {
 				goto _ctr37
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -371,7 +354,6 @@ func (e *Event) unpack(data string) error {
 		case 17:
 			if (p) == eof {
 				goto _ctr40
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -393,7 +375,6 @@ func (e *Event) unpack(data string) error {
 		case 18:
 			if (p) == eof {
 				goto _ctr41
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -415,7 +396,6 @@ func (e *Event) unpack(data string) error {
 		case 19:
 			if (p) == eof {
 				goto _ctr45
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -437,7 +417,6 @@ func (e *Event) unpack(data string) error {
 		case 20:
 			if (p) == eof {
 				goto _ctr49
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -459,7 +438,6 @@ func (e *Event) unpack(data string) error {
 		case 21:
 			if (p) == eof {
 				goto _ctr52
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -481,7 +459,6 @@ func (e *Event) unpack(data string) error {
 		case 22:
 			if (p) == eof {
 				goto _ctr53
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -503,7 +480,6 @@ func (e *Event) unpack(data string) error {
 		case 23:
 			if (p) == eof {
 				goto _ctr57
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -525,7 +501,6 @@ func (e *Event) unpack(data string) error {
 		case 24:
 			if (p) == eof {
 				goto _ctr61
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -547,7 +522,6 @@ func (e *Event) unpack(data string) error {
 		case 25:
 			if (p) == eof {
 				goto _ctr64
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -569,7 +543,6 @@ func (e *Event) unpack(data string) error {
 		case 26:
 			if (p) == eof {
 				goto _ctr65
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -591,7 +564,6 @@ func (e *Event) unpack(data string) error {
 		case 27:
 			if (p) == eof {
 				goto _ctr69
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -629,7 +601,6 @@ func (e *Event) unpack(data string) error {
 		case 28:
 			if (p) == eof {
 				goto _ctr72
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -667,7 +638,6 @@ func (e *Event) unpack(data string) error {
 		case 36:
 			if (p) == eof {
 				goto _ctr88
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -705,7 +675,6 @@ func (e *Event) unpack(data string) error {
 		case 29:
 			if (p) == eof {
 				goto _ctr74
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -743,7 +712,6 @@ func (e *Event) unpack(data string) error {
 		case 30:
 			if (p) == eof {
 				goto _ctr76
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -792,7 +760,6 @@ func (e *Event) unpack(data string) error {
 		case 37:
 			if (p) == eof {
 				goto _ctr91
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -823,7 +790,6 @@ func (e *Event) unpack(data string) error {
 		case 38:
 			if (p) == eof {
 				goto _ctr96
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -854,7 +820,6 @@ func (e *Event) unpack(data string) error {
 		case 39:
 			if (p) == eof {
 				goto _ctr101
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -908,7 +873,6 @@ func (e *Event) unpack(data string) error {
 		case 40:
 			if (p) == eof {
 				goto _ctr103
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -968,7 +932,6 @@ func (e *Event) unpack(data string) error {
 		case 41:
 			if (p) == eof {
 				goto _ctr106
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -999,7 +962,6 @@ func (e *Event) unpack(data string) error {
 		case 42:
 			if (p) == eof {
 				goto _ctr111
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1030,7 +992,6 @@ func (e *Event) unpack(data string) error {
 		case 43:
 			if (p) == eof {
 				goto _ctr116
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1084,7 +1045,6 @@ func (e *Event) unpack(data string) error {
 		case 44:
 			if (p) == eof {
 				goto _ctr118
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1144,7 +1104,6 @@ func (e *Event) unpack(data string) error {
 		case 31:
 			if (p) == eof {
 				goto _ctr78
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1176,7 +1135,6 @@ func (e *Event) unpack(data string) error {
 		case 45:
 			if (p) == eof {
 				goto _ctr120
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1207,7 +1165,6 @@ func (e *Event) unpack(data string) error {
 		case 32:
 			if (p) == eof {
 				goto _ctr81
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1239,7 +1196,6 @@ func (e *Event) unpack(data string) error {
 		case 46:
 			if (p) == eof {
 				goto _ctr125
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1270,7 +1226,6 @@ func (e *Event) unpack(data string) error {
 		case 33:
 			if (p) == eof {
 				goto _ctr83
-				goto _again
 
 			} else {
 				if (data[(p)]) == 32 {
@@ -1283,7 +1238,6 @@ func (e *Event) unpack(data string) error {
 		case 34:
 			if (p) == eof {
 				goto _ctr85
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1321,7 +1275,6 @@ func (e *Event) unpack(data string) error {
 		case 35:
 			if (p) == eof {
 				goto _ctr86
-				goto _again
 
 			} else {
 				switch data[(p)] {
@@ -1375,7 +1328,6 @@ func (e *Event) unpack(data string) error {
 		case 47:
 			if (p) == eof {
 				goto _ctr130
-				goto _again
 
 			} else {
 				if (data[(p)]) == 32 {
