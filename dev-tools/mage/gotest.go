@@ -136,10 +136,6 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-<<<<<<< HEAD
-	module := EnvOr("MODULE", "")
-	modulesFileInfo, err := ioutil.ReadDir("./module")
-=======
 	modules := EnvOr("MODULE", "")
 	if modules == "" {
 		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
@@ -157,7 +153,6 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 
 func goTestIntegrationForSingleModule(ctx context.Context, module string) error {
 	modulesFileInfo, err := os.ReadDir("./module")
->>>>>>> 313fdca1df ([CI] Module parsing fix (#40053))
 	if err != nil {
 		return err
 	}
