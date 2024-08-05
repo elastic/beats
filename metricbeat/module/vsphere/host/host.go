@@ -19,18 +19,16 @@ package host
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
-	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 )
@@ -54,6 +52,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	return &MetricSet{ms}, nil
+}
+
+// Structure to hold performance metrics values
+type PerformanceMetrics struct {
+	NetUsage                int64
+	NetDroppedTransmitted   int64
+	NetDroppedReceived      int64
+	NetMulticastTransmitted int64
+	NetMulticastReceived    int64
+	NetErrorsTransmitted    int64
+	NetErrorsReceived       int64
+	NetPacketTransmitted    int64
+	NetPacketReceived       int64
+	NetReceived             int64
+	NetTransmitted          int64
+	DiskWrite               int64
+	DiskRead                int64
+	DiskUsage               int64
+	DiskMaxTotalLatency     int64
+	DiskDeviceLatency       int64
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -92,83 +110,152 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all hosts.
 	var hst []mo.HostSystem
-	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hst)
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "network"}, &hst)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
-	for _, hs := range hst {
+	// Create a performance manager
+	perfManager := performance.NewManager(c)
 
-		event := mapstr.M{}
+	// Retrieve metric IDs for the specified metric names
+	metrics, err := perfManager.CounterInfoByName(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve metrics: %w", err)
+	}
 
-		event["name"] = hs.Summary.Config.Name
-		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
-		event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
+	// Define metrics to be collected
+	metricNames := []string{
+		"disk.deviceLatency.average",
+		"disk.maxTotalLatency.latest",
+		"disk.usage.average",
+		"disk.read.average",
+		"disk.write.average",
+		"net.transmitted.average",
+		"net.received.average",
+		"net.usage.average",
+		"net.packetsTx.summation",
+		"net.packetsRx.summation",
+		"net.errorsTx.summation",
+		"net.errorsRx.summation",
+		"net.multicastTx.summation",
+		"net.multicastRx.summation",
+		"net.droppedTx.summation",
+		"net.droppedRx.summation",
+	}
 
-		if hs.Summary.Hardware != nil {
-			totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", int64(totalCPU)-int64(hs.Summary.QuickStats.OverallCpuUsage))
-			event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
-			event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
-		} else {
-			m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
+	// Define refrence of structure
+	var metricsVar PerformanceMetrics
+
+	// Map metric names to struture	fields
+	metricMap := map[string]*int64{
+		"disk.deviceLatency.average":  &metricsVar.DiskDeviceLatency,
+		"disk.maxTotalLatency.latest": &metricsVar.DiskMaxTotalLatency,
+		"net.usage.average":           &metricsVar.NetUsage,
+		"disk.usage.average":          &metricsVar.DiskUsage,
+		"disk.read.average":           &metricsVar.DiskRead,
+		"disk.write.average":          &metricsVar.DiskWrite,
+		"net.transmitted.average":     &metricsVar.NetTransmitted,
+		"net.received.average":        &metricsVar.NetReceived,
+		"net.packetsTx.summation":     &metricsVar.NetPacketTransmitted,
+		"net.packetsRx.summation":     &metricsVar.NetPacketReceived,
+		"net.errorsTx.summation":      &metricsVar.NetErrorsTransmitted,
+		"net.errorsRx.summation":      &metricsVar.NetErrorsReceived,
+		"net.multicastTx.summation":   &metricsVar.NetMulticastTransmitted,
+		"net.multicastRx.summation":   &metricsVar.NetMulticastReceived,
+		"net.droppedTx.summation":     &metricsVar.NetDroppedTransmitted,
+		"net.droppedRx.summation":     &metricsVar.NetDroppedReceived,
+	}
+
+	// Map metric IDs to metric names
+	metricNamesById := make(map[int32]string)
+	for name, metric := range metrics {
+		metricNamesById[metric.Key] = name
+	}
+
+	var spec types.PerfQuerySpec
+	var metricIDs []types.PerfMetricId
+
+	for _, metricName := range metricNames {
+		metric, exists := metrics[metricName]
+		if !exists {
+			m.Logger().Debug("Metric %v not found", metricName)
+			continue
 		}
 
-		if hs.Summary.Host != nil {
-			networkNames, err := getNetworkNames(ctx, c, hs.Summary.Host.Reference())
-			if err != nil {
-				m.Logger().Debugf("error trying to get network names: %s", err.Error())
-			} else {
-				if len(networkNames) > 0 {
-					event["network_names"] = networkNames
-				}
+		metricIDs = append(metricIDs, types.PerfMetricId{
+			CounterId: metric.Key,
+		})
+	}
+
+	pc := property.DefaultCollector(c)
+	for _, hs := range hst {
+		var networkRefs []types.ManagedObjectReference
+		for _, obj := range hs.Network {
+			if obj.Type == "Network" {
+				networkRefs = append(networkRefs, obj)
 			}
 		}
+
+		var nets []mo.Network
+		if len(networkRefs) > 0 {
+			err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
+			if err != nil {
+				m.Logger().Errorf("error retrieving network from host: %v", err)
+			}
+		}
+
+		var outputNetworkNames []string
+		for _, net := range nets {
+			name := strings.Replace(net.Name, ".", "_", -1)
+			outputNetworkNames = append(outputNetworkNames, name)
+		}
+
+		spec = types.PerfQuerySpec{
+			Entity:     hs.Reference(),
+			MetricId:   metricIDs,
+			MaxSample:  1,
+			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+		}
+
+		// Query performance data
+		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+		if err != nil {
+			m.Logger().Debug("Failed to query performance data: %v", err)
+			continue
+		}
+
+		if len(samples) > 0 {
+			entityMetrics, ok := samples[0].(*types.PerfEntityMetric)
+			if !ok {
+				m.Logger().Debug("Unexpected metric type")
+				continue
+			}
+
+			for _, value := range entityMetrics.Value {
+				metricSeries, ok := value.(*types.PerfMetricIntSeries)
+				if !ok {
+					m.Logger().Debug("Unexpected metric series type")
+					continue
+				}
+
+				if len(metricSeries.Value) > 0 {
+					metricName := metricNamesById[metricSeries.Id.CounterId]
+					if assignValue, exists := metricMap[metricName]; exists {
+						*assignValue = metricSeries.Value[0] // Assign the metric value to the variable
+					}
+				} else {
+					m.Logger().Debug("Metric %v: No result found\n", metricNamesById[metricSeries.Id.CounterId])
+				}
+			}
+		} else {
+			m.Logger().Debug("No samples returned from performance manager")
+		}
+
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: m.eventMapping(hs, &metricsVar, outputNetworkNames),
 		})
 	}
 
 	return nil
-}
-
-func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObjectReference) ([]string, error) {
-	var outputNetworkNames []string
-
-	pc := property.DefaultCollector(c)
-
-	var hs mo.HostSystem
-	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &hs)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
-	}
-
-	if len(hs.Network) == 0 {
-		return nil, errors.New("no networks found")
-	}
-
-	var networkRefs []types.ManagedObjectReference
-	for _, obj := range hs.Network {
-		if obj.Type == "Network" {
-			networkRefs = append(networkRefs, obj)
-		}
-	}
-
-	if len(networkRefs) == 0 {
-		return nil, errors.New("no networks found")
-	}
-
-	var nets []mo.Network
-	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from host: %v", err)
-	}
-
-	for _, net := range nets {
-		name := strings.Replace(net.Name, ".", "_", -1)
-		outputNetworkNames = append(outputNetworkNames, name)
-	}
-
-	return outputNetworkNames, nil
 }

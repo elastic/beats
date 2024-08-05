@@ -26,6 +26,30 @@
             "mhz": 4521
           }
         },
+        "disk":{
+          "throughput": {
+              "bytes": 0
+            },
+            "device":{
+              "latency": {
+                "ms": 0
+              }
+            },
+            "latency":{
+              "total": {
+                "ms": 0
+              }
+            },
+            "total":{
+              "bytes": 0
+            },
+            "read":{
+              "bytes": 0
+            },
+            "write":{
+              "bytes": 0
+            }
+        },
         "memory": {
           "free": {
             "bytes": 2822230016
@@ -37,10 +61,66 @@
             "bytes": 1472200704
           }
         },
+        "network": {
+          "bandwidth": {
+            "transmitted": {
+              "bytes": 0
+            },
+            "received": {
+              "bytes": 0
+            },
+            "total": {
+              "bytes": 0
+            }
+          },
+          "packets":{
+            "transmitted": {
+              "count": 0
+            },
+            "received": {
+              "count": 0
+            },
+            "errors": {
+              "transmitted": {
+                "count": 0
+              },
+              "received": {
+                "count": 0
+              },
+              "total": {
+                "count": 0
+              }
+            },
+            "multicast": {
+              "transmitted": {
+                "count": 0
+              },
+              "received": {
+                "count": 0
+              },
+              "total": {
+                "count": 0
+              }
+            },
+            "dropped": {
+              "transmitted": {
+                "count": 0
+              },
+              "received": {
+                "count": 0
+              },
+              "total": {
+                "count": 0
+              }
+            }
+          }
+        },
         "network_names": [
           "VM Network"
         ],
-        "name": "DC0_H0"
+        "name": "DC0_H0",
+        "status": "green",
+        "uptime": 0
       }
     }
 }

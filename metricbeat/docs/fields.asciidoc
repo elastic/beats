@@ -66946,6 +66946,26 @@ type: keyword
 
 --
 
+*`vsphere.host.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.uptime`*::
++
+--
+The total uptime of a host in the vSphere environment.
+
+
+type: double
+
+--
+
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
@@ -66973,6 +66993,56 @@ Free CPU in Mhz
 
 
 type: long
+
+--
+
+*`vsphere.host.disk.throughput.bytes`*::
++
+--
+The average disk throughput usage over a specified interval.
+
+
+type: double
+
+--
+
+*`vsphere.host.disk.device.latency.ms`*::
++
+--
+Average amount of time it takes to complete an SCSI command from physical device.
+
+
+type: double
+
+--
+
+*`vsphere.host.disk.latency.total.ms`*::
++
+--
+Highest latency value across all disks used by the host.
+
+
+type: double
+
+--
+
+*`vsphere.host.disk.total.bytes`*::
++
+--
+Aggregated disk I/O rate.
+
+
+type: double
+
+--
+
+*`vsphere.host.disk.read.bytes`*::
++
+--
+Average number of kilobytes read from the disk each second.
+
+
+type: double
 
 --
 
@@ -67019,6 +67089,146 @@ Network names
 
 
 type: keyword
+
+--
+
+*`vsphere.host.network.bandwidth.transmitted.bytes`*::
++
+--
+Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.bandwidth.received.bytes`*::
++
+--
+Average rate at which data was received during the interval. This represents the bandwidth of the network.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.bandwidth.total.bytes`*::
++
+--
+Network utilization (combined transmit- and receive-rates).
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.transmitted.count`*::
++
+--
+Number of packets transmitted.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.received.count`*::
++
+--
+Number of packets received.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.errors.transmitted.count`*::
++
+--
+Number of packets with errors transmitted.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.errors.received.count`*::
++
+--
+Number of packets with errors received.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.errors.total.count`*::
++
+--
+Total number of packets with errors.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.multicast.transmitted.count`*::
++
+--
+Number of multicast packets transmitted.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.multicast.received.count`*::
++
+--
+Number of multicast packets received.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.multicast.total.count`*::
++
+--
+Total number of multicast packets.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.dropped.transmitted.count`*::
++
+--
+Number of transmitted packets dropped.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.dropped.received.count`*::
++
+--
+Number of received packets dropped.
+
+
+type: double
+
+--
+
+*`vsphere.host.network.packets.dropped.total.count`*::
++
+--
+Total number of packets dropped.    
+
+
+type: double
 
 --
 

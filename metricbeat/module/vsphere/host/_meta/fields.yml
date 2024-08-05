@@ -8,6 +8,14 @@
       type: keyword
       description: >
         Host name
+    - name: status
+      type: keyword
+      description: >
+        The overall health status of a host in the vSphere environment.
+    - name: uptime
+      type: double
+      description: >
+        The total uptime of a host in the vSphere environment.
     - name: cpu.used.mhz
       type: long
       description: >
@@ -20,6 +28,26 @@
       type: long
       description: >
         Free CPU in Mhz
+    - name: disk.throughput.bytes
+      type: double
+      description: >
+        The average disk throughput usage over a specified interval.
+    - name: disk.device.latency.ms
+      type: double
+      description: >
+        Average amount of time it takes to complete an SCSI command from physical device.
+    - name: disk.latency.total.ms
+      type: double
+      description: >
+        Highest latency value across all disks used by the host.
+    - name: disk.total.bytes
+      type: double
+      description: >
+        Aggregated disk I/O rate.
+    - name: disk.read.bytes
+      type: double
+      description: >
+        Average number of kilobytes read from the disk each second.
     - name: memory.used.bytes
       type: long
       description: >
@@ -39,3 +67,59 @@
       type: keyword
       description: >
         Network names
+    - name: network.bandwidth.transmitted.bytes
+      type: double
+      description: >
+        Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+    - name: network.bandwidth.received.bytes
+      type: double
+      description: >
+        Average rate at which data was received during the interval. This represents the bandwidth of the network.
+    - name: network.bandwidth.total.bytes
+      type: double
+      description: >
+        Network utilization (combined transmit- and receive-rates).
+    - name: network.packets.transmitted.count
+      type: double
+      description: >
+        Number of packets transmitted.
+    - name: network.packets.received.count
+      type: double
+      description: >
+        Number of packets received.
+    - name: network.packets.errors.transmitted.count
+      type: double
+      description: >
+        Number of packets with errors transmitted.
+    - name: network.packets.errors.received.count
+      type: double
+      description: >
+        Number of packets with errors received.
+    - name: network.packets.errors.total.count
+      type: double
+      description: >
+        Total number of packets with errors.
+    - name: network.packets.multicast.transmitted.count
+      type: double
+      description: >
+        Number of multicast packets transmitted.
+    - name: network.packets.multicast.received.count
+      type: double
+      description: >
+        Number of multicast packets received.
+    - name: network.packets.multicast.total.count
+      type: double
+      description: >
+        Total number of multicast packets.
+    - name: network.packets.dropped.transmitted.count
+      type: double
+      description: >
+        Number of transmitted packets dropped.
+    - name: network.packets.dropped.received.count
+      type: double
+      description: >
+        Number of received packets dropped.
+    - name: network.packets.dropped.total.count
+      type: double
+      description: >
+        Total number of packets dropped.    
