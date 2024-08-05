@@ -7,7 +7,6 @@ beta::[]
 <titleabbrev>add_session_metadata</titleabbrev>
 ++++
 
-ifeval::["{beatname_lc}"=="auditbeat"]
 
 The `add_session_metadata` processor enriches process events with additional
 information that users can see using the {security-guide}/session-view.html[Session View] tool in the
@@ -45,7 +44,7 @@ This enhanced data enables the powerful {security-guide}/session-view.html[Sessi
 
 To configure and enable Session View functionality, you'll:
 
-* Add the `add_sessions-metadata` processor to your `auditbeat.yml` file.
+* Add the `add_sessions_metadata` processor to your `auditbeat.yml` file.
 * Configure audit rules in your `auditbeat.yml` file. 
 * Restart {auditbeat}.
 
@@ -85,5 +84,3 @@ auditbeat.modules:
 -------------------------------------
 sudo systemctl restart auditbeat
 -------------------------------------
-
-endif::[]
