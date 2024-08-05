@@ -28,10 +28,6 @@
       type: long
       description: >
         Free CPU in Mhz
-    - name: disk.throughput.bytes
-      type: double
-      description: >
-        The average disk throughput usage over a specified interval.
     - name: disk.device.latency.ms
       type: double
       description: >

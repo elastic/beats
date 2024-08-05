@@ -27,9 +27,6 @@
           }
         },
         "disk":{
-          "throughput": {
-              "bytes": 0
-            },
             "device":{
               "latency": {
                 "ms": 0
