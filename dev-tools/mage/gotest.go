@@ -169,6 +169,9 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	modules := EnvOr("MODULE", "")
+	if modules == "" {
+		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
+	}
 	moduleArr := strings.Split(modules, ",")
 
 	for _, module := range moduleArr {
