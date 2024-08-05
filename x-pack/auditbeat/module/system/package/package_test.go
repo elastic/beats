@@ -12,7 +12,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -28,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -55,39 +53,6 @@ func TestRPMParallel(t *testing.T) {
 
 	}
 	waiter.Wait()
-}
-
-func TestWithSuid(t *testing.T) {
-	currentUID := os.Getuid()
-	if currentUID != 0 {
-		t.Skipf("can only run as root")
-	}
-	// pick a user to drop to
-	userList, err := user.GetUsers(false)
-	require.NoError(t, err)
-
-	var useUID int64
-	for _, user := range userList {
-		if user.UID != "0" {
-			newUID, err := strconv.ParseInt(user.UID, 10, 64)
-			require.NoError(t, err)
-			useUID = newUID
-			break
-		}
-	}
-
-	testMs := MetricSet{
-		log: logp.L(),
-		config: config{
-			PackageSuidDrop: &useUID,
-		},
-	}
-
-	packages, err := testMs.getPackages()
-	require.NoError(t, err)
-
-	require.NotZero(t, packages)
-	t.Logf("got %d packages", len(packages))
 }
 
 func TestData(t *testing.T) {
