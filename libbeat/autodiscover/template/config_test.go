@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -332,7 +331,7 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 
 // create a temporary file on disk to save the keystore.
 func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
+	path, err := os.MkdirTemp("", "testing")
 	if err != nil {
 		panic(err)
 	}

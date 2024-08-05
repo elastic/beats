@@ -30,10 +30,10 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Metricbeat Check/Update"
+  - group: "Check/Update"
     key: "metricbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "Metricbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C metricbeat check update
@@ -57,11 +57,11 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "metricbeat-check-update"
 
-  - group: "Metricbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "metricbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Metricbeat Unit Tests"
+      - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd metricbeat
@@ -78,9 +78,9 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Linux x86_64 Unit Tests"
+              context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Metricbeat Go Integration Tests"
+      - label: ":ubuntu: Metricbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -107,7 +107,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Metricbeat Python Integration Tests"
+      - label: ":ubuntu: Metricbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
@@ -133,7 +133,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Python Integration Tests"
 
-      - label: ":ubuntu: Metricbeat Crosscompile"
+      - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
         command: "make -C metricbeat crosscompile"
         retry:
@@ -150,7 +150,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Crosscompile"
 
-      - label: ":windows: Metricbeat Win-2016 Unit Tests"
+      - label: ":windows: Metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -169,9 +169,9 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Win-2016 Unit Tests"
+              context: "metricbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Metricbeat Win-2022 Unit Tests"
+      - label: ":windows: Metricbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -190,14 +190,14 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Win-2022 Unit Tests"
+              context: "metricbeat: Win 2022 Unit Tests"
 
-  - group: "Metricbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "metricbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Metricbeat Win 10 Unit Tests"
+      - label: ":windows: Metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -218,7 +218,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Win 10 Unit Tests"
 
-      - label: ":windows: Metricbeat Win 11 Unit Tests"
+      - label: ":windows: Metricbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -239,7 +239,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Win 11 Unit Tests"
 
-      - label: ":windows: Metricbeat Win-2019 Unit Tests"
+      - label: ":windows: Metricbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -258,14 +258,14 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Win-2019 Unit Tests"
+              context: "metricbeat: Win 2019 Unit Tests"
 
-  - group: "Metricbeat Extended macOS Tests"
-    key: "metricbeat-extended-macos-tests"
+  - group: "Extended Tests"
+    key: "metricbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
-      - label: ":mac: Metricbeat macOS x64_64 Unit Tests"
+      - label: ":mac: Metricbeat: macOS x64_64 Unit Tests"
         key: "extended-macos-x64-64-unit-tests"
         command: |
           set -euo pipefail
@@ -285,7 +285,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Metricbeat macOS arm64 Unit Tests"
+      - label: ":mac: Metricbeat: macOS arm64 Unit Tests"
         key: "extended-macos-arm64-unit-tests"
         skip: "Skipping due to elastic/beats#33035"
         # https://github.com/elastic/beats/issues/33035
@@ -314,11 +314,13 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "metricbeat-mandatory-tests"
 
-  - group: "Metricbeat Packaging"
+  - group: "Packaging"
     key: "metricbeat-packaging"
     steps:
-      - label: ":ubuntu: Metricbeat Packaging Linux"
+      - label: ":ubuntu: Metricbeat: Packaging Linux"
         key: "packaging-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           cd metricbeat
           mage package
@@ -332,14 +334,15 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "metricbeat: Packaging Linux"
 
-      - label: ":ubuntu: Metricbeat Packaging Linux arm64"
+      - label: ":ubuntu: Metricbeat: Packaging Linux arm64"
         key: "packaging-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
         command: |
           cd metricbeat
           mage package
@@ -351,9 +354,6 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
         notify:
           - github_commit_status:
               context: "metricbeat: Packaging Linux arm64"

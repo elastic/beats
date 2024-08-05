@@ -486,7 +486,11 @@ func TestURLEval(t *testing.T) {
 				state = conf.State
 			}
 
-			response, err := input{test.time, conf}.getURL(ctx, state, logp.NewLogger("websocket_url_eval_test"))
+			now := test.time
+			if now == nil {
+				now = time.Now
+			}
+			response, err := getURL(ctx, "websocket", conf.URLProgram, conf.URL.String(), state, conf.Redact, logp.NewLogger("websocket_url_eval_test"), now)
 			if err != nil && !errors.Is(err, context.Canceled) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, nil)
 			}
@@ -544,7 +548,7 @@ func TestInput(t *testing.T) {
 				}
 			}
 
-			err = input{test.time, conf}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{time: test.time, cfg: conf}.run(v2Ctx, src, test.persistCursor, &client)
 			if (fmt.Sprint(err) != fmt.Sprint(ctxCancelledError)) && (fmt.Sprint(err) != fmt.Sprint(test.wantErr)) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}

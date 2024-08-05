@@ -68,7 +68,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/filewatcher"
@@ -265,6 +264,11 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 		return nil, err
 	}
 
+	eid, err := uuid.FromString(metricreport.EphemeralID().String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate EphemeralID from UUID string: %w", err)
+	}
+
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:            name,
@@ -276,7 +280,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     metricreport.EphemeralID(),
+			EphemeralID:     eid,
 		},
 		Fields: fields,
 	}
@@ -337,8 +341,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-	logSystemInfo(b.Info)
-	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	log := logp.NewLogger("beat")
+	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
 	if err != nil {
@@ -865,17 +870,8 @@ func (b *Beat) configure(settings Settings) error {
 		version.SetPackageVersion(b.Info.Version)
 	}
 
-	// if we're in fleet mode, construct a custom user-agent
-	if fleetmode.Enabled() {
-		userAgent := ""
-		info := b.Manager.AgentInfo()
-		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
-			userAgent = "Agent-Managed"
-		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
-			userAgent = "Agent-Standalone"
-		}
-		b.Info.UserAgentPostfix = userAgent
-	}
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
@@ -1365,15 +1361,19 @@ func handleError(err error) error {
 // in debugging. This information includes data about the beat, build, go
 // runtime, host, and process. If any of the data is not available it will be
 // omitted.
-func logSystemInfo(info beat.Info) {
+func (b *Beat) logSystemInfo(log *logp.Logger) {
 	defer logp.Recover("An unexpected error occurred while collecting " +
 		"information about the system.")
-	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
+	log = log.With(logp.Namespace("system_info"))
+
+	if b.Manager.Enabled() {
+		return
+	}
 
 	// Beat
 	beat := mapstr.M{
-		"type": info.Beat,
-		"uuid": info.ID,
+		"type": b.Info.Beat,
+		"uuid": b.Info.ID,
 		"path": mapstr.M{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),
@@ -1387,7 +1387,7 @@ func logSystemInfo(info beat.Info) {
 	build := mapstr.M{
 		"commit":  version.Commit(),
 		"time":    version.BuildTime(),
-		"version": info.Version,
+		"version": b.Info.Version,
 		"libbeat": version.GetDefaultVersion(),
 	}
 	log.Infow("Build info", "build", build)

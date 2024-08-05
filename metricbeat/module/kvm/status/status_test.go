@@ -22,12 +22,15 @@ import (
 
 	"github.com/digitalocean/go-libvirt/libvirttest"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	conn := libvirttest.New()
+	dialer := libvirttest.New()
+	conn, err := dialer.Dial()
+	require.NoError(t, err)
 	defer conn.Close()
 
 	host := "test://" + conn.RemoteAddr().String() + ":123"
