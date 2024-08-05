@@ -35,9 +35,9 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 
 	if hs.Summary.Hardware != nil {
 		totalCPU = int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-		freeCPU = int64(totalCPU) - int64(hs.Summary.QuickStats.OverallCpuUsage)
+		freeCPU = totalCPU - int64(hs.Summary.QuickStats.OverallCpuUsage)
 		usedMemory = int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
-		freeMemory = int64(hs.Summary.Hardware.MemorySize) - usedMemory
+		freeMemory = hs.Summary.Hardware.MemorySize - usedMemory
 		totalMemory = hs.Summary.Hardware.MemorySize
 	} else {
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")

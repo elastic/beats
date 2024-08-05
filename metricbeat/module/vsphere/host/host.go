@@ -144,7 +144,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		"net.droppedRx.summation",
 	}
 
-	// Define refrence of structure
+	// Define reference of structure
 	var metricsVar PerformanceMetrics
 
 	// Map metric names to struture	fields
@@ -174,7 +174,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	var spec types.PerfQuerySpec
-	var metricIDs []types.PerfMetricId
+	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
 
 	for _, metricName := range metricNames {
 		metric, exists := metrics[metricName]
