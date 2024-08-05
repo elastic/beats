@@ -111,7 +111,8 @@ func TestStateStore(t *testing.T) {
 						"lastName":  "surname",
 					},
 					Credentials: &okta.Credentials{
-						Password: &struct{}{}, // Had a password: not retained.
+						Password:         &struct{}{}, // Had a password: not retained.
+						RecoveryQuestion: &struct{}{}, // Had a question: not retained.
 						Provider: okta.Provider{
 							Type: "OKTA",
 							Name: ptr("OKTA"),
