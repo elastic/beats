@@ -235,6 +235,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found.")
 	}
 
+	if config.PackageSuidDrop != nil {
+		if os.Getuid() != 0 && int(*config.PackageSuidDrop) != os.Getuid() {
+			return nil, fmt.Errorf("package.rpm_drop_to_suid is set to %d, but we're running as a different non-root user", config.PackageSuidDrop)
+		}
+		ms.log.Debugf("Dropping to EUID %d for RPM API calls", *ms.config.PackageSuidDrop)
+	}
+
 	packages, err := loadPackages(ms.bucket)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load persisted package metadata from disk: %w", err)
@@ -488,75 +495,55 @@ func (ms *MetricSet) getPackages() ([]*Package, error) {
 	var foundPackageManager bool
 	_, statErr := os.Stat(rpmPath)
 	if statErr == nil {
-
 		foundPackageManager = true
 		if ms.config.PackageSuidDrop != nil {
-			ms.log.Debugf("Dropping to EUID %d for RPM API calls", *ms.config.PackageSuidDrop)
 
-			// This is rather horrible.
+			// This is rather ugly.
 			// Basically, older RPM setups will use BDB as a database for the RPM state, and
 			// BDB is incredibly easy to corrupt and does not handle parallel operations well.
 			// see https://github.com/rpm-software-management/rpm/issues/232
 			// The easiest way around this is to drop perms to non-root, so librpm can't write to any of the DB files.
 			// this means we can't corrupt anything, and it also means that BDB won't perform any of the failchk()
 			// operations that exibit some parallel access issues
-			//
-			// We could potentially make the SYS_SETUID call just in getPackages() without spawning a child thread,
-			// but suid() is irreversible, and I'd rather have control over the context that we're running it in
+			// HOWEVER this is technically non-POSIX-compliant, as posix expects all threads in the process to
+			// have identical perms.
 
-			// time, cancel := context.WithTimeout(context.Background(), time.Minute*2)
-			// defer cancel()
-			// pkgUpdate := make(chan []*Package)
-			// pkgErr := make(chan error)
-
-			//go func(chUpdate chan []*Package, chErr chan error) {
-			// lock to a system thread and drop permissions
-			// we don't need to release the OS thread, since this goroutine will die anyway
+			// lock our setreuid to one thread
 			runtime.LockOSThread()
-			defer runtime.UnlockOSThread()
-			minus1 := -1
+			doUnlock := true
+			defer func() {
+				// if for some reason the second setreuid call fails, we don't
+				// want to release the OS thread, as we'll have a non-root thread floating around that
+				// the go scheduler could assign to something that expects root permissions.
+				if doUnlock {
+					runtime.UnlockOSThread()
+				} else {
+					ms.log.Debugf("setreuid has failed; package query thread will remain locked")
+				}
+			}()
 
+			minus1 := -1
 			currentUID := os.Getuid()
-			fmt.Printf("before 1st syscall: %v\n", currentUID)
-			//_, _, serr := syscall.Syscall(syscall.SYS_SETUID, uintptr(*ms.config.PackageSuidDrop), 0, 0)
 			_, _, serr := syscall.Syscall(syscall.SYS_SETREUID, uintptr(minus1), uintptr(*ms.config.PackageSuidDrop), uintptr(minus1))
 			if serr != 0 {
 				return nil, fmt.Errorf("got error from setreuid trying to drop out of root: %w", serr)
-				//pkgErr <- fmt.Errorf("error calling setresuid: %w\n", serr)
-				//return
 			}
 
-			rpmPackages, err := listRPMPackages()
+			rpmPackages, err := listRPMPackages(true)
 			if err != nil {
 				return nil, fmt.Errorf("got error listing RPM packages: %w", err)
-				//pkgErr <- err
-				//return
 			}
-			fmt.Printf("after 1st syscall: %v\n", os.Geteuid())
+
 			_, _, serr = syscall.Syscall(syscall.SYS_SETREUID, uintptr(minus1), uintptr(currentUID), uintptr(minus1))
 			if serr != 0 {
+				doUnlock = false
 				return nil, fmt.Errorf("got error from setreuid trying to reset euid: %w", serr)
-				//pkgErr <- fmt.Errorf("error calling setresuid to reset UID: %w", serr)
-				//return
 			}
-			fmt.Printf("after 2nd syscall: %v\n", os.Geteuid())
-			// on success, return here so we don't clash with any error values
-			//pkgUpdate <- rpmPackages
 
-			//}(pkgUpdate, pkgErr)
-
-			// select {
-			// case <-time.Done():
-			// case err := <-pkgErr:
-			// 	return nil, fmt.Errorf("error collecting packages: %w", err)
-			// case update := <-pkgUpdate:
-			// 	packages = append(packages, update...)
-			// }
 			packages = append(packages, rpmPackages...)
 		} else {
-			rpmPackages, err := listRPMPackages()
+			rpmPackages, err := listRPMPackages(false)
 			if err != nil {
-				//return nil, fmt.Errorf("error getting RPM packages: %w", err)
 				return nil, fmt.Errorf("error listing RPM packages: %w", err)
 			}
 			packages = append(packages, rpmPackages...)

@@ -16,7 +16,7 @@ type config struct {
 	PackageStatePeriod time.Duration `config:"package.state.period"`
 	// PackageSuidDrop runs RPM queries with suid to drop out of root
 	// see the comment in package.go for more context
-	PackageSuidDrop *int64 `config:"package.rpm_drop_to_suid"`
+	PackageSuidDrop *int64 `config:"package.rpm_drop_to_uid"`
 }
 
 func (c *config) effectiveStatePeriod() time.Duration {

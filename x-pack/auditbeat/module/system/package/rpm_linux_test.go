@@ -27,18 +27,10 @@ func TestRPMPackages(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	packages, err := listRPMPackages()
+	packages, err := listRPMPackages(false)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.EqualValues(t, packagesExpected, packages)
 }
-
-// func TestRPMPackagesRaw(t *testing.T) {
-// 	packages, err := listRPMPackages()
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	t.Logf("got packages: %d", len(packages))
-// }

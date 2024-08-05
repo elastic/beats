@@ -10,6 +10,7 @@ import (
 	"debug/elf"
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 	"time"
 	"unsafe"
@@ -339,16 +340,17 @@ func openLibrpm() (*librpm, error) {
 	return &librpm, nil
 }
 
-func listRPMPackages() ([]*Package, error) {
+func listRPMPackages(ownsThread bool) ([]*Package, error) {
 	// In newer versions, librpm is using the thread-local variable
 	// `disableInterruptSafety` in rpmio/rpmsq.c to disable signal
 	// traps. To make sure our settings remain in effect throughout
 	// our function calls we have to lock the OS thread here, since
 	// Golang can otherwise use any thread it likes for each C.* call.
 
-	// TODO: have this be aware of our setuid state
-	// runtime.LockOSThread()
-	// defer runtime.UnlockOSThread()
+	if !ownsThread {
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+	}
 
 	if openedLibrpm == nil {
 		var err error
