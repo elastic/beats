@@ -126,7 +126,7 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 }
 
 func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
-	var acks s3ACKHandler
+	var acks awsACKHandler
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := createPipelineClient(in.pipeline, &acks)
 	if err != nil {

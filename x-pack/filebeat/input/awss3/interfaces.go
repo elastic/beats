@@ -48,7 +48,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(e beat.Event)) error
+	ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(e beat.Event)) sqsProcessingResult
 }
 
 // ------

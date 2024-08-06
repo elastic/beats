@@ -120,13 +120,17 @@ func newSQSS3EventProcessor(
 type sqsProcessingResult struct {
 	processor       *sqsS3EventProcessor
 	msg             *types.Message
+	receiveCount    int // How many times this SQS object has been read
+	eventCount      int // How many events were generated from this SQS object
 	keepaliveCancel context.CancelFunc
 	processingErr   error
 
 	// Finalizer callbacks for the returned S3 events, invoked via
 	// finalizeS3Objects after all events are acknowledged.
-	s3Finalizers []func() error
+	finalizers []finalizerFunc
 }
+
+type finalizerFunc func() error
 
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(beat.Event)) sqsProcessingResult {
 	log := p.log.With(
@@ -156,30 +160,35 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 		}
 	}
 
-	processingErr := p.processS3Events(ctx, log, *msg.Body, eventCallback)
+	finalizers, processingErr := p.processS3Events(ctx, log, *msg.Body, eventCallback)
 
 	return sqsProcessingResult{
 		msg:             msg,
+		receiveCount:    receiveCount,
 		keepaliveCancel: keepaliveCancel,
 		processingErr:   processingErr,
+		finalizers:      finalizers,
 	}
 }
 
 // Call Done to indicate that all events from this SQS message have been
 // acknowledged and it is safe to stop the keepalive routine and
 // delete / finalize the message.
-func (p sqsProcessingResult) Done() {
+func (r sqsProcessingResult) Done() error {
+	p := r.processor
+	processingErr := r.processingErr
+
 	// Stop keepalive routine before changing visibility.
-	p.keepaliveCancel()
+	r.keepaliveCancel()
 
 	// No error. Delete SQS.
-	if p.processingErr == nil {
-		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+	if processingErr == nil {
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
 			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
 		// SQS message finished and deleted, finalize s3 objects
-		if finalizeErr := p.finalizeS3Objects(); finalizeErr != nil {
+		if finalizeErr := r.finalizeS3Objects(); finalizeErr != nil {
 			return fmt.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %w", finalizeErr)
 		}
 		return nil
@@ -188,16 +197,16 @@ func (p sqsProcessingResult) Done() {
 	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
 		// Prevent poison pill messages from consuming all workers. Check how
 		// many times this message has been received before making a disposition.
-		if receiveCount >= p.maxReceiveCount {
+		if r.receiveCount >= p.maxReceiveCount {
 			processingErr = nonRetryableErrorWrap(fmt.Errorf(
 				"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-				receiveCount, p.maxReceiveCount, processingErr))
+				r.receiveCount, p.maxReceiveCount, processingErr))
 		}
 	}
 
 	// An error that reprocessing cannot correct. Delete SQS.
 	if errors.Is(processingErr, &nonRetryableError{}) {
-		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
 			return multierr.Combine(
 				fmt.Errorf("failed processing SQS message (attempted to delete message): %w", processingErr),
 				fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr),
@@ -313,23 +322,24 @@ func (p *sqsS3EventProcessor) processS3Events(
 	log *logp.Logger,
 	body string,
 	eventCallback func(beat.Event),
-) error {
+) ([]finalizerFunc, error) {
 	s3Events, err := p.getS3Notifications(body)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			// Messages that are in-flight at shutdown should be returned to SQS.
-			return err
+			return nil, err
 		}
-		return &nonRetryableError{err}
+		return nil, &nonRetryableError{err}
 	}
 	log.Debugf("SQS message contained %d S3 event notifications.", len(s3Events))
 	defer log.Debug("End processing SQS S3 event notifications.")
 
 	if len(s3Events) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	var errs []error
+	var finalizers []finalizerFunc
 	for i, event := range s3Events {
 		s3Processor := p.s3HandlerFactory.Create(ctx, event)
 		if s3Processor == nil {
@@ -344,20 +354,20 @@ func (p *sqsS3EventProcessor) processS3Events(
 				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
 				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))
 		} else {
-			p.s3Finalizers = append(p.s3Finalizers, s3Processor.FinalizeS3Object)
+			finalizers = append(finalizers, s3Processor.FinalizeS3Object)
 		}
 	}
 
-	return multierr.Combine(errs...)
+	return finalizers, multierr.Combine(errs...)
 }
 
-func (p *sqsS3EventProcessor) finalizeS3Objects() error {
+func (r sqsProcessingResult) finalizeS3Objects() error {
 	var errs []error
-	for i, finalize := range p.s3Finalizers {
+	for i, finalize := range r.finalizers {
 		if err := finalize(); err != nil {
 			errs = append(errs, fmt.Errorf(
 				"failed finalizing S3 event (object record %d of %d in SQS notification): %w",
-				i+1, len(p.s3Finalizers), err))
+				i+1, len(r.finalizers), err))
 		}
 	}
 	return multierr.Combine(errs...)

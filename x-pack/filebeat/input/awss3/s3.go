@@ -33,7 +33,7 @@ func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*
 	}, nil
 }
 
-func createPipelineClient(pipeline beat.Pipeline, acks *s3ACKHandler) (beat.Client, error) {
+func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Client, error) {
 	return pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: acks.pipelineEventListener(),
 		Processing: beat.ProcessingConfig{

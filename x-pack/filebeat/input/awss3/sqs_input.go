@@ -17,6 +17,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/fifo"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -170,8 +171,9 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 }
 
 type sqsWorker struct {
-	input  *sqsReaderInput
-	client beat.Client
+	input       *sqsReaderInput
+	client      beat.Client
+	pendingACKs fifo.FIFO[sqsProcessingResult]
 }
 
 func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
@@ -218,11 +220,13 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 	publishCount := 0
 	start := time.Now()
 	id := w.input.metrics.beginSQSWorker()
-	if err := w.input.msgHandler.ProcessSQS(ctx, &msg, func(e beat.Event) {
+	result := w.input.msgHandler.ProcessSQS(ctx, &msg, func(e beat.Event) {
 		w.client.Publish(e)
 		publishCount++
 		// hi fae, finish this function
-	}); err != nil {
+	})
+
+	if result != nil {
 		w.input.log.Warnw("Failed processing SQS message.",
 			"error", err,
 			"message_id", *msg.MessageId,
