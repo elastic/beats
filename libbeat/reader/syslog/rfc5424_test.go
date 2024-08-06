@@ -98,6 +98,21 @@ func TestParseRFC5424(t *testing.T) {
 				rawSDValue: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`,
 			},
 		},
+		"sd-with-escape": {
+			in: `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011" somekey="[value\] more data"][examplePriority@32473 class="high"] This is a message`,
+			want: message{
+				timestamp:  mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z", nil),
+				priority:   165,
+				facility:   20,
+				severity:   5,
+				version:    1,
+				hostname:   "mymachine.example.com",
+				process:    "evntslog",
+				msgID:      "ID47",
+				msg:        "This is a message",
+				rawSDValue: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011" somekey="[value\] more data"][examplePriority@32473 class="high"]`,
+			},
+		},
 		"non-compliant-sd": {
 			in: `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [action:"Drop"; flags:"278528"; ifdir:"inbound"; ifname:"bond1.3999"; loguid:"{0x60928f1d,0x8,0x40de101f,0xfcdbb197}"; origin:"127.0.0.1"; originsicname:"CN=CP,O=cp.com.9jjkfo"; sequencenum:"62"; time:"1620217629"; version:"5"; __policy_id_tag:"product=VPN-1 & FireWall-1[db_tag={F6212FB3-54CE-6344-9164-B224119E2B92};mgmt=cp-m;date=1620031791;policy_name=CP-Cluster]"; action_reason:"Dropped by multiportal infrastructure"; dst:"81.2.69.144"; product:"VPN & FireWall"; proto:"6"; s_port:"52780"; service:"80"; src:"81.2.69.144"]`,
 			want: message{
