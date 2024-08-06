@@ -14,19 +14,27 @@ import (
 	"go.uber.org/multierr"
 )
 
-var cef_start int = 1
-var _ = cef_start
-var cef_first_final int = 36
-var _ = cef_first_final
-var cef_error int = 0
-var _ = cef_error
-var cef_en_gobble_extension int = 33
-var _ = cef_en_gobble_extension
-var cef_en_main int = 1
-var _ = cef_en_main
-var cef_en_main_cef_extensions int = 29
-var _ = cef_en_main_cef_extensions
+//line parser.go:14
+var _cef_eof_actions []byte = []byte{
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 25,
+	25, 0, 0, 0, 28, 30, 34, 34,
+	34, 30, 34, 34, 34, 37, 37, 0,
+}
 
+const cef_start int = 1
+const cef_first_final int = 36
+const cef_error int = 0
+
+const cef_en_gobble_extension int = 33
+const cef_en_main int = 1
+const cef_en_main_cef_extensions int = 29
+
+// unpack unpacks a CEF message.
+//
+//line parser.rl:17
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
@@ -43,2029 +51,1329 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
+//line parser.go:52
 	{
-		cs = int(cef_start)
-
+		cs = cef_start
 	}
+
+//line parser.go:56
 	{
-	_resume:
-		{
-
+		if (p) == (pe) {
+			goto _test_eof
 		}
-		if (p) == (pe) && (p) != eof {
+		if cs == 0 {
 			goto _out
-
 		}
+	_resume:
 		switch cs {
 		case 1:
-			if (p) == eof {
-				goto _ctr1
-
-			} else {
-				if (data[(p)]) == 67 {
-					goto _ctr2
-
-				}
-				goto _ctr0
-
+			if data[(p)] == 67 {
+				goto tr0
 			}
+			goto tr1
 		case 0:
-			if (p) == eof {
-				goto _ctr0
-
-			} else {
-				goto _again
-
-			}
+			goto _out
 		case 2:
-			if (p) == eof {
-				goto _ctr2
-
-			} else {
-				if (data[(p)]) == 69 {
-					goto _ctr3
-
-				}
-				goto _ctr0
-
+			if data[(p)] == 69 {
+				goto tr2
 			}
+			goto tr1
 		case 3:
-			if (p) == eof {
-				goto _ctr3
-
-			} else {
-				if (data[(p)]) == 70 {
-					goto _ctr4
-
-				}
-				goto _ctr0
-
+			if data[(p)] == 70 {
+				goto tr3
 			}
+			goto tr1
 		case 4:
-			if (p) == eof {
-				goto _ctr4
-
-			} else {
-				if (data[(p)]) == 58 {
-					goto _ctr5
-
-				}
-				goto _ctr0
-
+			if data[(p)] == 58 {
+				goto tr4
 			}
+			goto tr1
 		case 5:
-			if (p) == eof {
-				goto _ctr5
-
-			} else {
-				if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-					goto _ctr6
-
-				}
-				goto _ctr0
-
+			if 48 <= data[(p)] && data[(p)] <= 57 {
+				goto tr5
 			}
+			goto tr1
 		case 6:
-			if (p) == eof {
-				goto _ctr7
-
-			} else {
-				if (data[(p)]) == 124 {
-					goto _ctr8
-
-				}
-				if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-					goto _ctr7
-
-				}
-				goto _ctr0
-
+			if data[(p)] == 124 {
+				goto tr7
 			}
+			if 48 <= data[(p)] && data[(p)] <= 57 {
+				goto tr6
+			}
+			goto tr1
 		case 7:
-			if (p) == eof {
-				goto _ctr9
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr11
-
-					}
-				case 124:
-					{
-						goto _ctr12
-
-					}
-
-				}
-				goto _ctr10
-
+			switch data[(p)] {
+			case 92:
+				goto tr9
+			case 124:
+				goto tr10
 			}
+			goto tr8
 		case 8:
-			if (p) == eof {
-				goto _ctr13
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr14
-
-					}
-				case 124:
-					{
-						goto _ctr15
-
-					}
-
-				}
-				goto _ctr13
-
+			switch data[(p)] {
+			case 92:
+				goto tr12
+			case 124:
+				goto tr13
 			}
+			goto tr11
 		case 9:
-			if (p) == eof {
-				goto _ctr16
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr17
-
-					}
-				case 124:
-					{
-						goto _ctr17
-
-					}
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 92:
+				goto tr14
+			case 124:
+				goto tr14
 			}
+			goto tr1
 		case 10:
-			if (p) == eof {
-				goto _ctr17
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr19
-
-					}
-				case 124:
-					{
-						goto _ctr20
-
-					}
-
-				}
-				goto _ctr18
-
+			switch data[(p)] {
+			case 92:
+				goto tr16
+			case 124:
+				goto tr17
 			}
+			goto tr15
 		case 11:
-			if (p) == eof {
-				goto _ctr21
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr23
-
-					}
-				case 124:
-					{
-						goto _ctr24
-
-					}
-
-				}
-				goto _ctr22
-
+			switch data[(p)] {
+			case 92:
+				goto tr19
+			case 124:
+				goto tr20
 			}
+			goto tr18
 		case 12:
-			if (p) == eof {
-				goto _ctr25
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr26
-
-					}
-				case 124:
-					{
-						goto _ctr27
-
-					}
-
-				}
-				goto _ctr25
-
+			switch data[(p)] {
+			case 92:
+				goto tr22
+			case 124:
+				goto tr23
 			}
+			goto tr21
 		case 13:
-			if (p) == eof {
-				goto _ctr28
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr29
-
-					}
-				case 124:
-					{
-						goto _ctr29
-
-					}
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 92:
+				goto tr24
+			case 124:
+				goto tr24
 			}
+			goto tr1
 		case 14:
-			if (p) == eof {
-				goto _ctr29
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr31
-
-					}
-				case 124:
-					{
-						goto _ctr32
-
-					}
-
-				}
-				goto _ctr30
-
+			switch data[(p)] {
+			case 92:
+				goto tr26
+			case 124:
+				goto tr27
 			}
+			goto tr25
 		case 15:
-			if (p) == eof {
-				goto _ctr33
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr35
-
-					}
-				case 124:
-					{
-						goto _ctr36
-
-					}
-
-				}
-				goto _ctr34
-
+			switch data[(p)] {
+			case 92:
+				goto tr29
+			case 124:
+				goto tr30
 			}
+			goto tr28
 		case 16:
-			if (p) == eof {
-				goto _ctr37
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr38
-
-					}
-				case 124:
-					{
-						goto _ctr39
-
-					}
-
-				}
-				goto _ctr37
-
+			switch data[(p)] {
+			case 92:
+				goto tr32
+			case 124:
+				goto tr33
 			}
+			goto tr31
 		case 17:
-			if (p) == eof {
-				goto _ctr40
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr41
-
-					}
-				case 124:
-					{
-						goto _ctr41
-
-					}
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 92:
+				goto tr34
+			case 124:
+				goto tr34
 			}
+			goto tr1
 		case 18:
-			if (p) == eof {
-				goto _ctr41
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr43
-
-					}
-				case 124:
-					{
-						goto _ctr44
-
-					}
-
-				}
-				goto _ctr42
-
+			switch data[(p)] {
+			case 92:
+				goto tr36
+			case 124:
+				goto tr37
 			}
+			goto tr35
 		case 19:
-			if (p) == eof {
-				goto _ctr45
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr47
-
-					}
-				case 124:
-					{
-						goto _ctr48
-
-					}
-
-				}
-				goto _ctr46
-
+			switch data[(p)] {
+			case 92:
+				goto tr39
+			case 124:
+				goto tr40
 			}
+			goto tr38
 		case 20:
-			if (p) == eof {
-				goto _ctr49
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr50
-
-					}
-				case 124:
-					{
-						goto _ctr51
-
-					}
-
-				}
-				goto _ctr49
-
+			switch data[(p)] {
+			case 92:
+				goto tr42
+			case 124:
+				goto tr43
 			}
+			goto tr41
 		case 21:
-			if (p) == eof {
-				goto _ctr52
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr53
-
-					}
-				case 124:
-					{
-						goto _ctr53
-
-					}
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 92:
+				goto tr44
+			case 124:
+				goto tr44
 			}
+			goto tr1
 		case 22:
-			if (p) == eof {
-				goto _ctr53
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr55
-
-					}
-				case 124:
-					{
-						goto _ctr56
-
-					}
-
-				}
-				goto _ctr54
-
+			switch data[(p)] {
+			case 92:
+				goto tr46
+			case 124:
+				goto tr47
 			}
+			goto tr45
 		case 23:
-			if (p) == eof {
-				goto _ctr57
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr59
-
-					}
-				case 124:
-					{
-						goto _ctr60
-
-					}
-
-				}
-				goto _ctr58
-
+			switch data[(p)] {
+			case 92:
+				goto tr49
+			case 124:
+				goto tr50
 			}
+			goto tr48
 		case 24:
-			if (p) == eof {
-				goto _ctr61
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr62
-
-					}
-				case 124:
-					{
-						goto _ctr63
-
-					}
-
-				}
-				goto _ctr61
-
+			switch data[(p)] {
+			case 92:
+				goto tr52
+			case 124:
+				goto tr53
 			}
+			goto tr51
 		case 25:
-			if (p) == eof {
-				goto _ctr64
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr65
-
-					}
-				case 124:
-					{
-						goto _ctr65
-
-					}
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 92:
+				goto tr54
+			case 124:
+				goto tr54
 			}
+			goto tr1
 		case 26:
-			if (p) == eof {
-				goto _ctr65
-
-			} else {
-				switch data[(p)] {
-				case 92:
-					{
-						goto _ctr67
-
-					}
-				case 124:
-					{
-						goto _ctr68
-
-					}
-
-				}
-				goto _ctr66
-
+			switch data[(p)] {
+			case 92:
+				goto tr56
+			case 124:
+				goto tr57
 			}
+			goto tr55
 		case 27:
-			if (p) == eof {
-				goto _ctr69
-
-			} else {
-				switch data[(p)] {
-				case 45:
-					{
-						goto _ctr70
-
-					}
-				case 124:
-					{
-						goto _ctr71
-
-					}
-
-				}
-				if (data[(p)]) < 65 {
-					if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-						goto _ctr70
-
-					}
-
-				} else if (data[(p)]) > 90 {
-					if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-						goto _ctr70
-
-					}
-
-				} else {
-					goto _ctr70
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 45:
+				goto tr58
+			case 124:
+				goto tr59
 			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr58
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr58
+				}
+			default:
+				goto tr58
+			}
+			goto tr1
 		case 28:
-			if (p) == eof {
-				goto _ctr72
-
-			} else {
-				switch data[(p)] {
-				case 45:
-					{
-						goto _ctr72
-
-					}
-				case 124:
-					{
-						goto _ctr73
-
-					}
-
-				}
-				if (data[(p)]) < 65 {
-					if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-						goto _ctr72
-
-					}
-
-				} else if (data[(p)]) > 90 {
-					if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-						goto _ctr72
-
-					}
-
-				} else {
-					goto _ctr72
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 45:
+				goto tr60
+			case 124:
+				goto tr61
 			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr60
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr60
+				}
+			default:
+				goto tr60
+			}
+			goto tr1
 		case 36:
-			if (p) == eof {
-				goto _ctr88
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr89
-
-					}
-				case 95:
-					{
-						goto _ctr90
-
-					}
-
-				}
-				if (data[(p)]) < 65 {
-					if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-						goto _ctr90
-
-					}
-
-				} else if (data[(p)]) > 90 {
-					if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-						goto _ctr90
-
-					}
-
-				} else {
-					goto _ctr90
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 32:
+				goto tr73
+			case 95:
+				goto tr74
 			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr74
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr74
+				}
+			default:
+				goto tr74
+			}
+			goto tr1
 		case 29:
-			if (p) == eof {
-				goto _ctr74
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr74
-
-					}
-				case 95:
-					{
-						goto _ctr75
-
-					}
-
-				}
-				if (data[(p)]) < 65 {
-					if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-						goto _ctr75
-
-					}
-
-				} else if (data[(p)]) > 90 {
-					if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-						goto _ctr75
-
-					}
-
-				} else {
-					goto _ctr75
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 32:
+				goto tr62
+			case 95:
+				goto tr63
 			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr63
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr63
+				}
+			default:
+				goto tr63
+			}
+			goto tr1
 		case 30:
-			if (p) == eof {
-				goto _ctr76
-
-			} else {
-				switch data[(p)] {
-				case 61:
-					{
-						goto _ctr77
-
-					}
-				case 93:
-					{
-						goto _ctr76
-
-					}
-				case 95:
-					{
-						goto _ctr76
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if 44 <= (data[(p)]) && (data[(p)]) <= 46 {
-						goto _ctr76
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 91 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr76
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr76
-
-					}
-
-				} else {
-					goto _ctr76
-
-				}
-				goto _ctr0
-
+			switch data[(p)] {
+			case 61:
+				goto tr65
+			case 93:
+				goto tr64
+			case 95:
+				goto tr64
 			}
+			switch {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
+					goto tr64
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr64
+					}
+				case data[(p)] >= 65:
+					goto tr64
+				}
+			default:
+				goto tr64
+			}
+			goto tr1
 		case 37:
-			if (p) == eof {
-				goto _ctr91
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr94
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr95
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr93
-
-				}
-				goto _ctr92
-
+			switch data[(p)] {
+			case 32:
+				goto tr77
+			case 61:
+				goto tr66
+			case 92:
+				goto tr78
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr76
+			}
+			goto tr75
 		case 38:
-			if (p) == eof {
-				goto _ctr96
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr99
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr100
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr98
-
-				}
-				goto _ctr97
-
+			switch data[(p)] {
+			case 32:
+				goto tr81
+			case 61:
+				goto tr66
+			case 92:
+				goto tr82
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr80
+			}
+			goto tr79
 		case 39:
-			if (p) == eof {
-				goto _ctr101
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr99
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr100
-
-					}
-				case 95:
-					{
-						goto _ctr102
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-						goto _ctr98
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 90 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr102
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr102
-
-					}
-
-				} else {
-					goto _ctr102
-
-				}
-				goto _ctr97
-
+			switch data[(p)] {
+			case 32:
+				goto tr81
+			case 61:
+				goto tr66
+			case 92:
+				goto tr82
+			case 95:
+				goto tr83
 			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr80
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr83
+					}
+				case data[(p)] >= 65:
+					goto tr83
+				}
+			default:
+				goto tr83
+			}
+			goto tr79
 		case 40:
-			if (p) == eof {
-				goto _ctr103
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr99
-
-					}
-				case 61:
-					{
-						goto _ctr105
-
-					}
-				case 92:
-					{
-						goto _ctr100
-
-					}
-				case 95:
-					{
-						goto _ctr104
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if (data[(p)]) > 13 {
-						if 44 <= (data[(p)]) && (data[(p)]) <= 46 {
-							goto _ctr104
-
-						}
-
-					} else if (data[(p)]) >= 9 {
-						goto _ctr98
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 93 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr104
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr104
-
-					}
-
-				} else {
-					goto _ctr104
-
-				}
-				goto _ctr97
-
+			switch data[(p)] {
+			case 32:
+				goto tr81
+			case 61:
+				goto tr85
+			case 92:
+				goto tr82
+			case 95:
+				goto tr84
 			}
+			switch {
+			case data[(p)] < 48:
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr84
+					}
+				case data[(p)] >= 9:
+					goto tr80
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr84
+					}
+				case data[(p)] >= 65:
+					goto tr84
+				}
+			default:
+				goto tr84
+			}
+			goto tr79
 		case 41:
-			if (p) == eof {
-				goto _ctr106
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr109
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr110
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr108
-
-				}
-				goto _ctr107
-
+			switch data[(p)] {
+			case 32:
+				goto tr88
+			case 61:
+				goto tr66
+			case 92:
+				goto tr89
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr87
+			}
+			goto tr86
 		case 42:
-			if (p) == eof {
-				goto _ctr111
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr114
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr115
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr113
-
-				}
-				goto _ctr112
-
+			switch data[(p)] {
+			case 32:
+				goto tr92
+			case 61:
+				goto tr66
+			case 92:
+				goto tr93
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr91
+			}
+			goto tr90
 		case 43:
-			if (p) == eof {
-				goto _ctr116
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr114
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr115
-
-					}
-				case 95:
-					{
-						goto _ctr117
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-						goto _ctr113
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 90 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr117
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr117
-
-					}
-
-				} else {
-					goto _ctr117
-
-				}
-				goto _ctr112
-
+			switch data[(p)] {
+			case 32:
+				goto tr92
+			case 61:
+				goto tr66
+			case 92:
+				goto tr93
+			case 95:
+				goto tr94
 			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr91
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr94
+					}
+				case data[(p)] >= 65:
+					goto tr94
+				}
+			default:
+				goto tr94
+			}
+			goto tr90
 		case 44:
-			if (p) == eof {
-				goto _ctr118
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr114
-
-					}
-				case 61:
-					{
-						goto _ctr105
-
-					}
-				case 92:
-					{
-						goto _ctr115
-
-					}
-				case 95:
-					{
-						goto _ctr119
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if (data[(p)]) > 13 {
-						if 44 <= (data[(p)]) && (data[(p)]) <= 46 {
-							goto _ctr119
-
-						}
-
-					} else if (data[(p)]) >= 9 {
-						goto _ctr113
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 93 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr119
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr119
-
-					}
-
-				} else {
-					goto _ctr119
-
-				}
-				goto _ctr112
-
+			switch data[(p)] {
+			case 32:
+				goto tr92
+			case 61:
+				goto tr85
+			case 92:
+				goto tr93
+			case 95:
+				goto tr95
 			}
+			switch {
+			case data[(p)] < 48:
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr95
+					}
+				case data[(p)] >= 9:
+					goto tr91
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr95
+					}
+				case data[(p)] >= 65:
+					goto tr95
+				}
+			default:
+				goto tr95
+			}
+			goto tr90
 		case 31:
-			if (p) == eof {
-				goto _ctr78
-
-			} else {
-				switch data[(p)] {
-				case 61:
-					{
-						goto _ctr80
-
-					}
-				case 92:
-					{
-						goto _ctr80
-
-					}
-				case 110:
-					{
-						goto _ctr80
-
-					}
-				case 114:
-					{
-						goto _ctr80
-
-					}
-
-				}
-				goto _ctr79
-
+			switch data[(p)] {
+			case 61:
+				goto tr67
+			case 92:
+				goto tr67
+			case 110:
+				goto tr67
+			case 114:
+				goto tr67
 			}
+			goto tr66
 		case 45:
-			if (p) == eof {
-				goto _ctr120
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr123
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr124
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr122
-
-				}
-				goto _ctr121
-
+			switch data[(p)] {
+			case 32:
+				goto tr98
+			case 61:
+				goto tr66
+			case 92:
+				goto tr99
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr97
+			}
+			goto tr96
 		case 32:
-			if (p) == eof {
-				goto _ctr81
-
-			} else {
-				switch data[(p)] {
-				case 61:
-					{
-						goto _ctr82
-
-					}
-				case 92:
-					{
-						goto _ctr82
-
-					}
-				case 110:
-					{
-						goto _ctr82
-
-					}
-				case 114:
-					{
-						goto _ctr82
-
-					}
-
-				}
-				goto _ctr79
-
+			switch data[(p)] {
+			case 61:
+				goto tr68
+			case 92:
+				goto tr68
+			case 110:
+				goto tr68
+			case 114:
+				goto tr68
 			}
+			goto tr66
 		case 46:
-			if (p) == eof {
-				goto _ctr125
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr128
-
-					}
-				case 61:
-					{
-						goto _ctr79
-
-					}
-				case 92:
-					{
-						goto _ctr129
-
-					}
-
-				}
-				if 9 <= (data[(p)]) && (data[(p)]) <= 13 {
-					goto _ctr127
-
-				}
-				goto _ctr126
-
+			switch data[(p)] {
+			case 32:
+				goto tr102
+			case 61:
+				goto tr66
+			case 92:
+				goto tr103
 			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr101
+			}
+			goto tr100
 		case 33:
-			if (p) == eof {
-				goto _ctr83
-
-			} else {
-				if (data[(p)]) == 32 {
-					goto _ctr84
-
-				}
-				goto _ctr83
-
+			if data[(p)] == 32 {
+				goto tr70
 			}
+			goto tr69
 		case 34:
-			if (p) == eof {
-				goto _ctr85
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr84
-
-					}
-				case 95:
-					{
-						goto _ctr86
-
-					}
-
-				}
-				if (data[(p)]) < 65 {
-					if 48 <= (data[(p)]) && (data[(p)]) <= 57 {
-						goto _ctr86
-
-					}
-
-				} else if (data[(p)]) > 90 {
-					if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-						goto _ctr86
-
-					}
-
-				} else {
-					goto _ctr86
-
-				}
-				goto _ctr83
-
+			switch data[(p)] {
+			case 32:
+				goto tr70
+			case 95:
+				goto tr71
 			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr71
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr71
+				}
+			default:
+				goto tr71
+			}
+			goto tr69
 		case 35:
-			if (p) == eof {
-				goto _ctr86
-
-			} else {
-				switch data[(p)] {
-				case 32:
-					{
-						goto _ctr84
-
-					}
-				case 61:
-					{
-						goto _ctr87
-
-					}
-				case 93:
-					{
-						goto _ctr86
-
-					}
-				case 95:
-					{
-						goto _ctr86
-
-					}
-
-				}
-				if (data[(p)]) < 48 {
-					if 44 <= (data[(p)]) && (data[(p)]) <= 46 {
-						goto _ctr86
-
-					}
-
-				} else if (data[(p)]) > 57 {
-					if (data[(p)]) > 91 {
-						if 97 <= (data[(p)]) && (data[(p)]) <= 122 {
-							goto _ctr86
-
-						}
-
-					} else if (data[(p)]) >= 65 {
-						goto _ctr86
-
-					}
-
-				} else {
-					goto _ctr86
-
-				}
-				goto _ctr83
-
+			switch data[(p)] {
+			case 32:
+				goto tr70
+			case 61:
+				goto tr72
+			case 93:
+				goto tr71
+			case 95:
+				goto tr71
 			}
+			switch {
+			case data[(p)] < 48:
+				if 44 <= data[(p)] && data[(p)] <= 46 {
+					goto tr71
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 91:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr71
+					}
+				case data[(p)] >= 65:
+					goto tr71
+				}
+			default:
+				goto tr71
+			}
+			goto tr69
 		case 47:
-			if (p) == eof {
-				goto _ctr130
-
-			} else {
-				if (data[(p)]) == 32 {
-					goto _ctr84
-
-				}
-				goto _ctr83
-
+			if data[(p)] == 32 {
+				goto tr70
 			}
-
+			goto tr69
 		}
-	_ctr0:
+
+	tr1:
 		cs = 0
 		goto _again
-	_ctr79:
+	tr66:
 		cs = 0
 		goto f24
-	_ctr1:
-		cs = 1
-		goto _again
-	_ctr2:
+	tr0:
 		cs = 2
 		goto _again
-	_ctr3:
+	tr2:
 		cs = 3
 		goto _again
-	_ctr4:
+	tr3:
 		cs = 4
 		goto _again
-	_ctr5:
+	tr4:
 		cs = 5
 		goto _again
-	_ctr7:
+	tr6:
 		cs = 6
 		goto _again
-	_ctr6:
+	tr5:
 		cs = 6
 		goto f0
-	_ctr9:
-		cs = 7
-		goto _again
-	_ctr8:
+	tr7:
 		cs = 7
 		goto f1
-	_ctr13:
+	tr11:
 		cs = 8
 		goto _again
-	_ctr10:
+	tr8:
 		cs = 8
 		goto f0
-	_ctr18:
+	tr15:
 		cs = 8
 		goto f6
-	_ctr16:
-		cs = 9
-		goto _again
-	_ctr11:
+	tr9:
 		cs = 9
 		goto f2
-	_ctr14:
+	tr12:
 		cs = 9
 		goto f4
-	_ctr19:
+	tr16:
 		cs = 9
 		goto f7
-	_ctr17:
+	tr14:
 		cs = 10
 		goto _again
-	_ctr21:
-		cs = 11
-		goto _again
-	_ctr12:
+	tr10:
 		cs = 11
 		goto f3
-	_ctr15:
+	tr13:
 		cs = 11
 		goto f5
-	_ctr20:
+	tr17:
 		cs = 11
 		goto f8
-	_ctr25:
+	tr21:
 		cs = 12
 		goto _again
-	_ctr22:
+	tr18:
 		cs = 12
 		goto f0
-	_ctr30:
+	tr25:
 		cs = 12
 		goto f6
-	_ctr28:
-		cs = 13
-		goto _again
-	_ctr23:
+	tr19:
 		cs = 13
 		goto f2
-	_ctr26:
+	tr22:
 		cs = 13
 		goto f4
-	_ctr31:
+	tr26:
 		cs = 13
 		goto f7
-	_ctr29:
+	tr24:
 		cs = 14
 		goto _again
-	_ctr33:
-		cs = 15
-		goto _again
-	_ctr24:
+	tr20:
 		cs = 15
 		goto f9
-	_ctr27:
+	tr23:
 		cs = 15
 		goto f10
-	_ctr32:
+	tr27:
 		cs = 15
 		goto f11
-	_ctr37:
+	tr31:
 		cs = 16
 		goto _again
-	_ctr34:
+	tr28:
 		cs = 16
 		goto f0
-	_ctr42:
+	tr35:
 		cs = 16
 		goto f6
-	_ctr40:
-		cs = 17
-		goto _again
-	_ctr35:
+	tr29:
 		cs = 17
 		goto f2
-	_ctr38:
+	tr32:
 		cs = 17
 		goto f4
-	_ctr43:
+	tr36:
 		cs = 17
 		goto f7
-	_ctr41:
+	tr34:
 		cs = 18
 		goto _again
-	_ctr45:
-		cs = 19
-		goto _again
-	_ctr36:
+	tr30:
 		cs = 19
 		goto f12
-	_ctr39:
+	tr33:
 		cs = 19
 		goto f13
-	_ctr44:
+	tr37:
 		cs = 19
 		goto f14
-	_ctr49:
+	tr41:
 		cs = 20
 		goto _again
-	_ctr46:
+	tr38:
 		cs = 20
 		goto f0
-	_ctr54:
+	tr45:
 		cs = 20
 		goto f6
-	_ctr52:
-		cs = 21
-		goto _again
-	_ctr47:
+	tr39:
 		cs = 21
 		goto f2
-	_ctr50:
+	tr42:
 		cs = 21
 		goto f4
-	_ctr55:
+	tr46:
 		cs = 21
 		goto f7
-	_ctr53:
+	tr44:
 		cs = 22
 		goto _again
-	_ctr57:
-		cs = 23
-		goto _again
-	_ctr48:
+	tr40:
 		cs = 23
 		goto f15
-	_ctr51:
+	tr43:
 		cs = 23
 		goto f16
-	_ctr56:
+	tr47:
 		cs = 23
 		goto f17
-	_ctr61:
+	tr51:
 		cs = 24
 		goto _again
-	_ctr58:
+	tr48:
 		cs = 24
 		goto f0
-	_ctr66:
+	tr55:
 		cs = 24
 		goto f6
-	_ctr64:
-		cs = 25
-		goto _again
-	_ctr59:
+	tr49:
 		cs = 25
 		goto f2
-	_ctr62:
+	tr52:
 		cs = 25
 		goto f4
-	_ctr67:
+	tr56:
 		cs = 25
 		goto f7
-	_ctr65:
+	tr54:
 		cs = 26
 		goto _again
-	_ctr69:
-		cs = 27
-		goto _again
-	_ctr60:
+	tr50:
 		cs = 27
 		goto f18
-	_ctr63:
+	tr53:
 		cs = 27
 		goto f19
-	_ctr68:
+	tr57:
 		cs = 27
 		goto f20
-	_ctr72:
+	tr60:
 		cs = 28
 		goto _again
-	_ctr70:
+	tr58:
 		cs = 28
 		goto f0
-	_ctr74:
+	tr62:
 		cs = 29
 		goto _again
-	_ctr89:
+	tr73:
 		cs = 29
 		goto f27
-	_ctr76:
+	tr64:
 		cs = 30
 		goto _again
-	_ctr75:
+	tr63:
 		cs = 30
 		goto f0
-	_ctr90:
+	tr74:
 		cs = 30
 		goto f28
-	_ctr115:
+	tr93:
 		cs = 31
 		goto f4
-	_ctr124:
+	tr99:
 		cs = 31
 		goto f7
-	_ctr78:
-		cs = 31
-		goto f24
-	_ctr110:
+	tr89:
 		cs = 31
 		goto f32
-	_ctr100:
+	tr82:
 		cs = 32
 		goto f4
-	_ctr129:
+	tr103:
 		cs = 32
 		goto f7
-	_ctr81:
-		cs = 32
-		goto f24
-	_ctr95:
+	tr78:
 		cs = 32
 		goto f32
-	_ctr83:
+	tr69:
 		cs = 33
 		goto _again
-	_ctr85:
-		cs = 34
-		goto _again
-	_ctr84:
+	tr70:
 		cs = 34
 		goto f0
-	_ctr86:
+	tr71:
 		cs = 35
 		goto _again
-	_ctr71:
+	tr59:
 		cs = 36
 		goto f21
-	_ctr73:
+	tr61:
 		cs = 36
 		goto f22
-	_ctr88:
-		cs = 36
-		goto f27
-	_ctr77:
+	tr65:
 		cs = 37
 		goto f23
-	_ctr91:
-		cs = 37
-		goto f29
-	_ctr98:
+	tr80:
 		cs = 38
 		goto _again
-	_ctr127:
+	tr101:
 		cs = 38
 		goto f6
-	_ctr97:
+	tr79:
 		cs = 38
 		goto f25
-	_ctr92:
+	tr75:
 		cs = 38
 		goto f30
-	_ctr93:
+	tr76:
 		cs = 38
 		goto f31
-	_ctr96:
-		cs = 38
-		goto f33
-	_ctr126:
+	tr100:
 		cs = 38
 		goto f37
-	_ctr99:
+	tr81:
 		cs = 39
 		goto _again
-	_ctr128:
+	tr102:
 		cs = 39
 		goto f6
-	_ctr94:
+	tr77:
 		cs = 39
 		goto f31
-	_ctr101:
-		cs = 39
-		goto f33
-	_ctr104:
+	tr84:
 		cs = 40
 		goto f25
-	_ctr103:
-		cs = 40
-		goto f33
-	_ctr102:
+	tr83:
 		cs = 40
 		goto f34
-	_ctr105:
+	tr85:
 		cs = 41
 		goto f23
-	_ctr106:
-		cs = 41
-		goto f29
-	_ctr113:
+	tr91:
 		cs = 42
 		goto _again
-	_ctr122:
+	tr97:
 		cs = 42
 		goto f6
-	_ctr112:
+	tr90:
 		cs = 42
 		goto f25
-	_ctr107:
+	tr86:
 		cs = 42
 		goto f30
-	_ctr108:
+	tr87:
 		cs = 42
 		goto f31
-	_ctr111:
-		cs = 42
-		goto f33
-	_ctr121:
+	tr96:
 		cs = 42
 		goto f37
-	_ctr114:
+	tr92:
 		cs = 43
 		goto _again
-	_ctr123:
+	tr98:
 		cs = 43
 		goto f6
-	_ctr109:
+	tr88:
 		cs = 43
 		goto f31
-	_ctr116:
-		cs = 43
-		goto f33
-	_ctr119:
+	tr95:
 		cs = 44
 		goto f25
-	_ctr118:
-		cs = 44
-		goto f33
-	_ctr117:
+	tr94:
 		cs = 44
 		goto f35
-	_ctr80:
+	tr67:
 		cs = 45
 		goto f25
-	_ctr120:
-		cs = 45
-		goto f36
-	_ctr82:
+	tr68:
 		cs = 46
 		goto f25
-	_ctr125:
-		cs = 46
-		goto f36
-	_ctr130:
-		cs = 47
-		goto _again
-	_ctr87:
+	tr72:
 		cs = 47
 		goto f26
+
 	f0:
-		{
-			mark = p
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
 		goto _again
 	f4:
-		{
-			mark_slash = p
-		}
+//line cef_actions.rl:12
+
+		mark_slash = p
+
 		goto _again
 	f6:
-		{
-			state.pushEscape(mark_slash, p)
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
 		goto _again
 	f1:
-		{
-			e.Version, _ = strconv.Atoi(data[mark:p])
-		}
+//line cef_actions.rl:18
+
+		e.Version, _ = strconv.Atoi(data[mark:p])
+
 		goto _again
 	f5:
-		{
-			e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:21
+
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f10:
-		{
-			e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:25
+
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f13:
-		{
-			e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:29
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f16:
-		{
-			e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:33
+
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f19:
-		{
-			e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:37
+
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f22:
-		{
-			e.Severity = data[mark:p]
-		}
+//line cef_actions.rl:41
+
+		e.Severity = data[mark:p]
+
 		goto _again
 	f27:
-		{
-			complete = true
-		}
+//line cef_actions.rl:44
+
+		complete = true
+
 		goto _again
 	f23:
-		{
-			if len(state.key) != 0 && state.valueStart < mark {
-				// We should not be here, but purge the escapes and handle them.
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
-				state.reset()
-			}
-			state.key = data[mark:p]
+//line cef_actions.rl:51
+
+		// A new extension key marks the end of the last extension value.
+		if len(state.key) != 0 && state.valueStart < mark {
+			// We should not be here, but purge the escapes and handle them.
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
+			state.reset()
 		}
+		state.key = data[mark:p]
+
 		goto _again
 	f31:
-		{
-			if len(state.escapes) != 0 { // See ragel comment below.
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-			state.valueStart = p
-			state.valueEnd = p
+//line cef_actions.rl:60
+
+		if len(state.escapes) != 0 { // See ragel comment below.
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
 		}
+		state.valueStart = p
+		state.valueEnd = p
+
 		goto _again
 	f25:
-		{
-			state.valueEnd = p + 1
-		}
-		goto _again
-	f33:
-		{
-			if len(state.key) != 0 && state.valueStart < state.valueEnd {
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-		}
+//line cef_actions.rl:68
+
+		state.valueEnd = p + 1
+
 		goto _again
 	f24:
-		{
-			recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
-			{
-				(p) = (p) - 1
+//line cef_actions.rl:78
 
-			}
-			cs = 33
-		}
+		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
+		(p)--
+		cs = 33
+
 		goto _again
 	f26:
-		{
-			state.reset()
-			// Resume processing at p, the start of the next extension key.
-			p = mark
-			cs = 29
-		}
+//line cef_actions.rl:82
+
+		state.reset()
+		// Resume processing at p, the start of the next extension key.
+		p = mark
+		cs = 29
+
 		goto _again
 	f2:
-		{
-			mark = p
-		}
-		{
-			mark_slash = p
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:12
+
+		mark_slash = p
+
 		goto _again
 	f3:
-		{
-			mark = p
-		}
-		{
-			e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:21
+
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f9:
-		{
-			mark = p
-		}
-		{
-			e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:25
+
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f12:
-		{
-			mark = p
-		}
-		{
-			e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:29
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f15:
-		{
-			mark = p
-		}
-		{
-			e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:33
+
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f18:
-		{
-			mark = p
-		}
-		{
-			e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:37
+
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f21:
-		{
-			mark = p
-		}
-		{
-			e.Severity = data[mark:p]
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:41
+
+		e.Severity = data[mark:p]
+
 		goto _again
 	f35:
-		{
-			mark = p
-		}
-		{
-			state.valueEnd = p + 1
-		}
+//line cef_actions.rl:9
+
+		mark = p
+
+//line cef_actions.rl:68
+
+		state.valueEnd = p + 1
+
 		goto _again
 	f7:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			mark_slash = p
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:12
+
+		mark_slash = p
+
 		goto _again
 	f8:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:21
+
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f11:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:25
+
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f14:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:29
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f17:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:33
+
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f20:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-			state.reset()
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:37
+
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
+
 		goto _again
 	f37:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			state.valueEnd = p + 1
-		}
-		goto _again
-	f36:
-		{
-			state.pushEscape(mark_slash, p)
-		}
-		{
-			if len(state.key) != 0 && state.valueStart < state.valueEnd {
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-		}
+//line cef_actions.rl:15
+
+		state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:68
+
+		state.valueEnd = p + 1
+
 		goto _again
 	f28:
-		{
-			complete = true
-		}
-		{
-			mark = p
-		}
+//line cef_actions.rl:44
+
+		complete = true
+
+//line cef_actions.rl:9
+
+		mark = p
+
 		goto _again
 	f32:
-		{
-			if len(state.escapes) != 0 { // See ragel comment below.
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-			state.valueStart = p
-			state.valueEnd = p
+//line cef_actions.rl:60
+
+		if len(state.escapes) != 0 { // See ragel comment below.
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
 		}
-		{
-			mark_slash = p
-		}
+		state.valueStart = p
+		state.valueEnd = p
+
+//line cef_actions.rl:12
+
+		mark_slash = p
+
 		goto _again
 	f30:
-		{
-			if len(state.escapes) != 0 { // See ragel comment below.
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-			state.valueStart = p
-			state.valueEnd = p
+//line cef_actions.rl:60
+
+		if len(state.escapes) != 0 { // See ragel comment below.
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
 		}
-		{
-			state.valueEnd = p + 1
-		}
-		goto _again
-	f29:
-		{
-			if len(state.escapes) != 0 { // See ragel comment below.
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-			state.valueStart = p
-			state.valueEnd = p
-		}
-		{
-			if len(state.key) != 0 && state.valueStart < state.valueEnd {
-				e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
-				state.reset()
-			}
-		}
+		state.valueStart = p
+		state.valueEnd = p
+
+//line cef_actions.rl:68
+
+		state.valueEnd = p + 1
+
 		goto _again
 	f34:
-		{
-			state.valueEnd = p + 1
-		}
-		{
-			mark = p
-		}
-		goto _again
-	_again:
-		{
+//line cef_actions.rl:68
 
+		state.valueEnd = p + 1
+
+//line cef_actions.rl:9
+
+		mark = p
+
+		goto _again
+
+	_again:
+		if cs == 0 {
+			goto _out
+		}
+		if (p)++; (p) != (pe) {
+			goto _resume
+		}
+	_test_eof:
+		{
 		}
 		if (p) == eof {
-			if cs >= 36 {
-				goto _out
+			switch _cef_eof_actions[cs] {
+			case 28:
+//line cef_actions.rl:44
 
+				complete = true
+
+			case 34:
+//line cef_actions.rl:71
+
+				// Reaching the EOF marks the end of the final extension value.
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
+				}
+
+			case 25:
+//line cef_actions.rl:78
+
+				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
+				(p)--
+				cs = 33
+
+			case 37:
+//line cef_actions.rl:15
+
+				state.pushEscape(mark_slash, p)
+
+//line cef_actions.rl:71
+
+				// Reaching the EOF marks the end of the final extension value.
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
+				}
+
+			case 30:
+//line cef_actions.rl:60
+
+				if len(state.escapes) != 0 { // See ragel comment below.
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
+				}
+				state.valueStart = p
+				state.valueEnd = p
+
+//line cef_actions.rl:71
+
+				// Reaching the EOF marks the end of the final extension value.
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
+				}
+
+//line parser.go:1155
 			}
-
-		} else {
-			if cs != 0 {
-				(p) += 1
-				goto _resume
-
-			}
-
 		}
+
 	_out:
 		{
-
 		}
-
 	}
+
+//line parser.rl:54
+
+	// Check if state machine completed.
 	if cs < cef_first_final {
 		// Reached an early end.
 		if p == pe {
