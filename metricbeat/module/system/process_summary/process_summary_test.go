@@ -20,7 +20,6 @@
 package process_summary
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,7 +47,7 @@ func TestFetch(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.True(t, errors.Is(err, process.NonFatalErr{}))
+		assert.ErrorIs(t, err, process.NonFatalErr{})
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
@@ -66,7 +65,7 @@ func TestStateNames(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.True(t, errors.Is(err, process.NonFatalErr{}))
+		assert.ErrorIs(t, err, process.NonFatalErr{})
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
