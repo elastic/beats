@@ -3,6 +3,217 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.15.0]]
+=== Beats version 8.15.0
+https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.5. {pull}40082[40082]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
+- Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
+
+*Osquerybeat*
+
+- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `namespace` filter option on `add_kubernetes_metadata` processor. {pull}39934[39934]
+- Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
+- Validate config of the `replace` processor {pull}40047[40047]
+
+*Auditbeat*
+
+
+
+*Filebeat*
+
+- Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
+- Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
+- Update CEL mito extensions to v1.13.1. {pull}40307[40307]
+- Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
+- Add persistent volume claim name to volume if available {pull}38839[38839]
+- Raw events are now logged to a different file, this prevents potentially sensitive information from leaking into log files {pull}38767[38767]
+- Websocket input: Added runtime URL modification support based on state and cursor values {issue}39858[39858] {pull}39997[39997]
+
+*Auditbeat*
+
+- Reduce data size for add_session_metadata processor by removing unneeded fields {pull}39500[39500]
+- Enrich process events with user and group names, with add_session_metadata processor  {pull}39537[39537]
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Update CEL mito extensions to v1.10.0 to add base64 decode functions. {pull}38504[38504]
+- Ensure all responses sent by HTTP Endpoint are HTML-escaped. {pull}39329[39329]
+- Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
+- Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
+- Implement Elastic Agent status and health reporting for CEL Filebeat input. {pull}39209[39209]
+- Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
+- Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
+- Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
+- Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
+- Update CEL mito extensions to v1.12.2. {pull}39755[39755]
+- Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
+- Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
+- Add request trace support for Okta and EntraID entity analytics providers. {pull}39821[39821]
+- Allow elision of set and append failure logging. {issue}34544[34544] {pull}39929[39929]
+- Add ability to remove request trace logs from CEL input. {pull}39969[39969]
+- Add ability to remove request trace logs from HTTPJSON input. {pull}40003[40003]
+- Update CEL mito extensions to v1.13.0 {pull}40035[40035]
+- Add Jamf entity analytics provider. {pull}39996[39996]
+- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
+- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
+- Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
+- Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
+- Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Support schema_name for MySQL performance metricset {pull}38363[38363]
+- Add last_terminated_timestamp metric in kubernetes module {pull}39200[39200] {issue}3802[3802]
+- Add pod.status.ready_time and pod.status.reason metrics in kubernetes module {pull}39316[39316]
+- Add "Buffer cache hit ratio base" to calculate "Buffer cache hit ratio" for performance metrics {pull}40022[40022]
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
 [[release-notes-8.14.3]]
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
