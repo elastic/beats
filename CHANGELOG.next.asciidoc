@@ -110,7 +110,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 - Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
 - Validate config of the `replace` processor {pull}40047[40047]
-- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}1[1]
+- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 
 *Auditbeat*
 
