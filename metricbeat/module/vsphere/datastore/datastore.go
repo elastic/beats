@@ -23,11 +23,12 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 func init() {
@@ -49,6 +50,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	return &MetricSet{ms}, nil
+}
+
+type PerformanceMetrics struct {
+	DsRead         int64
+	DsWrite        int64
+	DsIops         int64
+	DsReadLatency  int64
+	DsWriteLatency int64
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -87,36 +96,105 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
-	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst); err != nil {
+	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst); err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
+	}
+	// Create a performance manager
+	perfManager := performance.NewManager(c)
+
+	// Retrieve metric IDs for the specified metric names
+	metrics, err := perfManager.CounterInfoByName(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve metrics: %w", err)
+	}
+
+	// Define metrics to be collected
+	metricNames := []string{
+		"datastore.read.average",
+		"datastore.write.average",
+		"datastore.datastoreIops.average",
+		"datastore.totalReadLatency.average",
+		"datastore.totalWriteLatency.average",
+	}
+
+	// Define refrence of structure
+	var metricsVar PerformanceMetrics
+
+	// Map metric names to struture	fields
+	metricMap := map[string]*int64{
+		"datastore.read.average":              &metricsVar.DsRead,
+		"datastore.write.average":             &metricsVar.DsWrite,
+		"datastore.datastoreIops.average":     &metricsVar.DsIops,
+		"datastore.totalReadLatency.average":  &metricsVar.DsReadLatency,
+		"datastore.totalWriteLatency.average": &metricsVar.DsWriteLatency,
+	}
+
+	// Map metric IDs to metric names
+	metricNamesById := make(map[int32]string)
+	for name, metric := range metrics {
+		metricNamesById[metric.Key] = name
+	}
+
+	var spec types.PerfQuerySpec
+	var metricIDs []types.PerfMetricId
+
+	for _, metricName := range metricNames {
+		metric, exists := metrics[metricName]
+		if !exists {
+			m.Logger().Debug("Metric %v not found", metricName)
+			continue
+		}
+
+		metricIDs = append(metricIDs, types.PerfMetricId{
+			CounterId: metric.Key,
+		})
 	}
 
 	for _, ds := range dst {
-		var usedSpacePercent float64
-		if ds.Summary.Capacity > 0 {
-			usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
-		}
-		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
-		event := mapstr.M{
-			"name":   ds.Summary.Name,
-			"fstype": ds.Summary.Type,
-			"capacity": mapstr.M{
-				"total": mapstr.M{
-					"bytes": ds.Summary.Capacity,
-				},
-				"free": mapstr.M{
-					"bytes": ds.Summary.FreeSpace,
-				},
-				"used": mapstr.M{
-					"bytes": usedSpaceBytes,
-					"pct":   usedSpacePercent,
-				},
-			},
+		spec = types.PerfQuerySpec{
+			Entity:     ds.Reference(),
+			MetricId:   metricIDs,
+			MaxSample:  1,
+			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+		}
+
+		// Query performance data
+		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+		if err != nil {
+			m.Logger().Debug("Failed to query performance data: %v", err)
+			continue
+		}
+
+		if len(samples) > 0 {
+			entityMetrics, ok := samples[0].(*types.PerfEntityMetric)
+			if !ok {
+				m.Logger().Debug("Unexpected metric type")
+				continue
+			}
+
+			for _, value := range entityMetrics.Value {
+				metricSeries, ok := value.(*types.PerfMetricIntSeries)
+				if !ok {
+					m.Logger().Debug("Unexpected metric series type")
+					continue
+				}
+
+				if len(metricSeries.Value) > 0 {
+					metricName := metricNamesById[metricSeries.Id.CounterId]
+					if assignValue, exists := metricMap[metricName]; exists {
+						*assignValue = metricSeries.Value[0] // Assign the metric value to the variable
+					}
+				} else {
+					m.Logger().Debug("Metric %v: No result found\n", metricNamesById[metricSeries.Id.CounterId])
+				}
+			}
+		} else {
+			m.Logger().Debug("No samples returned from performance manager")
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: m.eventMapping(ds, &metricsVar),
 		})
 	}
 

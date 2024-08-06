@@ -15,6 +15,15 @@
     },
     "vsphere": {
         "datastore": {
+            "iops": 0,
+            "host": {
+              "count": 1
+            },
+            "name": "LocalDS_0",
+            "status": "green",
+            "vm": {
+              "count": 6
+            },
             "capacity": {
                 "free": {
                     "bytes": 37120094208
@@ -25,7 +34,23 @@
                 "used": {
                     "bytes": 37566570496,
                     "pct": 0.502988996026061
-                }
+                },
+                "read": {
+                    "bytes": 0,
+                    "latency": {
+                      "total": {
+                        "ms": 0
+                      }
+                    }
+                  },
+                  "write": {
+                    "bytes": 337000,
+                    "latency": {
+                      "total": {
+                        "ms": 0
+                      }
+                    }
+                  }
             },
             "fstype": "local",
             "name": "LocalDS_0"
