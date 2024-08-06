@@ -599,8 +599,8 @@ func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, ol
 	}
 
 	// File size was reduced -> truncated file
-	if oldState.Finished && newState.Fileinfo.Size() < oldState.Offset {
-		logger.Debugf("Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Offset, newState.Fileinfo.Size())
+	if oldState.Finished && newState.Fileinfo.Size() < oldState.Fileinfo.Size() {
+		logger.Errorf("Old file was truncated. Starting from the beginning: %s, old size: %d, new size: %d ", newState.Source, oldState.Fileinfo.Size(), newState.Fileinfo.Size())
 		err := p.startHarvester(logger, newState, 0)
 		if err != nil {
 			p.updateStatus(status.Degraded, fmt.Sprintf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err))
