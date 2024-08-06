@@ -266,7 +266,7 @@ func openLibrpm() (*librpm, error) {
 
 	librpm.handle, err = dlopen.GetHandle(librpmNames)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't open %v: %v", librpmNames, err)
+		return nil, fmt.Errorf("couldn't open %v: %w", librpmNames, err)
 	}
 
 	librpm.rpmtsCreate, err = librpm.handle.GetSymbolPointer("rpmtsCreate")
@@ -325,11 +325,11 @@ func openLibrpm() (*librpm, error) {
 	}
 
 	// Only available in librpm>=4.13.0
-	librpm.rpmsqSetInterruptSafety, err = librpm.handle.GetSymbolPointer("rpmsqSetInterruptSafety")
+	librpm.rpmsqSetInterruptSafety, _ = librpm.handle.GetSymbolPointer("rpmsqSetInterruptSafety")
 	// no error check
 
 	// Only available in librpm>=4.6.0
-	librpm.rpmFreeMacros, err = librpm.handle.GetSymbolPointer("rpmFreeMacros")
+	librpm.rpmFreeMacros, _ = librpm.handle.GetSymbolPointer("rpmFreeMacros")
 	// no error check
 
 	librpm.rpmtsSetRootDir, err = librpm.handle.GetSymbolPointer("rpmtsSetRootDir")
@@ -388,7 +388,7 @@ func listRPMPackages(ownsThread bool) ([]*Package, error) {
 	}
 	defer C.my_rpmdbFreeIterator(openedLibrpm.rpmdbFreeIterator, mi)
 
-	var packages []*Package
+	packages := make([]*Package, 0)
 	for header := C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi) {
 
 		pkg, err := packageFromHeader(header, openedLibrpm)

@@ -302,7 +302,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	for _, pkg := range packages {
 		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
-		event.RootFields.Put("event.id", stateID.String()) //nolint:errcheck // This will not return an error as long as 'event' remains as a map.
+		_, _ = event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
 
