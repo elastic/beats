@@ -47,7 +47,7 @@ func TestFetch(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.ErrorIs(t, err, process.NonFatalErr{})
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
@@ -65,7 +65,7 @@ func TestStateNames(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
 	for _, err := range errs {
-		assert.ErrorIs(t, err, process.NonFatalErr{})
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
 	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
