@@ -12,12 +12,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
@@ -29,31 +27,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-func TestRPMParallel(t *testing.T) {
-	logp.DevelopmentSetup()
-
-	count := 20
-	waiter := sync.WaitGroup{}
-	waiter.Add(count)
-	t.Logf("Starting...")
-	for i := 0; i < count; i++ {
-		inner := i
-		go func() {
-			defer waiter.Done()
-			testMs := MetricSet{
-				log: logp.L(),
-			}
-
-			pkgList, err := testMs.getPackages()
-			require.NoError(t, err)
-
-			t.Logf("got %d packages from %d", len(pkgList), inner)
-		}()
-
-	}
-	waiter.Wait()
-}
 
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()

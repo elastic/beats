@@ -207,7 +207,7 @@ auditbeat.modules:
 
   # Use setreuid() to drop out of root before making any calls to the RPM backend.
   # This is exclusively useful for older rpm versions that rely on BDB as a backend;
-  # BDB does not parallize well, and multiple applications attempting to connect to
+  # BDB does not parallelize well, and multiple applications attempting to connect to
   # RPM's BDB backend may result in crashes and database corruption. By dropping out of root,
   # we eliminate the chances of any corruption happening should auditbeat conflict with any other
   # application attempting to use RPM/BDB
