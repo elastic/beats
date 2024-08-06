@@ -120,11 +120,7 @@ func Test(t *testing.T) {
 
 				query := make(url.Values)
 				query.Set("limit", "200")
-<<<<<<< HEAD
-				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, me.Profile.Login, query, omit, limiter, window)
-=======
-				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, login, query, omit, limiter, window, logger)
->>>>>>> 99c11386c3 (x-pack/filebeat/input/entityanalytics/provider/internal/okta: relax profile shape (#40359))
+				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, login, query, omit, limiter, window)
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
 				}
@@ -218,15 +214,9 @@ var localTests = []struct {
 	{
 		// Test case constructed from API-returned value with details anonymised.
 		name: "users",
-<<<<<<< HEAD
-		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
+		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
 		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
 			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window)
-=======
-		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
-		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
-			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window, log)
->>>>>>> 99c11386c3 (x-pack/filebeat/input/entityanalytics/provider/internal/okta: relax profile shape (#40359))
 		},
 		mkWant: mkWant[User],
 	},
