@@ -99,6 +99,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst); err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
+
 	// Create a performance manager
 	perfManager := performance.NewManager(c)
 
@@ -136,12 +137,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	var spec types.PerfQuerySpec
-	var metricIDs []types.PerfMetricId
+	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
 
 	for _, metricName := range metricNames {
 		metric, exists := metrics[metricName]
 		if !exists {
-			m.Logger().Debug("Metric %v not found", metricName)
+			m.Logger().Debug("Metric ", metricName, " not found")
 			continue
 		}
 
@@ -151,7 +152,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, ds := range dst {
-
 		spec = types.PerfQuerySpec{
 			Entity:     ds.Reference(),
 			MetricId:   metricIDs,
