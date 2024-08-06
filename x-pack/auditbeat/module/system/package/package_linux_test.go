@@ -15,7 +15,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
 	"github.com/elastic/elastic-agent-libs/logp"
-
 )
 
 func TestWithSuid(t *testing.T) {
