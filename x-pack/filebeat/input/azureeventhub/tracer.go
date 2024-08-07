@@ -15,28 +15,25 @@ import (
 )
 
 func init() {
-	tab.Register(&tracer{})
+	tab.Register(new(tracer))
 }
 
+// tracer manages the creation of spanners
 type tracer struct{}
 
-type noOpSpanner struct{}
-
-type logpLogger struct{}
-
-// StartSpan returns the input context and a no op Spanner
+// StartSpan returns the input context and a no-op Spanner
 func (nt *tracer) StartSpan(ctx context.Context, operationName string, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(noOpSpanner)
+	return ctx, new(logOnlySpanner)
 }
 
-// StartSpanWithRemoteParent returns the input context and a no op Spanner
+// StartSpanWithRemoteParent returns the input context and a no-op Spanner
 func (nt *tracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(noOpSpanner)
+	return ctx, new(logOnlySpanner)
 }
 
-// FromContext returns a no op Spanner without regard to the input context
+// FromContext returns a no-op Spanner without regard to the input context
 func (nt *tracer) FromContext(ctx context.Context) tab.Spanner {
-	return new(noOpSpanner)
+	return new(logOnlySpanner)
 }
 
 // NewContext returns the parent context
@@ -44,43 +41,52 @@ func (nt *tracer) NewContext(parent context.Context, span tab.Spanner) context.C
 	return parent
 }
 
-// AddAttributes is a nop
-func (ns *noOpSpanner) AddAttributes(attributes ...tab.Attribute) {}
+// logOnlySpanner is a Spanner implementation that focuses
+// on logging only.
+type logOnlySpanner struct{}
 
-// End is a nop
-func (ns *noOpSpanner) End() {}
+// AddAttributes is a no-op
+func (ns *logOnlySpanner) AddAttributes(attributes ...tab.Attribute) {}
 
-// Logger returns a nopLogger
-func (ns *noOpSpanner) Logger() tab.Logger {
-	return new(logpLogger)
+// End is a no-op
+func (ns *logOnlySpanner) End() {}
+
+// Logger returns a Logger implementation
+func (ns *logOnlySpanner) Logger() tab.Logger {
+	return &logpLogger{logp.L()}
 }
 
-// Inject is a nop
-func (ns *noOpSpanner) Inject(carrier tab.Carrier) error {
+// Inject is no-op
+func (ns *logOnlySpanner) Inject(carrier tab.Carrier) error {
 	return nil
 }
 
 // InternalSpan returns nil
-func (ns *noOpSpanner) InternalSpan() interface{} {
+func (ns *logOnlySpanner) InternalSpan() interface{} {
 	return nil
 }
 
-// Info nops log entry
+// logpLogger defers logging to the logp package
+type logpLogger struct {
+	logger *logp.Logger
+}
+
+// Info logs a message at info level
 func (sl logpLogger) Info(msg string, attributes ...tab.Attribute) {
-	logp.L().Info(msg)
+	sl.logger.Info(msg)
 }
 
-// Error nops log entry
+// Error logs a message at error level
 func (sl logpLogger) Error(err error, attributes ...tab.Attribute) {
-	logp.L().Error(err)
+	sl.logger.Error(err)
 }
 
-// Fatal nops log entry
+// Fatal logs a message at Fatal level
 func (sl logpLogger) Fatal(msg string, attributes ...tab.Attribute) {
-	logp.L().Fatal(msg)
+	sl.logger.Fatal(msg)
 }
 
-// Debug nops log entry
+// Debug logs a message at Debug level
 func (sl logpLogger) Debug(msg string, attributes ...tab.Attribute) {
-	logp.L().Debug(msg)
+	sl.logger.Debug(msg)
 }
