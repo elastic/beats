@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
+- Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 
@@ -163,6 +164,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
+- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
 
 *Heartbeat*
 
@@ -322,6 +324,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add scaling up support for Netflow input. {issue}37761[37761] {pull}40122[40122]
 - Update CEL mito extensions to v1.15.0. {pull}40294[40294]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
+- Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
 
 *Auditbeat*
 

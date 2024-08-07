@@ -20,6 +20,8 @@ import (
 	"time"
 
 	"golang.org/x/time/rate"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ISO8601 is the time format accepted by Okta queries.
@@ -39,47 +41,10 @@ type User struct {
 	PasswordChanged       *time.Time     `json:"passwordChanged,omitempty"`
 	Type                  map[string]any `json:"type"`
 	TransitioningToStatus *string        `json:"transitioningToStatus,omitempty"`
-	Profile               Profile        `json:"profile"`
+	Profile               map[string]any `json:"profile"`
 	Credentials           *Credentials   `json:"credentials,omitempty"`
 	Links                 HAL            `json:"_links,omitempty"` // See https://developer.okta.com/docs/reference/api/users/#links-object for details.
 	Embedded              HAL            `json:"_embedded,omitempty"`
-}
-
-// Profile is an Okta user's profile.
-//
-// See https://developer.okta.com/docs/reference/api/users/#profile-object for details.
-type Profile struct {
-	Login             string  `json:"login"`
-	Email             string  `json:"email"`
-	SecondEmail       *string `json:"secondEmail,omitempty"`
-	FirstName         *string `json:"firstName,omitempty"`
-	LastName          *string `json:"lastName,omitempty"`
-	MiddleName        *string `json:"middleName,omitempty"`
-	HonorificPrefix   *string `json:"honorificPrefix,omitempty"`
-	HonorificSuffix   *string `json:"honorificSuffix,omitempty"`
-	Title             *string `json:"title,omitempty"`
-	DisplayName       *string `json:"displayName,omitempty"`
-	NickName          *string `json:"nickName,omitempty"`
-	ProfileUrl        *string `json:"profileUrl,omitempty"`
-	PrimaryPhone      *string `json:"primaryPhone,omitempty"`
-	MobilePhone       *string `json:"mobilePhone,omitempty"`
-	StreetAddress     *string `json:"streetAddress,omitempty"`
-	City              *string `json:"city,omitempty"`
-	State             *string `json:"state,omitempty"`
-	ZipCode           *string `json:"zipCode,omitempty"`
-	CountryCode       *string `json:"countryCode,omitempty"`
-	PostalAddress     *string `json:"postalAddress,omitempty"`
-	PreferredLanguage *string `json:"preferredLanguage,omitempty"`
-	Locale            *string `json:"locale,omitempty"`
-	Timezone          *string `json:"timezone,omitempty"`
-	UserType          *string `json:"userType,omitempty"`
-	EmployeeNumber    *string `json:"employeeNumber,omitempty"`
-	CostCenter        *string `json:"costCenter,omitempty"`
-	Organization      *string `json:"organization,omitempty"`
-	Division          *string `json:"division,omitempty"`
-	Department        *string `json:"department,omitempty"`
-	ManagerId         *string `json:"managerId,omitempty"`
-	Manager           *string `json:"manager,omitempty"`
 }
 
 // Credentials is a redacted Okta user's credential details. Only the credential provider is retained.
@@ -114,7 +79,7 @@ type Device struct {
 	Created             time.Time         `json:"created"`
 	ID                  string            `json:"id"`
 	LastUpdated         time.Time         `json:"lastUpdated"`
-	Profile             DeviceProfile     `json:"profile"`
+	Profile             map[string]any    `json:"profile"`
 	ResourceAlternateID string            `json:"resourceAlternateID"`
 	ResourceDisplayName DeviceDisplayName `json:"resourceDisplayName"`
 	ResourceID          string            `json:"resourceID"`
@@ -126,27 +91,6 @@ type Device struct {
 	// It is not part of the list devices API return, but can
 	// be populated by a call to GetDeviceUsers.
 	Users []User `json:"users,omitempty"`
-}
-
-// DeviceProfile is an Okta device's hardware and security profile.
-//
-// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
-type DeviceProfile struct {
-	DiskEncryptionType    *string `json:"diskEncryptionType,omitempty"`
-	DisplayName           string  `json:"displayName"`
-	IMEI                  *string `json:"imei,omitempty"`
-	IntegrityJailBreak    *bool   `json:"integrityJailBreak,omitempty"`
-	Manufacturer          *string `json:"manufacturer,omitempty"`
-	MEID                  *string `json:"meid,omitempty"`
-	Model                 *string `json:"model,omitempty"`
-	OSVersion             *string `json:"osVersion,omitempty"`
-	Platform              string  `json:"platform"`
-	Registered            bool    `json:"registered"`
-	SecureHardwarePresent *bool   `json:"secureHardwarePresent,omitempty"`
-	SerialNumber          *string `json:"serialNumber,omitempty"`
-	SID                   *string `json:"sid,omitempty"`
-	TPMPublicKeyHash      *string `json:"tpmPublicKeyHash,omitempty"`
-	UDID                  *string `json:"udid,omitempty"`
 }
 
 // DeviceDisplayName is an Okta device's annotated display name.
@@ -220,7 +164,7 @@ func (o Response) String() string {
 // https://${yourOktaDomain}/reports/rate-limit.
 //
 // See https://developer.okta.com/docs/reference/api/users/#list-users for details.
-func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
+func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	u := &url.URL{
@@ -229,7 +173,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 		Path:     path.Join(endpoint, user),
 		RawQuery: query.Encode(),
 	}
-	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window)
+	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window, log)
 }
 
 // GetUserGroupDetails returns Okta group details using the users API endpoint. host is the
@@ -238,7 +182,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
-func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration) ([]Group, http.Header, error) {
+func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Group, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
@@ -250,7 +194,7 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 		Host:   host,
 		Path:   path.Join(endpoint, user, "groups"),
 	}
-	return getDetails[Group](ctx, cli, u, key, true, OmitNone, lim, window)
+	return getDetails[Group](ctx, cli, u, key, true, OmitNone, lim, window, log)
 }
 
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
@@ -260,7 +204,7 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details.
-func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) ([]Device, http.Header, error) {
+func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Device, http.Header, error) {
 	const endpoint = "/api/v1/devices"
 
 	u := &url.URL{
@@ -269,7 +213,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 		Path:     path.Join(endpoint, device),
 		RawQuery: query.Encode(),
 	}
-	return getDetails[Device](ctx, cli, u, key, device == "", OmitNone, lim, window)
+	return getDetails[Device](ctx, cli, u, key, device == "", OmitNone, lim, window, log)
 }
 
 // GetDeviceUsers returns Okta user details for users associated with the provided device identifier
@@ -279,7 +223,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDeviceUsers for details.
-func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
+func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
 	if device == "" {
 		// No user associated with a null device. Not an error.
 		return nil, nil, nil
@@ -293,7 +237,7 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 		Path:     path.Join(endpoint, device, "users"),
 		RawQuery: query.Encode(),
 	}
-	du, h, err := getDetails[devUser](ctx, cli, u, key, true, omit, lim, window)
+	du, h, err := getDetails[devUser](ctx, cli, u, key, true, omit, lim, window, log)
 	if err != nil {
 		return nil, h, err
 	}
@@ -318,8 +262,9 @@ type devUser struct {
 // for the specific user are returned, otherwise a list of all users is returned.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
-func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *rate.Limiter, window time.Duration) ([]E, http.Header, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]E, http.Header, error) {
+	url := u.String()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -331,6 +276,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
 
+	log.Debugw("rate limit", "limit", lim.Limit(), "burst", lim.Burst(), "url", url)
 	err = lim.Wait(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -340,7 +286,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	err = oktaRateLimit(resp.Header, window, lim)
+	err = oktaRateLimit(resp.Header, window, lim, log)
 	if err != nil {
 		io.Copy(io.Discard, resp.Body)
 		return nil, nil, err
@@ -406,10 +352,11 @@ func (e *Error) Error() string {
 // oktaRateLimit implements the Okta rate limit policy translation.
 //
 // See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
-func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter) error {
+func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter, log *logp.Logger) error {
 	limit := h.Get("X-Rate-Limit-Limit")
 	remaining := h.Get("X-Rate-Limit-Remaining")
 	reset := h.Get("X-Rate-Limit-Reset")
+	log.Debugw("rate limit header", "X-Rate-Limit-Limit", limit, "X-Rate-Limit-Remaining", remaining, "X-Rate-Limit-Reset", reset)
 	if limit == "" || remaining == "" || reset == "" {
 		return nil
 	}
@@ -446,10 +393,12 @@ func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter) e
 		next := rate.Limit(lim / window.Seconds())
 		limiter.SetLimitAt(waitUntil, next)
 		limiter.SetBurstAt(waitUntil, burst)
+		log.Debugw("rate limit adjust", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
 		return nil
 	}
 	limiter.SetLimit(rateLimit)
 	limiter.SetBurst(burst)
+	log.Debugw("rate limit adjust", "set_rate", rateLimit, "set_burst", burst)
 	return nil
 }
 
