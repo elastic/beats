@@ -174,7 +174,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 // Call Done to indicate that all events from this SQS message have been
 // acknowledged and it is safe to stop the keepalive routine and
 // delete / finalize the message.
-func (r sqsProcessingResult) Done() error {
+func (r sqsProcessingResult) Done() {
 	p := r.processor
 	processingErr := r.processingErr
 

@@ -39,6 +39,12 @@ func (ah *awsACKHandler) Add(eventCount int, ackCallback func()) {
 	}
 }
 
+// Called when a worker is closing, to indicate to the ack handler that it
+// should shut down as soon as the current pending list is acknowledged.
+func (ah *awsACKHandler) Close() {
+	close(ah.pendingChan)
+}
+
 func (ah *awsACKHandler) pipelineEventListener() beat.EventListener {
 	return acker.TrackingCounter(func(_ int, total int) {
 		// Notify the ack handler goroutine

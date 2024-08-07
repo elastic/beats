@@ -17,8 +17,6 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/fifo"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -171,15 +169,16 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 }
 
 type sqsWorker struct {
-	input       *sqsReaderInput
-	client      beat.Client
-	pendingACKs fifo.FIFO[sqsProcessingResult]
+	input      *sqsReaderInput
+	client     beat.Client
+	ackHandler *awsACKHandler
 }
 
 func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
 	// Create a pipeline client scoped to this worker.
+	ackHandler := newAWSACKHandler()
 	client, err := in.pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: awscommon.NewEventACKHandler(),
+		EventListener: ackHandler.pipelineEventListener(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
@@ -190,8 +189,9 @@ func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
 		return nil, fmt.Errorf("connecting to pipeline: %w", err)
 	}
 	return &sqsWorker{
-		input:  in,
-		client: client,
+		input:      in,
+		client:     client,
+		ackHandler: ackHandler,
 	}, nil
 }
 
@@ -226,14 +226,16 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 		// hi fae, finish this function
 	})
 
-	if result != nil {
+	if result.processingErr != nil {
 		w.input.log.Warnw("Failed processing SQS message.",
-			"error", err,
+			"error", result.processingErr,
 			"message_id", *msg.MessageId,
 			"elapsed_time_ns", time.Since(start))
 	}
 	w.input.metrics.endSQSWorker(id)
 
+	// Add this result's Done callback to the pending ACKs list
+	w.ackHandler.Add(publishCount, result.Done)
 }
 
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
