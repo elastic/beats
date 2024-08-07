@@ -201,9 +201,7 @@ func (p *noopPidProvider) Name() string { return "noop" }
 func (p *noopPidProvider) PID(ctx context.Context) (int, error) { return 0, nil }
 
 func invokeCmd(topPath string) *exec.Cmd {
-	homeExePath := filepath.Join(topPath, agentName)
-
-	cmd := exec.Command(homeExePath, watcherSubcommand,
+	cmd := exec.Command(paths.TopBinaryPath(), watcherSubcommand,
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),
 	)
