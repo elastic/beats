@@ -73,8 +73,9 @@
 
     header = priority version sp timestamp sp hostname sp app_name sp proc_id sp msg_id;
 
-    sd_raw_values = ((any - bs) | (bs ']'));
-    sd_raw        = nil_value | ('[' sd_raw_values+ ']') >tok %set_sd_raw;
+    sd_raw_escape = (bs | ']');
+    sd_raw_values = ((bs ']') | (any - sd_raw_escape));
+    sd_raw        = nil_value | ('[' sd_raw_values+ ']')+ >tok %set_sd_raw;
 
     msg = any* >tok %set_msg;
 }%%

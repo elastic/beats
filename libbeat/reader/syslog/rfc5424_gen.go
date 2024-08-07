@@ -104,14 +104,6 @@ func parseRFC5424(data string) (message, error) {
 			goto st_case_19
 		case 27:
 			goto st_case_27
-		case 28:
-			goto st_case_28
-		case 29:
-			goto st_case_29
-		case 30:
-			goto st_case_30
-		case 31:
-			goto st_case_31
 		case 20:
 			goto st_case_20
 		case 21:
@@ -382,6 +374,11 @@ func parseRFC5424(data string) (message, error) {
 			goto st25
 		}
 		goto tr0
+	tr37:
+
+		m.setRawSDValue(data[tok:p])
+
+		goto st25
 	st25:
 		if p++; p == pe {
 			goto _test_eof25
@@ -409,8 +406,11 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof17
 		}
 	st_case_17:
-		if data[p] == 92 {
+		switch data[p] {
+		case 92:
 			goto st19
+		case 93:
+			goto tr0
 		}
 		goto st18
 	st18:
@@ -442,79 +442,10 @@ func parseRFC5424(data string) (message, error) {
 		switch data[p] {
 		case 32:
 			goto tr37
-		case 92:
-			goto st19
-		case 93:
-			goto st27
+		case 91:
+			goto st17
 		}
-		goto st18
-	tr37:
-
-		m.setRawSDValue(data[tok:p])
-
-		goto st28
-	st28:
-		if p++; p == pe {
-			goto _test_eof28
-		}
-	st_case_28:
-		switch data[p] {
-		case 92:
-			goto tr39
-		case 93:
-			goto tr40
-		}
-		goto tr38
-	tr38:
-
-		tok = p
-
-		goto st29
-	st29:
-		if p++; p == pe {
-			goto _test_eof29
-		}
-	st_case_29:
-		switch data[p] {
-		case 92:
-			goto st30
-		case 93:
-			goto st31
-		}
-		goto st29
-	tr39:
-
-		tok = p
-
-		goto st30
-	st30:
-		if p++; p == pe {
-			goto _test_eof30
-		}
-	st_case_30:
-		if data[p] == 93 {
-			goto st29
-		}
-		goto st26
-	tr40:
-
-		tok = p
-
-		goto st31
-	st31:
-		if p++; p == pe {
-			goto _test_eof31
-		}
-	st_case_31:
-		switch data[p] {
-		case 32:
-			goto tr37
-		case 92:
-			goto st30
-		case 93:
-			goto st31
-		}
-		goto st29
+		goto tr0
 	tr11:
 
 		tok = p
@@ -690,18 +621,6 @@ func parseRFC5424(data string) (message, error) {
 	_test_eof27:
 		cs = 27
 		goto _test_eof
-	_test_eof28:
-		cs = 28
-		goto _test_eof
-	_test_eof29:
-		cs = 29
-		goto _test_eof
-	_test_eof30:
-		cs = 30
-		goto _test_eof
-	_test_eof31:
-		cs = 31
-		goto _test_eof
 	_test_eof20:
 		cs = 20
 		goto _test_eof
@@ -720,7 +639,7 @@ func parseRFC5424(data string) (message, error) {
 		}
 		if p == eof {
 			switch cs {
-			case 26, 29, 30:
+			case 26:
 
 				m.setMsg(data[tok:p])
 
@@ -733,15 +652,9 @@ func parseRFC5424(data string) (message, error) {
 
 				m.setRawSDValue(data[tok:p])
 
-			case 25, 28:
+			case 25:
 
 				tok = p
-
-				m.setMsg(data[tok:p])
-
-			case 31:
-
-				m.setRawSDValue(data[tok:p])
 
 				m.setMsg(data[tok:p])
 
