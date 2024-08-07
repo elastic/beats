@@ -72,6 +72,20 @@ func TestDecodeRecords(t *testing.T) {
 			assert.Contains(t, msgs, ms)
 		}
 	})
+
+	t.Run("Decode array with one event", func(t *testing.T) {
+		msg := "[{\"key1\":\"value1\",\"key2\":\"value2\",\"key3\":\"value3\",\"nestedKey\":{\"nestedKey1\":\"nestedValue1\"},\"arrayKey\":[\"arrayValue1\",\"arrayValue2\"]}]"
+		expected := "{\"arrayKey\":[\"arrayValue1\",\"arrayValue2\"],\"key1\":\"value1\",\"key2\":\"value2\",\"key3\":\"value3\",\"nestedKey\":{\"nestedKey1\":\"nestedValue1\"}}"
+
+		messages := decoder.Decode([]byte(msg))
+
+		assert.NotNil(t, messages)
+		assert.Equal(t, len(messages), 1)
+
+		for _, actual := range messages {
+			assert.Equal(t, expected, actual)
+		}
+	})
 }
 
 func TestDecodeRecordsWithSanitization(t *testing.T) {

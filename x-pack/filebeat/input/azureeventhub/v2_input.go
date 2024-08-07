@@ -482,7 +482,7 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
-		for record := range records {
+		for _, record := range records {
 			_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
 			_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
 			_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
