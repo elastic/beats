@@ -200,7 +200,7 @@ func (p *noopPidProvider) Name() string { return "noop" }
 
 func (p *noopPidProvider) PID(ctx context.Context) (int, error) { return 0, nil }
 
-func invokeCmd(topPath string) *exec.Cmd {
+func invokeCmd() *exec.Cmd {
 	cmd := exec.Command(paths.TopBinaryPath(), watcherSubcommand,
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),

@@ -61,7 +61,7 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	return int(status.ProcessId), nil
 }
 
-func invokeCmd(topPath string) *exec.Cmd {
+func invokeCmd() *exec.Cmd {
 	cmd := exec.Command(paths.TopBinaryPath(), watcherSubcommand,
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),

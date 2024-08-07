@@ -168,6 +168,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool, skipVe
 		return nil, err
 	}
 
+	// InvokeWatcher invokes the watcher using the symlink that is rotated above with ChangeSymlink
 	if err := InvokeWatcher(u.log); err != nil {
 		rollbackInstall(ctx, newHash)
 		return nil, errors.New("failed to invoke rollback watcher", err)
