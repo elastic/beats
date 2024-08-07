@@ -31,5 +31,7 @@ wait4
 execve
 
 # Jounrald input
-exec
-fork
+dup3
+faccessat2
+prctl
+setrlimit
