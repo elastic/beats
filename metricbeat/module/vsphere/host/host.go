@@ -72,6 +72,7 @@ type PerformanceMetrics struct {
 	DiskUsage               int64
 	DiskMaxTotalLatency     int64
 	DiskDeviceLatency       int64
+	DiskCapacityUsage       int64
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -126,6 +127,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Define metrics to be collected
 	metricNames := []string{
+		"disk.capacity.usage.average",
 		"disk.deviceLatency.average",
 		"disk.maxTotalLatency.latest",
 		"disk.usage.average",
@@ -149,6 +151,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Map metric names to struture	fields
 	metricMap := map[string]*int64{
+		"disk.capacity.usage.average": &metricsVar.DiskCapacityUsage,
 		"disk.deviceLatency.average":  &metricsVar.DiskDeviceLatency,
 		"disk.maxTotalLatency.latest": &metricsVar.DiskMaxTotalLatency,
 		"net.usage.average":           &metricsVar.NetUsage,
@@ -167,19 +170,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		"net.droppedRx.summation":     &metricsVar.NetDroppedReceived,
 	}
 
-	// Map metric IDs to metric names
-	metricNamesById := make(map[int32]string)
-	for name, metric := range metrics {
-		metricNamesById[metric.Key] = name
-	}
-
 	var spec types.PerfQuerySpec
 	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
 
 	for _, metricName := range metricNames {
 		metric, exists := metrics[metricName]
 		if !exists {
-			m.Logger().Debug("Metric %v not found", metricName)
+			m.Logger().Debug("Metric ", metricName, " not found")
 			continue
 		}
 
@@ -226,26 +223,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 
 		if len(samples) > 0 {
-			entityMetrics, ok := samples[0].(*types.PerfEntityMetric)
-			if !ok {
-				m.Logger().Debug("Unexpected metric type")
-				continue
+			results, err := perfManager.ToMetricSeries(ctx, samples)
+			if err != nil {
+				m.Logger().Debug("Failed to query performance data: %v", err)
 			}
 
-			for _, value := range entityMetrics.Value {
-				metricSeries, ok := value.(*types.PerfMetricIntSeries)
-				if !ok {
-					m.Logger().Debug("Unexpected metric series type")
-					continue
-				}
-
-				if len(metricSeries.Value) > 0 {
-					metricName := metricNamesById[metricSeries.Id.CounterId]
-					if assignValue, exists := metricMap[metricName]; exists {
-						*assignValue = metricSeries.Value[0] // Assign the metric value to the variable
+			for _, result := range results[0].Value {
+				if len(result.Value) > 0 {
+					if assignValue, exists := metricMap[result.Name]; exists {
+						*assignValue = result.Value[0] // Assign the metric value to the variable
 					}
 				} else {
-					m.Logger().Debug("Metric %v: No result found\n", metricNamesById[metricSeries.Id.CounterId])
+					m.Logger().Debug("Metric ", result.Name, ": No result found")
 				}
 			}
 		} else {

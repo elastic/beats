@@ -59,8 +59,13 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 			},
 		},
 		"disk": mapstr.M{
-			"device": mapstr.M{
-				"latency": mapstr.M{
+			"capacity": mapstr.M{
+				"usage": mapstr.M{
+					"bytes": int64(perfMertics.DiskUsage) * 1000,
+				},
+			},
+			"devicelatency": mapstr.M{
+				"average": mapstr.M{
 					"ms": perfMertics.DiskDeviceLatency,
 				},
 			},
@@ -70,13 +75,13 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 				},
 			},
 			"total": mapstr.M{
-				"bytes": perfMertics.DiskUsage,
+				"bytes": int64(perfMertics.DiskUsage) * 1000,
 			},
 			"read": mapstr.M{
-				"bytes": perfMertics.DiskRead,
+				"bytes": int64(perfMertics.DiskRead) * 1000,
 			},
 			"write": mapstr.M{
-				"bytes": perfMertics.DiskWrite,
+				"bytes": int64(perfMertics.DiskWrite) * 1000,
 			},
 		},
 		"memory": mapstr.M{
@@ -93,13 +98,13 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 		"network": mapstr.M{
 			"bandwidth": mapstr.M{
 				"transmitted": mapstr.M{
-					"bytes": perfMertics.NetTransmitted,
+					"bytes": int64(perfMertics.NetTransmitted) * 1000,
 				},
 				"received": mapstr.M{
-					"bytes": perfMertics.NetReceived,
+					"bytes": int64(perfMertics.NetReceived) * 1000,
 				},
 				"total": mapstr.M{
-					"bytes": perfMertics.NetUsage,
+					"bytes": int64(perfMertics.NetUsage) * 1000,
 				},
 			},
 			"packets": mapstr.M{

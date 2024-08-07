@@ -4,18 +4,6 @@
     host
   release: ga
   fields:
-    - name: name
-      type: keyword
-      description: >
-        Host name
-    - name: status
-      type: keyword
-      description: >
-        The overall health status of a host in the vSphere environment.
-    - name: uptime
-      type: double
-      description: >
-        The total uptime of a host in the vSphere environment.
     - name: cpu.used.mhz
       type: long
       description: >
@@ -28,94 +16,115 @@
       type: long
       description: >
         Free CPU in Mhz
-    - name: disk.device.latency.ms
-      type: double
+    - name: disk.capacity.usage.bytes
+      type: long
+      description: >
+        The amount of storage capacity currently being consumed by or on the entity.
+    - name: disk.devicelatency.average.ms
+      type: long
       description: >
         Average amount of time it takes to complete an SCSI command from physical device.
     - name: disk.latency.total.ms
-      type: double
+      type: long
       description: >
         Highest latency value across all disks used by the host.
+    - name: disk.read.bytes
+      type: long
+      description: >
+        Average number of bytes read from the disk each second.
+      format: bytes
     - name: disk.total.bytes
-      type: double
+      type: long
       description: >
         Aggregated disk I/O rate.
-    - name: disk.read.bytes
-      type: double
-      description: >
-        Average number of kilobytes read from the disk each second.
-    - name: memory.used.bytes
-      type: long
-      description: >
-        Used Memory in bytes
-      format: bytes
-    - name: memory.total.bytes
-      type: long
-      description: >
-        Total Memory in bytes
       format: bytes
     - name: memory.free.bytes
       type: long
       description: >
         Free Memory in bytes
       format: bytes
+    - name: memory.total.bytes
+      type: long
+      description: >
+        Total Memory in bytes
+      format: bytes
+    - name: memory.used.bytes
+      type: long
+      description: >
+        Used Memory in bytes
+      format: bytes
+    - name: name
+      type: keyword
+      description: >
+        Host name
     - name: network_names
       type: keyword
       description: >
         Network names
     - name: network.bandwidth.transmitted.bytes
-      type: double
+      type: long
       description: >
         Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+      format: bytes
     - name: network.bandwidth.received.bytes
-      type: double
+      type: long
       description: >
         Average rate at which data was received during the interval. This represents the bandwidth of the network.
+      format: bytes
     - name: network.bandwidth.total.bytes
-      type: double
+      type: long
       description: >
-        Network utilization (combined transmit- and receive-rates).
+        Network utilization (combined transmit-rates and receive-rates).
+      format: bytes
     - name: network.packets.transmitted.count
-      type: double
+      type: long
       description: >
         Number of packets transmitted.
     - name: network.packets.received.count
-      type: double
+      type: long
       description: >
         Number of packets received.
     - name: network.packets.errors.transmitted.count
-      type: double
+      type: long
       description: >
         Number of packets with errors transmitted.
     - name: network.packets.errors.received.count
-      type: double
+      type: long
       description: >
         Number of packets with errors received.
     - name: network.packets.errors.total.count
-      type: double
+      type: long
       description: >
         Total number of packets with errors.
     - name: network.packets.multicast.transmitted.count
-      type: double
+      type: long
       description: >
         Number of multicast packets transmitted.
     - name: network.packets.multicast.received.count
-      type: double
+      type: long
       description: >
         Number of multicast packets received.
     - name: network.packets.multicast.total.count
-      type: double
+      type: long
       description: >
         Total number of multicast packets.
     - name: network.packets.dropped.transmitted.count
-      type: double
+      type: long
       description: >
         Number of transmitted packets dropped.
     - name: network.packets.dropped.received.count
-      type: double
+      type: long
       description: >
         Number of received packets dropped.
     - name: network.packets.dropped.total.count
-      type: double
+      type: long
       description: >
-        Total number of packets dropped.    
+        Total number of packets dropped.   
+    - name: status
+      type: keyword
+      description: >
+        The overall health status of a host in the vSphere environment.
+    - name: uptime
+      type: long
+      description: >
+        The total uptime of a host in seconds within the vSphere environment.

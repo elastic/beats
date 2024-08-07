@@ -1,123 +1,128 @@
 {
     "@timestamp": "2022-09-06T06:41:22.128Z",
     "metricset": {
-      "name": "host",
-      "period": 10000
+        "name": "host",
+        "period": 10000
     },
     "service": {
-      "address": "https://localhost:8989/sdk",
-      "type": "vsphere"
+        "address": "https://localhost:8989/sdk",
+        "type": "vsphere"
     },
     "event": {
-      "module": "vsphere",
-      "duration": 23519250,
-      "dataset": "vsphere.host"
+        "module": "vsphere",
+        "duration": 23519250,
+        "dataset": "vsphere.host"
     },
     "vsphere": {
-      "host": {
-        "cpu": {
-          "used": {
-            "mhz": 67
-          },
-          "total": {
-            "mhz": 4588
-          },
-          "free": {
-            "mhz": 4521
-          }
-        },
-        "disk":{
-            "device":{
-              "latency": {
-                "ms": 0
-              }
+        "host": {
+            "cpu": {
+                "used": {
+                    "mhz": 67
+                },
+                "total": {
+                    "mhz": 4588
+                },
+                "free": {
+                    "mhz": 4521
+                }
             },
-            "latency":{
-              "total": {
-                "ms": 0
-              }
+            "disk": {
+                "capacity": {
+                    "usage": {
+                        "bytes": 0
+                    }
+                },
+                "devicelatency": {
+                    "average": {
+                        "ms": 0
+                    }
+                },
+                "latency": {
+                    "total": {
+                        "ms": 18
+                    }
+                },
+                "total": {
+                    "bytes": 262000
+                },
+                "read": {
+                    "bytes": 13000
+                },
+                "write": {
+                    "bytes": 248000
+                }
             },
-            "total":{
-              "bytes": 0
+            "memory": {
+                "free": {
+                    "bytes": 2822230016
+                },
+                "total": {
+                    "bytes": 4294430720
+                },
+                "used": {
+                    "bytes": 1472200704
+                }
             },
-            "read":{
-              "bytes": 0
+            "network": {
+                "bandwidth": {
+                    "total": {
+                        "bytes": 372000
+                    },
+                    "transmitted": {
+                        "bytes": 0
+                    },
+                    "received": {
+                        "bytes": 371000
+                    }
+                },
+                "packets": {
+                    "received": {
+                        "count": 9463
+                    },
+                    "errors": {
+                        "transmitted": {
+                            "count": 0
+                        },
+                        "received": {
+                            "count": 0
+                        },
+                        "total": {
+                            "count": 0
+                        }
+                    },
+                    "multicast": {
+                        "total": {
+                            "count": 6679
+                        },
+                        "transmitted": {
+                            "count": 0
+                        },
+                        "received": {
+                            "count": 6679
+                        }
+                    },
+                    "dropped": {
+                        "received": {
+                            "count": 0
+                        },
+                        "total": {
+                            "count": 0
+                        },
+                        "transmitted": {
+                            "count": 0
+                        }
+                    },
+                    "transmitted": {
+                        "count": 54
+                    }
+                }
             },
-            "write":{
-              "bytes": 0
-            }
-        },
-        "memory": {
-          "free": {
-            "bytes": 2822230016
-          },
-          "total": {
-            "bytes": 4294430720
-          },
-          "used": {
-            "bytes": 1472200704
-          }
-        },
-        "network": {
-          "bandwidth": {
-            "transmitted": {
-              "bytes": 0
-            },
-            "received": {
-              "bytes": 0
-            },
-            "total": {
-              "bytes": 0
-            }
-          },
-          "packets":{
-            "transmitted": {
-              "count": 0
-            },
-            "received": {
-              "count": 0
-            },
-            "errors": {
-              "transmitted": {
-                "count": 0
-              },
-              "received": {
-                "count": 0
-              },
-              "total": {
-                "count": 0
-              }
-            },
-            "multicast": {
-              "transmitted": {
-                "count": 0
-              },
-              "received": {
-                "count": 0
-              },
-              "total": {
-                "count": 0
-              }
-            },
-            "dropped": {
-              "transmitted": {
-                "count": 0
-              },
-              "received": {
-                "count": 0
-              },
-              "total": {
-                "count": 0
-              }
-            }
-          }
-        },
-        "network_names": [
-          "VM Network"
-        ],
-        "name": "DC0_H0",
-        "status": "green",
-        "uptime": 0
-      }
+            "network_names": [
+               "VM Network"
+            ],
+            "name": "DC0_H0",
+            "status": "green",
+            "uptime": 1728865
+        }
     }
 }
