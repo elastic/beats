@@ -81,6 +81,7 @@ var journaldEventFields = FieldConversion{
 	"CONTAINER_NAME":            text("container.name"),
 	"CONTAINER_TAG":             text("container.log.tag"),
 	"CONTAINER_PARTIAL_MESSAGE": text("container.partial"),
+	"IMAGE_NAME":                text("container.image.name"),
 
 	// dropped fields
 	sdjournal.SD_JOURNAL_FIELD_MONOTONIC_TIMESTAMP:       ignoredField, // saved in the registry
