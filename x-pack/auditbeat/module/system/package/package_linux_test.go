@@ -58,7 +58,6 @@ func TestWithSuid(t *testing.T) {
 	if currentUID != 0 {
 		t.Skipf("can only run as root")
 	}
-
 	useUID := getUser(t)
 	testMs := MetricSet{
 		log: logp.L(),

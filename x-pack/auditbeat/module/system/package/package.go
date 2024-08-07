@@ -239,7 +239,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		if os.Getuid() != 0 && int(*ms.config.PackageSuidDrop) != os.Getuid() {
 			return nil, fmt.Errorf("package.rpm_drop_to_suid is set to %d, but we're running as a different non-root user", *config.PackageSuidDrop)
 		}
-		ms.log.Debugf("Dropping to EUID %d for RPM API calls", *ms.config.PackageSuidDrop)
+		ms.log.Debugf("Dropping to EUID %d from UID %d for RPM API calls", *ms.config.PackageSuidDrop, os.Getuid())
 	}
 
 	packages, err := loadPackages(ms.bucket)
