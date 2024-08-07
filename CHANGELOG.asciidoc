@@ -12,7 +12,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 *Filebeat*
 
 - Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
-- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+- Fix filestream's registry garbage collection: registry entries will never be removed if `clean_inactive` is set to "-1". {pull}40258[40258]
 
 *Metricbeat*
 
@@ -21,7 +21,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 *Osquerybeat*
 
-- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Add action responses data stream, allowing Osquerybeat to post action results directly to Elasticsearch. {pull}39143[39143]
 
 ==== Bugfixes
 
@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 *Filebeat*
 
 - Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
-- Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
+- Prevent panic in CEL and salesforce inputs when `github.com/hashicorp/go-retryablehttp` exceeds maximum retries. {pull}40144[40144]
 - Update CEL mito extensions to v1.13.1. {pull}40307[40307]
 - Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
 
@@ -56,8 +56,8 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 *Auditbeat*
 
-- Reduce data size for add_session_metadata processor by removing unneeded fields. {pull}39500[39500]
-- Enrich process events with user and group names, with add_session_metadata processor. {pull}39537[39537]
+- Reduce data size for `add_session_metadata` processor by removing unneeded fields. {pull}39500[39500]
+- Enrich process events with user and group names, with `add_session_metadata` processor. {pull}39537[39537]
 
 *Filebeat*
 
@@ -76,18 +76,18 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 - Add ability to remove request trace logs from HTTPJSON input. {pull}40003[40003]
 - Update CEL mito extensions version to v1.13.0 {pull}40035[40035]
 - Add Jamf entity analytics provider. {pull}39996[39996]
-- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
-- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Add ability to remove request trace logs from `http_endpoint` input. {pull}40005[40005]
+- Add ability to remove request trace logs from `entityanalytics` input. {pull}40004[40004]
 - Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
 - Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
-- Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
+- Allow cross-region bucket configuration in S3 input. {issue}22161[22161] {pull}40309[40309]
 
 *Metricbeat*
 
-- Support schema_name for MySQL performance metricset. {pull}38363[38363]
-- Add last_terminated_timestamp metric in kubernetes module. {pull}39200[39200] {issue}3802[3802]
-- Add pod.status.ready_time and pod.status.reason metrics in kubernetes module. {pull}39316[39316]
+- Support `schema_name` for MySQL performance metricset. {pull}38363[38363]
+- Add `last_terminated_timestamp` metric in Kubernetes module. {pull}39200[39200] {issue}3802[3802]
+- Add `pod.status.ready_time` and `pod.status.reason` metrics in Kubernetes module. {pull}39316[39316]
 - Add "Buffer cache hit ratio base" to calculate "Buffer cache hit ratio" for performance metrics. {pull}40022[40022]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 
