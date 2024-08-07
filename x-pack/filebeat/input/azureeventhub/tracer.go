@@ -8,7 +8,9 @@ package azureeventhub
 
 import (
 	"context"
+
 	"github.com/devigned/tab"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
