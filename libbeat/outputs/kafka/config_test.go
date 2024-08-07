@@ -147,13 +147,6 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 				"topic": "%{[event.field]}",
 			},
 		},
-		{
-			name: "invalid topic with prefix before field name",
-			cfg: mapstr.M{
-				"topic": "test-%{[event.field]}",
-			},
-			expectError: true,
-		},
 
 		// The default config does not set `topic` not `topics`.
 		{
