@@ -75,13 +75,13 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 				},
 			},
 			"total": mapstr.M{
-				"bytes": int64(perfMertics.DiskUsage) * 1000,
+				"bytes": perfMertics.DiskUsage * 1000,
 			},
 			"read": mapstr.M{
-				"bytes": int64(perfMertics.DiskRead) * 1000,
+				"bytes": perfMertics.DiskRead * 1000,
 			},
 			"write": mapstr.M{
-				"bytes": int64(perfMertics.DiskWrite) * 1000,
+				"bytes": perfMertics.DiskWrite * 1000,
 			},
 		},
 		"memory": mapstr.M{
