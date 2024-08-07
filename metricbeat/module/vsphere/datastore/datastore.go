@@ -71,7 +71,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error in NewClient: %w", err)
 	}
-
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
 			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
@@ -118,7 +117,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		"datastore.totalWriteLatency.average",
 	}
 
-	// Define refrence of structure
+	// Define reference of structure
 	var metricsVar PerformanceMetrics
 
 	// Map metric names to struture	fields
@@ -128,12 +127,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		"datastore.datastoreIops.average":     &metricsVar.DsIops,
 		"datastore.totalReadLatency.average":  &metricsVar.DsReadLatency,
 		"datastore.totalWriteLatency.average": &metricsVar.DsWriteLatency,
-	}
-
-	// Map metric IDs to metric names
-	metricNamesById := make(map[int32]string)
-	for name, metric := range metrics {
-		metricNamesById[metric.Key] = name
 	}
 
 	var spec types.PerfQuerySpec
@@ -150,7 +143,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			CounterId: metric.Key,
 		})
 	}
-
 	for _, ds := range dst {
 		spec = types.PerfQuerySpec{
 			Entity:     ds.Reference(),
@@ -165,28 +157,19 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			m.Logger().Debug("Failed to query performance data: %v", err)
 			continue
 		}
-
 		if len(samples) > 0 {
-			entityMetrics, ok := samples[0].(*types.PerfEntityMetric)
-			if !ok {
-				m.Logger().Debug("Unexpected metric type")
-				continue
+			results, err := perfManager.ToMetricSeries(ctx, samples)
+			if err != nil {
+				m.Logger().Debug("Failed to query performance data: %v", err)
 			}
 
-			for _, value := range entityMetrics.Value {
-				metricSeries, ok := value.(*types.PerfMetricIntSeries)
-				if !ok {
-					m.Logger().Debug("Unexpected metric series type")
-					continue
-				}
-
-				if len(metricSeries.Value) > 0 {
-					metricName := metricNamesById[metricSeries.Id.CounterId]
-					if assignValue, exists := metricMap[metricName]; exists {
-						*assignValue = metricSeries.Value[0] // Assign the metric value to the variable
+			for _, result := range results[0].Value {
+				if len(result.Value) > 0 {
+					if assignValue, exists := metricMap[result.Name]; exists {
+						*assignValue = result.Value[0] // Assign the metric value to the variable
 					}
 				} else {
-					m.Logger().Debug("Metric %v: No result found\n", metricNamesById[metricSeries.Id.CounterId])
+					m.Logger().Debug("Metric ", result.Name, ": No result found")
 				}
 			}
 		} else {

@@ -19,7 +19,6 @@
             "host": {
               "count": 1
             },
-            "name": "LocalDS_0",
             "status": "green",
             "vm": {
               "count": 6

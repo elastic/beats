@@ -27,7 +27,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	model := simulator.ESX()
+	model := simulator.VPX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -40,7 +40,6 @@ func TestFetchEventContents(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-
 	assert.NotEmpty(t, events)
 
 	event := events[0].MetricSetFields
@@ -48,31 +47,36 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "local", event["fstype"])
+	assert.EqualValues(t, "OTHER", event["fstype"])
 
 	// Values are based on the result 'df -k'.
-	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes"}
+	fields := []string{
+		"capacity.total.bytes",
+		"capacity.free.bytes",
+		"status",
+		"host.count",
+		"vm.count",
+		"read.bytes",
+		"write.bytes",
+		"iops",
+		"read.latency.total.ms",
+		"write.latency.total.ms",
+		"capacity.used.bytes",
+	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
 			t.Error(err)
-		} else {
-			isNonNegativeInt64(t, field, value)
+			return
 		}
-	}
-}
+		if field == "status" {
+			assert.NotNil(t, value)
+		} else if field == "vm.count" || field == "host.count" {
+			assert.GreaterOrEqual(t, value, 0)
 
-func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
-	i, ok := v.(int64)
-	if !ok {
-		t.Errorf("%v: got %T, but expected int64", field, v)
-		return
-	}
-
-	if i < 0 {
-		t.Errorf("%v: value is negative (%v)", field, i)
-		return
+		} else {
+			assert.GreaterOrEqual(t, value, int64(0))
+		}
 	}
 }
 
