@@ -15,56 +15,81 @@ import (
 )
 
 func init() {
-	tab.Register(new(tracer))
+	tab.Register(new(logsOnlyTracer))
 }
 
-// tracer manages the creation of spanners
-type tracer struct{}
+// logsOnlyTracer manages the creation of the required
+// Spanners and Loggers with the goal of deferring logging
+// to the `logp` package.
+//
+// According to the `github.com/devigned/tab package`,
+// to implement a Tracer, you must provide the following
+// three components:
+//
+// - Tracer
+// - Spanner
+// - Logger
+//
+// Since we are currently only interested in logging, we will
+// implement a Tracer that only logs.
+type logsOnlyTracer struct{}
+
+// ----------------------------------------------------------------------------
+// Tracer
+// ----------------------------------------------------------------------------
 
 // StartSpan returns the input context and a no-op Spanner
-func (nt *tracer) StartSpan(ctx context.Context, operationName string, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(logOnlySpanner)
+func (nt *logsOnlyTracer) StartSpan(ctx context.Context, operationName string, opts ...interface{}) (context.Context, tab.Spanner) {
+	return ctx, new(logsOnlySpanner)
 }
 
 // StartSpanWithRemoteParent returns the input context and a no-op Spanner
-func (nt *tracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...interface{}) (context.Context, tab.Spanner) {
-	return ctx, new(logOnlySpanner)
+func (nt *logsOnlyTracer) StartSpanWithRemoteParent(ctx context.Context, operationName string, carrier tab.Carrier, opts ...interface{}) (context.Context, tab.Spanner) {
+	return ctx, new(logsOnlySpanner)
 }
 
 // FromContext returns a no-op Spanner without regard to the input context
-func (nt *tracer) FromContext(ctx context.Context) tab.Spanner {
-	return new(logOnlySpanner)
+func (nt *logsOnlyTracer) FromContext(ctx context.Context) tab.Spanner {
+	return new(logsOnlySpanner)
 }
 
 // NewContext returns the parent context
-func (nt *tracer) NewContext(parent context.Context, span tab.Spanner) context.Context {
+func (nt *logsOnlyTracer) NewContext(parent context.Context, span tab.Spanner) context.Context {
 	return parent
 }
 
-// logOnlySpanner is a Spanner implementation that focuses
+// ----------------------------------------------------------------------------
+// Spanner
+// ----------------------------------------------------------------------------
+
+// logsOnlySpanner is a Spanner implementation that focuses
 // on logging only.
-type logOnlySpanner struct{}
+type logsOnlySpanner struct{}
 
 // AddAttributes is a no-op
-func (ns *logOnlySpanner) AddAttributes(attributes ...tab.Attribute) {}
+func (ns *logsOnlySpanner) AddAttributes(attributes ...tab.Attribute) {}
 
 // End is a no-op
-func (ns *logOnlySpanner) End() {}
+func (ns *logsOnlySpanner) End() {}
 
 // Logger returns a Logger implementation
-func (ns *logOnlySpanner) Logger() tab.Logger {
+func (ns *logsOnlySpanner) Logger() tab.Logger {
 	return &logpLogger{logp.L()}
 }
 
 // Inject is no-op
-func (ns *logOnlySpanner) Inject(carrier tab.Carrier) error {
+func (ns *logsOnlySpanner) Inject(carrier tab.Carrier) error {
 	return nil
 }
 
 // InternalSpan returns nil
-func (ns *logOnlySpanner) InternalSpan() interface{} {
+func (ns *logsOnlySpanner) InternalSpan() interface{} {
 	return nil
 }
+
+// ----------------------------------------------------------------------------
+// Logger
+// ----------------------------------------------------------------------------
 
 // logpLogger defers logging to the logp package
 type logpLogger struct {
