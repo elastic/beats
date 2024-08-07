@@ -33,6 +33,11 @@
       description: >
         Average number of bytes read from the disk each second.
       format: bytes
+    - name: disk.write.bytes
+      type: long
+      description: >
+        Average number of kilobytes written to the disk each second.
+      format: bytes
     - name: disk.total.bytes
       type: long
       description: >
