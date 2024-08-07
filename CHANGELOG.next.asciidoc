@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
+- Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Add new metrics for the Vsphere Host metricset. {pull}40429[40429]
@@ -164,6 +165,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
+- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
 
 *Heartbeat*
 
