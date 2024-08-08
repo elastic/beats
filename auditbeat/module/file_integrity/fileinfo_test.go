@@ -31,7 +31,7 @@ import (
 
 func TestNewMetadata(t *testing.T) {
 	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
-	skipOnBuildkiteDarwin(t, "Group check")
+	//skipOnBuildkiteDarwin(t, "Group check")
 
 	f, err := ioutil.TempFile("", "metadata")
 	if err != nil {
@@ -100,7 +100,7 @@ func TestNewMetadata(t *testing.T) {
 
 func TestSetUIDSetGIDBits(t *testing.T) {
 	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
-	skipOnBuildkiteDarwin(t, "Wheel permission issue")
+	//skipOnBuildkiteDarwin(t, "Wheel permission issue")
 
 	f, err := ioutil.TempFile("", "setuid")
 	if err != nil {
