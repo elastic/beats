@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package websocket
+package streaming
 
 import (
 	"context"
@@ -472,8 +472,8 @@ func TestURLEval(t *testing.T) {
 			}
 
 			name := input{}.Name()
-			if name != "websocket" {
-				t.Errorf(`unexpected input name: got:%q want:"websocket"`, name)
+			if name != "streaming" {
+				t.Errorf(`unexpected input name: got:%q want:"streaming"`, name)
 			}
 
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -524,8 +524,8 @@ func TestInput(t *testing.T) {
 			}
 
 			name := input{}.Name()
-			if name != "websocket" {
-				t.Errorf(`unexpected input name: got:%q want:"websocket"`, name)
+			if name != "streaming" {
+				t.Errorf(`unexpected input name: got:%q want:"streaming"`, name)
 			}
 			src := &source{conf}
 			err = input{}.Test(src, v2.TestContext{})
