@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   mssql:
-    image: docker.elastic.co/integrations-ci/beats-mssql:${MSSQL_VERSION:-2017-GA-ubuntu}-1
+    image: docker.elastic.co/integrations-ci/beats-mssql:${MSSQL_VERSION:-2017-CU31-GDR2-ubuntu-18.04}-1
     build:
       context: ./_meta
       args:
-        MSSQL_VERSION: ${MSSQL_VERSION:-2017-GA-ubuntu}
+        MSSQL_VERSION: ${MSSQL_VERSION:-2017-CU31-GDR2-ubuntu-18.04}
     ports:
       - 1433

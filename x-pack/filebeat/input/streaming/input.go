@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package websocket
+package streaming
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/google/cel-go/cel"
-	"github.com/gorilla/websocket"
+	"github.com/google/cel-go/common/types/ref"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -26,12 +26,19 @@ import (
 )
 
 type input struct {
+	stream StreamFollower
+
 	time func() time.Time
 	cfg  config
 }
 
+type StreamFollower interface {
+	FollowStream(context.Context) error
+	Close() error
+}
+
 const (
-	inputName string = "websocket"
+	inputName string = "streaming"
 	root      string = "state"
 )
 
@@ -40,8 +47,19 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 		Name:       inputName,
 		Stability:  feature.Experimental,
 		Deprecated: false,
+		Info:       "Streaming Input",
+		Doc:        "Collect data from streaming data sources",
+		Manager:    NewInputManager(log, store),
+	}
+}
+
+func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+	return v2.Plugin{
+		Name:       "websocket",
+		Stability:  feature.Experimental,
+		Deprecated: false,
 		Info:       "Websocket Input",
-		Doc:        "Collect data from websocket api endpoints",
+		Doc:        "Collect data from websocket data sources",
 		Manager:    NewInputManager(log, store),
 	}
 }
@@ -65,147 +83,46 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 	return input{}.run(env, src.(*source), cursor, pub)
 }
 
-func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+func (i input) run(env v2.Context, src *source, cursor map[string]any, pub inputcursor.Publisher) error {
 	cfg := src.cfg
-	i.cfg = cfg
 	log := env.Logger.With("input_url", cfg.URL)
 
-	metrics := newInputMetrics(env.ID)
-	defer metrics.Close()
-	metrics.url.Set(cfg.URL.String())
-	metrics.errorsTotal.Set(0)
-
 	ctx := ctxtool.FromCanceller(env.Cancelation)
-
-	patterns, err := regexpsFromConfig(cfg)
+	s, err := NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
 	if err != nil {
-		metrics.errorsTotal.Inc()
 		return err
 	}
+	defer s.Close()
 
-	prg, ast, err := newProgram(ctx, cfg.Program, root, patterns, log)
-	if err != nil {
-		metrics.errorsTotal.Inc()
-		return err
-	}
-	var state map[string]interface{}
-	if cfg.State == nil {
-		state = make(map[string]interface{})
-	} else {
-		state = cfg.State
-	}
-	if cursor != nil {
-		state["cursor"] = cursor
-	}
-
-	// initialize the input url with the help of the url_program.
-	url, err := i.getURL(ctx, state, log)
-	if err != nil {
-		metrics.errorsTotal.Inc()
-		return err
-	}
-
-	// websocket client
-	headers := formHeader(cfg)
-	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
-	if resp != nil && resp.Body != nil {
-		log.Debugw("websocket connection response", "body", resp.Body)
-		resp.Body.Close()
-	}
-	if err != nil {
-		metrics.errorsTotal.Inc()
-		log.Errorw("failed to establish websocket connection", "error", err)
-		return err
-	}
-	defer c.Close()
-
-	done := make(chan error)
-
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				metrics.errorsTotal.Inc()
-				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-					log.Errorw("websocket connection closed", "error", err)
-				} else {
-					log.Errorw("failed to read websocket data", "error", err)
-				}
-				done <- err
-				return
-			}
-			metrics.receivedBytesTotal.Add(uint64(len(message)))
-			state["response"] = message
-			log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
-			err = i.processAndPublishData(ctx, metrics, prg, ast, state, cursor, pub, log)
-			if err != nil {
-				metrics.errorsTotal.Inc()
-				log.Errorw("failed to process and publish data", "error", err)
-				done <- err
-				return
-			}
-		}
-	}()
-
-	// blocks until done is closed, context is cancelled or an error is received
-	select {
-	case err := <-done:
-		return err
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	return s.FollowStream(ctx)
 }
 
 // getURL initializes the input URL with the help of the url_program.
-func (i input) getURL(ctx context.Context, state map[string]interface{}, log *logp.Logger) (string, error) {
-	var (
-		url string
-		err error
-	)
-	cfg := i.cfg
-	if cfg.URLProgram != "" {
-		state["url"] = cfg.URL.String()
-		// CEL program which is used to prime/initialize the input url
-		url_prg, ast, err := newProgram(ctx, cfg.URLProgram, root, nil, log)
-		if err != nil {
-			return url, err
-		}
-
-		log.Debugw("cel engine state before url_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: cfg.Redact})
-		start := i.now().In(time.UTC)
-		url, err = evalURLWith(ctx, url_prg, ast, state, start)
-		log.Debugw("url_eval result", logp.Namespace("websocket"), "modified_url", url)
-		if err != nil {
-			log.Errorw("failed url evaluation", "error", err)
-			return url, err
-		}
-	} else {
-		url = cfg.URL.String()
+func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
+	if src == "" {
+		return url, nil
 	}
-	return url, err
+
+	state["url"] = url
+	// CEL program which is used to prime/initialize the input url
+	url_prg, ast, err := newProgram(ctx, src, root, nil, log)
+	if err != nil {
+		return "", err
+	}
+
+	log.Debugw("cel engine state before url_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: redaction})
+	start := now().In(time.UTC)
+	url, err = evalURLWith(ctx, url_prg, ast, state, start)
+	log.Debugw("url_eval result", logp.Namespace(name), "modified_url", url)
+	if err != nil {
+		log.Errorw("failed url evaluation", "error", err)
+		return "", err
+	}
+	return url, nil
 }
 
 func evalURLWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (string, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
-		// Replace global program "now" with current time. This is necessary
-		// as the lib.Time now global is static at program instantiation time
-		// which will persist over multiple evaluations. The lib.Time behaviour
-		// is correct for mito where CEL program instances live for only a
-		// single evaluation. Rather than incurring the cost of creating a new
-		// cel.Program for each evaluation, shadow lib.Time's now with a new
-		// value for each eval. We retain the lib.Time now global for
-		// compatibility between CEL programs developed in mito with programs
-		// run in the input.
-		"now": now,
-		root:  state,
-	})
-	if err != nil {
-		err = lib.DecoratedError{AST: ast, Err: err}
-	}
-	if e := ctx.Err(); e != nil {
-		err = e
-	}
+	out, err := evalRefVal(ctx, prg, ast, state, now)
 	if err != nil {
 		return "", fmt.Errorf("failed eval: %w", err)
 	}
@@ -223,51 +140,63 @@ func evalURLWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[s
 	}
 }
 
-// processAndPublishData processes the data in state, updates the cursor and publishes it to the publisher.
-// the CEL program here only executes a single time, since the websocket connection is persistent and events are received and processed in real time.
-func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics, prg cel.Program, ast *cel.Ast,
-	state map[string]interface{}, cursor map[string]interface{}, pub inputcursor.Publisher, log *logp.Logger) error {
+// processor is a common CEL program evaluator and event publisher.
+type processor struct {
+	prg cel.Program
+	ast *cel.Ast
+	pub inputcursor.Publisher
+
+	ns      string
+	log     *logp.Logger
+	redact  *redact
+	metrics *inputMetrics
+}
+
+// process processes the data in state, updates the cursor and publishes it to
+// the reciever's publisher. The CEL program here only executes a single time,
+// since the connection is persistent and events are received and processed in
+// real time.
+func (p processor) process(ctx context.Context, state, cursor map[string]any, start time.Time) error {
 	goodCursor := cursor
-	log.Debugw("cel engine state before eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
-	start := i.now().In(time.UTC)
-	state, err := evalWith(ctx, prg, ast, state, start)
-	log.Debugw("cel engine state after eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
+	p.log.Debugw("cel engine state before eval", logp.Namespace(p.ns), "state", redactor{state: state, cfg: p.redact})
+	state, err := evalWith(ctx, p.prg, p.ast, state, start)
+	p.log.Debugw("cel engine state after eval", logp.Namespace(p.ns), "state", redactor{state: state, cfg: p.redact})
 	if err != nil {
-		metrics.celEvalErrors.Add(1)
+		p.metrics.celEvalErrors.Add(1)
 		switch {
 		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 			return err
 		default:
-			metrics.errorsTotal.Inc()
+			p.metrics.errorsTotal.Inc()
 		}
-		log.Errorw("failed evaluation", "error", err)
+		p.log.Errorw("failed evaluation", "error", err)
 	}
-	metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+	p.metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 
 	e, ok := state["events"]
 	if !ok {
-		log.Errorw("unexpected missing events from evaluation")
+		p.log.Errorw("unexpected missing events from evaluation")
 	}
-	var events []interface{}
+	var events []any
 	switch e := e.(type) {
-	case []interface{}:
+	case []any:
 		if len(e) == 0 {
 			return nil
 		}
 		events = e
-	case map[string]interface{}:
+	case map[string]any:
 		if e == nil {
 			return nil
 		}
-		log.Debugw("single event object returned by evaluation", "event", e)
-		events = []interface{}{e}
+		p.log.Debugw("single event object returned by evaluation", "event", e)
+		events = []any{e}
 	default:
 		return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 	}
 
 	// We have a non-empty batch of events to process.
-	metrics.batchesReceived.Add(1)
-	metrics.eventsReceived.Add(uint64(len(events)))
+	p.metrics.batchesReceived.Add(1)
+	p.metrics.eventsReceived.Add(uint64(len(events)))
 
 	// Drop events from state. If we fail during the publication,
 	// we will reprocess these events.
@@ -275,21 +204,21 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 
 	// Get cursors if they exist.
 	var (
-		cursors      []interface{}
+		cursors      []any
 		singleCursor bool
 	)
 	if c, ok := state["cursor"]; ok {
-		cursors, ok = c.([]interface{})
+		cursors, ok = c.([]any)
 		if ok {
 			if len(cursors) != len(events) {
-				log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+				p.log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
 				// But try to continue.
 				if len(cursors) < len(events) {
 					cursors = nil
 				}
 			}
 		} else {
-			cursors = []interface{}{c}
+			cursors = []any{c}
 			singleCursor = true
 		}
 	}
@@ -300,18 +229,18 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 	start = time.Now()
 	var hadPublicationError bool
 	for i, e := range events {
-		event, ok := e.(map[string]interface{})
+		event, ok := e.(map[string]any)
 		if !ok {
 			return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 		}
-		var pubCursor interface{}
+		var pubCursor any
 		if cursors != nil {
 			if singleCursor {
 				// Only set the cursor for publication at the last event
 				// when a single cursor object has been provided.
 				if i == len(events)-1 {
 					goodCursor = cursor
-					cursor, ok = cursors[0].(map[string]interface{})
+					cursor, ok = cursors[0].(map[string]any)
 					if !ok {
 						return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[0])
 					}
@@ -319,7 +248,7 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 				}
 			} else {
 				goodCursor = cursor
-				cursor, ok = cursors[i].(map[string]interface{})
+				cursor, ok = cursors[i].(map[string]any)
 				if !ok {
 					return fmt.Errorf("unexpected type returned for evaluation cursor element: %T", cursors[i])
 				}
@@ -327,14 +256,14 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 			}
 		}
 		// Publish the event.
-		err = pub.Publish(beat.Event{
+		err = p.pub.Publish(beat.Event{
 			Timestamp: time.Now(),
 			Fields:    event,
 		}, pubCursor)
 		if err != nil {
 			hadPublicationError = true
-			metrics.errorsTotal.Inc()
-			log.Errorw("error publishing event", "error", err)
+			p.metrics.errorsTotal.Inc()
+			p.log.Errorw("error publishing event", "error", err)
 			cursors = nil // We are lost, so retry with this event's cursor,
 			continue      // but continue with the events that we have without
 			// advancing the cursor. This allows us to potentially publish the
@@ -342,9 +271,9 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 			// correctly published cursor.
 		}
 		if i == 0 {
-			metrics.batchesPublished.Add(1)
+			p.metrics.batchesPublished.Add(1)
 		}
-		metrics.eventsPublished.Add(1)
+		p.metrics.eventsPublished.Add(1)
 
 		err = ctx.Err()
 		if err != nil {
@@ -352,7 +281,7 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 		}
 	}
 	// calculate batch processing time
-	metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
+	p.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 
 	// Advance the cursor to the final state if there was no error during
 	// publications. This is needed to transition to the next set of events.
@@ -365,33 +294,15 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 
 	switch {
 	case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
-		metrics.errorsTotal.Inc()
-		log.Infof("input stopped because context was cancelled with: %v", err)
+		p.metrics.errorsTotal.Inc()
+		p.log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
 	return err
 }
 
 func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
-		// Replace global program "now" with current time. This is necessary
-		// as the lib.Time now global is static at program instantiation time
-		// which will persist over multiple evaluations. The lib.Time behaviour
-		// is correct for mito where CEL program instances live for only a
-		// single evaluation. Rather than incurring the cost of creating a new
-		// cel.Program for each evaluation, shadow lib.Time's now with a new
-		// value for each eval. We retain the lib.Time now global for
-		// compatibility between CEL programs developed in mito with programs
-		// run in the input.
-		"now": now,
-		root:  state,
-	})
-	if err != nil {
-		err = lib.DecoratedError{AST: ast, Err: err}
-	}
-	if e := ctx.Err(); e != nil {
-		err = e
-	}
+	out, err := evalRefVal(ctx, prg, ast, state, now)
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
 		clearWantMore(state)
@@ -416,12 +327,27 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 	}
 }
 
-// now is time.Now with a modifiable time source.
-func (i input) now() time.Time {
-	if i.time == nil {
-		return time.Now()
+func evalRefVal(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (ref.Val, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+		// Replace global program "now" with current time. This is necessary
+		// as the lib.Time now global is static at program instantiation time
+		// which will persist over multiple evaluations. The lib.Time behaviour
+		// is correct for mito where CEL program instances live for only a
+		// single evaluation. Rather than incurring the cost of creating a new
+		// cel.Program for each evaluation, shadow lib.Time's now with a new
+		// value for each eval. We retain the lib.Time now global for
+		// compatibility between CEL programs developed in mito with programs
+		// run in the input.
+		"now": now,
+		root:  state,
+	})
+	if err != nil {
+		err = lib.DecoratedError{AST: ast, Err: err}
 	}
-	return i.time()
+	if e := ctx.Err(); e != nil {
+		err = e
+	}
+	return out, err
 }
 
 // clearWantMore sets the state to not request additional work in a periodic evaluation.
