@@ -27,7 +27,7 @@
     - name: fstype
       type: keyword
       description: >
-        Filesystem type
+        Filesystem type.
     - name: host.count
       type: long
       description: >
@@ -39,7 +39,7 @@
     - name: name
       type: keyword
       description: >
-        Datastore name
+        Datastore name.
     - name: read.bytes
       type: long
       description: >

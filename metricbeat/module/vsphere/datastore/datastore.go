@@ -143,13 +143,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			CounterId: metric.Key,
 		})
 	}
+	spec = types.PerfQuerySpec{
+		MetricId:   metricIDs,
+		MaxSample:  1,
+		IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+	}
 	for _, ds := range dst {
-		spec = types.PerfQuerySpec{
-			Entity:     ds.Reference(),
-			MetricId:   metricIDs,
-			MaxSample:  1,
-			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-		}
+		spec.Entity = ds.Reference()
 
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
