@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 
 *Auditbeat*
 
