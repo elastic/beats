@@ -18,11 +18,6 @@ type capProc interface {
 	SetProc() error
 }
 
-type capBound interface {
-	SetVector(vec cap.Vector, raised bool, vals ...cap.Value) error
-	SetProc() error
-}
-
 var (
 	// for unit-testing
 	capProcFunc = func() capProc {
