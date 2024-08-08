@@ -8,8 +8,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/utils"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/utils"
 )
 
 type capProc interface {
