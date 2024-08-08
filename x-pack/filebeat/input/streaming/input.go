@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package websocket
+package streaming
 
 import (
 	"context"
@@ -38,7 +38,7 @@ type StreamFollower interface {
 }
 
 const (
-	inputName string = "websocket"
+	inputName string = "streaming"
 	root      string = "state"
 )
 
@@ -47,8 +47,19 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 		Name:       inputName,
 		Stability:  feature.Experimental,
 		Deprecated: false,
+		Info:       "Streaming Input",
+		Doc:        "Collect data from streaming data sources",
+		Manager:    NewInputManager(log, store),
+	}
+}
+
+func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+	return v2.Plugin{
+		Name:       "websocket",
+		Stability:  feature.Experimental,
+		Deprecated: false,
 		Info:       "Websocket Input",
-		Doc:        "Collect data from websocket api endpoints",
+		Doc:        "Collect data from websocket data sources",
 		Manager:    NewInputManager(log, store),
 	}
 }
