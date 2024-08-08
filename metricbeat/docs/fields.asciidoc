@@ -67008,6 +67008,18 @@ format: bytes
 
 --
 
+*`vsphere.host.disk.write.bytes`*::
++
+--
+Average number of kilobytes written to the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`vsphere.host.disk.total.bytes`*::
 +
 --
