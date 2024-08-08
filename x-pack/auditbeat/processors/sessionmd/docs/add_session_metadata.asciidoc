@@ -29,7 +29,13 @@ auditbeat.modules:
 [[add-session-metadata-explained]]
 ==== How the `add_session_metadata` processor works
 
-The `add_session_metadata` processor operates using various backend options, including `auto`, `ebpf`, and `procfs`. 
+==== Backends
+* `auto` is the recommended setting, and will attempt to use `ebpf` first, falling back to `procfs` if necessary, ensuring compatibility even on systems without `ebpf` support.
+* `ebpf` will collect process information with eBPF. This backend requires a system with Linux kernel 5.10.16 or above, kernel support for eBPF enabled, and auditbeat running as superuser.
+* `procfs` will collect process information with the proc filesystem. This is compatible with older systems that may not support ebpf. To gather complete process info, auditbeat requires permissions to read all process data in procfs; for example, run as a superuser or have the `SYS_PTRACE` capability. 
+
+==== Containers
+If running auditbeat in a container, the container must run in the host's PID namespace. With the `auto` or `ebpf` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf` 
 The recommended `auto` setting attempts to use `ebpf` first, falling back to `procfs` if necessary, ensuring compatibility even on systems without `ebpf` support. 
 
 Using the available Linux kernel technology, the processor collects comprehensive information on all running system processes, compiling this data into a process database. 
