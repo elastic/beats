@@ -47,7 +47,6 @@ func init() {
 					"epoll_ctl",
 					"epoll_wait",
 					"execve",
-					"execve",
 					"exit",
 					"exit_group",
 					"faccessat2",
