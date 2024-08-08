@@ -286,7 +286,8 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		if err := json.Unmarshal(d, &fields); err != nil {
 			r.logger.Error("journal event cannot be parsed as map[string]any, look at the events log file for the raw journal event")
 			// Log raw data to events log file
-			r.logger.Errorw("data cannot be parsed as map[string]any JSON: '%s'", logp.TypeKey, logp.EventType, string(d), "error.message", err.Error())
+			msg := fmt.Sprintf("data cannot be parsed as map[string]any JSON: '%s'", string(d))
+			r.logger.Errorw(msg, logp.TypeKey, logp.EventType, "error.message", err.Error())
 			return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
 		}
 
