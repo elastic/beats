@@ -38,7 +38,6 @@ var coredumpJSON []byte
 //
 // If needed more test cases can be added in the future
 func TestEventWithNonStringData(t *testing.T) {
-
 	testCases := []json.RawMessage{}
 	if err := json.Unmarshal(coredumpJSON, &testCases); err != nil {
 		t.Fatalf("could not unmarshal the contents from 'testdata/message-byte-array.json' into map[string]any: %s", err)
