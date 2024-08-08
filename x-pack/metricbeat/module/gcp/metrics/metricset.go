@@ -155,7 +155,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	// set organization id
 	if err := m.setOrganization(); err != nil {
-		m.Logger().Warnf("Organization has not been set: %s", err)
+		m.Logger().Warnf("organization details has not been set: %s", err)
 	}
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
@@ -366,23 +366,23 @@ func (m *MetricSet) setOrganization() error {
 	// Initialize the Cloud Resource Manager service
 	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
 	if err != nil {
-		return fmt.Errorf("failed to create service: %v", err)
+		return fmt.Errorf("failed to create cloudresourcemanager service: %v", err)
 	}
 
 	// Get the project ancestor details
 	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Do()
 	if err != nil {
-		return fmt.Errorf("failed to get project: %v", err)
+		return fmt.Errorf("failed to get project ancestors: %v", err)
 	}
 
 	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
 	if ancestor.ResourceId.Type == "organization" {
 		m.config.OrganizationID = ancestor.ResourceId.Id
-		orgReq := srv.Organizations.Get("organizations/" + m.config.OrganizationID)
+		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.OrganizationID))
 
 		orgDetails, err := orgReq.Do()
 		if err != nil {
-			return fmt.Errorf("failed to get org: %v", err)
+			return fmt.Errorf("failed to get organization details: %v", err)
 		}
 		if orgDetails.DisplayName != "" {
 			m.config.OrganizationName = orgDetails.DisplayName
