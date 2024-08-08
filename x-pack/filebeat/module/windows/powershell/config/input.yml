@@ -1,0 +1,3 @@
+type: winlog
+event_logs: {{ .event_logs | tojson }}
+{{- if .tags }}tags: {{ .tags | tojson }}{{ end }}

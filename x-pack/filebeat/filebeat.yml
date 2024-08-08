@@ -136,13 +136,13 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+# output.elasticsearch:
+#   # Array of hosts to connect to.
+#   hosts: ["localhost:9200"]
 
-  # Performance preset - one of "balanced", "throughput", "scale",
-  # "latency", or "custom".
-  preset: balanced
+#   # Performance preset - one of "balanced", "throughput", "scale",
+#   # "latency", or "custom".
+#   preset: balanced
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -168,12 +168,12 @@ output.elasticsearch:
   #ssl.key: "/etc/pki/client/cert.key"
 
 # ================================= Processors =================================
-processors:
-  - add_host_metadata:
-      when.not.contains.tags: forwarded
-  - add_cloud_metadata: ~
-  - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
+# processors:
+#   - add_host_metadata:
+#       when.not.contains.tags: forwarded
+#   - add_cloud_metadata: ~
+#   - add_docker_metadata: ~
+#   - add_kubernetes_metadata: ~
 
 # ================================== Logging ===================================
 
@@ -235,3 +235,5 @@ processors:
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
 
+output.console:
+  pretty: true

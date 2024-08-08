@@ -1,0 +1,11 @@
+module_version: "1.0"
+
+var:
+  - name: event_logs
+  - name: tags
+    default: [windows]
+
+ingest_pipeline:
+  - ../routing/ingest/routing.yml
+input: config/input.yml
+
