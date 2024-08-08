@@ -150,7 +150,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	var spec types.PerfQuerySpec
-	var metricIDs []types.PerfMetricId
+	metricIDs := make([]types.PerfMetricId, 0, len(metricMap))
 
 	for _, metricName := range metricNames {
 		metric, exists := metrics[metricName]

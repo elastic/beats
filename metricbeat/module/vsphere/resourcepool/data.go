@@ -52,10 +52,10 @@ func (m *MetricSet) eventMapping(rp mo.ResourcePool, perfMertics *PerformanceMet
 				"pct": perfMertics.MemUsageAverage,
 			},
 			"shared": mapstr.M{
-				"bytes": int64(perfMertics.MemSharedAverage) * 1000,
+				"bytes": perfMertics.MemSharedAverage * 1000,
 			},
 			"swap": mapstr.M{
-				"bytes": int64(perfMertics.MemSwapInAverage) * 1000,
+				"bytes": perfMertics.MemSwapInAverage * 1000,
 			},
 		},
 	}
