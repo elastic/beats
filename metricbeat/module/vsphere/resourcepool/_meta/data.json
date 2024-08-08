@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2024-08-06T10:38:51.952Z",
+    "metricset": {
+      "name": "resourcepool",
+      "period": 10000
+    },
+    "service": {
+      "type": "vsphere",
+      "address": "https://localhost:8989/sdk"
+    },
+    "event": {
+      "dataset": "vsphere.resourcepool",
+      "module": "vsphere",
+      "duration": 57462824
+    },
+    "vsphere": {
+      "resourcepool": {
+        "name": "Resources",
+        "status": "green",
+        "cpu": {
+          "active": {
+            "average": {
+              "pct": 0
+            },
+            "max": {
+              "pct": 0
+            }
+          },
+          "entitlement": {
+            "mhz": 0
+          },
+          "usage": {
+            "pct": 0,
+            "mhz": 2018
+          }
+        },
+        "memory": {
+          "entitlement": {
+            "mhz": 0
+          },
+          "usage": {
+            "pct": 0
+          },
+          "shared": {
+            "bytes": 1078817000
+          },
+          "swap": {
+            "bytes": 0
+          }
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,85 @@
+- name: resourcepool
+  type: group
+  release: beta
+  description: >
+    resourcepool
+  fields:
+    - name: cpu
+      type: group
+      fields:
+        - name: entitlement
+          type: group
+          fields:
+            - name: mhz
+              type: long
+              description: >
+                Amount of CPU resources allocated to the resource pool.
+        - name: usage
+          type: group
+          fields:
+            - name: pct
+              type: long
+              description: >
+                CPU usage average in percentage.
+            - name: mhz
+              type: long
+              description: >
+                CPU usage average in MHz.
+        - name: active
+          type: group
+          fields:
+            - name: average
+              type: group
+              fields:
+                - name: pct
+                  type: long
+                  description: >
+                    CPU active average in percentage.
+        - name: max
+          type: group
+          fields:
+            - name: pct
+              type: long
+              description: >
+                CPU active max in percentage.
+    - name: memory
+      type: group
+      fields:
+        - name: entitlement
+          type: group
+          fields:
+            - name: mhz
+              type: long
+              description: >
+                Amount of Memory resources allocated to the resource pool.
+        - name: usage
+          type: group
+          fields:
+            - name: pct
+              type: long
+              description: >
+                Memory usage average in percentage.
+        - name: shared
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              description: >
+                Memory shared average in Bytes.
+              format: bytes
+        - name: swap
+          type: group
+          fields:
+            - name: bytes
+              type: long
+              description: >
+                Memory swap in average in Bytes.
+              format: bytes
+    - name: name
+      type: keyword
+      description: >
+        Name of resource pool.
+    - name: status
+      type: keyword
+      description: >
+        The overall health status of a host in the vSphere environment.
