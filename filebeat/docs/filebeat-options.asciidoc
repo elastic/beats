@@ -91,10 +91,10 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-redis>>
 * <<{beatname_lc}-input-salesforce>>
 * <<{beatname_lc}-input-stdin>>
+* <<{beatname_lc}-input-streaming>>
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
-* <<{beatname_lc}-input-websocket>>
 
 include::multiline.asciidoc[]
 
@@ -148,6 +148,8 @@ include::../../x-pack/filebeat/docs/inputs/input-salesforce.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-streaming.asciidoc[]
+
 include::inputs/input-syslog.asciidoc[]
 
 include::inputs/input-tcp.asciidoc[]
@@ -155,5 +157,3 @@ include::inputs/input-tcp.asciidoc[]
 include::inputs/input-udp.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
-
-include::../../x-pack/filebeat/docs/inputs/input-websocket.asciidoc[]
