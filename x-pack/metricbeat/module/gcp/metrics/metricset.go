@@ -18,6 +18,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v1"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -102,6 +104,8 @@ type config struct {
 	Region              string   `config:"region"`
 	Regions             []string `config:"regions"`
 	ProjectID           string   `config:"project_id" validate:"required"`
+	OrganizationID      string   `config:"organization_id"`
+	OrganizationName    string   `config:"organization_name"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 	CredentialsJSON     string   `config:"credentials_json"`
@@ -149,7 +153,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
 		}
 	}
-
+	// set organization id
+	if err := m.setOrganization(); err != nil {
+		m.Logger().Warnf("Organization has not been set: %s", err)
+	}
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
@@ -215,7 +222,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
 	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil, "", "")
 	var err error
 
 	if !m.config.ExcludeLabels {
@@ -351,4 +358,36 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 		}
 	}
 	return hostRootFields
+}
+
+func (m *MetricSet) setOrganization() error {
+	// get project details
+	ctx := context.Background()
+	// Initialize the Cloud Resource Manager service
+	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
+	if err != nil {
+		return fmt.Errorf("failed to create service: %v", err)
+	}
+
+	// Get the project ancestor details
+	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project: %v", err)
+	}
+
+	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
+	if ancestor.ResourceId.Type == "organization" {
+		m.config.OrganizationID = ancestor.ResourceId.Id
+		orgReq := srv.Organizations.Get("organizations/" + m.config.OrganizationID)
+
+		orgDetails, err := orgReq.Do()
+		if err != nil {
+			return fmt.Errorf("failed to get org: %v", err)
+		}
+		if orgDetails.DisplayName != "" {
+			m.config.OrganizationName = orgDetails.DisplayName
+		}
+	}
+
+	return nil
 }

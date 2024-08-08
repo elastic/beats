@@ -63,6 +63,7 @@ const (
 	ECSCloudMachineKey     = ECSCloud + "." + ECSCloudMachine
 	ECSCloudMachineType    = "type"
 	ECSCloudMachineTypeKey = ECSCloudMachineKey + "." + ECSCloudMachineType
+	ECSCloudProject        = "project"
 )
 
 // Metadata keys used for events. They follow GCP structure.

@@ -19,15 +19,17 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID: projectID,
-		zone:      zone,
-		region:    region,
-		regions:   regions,
-		opt:       opt,
-		instances: make(map[string]*sqladmin.DatabaseInstance),
-		logger:    logp.NewLogger("metrics-cloudsql"),
+		projectID:        projectID,
+		organizationID:   organizationID,
+		organizationName: organizationName,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
+		instances:        make(map[string]*sqladmin.DatabaseInstance),
+		logger:           logp.NewLogger("metrics-cloudsql"),
 	}, nil
 }
 
@@ -46,11 +48,13 @@ type cloudsqlMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID string
-	zone      string
-	region    string
-	regions   []string
-	opt       []option.ClientOption
+	projectID        string
+	organizationID   string
+	organizationName string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
 	// NOTE: instances holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
 	instances map[string]*sqladmin.DatabaseInstance
@@ -91,7 +95,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		return gcp.MetadataCollectorData{}, err
 	}
 
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName)
 
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {

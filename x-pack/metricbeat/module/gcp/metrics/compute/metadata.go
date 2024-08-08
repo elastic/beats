@@ -22,9 +22,11 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
+		organizationID:   organizationID,
+		organizationName: organizationName,
 		zone:             zone,
 		region:           region,
 		regions:          regions,
@@ -49,6 +51,8 @@ type computeMetadata struct {
 
 type metadataCollector struct {
 	projectID        string
+	organizationID   string
+	organizationName string
 	zone             string
 	region           string
 	regions          []string
@@ -63,7 +67,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
 	}
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName)
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
