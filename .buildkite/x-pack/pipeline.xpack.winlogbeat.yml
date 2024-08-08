@@ -198,7 +198,11 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
         key: "packaging-linux"
-        command: "cd x-pack/winlogbeat && mage package"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+        command: |
+          cd x-pack/winlogbeat
+          mage package
         retry:
           automatic:
             - limit: 3
@@ -209,8 +213,6 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat: Packaging Linux"

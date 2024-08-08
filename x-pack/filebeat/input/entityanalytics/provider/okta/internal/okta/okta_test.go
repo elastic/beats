@@ -112,14 +112,15 @@ func Test(t *testing.T) {
 			})
 
 			t.Run("user", func(t *testing.T) {
-				if me.Profile.Login == "" {
+				login, _ := me.Profile["login"].(string)
+				if login == "" {
 					b, _ := json.Marshal(me)
 					t.Skipf("cannot run user test without profile.login field set: %s", b)
 				}
 
 				query := make(url.Values)
 				query.Set("limit", "200")
-				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, me.Profile.Login, query, omit, limiter, window)
+				users, _, err := GetUserDetails(context.Background(), http.DefaultClient, host, key, login, query, omit, limiter, window)
 				if err != nil {
 					t.Fatalf("unexpected error: %v", err)
 				}
@@ -127,7 +128,7 @@ func Test(t *testing.T) {
 					t.Fatalf("unexpected len(users): got:%d want:1", len(users))
 				}
 				if !cmp.Equal(me, users[0]) {
-					t.Errorf("unexpected result:\n-'me'\n+'%s'\n%s", me.Profile.Login, cmp.Diff(me, users[0]))
+					t.Errorf("unexpected result:\n-'me'\n+'%s'\n%s", login, cmp.Diff(me, users[0]))
 				}
 			})
 
@@ -213,7 +214,7 @@ var localTests = []struct {
 	{
 		// Test case constructed from API-returned value with details anonymised.
 		name: "users",
-		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
+		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
 		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
 			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window)
 		},
@@ -231,7 +232,7 @@ var localTests = []struct {
 	{
 		// Test case constructed from API-returned value with details anonymised.
 		name: "devices_users",
-		msg:  `[{"created":"2023-08-07T21:48:27.000Z","managementStatus":"NOT_MANAGED","user":{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}}]`,
+		msg:  `[{"created":"2023-08-07T21:48:27.000Z","managementStatus":"NOT_MANAGED","user":{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}}]`,
 		id:   "devid",
 		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) (any, http.Header, error) {
 			return GetDeviceUsers(context.Background(), cli, host, key, device, query, OmitNone, lim, window)
