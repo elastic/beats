@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Update Go version to 1.22.5. {pull}40082[40082]
+
 *Auditbeat*
 
 
@@ -44,6 +46,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 - Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
 
 *Heartbeat*
 
@@ -53,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
 
 *Osquerybeat*
 
@@ -148,6 +152,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix filestream not correctly tracking the offset of a file when using the `include_message` parser. {pull}39873[39873] {issue}39653[39653]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
+- Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
+- Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
+- Update CEL mito extensions to v1.13.1. {pull}40307[40307]
+- Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
+- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
 
 *Heartbeat*
 
@@ -173,7 +182,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
 - Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
 - Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
-
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+- Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
+- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 
 *Osquerybeat*
 
@@ -198,7 +210,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-- Update to Go 1.21.11. {pull}39851[39851]
+- Update to Go 1.21.12. {pull}40114[40114]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
@@ -300,6 +312,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
 - Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
 - Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
+- Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 
 *Auditbeat*
 
@@ -382,4 +395,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
 

@@ -103,27 +103,27 @@ func TestS3Poller(t *testing.T) {
 			})
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key2")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key3")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key4")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
@@ -245,23 +245,23 @@ func TestS3Poller(t *testing.T) {
 			})
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key2")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key3")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key4")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3, nil, backupConfig{})
