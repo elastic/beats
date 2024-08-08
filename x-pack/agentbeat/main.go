@@ -71,6 +71,9 @@ func prepareCommand(rootCmd *cmd.BeatsRootCmd) *cobra.Command {
 		if err != nil {
 			panic(fmt.Errorf("failed to set default config file path: %v", err))
 		}
+
+		// elevate Effective capabilities to match the Permitted set.
+		// required for unprivileged mode
 		initCapabilities()
 		return nil
 	}
