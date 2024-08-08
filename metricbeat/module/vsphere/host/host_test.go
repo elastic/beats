@@ -91,7 +91,7 @@ func TestFetchEventContents(t *testing.T) {
 	memory := event["memory"].(mapstr.M)
 
 	memoryUsed := memory["used"].(mapstr.M)
-	assert.EqualValues(t, 1472200704, memoryUsed["bytes"])
+	assert.EqualValues(t, uint64(1472200704), memoryUsed["bytes"])
 
 	memoryTotal := memory["total"].(mapstr.M)
 	assert.EqualValues(t, uint64(4294430720), memoryTotal["bytes"])

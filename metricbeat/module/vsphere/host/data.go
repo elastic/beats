@@ -27,21 +27,6 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 	totalErrorPacketsCount := perfMertics.NetErrorsTransmitted + perfMertics.NetErrorsReceived
 	totalMulticastPacketsCount := perfMertics.NetMulticastTransmitted + perfMertics.NetMulticastReceived
 	totalDroppedPacketsCount := perfMertics.NetDroppedTransmitted + perfMertics.NetDroppedReceived
-	totalCPU := int64(0)
-	freeCPU := int64(0)
-	freeMemory := int64(0)
-	totalMemory := int64(0)
-	usedMemory := int64(0)
-
-	if hs.Summary.Hardware != nil {
-		totalCPU = int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-		freeCPU = totalCPU - int64(hs.Summary.QuickStats.OverallCpuUsage)
-		usedMemory = int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
-		freeMemory = hs.Summary.Hardware.MemorySize - usedMemory
-		totalMemory = hs.Summary.Hardware.MemorySize
-	} else {
-		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
-	}
 
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
@@ -51,17 +36,11 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 			"used": mapstr.M{
 				"mhz": hs.Summary.QuickStats.OverallCpuUsage,
 			},
-			"total": mapstr.M{
-				"mhz": totalCPU,
-			},
-			"free": mapstr.M{
-				"mhz": freeCPU,
-			},
 		},
 		"disk": mapstr.M{
 			"capacity": mapstr.M{
 				"usage": mapstr.M{
-					"bytes": perfMertics.DiskUsage * 1000,
+					"bytes": perfMertics.DiskCapacityUsage * 1000,
 				},
 			},
 			"devicelatency": mapstr.M{
@@ -82,17 +61,6 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 			},
 			"write": mapstr.M{
 				"bytes": perfMertics.DiskWrite * 1000,
-			},
-		},
-		"memory": mapstr.M{
-			"used": mapstr.M{
-				"bytes": usedMemory,
-			},
-			"total": mapstr.M{
-				"bytes": totalMemory,
-			},
-			"free": mapstr.M{
-				"bytes": freeMemory,
 			},
 		},
 		"network": mapstr.M{
@@ -149,6 +117,21 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetri
 				},
 			},
 		},
+	}
+	if hs.Summary.Hardware != nil {
+		totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+		freeCPU := totalCPU - int64(hs.Summary.QuickStats.OverallCpuUsage)
+		usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
+		freeMemory := hs.Summary.Hardware.MemorySize - usedMemory
+		totalMemory := hs.Summary.Hardware.MemorySize
+
+		event.Put("cpu.total.mhz", totalCPU)
+		event.Put("cpu.free.mhz", freeCPU)
+		event.Put("memory.used.bytes", usedMemory)
+		event.Put("memory.free.bytes", freeMemory)
+		event.Put("memory.total.bytes", totalMemory)
+	} else {
+		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
 	if len(networkNames) > 0 {
