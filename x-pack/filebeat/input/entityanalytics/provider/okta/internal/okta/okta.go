@@ -39,47 +39,10 @@ type User struct {
 	PasswordChanged       *time.Time     `json:"passwordChanged,omitempty"`
 	Type                  map[string]any `json:"type"`
 	TransitioningToStatus *string        `json:"transitioningToStatus,omitempty"`
-	Profile               Profile        `json:"profile"`
+	Profile               map[string]any `json:"profile"`
 	Credentials           *Credentials   `json:"credentials,omitempty"`
 	Links                 HAL            `json:"_links,omitempty"` // See https://developer.okta.com/docs/reference/api/users/#links-object for details.
 	Embedded              HAL            `json:"_embedded,omitempty"`
-}
-
-// Profile is an Okta user's profile.
-//
-// See https://developer.okta.com/docs/reference/api/users/#profile-object for details.
-type Profile struct {
-	Login             string  `json:"login"`
-	Email             string  `json:"email"`
-	SecondEmail       *string `json:"secondEmail,omitempty"`
-	FirstName         *string `json:"firstName,omitempty"`
-	LastName          *string `json:"lastName,omitempty"`
-	MiddleName        *string `json:"middleName,omitempty"`
-	HonorificPrefix   *string `json:"honorificPrefix,omitempty"`
-	HonorificSuffix   *string `json:"honorificSuffix,omitempty"`
-	Title             *string `json:"title,omitempty"`
-	DisplayName       *string `json:"displayName,omitempty"`
-	NickName          *string `json:"nickName,omitempty"`
-	ProfileUrl        *string `json:"profileUrl,omitempty"`
-	PrimaryPhone      *string `json:"primaryPhone,omitempty"`
-	MobilePhone       *string `json:"mobilePhone,omitempty"`
-	StreetAddress     *string `json:"streetAddress,omitempty"`
-	City              *string `json:"city,omitempty"`
-	State             *string `json:"state,omitempty"`
-	ZipCode           *string `json:"zipCode,omitempty"`
-	CountryCode       *string `json:"countryCode,omitempty"`
-	PostalAddress     *string `json:"postalAddress,omitempty"`
-	PreferredLanguage *string `json:"preferredLanguage,omitempty"`
-	Locale            *string `json:"locale,omitempty"`
-	Timezone          *string `json:"timezone,omitempty"`
-	UserType          *string `json:"userType,omitempty"`
-	EmployeeNumber    *string `json:"employeeNumber,omitempty"`
-	CostCenter        *string `json:"costCenter,omitempty"`
-	Organization      *string `json:"organization,omitempty"`
-	Division          *string `json:"division,omitempty"`
-	Department        *string `json:"department,omitempty"`
-	ManagerId         *string `json:"managerId,omitempty"`
-	Manager           *string `json:"manager,omitempty"`
 }
 
 // Credentials is a redacted Okta user's credential details. Only the credential provider is retained.
@@ -114,7 +77,7 @@ type Device struct {
 	Created             time.Time         `json:"created"`
 	ID                  string            `json:"id"`
 	LastUpdated         time.Time         `json:"lastUpdated"`
-	Profile             DeviceProfile     `json:"profile"`
+	Profile             map[string]any    `json:"profile"`
 	ResourceAlternateID string            `json:"resourceAlternateID"`
 	ResourceDisplayName DeviceDisplayName `json:"resourceDisplayName"`
 	ResourceID          string            `json:"resourceID"`
@@ -126,27 +89,6 @@ type Device struct {
 	// It is not part of the list devices API return, but can
 	// be populated by a call to GetDeviceUsers.
 	Users []User `json:"users,omitempty"`
-}
-
-// DeviceProfile is an Okta device's hardware and security profile.
-//
-// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
-type DeviceProfile struct {
-	DiskEncryptionType    *string `json:"diskEncryptionType,omitempty"`
-	DisplayName           string  `json:"displayName"`
-	IMEI                  *string `json:"imei,omitempty"`
-	IntegrityJailBreak    *bool   `json:"integrityJailBreak,omitempty"`
-	Manufacturer          *string `json:"manufacturer,omitempty"`
-	MEID                  *string `json:"meid,omitempty"`
-	Model                 *string `json:"model,omitempty"`
-	OSVersion             *string `json:"osVersion,omitempty"`
-	Platform              string  `json:"platform"`
-	Registered            bool    `json:"registered"`
-	SecureHardwarePresent *bool   `json:"secureHardwarePresent,omitempty"`
-	SerialNumber          *string `json:"serialNumber,omitempty"`
-	SID                   *string `json:"sid,omitempty"`
-	TPMPublicKeyHash      *string `json:"tpmPublicKeyHash,omitempty"`
-	UDID                  *string `json:"udid,omitempty"`
 }
 
 // DeviceDisplayName is an Okta device's annotated display name.
@@ -438,7 +380,7 @@ func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter) e
 	rateLimit := rate.Limit(rem / per)
 
 	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if rateLimit == 0 {
+	if rateLimit <= 0 {
 		waitUntil := resetTime.UTC()
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
