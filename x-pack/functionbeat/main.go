@@ -6,6 +6,7 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	_ "github.com/elastic/beats/v7/x-pack/functionbeat/include" // imports features
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/cmd"
