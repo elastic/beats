@@ -385,9 +385,18 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output_json()
         self.assertGreater(len(output), 0)
+        only_errors_encountered = True
 
         for evt in output:
             self.assert_fields_are_documented(evt)
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
@@ -395,6 +404,10 @@ class Test(metricbeat.BaseTest):
             if sys.platform.startswith("windows"):
                 assert isinstance(summary["running"], int)
                 assert isinstance(summary["total"], int)
+
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -419,7 +432,17 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         found_cmdline = False
+        only_errors_encountered = True
         for evt in output:
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
+
             process = evt["system"]["process"]
             # Not all process will have 'cmdline' due to permission issues,
             # especially on Windows. Therefore we ensure at least some of
@@ -441,6 +464,10 @@ class Test(metricbeat.BaseTest):
         # the 'cmdline' set.
         self.assertTrue(
             found_cmdline, "cmdline not found in any process events")
+
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
@@ -477,7 +504,16 @@ class Test(metricbeat.BaseTest):
         found_fd = False
         found_env = False
         found_cwd = not sys.platform.startswith("linux")
+        only_errors_encountered = True
         for evt in output:
+            if evt.get("error", None) is not None:
+                # Here, we assume that the error is non-fatal and we move forward the test execution.
+                # If the error is non-fatal, the test should pass with assertions.
+                # If the error is fatal, the test should fail.
+                continue
+            # we've encoutered an event. Turn off the flag
+            only_errors_encountered = False
+
             found_cwd |= "working_directory" in evt["process"]
 
             process = evt["system"]["process"]
@@ -499,6 +535,9 @@ class Test(metricbeat.BaseTest):
         if not sys.platform.startswith("darwin"):
             self.assertTrue(found_fd, "fd not found in any process events")
 
+        # If the flag is true, we've only encountered error (fatal errors)
+        # If the flag is false, we've encoutered events and probably some non-fatal errors.
+        assert not only_errors_encountered
         self.assertTrue(found_env, "env not found in any process events")
         self.assertTrue(
             found_cwd, "working_directory not found in any process events")
