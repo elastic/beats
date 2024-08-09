@@ -54,10 +54,10 @@ func TestConfig(t *testing.T) {
 	assert.EqualValues(t, 1024*1024*1024, c.MaxFileSizeBytes)
 	assert.EqualValues(t, 1024*1024*10, c.ScanRateBytesPerSec)
 	assert.Len(t, c.ExcludeFiles, 2)
-	assert.EqualValues(t, `\.DS_Store(?-m:$)`, c.ExcludeFiles[0].String())
-	assert.EqualValues(t, `\.swp(?-m:$)`, c.ExcludeFiles[1].String())
+	assert.EqualValues(t, `(?-m:\.DS_Store$)`, c.ExcludeFiles[0].String())
+	assert.EqualValues(t, `(?-m:\.swp$)`, c.ExcludeFiles[1].String())
 	assert.Len(t, c.IncludeFiles, 1)
-	assert.EqualValues(t, `\.ssh/(?-m:$)`, c.IncludeFiles[0].String())
+	assert.EqualValues(t, `(?-m:\.ssh/$)`, c.IncludeFiles[0].String())
 	assert.Len(t, c.FileParsers, 2)
 }
 
