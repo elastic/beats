@@ -19,12 +19,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
+	"github.com/elastic/go-structform"
 )
 
 const (
@@ -155,7 +157,12 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{
-				EventNormalization: boolPtr(true),
+				EventNormalization: boolPtr(false),
+				CustomTypeCodecs: []beat.TypeCodec{
+					codec.NewTypeCodec(func(ip *net.IP, v structform.ExtVisitor) error {
+						return v.OnString(ip.String())
+					}),
+				},
 			},
 			EventListener: nil,
 		})

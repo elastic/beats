@@ -125,6 +125,16 @@ type ProcessingConfig struct {
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
+
+	// CustomTypeCodecs is a slice of TypeCodec that passes
+	// to the encoder custom type encoding functions
+	CustomTypeCodecs []TypeCodec
+}
+
+// TypeCodec is an interface for custom type codec
+type TypeCodec interface {
+	// Codec returns the codec function
+	Codec() any
 }
 
 // ClientListener provides access to internal client events.

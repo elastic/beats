@@ -240,6 +240,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		},
 	}
 
+	for _, customTypeCodec := range cfg.Processing.CustomTypeCodecs {
+		producerCfg.CustomTypeCodecs = append(producerCfg.CustomTypeCodecs, customTypeCodec.Codec())
+	}
+
 	if ackHandler == nil {
 		ackHandler = acker.Nil()
 	}

@@ -67,17 +67,18 @@ func newEventEncoderFactory(
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
 ) queue.EncoderFactory {
-	return func() queue.Encoder {
-		return newEventEncoder(escapeHTML, indexSelector, pipelineSelector)
+	return func(customTypeCodecs ...any) queue.Encoder {
+		return newEventEncoder(escapeHTML, indexSelector, pipelineSelector, customTypeCodecs...)
 	}
 }
 
 func newEventEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
+	customTypeCodecs ...any,
 ) queue.Encoder {
 	buf := bytes.NewBuffer(nil)
-	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
+	enc := eslegclient.NewJSONEncoder(buf, escapeHTML, customTypeCodecs...)
 	return &eventEncoder{
 		buf:              buf,
 		enc:              enc,

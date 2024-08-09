@@ -50,8 +50,9 @@ type BulkWriter interface {
 }
 
 type jsonEncoder struct {
-	buf    *bytes.Buffer
-	folder *gotype.Iterator
+	buf        *bytes.Buffer
+	folder     *gotype.Iterator
+	typeCodecs []any
 
 	escapeHTML bool
 }
@@ -69,11 +70,19 @@ type event struct {
 	Fields    mapstr.M  `struct:",inline"`
 }
 
-func NewJSONEncoder(buf *bytes.Buffer, escapeHTML bool) *jsonEncoder {
+func NewJSONEncoder(buf *bytes.Buffer, escapeHTML bool, customTypeCodecs ...any) *jsonEncoder {
 	if buf == nil {
 		buf = bytes.NewBuffer(nil)
 	}
-	e := &jsonEncoder{buf: buf, escapeHTML: escapeHTML}
+	e := &jsonEncoder{buf: buf, escapeHTML: escapeHTML, typeCodecs: []any{
+		codec.MakeTimestampEncoder(),
+		codec.MakeBCTimestampEncoder(),
+	}}
+
+	if len(customTypeCodecs) > 0 {
+		e.typeCodecs = append(e.typeCodecs, customTypeCodecs...)
+	}
+
 	e.resetState()
 	return e
 }
@@ -88,9 +97,7 @@ func (b *jsonEncoder) resetState() {
 	visitor.SetEscapeHTML(b.escapeHTML)
 
 	b.folder, err = gotype.NewIterator(visitor,
-		gotype.Folders(
-			codec.MakeTimestampEncoder(),
-			codec.MakeBCTimestampEncoder()))
+		gotype.Folders(b.typeCodecs...))
 	if err != nil {
 		panic(err)
 	}

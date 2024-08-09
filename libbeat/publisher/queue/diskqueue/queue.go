@@ -272,7 +272,7 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(SerializationCBOR),
+		encoder: newEventEncoder(SerializationCBOR, cfg.CustomTypeCodecs...),
 		done:    make(chan struct{}),
 	}
 }

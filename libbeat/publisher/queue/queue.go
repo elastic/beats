@@ -81,6 +81,8 @@ type ProducerConfig struct {
 	// if ACK is set, the callback will be called with number of events produced
 	// by the producer instance and being ACKed by the queue.
 	ACK func(count int)
+
+	CustomTypeCodecs []any
 }
 
 type EntryID uint64
@@ -118,7 +120,7 @@ type Batch interface {
 // case the queue will run the given encoder on events before they reach
 // consumers.
 // Encoders are provided as factories so each worker goroutine can have its own
-type EncoderFactory func() Encoder
+type EncoderFactory func(customTypeCodecs ...any) Encoder
 
 type Encoder interface {
 	// Return the encoded form of the entry that the output workers can use,

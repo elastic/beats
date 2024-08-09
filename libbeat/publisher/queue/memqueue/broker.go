@@ -262,7 +262,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	// encoder for the new producer.
 	var encoder queue.Encoder
 	if b.encoderFactory != nil {
-		encoder = b.encoderFactory()
+		encoder = b.encoderFactory(cfg.CustomTypeCodecs...)
 	}
 	return newProducer(b, cfg.ACK, encoder)
 }
