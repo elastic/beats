@@ -10,6 +10,9 @@
   username: "user"
   password: "secret"
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #count_metrics: false
+
   # This can be used for service account based authorization:
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   ssl.certificate_authorities:
@@ -27,6 +30,9 @@
   metricsets: ["remote_write"]
   host: "localhost"
   port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  count_metrics: false
 
   # Secure settings for the server using TLS/SSL:
   ssl.enabled: false

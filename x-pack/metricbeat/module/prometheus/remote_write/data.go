@@ -36,7 +36,7 @@ type histogram struct {
 	metricName string
 }
 
-func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.RemoteWriteEventsGenerator, error) {
+func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool) (remote_write.RemoteWriteEventsGenerator, error) {
 	var err error
 	config := defaultConfig
 	if err = base.Module().UnpackConfig(&config); err != nil {
@@ -52,6 +52,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 		g := remoteWriteTypedGenerator{
 			counterCache: counters,
 			rateCounters: config.RateCounters,
+			countMetrics: countMetrics,
 		}
 
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
@@ -66,10 +67,11 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 		return &g, nil
 	}
 
-	return remote_write.DefaultRemoteWriteEventsGeneratorFactory(base)
+	return remote_write.DefaultRemoteWriteEventsGeneratorFactory(base, countMetrics)
 }
 
 type remoteWriteTypedGenerator struct {
+	countMetrics      bool
 	counterCache      collector.CounterCache
 	rateCounters      bool
 	counterPatterns   []*regexp.Regexp
@@ -101,12 +103,14 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
 
-	for _, metric := range metrics {
-		labels := mapstr.M{}
+	metricCounter := make(map[string]int64, len(metrics)/2)
 
+	for _, metric := range metrics {
 		if metric == nil {
 			continue
 		}
+
+		labels := mapstr.M{}
 		val := float64(metric.Value)
 		if math.IsNaN(val) || math.IsInf(val, 0) {
 			continue
@@ -130,6 +134,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
+				RootFields:   make(mapstr.M, 1),
 				ModuleFields: mapstr.M{},
 				Timestamp:    metric.Timestamp.Time(),
 			}
@@ -145,6 +150,12 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 
 		e := eventList[labelsHash]
+
+		if g.countMetrics {
+			metricCounter[labelsHash]++
+			e.RootFields["metrics_count"] = metricCounter[labelsHash]
+		}
+
 		switch promType {
 		case counterType:
 			data = mapstr.M{
@@ -182,12 +193,13 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			histograms[histKey] = hist
 			continue
 		}
-		e.ModuleFields.Update(data)
 
+		e.ModuleFields.Update(data)
 	}
 
 	// process histograms together
 	g.processPromHistograms(eventList, histograms)
+
 	return eventList
 }
 

@@ -6,6 +6,10 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
+    - name: metrics_count
+      type: long
+      description: >
+        Count the number of metrics
     - name: prometheus
       type: group
       fields:
