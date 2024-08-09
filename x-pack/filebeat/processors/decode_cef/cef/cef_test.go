@@ -60,6 +60,8 @@ const (
 
 	noValueInExtension = `CEF:26|security|threat=manager|1.0|100|trojan successfully stopped|10|src= dst=12.121.122.82 spt=`
 
+	hyphenInExtensionKey = `CEF:26|security|threatmanager|1.0|100|trojan successfully stopped|10|Some-Key=123456`
+
 	// Found by fuzzing but minimised by hand.
 	fuzz0 = `CEF:0|a=\\ b|`
 	fuzz1 = `CEF:0|\|a=|b=`
@@ -87,6 +89,7 @@ var testMessages = []string{
 	escapedMessage,
 	truncatedHeader,
 	noValueInExtension,
+	hyphenInExtensionKey,
 	fuzz0,
 	fuzz1,
 	fuzz2,
@@ -177,6 +180,24 @@ func TestEventUnpack(t *testing.T) {
 		assert.Equal(t, "10", e.Severity)
 		assert.Equal(t, map[string]*Field{
 			"dst": IPField("12.121.122.82"),
+		}, e.Extensions)
+	})
+
+	t.Run("hyphenInExtensionKey", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(hyphenInExtensionKey)
+		assert.NoError(t, err)
+		assert.Equal(t, 26, e.Version)
+		assert.Equal(t, "security", e.DeviceVendor)
+		assert.Equal(t, "threatmanager", e.DeviceProduct)
+		assert.Equal(t, "1.0", e.DeviceVersion)
+		assert.Equal(t, "100", e.DeviceEventClassID)
+		assert.Equal(t, "trojan successfully stopped", e.Name)
+		assert.Equal(t, "10", e.Severity)
+		assert.Equal(t, map[string]*Field{
+			"Some-Key": {
+				String: "123456",
+			},
 		}, e.Extensions)
 	})
 

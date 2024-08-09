@@ -92,9 +92,8 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		if err != nil {
-			err = fmt.Errorf("decode_cef failed to parse message: %w", err)
-		}
+
+		err = fmt.Errorf("decode_cef failed to parse message: %w", err)
 		return event, err
 	}
 
