@@ -62,7 +62,6 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	var sources []cursor.Source
 	var cfgs []*conf.C
 	if cfg.HasField("event_logs") {
 		multiCfg := struct {
@@ -79,12 +78,13 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		cfgs = append(cfgs, cfg)
 	}
 
-	for _, cfg := range cfgs {
+	sources := make([]cursor.Source, len(cfgs))
+	for i, cfg := range cfgs {
 		eventLog, err := eventlog.New(cfg)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 		}
-		sources = append(sources, eventLog)
+		sources[i] = eventLog
 	}
 
 	return sources, eventlogRunner{}, nil
