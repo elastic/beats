@@ -24,7 +24,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -483,7 +483,7 @@ func hexDecode(enc string) string {
 }
 
 func uuidString() string {
-	uuid, err := uuid.NewRandom()
+	uuid, err := uuid.NewV4()
 	if err != nil {
 		return ""
 	}

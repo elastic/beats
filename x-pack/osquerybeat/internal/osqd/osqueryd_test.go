@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 )
 

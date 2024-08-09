@@ -37,7 +37,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -292,7 +292,7 @@ func (b *BeatProc) LogMatch(match string) bool {
 	logFile := b.openLogFile()
 	defer logFile.Close()
 
-	found := false
+	var found bool
 	found, b.logFileOffset = b.logRegExpMatch(re, logFile, b.logFileOffset)
 	if found {
 		return found
@@ -355,7 +355,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	logFile := b.openLogFile()
 	defer logFile.Close()
 
-	found := false
+	var found bool
 	found, b.logFileOffset = b.searchStrInLogs(logFile, s, b.logFileOffset)
 	if found {
 		return found

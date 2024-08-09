@@ -11,7 +11,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 const (

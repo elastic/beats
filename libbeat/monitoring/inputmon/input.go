@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -59,7 +59,7 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	// logs during support interactions.
 	log := logp.NewLogger("metric_registry")
 	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	uuid := uuid.New().String()
+	uuid := uuid.Must(uuid.NewV4()).String()
 	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
 
 	reg = parentRegistry.NewRegistry(key)

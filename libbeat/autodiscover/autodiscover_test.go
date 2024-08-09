@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -129,7 +129,7 @@ func (m *mockAdapter) Create(_ beat.PipelineConnector, config *conf.C) (cfgfile.
 func (m *mockAdapter) Runners() []*mockRunner {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	var res []*mockRunner
+	res := make([]*mockRunner, 0, len(m.runners))
 	for _, r := range m.runners {
 		res = append(res, r.Clone())
 	}
