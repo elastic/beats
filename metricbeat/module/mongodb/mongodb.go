@@ -160,12 +160,8 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 		clientOptions.SetTLSConfig(tlsConfig.ToConfig())
 	}
 
-	client, err := mongo.NewClient(clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		return nil, fmt.Errorf("could not create mongodb client: %w", err)
-	}
-
-	if err = client.Connect(context.Background()); err != nil {
 		return client, fmt.Errorf("could not connect to mongodb: %w", err)
 	}
 	return client, nil
