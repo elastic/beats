@@ -32,8 +32,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/mock"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -393,7 +393,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
 		readers:    newReaderGroup(),
-		pipeline:   &pipelinemock.MockPipelineConnector{},
+		pipeline:   &mock.MockPipeline{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
 		identifier: &sourceIdentifier{"filestream::.global::"},
