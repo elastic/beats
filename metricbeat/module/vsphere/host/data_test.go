@@ -27,6 +27,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
+	var m *MetricSet
 	var HostSystemTest = mo.HostSystem{
 		Summary: types.HostListSummary{
 			Host: &types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},
@@ -45,7 +46,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := eventMapping(HostSystemTest)
+	event := m.eventMapping(HostSystemTest, &PerformanceMetrics{}, []string{})
 
 	cpuUsed, _ := event.GetValue("cpu.used.mhz")
 	assert.EqualValues(t, 67, cpuUsed)

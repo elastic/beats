@@ -23,36 +23,119 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(hs mo.HostSystem) mapstr.M {
-	totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-	freeCPU := int64(totalCPU) - int64(hs.Summary.QuickStats.OverallCpuUsage)
-	usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
-	freeMemory := int64(hs.Summary.Hardware.MemorySize) - usedMemory
+func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMertics *PerformanceMetrics, networkNames []string) mapstr.M {
+	totalErrorPacketsCount := perfMertics.NetErrorsTransmitted + perfMertics.NetErrorsReceived
+	totalMulticastPacketsCount := perfMertics.NetMulticastTransmitted + perfMertics.NetMulticastReceived
+	totalDroppedPacketsCount := perfMertics.NetDroppedTransmitted + perfMertics.NetDroppedReceived
 
 	event := mapstr.M{
-		"name": hs.Summary.Config.Name,
+		"name":   hs.Summary.Config.Name,
+		"status": hs.Summary.OverallStatus,
+		"uptime": hs.Summary.QuickStats.Uptime,
 		"cpu": mapstr.M{
 			"used": mapstr.M{
 				"mhz": hs.Summary.QuickStats.OverallCpuUsage,
 			},
-			"total": mapstr.M{
-				"mhz": totalCPU,
+		},
+		"disk": mapstr.M{
+			"capacity": mapstr.M{
+				"usage": mapstr.M{
+					"bytes": perfMertics.DiskCapacityUsage * 1000,
+				},
 			},
-			"free": mapstr.M{
-				"mhz": freeCPU,
+			"devicelatency": mapstr.M{
+				"average": mapstr.M{
+					"ms": perfMertics.DiskDeviceLatency,
+				},
+			},
+			"latency": mapstr.M{
+				"total": mapstr.M{
+					"ms": perfMertics.DiskMaxTotalLatency,
+				},
+			},
+			"total": mapstr.M{
+				"bytes": perfMertics.DiskUsage * 1000,
+			},
+			"read": mapstr.M{
+				"bytes": perfMertics.DiskRead * 1000,
+			},
+			"write": mapstr.M{
+				"bytes": perfMertics.DiskWrite * 1000,
 			},
 		},
-		"memory": mapstr.M{
-			"used": mapstr.M{
-				"bytes": usedMemory,
+		"network": mapstr.M{
+			"bandwidth": mapstr.M{
+				"transmitted": mapstr.M{
+					"bytes": perfMertics.NetTransmitted * 1000,
+				},
+				"received": mapstr.M{
+					"bytes": perfMertics.NetReceived * 1000,
+				},
+				"total": mapstr.M{
+					"bytes": perfMertics.NetUsage * 1000,
+				},
 			},
-			"total": mapstr.M{
-				"bytes": hs.Summary.Hardware.MemorySize,
-			},
-			"free": mapstr.M{
-				"bytes": freeMemory,
+			"packets": mapstr.M{
+				"transmitted": mapstr.M{
+					"count": perfMertics.NetPacketTransmitted,
+				},
+				"received": mapstr.M{
+					"count": perfMertics.NetPacketReceived,
+				},
+				"errors": mapstr.M{
+					"transmitted": mapstr.M{
+						"count": perfMertics.NetErrorsTransmitted,
+					},
+					"received": mapstr.M{
+						"count": perfMertics.NetErrorsReceived,
+					},
+					"total": mapstr.M{
+						"count": totalErrorPacketsCount,
+					},
+				},
+				"multicast": mapstr.M{
+					"transmitted": mapstr.M{
+						"count": perfMertics.NetMulticastTransmitted,
+					},
+					"received": mapstr.M{
+						"count": perfMertics.NetMulticastReceived,
+					},
+					"total": mapstr.M{
+						"count": totalMulticastPacketsCount,
+					},
+				},
+				"dropped": mapstr.M{
+					"transmitted": mapstr.M{
+						"count": perfMertics.NetDroppedTransmitted,
+					},
+					"received": mapstr.M{
+						"count": perfMertics.NetDroppedReceived,
+					},
+					"total": mapstr.M{
+						"count": totalDroppedPacketsCount,
+					},
+				},
 			},
 		},
+	}
+	if hs.Summary.Hardware != nil {
+		totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
+		freeCPU := totalCPU - int64(hs.Summary.QuickStats.OverallCpuUsage)
+		usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
+		freeMemory := hs.Summary.Hardware.MemorySize - usedMemory
+		totalMemory := hs.Summary.Hardware.MemorySize
+
+		event.Put("cpu.total.mhz", totalCPU)
+		event.Put("cpu.free.mhz", freeCPU)
+		event.Put("memory.used.bytes", usedMemory)
+		event.Put("memory.free.bytes", freeMemory)
+		event.Put("memory.total.bytes", totalMemory)
+	} else {
+		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
+	}
+
+	if len(networkNames) > 0 {
+		event.Put("network_names", networkNames)
 	}
 
 	return event

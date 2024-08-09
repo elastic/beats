@@ -66936,16 +66936,6 @@ host
 
 
 
-*`vsphere.host.name`*::
-+
---
-Host name
-
-
-type: keyword
-
---
-
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
@@ -66976,10 +66966,40 @@ type: long
 
 --
 
-*`vsphere.host.memory.used.bytes`*::
+*`vsphere.host.disk.capacity.usage.bytes`*::
 +
 --
-Used Memory in bytes
+The amount of storage capacity currently being consumed by or on the entity.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.devicelatency.average.ms`*::
++
+--
+Average amount of time it takes to complete an SCSI command from physical device.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.latency.total.ms`*::
++
+--
+Highest latency value across all disks used by the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.read.bytes`*::
++
+--
+Average number of bytes read from the disk each second.
 
 
 type: long
@@ -66988,10 +67008,22 @@ format: bytes
 
 --
 
-*`vsphere.host.memory.total.bytes`*::
+*`vsphere.host.disk.write.bytes`*::
 +
 --
-Total Memory in bytes
+Average number of kilobytes written to the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.total.bytes`*::
++
+--
+Aggregated disk I/O rate.
 
 
 type: long
@@ -67012,6 +67044,40 @@ format: bytes
 
 --
 
+*`vsphere.host.memory.total.bytes`*::
++
+--
+Total Memory in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.memory.used.bytes`*::
++
+--
+Used Memory in bytes
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.name`*::
++
+--
+Host name
+
+
+type: keyword
+
+--
+
 *`vsphere.host.network_names`*::
 +
 --
@@ -67019,6 +67085,172 @@ Network names
 
 
 type: keyword
+
+--
+
+*`vsphere.host.network.bandwidth.transmitted.bytes`*::
++
+--
+Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.received.bytes`*::
++
+--
+Average rate at which data was received during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.total.bytes`*::
++
+--
+Network utilization (combined transmit-rates and receive-rates).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.packets.transmitted.count`*::
++
+--
+Number of packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.received.count`*::
++
+--
+Number of packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.transmitted.count`*::
++
+--
+Number of packets with errors transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.received.count`*::
++
+--
+Number of packets with errors received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.total.count`*::
++
+--
+Total number of packets with errors.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.transmitted.count`*::
++
+--
+Number of multicast packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.received.count`*::
++
+--
+Number of multicast packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.total.count`*::
++
+--
+Total number of multicast packets.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.transmitted.count`*::
++
+--
+Number of transmitted packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.received.count`*::
++
+--
+Number of received packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.total.count`*::
++
+--
+Total number of packets dropped.   
+
+
+type: long
+
+--
+
+*`vsphere.host.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.uptime`*::
++
+--
+The total uptime of a host in seconds within the vSphere environment.
+
+
+type: long
 
 --
 
