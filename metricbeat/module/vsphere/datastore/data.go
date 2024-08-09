@@ -24,10 +24,6 @@ import (
 )
 
 func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetrics) mapstr.M {
-	var usedSpacePercent float64
-	if ds.Summary.Capacity > 0 {
-		usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
-	}
 	usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
 	event := mapstr.M{
@@ -51,12 +47,6 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetric
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
-		"host": mapstr.M{
-			"count": len(ds.Host),
-		},
-		"vm": mapstr.M{
-			"count": len(ds.Vm),
-		},
 		"capacity": mapstr.M{
 			"total": mapstr.M{
 				"bytes": ds.Summary.Capacity,
@@ -66,9 +56,23 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetric
 			},
 			"used": mapstr.M{
 				"bytes": usedSpaceBytes,
-				"pct":   usedSpacePercent,
 			},
 		},
 	}
+
+	var usedSpacePercent float64
+	if ds.Summary.Capacity > 0 {
+		usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
+		event.Put("capacity.used.pct", usedSpacePercent)
+	}
+
+	if len(ds.Host) > 0 {
+		event.Put("host.names", ds.Host)
+	}
+
+	if len(ds.Vm) > 0 {
+		event.Put("vm.names", ds.Vm)
+	}
+
 	return event
 }

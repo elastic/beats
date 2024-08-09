@@ -46,7 +46,7 @@
         Rate of reading data from the datastore.
       format: bytes
     - name: read.latency.total.ms
-      type: double
+      type: long
       description: >
         Average amount of time for a read operation from the datastore.
     - name: status
@@ -63,7 +63,7 @@
         Rate of writing data to the datastore.
       format: bytes
     - name: write.latency.total.ms
-      type: double
+      type: long
       description: >
         Average amount of time for a write operation from the datastore.
 
