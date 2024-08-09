@@ -215,7 +215,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
 	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService gcp.MetadataService
 	var err error
 
 	if !m.config.ExcludeLabels {
