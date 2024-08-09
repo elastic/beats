@@ -11,7 +11,13 @@ experimental[]
 
 https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[`journald`]
 is a system service that collects and stores logging data. The `journald` input
-reads this log data and the metadata associated with it.
+reads this log data and the metadata associated with it. To read this
+log data {beatname_uc} calls `journalctl` to read from the journal, therefore
+{beatname_uc} needs permission to execute `journalctl`.
+
+If the `journalctl` process exits unexpectedly the {type} input will
+terminate with an error and {beatname_uc} will need to be
+restarted to start reading from the jouranl again.
 
 The simplest configuration example is one that reads all logs from the default
 journal.
@@ -71,21 +77,22 @@ The `journald` input supports the following configuration options plus the
 [id="{beatname_lc}-input-{type}-id"]
 ==== `id`
 
-An optional unique identifier for the input. By providing a unique `id` you can
+An unique identifier for the input. By providing a unique `id` you can
 operate multiple inputs on the same journal. This allows each input's cursor to
-be persisted independently in the registry file.
+be persisted independently in the registry file. Each {type} input must have
+an unique ID.
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: journald
   id: consul.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=consul.service
 
 - type: journald
   id: vault.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=vault.service
 ----
 
@@ -101,20 +108,6 @@ into a single journal and reads them.
 If no paths are specified, {beatname_uc} reads from the default journal.
 
 [float]
-[id="{beatname_lc}-input-{type}-backoff"]
-==== `backoff`
-
-The number of seconds to wait before trying to read again from journals. The
-default is 1s.
-
-[float]
-[id="{beatname_lc}-input-{type}-max-backoff"]
-==== `max_backoff`
-
-The maximum number of seconds to wait before attempting to read again from
-journals. The default is 60s.
-
-[float]
 [id="{beatname_lc}-input-{type}-seek"]
 ==== `seek`
 
@@ -124,36 +117,26 @@ The position to start reading the journal from. Valid settings are:
 {beatname_uc} resends all log messages in the journal.
 * `tail`: Starts reading at the end of the journal. This means that no events
 will be sent until a new message is written.
-* `cursor`: On first read, starts reading at the beginning of the journal. After
-a reload or restart, continues reading at the last known position.
 * `since`: Use the `since` option to determine where to start reading from.
 
-If you have old log files and want to skip lines, start {beatname_uc} with
-`seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
-{beatname_uc}.
+Regardless of the value of `seek` if {beatname_uc} has a state (cursor) for this
+input, the `seek` value is ignored and the current cursor is used. To reset
+the cursor, just change the `id` of the input, this will start from a fresh state.
 
-[float]
-[id="{beatname_lc}-input-{type}-cursor_seek_fallback"]
-==== `cursor_seek_fallback`
-
-The position to start reading the journal from if no cursor information is
-available. Valid options are `head`, `tail` and `since`.
 
 [float]
 [id="{beatname_lc}-input-{type}-since"]
 ==== `since`
 
 A time offset from the current time to start reading from. To use
-`since`, either the `seek` option must be set to `since`, or the `seek` mode
-must be set to `cursor` and the `cursor_seek_fallback` set to `since`.
+`since`, `seek` option must be set to `since`.
 
 This example demonstrates how to resume from the persisted cursor when
 it exists, or otherwise begin reading logs from the last 24 hours.
 
 ["source","yaml",subs="attributes"]
 ----
-seek: cursor
-cursor_seek_fallback: since
+seek: since
 since: -24h
 ----
 
@@ -199,20 +182,30 @@ If the filter expressions apply to different fields, only entries with all field
 If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
 `match`: List of filter expressions to match fields.
-`or`: The filter expressions listed under `or` are connected with a disjunction (or).
-`and`: The filter expressions listed under `and` are connected with a conjunction (and).
 
 Please note that these expressions are limited. You can build complex filtering, but full logical
 expressions are not supported.
 
-The following include matches configuration reads all `systemd` syslog entries:
+The following include matches configuration will ingest entries that
+contain `journald.process.name: systemd` and `systemd.transport: syslog`.
 
 ["source","yaml",subs="attributes"]
 ----
-include_matches.and:
-- match:
-  - "journald.process.name=systemd"
-  - "systemd.transport=syslog"
+include_matches:
+  match:
+    - "journald.process.name=systemd"
+    - "systemd.transport=syslog"
+----
+
+The following include matches configuration will ingest entries that
+contain `systemd.transport: systemd` or `systemd.transport: kernel`.
+
+["source","yaml",subs="attributes"]
+----
+include_matches:
+  match:
+    - "systemd.transport=kernel"
+    - "systemd.transport=syslog"
 ----
 
 To reference fields, use one of the following:
