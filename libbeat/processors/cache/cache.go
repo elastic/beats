@@ -22,10 +22,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -67,7 +67,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to unpack the %s configuration: %w", name, err)
 	}
 	// Logging (each processor instance has a unique ID).
-	id := int(instanceID.Inc())
+	id := int(instanceID.Add(1))
 	log := logp.NewLogger(name).With("instance_id", id)
 
 	src, cancel, err := getStoreFor(config, log)

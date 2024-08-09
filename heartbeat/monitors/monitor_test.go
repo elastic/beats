@@ -103,10 +103,10 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 		t.Fatalf("No publishes detected!")
 	}
 
-	assert.Equal(t, 1, built.Load())
+	assert.Equal(t, int64(1), built.Load())
 	mon.Stop()
 
-	assert.Equal(t, 1, closed.Load())
+	assert.Equal(t, int64(1), closed.Load())
 	assert.Equal(t, true, pcClient.closed)
 }
 
@@ -126,8 +126,8 @@ func TestCheckInvalidConfig(t *testing.T) {
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
 
 	// These counters are both zero since this fails at config parse time
-	require.Equal(t, 0, built.Load())
-	require.Equal(t, 0, closed.Load())
+	require.Equal(t, int64(0), built.Load())
+	require.Equal(t, int64(0), closed.Load())
 
 	require.Error(t, checkMonitorConfig(serverMonConf, reg))
 }

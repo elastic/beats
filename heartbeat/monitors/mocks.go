@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"regexp"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -42,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -216,17 +216,17 @@ func createMockJob() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
+func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	reg := monitoring.NewRegistry()
 
-	built := atomic.NewInt(0)
-	closed := atomic.NewInt(0)
+	built := &atomic.Int64{}
+	closed := &atomic.Int64{}
 
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
 			Make: func(s string, config *config.C) (plugin.Plugin, error) {
-				built.Inc()
+				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
 					URLs []string `config:"urls" validate:"required"`
@@ -234,7 +234,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 
 				// track all closes, even on error
 				closer := func() error {
-					closed.Inc()
+					closed.Add(1)
 					return nil
 				}
 
@@ -251,7 +251,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 		closed
 }
 
-func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
+func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int64, closed *atomic.Int64) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
 	_ = reg.Add(builder)

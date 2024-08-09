@@ -26,9 +26,9 @@ import (
 	"net"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -44,7 +44,7 @@ type Listener struct {
 	wg              sync.WaitGroup
 	log             *logp.Logger
 	ctx             ctxtool.CancelContext
-	clientsCount    atomic.Int
+	clientsCount    atomic.Int64
 	handlerFactory  HandlerFactory
 	listenerFactory ListenerFactory
 }
@@ -190,10 +190,10 @@ func (l *Listener) handleConnection(conn net.Conn) {
 	defer cancel()
 
 	// Track number of clients.
-	l.clientsCount.Inc()
+	l.clientsCount.Add(1)
 	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
 	defer func() {
-		l.clientsCount.Dec()
+		l.clientsCount.Add(-1)
 		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
 	}()
 

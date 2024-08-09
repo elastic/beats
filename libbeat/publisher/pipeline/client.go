@@ -19,10 +19,10 @@ package pipeline
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -41,8 +41,7 @@ type client struct {
 	canDrop    bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen    atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
-	closeOnce sync.Once   // closeOnce ensure that the client shutdown sequence is only executed once
+	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
 	observer       observer
 	eventListener  beat.EventListener
@@ -204,12 +203,12 @@ func newClientCloseWaiter(timeout time.Duration) *clientCloseWaiter {
 
 func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 	if published {
-		w.events.Inc()
+		w.events.Add(1)
 	}
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Sub(uint32(n))
+	value := w.events.Add(^uint32(n - 1))
 	if value != 0 {
 		return
 	}
