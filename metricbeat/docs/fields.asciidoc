@@ -67023,6 +67023,138 @@ type: keyword
 --
 
 [float]
+=== resourcepool
+
+resourcepool
+
+
+
+
+
+*`vsphere.resourcepool.cpu.entitlement.mhz`*::
++
+--
+Amount of CPU resources allocated to the resource pool.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.usage.pct`*::
++
+--
+CPU usage average in percentage.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.usage.mhz`*::
++
+--
+CPU usage average in MHz.
+
+
+type: long
+
+--
+
+
+
+*`vsphere.resourcepool.cpu.active.average.pct`*::
++
+--
+CPU active average in percentage.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.max.pct`*::
++
+--
+CPU active max in percentage.
+
+
+type: long
+
+--
+
+
+
+*`vsphere.resourcepool.memory.entitlement.mhz`*::
++
+--
+Amount of Memory resources allocated to the resource pool.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.memory.usage.pct`*::
++
+--
+Memory usage average in percentage.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.memory.shared.bytes`*::
++
+--
+Memory shared average in Bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.swap.bytes`*::
++
+--
+Memory swap in average in Bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.name`*::
++
+--
+Name of resource pool.
+
+
+type: keyword
+
+--
+
+*`vsphere.resourcepool.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+[float]
 === virtualmachine
 
 virtualmachine
