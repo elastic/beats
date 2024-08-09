@@ -23,11 +23,12 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 func init() {
@@ -51,6 +52,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
+type PerformanceMetrics struct {
+	DsRead         int64
+	DsWrite        int64
+	DsIops         int64
+	DsReadLatency  int64
+	DsWriteLatency int64
+}
+
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
@@ -62,7 +71,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error in NewClient: %w", err)
 	}
-
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
 			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
@@ -87,36 +95,89 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
-	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst); err != nil {
+	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst); err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
-	for _, ds := range dst {
-		var usedSpacePercent float64
-		if ds.Summary.Capacity > 0 {
-			usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
-		}
-		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
+	// Create a performance manager
+	perfManager := performance.NewManager(c)
 
-		event := mapstr.M{
-			"name":   ds.Summary.Name,
-			"fstype": ds.Summary.Type,
-			"capacity": mapstr.M{
-				"total": mapstr.M{
-					"bytes": ds.Summary.Capacity,
-				},
-				"free": mapstr.M{
-					"bytes": ds.Summary.FreeSpace,
-				},
-				"used": mapstr.M{
-					"bytes": usedSpaceBytes,
-					"pct":   usedSpacePercent,
-				},
-			},
+	// Retrieve metric IDs for the specified metric names
+	metrics, err := perfManager.CounterInfoByName(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve metrics: %w", err)
+	}
+
+	// Define metrics to be collected
+	metricNames := []string{
+		"datastore.read.average",
+		"datastore.write.average",
+		"datastore.datastoreIops.average",
+		"datastore.totalReadLatency.average",
+		"datastore.totalWriteLatency.average",
+	}
+
+	// Define reference of structure
+	var metricsVar PerformanceMetrics
+
+	// Map metric names to struture	fields
+	metricMap := map[string]*int64{
+		"datastore.read.average":              &metricsVar.DsRead,
+		"datastore.write.average":             &metricsVar.DsWrite,
+		"datastore.datastoreIops.average":     &metricsVar.DsIops,
+		"datastore.totalReadLatency.average":  &metricsVar.DsReadLatency,
+		"datastore.totalWriteLatency.average": &metricsVar.DsWriteLatency,
+	}
+
+	var spec types.PerfQuerySpec
+	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
+
+	for _, metricName := range metricNames {
+		metric, exists := metrics[metricName]
+		if !exists {
+			m.Logger().Debug("Metric ", metricName, " not found")
+			continue
+		}
+
+		metricIDs = append(metricIDs, types.PerfMetricId{
+			CounterId: metric.Key,
+		})
+	}
+	spec = types.PerfQuerySpec{
+		MetricId:   metricIDs,
+		MaxSample:  1,
+		IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+	}
+	for _, ds := range dst {
+		spec.Entity = ds.Reference()
+
+		// Query performance data
+		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+		if err != nil {
+			m.Logger().Debug("Failed to query performance data: %v", err)
+			continue
+		}
+		if len(samples) > 0 {
+			results, err := perfManager.ToMetricSeries(ctx, samples)
+			if err != nil {
+				m.Logger().Debug("Failed to query performance data: %v", err)
+			}
+
+			for _, result := range results[0].Value {
+				if len(result.Value) > 0 {
+					if assignValue, exists := metricMap[result.Name]; exists {
+						*assignValue = result.Value[0] // Assign the metric value to the variable
+					}
+				} else {
+					m.Logger().Debug("Metric ", result.Name, ": No result found")
+				}
+			}
+		} else {
+			m.Logger().Debug("No samples returned from performance manager")
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: m.eventMapping(ds, &metricsVar),
 		})
 	}
 
