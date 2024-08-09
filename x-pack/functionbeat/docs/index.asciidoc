@@ -34,6 +34,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_script_processor:
 :no_timestamp_processor:
 :no_keystore:
+:no_add_session_metadata_processor:
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
