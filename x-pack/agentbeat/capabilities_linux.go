@@ -9,8 +9,6 @@ import (
 	"os"
 
 	"kernel.org/pub/linux/libs/security/libcap/cap"
-
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/utils"
 )
 
 type capProc interface {
@@ -27,7 +25,7 @@ var (
 )
 
 func initCapabilities() {
-	isRoot, err := utils.HasRoot()
+	isRoot, err := hasRoot()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: %v\n", err)
 	}
@@ -89,4 +87,10 @@ func raiseEffectiveCapabilities() error {
 	}
 
 	return nil
+}
+
+// hasRoot returns true if the user has root permissions.
+// Added extra `nil` value to return since the hasRoot for windows will return an error as well
+func hasRoot() (bool, error) {
+	return os.Geteuid() == 0, nil
 }
