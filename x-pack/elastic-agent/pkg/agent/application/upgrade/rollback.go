@@ -104,8 +104,7 @@ func InvokeWatcher(log *logger.Logger) error {
 		return nil
 	}
 
-	versionedHome := paths.VersionedHome(paths.Top())
-	cmd := invokeCmd(versionedHome)
+	cmd := invokeCmd()
 	defer func() {
 		if cmd.Process != nil {
 			log.Debugf("releasing watcher %v", cmd.Process.Pid)

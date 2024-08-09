@@ -31,6 +31,10 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 
 *Functionbeat*
 
+*Elastic Agent*
+
+- Fixes the issue where upgrading from 7.17 to a 8.x+ version only runs the 7.17 watcher for the latest 8.x release.
+
 ==== Bugfixes
 
 *Affecting all Beats*

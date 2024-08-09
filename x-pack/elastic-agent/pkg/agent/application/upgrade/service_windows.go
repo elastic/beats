@@ -10,7 +10,6 @@ package upgrade
 import (
 	"context"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	"golang.org/x/sys/windows/svc/mgr"
@@ -62,10 +61,8 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	return int(status.ProcessId), nil
 }
 
-func invokeCmd(topPath string) *exec.Cmd {
-	homeExePath := filepath.Join(topPath, agentName)
-
-	cmd := exec.Command(homeExePath, watcherSubcommand,
+func invokeCmd() *exec.Cmd {
+	cmd := exec.Command(paths.TopBinaryPath(), watcherSubcommand,
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),
 	)
