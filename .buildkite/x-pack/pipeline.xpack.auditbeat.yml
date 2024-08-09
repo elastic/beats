@@ -26,6 +26,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module tests
+  BEAT_PATH: "x-pack/auditbeat"
+
 steps:
   - group: "Check/Update"
     key: "x-pack-auditbeat-check-update"
@@ -59,14 +62,9 @@ steps:
     key: "x-pack-auditbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/auditbeat: Build Tests"
+      - label: ":ubuntu: x-pack/auditbeat: Build Tests (Module)"
         key: "mandatory-linux-unit-test"
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/auditbeat
-          echo "~~~ Running tests"
           cd x-pack/auditbeat
           mage update build test
         retry:
@@ -81,7 +79,7 @@ steps:
           - "x-pack/auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/auditbeat: Build Tests"
+              context: "x-pack/auditbeat: Build Tests (Module)"
 
       - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
