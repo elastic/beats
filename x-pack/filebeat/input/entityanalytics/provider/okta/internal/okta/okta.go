@@ -380,7 +380,7 @@ func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter) e
 	rateLimit := rate.Limit(rem / per)
 
 	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if rateLimit == 0 {
+	if rateLimit <= 0 {
 		waitUntil := resetTime.UTC()
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
