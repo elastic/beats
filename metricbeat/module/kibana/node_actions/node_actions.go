@@ -88,7 +88,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 }
 
 func (m *MetricSet) validate() (err error, versionSupported bool) {
-	kibanaVersion, err := kibana.GetVersion(m.actionsHTTP, kibana.NodeActionsPath)
+	kibanaVersion, err := kibana.GetVersion(m.actionsHTTP, kibana.NodeActionsPath, m.ApiKey)
 	if err != nil {
 		return err, false
 	}

@@ -18,13 +18,16 @@
 package kibana
 
 import (
+	"encoding/base64"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"fmt"
 )
 
 // MetricSet can be used to build other metricsets within the Kibana module.
 type MetricSet struct {
 	mb.BaseMetricSet
 	XPackEnabled bool
+	ApiKey       string
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -35,8 +38,16 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
+	if config.ApiKey != "" {
+		hostData := base.HostData()
+		if hostData.User != "" || hostData.Password != "" {
+			return nil, fmt.Errorf("cannot set both api_key and username/password")
+		}
+	}
+
 	return &MetricSet{
 		base,
 		config.XPackEnabled,
+		base64.StdEncoding.EncodeToString([]byte(config.ApiKey)),
 	}, nil
 }

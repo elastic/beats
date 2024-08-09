@@ -45,13 +45,19 @@ var (
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
+	*kibana.MetricSet
 	mb.BaseMetricSet
 	settingsHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	ms, err := kibana.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
 	return &MetricSet{
+		MetricSet: ms,
 		BaseMetricSet: base,
 	}, nil
 }
@@ -80,7 +86,7 @@ func (m *MetricSet) init() (err error) {
 
 	httpHelper.SetHeaderDefault(productorigin.Header, productorigin.Beats)
 
-	kibanaVersion, err := kibana.GetVersion(httpHelper, kibana.SettingsPath)
+	kibanaVersion, err := kibana.GetVersion(httpHelper, kibana.SettingsPath, m.ApiKey)
 	if err != nil {
 		return err
 	}
