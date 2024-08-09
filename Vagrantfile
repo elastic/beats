@@ -47,10 +47,13 @@ TEST_BOXES = [
   {:name => "ubuntu1604", :box => "ubuntu/xenial64", :platform => "ubuntu"},
   {:name => "ubuntu1804", :box => "ubuntu/bionic64", :platform => "ubuntu"},
   {:name => "ubuntu2004", :box => "ubuntu/focal64", :platform => "ubuntu"},
+  {:name => "ubuntu2204", :box => "ubuntu/jammy64", :platform => "ubuntu"},
 
   {:name => "debian8", :box => "generic/debian8", :platform => "debian"},
   {:name => "debian9", :box => "debian/stretch64", :platform => "debian"},
   {:name => "debian10", :box => "debian/buster64", :platform => "debian"},
+  {:name => "debian11", :box => "debian/bullseye64", :platform => "debian"},
+  {:name => "debian12", :box => "debian/bookworm64", :platform => "debian"},
 
   {:name => "amazon1", :box => "mvbcoding/awslinux", :platform => "centos"},
   {:name => "amazon2", :box => "bento/amazonlinux-2", :platform => "centos"},
