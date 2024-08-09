@@ -19,6 +19,7 @@ import (
 )
 
 /*
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,6 +27,15 @@ import (
 #include <rpm/header.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
+
+
+int
+my_rpmtsSetRootDir(void *f, rpmts ts) {
+	int (*rpmtsSetRootDir)(rpmts, const char*);
+	rpmtsSetRootDir = (int (*)(rpmts, const char*))f;
+
+	return rpmtsSetRootDir(ts, "/");
+}
 
 rpmts
 my_rpmtsCreate(void *f) {
@@ -196,6 +206,7 @@ type librpm struct {
 	rpmsqSetInterruptSafety unsafe.Pointer
 	rpmFreeRpmrc            unsafe.Pointer
 	rpmFreeMacros           unsafe.Pointer
+	rpmtsSetRootDir         unsafe.Pointer
 }
 
 func (lib *librpm) close() error {
@@ -255,7 +266,7 @@ func openLibrpm() (*librpm, error) {
 
 	librpm.handle, err = dlopen.GetHandle(librpmNames)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't open %v: %v", librpmNames, err)
+		return nil, fmt.Errorf("couldn't open %v: %w", librpmNames, err)
 	}
 
 	librpm.rpmtsCreate, err = librpm.handle.GetSymbolPointer("rpmtsCreate")
@@ -314,24 +325,32 @@ func openLibrpm() (*librpm, error) {
 	}
 
 	// Only available in librpm>=4.13.0
-	librpm.rpmsqSetInterruptSafety, err = librpm.handle.GetSymbolPointer("rpmsqSetInterruptSafety")
+	librpm.rpmsqSetInterruptSafety, _ = librpm.handle.GetSymbolPointer("rpmsqSetInterruptSafety")
 	// no error check
 
 	// Only available in librpm>=4.6.0
-	librpm.rpmFreeMacros, err = librpm.handle.GetSymbolPointer("rpmFreeMacros")
+	librpm.rpmFreeMacros, _ = librpm.handle.GetSymbolPointer("rpmFreeMacros")
 	// no error check
+
+	librpm.rpmtsSetRootDir, err = librpm.handle.GetSymbolPointer("rpmtsSetRootDir")
+	if err != nil {
+		return nil, err
+	}
 
 	return &librpm, nil
 }
 
-func listRPMPackages() ([]*Package, error) {
+func listRPMPackages(ownsThread bool) ([]*Package, error) {
 	// In newer versions, librpm is using the thread-local variable
 	// `disableInterruptSafety` in rpmio/rpmsq.c to disable signal
 	// traps. To make sure our settings remain in effect throughout
 	// our function calls we have to lock the OS thread here, since
 	// Golang can otherwise use any thread it likes for each C.* call.
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
+
+	if !ownsThread {
+		runtime.LockOSThread()
+		defer runtime.UnlockOSThread()
+	}
 
 	if openedLibrpm == nil {
 		var err error
@@ -339,6 +358,15 @@ func listRPMPackages() ([]*Package, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	res := C.my_rpmReadConfigFiles(openedLibrpm.rpmReadConfigFiles)
+	if int(res) != 0 {
+		return nil, fmt.Errorf("Error: %d", int(res))
+	}
+	defer C.my_rpmFreeRpmrc(openedLibrpm.rpmFreeRpmrc)
+	if openedLibrpm.rpmFreeMacros != nil {
+		defer C.my_rpmFreeMacros(openedLibrpm.rpmFreeMacros)
 	}
 
 	if openedLibrpm.rpmsqSetInterruptSafety != nil {
@@ -351,14 +379,8 @@ func listRPMPackages() ([]*Package, error) {
 	}
 	defer C.my_rpmtsFree(openedLibrpm.rpmtsFree, rpmts)
 
-	res := C.my_rpmReadConfigFiles(openedLibrpm.rpmReadConfigFiles)
-	if int(res) != 0 {
-		return nil, fmt.Errorf("Error: %d", int(res))
-	}
-	defer C.my_rpmFreeRpmrc(openedLibrpm.rpmFreeRpmrc)
-	if openedLibrpm.rpmFreeMacros != nil {
-		defer C.my_rpmFreeMacros(openedLibrpm.rpmFreeMacros)
-	}
+	// setup root dir, used if librpm has to resolve a macro that contains a path
+	C.my_rpmtsSetRootDir(openedLibrpm.rpmtsSetRootDir, rpmts)
 
 	mi := C.my_rpmtsInitIterator(openedLibrpm.rpmtsInitIterator, rpmts)
 	if mi == nil {
@@ -366,7 +388,7 @@ func listRPMPackages() ([]*Package, error) {
 	}
 	defer C.my_rpmdbFreeIterator(openedLibrpm.rpmdbFreeIterator, mi)
 
-	var packages []*Package
+	packages := make([]*Package, 0)
 	for header := C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi); header != nil; header = C.my_rpmdbNextIterator(openedLibrpm.rpmdbNextIterator, mi) {
 
 		pkg, err := packageFromHeader(header, openedLibrpm)
