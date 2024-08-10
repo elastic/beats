@@ -24,13 +24,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
+// MockClient is a mock implementation of the beat.Client interface.
 type MockClient struct {
-	published []beat.Event
+	published []beat.Event // Slice to store published events
 
-	closed bool
-	mu     sync.Mutex
+	closed bool       // Flag to indicate if the client is closed
+	mu     sync.Mutex // Mutex to synchronize access to the published events slice
 }
 
+// GetEvents returns all the events published by the mock client.
 func (m *MockClient) GetEvents() []beat.Event {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -38,6 +40,7 @@ func (m *MockClient) GetEvents() []beat.Event {
 	return m.published
 }
 
+// Publish publishes a single event.
 func (m *MockClient) Publish(e beat.Event) {
 	es := make([]beat.Event, 1)
 	es = append(es, e)
@@ -45,6 +48,7 @@ func (m *MockClient) Publish(e beat.Event) {
 	m.PublishAll(es)
 }
 
+// PublishAll publishes multiple events.
 func (m *MockClient) PublishAll(es []beat.Event) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -52,6 +56,7 @@ func (m *MockClient) PublishAll(es []beat.Event) {
 	m.published = append(m.published, es...)
 }
 
+// Close closes the mock client.
 func (m *MockClient) Close() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -64,12 +69,14 @@ func (m *MockClient) Close() error {
 	return nil
 }
 
+// MockPipeline is a mock implementation of the beat.Pipeline interface.
 type MockPipeline struct {
-	c  beat.Client
-	mu sync.Mutex
+	c  beat.Client // Client used by the pipeline
+	mu sync.Mutex  // Mutex to synchronize access to the client
 }
 
-func (mp *MockPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+// ConnectWith connects the mock pipeline with a client using the provided configuration.
+func (mp *MockPipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
 	mp.mu.Lock()
 	defer mp.mu.Unlock()
 
@@ -80,6 +87,7 @@ func (mp *MockPipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
 	return c, nil
 }
 
+// Connect connects the mock pipeline with a client using the default configuration.
 func (mp *MockPipeline) Connect() (beat.Client, error) {
 	return mp.ConnectWith(beat.ClientConfig{})
 }
