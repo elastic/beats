@@ -22,14 +22,14 @@
 package docker
 
 import (
+	"context"
 	"os"
 	"testing"
 
 	"github.com/docker/docker/api"
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 )
 
 func TestNewClient(t *testing.T) {
@@ -37,7 +37,7 @@ func TestNewClient(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 
-	_, err = c.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err = c.ContainerList(context.Background(), container.ListOptions{})
 	assert.NoError(t, err)
 
 	// This test only works on newer Docker versions (any supported one really)
@@ -58,6 +58,6 @@ func TestNewClient(t *testing.T) {
 	assert.NotNil(t, c)
 	assert.Equal(t, "1.22", c.ClientVersion())
 
-	_, err = c.ContainerList(context.Background(), types.ContainerListOptions{})
+	_, err = c.ContainerList(context.Background(), container.ListOptions{})
 	assert.NoError(t, err)
 }

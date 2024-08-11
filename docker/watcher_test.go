@@ -21,6 +21,7 @@
 package docker
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"testing"
@@ -31,7 +32,6 @@ import (
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/context"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
