@@ -96,7 +96,6 @@ func GetPodMetaGen(
 	replicasetWatcher kubernetes.Watcher,
 	jobWatcher kubernetes.Watcher,
 	metaConf *AddResourceMetadataConfig) MetaGen {
-
 	var nodeMetaGen, namespaceMetaGen, rsMetaGen, jobMetaGen MetaGen
 	if nodeWatcher != nil && metaConf.Node.Enabled() {
 		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store(), nodeWatcher.Client())
@@ -134,18 +133,22 @@ func GetKubernetesClusterIdentifier(cfg *config.C, client k8sclient.Interface) (
 	if err == nil {
 		return clusterInfo, nil
 	}
-	// try with kubeadm-config configmap
-	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
+
+	// try with kubeadm-config configmap only if config_kubeAdm == true
+	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client, c.KubeAdm)
 	if err == nil {
 		return clusterInfo, nil
 	}
 	return ClusterInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
 }
 
-func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo, error) {
+func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface, kubeadm bool) (ClusterInfo, error) {
 	clusterInfo := ClusterInfo{}
 	if client == nil {
 		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config")
+	}
+	if !kubeadm {
+		return clusterInfo, nil
 	}
 	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
 	if err != nil {
