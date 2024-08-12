@@ -366,13 +366,13 @@ func (m *MetricSet) setOrganization() error {
 	// Initialize the Cloud Resource Manager service
 	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
 	if err != nil {
-		return fmt.Errorf("failed to create cloudresourcemanager service: %v", err)
+		return fmt.Errorf("failed to create cloudresourcemanager service: %w", err)
 	}
 
 	// Get the project ancestor details
 	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Do()
 	if err != nil {
-		return fmt.Errorf("failed to get project ancestors: %v", err)
+		return fmt.Errorf("failed to get project ancestors: %w", err)
 	}
 
 	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
@@ -382,7 +382,7 @@ func (m *MetricSet) setOrganization() error {
 
 		orgDetails, err := orgReq.Do()
 		if err != nil {
-			return fmt.Errorf("failed to get organization details: %v", err)
+			return fmt.Errorf("failed to get organization details: %w", err)
 		}
 		if orgDetails.DisplayName != "" {
 			m.config.OrganizationName = orgDetails.DisplayName
