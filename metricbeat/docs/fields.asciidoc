@@ -66966,6 +66966,26 @@ type: long
 
 --
 
+*`vsphere.host.datastore.names`*::
++
+--
+Names of the datastores on the host.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.datastore.count`*::
++
+--
+Number of datastores on the host.
+
+
+type: long
+
+--
+
 *`vsphere.host.disk.capacity.usage.bytes`*::
 +
 --
@@ -67085,6 +67105,16 @@ Network names.
 
 
 type: keyword
+
+--
+
+*`vsphere.host.network_count`*::
++
+--
+Number of networks on the host.
+
+
+type: long
 
 --
 
@@ -67248,6 +67278,26 @@ type: keyword
 +
 --
 The total uptime of a host in seconds within the vSphere environment.
+
+
+type: long
+
+--
+
+*`vsphere.host.vm.names`*::
++
+--
+Names of the virtual machines on the host.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.vm.count`*::
++
+--
+Number of virtual machines on the host.
 
 
 type: long
