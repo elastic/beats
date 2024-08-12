@@ -82,7 +82,7 @@ func (g *guessInetSockIPv4) Probes() ([]helper.ProbeDef, error) {
 				Type:      tracing.TypeKRetProbe,
 				Name:      "inet_sock_guess",
 				Address:   "inet_csk_accept",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, 2048),
+				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, 1024),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},

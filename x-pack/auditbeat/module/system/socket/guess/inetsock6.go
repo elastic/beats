@@ -100,7 +100,7 @@ import (
 	INET_SOCK_V6_LADDR_B: +80
 */
 
-const inetSockDumpSize = 8 * 256
+const inetSockDumpSize = 4 * 256
 
 func init() {
 	if err := Registry.AddGuess(func() Guesser { return &guessInetSockIPv6{} }); err != nil {
