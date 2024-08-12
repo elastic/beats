@@ -63,7 +63,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
-- Add metrics for the vSphere Virtualmachine metricset. {pull}1234[1234]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 
 *Osquerybeat*
 

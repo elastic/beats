@@ -215,14 +215,12 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	var outputNetworkNames []string
-
 	pc := property.DefaultCollector(c)
 
 	var vm mo.VirtualMachine
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &vm)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err)
+		return nil, fmt.Errorf("error retrieving virtual machine information: %w", err)
 	}
 
 	if len(vm.Network) == 0 {
@@ -244,9 +242,9 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var nets []mo.Network
 	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err)
+		return nil, fmt.Errorf("error retrieving network from virtual machine: %w", err)
 	}
-
+	outputNetworkNames := make([]string, 0, len(nets))
 	for _, net := range nets {
 		name := strings.Replace(net.Name, ".", "_", -1)
 		outputNetworkNames = append(outputNetworkNames, name)
@@ -281,7 +279,7 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
+		return nil, fmt.Errorf("error retrieving host information: %w", err)
 	}
 	return &hs, nil
 }
