@@ -7,15 +7,15 @@
     - name: cpu.used.mhz
       type: long
       description: >
-        Used CPU in Mhz
+        Used CPU in Mhz.
     - name: cpu.total.mhz
       type: long
       description: >
-        Total CPU in Mhz
+        Total CPU in Mhz.
     - name: cpu.free.mhz
       type: long
       description: >
-        Free CPU in Mhz
+        Free CPU in Mhz.
     - name: disk.capacity.usage.bytes
       type: long
       description: >
@@ -46,26 +46,26 @@
     - name: memory.free.bytes
       type: long
       description: >
-        Free Memory in bytes
+        Free Memory in bytes.
       format: bytes
     - name: memory.total.bytes
       type: long
       description: >
-        Total Memory in bytes
+        Total Memory in bytes.
       format: bytes
     - name: memory.used.bytes
       type: long
       description: >
-        Used Memory in bytes
+        Used Memory in bytes.
       format: bytes
     - name: name
       type: keyword
       description: >
-        Host name
+        Host name.
     - name: network_names
       type: keyword
       description: >
-        Network names
+        Network names.
     - name: network.bandwidth.transmitted.bytes
       type: long
       description: >

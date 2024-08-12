@@ -66939,7 +66939,7 @@ host
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in Mhz.
 
 
 type: long
@@ -66949,7 +66949,7 @@ type: long
 *`vsphere.host.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in Mhz.
 
 
 type: long
@@ -66959,7 +66959,7 @@ type: long
 *`vsphere.host.cpu.free.mhz`*::
 +
 --
-Free CPU in Mhz
+Free CPU in Mhz.
 
 
 type: long
@@ -67011,7 +67011,7 @@ format: bytes
 *`vsphere.host.disk.write.bytes`*::
 +
 --
-Average number of kilobytes written to the disk each second.
+Average number of bytes written to the disk each second.
 
 
 type: long
@@ -67035,7 +67035,7 @@ format: bytes
 *`vsphere.host.memory.free.bytes`*::
 +
 --
-Free Memory in bytes
+Free Memory in bytes.
 
 
 type: long
@@ -67047,7 +67047,7 @@ format: bytes
 *`vsphere.host.memory.total.bytes`*::
 +
 --
-Total Memory in bytes
+Total Memory in bytes.
 
 
 type: long
@@ -67059,7 +67059,7 @@ format: bytes
 *`vsphere.host.memory.used.bytes`*::
 +
 --
-Used Memory in bytes
+Used Memory in bytes.
 
 
 type: long
@@ -67071,7 +67071,7 @@ format: bytes
 *`vsphere.host.name`*::
 +
 --
-Host name
+Host name.
 
 
 type: keyword
@@ -67081,7 +67081,7 @@ type: keyword
 *`vsphere.host.network_names`*::
 +
 --
-Network names
+Network names.
 
 
 type: keyword
