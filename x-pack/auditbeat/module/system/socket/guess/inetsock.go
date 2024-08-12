@@ -149,10 +149,10 @@ func (g *guessInetSockIPv4) Extract(ev interface{}) (mapstr.M, bool) {
 	raddr := g.remote.Addr[:]
 	rport := make([]byte, 2)
 	binary.BigEndian.PutUint16(rport, uint16(g.remote.Port))
-	var laddrHits []int
-	var lportHits []int
-	var raddrHits []int
-	var rportHits []int
+	laddrHits := make([]int, 0)
+	lportHits := make([]int, 0)
+	raddrHits := make([]int, 0)
+	rportHits := make([]int, 0)
 
 	off := indexAligned(data, laddr, 0, 4)
 	for off != -1 {
