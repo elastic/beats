@@ -169,6 +169,13 @@ func SetInstall(path string) {
 	installPath = path
 }
 
+// TopBinaryPath returns the path to the Elastic Agent binary that is inside the Top directory.
+//
+// This always points to the symlink that points to the latest Elastic Agent version.
+func TopBinaryPath() string {
+	return filepath.Join(Top(), BinaryName)
+}
+
 // initialTop returns the initial top-level path for the binary
 //
 // When nested in top-level/data/elastic-agent-${hash}/ the result is top-level/.

@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -114,10 +113,8 @@ func (p *darwinPidProvider) piderFromCmd(ctx context.Context, name string, args 
 	}
 }
 
-func invokeCmd(topPath string) *exec.Cmd {
-	homeExePath := filepath.Join(topPath, agentName)
-
-	cmd := exec.Command(homeExePath, watcherSubcommand,
+func invokeCmd() *exec.Cmd {
+	cmd := exec.Command(paths.TopBinaryPath(), watcherSubcommand,
 		"--path.config", paths.Config(),
 		"--path.home", paths.Top(),
 	)
