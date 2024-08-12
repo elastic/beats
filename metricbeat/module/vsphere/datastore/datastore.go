@@ -20,12 +20,14 @@ package datastore
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/performance"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
@@ -148,6 +150,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		MaxSample:  1,
 		IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
 	}
+
+	pc := property.DefaultCollector(c)
 	for _, ds := range dst {
 		spec.Entity = ds.Reference()
 
@@ -176,8 +180,56 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			m.Logger().Debug("No samples returned from performance manager")
 		}
 
+		outputVmNames := []string{}
+		if len(ds.Vm) > 0 {
+			VmRefs := []types.ManagedObjectReference{}
+			for _, obj := range ds.Vm {
+				if obj.Type == "VirtualMachine" {
+					VmRefs = append(VmRefs, obj)
+				}
+			}
+
+			// Retrieve VM names
+			var vms []mo.VirtualMachine
+			if len(VmRefs) > 0 {
+				err := pc.Retrieve(ctx, VmRefs, []string{"name"}, &vms)
+				if err != nil {
+					m.Logger().Debug("Error retrieving VMs: %v", err)
+				}
+			}
+
+			for _, vm := range vms {
+				name := strings.Replace(vm.Name, ".", "_", -1)
+				outputVmNames = append(outputVmNames, name)
+			}
+		}
+
+		outputHsNames := []string{}
+		if len(ds.Host) > 0 {
+			hsRefs := []types.ManagedObjectReference{}
+			for _, obj := range ds.Host {
+				if obj.Key.Type == "HostSystem" {
+					hsRefs = append(hsRefs, obj.Key)
+				}
+			}
+
+			// Retrieve Host names
+			var hosts []mo.HostSystem
+			if len(hsRefs) > 0 {
+				err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
+				if err != nil {
+					m.Logger().Debug("Error retrieving VMs: %v", err)
+				}
+			}
+
+			for _, host := range hosts {
+				name := strings.Replace(host.Name, ".", "_", -1)
+				outputHsNames = append(outputHsNames, name)
+			}
+		}
+
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(ds, &metricsVar),
+			MetricSetFields: m.eventMapping(ds, &metricsVar, outputVmNames, outputHsNames),
 		})
 	}
 

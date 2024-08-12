@@ -32,6 +32,10 @@
       type: long
       description: >
         Number of hosts.
+    - name: host.names
+      type: keyword
+      description: >
+        list of all the host names.
     - name: iops
       type: long
       description: >
@@ -57,6 +61,10 @@
       type: long
       description: >
         Number of VMs.
+    - name: vm.names
+      type: keyword
+      description: >
+        list of all the VM names.
     - name: write.bytes
       type: long
       description: >

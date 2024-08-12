@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetrics) mapstr.M {
+func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetrics, outputVmNames, outputHsNames []string) mapstr.M {
 	usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
 	event := mapstr.M{
@@ -66,12 +66,14 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetric
 		event.Put("capacity.used.pct", usedSpacePercent)
 	}
 
-	if len(ds.Host) > 0 {
-		event.Put("host.names", ds.Host)
+	event.Put("host.count", len(outputHsNames))
+	if len(outputHsNames) > 0 {
+		event.Put("host.names", outputHsNames)
 	}
 
-	if len(ds.Vm) > 0 {
-		event.Put("vm.names", ds.Vm)
+	event.Put("vm.count", len(outputVmNames))
+	if len(outputVmNames) > 0 {
+		event.Put("vm.names", outputVmNames)
 	}
 
 	return event
