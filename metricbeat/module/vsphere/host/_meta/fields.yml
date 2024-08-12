@@ -16,6 +16,14 @@
       type: long
       description: >
         Free CPU in Mhz.
+    - name: datastore.names
+      type: keyword
+      description: >
+        Names of the datastores on the host.
+    - name: datastore.count
+      type: long
+      description: >
+        Number of datastores on the host.
     - name: disk.capacity.usage.bytes
       type: long
       description: >
@@ -66,6 +74,10 @@
       type: keyword
       description: >
         Network names.
+    - name: network_count
+      type: long
+      description: >
+        Number of networks on the host.
     - name: network.bandwidth.transmitted.bytes
       type: long
       description: >
@@ -133,3 +145,11 @@
       type: long
       description: >
         The total uptime of a host in seconds within the vSphere environment.
+    - name: vm.names
+      type: keyword
+      description: >
+        Names of the virtual machines on the host.
+    - name: vm.count
+      type: long
+      description: >
+        Number of virtual machines on the host.

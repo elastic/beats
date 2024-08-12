@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMetrics *PerformanceMetrics, networkNames []string) mapstr.M {
+func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMetrics *PerformanceMetrics, networkNames, datastoreNames, virtualmachine []string) mapstr.M {
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
 		"status": hs.Summary.OverallStatus,
@@ -76,8 +76,19 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMetrics *PerformanceMetri
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
+	if len(virtualmachine) > 0 {
+		event.Put("vm.names", virtualmachine)
+		event.Put("vm.count", len(virtualmachine))
+	}
+
+	if len(datastoreNames) > 0 {
+		event.Put("datastore.names", datastoreNames)
+		event.Put("datastore.count", len(datastoreNames))
+	}
+
 	if len(networkNames) > 0 {
 		event.Put("network_names", networkNames)
+		event.Put("network_count", len(networkNames))
 	}
 
 	return event

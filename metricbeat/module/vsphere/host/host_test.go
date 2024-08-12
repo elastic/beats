@@ -50,6 +50,17 @@ func TestFetchEventContents(t *testing.T) {
 
 	assert.EqualValues(t, "localhost.localdomain", event["name"])
 
+	vm := event["vm"].(mapstr.M)
+	assert.NotNil(t, vm["names"])
+	assert.GreaterOrEqual(t, vm["count"], 0)
+
+	dataStore := event["datastore"].(mapstr.M)
+	assert.NotNil(t, dataStore["names"])
+	assert.GreaterOrEqual(t, dataStore["count"], 0)
+
+	assert.NotNil(t, event["network_names"])
+	assert.GreaterOrEqual(t, event["network_count"], 0)
+
 	assert.NotNil(t, event["status"])
 
 	assert.GreaterOrEqual(t, event["uptime"], int32(0))

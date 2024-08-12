@@ -111,7 +111,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all hosts.
 	var hst []mo.HostSystem
-	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "network"}, &hst)
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "network", "name", "vm", "datastore"}, &hst)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -191,6 +191,48 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	pc := property.DefaultCollector(c)
 	for _, hs := range hst {
+		datastoreRefs := make([]types.ManagedObjectReference, 0, len(hs.Datastore))
+		for _, obj := range hs.Datastore {
+			if obj.Type == "Datastore" {
+				datastoreRefs = append(datastoreRefs, obj)
+			}
+		}
+
+		var datastores []mo.Datastore
+		if len(datastoreRefs) > 0 {
+			if err := pc.Retrieve(ctx, datastoreRefs, []string{"name"}, &datastores); err != nil {
+				m.Logger().Errorf("Failed to retrieve datastore from host: %v", err)
+				continue
+			}
+		}
+
+		outputDsNames := make([]string, 0, len(datastores))
+		for _, ds := range datastores {
+			name := strings.ReplaceAll(ds.Name, ".", "_")
+			outputDsNames = append(outputDsNames, name)
+		}
+
+		virtualMachineRefs := make([]types.ManagedObjectReference, 0, len(hs.Vm))
+		for _, obj := range hs.Vm {
+			if obj.Type == "VirtualMachine" {
+				virtualMachineRefs = append(virtualMachineRefs, obj)
+			}
+		}
+
+		var vms []mo.VirtualMachine
+		if len(virtualMachineRefs) > 0 {
+			if err := pc.Retrieve(ctx, virtualMachineRefs, []string{"name"}, &vms); err != nil {
+				m.Logger().Errorf("Failed to retrieve virtual machine from host: %v", err)
+				continue
+			}
+		}
+
+		outputVmNames := make([]string, 0, len(vms))
+		for _, vm := range vms {
+			name := strings.ReplaceAll(vm.Name, ".", "_")
+			outputVmNames = append(outputVmNames, name)
+		}
+
 		networkRefs := make([]types.ManagedObjectReference, 0, len(hs.Network))
 		for _, obj := range hs.Network {
 			if obj.Type == "Network" {
@@ -247,7 +289,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(hs, &metricsVar, outputNetworkNames),
+			MetricSetFields: m.eventMapping(hs, &metricsVar, outputNetworkNames, outputDsNames, outputVmNames),
 		})
 	}
 

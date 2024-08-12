@@ -66,7 +66,7 @@ func TestEventMapping(t *testing.T) {
 		DiskCapacityUsage:       80,
 	}
 
-	event := m.eventMapping(HostSystemTest, &PerformanceMetricsTest, []string{"network-1", "network-2"})
+	event := m.eventMapping(HostSystemTest, &PerformanceMetricsTest, []string{"network-1", "network-2"}, []string{"datastore-1", "datastore-2"}, []string{"vm-1", "vm-2"})
 
 	cpuUsed, _ := event.GetValue("cpu.used.mhz")
 	assert.EqualValues(t, 67, cpuUsed)
@@ -131,4 +131,10 @@ func TestEventMapping(t *testing.T) {
 
 	networkNames, _ := event.GetValue("network_names")
 	assert.EqualValues(t, []string{"network-1", "network-2"}, networkNames)
+
+	vmNames, _ := event.GetValue("vm.names")
+	assert.EqualValues(t, []string{"vm-1", "vm-2"}, vmNames)
+
+	datastoreNames, _ := event.GetValue("datastore.names")
+	assert.EqualValues(t, []string{"datastore-1", "datastore-2"}, datastoreNames)
 }
