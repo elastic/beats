@@ -149,7 +149,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Define reference of structure
 	var metricsVar PerformanceMetrics
 
-	// Map metric names to struture	fields
+	// Map metric names to structure fields
 	metricMap := map[string]*int64{
 		"disk.capacity.usage.average": &metricsVar.DiskCapacityUsage,
 		"disk.deviceLatency.average":  &metricsVar.DiskDeviceLatency,
@@ -170,16 +170,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		"net.droppedRx.summation":     &metricsVar.NetDroppedReceived,
 	}
 
-	var spec types.PerfQuerySpec
-	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
+	// Retrieve only the required metrics
+	requiredMetrics := make(map[string]*types.PerfCounterInfo)
 
-	for _, metricName := range metricNames {
-		metric, exists := metrics[metricName]
+	for _, name := range metricNames {
+		metric, exists := metrics[name]
 		if !exists {
-			m.Logger().Debug("Metric ", metricName, " not found")
+			m.Logger().Warnf("Metric %s not found", name)
 			continue
 		}
+		requiredMetrics[name] = metric
+	}
 
+	metricIDs := make([]types.PerfMetricId, 0, len(requiredMetrics))
+	for _, metric := range requiredMetrics {
 		metricIDs = append(metricIDs, types.PerfMetricId{
 			CounterId: metric.Key,
 		})
@@ -187,7 +191,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	pc := property.DefaultCollector(c)
 	for _, hs := range hst {
-		var networkRefs []types.ManagedObjectReference
+		networkRefs := make([]types.ManagedObjectReference, 0, len(hs.Network))
 		for _, obj := range hs.Network {
 			if obj.Type == "Network" {
 				networkRefs = append(networkRefs, obj)
@@ -196,19 +200,19 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 		var nets []mo.Network
 		if len(networkRefs) > 0 {
-			err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
-			if err != nil {
-				m.Logger().Errorf("error retrieving network from host: %v", err)
+			if err := pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets); err != nil {
+				m.Logger().Errorf("Failed to retrieve network from host: %v", err)
+				continue
 			}
 		}
 
-		var outputNetworkNames []string
+		outputNetworkNames := make([]string, 0, len(nets))
 		for _, net := range nets {
-			name := strings.Replace(net.Name, ".", "_", -1)
+			name := strings.ReplaceAll(net.Name, ".", "_")
 			outputNetworkNames = append(outputNetworkNames, name)
 		}
 
-		spec = types.PerfQuerySpec{
+		spec := types.PerfQuerySpec{
 			Entity:     hs.Reference(),
 			MetricId:   metricIDs,
 			MaxSample:  1,
@@ -218,27 +222,28 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 		if err != nil {
-			m.Logger().Debug("Failed to query performance data: %v", err)
+			m.Logger().Errorf("Failed to query performance data: %v", err)
 			continue
 		}
 
-		if len(samples) > 0 {
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debug("Failed to query performance data: %v", err)
-			}
-
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					if assignValue, exists := metricMap[result.Name]; exists {
-						*assignValue = result.Value[0] // Assign the metric value to the variable
-					}
-				} else {
-					m.Logger().Debug("Metric ", result.Name, ": No result found")
-				}
-			}
-		} else {
+		if len(samples) == 0 {
 			m.Logger().Debug("No samples returned from performance manager")
+			continue
+		}
+
+		results, err := perfManager.ToMetricSeries(ctx, samples)
+		if err != nil {
+			m.Logger().Errorf("Failed to convert performance data: %v", err)
+		}
+
+		for _, result := range results[0].Value {
+			if len(result.Value) > 0 {
+				if assignValue, exists := metricMap[result.Name]; exists {
+					*assignValue = result.Value[0] // Assign the metric value to the variable
+				}
+			} else {
+				m.Logger().Debug("Metric ", result.Name, ": No result found")
+			}
 		}
 
 		reporter.Event(mb.Event{

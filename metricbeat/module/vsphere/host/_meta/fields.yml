@@ -124,7 +124,7 @@
     - name: network.packets.dropped.total.count
       type: long
       description: >
-        Total number of packets dropped.   
+        Total number of packets dropped.
     - name: status
       type: keyword
       description: >

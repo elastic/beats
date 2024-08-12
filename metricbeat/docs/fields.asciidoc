@@ -67227,7 +67227,7 @@ type: long
 *`vsphere.host.network.packets.dropped.total.count`*::
 +
 --
-Total number of packets dropped.   
+Total number of packets dropped.
 
 
 type: long
