@@ -8,10 +8,11 @@ package azureeventhub
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest/azure"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -21,6 +22,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -34,6 +36,7 @@ type eventHubInputV1 struct {
 	metrics        *inputMetrics
 	processor      *eph.EventProcessorHost
 	pipelineClient beat.Client
+	messageDecoder messageDecoder
 }
 
 // newEventHubInputV1 creates a new instance of the Azure Event Hub input V1.
@@ -75,6 +78,12 @@ func (in *eventHubInputV1) Run(
 	// Setup input metrics
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
+
+	in.messageDecoder = messageDecoder{
+		config:  in.config,
+		log:     in.log,
+		metrics: in.metrics,
+	}
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
@@ -223,7 +232,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	processingStartTime := time.Now()
 	eventHubMetadata := mapstr.M{
 		// The `partition_id` is not available in the
-		// current version of the SDK.
+		// legacy version of the SDK.
 		"eventhub":       in.config.EventHubName,
 		"consumer_group": in.config.ConsumerGroup,
 	}
@@ -232,7 +241,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	in.metrics.receivedMessages.Inc()
 	in.metrics.receivedBytes.Add(uint64(len(event.Data)))
 
-	records := in.unpackRecords(event.Data)
+	records := in.messageDecoder.Decode(event.Data)
 
 	for _, record := range records {
 		_, _ = eventHubMetadata.Put("offset", event.SystemProperties.Offset)
@@ -262,88 +271,31 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 }
 
-// unpackRecords will try to split the message into multiple ones based on
-// the group field provided by the configuration.
-//
-// `unpackRecords()` supports two types of messages:
-//
-//  1. A message with an object with a `records`
-//     field containing a list of events.
-//  2. A message with a single event.
-//
-// (1) Here is an example of a message containing an object with
-// a `records` field:
-//
-//	{
-//	  "records": [
-//	    {
-//	      "time": "2019-12-17T13:43:44.4946995Z",
-//	      "test": "this is some message"
-//	    }
-//	  ]
-//	}
-//
-// (2) Here is an example of a message with a single event:
-//
-//	{
-//	  "time": "2019-12-17T13:43:44.4946995Z",
-//	  "test": "this is some message"
-//	}
-//
-// The Diagnostic Settings uses the single object with `records`
-// fields (1) when exporting data from an Azure service to an
-// event hub. This is the most common case.
-func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
-	var mapObject map[string][]interface{}
-	var messages []string
+func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
+	return pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: acker.LastEventPrivateReporter(func(acked int, data interface{}) {
+			// fmt.Println(acked, data)
+		}),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: to.Ptr(false),
+		},
+	})
+}
 
-	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
-	// Sanitization occurs if options are available and the message contains an invalid JSON.
-	//
-	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-	if len(in.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
-		bMessage = sanitize(bMessage, in.config.SanitizeOptions...)
-		in.metrics.sanitizedMessages.Inc()
+// Strip connection string to remove sensitive information
+// A connection string should look like this:
+// Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=
+// This code will remove everything after ';' so key information is stripped
+func stripConnectionString(c string) string {
+	if parts := strings.SplitN(c, ";", 2); len(parts) == 2 {
+		return parts[0]
 	}
 
-	// check if the message is a "records" object containing a list of events
-	err := json.Unmarshal(bMessage, &mapObject)
-	if err == nil {
-		if len(mapObject[expandEventListFromField]) > 0 {
-			for _, ms := range mapObject[expandEventListFromField] {
-				js, err := json.Marshal(ms)
-				if err == nil {
-					messages = append(messages, string(js))
-					in.metrics.receivedEvents.Inc()
-				} else {
-					in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-				}
-			}
-		}
-	} else {
-		in.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []interface{}
-		err = json.Unmarshal(bMessage, &arrayObject)
-		if err != nil {
-			// return entire message
-			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			in.metrics.decodeErrors.Inc()
-			return []string{string(bMessage)}
-		}
-
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-				in.metrics.receivedEvents.Inc()
-			} else {
-				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-		}
-	}
-
-	return messages
+	// We actually expect the string to have the documented format
+	// if we reach here something is wrong, so let's stay on the safe side
+	return "(redacted)"
 }
 
 func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
