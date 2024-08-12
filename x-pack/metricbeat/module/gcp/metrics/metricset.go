@@ -104,14 +104,14 @@ type config struct {
 	Region              string   `config:"region"`
 	Regions             []string `config:"regions"`
 	ProjectID           string   `config:"project_id" validate:"required"`
-	OrganizationID      string   `config:"organization_id"`
-	OrganizationName    string   `config:"organization_name"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 	CredentialsJSON     string   `config:"credentials_json"`
 
-	opt    []option.ClientOption
-	period *durationpb.Duration
+	opt              []option.ClientOption
+	period           *durationpb.Duration
+	organizationID   string
+	organizationName string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -153,12 +153,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
 		}
 	}
-	// set organization id
-	if err := m.setOrganization(); err != nil {
-		m.Logger().Warnf("organization details has not been set: %s", err)
-	}
+
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
+	// set organization id
+	if err := m.setOrganization(ctx); err != nil {
+		m.Logger().Warnf("organization details has not been set: %s", err)
+	}
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
@@ -360,9 +361,8 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 	return hostRootFields
 }
 
-func (m *MetricSet) setOrganization() error {
-	// get project details
-	ctx := context.Background()
+func (m *MetricSet) setOrganization(ctx context.Context) error {
+
 	// Initialize the Cloud Resource Manager service
 	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
 	if err != nil {
@@ -377,15 +377,15 @@ func (m *MetricSet) setOrganization() error {
 
 	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
 	if ancestor.ResourceId.Type == "organization" {
-		m.config.OrganizationID = ancestor.ResourceId.Id
-		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.OrganizationID))
+		m.config.organizationID = ancestor.ResourceId.Id
+		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
 
 		orgDetails, err := orgReq.Do()
 		if err != nil {
 			return fmt.Errorf("failed to get organization details: %w", err)
 		}
 		if orgDetails.DisplayName != "" {
-			m.config.OrganizationName = orgDetails.DisplayName
+			m.config.organizationName = orgDetails.DisplayName
 		}
 	}
 

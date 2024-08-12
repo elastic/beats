@@ -116,7 +116,7 @@ func (m *MetricSet) groupTimeSeries(ctx context.Context, timeSeries []timeSeries
 		aligner := tsa.aligner
 		for _, ts := range tsa.timeSeries {
 			if defaultMetadataService == nil {
-				metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(ts, m.config.OrganizationID, m.config.OrganizationName)
+				metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(ts, m.config.organizationID, m.config.organizationName)
 			}
 			sdCollectorInputData := gcp.NewStackdriverCollectorInputData(ts, m.config.ProjectID, m.config.Zone, m.config.Region, m.config.Regions)
 			keyValues := mapper.mapTimeSeriesToKeyValuesPoints(ts, aligner)
