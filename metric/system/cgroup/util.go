@@ -477,7 +477,7 @@ func (r *Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 				logp.L().Debugf("cgroup for process %d contains a relative cgroup path (%s), but we were not able to find a root cgroup. Cgroup monitoring for this PID may be incomplete",
 					pid, path)
 			} else {
-				logp.L().Infof("using root mount %s and path %s", r.cgroupMountpoints.ContainerizedRootMount, path)
+				logp.L().Debugf("using root mount %s and path %s", r.cgroupMountpoints.ContainerizedRootMount, path)
 				path = filepath.Join(r.cgroupMountpoints.ContainerizedRootMount, path)
 			}
 		}
