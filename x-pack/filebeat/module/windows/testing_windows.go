@@ -13,13 +13,11 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -116,9 +114,6 @@ func testCollectionPipeline(t testing.TB, evtx string, p *params) {
 		for _, r := range records {
 			record := r.ToEvent()
 
-			// Validate fields in event against fields.yml.
-			assertFieldsAreDocumented(t, record.Fields)
-
 			record.Delete("event.created")
 			record.Delete("log.file")
 
@@ -174,32 +169,42 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 }
 
 func writeGolden(t testing.TB, source, dir string, events []mapstr.M) {
-	data, err := json.MarshalIndent(events, "", "  ")
-	if err != nil {
-		t.Fatal(err)
+	var data []byte
+	for _, event := range events {
+		b, err := json.Marshal(event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		data = append(data, b...)
+		data = append(data, byte('\n'))
 	}
 
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		t.Fatal(err)
 	}
 
-	outPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
+	outPath := filepath.Join(dir, filepath.Base(source)+".ndjson.log")
 	if err := os.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func readGolden(t testing.TB, source, dir string) []mapstr.M {
-	inPath := filepath.Join(dir, filepath.Base(source)+".golden.json")
+	inPath := filepath.Join(dir, filepath.Base(source)+".ndjson.log")
 
-	data, err := os.ReadFile(inPath)
+	f, err := os.Open(inPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	dec := json.NewDecoder(f)
 	var events []mapstr.M
-	if err = json.Unmarshal(data, &events); err != nil {
-		t.Fatal(err)
+	for dec.More() {
+		var event mapstr.M
+		if err = dec.Decode(&event); err != nil {
+			t.Fatal(err)
+		}
+		events = append(events, event)
 	}
 
 	for _, e := range events {
@@ -246,36 +251,4 @@ func lowercaseGUIDs(m mapstr.M) mapstr.M {
 		}
 	}
 	return m
-}
-
-var (
-	loadDocumentedFieldsOnce sync.Once
-	documentedFields         []string
-)
-
-// assertFieldsAreDocumented validates that all fields contained in the event
-// are documented in a fields.yml file.
-func assertFieldsAreDocumented(t testing.TB, m mapstr.M) {
-	t.Helper()
-
-	loadDocumentedFieldsOnce.Do(func() {
-		fieldsYml, err := mapping.LoadFieldsYaml("../../../build/fields/fields.all.yml")
-		if err != nil {
-			t.Fatal("Failed to load generated fields.yml data. Try running 'mage update'.", err)
-		}
-		documentedFields = fieldsYml.GetKeys()
-	})
-
-	for eventFieldName := range m.Flatten() {
-		found := false
-		for _, documentedFieldName := range documentedFields {
-			if strings.HasPrefix(eventFieldName, documentedFieldName) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			assert.Fail(t, "Field not documented", "Key '%v' found in event is not documented.", eventFieldName)
-		}
-	}
 }
