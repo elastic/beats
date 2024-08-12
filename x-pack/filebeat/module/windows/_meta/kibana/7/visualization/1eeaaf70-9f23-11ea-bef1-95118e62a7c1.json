@@ -1,0 +1,93 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" "
+                }
+            }
+        },
+        "title": "Engine versions [Winlogbeat powershell]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Engine version",
+                        "field": "powershell.engine.version",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addTooltip": true,
+                "dimensions": {
+                    "metric": {
+                        "accessor": 0,
+                        "aggType": "count",
+                        "format": {
+                            "id": "number"
+                        },
+                        "label": "Count",
+                        "params": {}
+                    }
+                },
+                "distinctColors": true,
+                "isDonut": false,
+                "labels": {
+                    "last_level": false,
+                    "show": false,
+                    "truncate": 100,
+                    "values": false
+                },
+                "legendDisplay": "show",
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "Engine versions [Winlogbeat powershell]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:10.446Z",
+    "id": "1eeaaf70-9f23-11ea-bef1-95118e62a7c1",
+    "managed": false,
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:10.446Z",
+    "version": "WzMwMSwxXQ=="
+}

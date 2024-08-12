@@ -1976,6 +1976,18 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#------------------------------- Windows Module -------------------------------
+- module: windows
+  powershell:
+    enabled: false
+    var.event_logs:
+      - id: windows-module-powershell
+        name: Windows PowerShell
+        event_id: 400, 403, 600, 800
+      - id: windows-module-powershell-operational
+        name: Microsoft-Windows-PowerShell/Operational
+        event_id: 4103, 4104, 4105, 4106
+
 #--------------------------------- Zeek Module ---------------------------------
 - module: zeek
   capture_loss:

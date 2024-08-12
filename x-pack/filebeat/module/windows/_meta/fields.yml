@@ -1,0 +1,4 @@
+- key: windows
+  title: windows
+  description: >
+    Module for Windows Events
