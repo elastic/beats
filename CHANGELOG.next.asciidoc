@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.5. {pull}40082[40082]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Elevate effective capability set to match the Permitted set for agentbeat {pull}40466[40466]
 - Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
 
 *Auditbeat*
@@ -38,9 +39,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Implement Elastic Agent status and health reporting for Winlog Filebeat input. {pull}40163[40163]
 - Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
 - Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Added support for hyphens in extension keys in `decode_cef` Filebeat processor. {pull}40427[40427]
 - Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
 - Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+
 
 *Heartbeat*
 
