@@ -61,3 +61,17 @@
       type: keyword
       description: >
         Network names
+    - name: status
+      type: keyword
+      description: >
+        Overall health and status of a virtual machine
+    - name: uptime
+      type: long
+      description: >
+        The uptime of the VM in seconds
+    - name: datastore.names
+      type: keyword
+      description: >
+        Datastore names associated with the virtual machine
+
+

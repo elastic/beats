@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2024-08-12T04:51:25.851Z",
     "event": {
         "dataset": "vsphere.virtualmachine",
         "duration": 115000,
@@ -15,35 +15,46 @@
     },
     "vsphere": {
         "virtualmachine": {
-            "cpu": {
-                "used": {
-                    "mhz": 0
-                }
+          "os": "otherGuest",
+          "memory": {
+            "used": {
+              "guest": {
+                "bytes": 0
+              },
+              "host": {
+                "bytes": 0
+              }
             },
-            "host.hostname": "localhost.localdomain",
-            "host.id": "ha-host",
-            "memory": {
-                "free": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
-                },
-                "total": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
-                },
-                "used": {
-                    "guest": {
-                        "bytes": 0
-                    },
-                    "host": {
-                        "bytes": 0
-                    }
-                }
+            "total": {
+              "guest": {
+                "bytes": 33554432
+              }
             },
-            "name": "ha-host_VM0",
-            "os": "otherGuest"
+            "free": {
+              "guest": {
+                "bytes": 33554432
+              }
+            }
+          },
+          "name": "DC0_C0_RP0_VM1",
+          "uptime": 0,
+          "status": "green",
+          "host.hostname": "DC0_C0_H2",
+          "cpu": {
+            "used": {
+              "mhz": 0
+            },
+            "total": {
+              "mhz": 0
+            },
+            "free": {
+              "mhz": 0
+            }
+          },
+          "datastore_names": [
+            "LocalDS_0"
+          ],
+          "host.id": "host-58"
         }
     }
 }

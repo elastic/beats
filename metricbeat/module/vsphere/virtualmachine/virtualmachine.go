@@ -49,6 +49,15 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+type VMData struct {
+	VM             mo.VirtualMachine
+	HostID         string
+	HostName       string
+	NetworkNames   []string
+	DatastoreNames []string
+	CustomFields   mapstr.M
+}
+
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := vsphere.NewMetricSet(base)
@@ -117,61 +126,22 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
+	pc := property.DefaultCollector(c)
 	for _, vm := range vmt {
-		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
-		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
-		event := mapstr.M{
-			"name": vm.Summary.Config.Name,
-			"os":   vm.Summary.Config.GuestFullName,
-			"cpu": mapstr.M{
-				"used": mapstr.M{
-					"mhz": usedCPU,
-				},
-			},
-			"memory": mapstr.M{
-				"used": mapstr.M{
-					"guest": mapstr.M{
-						"bytes": usedMemory,
-					},
-					"host": mapstr.M{
-						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
-					},
-				},
-			},
-		}
-
-		totalCPU := vm.Summary.Config.CpuReservation
-		if totalCPU > 0 {
-			freeCPU := totalCPU - usedCPU
-			// Avoid negative values if reported used CPU is slightly over total configured.
-			if freeCPU < 0 {
-				freeCPU = 0
-			}
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", freeCPU)
-		}
-
-		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
-		if totalMemory > 0 {
-			freeMemory := totalMemory - usedMemory
-			// Avoid negative values if reported used memory is slightly over total configured.
-			if freeMemory < 0 {
-				freeMemory = 0
-			}
-			event.Put("memory.total.guest.bytes", totalMemory)
-			event.Put("memory.free.guest.bytes", freeMemory)
-		}
+		var hostID, hostName string
+		var networkNames, datastoreNames []string
+		var customFields mapstr.M
 
 		if host := vm.Summary.Runtime.Host; host != nil {
-			event["host.id"] = host.Value
+			hostID = host.Value
 			hostSystem, err := getHostSystem(ctx, c, host.Reference())
 			if err == nil {
-				event["host.hostname"] = hostSystem.Summary.Config.Name
+				hostName = hostSystem.Summary.Config.Name
 			} else {
 				m.Logger().Debug(err.Error())
 			}
@@ -183,30 +153,43 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 		// Get custom fields (attributes) values if get_custom_fields is true.
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
-			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
-
-			if len(customFields) > 0 {
-				event["custom_fields"] = customFields
-			}
-		} else {
+			customFields = getCustomFields(vm.Summary.CustomValue, customFieldsMap)
+		}
+		if len(customFields) <= 0 {
 			m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
 				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
 				"information returned from host/guest")
 		}
 
 		if vm.Summary.Vm != nil {
-			networkNames, err := getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
+			networkNames, err = getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
 			if err != nil {
 				m.Logger().Debug(err.Error())
-			} else {
-				if len(networkNames) > 0 {
-					event["network_names"] = networkNames
-				}
 			}
 		}
 
+		// Retrieve the datastore names associated with the Virtualmachine
+		for _, datastoreRef := range vm.Datastore {
+			var ds mo.Datastore
+			err = pc.RetrieveOne(ctx, datastoreRef, []string{"name"}, &ds)
+			if err == nil {
+				datastoreNames = append(datastoreNames, ds.Name)
+			} else {
+				m.Logger().Debug(fmt.Sprintf("error retrieving datastore name for VM %s: %v", vm.Summary.Config.Name, err))
+			}
+		}
+
+		data := VMData{
+			VM:             vm,
+			HostID:         hostID,
+			HostName:       hostName,
+			NetworkNames:   networkNames,
+			DatastoreNames: datastoreNames,
+			CustomFields:   customFields,
+		}
+
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: m.eventMapping(data),
 		})
 	}
 

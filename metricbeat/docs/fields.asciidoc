@@ -67167,6 +67167,36 @@ type: keyword
 
 --
 
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Datastore names associated with the virtual machine
+
+
+type: keyword
+
+--
+
 [[exported-fields-windows]]
 == Windows fields
 
