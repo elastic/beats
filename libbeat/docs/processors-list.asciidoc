@@ -38,6 +38,9 @@ endif::[]
 ifndef::no_add_process_metadata_processor[]
 * <<add-process-metadata,`add_process_metadata`>>
 endif::[]
+ifndef::no_add_session_metadata_processor[]
+* <<add-session-metadata,`add_session_metadata`>>
+endif::[]
 ifndef::no_add_tags_processor[]
 * <<add-tags, `add_tags`>>
 endif::[]
@@ -179,6 +182,9 @@ include::{libbeat-processors-dir}/add_observer_metadata/docs/add_observer_metada
 endif::[]
 ifndef::no_add_process_metadata_processor[]
 include::{libbeat-processors-dir}/add_process_metadata/docs/add_process_metadata.asciidoc[]
+endif::[]
+ifndef::no_add_session_metadata_processor[]
+include::{x-auditbeat-processors-dir}/sessionmd/docs/add_session_metadata.asciidoc[]
 endif::[]
 ifndef::no_add_tags_processor[]
 include::{libbeat-processors-dir}/actions/docs/add_tags.asciidoc[]
