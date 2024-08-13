@@ -85,7 +85,9 @@ func TestEventsLoggerESOutput(t *testing.T) {
 	_, _ = logFile.WriteString(`
 {"message":"foo bar","int":10,"string":"str"}
 {"message":"another message","int":20,"string":"str2"}
-{"message":"index failure","int":"not a number","string":10}
+{"message":"index failure 1","int":"not a number","string":10}
+{"message":"index failure 2","int":"not a number","string":10}
+{"message":"index failure 3","int":"not a number","string":10}
 {"message":"second index failure","int":"not a number","string":10}
 `)
 	if err := logFile.Sync(); err != nil {
@@ -99,7 +101,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 
 	// Wait for a log entry that indicates an entry in the events
 	// logger file.
-	msg := "Failed to index 1 events in last 10s: events were dropped"
+	msg := "Failed to index 3 events in last"
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains(msg)
 	}, time.Minute, 100*time.Millisecond,
