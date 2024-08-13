@@ -99,7 +99,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 
 	// Wait for a log entry that indicates an entry in the events
 	// logger file.
-	msg := "Cannot index event (status=400)"
+	msg := "Failed to index 1 events in last 10s: events were dropped"
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains(msg)
 	}, time.Minute, 100*time.Millisecond,

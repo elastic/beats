@@ -59,10 +59,10 @@ type Client struct {
 	// forwarded to this index. Otherwise, they will be dropped.
 	deadLetterIndex string
 
-	log                     *logp.Logger
-	rlLogIndex              *periodic.Doer
-	rlLogIndexTryDeadLetter *periodic.Doer
-	rlLogDeadLetter         *periodic.Doer
+	log                    *logp.Logger
+	pLogIndex              *periodic.Doer
+	pLogIndexTryDeadLetter *periodic.Doer
+	pLogDeadLetter         *periodic.Doer
 }
 
 // clientSettings contains the settings for a client.
@@ -192,10 +192,10 @@ func NewClient(
 		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
-		log:                     log,
-		rlLogDeadLetter:         pLogDeadLetter,
-		rlLogIndex:              pLogIndex,
-		rlLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
+		log:                    log,
+		pLogDeadLetter:         pLogDeadLetter,
+		pLogIndex:              pLogIndex,
+		pLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
 	}
 
 	return client, nil
@@ -506,14 +506,14 @@ func (client *Client) applyItemStatus(
 		if encodedEvent.deadLetter {
 			// Fatal error while sending an already-failed event to the dead letter
 			// index, drop.
-			client.rlLogDeadLetter.Add()
+			client.pLogDeadLetter.Add()
 			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
-			client.rlLogIndex.Add()
+			client.pLogIndex.Add()
 			client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
@@ -522,7 +522,7 @@ func (client *Client) applyItemStatus(
 		// We count this as a "retryable failure", and then if the dead letter
 		// ingestion succeeds it is counted in the "deadLetter" counter
 		// rather than the "acked" counter.
-		client.rlLogIndexTryDeadLetter.Add()
+		client.pLogIndexTryDeadLetter.Add()
 		client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
 	}
