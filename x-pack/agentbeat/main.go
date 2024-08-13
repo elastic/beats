@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -69,8 +70,12 @@ func prepareCommand(rootCmd *cmd.BeatsRootCmd) *cobra.Command {
 		// filename, as all the beats set this in the initialization.
 		err := cfgfile.ChangeDefaultCfgfileFlag(rootCmd.Use)
 		if err != nil {
-			panic(fmt.Errorf("failed to set default config file path: %v", err))
+			panic(fmt.Errorf("failed to set default config file path: %w", err))
 		}
+
+		// elevate Effective capabilities to match the Permitted set.
+		// required for unprivileged mode
+		initCapabilities()
 		return nil
 	}
 	return &rootCmd.Command
