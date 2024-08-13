@@ -560,8 +560,6 @@ github.com/elastic/elastic-agent-client/v7 v7.13.0 h1:ENCfV5XIMmjWo9/0J7t//5N7xg
 github.com/elastic/elastic-agent-client/v7 v7.13.0/go.mod h1:h2yJHN8Q5rhfi9i6FfyPufh+StFN+UD9PYGv8blXKbE=
 github.com/elastic/elastic-agent-libs v0.9.13 h1:D1rh1s67zlkDWmixWQaNWzn+qy6DafIDPTQnLpBNBUA=
 github.com/elastic/elastic-agent-libs v0.9.13/go.mod h1:G9ljFvDE+muOOOQBf2eRituF0fE4suGkv25rfjTwY+c=
-github.com/elastic/elastic-agent-system-metrics v0.10.5 h1:a0bDdSOE6jfBIFqTuHJ8uOPXKcWOZJ5GJRkCUZbn0JA=
-github.com/elastic/elastic-agent-system-metrics v0.10.5/go.mod h1:cd7YgcTEjBNeLGnH/C9cEvP/YexohwS6CpmN9Ju58Mw=
 github.com/elastic/elastic-agent-system-metrics v0.11.1 h1:BxViQHnqxvvi/65rj3mGwG6Eto6ldFCTnuDTUJnakaU=
 github.com/elastic/elastic-agent-system-metrics v0.11.1/go.mod h1:3QiMu9wTKJFvpCN+5klgGqasTMNKJbgY3xcoN1KQXJk=
 github.com/elastic/elastic-transport-go/v8 v8.6.0 h1:Y2S/FBjx1LlCv5m6pWAF2kDJAHoSjSRSJCApolgfthA=
@@ -590,8 +588,6 @@ github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff h1:VjmGr45YsntTPgT
 github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff/go.mod h1:sw1pzz4pIqzDQxFWt3dFoG2uIUFAfThxlMfWpjH590E=
 github.com/elastic/go-structform v0.0.10 h1:oy08o/Ih2hHTkNcRY/1HhaYvIp5z6t8si8gnCJPDo1w=
 github.com/elastic/go-structform v0.0.10/go.mod h1:CZWf9aIRYY5SuKSmOhtXScE5uQiLZNqAFnwKR4OrIM4=
-github.com/elastic/go-sysinfo v1.14.0 h1:dQRtiqLycoOOla7IflZg3aN213vqJmP0lpVpKQ9lUEY=
-github.com/elastic/go-sysinfo v1.14.0/go.mod h1:FKUXnZWhnYI0ueO7jhsGV3uQJ5hiz8OqM5b3oGyaRr8=
 github.com/elastic/go-sysinfo v1.14.1 h1:BpY/Utfz75oKSpsQnbAJmmlnT3gBV9WFsopBEYgjhZY=
 github.com/elastic/go-sysinfo v1.14.1/go.mod h1:FKUXnZWhnYI0ueO7jhsGV3uQJ5hiz8OqM5b3oGyaRr8=
 github.com/elastic/go-ucfg v0.8.8 h1:54KIF/2zFKfl0MzsSOCGOsZ3O2bnjFQJ0nDJcLhviyk=
