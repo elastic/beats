@@ -3,15 +3,9 @@ module github.com/elastic/beats/v7
 go 1.22.5
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/bigquery v1.59.1
-	cloud.google.com/go/monitoring v1.18.0
-	cloud.google.com/go/pubsub v1.36.1
-=======
 	cloud.google.com/go/bigquery v1.62.0
 	cloud.google.com/go/monitoring v1.20.4
 	cloud.google.com/go/pubsub v1.41.0
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
@@ -60,17 +54,8 @@ require (
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
 	github.com/dgraph-io/badger/v3 v3.2103.1
-<<<<<<< HEAD
-	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
-	github.com/docker/docker v26.1.5+incompatible
-=======
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
-<<<<<<< HEAD
-	github.com/docker/docker v24.0.9+incompatible
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-=======
 	github.com/docker/docker v26.1.5+incompatible
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-plugins-helpers v0.0.0-20181025120712-1e6269c305b8
 	github.com/docker/go-units v0.5.0
@@ -154,37 +139,9 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-<<<<<<< HEAD
-	golang.org/x/crypto v0.24.0
-	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-	golang.org/x/mod v0.18.0
-	golang.org/x/net v0.26.0
-	golang.org/x/oauth2 v0.18.0
-=======
 	golang.org/x/crypto v0.25.0
 	golang.org/x/mod v0.19.0
 	golang.org/x/net v0.27.0
-<<<<<<< HEAD
-	golang.org/x/oauth2 v0.10.0
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.22.0
-	golang.org/x/text v0.16.0
-	golang.org/x/time v0.5.0
-<<<<<<< HEAD
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d
-	google.golang.org/api v0.169.0
-	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
-	google.golang.org/grpc v1.64.0
-	google.golang.org/protobuf v1.34.2
-=======
-	golang.org/x/tools v0.23.0
-	google.golang.org/api v0.128.0
-	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
-	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.33.0
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-=======
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.22.0
@@ -195,7 +152,6 @@ require (
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
 	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.34.2
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
@@ -211,28 +167,12 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-<<<<<<< HEAD
-	cloud.google.com/go v0.112.1
-	cloud.google.com/go/compute v1.25.1
-	cloud.google.com/go/redis v1.14.2
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.2
-=======
-	cloud.google.com/go v0.110.8
-	cloud.google.com/go/compute v1.23.0
-	cloud.google.com/go/redis v1.13.1
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.12.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-=======
 	cloud.google.com/go v0.115.0
 	cloud.google.com/go/compute v1.27.4
 	cloud.google.com/go/redis v1.16.4
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
@@ -252,15 +192,9 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
-<<<<<<< HEAD
 	github.com/elastic/elastic-agent-autodiscover v0.8.2
-	github.com/elastic/elastic-agent-libs v0.9.13
-	github.com/elastic/elastic-agent-system-metrics v0.10.3
-=======
-	github.com/elastic/elastic-agent-autodiscover v0.8.1
 	github.com/elastic/elastic-agent-libs v0.9.15
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
 	github.com/elastic/mito v1.15.0
@@ -270,11 +204,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/cel-go v0.19.0
-<<<<<<< HEAD
-	github.com/googleapis/gax-go/v2 v2.12.2
-=======
 	github.com/googleapis/gax-go/v2 v2.13.0
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
@@ -289,33 +219,17 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
-<<<<<<< HEAD
-<<<<<<< HEAD
-	golang.org/x/tools/go/vcs v0.1.0-deprecated
-	google.golang.org/genproto/googleapis/api v0.0.0-20240513163218-0867130af1f8
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-=======
-	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb
-=======
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
 )
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
-<<<<<<< HEAD
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v1.1.6 // indirect
-	cloud.google.com/go/longrunning v0.5.5 // indirect
-=======
 	cloud.google.com/go/auth v0.8.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.12 // indirect
 	cloud.google.com/go/longrunning v0.5.11 // indirect
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.3 // indirect
@@ -331,10 +245,7 @@ require (
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
-<<<<<<< HEAD
-=======
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/apache/thrift v0.19.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.60 // indirect
@@ -391,11 +302,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/licenseclassifier v0.0.0-20221004142553-c1ed8fcf4bab // indirect
-<<<<<<< HEAD
-	github.com/google/s2a-go v0.1.7 // indirect
-=======
 	github.com/google/s2a-go v0.1.8 // indirect
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/hashicorp/cronexpr v1.1.0 // indirect
@@ -443,18 +350,8 @@ require (
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-<<<<<<< HEAD
-<<<<<<< HEAD
-	github.com/prometheus/client_golang v1.14.0 // indirect
-	github.com/sanathkr/go-yaml v0.0.0-20170819195128-ed9d249f429b // indirect
-=======
-	github.com/prometheus/client_golang v1.11.1 // indirect
-	github.com/rootless-containers/rootlesskit v1.1.0 // indirect
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-=======
 	github.com/prometheus/client_golang v1.14.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
@@ -474,25 +371,10 @@ require (
 	go.opentelemetry.io/otel/metric v1.28.0 // indirect
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-<<<<<<< HEAD
-	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
-<<<<<<< HEAD
-	golang.org/x/term v0.21.0 // indirect
-	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240513163218-0867130af1f8 // indirect
-=======
-	golang.org/x/term v0.22.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect
->>>>>>> 499957e39e9c849c667a68baa1d924795b37d17e
-=======
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/term v0.22.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240730163845-b1a4ccb954bf // indirect
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
@@ -505,11 +387,7 @@ require (
 )
 
 require (
-<<<<<<< HEAD
-	cloud.google.com/go/storage v1.38.0
-=======
 	cloud.google.com/go/storage v1.43.0
->>>>>>> 08342bbf7b84a228d8763b911ed32a759504b874
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
