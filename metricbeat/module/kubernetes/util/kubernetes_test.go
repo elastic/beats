@@ -235,6 +235,7 @@ func TestCreateMetaGen(t *testing.T) {
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
+		KubeAdm:    true,
 		Node:       "test-node",
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
@@ -271,14 +272,20 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	nodeConfig, err := conf.NewConfigFrom(map[string]interface{}{
+		"enabled": true,
+	})
+	require.NoError(t, err)
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
+		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: true,
 			Namespace:  namespaceConfig,
+			Node:       nodeConfig,
 		},
 	}
 	client := k8sfake.NewSimpleClientset()
@@ -341,6 +348,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
+		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -425,6 +433,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
+		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -496,6 +505,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
+		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -639,6 +649,7 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
+		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
