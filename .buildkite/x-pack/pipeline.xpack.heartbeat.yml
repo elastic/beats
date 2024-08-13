@@ -157,7 +157,7 @@ steps:
   - group: "Extended Windows Tests"
     key: "x-pack-heartbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-    skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+#    skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
 
     steps:
       - label: ":windows: x-pack/heartbeat: Win 10 Unit Tests"
