@@ -191,6 +191,11 @@ The Active Directory Base Distinguished Name. Field is required.
 The client user name. Used for authentication. The user must have Active Directory read access. Field is required.
 
 [float]
+===== `ad_paging_size`
+
+The number of records to request from the Active Directory server for each page, if set.
+
+[float]
 ===== `ad_password`
 
 The client's password, used for authentication. Field is required.

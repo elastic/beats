@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.5. {pull}40082[40082]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Elevate effective capability set to match the Permitted set for agentbeat {pull}40466[40466]
 - Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
 
 *Auditbeat*
@@ -147,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
 - Fix bug in Okta entity analytics rate limit logic. {issue}40106[40106] {pull}40267[40267]
 - Fix crashes in the journald input. {pull}40061[40061]
+- Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
 
 *Heartbeat*
 
@@ -173,6 +175,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
+- Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 
 *Osquerybeat*
 
