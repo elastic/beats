@@ -57,34 +57,20 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 		"host.id":       data.HostID,
 		"host.hostname": data.HostName,
 		"cpu": mapstr.M{
-			"used": mapstr.M{
-				"mhz": usedCPU,
-			},
-			"total": mapstr.M{
-				"mhz": totalCPU,
-			},
-			"free": mapstr.M{
-				"mhz": freeCPU,
-			},
+			"used":  mapstr.M{"mhz": usedCPU},
+			"total": mapstr.M{"mhz": totalCPU},
+			"free":  mapstr.M{"mhz": freeCPU},
 		},
 		"memory": mapstr.M{
 			"used": mapstr.M{
-				"guest": mapstr.M{
-					"bytes": usedMemory,
-				},
-				"host": mapstr.M{
-					"bytes": int64(data.VM.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
-				},
+				"guest": mapstr.M{"bytes": usedMemory},
+				"host":  mapstr.M{"bytes": int64(data.VM.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024},
 			},
 			"total": mapstr.M{
-				"guest": mapstr.M{
-					"bytes": totalMemory,
-				},
+				"guest": mapstr.M{"bytes": totalMemory},
 			},
 			"free": mapstr.M{
-				"guest": mapstr.M{
-					"bytes": freeMemory,
-				},
+				"guest": mapstr.M{"bytes": freeMemory},
 			},
 		},
 	}
