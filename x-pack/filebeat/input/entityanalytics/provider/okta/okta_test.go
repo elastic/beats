@@ -27,6 +27,8 @@ import (
 var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
 
 func TestOktaDoFetch(t *testing.T) {
+	logp.TestingSetup()
+
 	tests := []struct {
 		dataset     string
 		wantUsers   bool
