@@ -84,11 +84,10 @@ func TestEventsLoggerESOutput(t *testing.T) {
 
 	_, _ = logFile.WriteString(`
 {"message":"foo bar","int":10,"string":"str"}
-{"message":"another message","int":20,"string":"str2"}
 {"message":"index failure 1","int":"not a number","string":10}
+{"message":"another message","int":20,"string":"str2"}
 {"message":"index failure 2","int":"not a number","string":10}
 {"message":"index failure 3","int":"not a number","string":10}
-{"message":"second index failure","int":"not a number","string":10}
 `)
 	if err := logFile.Sync(); err != nil {
 		t.Fatalf("could not sync log file '%s': %s", logFilePath, err)
