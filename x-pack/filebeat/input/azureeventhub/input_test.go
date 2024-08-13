@@ -64,7 +64,13 @@ func TestProcessEvents(t *testing.T) {
 		log:            log,
 		metrics:        metrics,
 		pipelineClient: &fakePipelineClient,
+		messageDecoder: messageDecoder{
+			config:  defaultTestConfig,
+			log:     log,
+			metrics: metrics,
+		},
 	}
+
 	var sn int64 = 12
 	now := time.Now()
 	var off int64 = 1234
@@ -93,58 +99,6 @@ func TestProcessEvents(t *testing.T) {
 	assert.Equal(t, message, single)
 }
 
-func TestParseMultipleRecords(t *testing.T) {
-	// records object
-	msg := "{\"records\":[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"
-	msgs := []string{
-		"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
-	}
-
-	reg := monitoring.NewRegistry()
-	metrics := newInputMetrics("test", reg)
-	defer metrics.Close()
-
-	fakePipelineClient := fakeClient{}
-
-	input := eventHubInputV1{
-		config:         azureInputConfig{},
-		log:            logp.NewLogger(fmt.Sprintf("%s test for input", inputName)),
-		metrics:        metrics,
-		pipelineClient: &fakePipelineClient,
-	}
-
-	messages := input.unpackRecords([]byte(msg))
-	assert.NotNil(t, messages)
-	assert.Equal(t, len(messages), 3)
-	for _, ms := range messages {
-		assert.Contains(t, msgs, ms)
-	}
-
-	// array of events
-	msg1 := "[{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is 2nd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +
-		"{\"test\":\"this is 3rd message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]"
-	messages = input.unpackRecords([]byte(msg1))
-	assert.NotNil(t, messages)
-	assert.Equal(t, len(messages), 3)
-	for _, ms := range messages {
-		assert.Contains(t, msgs, ms)
-	}
-
-	// one event only
-	msg2 := "{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"
-	messages = input.unpackRecords([]byte(msg2))
-	assert.NotNil(t, messages)
-	assert.Equal(t, len(messages), 1)
-	for _, ms := range messages {
-		assert.Contains(t, msgs, ms)
-	}
-}
-
 //func TestNewInputDone(t *testing.T) {
 //	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 //	config := mapstr.M{
@@ -155,30 +109,6 @@ func TestParseMultipleRecords(t *testing.T) {
 //	}
 //	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 //}
-
-func TestStripConnectionString(t *testing.T) {
-	tests := []struct {
-		connectionString, expected string
-	}{
-		{
-			"Endpoint=sb://something",
-			"(redacted)",
-		},
-		{
-			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
-			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
-		},
-		{
-			"Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=",
-			"Endpoint=sb://dummynamespace.servicebus.windows.net/",
-		},
-	}
-
-	for _, tt := range tests {
-		res := stripConnectionString(tt.connectionString)
-		assert.Equal(t, res, tt.expected)
-	}
-}
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type fakeClient struct {
