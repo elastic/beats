@@ -274,7 +274,7 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	// Queue metrics are reported under the pipeline namespace
 	var pipelineMetrics *monitoring.Registry
 	if c.monitors.Metrics != nil {
-		pipelineMetrics := c.monitors.Metrics.GetRegistry("pipeline")
+		pipelineMetrics = c.monitors.Metrics.GetRegistry("pipeline")
 		if pipelineMetrics == nil {
 			pipelineMetrics = c.monitors.Metrics.NewRegistry("pipeline")
 		}

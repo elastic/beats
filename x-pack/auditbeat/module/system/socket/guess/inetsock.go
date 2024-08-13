@@ -82,7 +82,7 @@ func (g *guessInetSockIPv4) Probes() ([]helper.ProbeDef, error) {
 				Type:      tracing.TypeKRetProbe,
 				Name:      "inet_sock_guess",
 				Address:   "inet_csk_accept",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, 2048),
+				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, inetSockDumpSize),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -149,10 +149,10 @@ func (g *guessInetSockIPv4) Extract(ev interface{}) (mapstr.M, bool) {
 	raddr := g.remote.Addr[:]
 	rport := make([]byte, 2)
 	binary.BigEndian.PutUint16(rport, uint16(g.remote.Port))
-	var laddrHits []int
-	var lportHits []int
-	var raddrHits []int
-	var rportHits []int
+	laddrHits := make([]int, 0)
+	lportHits := make([]int, 0)
+	raddrHits := make([]int, 0)
+	rportHits := make([]int, 0)
 
 	off := indexAligned(data, laddr, 0, 4)
 	for off != -1 {
