@@ -56,9 +56,9 @@ func init() {
 func Build() error {
 	args := devtools.DefaultBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,grpcnotrace")
 	} else {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,grpcnotrace")
 	}
 	return devtools.Build(args)
 }
@@ -66,7 +66,7 @@ func Build() error {
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
 	args := devtools.DefaultTestBinaryArgs()
-	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,grpcnotrace")
 	return devtools.BuildSystemTestGoBinary(args)
 }
 
@@ -75,7 +75,7 @@ func BuildSystemTestBinary() error {
 func GolangCrossBuild() error {
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
-	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,grpcnotrace")
 
 	return multierr.Combine(
 		devtools.GolangCrossBuild(args),
