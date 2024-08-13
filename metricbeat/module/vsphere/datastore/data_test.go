@@ -43,7 +43,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.eventMapping(DatastoreTest, &PerformanceMetrics{})
+	event := m.eventMapping(DatastoreTest, &PerformanceMetrics{}, []string{"DC3_H0_VM0"}, []string{"DC3_H0"})
 
 	VmCount, _ := event.GetValue("vm.count")
 	assert.EqualValues(t, 1, VmCount)
