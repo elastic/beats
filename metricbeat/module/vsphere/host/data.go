@@ -18,52 +18,23 @@
 package host
 
 import (
+	"fmt"
+
 	"github.com/vmware/govmomi/vim25/mo"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMetrics *PerformanceMetrics, networkNames, datastoreNames, virtualmachine []string) mapstr.M {
+func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
 		"status": hs.Summary.OverallStatus,
 		"uptime": hs.Summary.QuickStats.Uptime,
 		"cpu":    mapstr.M{"used": mapstr.M{"mhz": hs.Summary.QuickStats.OverallCpuUsage}},
-		"disk": mapstr.M{
-			"capacity":      mapstr.M{"usage": mapstr.M{"bytes": perfMetrics.DiskCapacityUsage * 1000}},
-			"devicelatency": mapstr.M{"average": mapstr.M{"ms": perfMetrics.DiskDeviceLatency}},
-			"latency":       mapstr.M{"total": mapstr.M{"ms": perfMetrics.DiskMaxTotalLatency}},
-			"total":         mapstr.M{"bytes": perfMetrics.DiskUsage * 1000},
-			"read":          mapstr.M{"bytes": perfMetrics.DiskRead * 1000},
-			"write":         mapstr.M{"bytes": perfMetrics.DiskWrite * 1000},
-		},
-		"network": mapstr.M{
-			"bandwidth": mapstr.M{
-				"transmitted": mapstr.M{"bytes": perfMetrics.NetTransmitted * 1000},
-				"received":    mapstr.M{"bytes": perfMetrics.NetReceived * 1000},
-				"total":       mapstr.M{"bytes": perfMetrics.NetUsage * 1000},
-			},
-			"packets": mapstr.M{
-				"transmitted": mapstr.M{"count": perfMetrics.NetPacketTransmitted},
-				"received":    mapstr.M{"count": perfMetrics.NetPacketReceived},
-				"errors": mapstr.M{
-					"transmitted": mapstr.M{"count": perfMetrics.NetErrorsTransmitted},
-					"received":    mapstr.M{"count": perfMetrics.NetErrorsReceived},
-					"total":       mapstr.M{"count": perfMetrics.NetErrorsTransmitted + perfMetrics.NetErrorsReceived},
-				},
-				"multicast": mapstr.M{
-					"transmitted": mapstr.M{"count": perfMetrics.NetMulticastTransmitted},
-					"received":    mapstr.M{"count": perfMetrics.NetMulticastReceived},
-					"total":       mapstr.M{"count": perfMetrics.NetMulticastTransmitted + perfMetrics.NetMulticastReceived},
-				},
-				"dropped": mapstr.M{
-					"transmitted": mapstr.M{"count": perfMetrics.NetDroppedTransmitted},
-					"received":    mapstr.M{"count": perfMetrics.NetDroppedReceived},
-					"total":       mapstr.M{"count": perfMetrics.NetDroppedTransmitted + perfMetrics.NetDroppedReceived},
-				},
-			},
-		},
 	}
+
+	mapPerfMetricToEvent(event, data.perfMetrics)
+
 	if hw := hs.Summary.Hardware; hw != nil {
 		totalCPU := int64(hw.CpuMhz) * int64(hw.NumCpuCores)
 		usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
@@ -76,20 +47,96 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, perfMetrics *PerformanceMetri
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
-	if len(virtualmachine) > 0 {
-		event.Put("vm.names", virtualmachine)
-		event.Put("vm.count", len(virtualmachine))
+	if len(data.assetsName.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetsName.outputVmNames)
+		event.Put("vm.count", len(data.assetsName.outputVmNames))
 	}
 
-	if len(datastoreNames) > 0 {
-		event.Put("datastore.names", datastoreNames)
-		event.Put("datastore.count", len(datastoreNames))
+	if len(data.assetsName.outputDsNames) > 0 {
+		event.Put("datastore.names", data.assetsName.outputDsNames)
+		event.Put("datastore.count", len(data.assetsName.outputDsNames))
 	}
 
-	if len(networkNames) > 0 {
-		event.Put("network_names", networkNames)
-		event.Put("network_count", len(networkNames))
+	if len(data.assetsName.outputNetworkNames) > 0 {
+		event.Put("network_names", data.assetsName.outputNetworkNames)
+		event.Put("network.names", data.assetsName.outputNetworkNames)
+		event.Put("network.count", len(data.assetsName.outputNetworkNames))
 	}
 
 	return event
+}
+
+func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
+		fmt.Printf("val: %v\n", val)
+		event.Put("disk.capacity.usage.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["disk.deviceLatency.average"]; exist {
+		event.Put("disk.devicelatency.average.ms", val)
+	}
+	if val, exist := perfMetricMap["disk.maxTotalLatency.latest"]; exist {
+		event.Put("disk.latency.total.ms", val)
+	}
+	if val, exist := perfMetricMap["disk.usage.average"]; exist {
+		event.Put("disk.total.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["disk.read.average"]; exist {
+		event.Put("disk.read.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["disk.write.average"]; exist {
+		event.Put("disk.write.bytes", val.(int64)*1000)
+	}
+
+	if val, exist := perfMetricMap["net.transmitted.average"]; exist {
+		event.Put("network.bandwidth.transmitted.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["net.received.average"]; exist {
+		event.Put("network.bandwidth.received.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["net.usage.average"]; exist {
+		event.Put("network.bandwidth.total.bytes", val.(int64)*1000)
+	}
+
+	if val, exist := perfMetricMap["net.packetsTx.summation"]; exist {
+		event.Put("network.packets.transmitted.count", val)
+	}
+	if val, exist := perfMetricMap["net.packetsRx.summation"]; exist {
+		event.Put("network.packets.received.count", val)
+	}
+
+	netErrorsTransmitted, netErrorsTransmittedExist := perfMetricMap["net.errorsTx.summation"]
+	if netErrorsTransmittedExist {
+		event.Put("network.packets.errors.transmitted.count", netErrorsTransmitted)
+	}
+	netErrorsReceived, netErrorsReceivedExist := perfMetricMap["net.errorsRx.summation"]
+	if netErrorsReceivedExist {
+		event.Put("network.packets.errors.received.count", netErrorsReceived)
+	}
+	if netErrorsTransmittedExist && netErrorsReceivedExist {
+		event.Put("network.packets.errors.total.count", netErrorsTransmitted.(int64)+netErrorsReceived.(int64))
+	}
+
+	netMulticastTransmitted, netMulticastTransmittedExist := perfMetricMap["net.multicastTx.summation"]
+	if netMulticastTransmittedExist {
+		event.Put("network.packets.multicast.transmitted.count", netMulticastTransmitted)
+	}
+	netMulticastReceived, netMulticastReceivedExist := perfMetricMap["net.multicastRx.summation"]
+	if netMulticastReceivedExist {
+		event.Put("network.packets.multicast.received.count", netMulticastReceived)
+	}
+	if netMulticastTransmittedExist && netMulticastReceivedExist {
+		event.Put("network.packets.multicast.total.count", netMulticastTransmitted.(int64)+netMulticastReceived.(int64))
+	}
+
+	netDroppedTransmitted, netDroppedTransmittedExist := perfMetricMap["net.droppedTx.summation"]
+	if netDroppedTransmittedExist {
+		event.Put("network.packets.dropped.transmitted.count", netDroppedTransmitted)
+	}
+	netDroppedReceived, netDroppedReceivedExist := perfMetricMap["net.droppedRx.summation"]
+	if netDroppedReceivedExist {
+		event.Put("network.packets.dropped.received.count", netDroppedReceived)
+	}
+	if netDroppedTransmittedExist && netDroppedReceivedExist {
+		event.Put("network.packets.dropped.total.count", netDroppedTransmitted.(int64)+netDroppedReceived.(int64))
+	}
 }

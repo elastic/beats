@@ -67108,7 +67108,17 @@ type: keyword
 
 --
 
-*`vsphere.host.network_count`*::
+*`vsphere.host.network.names`*::
++
+--
+Network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.count`*::
 +
 --
 Number of networks on the host.

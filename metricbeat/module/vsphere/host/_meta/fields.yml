@@ -74,7 +74,11 @@
       type: keyword
       description: >
         Network names.
-    - name: network_count
+    - name: network.names
+      type: keyword
+      description: >
+        Network names.
+    - name: network.count
       type: long
       description: >
         Number of networks on the host.

@@ -59,7 +59,9 @@ func TestFetchEventContents(t *testing.T) {
 	assert.GreaterOrEqual(t, dataStore["count"], 0)
 
 	assert.NotNil(t, event["network_names"])
-	assert.GreaterOrEqual(t, event["network_count"], 0)
+	network := event["network"].(mapstr.M)
+	assert.NotNil(t, network["names"])
+	assert.GreaterOrEqual(t, network["count"], 0)
 
 	assert.NotNil(t, event["status"])
 
@@ -78,17 +80,22 @@ func TestFetchEventContents(t *testing.T) {
 
 	disk := event["disk"].(mapstr.M)
 
-	diskCapacity := disk["capacity"].(mapstr.M)
-	diskCapacityUsage := diskCapacity["usage"].(mapstr.M)
-	assert.GreaterOrEqual(t, diskCapacityUsage["bytes"], int64(0))
+	diskCapacity, ok := disk["capacity"].(mapstr.M)
+	if ok {
+		diskCapacityUsage := diskCapacity["usage"].(mapstr.M)
+		assert.GreaterOrEqual(t, diskCapacityUsage["bytes"], int64(0))
+	}
 
-	diskDevielatency := disk["devicelatency"].(mapstr.M)
-	diskDevielatencyAverage := diskDevielatency["average"].(mapstr.M)
-	assert.GreaterOrEqual(t, diskDevielatencyAverage["ms"], int64(0))
-
-	diskLatency := disk["latency"].(mapstr.M)
-	diskLatencyTotal := diskLatency["total"].(mapstr.M)
-	assert.GreaterOrEqual(t, diskLatencyTotal["ms"], int64(0))
+	diskDevielatency, ok := disk["devicelatency"].(mapstr.M)
+	if ok {
+		diskDevielatencyAverage := diskDevielatency["average"].(mapstr.M)
+		assert.GreaterOrEqual(t, diskDevielatencyAverage["ms"], int64(0))
+	}
+	diskLatency, ok := disk["latency"].(mapstr.M)
+	if ok {
+		diskLatencyTotal := diskLatency["total"].(mapstr.M)
+		assert.GreaterOrEqual(t, diskLatencyTotal["ms"], int64(0))
+	}
 
 	diskTotal := disk["total"].(mapstr.M)
 	assert.GreaterOrEqual(t, diskTotal["bytes"], int64(0))
@@ -110,7 +117,7 @@ func TestFetchEventContents(t *testing.T) {
 	memoryFree := memory["free"].(mapstr.M)
 	assert.EqualValues(t, uint64(2822230016), memoryFree["bytes"])
 
-	network := event["network"].(mapstr.M)
+	network = event["network"].(mapstr.M)
 
 	networkBandwidth := network["bandwidth"].(mapstr.M)
 	networkBandwidthTransmitted := networkBandwidth["transmitted"].(mapstr.M)
@@ -126,29 +133,38 @@ func TestFetchEventContents(t *testing.T) {
 	assert.GreaterOrEqual(t, networkPacketsTransmitted["count"], int64(0))
 	assert.GreaterOrEqual(t, networkPacketsReceived["count"], int64(0))
 
-	networkErrors := networkPackets["errors"].(mapstr.M)
-	networkErrorsTransmitted := networkErrors["transmitted"].(mapstr.M)
-	networkErrorsReceived := networkErrors["received"].(mapstr.M)
-	networkErrorsTotal := networkErrors["total"].(mapstr.M)
-	assert.GreaterOrEqual(t, networkErrorsTransmitted["count"], int64(0))
-	assert.GreaterOrEqual(t, networkErrorsReceived["count"], int64(0))
-	assert.GreaterOrEqual(t, networkErrorsTotal["count"], int64(0))
+	networkErrors, ok := networkPackets["errors"].(mapstr.M)
+	if ok {
+		networkErrorsTransmitted := networkErrors["transmitted"].(mapstr.M)
+		networkErrorsReceived := networkErrors["received"].(mapstr.M)
+		networkErrorsTotal := networkErrors["total"].(mapstr.M)
+		assert.GreaterOrEqual(t, networkErrorsTransmitted["count"], int64(0))
+		assert.GreaterOrEqual(t, networkErrorsReceived["count"], int64(0))
+		assert.GreaterOrEqual(t, networkErrorsTotal["count"], int64(0))
+	}
 
 	networkMulticast := networkPackets["multicast"].(mapstr.M)
-	networkMulticastTransmitted := networkMulticast["transmitted"].(mapstr.M)
-	networkMulticastReceived := networkMulticast["received"].(mapstr.M)
-	networkMulticastTotal := networkMulticast["total"].(mapstr.M)
-	assert.GreaterOrEqual(t, networkMulticastTransmitted["count"], int64(0))
-	assert.GreaterOrEqual(t, networkMulticastReceived["count"], int64(0))
-	assert.GreaterOrEqual(t, networkMulticastTotal["count"], int64(0))
+	if networkMulticastTransmitted, ok := networkMulticast["transmitted"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, networkMulticastTransmitted["count"], int64(0))
+	}
+	if networkMulticastReceived, ok := networkMulticast["received"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, networkMulticastReceived["count"], int64(0))
+	}
+	if networkMulticastTotal, ok := networkMulticast["total"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, networkMulticastTotal["count"], int64(0))
+	}
 
-	networkDropped := networkPackets["dropped"].(mapstr.M)
-	networkDroppedTransmitted := networkDropped["transmitted"].(mapstr.M)
-	networkDroppedReceived := networkDropped["received"].(mapstr.M)
-	networkDroppedTotal := networkDropped["total"].(mapstr.M)
-	assert.GreaterOrEqual(t, networkDroppedTransmitted["count"], int64(0))
-	assert.GreaterOrEqual(t, networkDroppedReceived["count"], int64(0))
-	assert.GreaterOrEqual(t, networkDroppedTotal["count"], int64(0))
+	if networkDropped, ok := networkPackets["dropped"].(mapstr.M); ok {
+		if networkDroppedTransmitted, ok := networkDropped["transmitted"].(mapstr.M); ok {
+			assert.GreaterOrEqual(t, networkDroppedTransmitted["count"], int64(0))
+		}
+		if networkDroppedReceived, ok := networkDropped["received"].(mapstr.M); ok {
+			assert.GreaterOrEqual(t, networkDroppedReceived["count"], int64(0))
+		}
+		if networkDroppedTotal, ok := networkDropped["total"].(mapstr.M); ok {
+			assert.GreaterOrEqual(t, networkDroppedTotal["count"], int64(0))
+		}
+	}
 }
 
 func TestData(t *testing.T) {
