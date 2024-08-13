@@ -18,15 +18,11 @@
 package journalctl
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"os/exec"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -66,14 +62,11 @@ type JournalEntry struct {
 // More details can be found in the PR introducing this feature and related
 // issues. PR: https://github.com/elastic/beats/pull/40061.
 type Reader struct {
-	cmd      *exec.Cmd
-	dataChan chan []byte
-	errChan  chan string
 	logger   *logp.Logger
-	stdout   io.ReadCloser
-	stderr   io.ReadCloser
 	canceler input.Canceler
 	wg       sync.WaitGroup
+
+	jctl *journalctl
 }
 
 // handleSeekAndCursor adds the correct arguments for seek and cursor.
@@ -155,79 +148,16 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
-	logger.Infof("Journalctl command: journalctl %s", strings.Join(args, " "))
-	cmd := exec.Command("journalctl", args...)
-
-	stdout, err := cmd.StdoutPipe()
+	jctl, err := newJournalctl(canceler, logger.Named("journalctl-runner"), "journalctl", args...)
 	if err != nil {
-		return &Reader{}, fmt.Errorf("cannot get stdout pipe: %w", err)
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return &Reader{}, fmt.Errorf("cannot get stderr pipe: %w", err)
+		return &Reader{}, err
 	}
 
 	r := Reader{
-		cmd:      cmd,
-		dataChan: make(chan []byte),
-		errChan:  make(chan string),
+		jctl:     jctl,
 		logger:   logger,
-		stdout:   stdout,
-		stderr:   stderr,
 		canceler: canceler,
 	}
-
-	// Goroutine to read errors from stderr
-	r.wg.Add(1)
-	go func() {
-		defer r.logger.Debug("stderr reader goroutine done")
-		defer close(r.errChan)
-		defer r.wg.Done()
-		reader := bufio.NewReader(r.stderr)
-		for {
-			line, err := reader.ReadString('\n')
-			if err != nil {
-				if errors.Is(err, io.EOF) {
-					return
-				}
-				logger.Errorf("cannot read from journalctl stderr: %s", err)
-				return
-			}
-
-			r.errChan <- fmt.Sprintf("Journalctl wrote to stderr: %s", line)
-		}
-	}()
-
-	// Goroutine to read events from stdout
-	r.wg.Add(1)
-	go func() {
-		defer r.logger.Debug("stdout reader goroutine done")
-		defer close(r.dataChan)
-		defer r.wg.Done()
-		reader := bufio.NewReader(r.stdout)
-		for {
-			data, err := reader.ReadBytes('\n')
-			if errors.Is(err, io.EOF) {
-				return
-			}
-
-			select {
-			case <-r.canceler.Done():
-				return
-			case r.dataChan <- data:
-			}
-		}
-	}()
-
-	if err := cmd.Start(); err != nil {
-		return &Reader{}, fmt.Errorf("cannot start journalctl: %w", err)
-	}
-
-	go func() {
-		if err := cmd.Wait(); err != nil {
-			r.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
-		}
-	}()
 
 	return &r, nil
 }
@@ -236,10 +166,6 @@ func New(
 // goroutines to return, the canceller passed to `New` should
 // be cancelled before `Close` is called
 func (r *Reader) Close() error {
-	if r.cmd == nil {
-		return nil
-	}
-
 	// Try reading stderr until EOF. If there is too much data to read,
 	// timeout after 1 minute and proceed to kill the journalctl process.
 	readStderrTimeout, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -252,7 +178,7 @@ ReadErrForLoop:
 		case <-readStderrTimeout.Done():
 			r.logger.Error("timedout while reading stderr from journalctl, the process will be killed")
 			break ReadErrForLoop
-		case stderrLine, isOpen := <-r.errChan:
+		case stderrLine, isOpen := <-r.jctl.Error():
 			r.logger.Error(stderrLine)
 			if !isOpen {
 				break ReadErrForLoop
@@ -260,7 +186,7 @@ ReadErrForLoop:
 		}
 	}
 
-	if err := r.cmd.Process.Kill(); err != nil {
+	if err := r.jctl.Kill(); err != nil {
 		return fmt.Errorf("cannot stop journalctl: %w", err)
 	}
 
@@ -275,50 +201,47 @@ ReadErrForLoop:
 // If cancel is cancelled, Next returns a zero value JournalEntry
 // and ErrCancelled.
 func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
-	select {
-	case <-cancel.Done():
-		return JournalEntry{}, ErrCancelled
-	case d, open := <-r.dataChan:
-		if !open {
-			return JournalEntry{}, errors.New("no more data to read, journalctl might have exited unexpectedly")
-		}
-		fields := map[string]any{}
-		if err := json.Unmarshal(d, &fields); err != nil {
-			r.logger.Error("journal event cannot be parsed as map[string]any, look at the events log file for the raw journal event")
-			// Log raw data to events log file
-			msg := fmt.Sprintf("data cannot be parsed as map[string]any JSON: '%s'", string(d))
-			r.logger.Errorw(msg, logp.TypeKey, logp.EventType, "error.message", err.Error())
-			return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
-		}
-
-		ts, isString := fields["__REALTIME_TIMESTAMP"].(string)
-		if !isString {
-			return JournalEntry{}, fmt.Errorf("'__REALTIME_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__REALTIME_TIMESTAMP"])
-		}
-		unixTS, err := strconv.ParseUint(ts, 10, 64)
-		if err != nil {
-			return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
-		}
-
-		monotomicTs, isString := fields["__MONOTONIC_TIMESTAMP"].(string)
-		if !isString {
-			return JournalEntry{}, fmt.Errorf("'__MONOTONIC_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__MONOTONIC_TIMESTAMP"])
-		}
-		monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
-		if err != nil {
-			return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
-		}
-
-		cursor, isString := fields["__CURSOR"].(string)
-		if !isString {
-			return JournalEntry{}, fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string", fields["_CURSOR"])
-		}
-
-		return JournalEntry{
-			Fields:             fields,
-			RealtimeTimestamp:  unixTS,
-			Cursor:             cursor,
-			MonotonicTimestamp: monotonicTSInt,
-		}, nil
+	d, err := r.jctl.Next(cancel)
+	if err != nil {
+		return JournalEntry{}, err
 	}
+
+	fields := map[string]any{}
+	if err := json.Unmarshal(d, &fields); err != nil {
+		r.logger.Error("journal event cannot be parsed as map[string]any, look at the events log file for the raw journal event")
+		// Log raw data to events log file
+		msg := fmt.Sprintf("data cannot be parsed as map[string]any JSON: '%s'", string(d))
+		r.logger.Errorw(msg, logp.TypeKey, logp.EventType, "error.message", err.Error())
+		return JournalEntry{}, fmt.Errorf("cannot decode Journald JSON: %w", err)
+	}
+
+	ts, isString := fields["__REALTIME_TIMESTAMP"].(string)
+	if !isString {
+		return JournalEntry{}, fmt.Errorf("'__REALTIME_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__REALTIME_TIMESTAMP"])
+	}
+	unixTS, err := strconv.ParseUint(ts, 10, 64)
+	if err != nil {
+		return JournalEntry{}, fmt.Errorf("could not convert '__REALTIME_TIMESTAMP' to uint64: %w", err)
+	}
+
+	monotomicTs, isString := fields["__MONOTONIC_TIMESTAMP"].(string)
+	if !isString {
+		return JournalEntry{}, fmt.Errorf("'__MONOTONIC_TIMESTAMP': '%[1]v', type %[1]T is not a string", fields["__MONOTONIC_TIMESTAMP"])
+	}
+	monotonicTSInt, err := strconv.ParseUint(monotomicTs, 10, 64)
+	if err != nil {
+		return JournalEntry{}, fmt.Errorf("could not convert '__MONOTONIC_TIMESTAMP' to uint64: %w", err)
+	}
+
+	cursor, isString := fields["__CURSOR"].(string)
+	if !isString {
+		return JournalEntry{}, fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string", fields["_CURSOR"])
+	}
+
+	return JournalEntry{
+		Fields:             fields,
+		RealtimeTimestamp:  unixTS,
+		Cursor:             cursor,
+		MonotonicTimestamp: monotonicTSInt,
+	}, nil
 }
