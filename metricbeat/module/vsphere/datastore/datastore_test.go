@@ -27,6 +27,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
+	// Creating a new simulator model with VPX server to collect broad range of data.
 	model := simulator.VPX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
