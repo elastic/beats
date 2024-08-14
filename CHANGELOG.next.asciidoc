@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Update Go version to 1.22.5. {pull}40082[40082]
 Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull}40096[40096]
 - Update github.com/containerd/containerd version to v1.5.18 {pull}40096[40096]
 
@@ -70,6 +69,7 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 
 *Affecting all Beats*
 
+- Update Go version to 1.22.6. {pull}40529[40529]
 
 *Auditbeat*
 
