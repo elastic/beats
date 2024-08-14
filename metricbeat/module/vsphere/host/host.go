@@ -233,14 +233,14 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
 	// instead mo.Network.Name contains correct value of Network name
 	var netObjects []mo.Network
-	if len(referenceList) > 0 {
+	if len(hs.Network) > 0 {
 		if err := pc.Retrieve(ctx, hs.Network, []string{"name"}, &netObjects); err != nil {
 			return nil, err
 		}
 	}
 
 	outputNetworkNames := make([]string, 0, len(hs.Network))
-	for _, ob := range objects {
+	for _, ob := range netObjects {
 		name := strings.ReplaceAll(ob.Name, ".", "_")
 		outputNetworkNames = append(outputNetworkNames, name)
 	}
