@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
 - Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
+- Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
 
 *Auditbeat*
 
@@ -147,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix bug in Okta entity analytics rate limit logic. {issue}40106[40106] {pull}40267[40267]
 - Fix crashes in the journald input. {pull}40061[40061]
 - Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
+- Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
 
 *Heartbeat*
 
@@ -200,6 +202,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
+- When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 
 *Auditbeat*
 
