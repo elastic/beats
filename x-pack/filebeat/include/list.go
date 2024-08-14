@@ -52,6 +52,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/sophos"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/threatintel"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/windows"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zeek"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zoom"

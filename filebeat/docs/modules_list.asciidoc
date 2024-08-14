@@ -55,6 +55,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-system>>
   * <<filebeat-module-threatintel>>
   * <<filebeat-module-traefik>>
+  * <<filebeat-module-windows>>
   * <<filebeat-module-zeek>>
   * <<filebeat-module-zookeeper>>
   * <<filebeat-module-zoom>>
@@ -115,6 +116,7 @@ include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/threatintel.asciidoc[]
 include::modules/traefik.asciidoc[]
+include::modules/windows.asciidoc[]
 include::modules/zeek.asciidoc[]
 include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]

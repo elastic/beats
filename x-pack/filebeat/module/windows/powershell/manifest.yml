@@ -1,0 +1,15 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: winlog
+  - name: event_logs
+  - name: tags
+    default: [windows]
+
+ingest_pipeline:
+  - ../ingest/routing.yml
+  - ./ingest/powershell.yml
+  - ./ingest/powershell_operational.yml
+input: config/input.yml
+

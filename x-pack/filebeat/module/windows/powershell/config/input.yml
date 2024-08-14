@@ -1,0 +1,18 @@
+{{ if eq .input "winlog" }}
+type: winlog
+event_logs: {{ .event_logs | tojson }}
+{{ else if eq .input "file" }}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+processors:
+  - decode_json_fields:
+      fields:
+        - message
+      overwrite_keys: true
+      target: ""
+{{ end }}
+{{- if .tags }}tags: {{ .tags | tojson }}{{ end }}
