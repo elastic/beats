@@ -18,8 +18,9 @@
 package virtualmachine
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"golang.org/x/exp/constraints"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func (m *MetricSet) eventMapping(data VMData) mapstr.M {
