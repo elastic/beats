@@ -18,8 +18,6 @@
 package host
 
 import (
-	"fmt"
-
 	"github.com/vmware/govmomi/vim25/mo"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -68,7 +66,6 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
 	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
-		fmt.Printf("val: %v\n", val)
 		event.Put("disk.capacity.usage.bytes", val.(int64)*1000)
 	}
 	if val, exist := perfMetricMap["disk.deviceLatency.average"]; exist {

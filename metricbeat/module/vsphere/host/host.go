@@ -154,7 +154,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			CounterId: metric.Key,
 		})
 	}
-	metricMap := map[string]interface{}{}
 
 	pc := property.DefaultCollector(c)
 	for _, hs := range hst {
@@ -187,6 +186,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			m.Logger().Errorf("Failed to convert performance data: %v", err)
 		}
 
+		metricMap := make(map[string]interface{})
 		for _, result := range results[0].Value {
 			if len(result.Value) > 0 {
 				metricMap[result.Name] = result.Value[0]
@@ -207,10 +207,9 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 }
 
 func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSystem) (*assetNames, error) {
-	referenceList := make([]types.ManagedObjectReference, 0, len(hs.Datastore)+len(hs.Vm)+len(hs.Network))
+	referenceList := make([]types.ManagedObjectReference, 0, len(hs.Datastore)+len(hs.Vm))
 	referenceList = append(referenceList, hs.Datastore...)
 	referenceList = append(referenceList, hs.Vm...)
-	referenceList = append(referenceList, hs.Network...)
 
 	var objects []mo.ManagedEntity
 	if len(referenceList) > 0 {
@@ -221,7 +220,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 
 	outputDsNames := make([]string, 0, len(hs.Datastore))
 	outputVmNames := make([]string, 0, len(hs.Vm))
-	outputNetworkNames := make([]string, 0, len(hs.Network))
 	for _, ob := range objects {
 		name := strings.ReplaceAll(ob.Name, ".", "_")
 		switch ob.Reference().Type {
@@ -229,9 +227,22 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 			outputDsNames = append(outputDsNames, name)
 		case "VirtualMachine":
 			outputVmNames = append(outputVmNames, name)
-		case "Network":
-			outputNetworkNames = append(outputNetworkNames, name)
 		}
+	}
+
+	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
+	// instead mo.Network.Name contains correct value of Network name
+	var netObjects []mo.Network
+	if len(referenceList) > 0 {
+		if err := pc.Retrieve(ctx, hs.Network, []string{"name"}, &netObjects); err != nil {
+			return nil, err
+		}
+	}
+
+	outputNetworkNames := make([]string, 0, len(hs.Network))
+	for _, ob := range objects {
+		name := strings.ReplaceAll(ob.Name, ".", "_")
+		outputNetworkNames = append(outputNetworkNames, name)
 	}
 
 	return &assetNames{
