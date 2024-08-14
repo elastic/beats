@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/periodic"
 	"github.com/elastic/elastic-agent-libs/testing"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -58,7 +59,10 @@ type Client struct {
 	// forwarded to this index. Otherwise, they will be dropped.
 	deadLetterIndex string
 
-	log *logp.Logger
+	log                    *logp.Logger
+	pLogIndex              *periodic.Doer
+	pLogIndexTryDeadLetter *periodic.Doer
+	pLogDeadLetter         *periodic.Doer
 }
 
 // clientSettings contains the settings for a client.
@@ -154,12 +158,33 @@ func NewClient(
 		return nil
 	}
 
-	// Make sure there's a non-nil obser
+	// Make sure there's a non-nil observer
 	observer := s.observer
 	if observer == nil {
 		observer = outputs.NewNilObserver()
 	}
 
+	log := logp.NewLogger("elasticsearch")
+
+	pLogDeadLetter := periodic.NewDoer(10*time.Second,
+		func(count uint64, d time.Duration) {
+			log.Errorf(
+				"Failed to deliver to dead letter index %d events in last %s. Look at the event log to view the event and cause.", count, d)
+		})
+	pLogIndex := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
+		log.Warnf(
+			"Failed to index %d events in last %s: events were dropped! Look at the event log to view the event and cause.",
+			count, d)
+	})
+	pLogIndexTryDeadLetter := periodic.NewDoer(10*time.Second, func(count uint64, d time.Duration) {
+		log.Warnf(
+			"Failed to index %d events in last %s: tried dead letter index. Look at the event log to view the event and cause.",
+			count, d)
+	})
+
+	pLogDeadLetter.Start()
+	pLogIndex.Start()
+	pLogIndexTryDeadLetter.Start()
 	client := &Client{
 		conn:             *conn,
 		indexSelector:    s.indexSelector,
@@ -167,7 +192,10 @@ func NewClient(
 		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
-		log: logp.NewLogger("elasticsearch"),
+		log:                    log,
+		pLogDeadLetter:         pLogDeadLetter,
+		pLogIndex:              pLogIndex,
+		pLogIndexTryDeadLetter: pLogIndexTryDeadLetter,
 	}
 
 	return client, nil
@@ -478,14 +506,14 @@ func (client *Client) applyItemStatus(
 		if encodedEvent.deadLetter {
 			// Fatal error while sending an already-failed event to the dead letter
 			// index, drop.
-			client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look at the event log to view the event and cause.", itemStatus)
+			client.pLogDeadLetter.Add()
 			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
-			client.log.Warnf("Cannot index event (status=%v): dropping event! Look at the event log to view the event and cause.", itemStatus)
+			client.pLogIndex.Add()
 			client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
@@ -494,7 +522,7 @@ func (client *Client) applyItemStatus(
 		// We count this as a "retryable failure", and then if the dead letter
 		// ingestion succeeds it is counted in the "deadLetter" counter
 		// rather than the "acked" counter.
-		client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", itemStatus)
+		client.pLogIndexTryDeadLetter.Add()
 		client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
 	}

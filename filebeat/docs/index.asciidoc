@@ -30,6 +30,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :docker_platform:
 :win_os:
+:no_add_session_metadata_processor:
 
 :kubernetes_default_indexers: {docdir}/kubernetes-default-indexers-matchers.asciidoc
 
