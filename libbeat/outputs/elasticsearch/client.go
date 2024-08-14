@@ -478,15 +478,25 @@ func (client *Client) applyItemStatus(
 		if encodedEvent.deadLetter {
 			// Fatal error while sending an already-failed event to the dead letter
 			// index, drop.
+<<<<<<< HEAD
 			client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look at the event log to view the event and cause.", itemStatus)
 			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+=======
+			client.pLogDeadLetter.Add()
+			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event '%s' (status=%v): %s", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+>>>>>>> e7732c6669 ([ES output] Log event fields in events log file (#40512))
 			stats.nonIndexable++
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
+<<<<<<< HEAD
 			client.log.Warnf("Cannot index event (status=%v): dropping event! Look at the event log to view the event and cause.", itemStatus)
 			client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+=======
+			client.pLogIndex.Add()
+			client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, dropping event!", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+>>>>>>> e7732c6669 ([ES output] Log event fields in events log file (#40512))
 			stats.nonIndexable++
 			return false
 		}
@@ -494,8 +504,13 @@ func (client *Client) applyItemStatus(
 		// We count this as a "retryable failure", and then if the dead letter
 		// ingestion succeeds it is counted in the "deadLetter" counter
 		// rather than the "acked" counter.
+<<<<<<< HEAD
 		client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", itemStatus)
 		client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+=======
+		client.pLogIndexTryDeadLetter.Add()
+		client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, trying dead letter index", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+>>>>>>> e7732c6669 ([ES output] Log event fields in events log file (#40512))
 		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
 	}
 
