@@ -374,8 +374,11 @@ func (m *MetricSet) setOrganization(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to get project ancestors: %w", err)
 	}
-
+	if len(ancestryResponse.Ancestor) == 0 {
+		return fmt.Errorf("no ancestors found for project '%s'", m.config.ProjectID)
+	}
 	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
+
 	if ancestor.ResourceId.Type == "organization" {
 		m.config.organizationID = ancestor.ResourceId.Id
 		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
@@ -384,9 +387,8 @@ func (m *MetricSet) setOrganization(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to get organization details: %w", err)
 		}
-		if orgDetails.DisplayName != "" {
-			m.config.organizationName = orgDetails.DisplayName
-		}
+
+		m.config.organizationName = orgDetails.DisplayName
 	}
 
 	return nil
