@@ -23,31 +23,13 @@ import (
 
 func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 
-	var (
-		freeCPU    int32
-		freeMemory int64
-	)
-
 	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
 	usedCPU := data.VM.Summary.QuickStats.OverallCpuUsage
 	totalCPU := data.VM.Summary.Config.CpuReservation
 	totalMemory := int64(data.VM.Summary.Config.MemorySizeMB) * 1024 * 1024
 
-	if totalCPU > 0 {
-		freeCPU = totalCPU - usedCPU
-		// Avoid negative values if reported used CPU is slightly over total configured.
-		if freeCPU < 0 {
-			freeCPU = 0
-		}
-	}
-
-	if totalMemory > 0 {
-		freeMemory = totalMemory - usedMemory
-		// Avoid negative values if reported used memory is slightly over total configured.
-		if freeMemory < 0 {
-			freeMemory = 0
-		}
-	}
+	freeCPU := max(0, totalCPU-usedCPU)
+	freeMemory := max(0, totalMemory-usedMemory)
 
 	event := mapstr.M{
 		"name":          data.VM.Summary.Config.Name,
@@ -84,4 +66,11 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 		event["datastore.names"] = data.DatastoreNames
 	}
 	return event
+}
+
+func max[T ~int32 | ~int64](a T, b T) T {
+	if a > b {
+		return a
+	}
+	return b
 }

@@ -89,12 +89,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return fmt.Errorf("error in NewClient: %w", err)
+		return fmt.Errorf("virtualmachine: error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
+			m.Logger().Debugf("Error logging out from vsphere: %v", err)
 		}
 	}()
 
@@ -106,7 +106,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
-			return fmt.Errorf("error in setCustomFieldsMap: %w", err)
+			return fmt.Errorf("virtualmachine: error in setCustomFieldsMap: %w", err)
 		}
 	}
 
@@ -115,12 +115,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
+		return fmt.Errorf("virtualmachine: error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Debug("Error destroying view from vsphere %w", err)
 		}
 	}()
 
@@ -128,7 +128,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	var vmt []mo.VirtualMachine
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
 	if err != nil {
-		return fmt.Errorf("error in Retrieve: %w", err)
+		return fmt.Errorf("virtualmachine:error in Retrieve: %w", err)
 	}
 
 	pc := property.DefaultCollector(c)
@@ -151,7 +151,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				"from host/guest")
 		}
 
-		// Get custom fields (attributes) values if get_custom_fields is true.
+		// Retrieve custom fields if enabled
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
 			customFields = getCustomFields(vm.Summary.CustomValue, customFieldsMap)
 		}
@@ -160,7 +160,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
 				"information returned from host/guest")
 		}
-
+		// Retrieve network names
 		if vm.Summary.Vm != nil {
 			networkNames, err = getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
 			if err != nil {
@@ -175,7 +175,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			if err == nil {
 				datastoreNames = append(datastoreNames, ds.Name)
 			} else {
-				m.Logger().Debug(fmt.Sprintf("error retrieving datastore name for VM %s: %v", vm.Summary.Config.Name, err))
+				m.Logger().Debug("error retrieving datastore name for VM %s: %v", vm.Summary.Config.Name, err)
 			}
 		}
 
@@ -226,8 +226,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	if len(vm.Network) == 0 {
 		return nil, errors.New("no networks found")
 	}
-
-	var networkRefs []types.ManagedObjectReference
+	networkRefs := make([]types.ManagedObjectReference, 0, len(vm.Network))
 	for _, obj := range vm.Network {
 		if obj.Type == "Network" {
 			networkRefs = append(networkRefs, obj)
@@ -240,8 +239,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	}
 
 	var nets []mo.Network
-	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
-	if err != nil {
+	if err := pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets); err != nil {
 		return nil, fmt.Errorf("error retrieving network from virtual machine: %w", err)
 	}
 	outputNetworkNames := make([]string, 0, len(nets))
