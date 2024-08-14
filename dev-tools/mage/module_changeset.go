@@ -47,12 +47,12 @@ func DefineModules() {
 		log.Fatal("failed to compile regex: " + err.Error())
 	}
 
-	modules := make(map[string]bool)
+	modules := map[string]struct{}{}
 	for _, line := range getDiff() {
 		if !isAsciiOrPng(line) {
 			matches := moduleRegex.FindStringSubmatch(line)
 			if len(matches) > 0 {
-				modules[matches[1]] = true
+				modules[matches[1]] = struct{}{}
 			}
 		}
 	}
