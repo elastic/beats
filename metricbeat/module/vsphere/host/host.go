@@ -156,14 +156,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	pc := property.DefaultCollector(c)
-	for _, hs := range hst {
-		assetNames, err := getAssetNames(ctx, pc, &hs)
+	for i := range hst {
+		assetNames, err := getAssetNames(ctx, pc, &hst[i])
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve object from host: %w", err)
 		}
 
 		spec := types.PerfQuerySpec{
-			Entity:     hs.Reference(),
+			Entity:     hst[i].Reference(),
 			MetricId:   metricIDs,
 			MaxSample:  1,
 			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
@@ -196,7 +196,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(hs, &metricData{
+			MetricSetFields: m.eventMapping(hst[i], &metricData{
 				perfMetrics: metricMap,
 				assetsName:  *assetNames,
 			}),
