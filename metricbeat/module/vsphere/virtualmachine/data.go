@@ -19,6 +19,7 @@ package virtualmachine
 
 import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"golang.org/x/exp/constraints"
 )
 
 func (m *MetricSet) eventMapping(data VMData) mapstr.M {
@@ -67,8 +68,7 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 	}
 	return event
 }
-
-func max[T ~int32 | ~int64](a T, b T) T {
+func max[T constraints.Ordered](a T, b T) T {
 	if a > b {
 		return a
 	}
