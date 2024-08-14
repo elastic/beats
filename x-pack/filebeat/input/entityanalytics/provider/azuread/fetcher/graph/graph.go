@@ -456,7 +456,7 @@ func requestTrace(ctx context.Context, cli *http.Client, cfg graphConf, log *log
 	traceLogger := zap.New(core)
 
 	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-	maxSize := cfg.Tracer.MaxSize * 1e6
+	maxSize := max(1, cfg.Tracer.MaxSize) * 1e6
 	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
 	return cli
 }
