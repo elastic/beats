@@ -197,15 +197,9 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
-<<<<<<< HEAD
 	github.com/elastic/elastic-agent-autodiscover v0.8.1
-	github.com/elastic/elastic-agent-libs v0.9.13
-	github.com/elastic/elastic-agent-system-metrics v0.10.3
-=======
-	github.com/elastic/elastic-agent-autodiscover v0.7.0
 	github.com/elastic/elastic-agent-libs v0.9.15
 	github.com/elastic/elastic-agent-system-metrics v0.10.6
->>>>>>> a4568f918c (use go-sysinfo v1.14.1 and elastic-agent-system-metrics v0.10.6 (#40324))
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
 	github.com/elastic/mito v1.13.1
@@ -302,6 +296,7 @@ require (
 	github.com/gobuffalo/here v0.6.7 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
+	github.com/gofrs/uuid/v5 v5.2.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
