@@ -48,8 +48,9 @@ func NewStructDecoder(allocator tracing.AllocateFn) func(tracing.ProbeFormat) (t
 
 // MakeMemoryDump returns a kprobe fetchargs definition that reads a region
 // of memory using a sequence of 8-byte fields.
+// Creating more than 128 args is undefined.
 func MakeMemoryDump(address string, from, to int) string {
-	var params []string
+	params := make([]string, 0)
 	for off := from; off < to; off += 8 {
 		params = append(params, fmt.Sprintf("+%d(%s):u64", off, address))
 	}
