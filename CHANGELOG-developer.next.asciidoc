@@ -196,6 +196,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Improve robustness and error reporting from packetbeat default route testing. {pull}39757[39757]
 - Move x-pack/filebeat/input/salesforce jwt import to v5. {pull}39823[39823]
 - Drop x-pack/filebeat/input dependency on github.com/lestrrat-go/jwx/v2. {pull}39968[39968]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
 
 ==== Deprecated
 
