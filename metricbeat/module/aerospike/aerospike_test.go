@@ -19,6 +19,8 @@ package aerospike
 
 import (
 	"errors"
+	"fmt"
+	"github.com/magefile/mage/mg"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -104,6 +106,10 @@ func pointer[T any](d T) *T {
 }
 
 func TestParseClientPolicy(t *testing.T) {
+	if mg.Verbose() {
+		fmt.Printf("DELETEME\n")
+	}
+
 	sampleClusterName := "TestCluster"
 
 	TLSPolicy := as.NewClientPolicy()

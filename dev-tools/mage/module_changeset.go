@@ -28,6 +28,9 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
+// DefineModules checks which modules were changed and populates MODULE environment variable,
+// so that CI would run tests only for the changed ones.
+// If no modules were changed MODULE variable won't be defined.
 func DefineModules() {
 	// If MODULE is set in Buildkite pipeline step, skip variable further definition
 	if os.Getenv("MODULE") != "" {
@@ -49,7 +52,7 @@ func DefineModules() {
 
 	modules := map[string]struct{}{}
 	for _, line := range getDiff() {
-		if !isAsciiOrPng(line) {
+		if !shouldIgnore(line) {
 			matches := moduleRegex.FindStringSubmatch(line)
 			if len(matches) > 0 {
 				modules[matches[1]] = struct{}{}
@@ -72,48 +75,54 @@ func DefineModules() {
 			return
 		}
 
-		_, _ = fmt.Fprintf(os.Stderr, "Detected changes in module(s): %s\n", moduleVar)
+		_, _ = fmt.Fprintf(os.Stdout, "Detected changes in module(s): %s\n", moduleVar)
+	} else {
+		fmt.Print("No changed modules found")
 	}
 }
 
-func isAsciiOrPng(file string) bool {
-	return strings.HasSuffix(file, ".asciidoc") || strings.HasSuffix(file, ".png")
+func shouldIgnore(file string) bool {
+	ignoreList := []string{".asciidoc", ".png"}
+	for ext := range ignoreList {
+		if strings.HasSuffix(file, ignoreList[ext]) {
+			return true
+		}
+	}
+	return false
 }
 
 func getDiff() []string {
 	commitRange := getCommitRange()
 	var output, _ = sh.Output("git", "diff", "--name-only", commitRange)
 
-	if mg.Verbose() {
-		_ = fmt.Sprintf("Git Diff result: %s\n", output)
-	}
+	printWhenVerbose("Git Diff result: %s\n", output)
 
 	return strings.Split(output, "\n")
 }
 
 func getFromCommit() string {
-	baseBranch := os.Getenv("BUILDKITE_PULL_REQUEST_BASE_BRANCH")
-	branch := os.Getenv("BUILDKITE_BRANCH")
-	commit := os.Getenv("BUILDKITE_COMMIT")
+	if baseBranch := os.Getenv("BUILDKITE_PULL_REQUEST_BASE_BRANCH"); baseBranch != "" {
+		printWhenVerbose("PR branch: %s\n", baseBranch)
 
-	if baseBranch != "" {
-		return fmt.Sprintf("origin/%s", baseBranch)
+		return getBranchName(baseBranch)
 	}
 
-	if branch != "" {
-		return fmt.Sprintf("origin/%s", branch)
+	if branch := os.Getenv("BUILDKITE_BRANCH"); branch != "" {
+		printWhenVerbose("Target branch: %s\n", branch)
+
+		return getBranchName(branch)
 	}
 
-	previousCommit := getPreviousCommit()
-	if previousCommit != "" {
+	if previousCommit := getPreviousCommit(); previousCommit != "" {
+		printWhenVerbose("Git from commit: %s\n", previousCommit)
+
 		return previousCommit
-	}
+	} else {
+		commit := os.Getenv("BUILDKITE_COMMIT")
+		printWhenVerbose("Git from commit: %s\n", commit)
 
-	if mg.Verbose() {
-		_ = fmt.Sprintf("Git from commit: %s", commit)
+		return commit
 	}
-
-	return commit
 }
 
 func getPreviousCommit() string {
@@ -129,4 +138,14 @@ func getCommitRange() string {
 	commit := os.Getenv("BUILDKITE_COMMIT")
 
 	return fmt.Sprintf("%s...%s", getFromCommit(), commit)
+}
+
+func getBranchName(branch string) string {
+	return fmt.Sprintf("origin/%s", branch)
+}
+
+func printWhenVerbose(template string, parameter string) {
+	if mg.Verbose() {
+		_ = fmt.Sprintf(template, parameter)
+	}
 }
