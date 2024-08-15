@@ -1,0 +1,46 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "vsphere.datastore",
+        "duration": 115000,
+        "module": "vsphere"
+    },
+    "metricset": {
+        "name": "datastore",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:33365",
+        "type": "vsphere"
+    },
+    "vsphere": {
+      "cluster": {
+        "das_config": {
+          "enabled": false,
+          "admission": {
+            "control": {
+              "enabled": true
+            }
+          }
+        },
+        "host": {
+          "count": 1,
+          "names": [
+            "Host_1"
+          ]
+        },
+        "datastore": {
+          "count": 1,
+          "names": [
+            "Datastore_1"
+          ]
+        },
+        "network": {
+          "count": 1,
+          "names": [
+            "Network_1"
+          ]
+        }
+      }
+    }
+}

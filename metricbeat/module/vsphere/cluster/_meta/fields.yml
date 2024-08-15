@@ -1,0 +1,38 @@
+- name: cluter
+  type: group
+  release: beta
+  description: >
+    cluster
+  fields:
+    - name: datastore.count
+      type: long
+      description: >
+        Number of datastores associated with the cluster.
+    - name: datastore.names
+      type: keyword
+      description: >
+        list of all the Datastore names associated with the cluster.
+    - name: das_config.admission.control.enabled
+      type: boolean
+      description: >
+        Flag that determines whether strict admission control is enabled.
+    - name: das_config.enabled
+      type: boolean
+      description: >
+        Flag to indicate whether or not vSphere HA feature is enabled.
+    - name: host.count
+      type: long
+      description: >
+        Number of hosts associated with the cluster.
+    - name: host.names
+      type: keyword
+      description: >
+        list of all the Host names associated with the cluster.
+    - name: network.count
+      type: long
+      description: >
+        Number of networks associated with the cluster.
+    - name: network.names
+      type: keyword
+      description: >
+        list of all the Network names associated with the cluster.
