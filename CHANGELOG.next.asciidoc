@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Update Go version to 1.22.5. {pull}40082[40082]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
+- Elevate effective capability set to match the Permitted set for agentbeat {pull}40466[40466]
 
 *Auditbeat*
 
