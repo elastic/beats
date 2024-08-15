@@ -108,6 +108,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Auditbeat*
 
 - Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
+- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 
 *Filebeat*
