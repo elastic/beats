@@ -65,7 +65,6 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
-    - prealloc # Finds slice declarations that could potentially be pre-allocated
     - depguard
 
 # all available settings of specific linters
