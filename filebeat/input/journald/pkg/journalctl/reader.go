@@ -62,6 +62,9 @@ type JournalEntry struct {
 // More details can be found in the PR introducing this feature and related
 // issues. PR: https://github.com/elastic/beats/pull/40061.
 type Reader struct {
+	args   []string
+	cursor string
+
 	logger   *logp.Logger
 	canceler input.Canceler
 	wg       sync.WaitGroup
@@ -69,25 +72,25 @@ type Reader struct {
 	jctl *journalctl
 }
 
-// handleSeekAndCursor adds the correct arguments for seek and cursor.
+// handleSeekAndCursor returns the correct arguments for seek and cursor.
 // If there is a cursor, only the cursor is used, seek is ignored.
 // If there is no cursor, then seek is used
-func handleSeekAndCursor(args []string, mode SeekMode, since time.Duration, cursor string) []string {
+func handleSeekAndCursor(mode SeekMode, since time.Duration, cursor string) []string {
 	if cursor != "" {
-		args = append(args, "--after-cursor", cursor)
-		return args
+		return []string{"--after-cursor", cursor}
 	}
 
 	switch mode {
 	case SeekSince:
-		args = append(args, "--since", time.Now().Add(since).Format(sinceTimeFormat))
+		return []string{"--since", time.Now().Add(since).Format(sinceTimeFormat)}
 	case SeekTail:
-		args = append(args, "--since", "now")
+		return []string{"--since", "now"}
 	case SeekHead:
-		args = append(args, "--no-tail")
+		return []string{"--no-tail"}
+	default:
+		// That should never happen
+		return []string{}
 	}
-
-	return args
 }
 
 // New instantiates and starts a reader for journald logs.
@@ -130,8 +133,6 @@ func New(
 		args = append(args, "--file", file)
 	}
 
-	args = handleSeekAndCursor(args, mode, since, cursor)
-
 	for _, u := range units {
 		args = append(args, "--unit", u)
 	}
@@ -148,14 +149,18 @@ func New(
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
 	}
 
-	jctl, err := newJournalctl(canceler, logger.Named("journalctl-runner"), "journalctl", args...)
+	otherArgs := handleSeekAndCursor(mode, since, cursor)
+
+	jctl, err := newJournalctl(canceler, logger.Named("journalctl-runner"), "journalctl", append(args, otherArgs...)...)
 	if err != nil {
 		return &Reader{}, err
 	}
 
 	r := Reader{
+		args:     args,
+		cursor:   cursor,
 		jctl:     jctl,
-		logger:   logger,
+		logger:   logger.Named("reader"),
 		canceler: canceler,
 	}
 
@@ -202,8 +207,28 @@ ReadErrForLoop:
 // and ErrCancelled.
 func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 	d, err := r.jctl.Next(cancel)
-	if err != nil {
+
+	// Check if the input has been cancelled
+	select {
+	case <-cancel.Done():
+		// Input has been cancelled, ignore the message?
 		return JournalEntry{}, err
+	default:
+		// Two options:
+		//   - No error, go parse the message
+		//   - Error, if journalctl is not running any more, restart it
+		if err != nil {
+			r.logger.Warnf("reader error: '%s', restarting...", err)
+			jctl, err := newJournalctl(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", append(r.args, "--after-cursor", r.cursor)...)
+			if err != nil {
+				// If we cannot restart journalct, there is nothing we can do.
+				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
+			}
+			r.jctl = jctl
+
+			// Return an empty message and wait for the input to all us again
+			return JournalEntry{}, nil
+		}
 	}
 
 	fields := map[string]any{}
@@ -237,6 +262,9 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 	if !isString {
 		return JournalEntry{}, fmt.Errorf("'_CURSOR': '%[1]v', type %[1]T is not a string", fields["_CURSOR"])
 	}
+
+	// Update our cursor so we can restart journalctl if needed
+	r.cursor = cursor
 
 	return JournalEntry{
 		Fields:             fields,

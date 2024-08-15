@@ -187,6 +187,10 @@ func (inp *journald) Run(
 			return err
 		}
 
+		if entry.IsEmpty() {
+			continue
+		}
+
 		event := entry.ToEvent()
 		if err := publisher.Publish(event, event.Private); err != nil {
 			logger.Errorf("could not publish event: %s", err)

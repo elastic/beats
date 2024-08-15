@@ -75,7 +75,11 @@ func newJournalctl(ctx input.Canceler, logger *logp.Logger, binary string, args 
 		reader := bufio.NewReader(jctl.stdout)
 		for {
 			data, err := reader.ReadBytes('\n')
-			if errors.Is(err, io.EOF) {
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return
+				}
+				logger.Errorf("cannot read from journalctl stdout: %s", err)
 				return
 			}
 
