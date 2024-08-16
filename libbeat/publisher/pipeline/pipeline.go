@@ -110,7 +110,7 @@ type OutputReloader interface {
 // The new pipeline will take ownership of queue and outputs. On Close, the
 // queue and outputs will be closed.
 func New(
-	beat beat.Info,
+	beatInfo beat.Info,
 	monitors Monitors,
 	userQueueConfig conf.Namespace,
 	out outputs.Group,
@@ -121,7 +121,7 @@ func New(
 	}
 
 	p := &Pipeline{
-		beatInfo:         beat,
+		beatInfo:         beatInfo,
 		monitors:         monitors,
 		observer:         nilObserver,
 		waitCloseTimeout: settings.WaitClose,
@@ -147,7 +147,7 @@ func New(
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	output, err := newOutputController(beatInfo, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
-	client := &client{
+	clt := &client{
 		logger:         p.monitors.Logger,
 		isOpen:         atomic.MakeBool(true),
 		clientListener: cfg.ClientListener,
@@ -233,7 +233,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	producerCfg := queue.ProducerConfig{
 		ACK: func(count int) {
-			client.observer.eventsACKed(count)
+			clt.observer.eventsACKed(count)
 			if ackHandler != nil {
 				ackHandler.ACKEvents(count)
 			}
@@ -244,17 +244,18 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		ackHandler = acker.Nil()
 	}
 
-	client.eventListener = ackHandler
-	client.waiter = waiter
-	client.producer = p.outputController.queueProducer(producerCfg)
-	if client.producer == nil {
+	clt.eventListener = ackHandler
+	clt.waiter = waiter
+	clt.producer = p.outputController.queueProducer(producerCfg)
+	if clt.producer == nil {
 		// This can only happen if the pipeline was shut down while clients
 		// were still waiting to connect.
 		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
 	}
 
 	p.observer.clientConnected()
-	return client, nil
+
+	return clt, nil
 }
 
 func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {

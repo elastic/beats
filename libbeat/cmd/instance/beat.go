@@ -97,8 +97,9 @@ type Beat struct {
 	RawConfig    *config.C // Raw config that can be unpacked to get Beat specific config data.
 	IdxSupporter idxmgmt.Supporter
 
-	keystore   keystore.Keystore
-	processors processing.Supporter
+	keystore          keystore.Keystore
+	processors        processing.Supporter
+	processingFactory processing.SupportFactory
 
 	InputQueueSize int // Size of the producer queue used by most queues.
 
@@ -383,7 +384,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		}
 	}
 
-	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
 		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
@@ -395,18 +395,39 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
-	publisher, err = pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing publisher: %w", err)
-	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	if b.Manager.Enabled() {
+		if !outputEnabled {
+			// Create a pipeline builder and don't set the pipeline until we are ready to set the output
+			pipelineBuilder := pipeline.NewPipelineBuilder(b.Info, monitors, b.Config.Pipeline, outputFactory, settings, b.processingFactory)
+			b.Publisher = pipelineBuilder
+			reload.RegisterV2.MustRegisterGlobalProcessors(pipelineBuilder.GlobalProcessorsReloader())
+			reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(pipelineBuilder.OutputReloader()))
+		} else {
+			// don't set the builder, the output is already there.
+			// TODO Log a warning saying that reload won't work properly
+
+			publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
+			if err != nil {
+				return nil, fmt.Errorf("error initializing publisher: %w", err)
+			}
+			b.Publisher = publisher
+			reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+		}
+	} else {
+		// normal running without agent
+		publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, settings)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing publisher: %w", err)
+		}
+		b.Publisher = publisher
+		reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	}
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
 	// defer pipeline.Close()
 
-	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
 	if err != nil {
 		return nil, err
@@ -904,6 +925,7 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
+	b.processingFactory = processingFactory
 	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
