@@ -1,4 +1,4 @@
-FROM docker.elastic.co/observability/stream:v0.6.1
+FROM docker.elastic.co/observability/stream:v0.7.0
 
 RUN apt update && \
     apt -y install curl

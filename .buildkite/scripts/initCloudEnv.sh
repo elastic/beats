@@ -63,38 +63,6 @@ dockerTeardown() {
   docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
 }
 
-terraformSetup() {
-  max_retries=2
-  timeout=5
-  retries=0
-
-  while true; do
-    echo "~~~ Setting up Terraform"
-    out=$(terraformApply 2>&1)
-    exit_code=$?
-
-    echo "$out"
-
-    if [ $exit_code -eq 0 ]; then
-      break
-    else
-      retries=$((retries + 1))
-
-      if [ $retries -gt $max_retries ]; then
-        teardown
-        echo "+++ Terraform init & apply failed: $out"
-        exit 1
-      fi
-
-      teardown
-
-      sleep_time=$((timeout * retries))
-      echo "~~~~ Retry #$retries failed. Retrying after ${sleep_time}s..."
-      sleep $sleep_time
-    fi
-  done
-}
-
 teardown() {
   terraformDestroy
   dockerTeardown
@@ -104,4 +72,4 @@ trap 'teardown' EXIT
 
 exportAwsSecrets
 dockerUp
-terraformSetup
+terraformApply
