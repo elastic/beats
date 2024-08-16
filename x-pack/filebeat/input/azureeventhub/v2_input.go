@@ -457,6 +457,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 		}
 
 		if len(events) == 0 {
+			in.log.Debugw(
+				"no events received",
+				"partition_id", partitionID,
+			)
 			continue
 		}
 
