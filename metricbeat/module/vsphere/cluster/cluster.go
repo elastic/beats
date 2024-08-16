@@ -100,15 +100,15 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	pc := property.DefaultCollector(c)
 
-	for _, cl := range clt {
+	for i := range clt {
 
-		assetNames, err := getAssetNames(ctx, pc, &cl)
+		assetNames, err := getAssetNames(ctx, pc, &clt[i])
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve object from host: %w", err)
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(cl, assetNames),
+			MetricSetFields: m.eventMapping(clt[i], assetNames),
 		})
 	}
 
