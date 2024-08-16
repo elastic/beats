@@ -388,7 +388,7 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 		go func() {
 			in.log.Infow(
 				"starting a partition worker",
-				"partition", partitionID,
+				"partition_id", partitionID,
 			)
 
 			if err := in.processEventsForPartition(ctx, processorPartitionClient); err != nil {
@@ -397,13 +397,13 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 				in.log.Infow(
 					"stopping processing events for partition",
 					"reason", err,
-					"partition", partitionID,
+					"partition_id", partitionID,
 				)
 			}
 
 			in.log.Infow(
 				"partition worker exited",
-				"partition", partitionID,
+				"partition_id", partitionID,
 			)
 		}()
 	}
@@ -428,7 +428,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 		// 3/3 [END] Do cleanup here, like shutting down database clients
 		// or other resources used for processing this partition.
 		shutdownPartitionResources(ctx, partitionClient, pipelineClient)
-		in.log.Debugw("partition resources cleaned up", "partition", partitionID)
+		in.log.Debugw(
+			"partition resources cleaned up",
+			"partition_id", partitionID,
+		)
 	}()
 
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
@@ -444,7 +447,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 			if errors.As(err, &eventHubError) && eventHubError.Code == azeventhubs.ErrorCodeOwnershipLost {
 				in.log.Infow(
 					"ownership lost for partition, stopping processing",
-					"partition", partitionID,
+					"partition_id", partitionID,
 				)
 
 				return nil
@@ -537,7 +540,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			if !ok {
 				log.Errorw(
 					"error updating checkpoint",
-					"partition", partitionClient.PartitionID(),
+					"partition_id", partitionClient.PartitionID(),
 					"acked", acked,
 					"error", "invalid data type",
 					"type", fmt.Sprintf("%T", data),
@@ -555,7 +558,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 
 			log.Debugw(
 				"checkpoint updated",
-				"partition", partitionClient.PartitionID(),
+				"partition_id", partitionClient.PartitionID(),
 				"acked", acked,
 				"sequence_number", receivedEventData.SequenceNumber,
 				"offset", receivedEventData.Offset,
