@@ -153,10 +153,25 @@ func (conf *azureInputConfig) Validate() error {
 		}
 	case processorV2:
 		if conf.SAKey != "" {
-			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
+			logger.Warnf("storage_account_key is not used in processor v2; please remove it from the configuration and use the connection string instead (config: storage_account_connection_string)")
 		}
 		if conf.SAConnectionString == "" {
-			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			if conf.SAKey == "" {
+				// No connection string and no key, so we can't proceed.
+				return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
+			}
+
+			// To avoid breaking changes, and ease the migration from v1 to v2,
+			// we can build the connection string using the following settings:
+			//
+			// - DefaultEndpointsProtocol=https;
+			// - AccountName=<SAName>;
+			// - AccountKey=<SAKey>;
+			// - EndpointSuffix=core.windows.net
+			//
+			logger.Warnf("trying to use storage_account_key to build the storage_account_connection_string with DefaultEndpointsProtocol=https and EndpointSuffix=core.windows.net; it may not work fow all cases, so please set connection string instead (config: storage_account_connection_string)")
+			conf.SAConnectionString = fmt.Sprintf("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;EndpointSuffix=core.windows.net", conf.SAName, conf.SAKey)
+			conf.SAKey = "" // the SA client accepts a key or a connection string, but not both.
 		}
 	default:
 		return fmt.Errorf(
