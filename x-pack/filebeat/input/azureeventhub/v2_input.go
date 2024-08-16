@@ -474,30 +474,32 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 // processReceivedEvents
 func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, partitionID string, pipelineClient beat.Client) error {
 	processingStartTime := time.Now()
-	eventHubMetadata := mapstr.M{
-		"partition_id":   partitionID,
-		"eventhub":       in.config.EventHubName,
-		"consumer_group": in.config.ConsumerGroup,
-	}
 
 	for _, receivedEventData := range receivedEvents {
+		eventHubMetadata := mapstr.M{
+			"partition_id":   partitionID,
+			"eventhub":       in.config.EventHubName,
+			"consumer_group": in.config.ConsumerGroup,
+		}
+
 		// Update input metrics.
 		in.metrics.receivedMessages.Inc()
 		in.metrics.receivedBytes.Add(uint64(len(receivedEventData.Body)))
+
+		_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
+		_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
+		_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
+
+		// The partition key is optional.
+		if receivedEventData.PartitionKey != nil {
+			_, _ = eventHubMetadata.Put("partition_key", *receivedEventData.PartitionKey)
+		}
 
 		// A single event can contain multiple records.
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
 		for _, record := range records {
-			_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
-			_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
-			_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
-
-			// The partition key is optional.
-			if receivedEventData.PartitionKey != nil {
-				_, _ = eventHubMetadata.Put("partition_key", *receivedEventData.PartitionKey)
-			}
 
 			event := beat.Event{
 				// this is the default value for the @timestamp field; usually the ingest
