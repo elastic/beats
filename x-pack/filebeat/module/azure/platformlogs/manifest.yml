@@ -22,6 +22,8 @@ var:
     default: "10s"
   - name: processor_start_position
     default: "earliest"
+  - name: processor_log_events
+    default: no
   - name: partition_receive_timeout
     default: "5s"
   - name: partition_receive_count

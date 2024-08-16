@@ -50,6 +50,18 @@ type azureInputConfig struct {
 	// ProcessorStartPosition Controls the start position for all partitions
 	// (processor v2 only). Default is "earliest".
 	ProcessorStartPosition string `config:"processor_start_position"`
+	// ProcessorLogEvents controls if the processor should log
+	// internal events using the debug log level (processor v2 only).
+	// Default is false.
+	//
+	// When enabled, the processor logs the following events:
+	//
+	// - azeventhubs.EventConn
+	// - azeventhubs.EventAuth
+	// - azeventhubs.EventConsumer
+	//
+	// This option is useful for debugging purposes.
+	ProcessorLogEvents bool `config:"processor_log_events"`
 	// PartitionReceiveTimeout controls the batching of incoming messages together
 	// with `PartitionReceiveCount` (processor v2 only). Default is 5s.
 	//
