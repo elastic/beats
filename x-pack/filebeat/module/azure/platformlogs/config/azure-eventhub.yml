@@ -27,6 +27,14 @@ storage_account_container: filebeat-platformlogs-{{ .eventhub }}
 {{ end }}
 {{ end }}
 
+{{ if .active_directory_endpoint }}
+active_directory_endpoint: {{ .active_directory_endpoint }}
+{{ end }}
+
+{{ if .resource_manager_audience }}
+resource_manager_audience: {{ .resource_manager_audience }}
+{{ end }}
+
 {{ if .resource_manager_endpoint }}
 resource_manager_endpoint: {{ .resource_manager_endpoint }}
 {{ end }}

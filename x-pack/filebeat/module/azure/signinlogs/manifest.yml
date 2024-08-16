@@ -12,6 +12,8 @@ var:
   - name: storage_account_key
   - name: storage_account_connection_string
   - name: storage_account_container
+  - name: active_directory_endpoint
+  - name: resource_manager_audience
   - name: resource_manager_endpoint
   - name: tags
     default: [forwarded]

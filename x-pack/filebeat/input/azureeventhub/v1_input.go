@@ -121,7 +121,7 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 		return err
 	}
 
-	env, err := getAzureEnvironment(in.config.OverrideEnvironment)
+	env, err := getAzureEnvironment(in.config.ResourceManagerEndpoint)
 	if err != nil {
 		return err
 	}
@@ -298,14 +298,14 @@ func stripConnectionString(c string) string {
 	return "(redacted)"
 }
 
-func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
+func getAzureEnvironment(customResourceManagerEndpoint string) (azure.Environment, error) {
 	// if no override is set then the azure public cloud is used
-	if overrideResManager == "" || overrideResManager == "<no value>" {
+	if customResourceManagerEndpoint == "" || customResourceManagerEndpoint == "<no value>" {
 		return azure.PublicCloud, nil
 	}
-	if env, ok := environments[overrideResManager]; ok {
+	if env, ok := environments[customResourceManagerEndpoint]; ok {
 		return env, nil
 	}
 	// can retrieve hybrid env from the resource manager endpoint
-	return azure.EnvironmentFromURL(overrideResManager)
+	return azure.EnvironmentFromURL(customResourceManagerEndpoint)
 }

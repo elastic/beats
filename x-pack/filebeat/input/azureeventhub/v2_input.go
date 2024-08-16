@@ -10,9 +10,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -108,7 +107,6 @@ func (in *eventHubInputV2) Run(
 
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
-
 	// Decode the messages from event hub into
 	// a `[]string`.
 	in.messageDecoder = messageDecoder{
@@ -117,13 +115,39 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		metrics: in.metrics,
 	}
 
+	// Defaults to the public Azure cloud.
+	activeDirectoryAuthorityHost := cloud.AzurePublic.ActiveDirectoryAuthorityHost
+	if in.config.ActiveDirectoryEndpoint != "" {
+		activeDirectoryAuthorityHost = in.config.ActiveDirectoryEndpoint
+	}
+
+	// If the user has provided a custom resource manager endpoint,
+	// we update the configuration.
+	//services := cloud.AzurePublic.Services
+	resourceManagerConfig := cloud.AzurePublic.Services[cloud.ResourceManager]
+	if in.config.ResourceManagerAudience != "" {
+		resourceManagerConfig.Audience = in.config.ResourceManagerAudience
+	}
+	if in.config.ResourceManagerEndpoint != "" {
+		resourceManagerConfig.Endpoint = in.config.ResourceManagerEndpoint
+	}
+
+	// Create the Storage Account container client.
 	containerClient, err := container.NewClientFromConnectionString(
 		in.config.SAConnectionString,
 		in.config.SAContainer,
 		&container.ClientOptions{
+			//ClientOptions: azcore.ClientOptions{
+			//	// FIXME: check more pipelineClient creation options.
+			//	Cloud: cloud.AzureChina,
+			//},
 			ClientOptions: azcore.ClientOptions{
-				// FIXME: check more pipelineClient creation options.
-				Cloud: cloud.AzurePublic,
+				Cloud: cloud.Configuration{
+					ActiveDirectoryAuthorityHost: activeDirectoryAuthorityHost,
+					Services: map[cloud.ServiceName]cloud.ServiceConfiguration{
+						cloud.ResourceManager: resourceManagerConfig,
+					},
+				},
 			},
 		},
 	)

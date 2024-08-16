@@ -34,8 +34,12 @@ type azureInputConfig struct {
 	// SAContainer is the name of the storage account container to store
 	// partition ownership and checkpoint information.
 	SAContainer string `config:"storage_account_container"`
+	// ActiveDirectoryEndpoint is the endpoint for the Active Directory (processor v2 only)
+	ActiveDirectoryEndpoint string `config:"active_directory_endpoint"`
+	// ResourceManagerAudience is the audience for the resource manager endpoint (processor v2 only)
+	ResourceManagerAudience string `config:"resource_manager_audience"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
-	OverrideEnvironment string `config:"resource_manager_endpoint"`
+	ResourceManagerEndpoint string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
