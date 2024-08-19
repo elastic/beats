@@ -33229,6 +33229,13 @@ type: keyword
 
 --
 
+*`elasticsearch.ml.job.model_size_stats.model_bytes`*::
++
+--
+type: long
+
+--
+
 
 *`elasticsearch.ml.job.data_counts.invalid_date_count`*::
 +

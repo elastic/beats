@@ -19,6 +19,8 @@
       fields:
         - name: memory_status
           type: keyword
+    - name: model_size_stats.model_bytes
+      type: long
     - name: data_counts
       type: group
       fields:

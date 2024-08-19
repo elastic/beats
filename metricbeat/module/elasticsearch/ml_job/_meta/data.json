@@ -18,6 +18,9 @@
                 "model_size": {
                     "memory_status": "ok"
                 },
+                "model_size_stats": {
+                  "model_bytes": 50440
+                },
                 "state": "closed"
             }
         },
