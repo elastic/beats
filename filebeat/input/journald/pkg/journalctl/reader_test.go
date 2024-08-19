@@ -20,7 +20,9 @@ package journalctl
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"sync/atomic"
 	"testing"
 
@@ -35,38 +37,33 @@ var coredumpJSON []byte
 // TestEventWithNonStringData ensures the Reader can read data that is not a
 // string. There is at least one real example of that: coredumps.
 // This test uses a real example captured from journalctl -o json.
-//
+
 // If needed more test cases can be added in the future
-// func TestEventWithNonStringData(t *testing.T) {
-// 	t.Skip("TODO: Re-write this test to test the correct type.")
-// 	testCases := []json.RawMessage{}
-// 	if err := json.Unmarshal(coredumpJSON, &testCases); err != nil {
-// 		t.Fatalf("could not unmarshal the contents from 'testdata/message-byte-array.json' into map[string]any: %s", err)
-// 	}
+func TestEventWithNonStringData(t *testing.T) {
+	testCases := []json.RawMessage{}
+	if err := json.Unmarshal(coredumpJSON, &testCases); err != nil {
+		t.Fatalf("could not unmarshal the contents from 'testdata/message-byte-array.json' into map[string]any: %s", err)
+	}
 
-// 	for idx, event := range testCases {
-// 		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
-// 			// stdout := io.NopCloser(&bytes.Buffer{})
-// 			// stderr := io.NopCloser(&bytes.Buffer{})
-// 			r := Reader{
-// 				logger: logp.L(),
-// 				// dataChan: make(chan []byte),
-// 				// errChan:  make(chan string),
-// 				// stdout:   stdout,
-// 				// stderr:   stderr,
-// 			}
+	for idx, rawEvent := range testCases {
+		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
+			mock := JctlMock{
+				NextFunc: func(canceler input.Canceler) ([]byte, error) {
+					return rawEvent, nil
+				},
+			}
+			r := Reader{
+				logger: logp.L(),
+				jctl:   &mock,
+			}
 
-// 			go func() {
-// 				r.dataChan <- []byte(event)
-// 			}()
-
-// 			_, err := r.Next(context.Background())
-// 			if err != nil {
-// 				t.Fatalf("did not expect an error: %s", err)
-// 			}
-// 		})
-// 	}
-// }
+			_, err := r.Next(context.Background())
+			if err != nil {
+				t.Fatalf("did not expect an error: %s", err)
+			}
+		})
+	}
+}
 
 //go:embed testdata/sample-journal-event.json
 var jdEvent []byte
