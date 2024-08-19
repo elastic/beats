@@ -398,7 +398,8 @@ scanner:
 				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
 			},
 		}
-		nextEvt := loginp.FSEvent{} //nolint:staticcheck False positive, nextEvt is used below.
+		//lint:ignore SA4006 False positive, nextEvt is used below.
+		nextEvt := loginp.FSEvent{}
 
 		// Events can be out of order, at least on Windows, so we
 		// need to check the fileneame, then compare the events.
