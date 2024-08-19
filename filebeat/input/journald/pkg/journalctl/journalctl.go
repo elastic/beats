@@ -25,11 +25,14 @@ type journalctl struct {
 	canceler input.Canceler
 }
 
-func newJournalctl(ctx input.Canceler, logger *logp.Logger, binary string, args ...string) (*journalctl, error) {
+// Factory returns an instance of journalctl ready to use.
+//
+// The returned type is an interface to allow mocking for testing
+func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
 	cmd := exec.Command(binary, args...)
 
 	jctl := journalctl{
-		canceler: ctx,
+		canceler: canceller,
 		cmd:      cmd,
 		dataChan: make(chan []byte),
 		errChan:  make(chan string),

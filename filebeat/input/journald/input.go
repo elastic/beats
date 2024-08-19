@@ -132,6 +132,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return err
@@ -161,6 +162,7 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return fmt.Errorf("could not start journal reader: %w", err)

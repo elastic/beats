@@ -50,6 +50,19 @@ type JournalEntry struct {
 	MonotonicTimestamp uint64
 }
 
+// JctlFactory is a function that returns an instance of journalctl ready to use.
+// It exists to allow testing
+type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error)
+
+// Jctl abstracts the call to journalctl, it exists only for testing purposes
+//
+//go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
+type Jctl interface {
+	Next(input.Canceler) ([]byte, error)
+	Error() <-chan string
+	Kill() error
+}
+
 // Reader reads entries from journald by calling `jouranlctl`
 // and reading its output.
 //
@@ -69,7 +82,8 @@ type Reader struct {
 	canceler input.Canceler
 	wg       sync.WaitGroup
 
-	jctl *journalctl
+	jctl        Jctl
+	jctlFactory JctlFactory
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
@@ -126,7 +140,9 @@ func New(
 	mode SeekMode,
 	cursor string,
 	since time.Duration,
-	file string) (*Reader, error) {
+	file string,
+	newJctl JctlFactory,
+) (*Reader, error) {
 
 	args := []string{"--utc", "--output=json", "--follow"}
 	if file != "" && file != localSystemJournalID {
@@ -151,17 +167,18 @@ func New(
 
 	otherArgs := handleSeekAndCursor(mode, since, cursor)
 
-	jctl, err := newJournalctl(canceler, logger.Named("journalctl-runner"), "journalctl", append(args, otherArgs...)...)
+	jctl, err := newJctl(canceler, logger.Named("journalctl-runner"), "journalctl", append(args, otherArgs...)...)
 	if err != nil {
 		return &Reader{}, err
 	}
 
 	r := Reader{
-		args:     args,
-		cursor:   cursor,
-		jctl:     jctl,
-		logger:   logger.Named("reader"),
-		canceler: canceler,
+		args:        args,
+		cursor:      cursor,
+		jctl:        jctl,
+		logger:      logger.Named("reader"),
+		canceler:    canceler,
+		jctlFactory: newJctl,
 	}
 
 	return &r, nil
@@ -216,17 +233,17 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 	default:
 		// Two options:
 		//   - No error, go parse the message
-		//   - Error, if journalctl is not running any more, restart it
+		//   - Error, journalctl is not running any more, restart it
 		if err != nil {
 			r.logger.Warnf("reader error: '%s', restarting...", err)
-			jctl, err := newJournalctl(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", append(r.args, "--after-cursor", r.cursor)...)
+			jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", append(r.args, "--after-cursor", r.cursor)...)
 			if err != nil {
 				// If we cannot restart journalct, there is nothing we can do.
 				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
 			}
 			r.jctl = jctl
 
-			// Return an empty message and wait for the input to all us again
+			// Return an empty message and wait for the input to call us again
 			return JournalEntry{}, nil
 		}
 	}
