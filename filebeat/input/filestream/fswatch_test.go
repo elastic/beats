@@ -398,7 +398,7 @@ scanner:
 				Info:     testFileInfo{name: secondBasename, size: 5}, // "line\n"
 			},
 		}
-		nextEvt := loginp.FSEvent{}
+		nextEvt := loginp.FSEvent{} //nolint:staticcheck
 
 		// Events can be out of order, at least on Windows, so we
 		// need to check the fileneame, then compare the events.
@@ -810,7 +810,7 @@ scanner:
     offset: 0
     length: 1024
 `
-		logp.DevelopmentSetup(logp.ToObserverOutput())
+		logp.DevelopmentSetup(logp.ToObserverOutput()) //nolint:errcheck
 
 		// this file is 128 bytes long
 		paths := []string{filepath.Join(dir, undersizedBasename)}
