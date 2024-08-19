@@ -145,15 +145,15 @@ func newConstantS3(t testing.TB) *constantS3 {
 	}
 }
 
-func (c constantS3) GetObject(context.Context, string, string) (*s3.GetObjectOutput, error) {
+func (c constantS3) GetObject(context.Context, string, string, string) (*s3.GetObjectOutput, error) {
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
-func (c constantS3) CopyObject(context.Context, string, string, string, string) (*s3.CopyObjectOutput, error) {
+func (c constantS3) CopyObject(context.Context, string, string, string, string, string) (*s3.CopyObjectOutput, error) {
 	return nil, nil
 }
 
-func (c constantS3) DeleteObject(context.Context, string, string) (*s3.DeleteObjectOutput, error) {
+func (c constantS3) DeleteObject(context.Context, string, string, string) (*s3.DeleteObjectOutput, error) {
 	return nil, nil
 }
 

@@ -40,7 +40,7 @@ func TestProcessStatusReporter(t *testing.T) {
 	tests.InitBeatsForTest(t, cmd.RootCmd)
 
 	filename := fmt.Sprintf("test-%d", time.Now().Unix())
-	outPath := filepath.Join(os.TempDir(), filename)
+	outPath := filepath.Join(t.TempDir(), filename)
 	t.Logf("writing output to file %s", outPath)
 	err := os.Mkdir(outPath, 0775)
 	require.NoError(t, err)
@@ -49,12 +49,12 @@ func TestProcessStatusReporter(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	/*
-	 * process with pid=-1 doesn't exist. This should degrade the input for a while */
+	// process with pid=-1 doesn't exist. This should degrade the input for a while
 	inputStreamIncorrectPid := getInputStream(unitOneID, -1, 1)
-	/*
-	 * process with valid pid. This should change state to healthy */
+
+	// process with valid pid. This should change state to healthy
 	inputStreamCorrectPid := getInputStream(unitOneID, os.Getpid(), 2)
+
 	outputExpectedStream := proto.UnitExpected{
 		Id:             unitOutID,
 		Type:           proto.UnitType_OUTPUT,
@@ -85,7 +85,7 @@ func TestProcessStatusReporter(t *testing.T) {
 	observedStates := make(chan *proto.CheckinObserved)
 	expectedUnits := make(chan []*proto.UnitExpected)
 	done := make(chan struct{})
-	// V2 mock server
+
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
 			select {
@@ -101,7 +101,7 @@ func TestProcessStatusReporter(t *testing.T) {
 			return nil
 		},
 	}
-	require.NoError(t, server.Start())
+	require.NoError(t, server.Start(), "could not start V2 mock server")
 	defer server.Stop()
 
 	// start the client
@@ -149,9 +149,10 @@ func TestProcessStatusReporter(t *testing.T) {
 		},
 	}
 
-	timer := time.NewTimer(2 * time.Minute)
-	id := 0
-	for id < len(scenarios) {
+	timeout := 2 * time.Minute
+	timer := time.NewTimer(timeout)
+
+	for id := 0; id < len(scenarios); {
 		select {
 		case observed := <-observedStates:
 			state := extractState(observed.GetUnits(), unitOneID)
@@ -166,10 +167,10 @@ func TestProcessStatusReporter(t *testing.T) {
 			outputState := extractState(observed.GetUnits(), unitOutID)
 			require.Equal(t, outputState, proto.State_HEALTHY)
 
-			timer.Reset(2 * time.Minute)
+			timer.Reset(timeout)
 			id++
 		case <-timer.C:
-			t.Fatal("timeout waiting for checkin")
+			t.Fatalf("timeout after %s waiting for checkin", timeout)
 		default:
 		}
 	}

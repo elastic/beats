@@ -59,7 +59,7 @@ func NewConverter(log *logp.Logger, conversions FieldConversion) *Converter {
 // configured conversion rules.
 // Field type conversion errors are logged to at debug level and the original
 // value is added to the map.
-func (c *Converter) Convert(entryFields map[string]string) mapstr.M {
+func (c *Converter) Convert(entryFields map[string]any) mapstr.M {
 	fields := mapstr.M{}
 	var custom mapstr.M
 
@@ -89,15 +89,19 @@ func (c *Converter) Convert(entryFields map[string]string) mapstr.M {
 	return withECSEnrichment(fields)
 }
 
-func convertValue(fc Conversion, value string) (interface{}, error) {
+func convertValue(fc Conversion, value any) (interface{}, error) {
 	if fc.IsInteger {
-		v, err := strconv.ParseInt(value, 10, 64)
+		strValue, isString := value.(string)
+		if !isString {
+			return nil, fmt.Errorf("value  '%[1]v', type %[1]T is not a string", value)
+		}
+		v, err := strconv.ParseInt(strValue, 10, 64)
 		if err != nil {
 			// On some versions of systemd the 'syslog.pid' can contain the username
 			// appended to the end of the pid. In most cases this does not occur
 			// but in the cases that it does, this tries to strip ',\w*' from the
 			// value and then perform the conversion.
-			s := strings.Split(value, ",")
+			s := strings.Split(strValue, ",")
 			v, err = strconv.ParseInt(s[0], 10, 64)
 			if err != nil {
 				return value, fmt.Errorf("failed to convert field %s \"%v\" to int: %w", fc.Names[0], value, err)

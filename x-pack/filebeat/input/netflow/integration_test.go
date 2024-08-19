@@ -41,7 +41,8 @@ const (
 
 func TestNetFlowIntegration(t *testing.T) {
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
@@ -128,6 +129,7 @@ func TestNetFlowIntegration(t *testing.T) {
 							"queue_size":            2 * 4 * 1600,
 							"detect_sequence_reset": true,
 							"max_message_size":      "10KiB",
+							"workers":               100,
 						}),
 					},
 				},
@@ -205,7 +207,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	require.NoError(t, err)
 
-	data, err := os.ReadFile("testdata/golden/ipfix_cisco.pcap.golden.json")
+	data, err := os.ReadFile("testdata/golden/ipfix_cisco.reversed.pcap.golden.json")
 	require.NoError(t, err)
 
 	var expectedFlows struct {
@@ -214,7 +216,7 @@ func TestNetFlowIntegration(t *testing.T) {
 	err = json.Unmarshal(data, &expectedFlows)
 	require.NoError(t, err)
 
-	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.pcap")
+	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.reversed.pcap")
 	require.NoError(t, err)
 	defer f.Close()
 
@@ -331,35 +333,13 @@ func HasDataStream(ctx context.Context, username string, password string, url st
 	return nil
 }
 
-// Hit represents a single search hit.
-type Hit struct {
-	Index  string                 `json:"_index"`
-	Type   string                 `json:"_type"`
-	ID     string                 `json:"_id"`
-	Score  float64                `json:"_score"`
-	Source map[string]interface{} `json:"_source"`
-}
-
-type Total struct {
-	Value uint64 `json:"value"`
-}
-
-// Hits are the collections of search hits.
-type Hits struct {
-	Total Total // model when needed
-	Hits  []Hit `json:"hits"`
-}
-
-// SearchResults are the results returned from a _search.
-type SearchResults struct {
-	Took   int
-	Hits   Hits                       `json:"hits"`
-	Shards json.RawMessage            // model when needed
-	Aggs   map[string]json.RawMessage // model when needed
+// CountResults are the results returned from a _search.
+type CountResults struct {
+	Count uint64 `json:"count"`
 }
 
 func DataStreamEventsCount(ctx context.Context, username string, password string, url string, name string) (uint64, error) {
-	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!_ignored:*+AND+!event.message:*", url, name))
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_count?q=!_ignored:*+AND+!event.message:*", url, name))
 	if err != nil {
 		return 0, err
 	}
@@ -368,12 +348,12 @@ func DataStreamEventsCount(ctx context.Context, username string, password string
 		return 0, errors.New("http not found error")
 	}
 
-	var results SearchResults
+	var results CountResults
 	err = json.Unmarshal(resultBytes, &results)
 	if err != nil {
 		return 0, err
 	}
-	return results.Hits.Total.Value, nil
+	return results.Count, nil
 }
 
 // DeleteResults are the results returned from a _data_stream delete.
