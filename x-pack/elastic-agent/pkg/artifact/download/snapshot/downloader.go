@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -107,9 +108,13 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 		Packages map[string]interface{} `json:"packages"`
 	}{}
 
-	dec := json.NewDecoder(resp.Body)
-	if err := dec.Decode(&body); err != nil {
-		return "", err
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("reading artifactsURI response: %w", err)
+	}
+
+	if err := json.Unmarshal(bodyBytes, &body); err != nil {
+		return "", fmt.Errorf("decoding artifactsURI response %s: %w", string(bodyBytes), err)
 	}
 
 	if len(body.Packages) == 0 {
