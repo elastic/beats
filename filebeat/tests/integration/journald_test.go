@@ -48,6 +48,12 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
 			t.Errorf("could not terminate systemd-cat: %s", err)
 		}
+
+		if err := cmd.Wait(); err != nil {
+			t.Errorf("error waiting for system-cat to finish: %s", err)
+		}
+
+		fmt.Println("Success?", cmd.ProcessState.Success(), "Exit code:", cmd.ProcessState.ExitCode())
 	}()
 
 	for count := 1; count <= max; count++ {
