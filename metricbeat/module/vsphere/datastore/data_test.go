@@ -61,8 +61,9 @@ func TestEventMapping(t *testing.T) {
 	outputEvent := m.eventMapping(DatastoreTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"fstype": "local",
-		"status": "green",
+		"status": types.ManagedEntityStatus("green"),
 		"iops":   int64(10),
+		"name":   "datastore-test",
 		"host": mapstr.M{
 			"count": 1,
 			"names": []string{"DC3_H0"},
