@@ -67023,6 +67023,95 @@ type: keyword
 --
 
 [float]
+=== network
+
+network
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+At least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+The configStatus indicates whether or not the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts on the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts on the network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of Network.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines on the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines on the network.
+
+
+type: long
+
+--
+
+[float]
 === virtualmachine
 
 virtualmachine
