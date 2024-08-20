@@ -253,6 +253,14 @@ func (b *BeatProc) startBeat() {
 	require.NoError(b.t, err, "error starting beat process")
 
 	b.Process = cmd.Process
+
+	b.t.Cleanup(func() {
+		// If the test failed, print the whole cmd line to help debugging
+		if b.t.Failed() {
+			args := strings.Join(cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+		}
+	})
 }
 
 // waitBeatToExit blocks until the Beat exits.
