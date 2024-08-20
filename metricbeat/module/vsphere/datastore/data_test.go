@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
