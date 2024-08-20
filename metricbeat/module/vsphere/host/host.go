@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to logout from vshphere: %w", err)
+			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vshphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
 		}
 	}()
 
@@ -159,7 +159,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	for i := range hst {
 		assetNames, err := getAssetNames(ctx, pc, &hst[i])
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from host: %w", err)
+			m.Logger().Errorf("Failed to retrieve object from host %s: %w", hst[i].Name, err)
 		}
 
 		spec := types.PerfQuerySpec{
@@ -172,7 +172,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 		if err != nil {
-			m.Logger().Errorf("Failed to query performance data: %v", err)
+			m.Logger().Errorf("Failed to query performance data from host %s: %v", hst[i].Name, err)
 			continue
 		}
 
@@ -183,7 +183,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 		results, err := perfManager.ToMetricSeries(ctx, samples)
 		if err != nil {
-			m.Logger().Errorf("Failed to convert performance data: %v", err)
+			m.Logger().Errorf("Failed to convert performance data to metric series for host %s: %v", hst[i].Name, err)
 		}
 
 		metricMap := make(map[string]interface{})
@@ -192,13 +192,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				metricMap[result.Name] = result.Value[0]
 				continue
 			}
-			m.Logger().Debugf("Metric %v: No result found", result.Name)
+			m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
 		}
 
 		reporter.Event(mb.Event{
 			MetricSetFields: m.eventMapping(hst[i], &metricData{
 				perfMetrics: metricMap,
-				assetsName:  *assetNames,
+				assetsName:  assetNames,
 			}),
 		})
 	}
@@ -206,15 +206,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	return nil
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSystem) (*assetNames, error) {
-	referenceList := make([]types.ManagedObjectReference, 0, len(hs.Datastore)+len(hs.Vm))
-	referenceList = append(referenceList, hs.Datastore...)
-	referenceList = append(referenceList, hs.Vm...)
+func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSystem) (assetNames, error) {
+	referenceList := append(hs.Datastore, hs.Vm...)
 
 	var objects []mo.ManagedEntity
 	if len(referenceList) > 0 {
 		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return assetNames{}, err
 		}
 	}
 
@@ -232,20 +230,18 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 
 	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
 	// instead mo.Network.Name contains correct value of Network name
-	var netObjects []mo.Network
+	outputNetworkNames := make([]string, 0, len(hs.Network))
 	if len(hs.Network) > 0 {
+		var netObjects []mo.Network
 		if err := pc.Retrieve(ctx, hs.Network, []string{"name"}, &netObjects); err != nil {
-			return nil, err
+			return assetNames{}, err
+		}
+		for _, ob := range netObjects {
+			outputNetworkNames = append(outputNetworkNames, strings.ReplaceAll(ob.Name, ".", "_"))
 		}
 	}
 
-	outputNetworkNames := make([]string, 0, len(hs.Network))
-	for _, ob := range netObjects {
-		name := strings.ReplaceAll(ob.Name, ".", "_")
-		outputNetworkNames = append(outputNetworkNames, name)
-	}
-
-	return &assetNames{
+	return assetNames{
 		outputNetworkNames: outputNetworkNames,
 		outputDsNames:      outputDsNames,
 		outputVmNames:      outputVmNames,
