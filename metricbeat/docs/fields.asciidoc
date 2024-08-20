@@ -67055,7 +67055,7 @@ type: long
 *`vsphere.resourcepool.cpu.usage.mhz`*::
 +
 --
-CPU usage average in MHz.
+CPU usage average in Mhz.
 
 
 type: long
@@ -67075,7 +67075,7 @@ type: long
 --
 
 
-*`vsphere.resourcepool.cpu.max.pct`*::
+*`vsphere.resourcepool.cpu.active.max.pct`*::
 +
 --
 CPU active max in percentage.
@@ -67112,7 +67112,7 @@ type: long
 *`vsphere.resourcepool.memory.shared.bytes`*::
 +
 --
-Memory shared average in Bytes.
+Memory shared average in bytes.
 
 
 type: long
@@ -67125,7 +67125,7 @@ format: bytes
 *`vsphere.resourcepool.memory.swap.bytes`*::
 +
 --
-Memory swap in average in Bytes.
+Memory swap in average in bytes.
 
 
 type: long
@@ -67148,6 +67148,27 @@ type: keyword
 +
 --
 The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.resourcepool.vm.count`*::
++
+--
+Number of virtual machines on the resource pool.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.vm.names`*::
++
+--
+Names of the virtual machines on the resource pool.
 
 
 type: keyword
