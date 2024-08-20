@@ -917,7 +917,8 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 }
 
 func (b *BeatProc) CountFileLines(glob string) int {
-	file := b.openGlobFile(glob, true) // 	defer file.Close()
+	file := b.openGlobFile(glob, true)
+	defer file.Close()
 	data, err := io.ReadAll(file)
 	if err != nil {
 		b.t.Fatalf("could not read file '%s': %s", file.Name(), err)
