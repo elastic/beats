@@ -103,7 +103,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		MetricSetFields: outMap,
 	})
 
-	return degradeErr
+	return mb.PartialMetricsError{Err: degradeErr}
 }
 
 // threadStats returns a map of state counts for running threads on a system

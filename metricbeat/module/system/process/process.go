@@ -126,7 +126,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				return err
 			}
 		}
-		return err
+		return mb.PartialMetricsError{Err: err}
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
 		if err != nil {
