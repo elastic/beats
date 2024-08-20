@@ -21,12 +21,25 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
   ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_PYTHON_VERSION: 3.10.9
 
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
 steps:
+  - group: "Pre-commit"
+    steps:
+      - label: "Pre-commit"
+        command: |
+          pre-commit run --from-ref origin/HEAD --to-ref HEAD --show-diff-on-failure
+        plugins:
+          - elastic/pre-commit#v1.0.1
+        agents:
+          image: "docker.elastic.co/ci-agent-images/ubuntu-build-essential:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+
   - group: "Check/Update"
     key: "heartbeat-check-update"
 
