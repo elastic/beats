@@ -108,7 +108,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
-	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst); err != nil {
+	err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst)
+	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
@@ -120,8 +121,6 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
-
-	var spec types.PerfQuerySpec
 
 	// Retrieve only the required metrics
 	requiredMetrics := make(map[string]*types.PerfCounterInfo)
@@ -142,36 +141,37 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		})
 	}
 
-	spec = types.PerfQuerySpec{
-		MetricId:   metricIDs,
-		MaxSample:  1,
-		IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-	}
-
 	pc := property.DefaultCollector(c)
 	for i := range dst {
 		assetNames, err := getAssetNames(ctx, pc, &dst[i])
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
+			continue
 		}
 
-		spec.Entity = dst[i].Reference()
+		spec := types.PerfQuerySpec{
+			Entity:     dst[i].Reference(),
+			MetricId:   metricIDs,
+			MaxSample:  1,
+			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+		}
 
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 		if err != nil {
-			m.Logger().Debug("Failed to query performance data for host %s: %v", dst[i].Name, err)
+			m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
 			continue
 		}
 
 		if len(samples) == 0 {
-			m.Logger().Debug("No samples returned from performance manager")
+			m.Logger().Debugf("No samples returned from performance manager")
 			continue
 		}
 
 		results, err := perfManager.ToMetricSeries(ctx, samples)
 		if err != nil {
-			m.Logger().Debug("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
+			m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
+			continue
 		}
 
 		metricMap := make(map[string]interface{})
@@ -216,7 +216,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 	// calling Host explicitly because of mo.Datastore.hHost has types.DatastoreHostMount instead of mo.ManagedEntity
 	outputHsNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
-		hsRefs := []types.ManagedObjectReference{}
+		hsRefs := make([]types.ManagedObjectReference, 0, len(ds.Host))
 		for _, obj := range ds.Host {
 			if obj.Key.Type == "HostSystem" {
 				hsRefs = append(hsRefs, obj.Key)
@@ -233,7 +233,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		}
 
 		for _, host := range hosts {
-			name := strings.Replace(host.Name, ".", "_", -1)
+			name := strings.ReplaceAll(host.Name, ".", "_")
 			outputHsNames = append(outputHsNames, name)
 		}
 	}

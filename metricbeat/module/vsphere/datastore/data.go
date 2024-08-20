@@ -24,9 +24,6 @@ import (
 )
 
 func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
-
-	usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
-
 	event := mapstr.M{
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
@@ -45,7 +42,7 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 				"bytes": ds.Summary.FreeSpace,
 			},
 			"used": mapstr.M{
-				"bytes": usedSpaceBytes,
+				"bytes": ds.Summary.Capacity - ds.Summary.FreeSpace,
 			},
 		},
 	}
