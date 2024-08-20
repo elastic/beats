@@ -44,14 +44,18 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 	if err := cmd.Start(); err != nil {
 		t.Fatalf("cannot start 'systemd-cat': %s", err)
 	}
-	defer cmd.Process.Kill()
+	defer func() {
+		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
+			t.Errorf("could not terminate systemd-cat: %s", err)
+		}
+	}()
 
 	for count := 1; count <= max; count++ {
 		i, err := fmt.Fprintf(w, "Count: %03d\n", count)
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", i, "bytes written", err)
 		if err != nil {
 			t.Errorf("could not write message to journald: %s", err)
 		}
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", i, "bytes written")
 		time.Sleep(time.Millisecond)
 	}
 }
