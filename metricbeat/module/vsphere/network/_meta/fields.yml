@@ -1,0 +1,44 @@
+- name: network
+  type: group
+  release: beta
+  description: >
+    network
+  fields:
+    - name: accessible
+      type: boolean
+      description: >
+        At least one host is configured to provide this network.
+    - name: config.status
+      type: keyword
+      description: >
+        The configStatus indicates whether or not the system has detected a configuration issue.
+    - name: host
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the hosts on the network.
+        - name: count
+          type: long
+          description: >
+            Number of hosts on the network.
+    - name: name
+      type: keyword
+      description: >
+        Name of Network.
+    - name: status
+      type: keyword
+      description: >
+        General health of Network.
+    - name: vm
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the virtual machines on the network.
+        - name: count
+          type: long
+          description: >
+            Number of virtual machines on the network.

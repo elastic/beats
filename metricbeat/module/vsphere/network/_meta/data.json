@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2024-08-09T05:42:55.582Z",
+    "service": {
+      "address": "https://localhost:8989/sdk",
+      "type": "vsphere"
+    },
+    "event": {
+      "duration": 110445057,
+      "dataset": "vsphere.network",
+      "module": "vsphere"
+    },
+    "metricset": {
+      "period": 10000,
+      "name": "network"
+    },
+    "vsphere": {
+      "network": {
+        "name": "VM Network",
+        "status": "green",
+        "accessible": true,
+        "config": {
+          "status": "green"
+        }
+      }
+    }
+  }
