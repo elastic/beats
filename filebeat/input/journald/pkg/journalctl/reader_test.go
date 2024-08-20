@@ -97,7 +97,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		return &mock, nil
 	}
 
-	reaqder, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, SeekHead, "", 0, "", factory)
+	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, SeekHead, "", 0, "", factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}
@@ -107,17 +107,17 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	}
 
 	// In the first call the mock will return an error, simulating journalctl crashing
-	// we expect no error and an empty entry. The input can handle this situation.
-	entry, err := reaqder.Next(ctx)
-	if err != nil {
-		t.Fatalf("did not expect an error when calling Next: %s", err)
+	// so we should get ErrRestarting
+	entry, err := reader.Next(ctx)
+	if !errors.Is(err, ErrRestarting) {
+		t.Fatalf("expecting ErrRestarting when calling Next and journalctl crashed: %s", err)
 	}
 	if !isEntryEmpty(entry) {
 		t.Fatal("the first call to Next must return an empty JournalEntry because 'journalctl has crashed'")
 	}
 
 	for i := 0; i < 2; i++ {
-		entry, err := reaqder.Next(ctx)
+		entry, err := reader.Next(ctx)
 		if err != nil {
 			t.Fatalf("did not expect an error when calling Next 'after journalctl restart': %s", err)
 		}

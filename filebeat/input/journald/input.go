@@ -181,16 +181,17 @@ func (inp *journald) Run(
 	for {
 		entry, err := parser.Next()
 		if err != nil {
+			switch {
 			// The input has been cancelled, gracefully return
-			if errors.Is(err, journalctl.ErrCancelled) {
+			case errors.Is(err, journalctl.ErrCancelled):
 				return nil
+				// Journalctl is restarting, do ignore the empty event
+			case errors.Is(err, journalctl.ErrRestarting):
+				continue
+			default:
+				logger.Errorf("could not read event: %s", err)
+				return err
 			}
-			logger.Errorf("could not read event: %s", err)
-			return err
-		}
-
-		if entry.IsEmpty() {
-			continue
 		}
 
 		event := entry.ToEvent()

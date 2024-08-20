@@ -41,6 +41,7 @@ const sinceTimeFormat = "2006-01-02 15:04:05.999999999"
 
 // ErrCancelled indicates the read was cancelled
 var ErrCancelled = errors.New("cancelled")
+var ErrRestarting = errors.New("restarting journalctl")
 
 // JournalEntry holds all fields of a journal entry plus cursor and timestamps
 type JournalEntry struct {
@@ -244,7 +245,7 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 			r.jctl = jctl
 
 			// Return an empty message and wait for the input to call us again
-			return JournalEntry{}, nil
+			return JournalEntry{}, ErrRestarting
 		}
 	}
 
