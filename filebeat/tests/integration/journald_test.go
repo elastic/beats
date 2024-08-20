@@ -56,11 +56,6 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 var journaldInputCfg string
 
 func TestJournaldInput(t *testing.T) {
-	// First things first, ensure ES is running and we can connect to it.
-	// If ES is not running, the test will timeout and the only way to know
-	// what caused it is going through Filebeat's logs.
-	integration.EnsureESIsRunning(t)
-
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
