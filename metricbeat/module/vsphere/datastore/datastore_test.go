@@ -57,11 +57,7 @@ func TestFetchEventContents(t *testing.T) {
 		"status",
 		"host.count",
 		"vm.count",
-		// "read.bytes",
 		"write.bytes",
-		// "iops",
-		// "read.latency.total.ms",
-		// "write.latency.total.ms",
 		"capacity.used.bytes",
 	}
 	for _, field := range fields {
