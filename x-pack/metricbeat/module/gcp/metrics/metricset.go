@@ -370,7 +370,7 @@ func (m *MetricSet) setOrganization(ctx context.Context) error {
 	}
 
 	// Get the project ancestor details
-	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Do()
+	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
 	if err != nil {
 		return fmt.Errorf("failed to get project ancestors: %w", err)
 	}
@@ -383,7 +383,7 @@ func (m *MetricSet) setOrganization(ctx context.Context) error {
 		m.config.organizationID = ancestor.ResourceId.Id
 		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
 
-		orgDetails, err := orgReq.Do()
+		orgDetails, err := orgReq.Context(ctx).Do()
 		if err != nil {
 			return fmt.Errorf("failed to get organization details: %w", err)
 		}
