@@ -22,7 +22,6 @@ package journalfield
 import (
 	"testing"
 
-	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -31,12 +30,12 @@ import (
 
 func TestConversion(t *testing.T) {
 	tests := map[string]struct {
-		fields map[string]string
+		fields map[string]any
 		want   mapstr.M
 	}{
 		"field name from fields.go": {
-			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_BOOT_ID: "123456",
+			fields: map[string]any{
+				"_BOOT_ID": "123456",
 			},
 			want: mapstr.M{
 				"journald": mapstr.M{
@@ -47,8 +46,8 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"'syslog.pid' field without user append": {
-			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456",
+			fields: map[string]any{
+				"SYSLOG_PID": "123456",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -57,8 +56,8 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"'syslog.priority' field with junk": {
-			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_PRIORITY: "123456, ",
+			fields: map[string]any{
+				"PRIORITY": "123456, ",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -72,8 +71,8 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"'syslog.pid' field with user append": {
-			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "123456,root",
+			fields: map[string]any{
+				"SYSLOG_PID": "123456,root",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -82,8 +81,8 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"'syslog.pid' field empty": {
-			fields: map[string]string{
-				sdjournal.SD_JOURNAL_FIELD_SYSLOG_PID: "",
+			fields: map[string]any{
+				"SYSLOG_PID": "",
 			},
 			want: mapstr.M{
 				"syslog": mapstr.M{
@@ -92,7 +91,7 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"custom field": {
-			fields: map[string]string{
+			fields: map[string]any{
 				"my_custom_field": "value",
 			},
 			want: mapstr.M{
@@ -104,7 +103,7 @@ func TestConversion(t *testing.T) {
 			},
 		},
 		"dropped field": {
-			fields: map[string]string{
+			fields: map[string]any{
 				"_SOURCE_MONOTONIC_TIMESTAMP": "value",
 			},
 			want: mapstr.M{},

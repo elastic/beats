@@ -15,20 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/stretchr/testify/assert"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
@@ -72,7 +72,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	if err := manager.Init(&e.grp, v2.ModeRun); err != nil {
+	if err := manager.Init(&e.grp); err != nil {
 		e.t.Fatalf("failed to initialise manager: %+v", err)
 	}
 
@@ -89,42 +89,40 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
-		defer grp.Stop()
+		defer func() {
+			if err := grp.Stop(); err != nil {
+				e.t.Errorf("could not stop input: %s", err)
+			}
+		}()
 
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
-		inp.Run(inputCtx, e.pipeline)
+		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx}
+		if err := inp.Run(inputCtx, e.pipeline); err != nil {
+			e.t.Errorf("input 'Run' method returned an error: %s", err)
+		}
 	}(&e.wg, &e.grp)
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
-	for {
+	msg := strings.Builder{}
+	fmt.Fprintf(&msg, "did not find the expected %d events", count)
+	assert.Eventually(e.t, func() bool {
 		sum := len(e.pipeline.GetAllEvents())
 		if sum == count {
-			return
+			return true
 		}
 		if count < sum {
-			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
+			msg.Reset()
+			fmt.Fprintf(&msg, "too many events; expected: %d, actual: %d", count, sum)
+			return false
 		}
-		time.Sleep(10 * time.Millisecond)
-	}
-}
 
-func (e *inputTestingEnvironment) waitUntilInputStops() {
-	e.wg.Wait()
-}
+		msg.Reset()
+		fmt.Fprintf(&msg, "too few events; expected: %d, actual: %d", count, sum)
 
-func (e *inputTestingEnvironment) abspath(filename string) string {
-	return filepath.Join(e.workingDir, filename)
-}
-
-func (e *inputTestingEnvironment) mustWriteFile(filename string, lines []byte) {
-	e.t.Helper()
-	path := e.abspath(filename)
-	if err := os.WriteFile(path, lines, 0o644); err != nil {
-		e.t.Fatalf("failed to write file '%s': %+v", path, err)
-	}
+		return false
+	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
 type testInputStore struct {
@@ -182,15 +180,7 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	}
 	c.ackHandler.ACKEvents(len(events))
 
-	for _, event := range events {
-		c.published = append(c.published, event)
-	}
-}
-
-func (c *mockClient) waitUntilPublishingHasStarted() {
-	for len(c.publishing) == 0 {
-		time.Sleep(10 * time.Millisecond)
-	}
+	c.published = append(c.published, events...)
 }
 
 // Close mocks the Client Close method
@@ -245,26 +235,6 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-}
-
-func (pc *mockPipelineConnector) cancelAllClients() {
-	pc.mtx.Lock()
-	defer pc.mtx.Unlock()
-
-	for _, client := range pc.clients {
-		client.canceler()
-	}
-}
-
-func (pc *mockPipelineConnector) cancelClient(i int) {
-	pc.mtx.Lock()
-	defer pc.mtx.Unlock()
-
-	if len(pc.clients) < i+1 {
-		return
-	}
-
-	pc.clients[i].canceler()
 }
 
 func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
