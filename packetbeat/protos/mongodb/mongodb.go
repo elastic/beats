@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -54,7 +55,7 @@ type mongodbPlugin struct {
 
 type transactionKey struct {
 	tcp common.HashableTCPTuple
-	id  int
+	id  int32
 }
 
 var unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
@@ -232,7 +233,7 @@ func (mongodb *mongodbPlugin) handleMongodb(
 
 func (mongodb *mongodbPlugin) onRequest(conn *mongodbConnectionData, msg *mongodbMessage) {
 	// publish request only transaction
-	if !awaitsReply(msg.opCode) {
+	if !awaitsReply(msg) {
 		mongodb.onTransComplete(msg, nil)
 		return
 	}
@@ -273,7 +274,6 @@ func (mongodb *mongodbPlugin) onResponse(conn *mongodbConnectionData, msg *mongo
 func (mongodb *mongodbPlugin) onTransComplete(requ, resp *mongodbMessage) {
 	trans := newTransaction(requ, resp)
 	debugf("Mongodb transaction completed: %s", trans.mongodb)
-
 	mongodb.publishTransaction(trans)
 }
 
@@ -294,8 +294,9 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		}
 		trans.params = requ.params
 		trans.resource = requ.resource
-		trans.bytesIn = requ.messageLength
+		trans.bytesIn = int(requ.messageLength)
 		trans.documents = requ.documents
+		trans.requestDocuments = requ.documents // preserving request documents that contains mongodb query for the new OP_MSG based protocol
 	}
 
 	// fill response
@@ -308,7 +309,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 		trans.documents = resp.documents
 
 		trans.endTime = resp.ts
-		trans.bytesOut = resp.messageLength
+		trans.bytesOut = int(resp.messageLength)
 
 	}
 
@@ -325,10 +326,18 @@ func (mongodb *mongodbPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	return private
 }
 
-func copyMapWithoutKey(d map[string]interface{}, key string) map[string]interface{} {
+func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]interface{} {
 	res := map[string]interface{}{}
 	for k, v := range d {
-		if k != key {
+		found := false
+		for _, excludeKey := range keys {
+			if k == excludeKey {
+				found = true
+				break
+
+			}
+		}
+		if !found {
 			res[k] = v
 		}
 	}
@@ -337,29 +346,40 @@ func copyMapWithoutKey(d map[string]interface{}, key string) map[string]interfac
 
 func reconstructQuery(t *transaction, full bool) (query string) {
 	query = t.resource + "." + t.method + "("
+	var doc interface{}
+
 	if len(t.params) > 0 {
-		var err error
-		var params string
 		if !full {
 			// remove the actual data.
 			// TODO: review if we need to add other commands here
 			switch t.method {
 			case "insert":
-				params, err = doc2str(copyMapWithoutKey(t.params, "documents"))
+				doc = copyMapWithoutKey(t.params, "documents")
 			case "update":
-				params, err = doc2str(copyMapWithoutKey(t.params, "updates"))
+				doc = copyMapWithoutKey(t.params, "updates")
 			case "findandmodify":
-				params, err = doc2str(copyMapWithoutKey(t.params, "update"))
+				doc = copyMapWithoutKey(t.params, "update")
 			}
 		} else {
-			params, err = doc2str(t.params)
+			doc = t.params
 		}
-		if err != nil {
-			debugf("Error marshaling params: %v", err)
-		} else {
-			query += params
+	} else if len(t.requestDocuments) > 0 { // This recovers the query document from OP_MSG
+		if m, ok := t.requestDocuments[0].(primitive.M); ok {
+			excludeKeys := []string{"lsid"}
+			if !full {
+				excludeKeys = append(excludeKeys, "documents")
+			}
+			doc = copyMapWithoutKey(m, excludeKeys...)
 		}
 	}
+
+	queryString, err := doc2str(doc)
+	if err != nil {
+		debugf("Error marshaling query document: %v", err)
+	} else {
+		query += queryString
+	}
+
 	query += ")"
 	skip, _ := t.event["numberToSkip"].(int)
 	if skip > 0 {

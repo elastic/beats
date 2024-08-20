@@ -20,6 +20,9 @@
 package mongodb
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,6 +77,40 @@ func TestMongodbParser_simpleRequest(t *testing.T) {
 	}
 	if !complete {
 		t.Errorf("Expecting a complete message")
+	}
+}
+
+func TestMongodbParser_OpMsg(t *testing.T) {
+	files := []string{
+		"1req.bin",
+		"1res.bin",
+		"2req.bin",
+		"2req.bin",
+		"3req.bin",
+		"3res.bin",
+	}
+
+	for _, fn := range files {
+		data, err := os.ReadFile(filepath.Join("testdata", fn))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		st := &stream{data: data, message: new(mongodbMessage)}
+
+		ok, complete := mongodbMessageParser(st)
+
+		_, err = json.Marshal(st.message.documents)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !ok {
+			t.Errorf("Parsing returned error")
+		}
+		if !complete {
+			t.Errorf("Expecting a complete message")
+		}
 	}
 }
 
