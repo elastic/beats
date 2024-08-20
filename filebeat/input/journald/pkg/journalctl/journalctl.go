@@ -100,6 +100,8 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		return &journalctl{}, fmt.Errorf("cannot start journalctl: %w", err)
 	}
 
+	logger.Debugf("journalctl started with PID %d", cmd.Process.Pid)
+
 	go func() {
 		if err := cmd.Wait(); err != nil {
 			jctl.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
