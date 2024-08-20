@@ -384,7 +384,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	defer logFile.Close()
 
 	var found bool
-	found, b.logFileOffset = b.searchStrInLogs(logFile, s, b.logFileOffset)
+	found, b.logFileOffset, _ = b.searchStrInLogs(logFile, s, b.logFileOffset)
 	if found {
 		return found
 	}

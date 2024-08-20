@@ -73,7 +73,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 	mock := JctlMock{
 		NextFunc: func(canceler input.Canceler) ([]byte, error) {
-			return []byte(jdEvent), errors.New("journalctl exited with code 42")
+			return jdEvent, errors.New("journalctl exited with code 42")
 		},
 	}
 
@@ -91,7 +91,7 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 		// If calls have been made, change the Next function to always succeed
 		// and return it
 		mock.NextFunc = func(canceler input.Canceler) ([]byte, error) {
-			return []byte(jdEvent), nil
+			return jdEvent, nil
 		}
 
 		return &mock, nil
