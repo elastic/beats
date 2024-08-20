@@ -20,9 +20,11 @@ package resourcepool
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/performance"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
@@ -33,7 +35,7 @@ import (
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
-// the MetricSet for each host is defined in the module's configuration. After the
+// the MetricSet for each resourcepool is defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "resourcepool", New,
@@ -58,16 +60,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Structure to hold performance metrics values
-type PerformanceMetrics struct {
-	CPUUsageAverage      int64
-	ResCPUActAv1Latest   int64
-	ResCPUActPk1Latest   int64
-	CPUUsageMHzAverage   int64
-	MemUsageAverage      int64
-	MemSharedAverage     int64
-	MemSwapInAverage     int64
-	CPUEntitlementLatest int64
-	MemEntitlementLatest int64
+type metricData struct {
+	perfMetrics map[string]interface{}
+	assetsName  assetNames
+}
+
+type assetNames struct {
+	outputVmNames []string
+}
+
+// Define metrics to be collected
+var metricNames = []string{
+	"cpu.usage.average",
+	"rescpu.actav1.latest",
+	"rescpu.actpk1.latest",
+	"cpu.usagemhz.average",
+	"mem.usage.average",
+	"mem.shared.average",
+	"mem.swapin.average",
+	"cpu.cpuentitlement.latest",
+	"mem.mementitlement.latest",
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -84,13 +96,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
+			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
 		}
 	}()
 
 	c := client.Client
 
-	// Create a view of HostSystem objects.
+	// Create a view of ResourcePool objects.
 	mgr := view.NewManager(c)
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"ResourcePool"}, true)
@@ -100,13 +112,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
 		}
 	}()
 
-	// Retrieve summary property for all hosts.
+	// Retrieve property for all ResourcePools.
 	var rps []mo.ResourcePool
-	err = v.Retrieve(ctx, []string{"ResourcePool"}, []string{"summary"}, &rps)
+	err = v.Retrieve(ctx, []string{"ResourcePool"}, []string{"name", "summary", "overallStatus", "vm"}, &rps)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -120,53 +132,38 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
 
-	// Define metrics to be collected
-	metricNames := []string{
-		"cpu.usage.average",
-		"rescpu.actav1.latest",
-		"rescpu.actpk1.latest",
-		"cpu.usagemhz.average",
-		"mem.usage.average",
-		"mem.shared.average",
-		"mem.swapin.average",
-		"cpu.cpuentitlement.latest",
-		"mem.mementitlement.latest",
-	}
-
-	// Define reference of structure
-	var metricsVar PerformanceMetrics
-
-	// Map metric names to structure fields
-	metricMap := map[string]*int64{
-		"cpu.usage.average":         &metricsVar.CPUUsageAverage,
-		"rescpu.actav1.latest":      &metricsVar.ResCPUActAv1Latest,
-		"rescpu.actpk1.latest":      &metricsVar.ResCPUActPk1Latest,
-		"cpu.usagemhz.average":      &metricsVar.CPUUsageMHzAverage,
-		"mem.usage.average":         &metricsVar.MemUsageAverage,
-		"mem.shared.average":        &metricsVar.MemSharedAverage,
-		"mem.swapin.average":        &metricsVar.MemSwapInAverage,
-		"cpu.cpuentitlement.latest": &metricsVar.CPUEntitlementLatest,
-		"mem.mementitlement.latest": &metricsVar.MemEntitlementLatest,
-	}
+	// Retrieve only the required metrics
+	requiredMetrics := make(map[string]*types.PerfCounterInfo)
 
 	var spec types.PerfQuerySpec
-	metricIDs := make([]types.PerfMetricId, 0, len(metricMap))
 
-	for _, metricName := range metricNames {
-		metric, exists := metrics[metricName]
+	for _, name := range metricNames {
+		metric, exists := metrics[name]
 		if !exists {
-			m.Logger().Debug("Metric ", metricName, " not found")
+			m.Logger().Warnf("Metric %s not found", name)
 			continue
 		}
+		requiredMetrics[name] = metric
+	}
 
+	metricIDs := make([]types.PerfMetricId, 0, len(requiredMetrics))
+	for _, metric := range requiredMetrics {
 		metricIDs = append(metricIDs, types.PerfMetricId{
 			CounterId: metric.Key,
 		})
 	}
+	pc := property.DefaultCollector(c)
+	for i := range rps {
 
-	for _, rp := range rps {
+		metricMap := map[string]interface{}{}
+
+		assetNames, err := getAssetNames(ctx, pc, &rps[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from resource pool %s: %w", rps[i].Name, err)
+		}
+
 		spec = types.PerfQuerySpec{
-			Entity:     rp.Reference(),
+			Entity:     rps[i].Reference(),
 			MetricId:   metricIDs,
 			MaxSample:  1,
 			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
@@ -175,33 +172,59 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 		if err != nil {
-			m.Logger().Debug("Failed to query performance data: %v", err)
+			m.Logger().Errorf("Failed to query performance data from resource pool %s: %v", rps[i].Name, err)
 			continue
 		}
 
-		if len(samples) > 0 {
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debug("Failed to query performance data: %v", err)
-			}
-
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					if assignValue, exists := metricMap[result.Name]; exists {
-						*assignValue = result.Value[0] // Assign the metric value to the variable
-					}
-				} else {
-					m.Logger().Debug("Metric ", result.Name, ": No result found")
-				}
-			}
-		} else {
+		if len(samples) == 0 {
 			m.Logger().Debug("No samples returned from performance manager")
+			continue
+		}
+
+		results, err := perfManager.ToMetricSeries(ctx, samples)
+		if err != nil {
+			m.Logger().Errorf("Failed to convert performance data to metric series for resource pool %s: %v", rps[i].Name, err)
+		}
+
+		for _, result := range results[0].Value {
+			if len(result.Value) > 0 {
+				metricMap[result.Name] = result.Value[0]
+				continue
+			}
+			m.Logger().Debugf("For resource pool %s,Metric %v: No result found", rps[i].Name, result.Name)
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(rp, &metricsVar),
+			MetricSetFields: m.eventMapping(rps[i], &metricData{
+				perfMetrics: metricMap,
+				assetsName:  assetNames,
+			}),
 		})
 	}
 
 	return nil
+}
+
+func getAssetNames(ctx context.Context, pc *property.Collector, rp *mo.ResourcePool) (assetNames, error) {
+	referenceList := append([]types.ManagedObjectReference{}, rp.Vm...)
+
+	var objects []mo.ManagedEntity
+	if len(referenceList) > 0 {
+		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
+			return assetNames{}, err
+		}
+	}
+
+	outputVmNames := make([]string, 0, len(rp.Vm))
+	for _, ob := range objects {
+		name := strings.ReplaceAll(ob.Name, ".", "_")
+		switch ob.Reference().Type {
+		case "VirtualMachine":
+			outputVmNames = append(outputVmNames, name)
+		}
+	}
+
+	return assetNames{
+		outputVmNames: outputVmNames,
+	}, nil
 }

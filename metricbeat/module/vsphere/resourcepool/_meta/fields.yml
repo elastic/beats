@@ -24,7 +24,7 @@
             - name: mhz
               type: long
               description: >
-                CPU usage average in MHz.
+                CPU usage average in Mhz.
         - name: active
           type: group
           fields:
@@ -35,13 +35,13 @@
                   type: long
                   description: >
                     CPU active average in percentage.
-        - name: max
-          type: group
-          fields:
-            - name: pct
-              type: long
-              description: >
-                CPU active max in percentage.
+            - name: max
+              type: group
+              fields:
+                - name: pct
+                  type: long
+                  description: >
+                    CPU active max in percentage.
     - name: memory
       type: group
       fields:
@@ -65,7 +65,7 @@
             - name: bytes
               type: long
               description: >
-                Memory shared average in Bytes.
+                Memory shared average in bytes.
               format: bytes
         - name: swap
           type: group
@@ -73,7 +73,7 @@
             - name: bytes
               type: long
               description: >
-                Memory swap in average in Bytes.
+                Memory swap in average in bytes.
               format: bytes
     - name: name
       type: keyword
@@ -83,3 +83,14 @@
       type: keyword
       description: >
         The overall health status of a host in the vSphere environment.
+    - name: vm
+      type: group
+      fields:
+        - name: count
+          type: long
+          description: >
+            Number of virtual machines on the resource pool.
+        - name: names
+          type: keyword
+          description: >
+            Names of the virtual machines on the resource pool.

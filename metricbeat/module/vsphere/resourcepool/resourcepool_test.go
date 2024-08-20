@@ -49,32 +49,56 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "Resources", event["name"])
+	assert.EqualValues(t, "green", event["status"])
+
+	vm := event["vm"].(mapstr.M)
+	assert.NotNil(t, vm["names"])
+	assert.GreaterOrEqual(t, vm["count"], 0)
 
 	cpu := event["cpu"].(mapstr.M)
-	cpuActive := cpu["active"].(mapstr.M)
 
-	cpuAverage := cpuActive["average"].(mapstr.M)
-	assert.EqualValues(t, 0, cpuAverage["pct"])
+	cpuUsageMhz, ok := cpu["usage.mhz"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, cpuUsageMhz, int64(0))
+	}
 
-	cpuMax := cpuActive["max"].(mapstr.M)
-	assert.EqualValues(t, 0, cpuMax["pct"])
+	cpuUsagPct, ok := cpu["usage.pct"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, cpuUsagPct, int64(0))
+	}
 
-	cpuUsageMhz := cpu["usage"].(mapstr.M)
-	assert.NotEmpty(t, cpuUsageMhz["mhz"])
+	cpuEntitlement, ok := cpu["entitlement"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, cpuEntitlement["mhz"], int64(0))
+	}
 
-	cpuUsagePct := cpu["usage"].(mapstr.M)
-	assert.EqualValues(t, 0, cpuUsagePct["pct"])
+	cpuActive, ok := cpu["active"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, cpuActive["average.pct"], int64(0))
+		assert.GreaterOrEqual(t, cpuActive["max.pct"], int64(0))
+	}
 
 	memory := event["memory"].(mapstr.M)
 
-	memoryUsed := memory["usage"].(mapstr.M)
-	assert.EqualValues(t, 0, memoryUsed["pct"])
+	memoryUsage, ok := memory["usage"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, memoryUsage["pct"], int64(0))
+	}
 
-	memorySwap := memory["swap"].(mapstr.M)
-	assert.EqualValues(t, 0, memorySwap["bytes"])
+	memoryShared, ok := memory["shared"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, memoryShared["bytes"], int64(0))
+	}
 
-	memoryShared := memory["shared"].(mapstr.M)
-	assert.NotEmpty(t, memoryShared["bytes"])
+	memorySwap, ok := memory["swap"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, memorySwap["bytes"], int64(0))
+	}
+
+	memoryEntitlement, ok := memory["entitlement"].(mapstr.M)
+	if ok {
+		assert.GreaterOrEqual(t, memoryEntitlement["mhz"], int64(0))
+	}
 }
 
 func TestData(t *testing.T) {

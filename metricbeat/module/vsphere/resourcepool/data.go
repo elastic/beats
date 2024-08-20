@@ -23,42 +23,47 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(rp mo.ResourcePool, perfMertics *PerformanceMetrics) mapstr.M {
+func (m *MetricSet) eventMapping(rp mo.ResourcePool, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   rp.Summary.GetResourcePoolSummary().Name,
 		"status": rp.OverallStatus,
-		"cpu": mapstr.M{
-			"entitlement": mapstr.M{
-				"mhz": perfMertics.CPUEntitlementLatest,
-			},
-			"usage": mapstr.M{
-				"pct": perfMertics.CPUUsageAverage,
-				"mhz": perfMertics.CPUUsageMHzAverage,
-			},
-			"active": mapstr.M{
-				"average": mapstr.M{
-					"pct": perfMertics.ResCPUActAv1Latest,
-				},
-				"max": mapstr.M{
-					"pct": perfMertics.ResCPUActPk1Latest,
-				},
-			},
-		},
-		"memory": mapstr.M{
-			"entitlement": mapstr.M{
-				"mhz": perfMertics.MemEntitlementLatest,
-			},
-			"usage": mapstr.M{
-				"pct": perfMertics.MemUsageAverage,
-			},
-			"shared": mapstr.M{
-				"bytes": perfMertics.MemSharedAverage * 1000,
-			},
-			"swap": mapstr.M{
-				"bytes": perfMertics.MemSwapInAverage * 1000,
-			},
-		},
+	}
+	mapPerfMetricToEvent(event, data.perfMetrics)
+
+	if len(data.assetsName.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetsName.outputVmNames)
+		event.Put("vm.count", len(data.assetsName.outputVmNames))
+	}
+	return event
+}
+
+func mapPerfMetricToEvent(event mapstr.M, perfMetrics map[string]interface{}) {
+	if val, exist := perfMetrics["cpu.usage.average"]; exist {
+		event.Put("cpu.usage.pct", val)
+	}
+	if val, exist := perfMetrics["cpu.usagemhz.average"]; exist {
+		event.Put("cpu.usage.mhz", val)
+	}
+	if val, exist := perfMetrics["cpu.cpuentitlement.latest"]; exist {
+		event.Put("cpu.entitlement.mhz", val)
+	}
+	if val, exist := perfMetrics["rescpu.actav1.latest"]; exist {
+		event.Put("cpu.active.average.pct", val)
+	}
+	if val, exist := perfMetrics["rescpu.actpk1.average"]; exist {
+		event.Put("cpu.active.max.pct", val)
 	}
 
-	return event
+	if val, exist := perfMetrics["mem.usage.average"]; exist {
+		event.Put("memory.usage.pct", val)
+	}
+	if val, exist := perfMetrics["mem.shared.average"]; exist {
+		event.Put("memory.shared.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetrics["mem.swapin.average"]; exist {
+		event.Put("memory.swap.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetrics["mem.mementitlement.latest"]; exist {
+		event.Put("memory.entitlement.mhz", val)
+	}
 }
