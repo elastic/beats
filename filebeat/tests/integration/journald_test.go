@@ -45,23 +45,31 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 		t.Fatalf("cannot start 'systemd-cat': %s", err)
 	}
 	defer func() {
+		// Make sure systemd-cat terminates successfully so the messages
+		// are correctly written to the journal
 		if err := cmd.Wait(); err != nil {
 			t.Errorf("error waiting for system-cat to finish: %s", err)
 		}
 
-		fmt.Println("Success?", cmd.ProcessState.Success(), "Exit code:", cmd.ProcessState.ExitCode())
+		if !cmd.ProcessState.Success() {
+			t.Errorf("systemd-cat exited with %d", cmd.ProcessState.ExitCode())
+		}
 	}()
 
 	for count := 1; count <= max; count++ {
-		i, err := fmt.Fprintf(w, "Count: %03d\n", count)
-		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", i, "bytes written", err)
+		written, err := fmt.Fprintf(w, "Count: %03d\n", count)
 		if err != nil {
 			t.Errorf("could not write message to journald: %s", err)
+		}
+		if written != 11 {
+			t.Errorf("could not write the whole message, expecing to write 11 bytes, but wrote %d", written)
 		}
 		time.Sleep(time.Millisecond)
 	}
 
-	fmt.Println("closing stdin:", w.Close())
+	if err := w.Close(); err != nil {
+		t.Errorf("could not close stdin from systemd-cat, messages are likely not written to the  journal: %s", err)
+	}
 }
 
 //go:embed testdata/filebeat_journald.yml
