@@ -66900,7 +66900,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.pct`*::
 +
 --
-Used percent of the datastore.
+Percentage of datastore capacity used.
 
 
 type: scaled_float
@@ -66932,7 +66932,7 @@ type: long
 *`vsphere.datastore.host.names`*::
 +
 --
-list of all the host names.
+List of all the host names.
 
 
 type: keyword
@@ -66942,7 +66942,7 @@ type: keyword
 *`vsphere.datastore.iops`*::
 +
 --
-Storage I/O Control aggregated IOPS.
+Storage I/O Control aggregated Input/Output Operations Per Second.
 
 
 type: long
@@ -66974,7 +66974,7 @@ format: bytes
 *`vsphere.datastore.read.latency.total.ms`*::
 +
 --
-Average amount of time for a read operation from the datastore.
+Average amount of time for a read operation from the datastore in milliseconds.
 
 
 type: long
@@ -67004,7 +67004,7 @@ type: long
 *`vsphere.datastore.vm.names`*::
 +
 --
-list of all the VM names.
+List of all the VM names.
 
 
 type: keyword
@@ -67026,7 +67026,7 @@ format: bytes
 *`vsphere.datastore.write.latency.total.ms`*::
 +
 --
-Average amount of time for a write operation from the datastore.
+Average amount of time for a write operation from the datastore in milliseconds.
 
 
 type: long
