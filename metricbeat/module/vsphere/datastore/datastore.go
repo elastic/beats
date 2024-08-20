@@ -54,12 +54,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-type PerformanceMetrics struct {
-	DsRead         int64
-	DsWrite        int64
-	DsIops         int64
-	DsReadLatency  int64
-	DsWriteLatency int64
+type metricData struct {
+	perfMetrics map[string]interface{}
+	assetsName  assetNames
+}
+
+type assetNames struct {
+	outputVmNames []string
+	outputHsNames []string
+}
+
+// Define metrics to be collected
+var metricNames = []string{
+	"datastore.read.average",
+	"datastore.write.average",
+	"datastore.datastoreIops.average",
+	"datastore.totalReadLatency.average",
+	"datastore.totalWriteLatency.average",
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -110,29 +121,10 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
 
-	// Define metrics to be collected
-	metricNames := []string{
-		"datastore.read.average",
-		"datastore.write.average",
-		"datastore.datastoreIops.average",
-		"datastore.totalReadLatency.average",
-		"datastore.totalWriteLatency.average",
-	}
-
-	// Define reference of structure
-	var metricsVar PerformanceMetrics
-
-	// Map metric names to struture	fields
-	metricMap := map[string]*int64{
-		"datastore.read.average":              &metricsVar.DsRead,
-		"datastore.write.average":             &metricsVar.DsWrite,
-		"datastore.datastoreIops.average":     &metricsVar.DsIops,
-		"datastore.totalReadLatency.average":  &metricsVar.DsReadLatency,
-		"datastore.totalWriteLatency.average": &metricsVar.DsWriteLatency,
-	}
-
 	var spec types.PerfQuerySpec
-	metricIDs := make([]types.PerfMetricId, 0, len(metricNames))
+
+	// Retrieve only the required metrics
+	requiredMetrics := make(map[string]*types.PerfCounterInfo)
 
 	for _, metricName := range metricNames {
 		metric, exists := metrics[metricName]
@@ -140,11 +132,16 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			m.Logger().Debug("Metric ", metricName, " not found")
 			continue
 		}
+		requiredMetrics[metricName] = metric
+	}
 
+	metricIDs := make([]types.PerfMetricId, 0, len(requiredMetrics))
+	for _, metric := range requiredMetrics {
 		metricIDs = append(metricIDs, types.PerfMetricId{
 			CounterId: metric.Key,
 		})
 	}
+
 	spec = types.PerfQuerySpec{
 		MetricId:   metricIDs,
 		MaxSample:  1,
@@ -152,86 +149,97 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	pc := property.DefaultCollector(c)
-	for _, ds := range dst {
-		spec.Entity = ds.Reference()
+	for i := range dst {
+		assetNames, err := getAssetNames(ctx, pc, &dst[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
+		}
+
+		spec.Entity = dst[i].Reference()
 
 		// Query performance data
 		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 		if err != nil {
-			m.Logger().Debug("Failed to query performance data: %v", err)
+			m.Logger().Debug("Failed to query performance data for host %s: %v", dst[i].Name, err)
 			continue
 		}
-		if len(samples) > 0 {
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debug("Failed to query performance data: %v", err)
-			}
 
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					if assignValue, exists := metricMap[result.Name]; exists {
-						*assignValue = result.Value[0] // Assign the metric value to the variable
-					}
-				} else {
-					m.Logger().Debug("Metric ", result.Name, ": No result found")
-				}
-			}
-		} else {
+		if len(samples) == 0 {
 			m.Logger().Debug("No samples returned from performance manager")
+			continue
 		}
 
-		outputVmNames := []string{}
-		if len(ds.Vm) > 0 {
-			VmRefs := []types.ManagedObjectReference{}
-			for _, obj := range ds.Vm {
-				if obj.Type == "VirtualMachine" {
-					VmRefs = append(VmRefs, obj)
-				}
-			}
-
-			// Retrieve VM names
-			var vms []mo.VirtualMachine
-			if len(VmRefs) > 0 {
-				err := pc.Retrieve(ctx, VmRefs, []string{"name"}, &vms)
-				if err != nil {
-					m.Logger().Debug("Error retrieving VMs: %v", err)
-				}
-			}
-
-			for _, vm := range vms {
-				name := strings.Replace(vm.Name, ".", "_", -1)
-				outputVmNames = append(outputVmNames, name)
-			}
+		results, err := perfManager.ToMetricSeries(ctx, samples)
+		if err != nil {
+			m.Logger().Debug("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
 		}
 
-		outputHsNames := []string{}
-		if len(ds.Host) > 0 {
-			hsRefs := []types.ManagedObjectReference{}
-			for _, obj := range ds.Host {
-				if obj.Key.Type == "HostSystem" {
-					hsRefs = append(hsRefs, obj.Key)
-				}
+		metricMap := make(map[string]interface{})
+		for _, result := range results[0].Value {
+			if len(result.Value) > 0 {
+				metricMap[result.Name] = result.Value[0]
+				continue
 			}
-
-			// Retrieve Host names
-			var hosts []mo.HostSystem
-			if len(hsRefs) > 0 {
-				err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
-				if err != nil {
-					m.Logger().Debug("Error retrieving VMs: %v", err)
-				}
-			}
-
-			for _, host := range hosts {
-				name := strings.Replace(host.Name, ".", "_", -1)
-				outputHsNames = append(outputHsNames, name)
-			}
+			m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(ds, &metricsVar, outputVmNames, outputHsNames),
+			MetricSetFields: m.eventMapping(dst[i], &metricData{
+				perfMetrics: metricMap,
+				assetsName:  *assetNames,
+			}),
 		})
 	}
 
 	return nil
+}
+
+func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
+	referenceList := make([]types.ManagedObjectReference, 0, len(ds.Vm))
+	referenceList = append(referenceList, ds.Vm...)
+
+	var objects []mo.ManagedEntity
+	if len(referenceList) > 0 {
+		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
+			return nil, err
+		}
+	}
+
+	outputVmNames := make([]string, 0, len(ds.Vm))
+	for _, ob := range objects {
+		if ob.Reference().Type == "VirtualMachine" {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
+			outputVmNames = append(outputVmNames, name)
+		}
+	}
+
+	// calling Host explicitly because of mo.Datastore.hHost has types.DatastoreHostMount instead of mo.ManagedEntity
+	outputHsNames := []string{}
+	if len(ds.Host) > 0 {
+		hsRefs := []types.ManagedObjectReference{}
+		for _, obj := range ds.Host {
+			if obj.Key.Type == "HostSystem" {
+				hsRefs = append(hsRefs, obj.Key)
+			}
+		}
+
+		// Retrieve Host names
+		var hosts []mo.HostSystem
+		if len(hsRefs) > 0 {
+			err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		for _, host := range hosts {
+			name := strings.Replace(host.Name, ".", "_", -1)
+			outputHsNames = append(outputHsNames, name)
+		}
+	}
+
+	return &assetNames{
+		outputHsNames: outputHsNames,
+		outputVmNames: outputVmNames,
+	}, nil
 }

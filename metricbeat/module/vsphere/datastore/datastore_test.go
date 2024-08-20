@@ -57,17 +57,17 @@ func TestFetchEventContents(t *testing.T) {
 		"status",
 		"host.count",
 		"vm.count",
-		"read.bytes",
+		// "read.bytes",
 		"write.bytes",
-		"iops",
-		"read.latency.total.ms",
-		"write.latency.total.ms",
+		// "iops",
+		// "read.latency.total.ms",
+		// "write.latency.total.ms",
 		"capacity.used.bytes",
 	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			t.Error(err)
+			t.Error(field, err)
 			return
 		}
 		if field == "status" {

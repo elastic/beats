@@ -23,27 +23,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetrics, outputVmNames, outputHsNames []string) mapstr.M {
+func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 	usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
 	event := mapstr.M{
-		"read": mapstr.M{
-			"bytes": perfMertics.DsRead * 1000,
-			"latency": mapstr.M{
-				"total": mapstr.M{
-					"ms": perfMertics.DsReadLatency,
-				},
-			},
-		},
-		"write": mapstr.M{
-			"bytes": perfMertics.DsWrite * 1000,
-			"latency": mapstr.M{
-				"total": mapstr.M{
-					"ms": perfMertics.DsWriteLatency,
-				},
-			},
-		},
-		"iops":   perfMertics.DsIops,
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
@@ -63,18 +46,38 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, perfMertics *PerformanceMetric
 	var usedSpacePercent float64
 	if ds.Summary.Capacity > 0 {
 		usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
-		event.Put("capacity.used.pct", usedSpacePercent)
+		event.Put("capacity.used.pct", usedSpacePercent*100)
 	}
 
-	event.Put("host.count", len(outputHsNames))
-	if len(outputHsNames) > 0 {
-		event.Put("host.names", outputHsNames)
+	event.Put("host.count", len(data.assetsName.outputHsNames))
+	if len(data.assetsName.outputHsNames) > 0 {
+		event.Put("host.names", data.assetsName.outputHsNames)
 	}
 
-	event.Put("vm.count", len(outputVmNames))
-	if len(outputVmNames) > 0 {
-		event.Put("vm.names", outputVmNames)
+	event.Put("vm.count", len(data.assetsName.outputVmNames))
+	if len(data.assetsName.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetsName.outputVmNames)
 	}
+
+	mapPerfMetricToEvent(event, data.perfMetrics)
 
 	return event
+}
+
+func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+	if val, exist := perfMetricMap["datastore.read.average"]; exist {
+		event.Put("read.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["datastore.totalReadLatency.average"]; exist {
+		event.Put("read.latency.total.ms", val)
+	}
+	if val, exist := perfMetricMap["datastore.write.average"]; exist {
+		event.Put("write.bytes", val.(int64)*1000)
+	}
+	if val, exist := perfMetricMap["datastore.totalWriteLatency.average"]; exist {
+		event.Put("write.latency.total.ms", val)
+	}
+	if val, exist := perfMetricMap["datastore.datastoreIops.average"]; exist {
+		event.Put("iops", val)
+	}
 }

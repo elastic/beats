@@ -20,6 +20,7 @@ package datastore
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
@@ -43,21 +44,63 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.eventMapping(DatastoreTest, &PerformanceMetrics{}, []string{"DC3_H0_VM0"}, []string{"DC3_H0"})
+	var metricDataTest = metricData{
+		perfMetrics: map[string]interface{}{
+			"datastore.read.average":              int64(100),
+			"datastore.write.average":             int64(200),
+			"datastore.datastoreIops.average":     int64(10),
+			"datastore.totalReadLatency.average":  int64(100),
+			"datastore.totalWriteLatency.average": int64(100),
+		},
+		assetsName: assetNames{
+			outputHsNames: []string{"DC3_H0"},
+			outputVmNames: []string{"DC3_H0_VM0"},
+		},
+	}
 
-	VmCount, _ := event.GetValue("vm.count")
-	assert.EqualValues(t, 1, VmCount)
+	outputEvent := m.eventMapping(DatastoreTest, &metricDataTest)
+	testEvent := mapstr.M{
+		"fstype": "local",
+		"status": "green",
+		"iops":   int64(10),
+		"host": mapstr.M{
+			"count": 1,
+			"names": []string{"DC3_H0"},
+		},
+		"vm": mapstr.M{
+			"count": 1,
+			"names": []string{"DC3_H0_VM0"},
+		},
+		"read": mapstr.M{
+			"bytes": int64(100000),
+			"latency": mapstr.M{
+				"total": mapstr.M{
+					"ms": int64(100),
+				},
+			},
+		},
+		"write": mapstr.M{
+			"bytes": int64(200000),
+			"latency": mapstr.M{
+				"total": mapstr.M{
+					"ms": int64(100),
+				},
+			},
+		},
+		"capacity": mapstr.M{
+			"free": mapstr.M{
+				"bytes": int64(5000000),
+			},
+			"total": mapstr.M{
+				"bytes": int64(5000000),
+			},
+			"used": mapstr.M{
+				"bytes": int64(0),
+				"pct":   float64(0),
+			},
+		},
+	}
 
-	capacityTotal, _ := event.GetValue("capacity.total.bytes")
-	assert.EqualValues(t, 5000000, capacityTotal)
-
-	capacityFree, _ := event.GetValue("capacity.free.bytes")
-	assert.EqualValues(t, 5000000, capacityFree)
-
-	capacityUsed, _ := event.GetValue("capacity.used.bytes")
-	assert.EqualValues(t, 0, capacityUsed)
-
-	capacityUsedPct, _ := event.GetValue("capacity.used.pct")
-	assert.EqualValues(t, 0, capacityUsedPct)
+	assert.Exactly(t, outputEvent, testEvent)
 
 }
