@@ -45,10 +45,6 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 		t.Fatalf("cannot start 'systemd-cat': %s", err)
 	}
 	defer func() {
-		if err := cmd.Process.Signal(syscall.SIGTERM); err != nil {
-			t.Errorf("could not terminate systemd-cat: %s", err)
-		}
-
 		if err := cmd.Wait(); err != nil {
 			t.Errorf("error waiting for system-cat to finish: %s", err)
 		}
@@ -64,6 +60,8 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 		}
 		time.Sleep(time.Millisecond)
 	}
+
+	fmt.Println("closing stdin:", w.Close())
 }
 
 //go:embed testdata/filebeat_journald.yml
