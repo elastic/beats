@@ -53,6 +53,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 			continue
 		}
 
+		//nolint:typecheck // 'name' is being used in as a key in mapstr.M below
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 

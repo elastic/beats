@@ -186,12 +186,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Report events
 	for labelHash, e := range eventList {
-		isOpen := reporter.Event(mb.Event{
-			RootFields: mapstr.M{
-				m.namespace:     e,
-				"metrics_count": metricCounter[labelHash],
-			},
-		})
+		event := mb.Event{RootFields: mapstr.M{m.namespace: e}}
+		if m.countMetrics {
+			event.RootFields.Put("metrics_count", metricCounter[labelHash])
+		}
+		isOpen := reporter.Event(event)
 		if !isOpen {
 			break
 		}
