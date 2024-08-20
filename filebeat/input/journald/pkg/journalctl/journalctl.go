@@ -117,7 +117,7 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		return &journalctl{}, fmt.Errorf("cannot start journalctl: %w", err)
 	}
 
-	logger.Debugf("journalctl started with PID %d", cmd.Process.Pid)
+	logger.Infof("journalctl started with PID %d", cmd.Process.Pid)
 
 	go func() {
 		if err := cmd.Wait(); err != nil {
