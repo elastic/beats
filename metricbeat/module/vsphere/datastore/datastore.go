@@ -86,7 +86,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
+			m.Logger().Debugf("error trying to logout from vshphere: %w", err)
 		}
 	}()
 
@@ -102,7 +102,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Debugf("error trying to destroy view from vshphere: %w", err)
 		}
 	}()
 
@@ -214,7 +214,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 	}
 
 	// calling Host explicitly because of mo.Datastore.hHost has types.DatastoreHostMount instead of mo.ManagedEntity
-	outputHsNames := []string{}
+	outputHsNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
 		hsRefs := []types.ManagedObjectReference{}
 		for _, obj := range ds.Host {

@@ -22,7 +22,7 @@
     - name: capacity.used.pct
       type: scaled_float
       description: >
-        Used percent of the datastore.
+        Percentage of datastore capacity used.
       format: percent
     - name: fstype
       type: keyword
@@ -35,11 +35,11 @@
     - name: host.names
       type: keyword
       description: >
-        list of all the host names.
+        List of all the host names.
     - name: iops
       type: long
       description: >
-        Storage I/O Control aggregated IOPS.
+        Storage I/O Control aggregated Input/Output Operations Per Second.
     - name: name
       type: keyword
       description: >
@@ -52,7 +52,7 @@
     - name: read.latency.total.ms
       type: long
       description: >
-        Average amount of time for a read operation from the datastore.
+        Average amount of time for a read operation from the datastore in milliseconds.
     - name: status
       type: keyword
       description: >
@@ -64,7 +64,7 @@
     - name: vm.names
       type: keyword
       description: >
-        list of all the VM names.
+        List of all the VM names.
     - name: write.bytes
       type: long
       description: >
@@ -73,5 +73,5 @@
     - name: write.latency.total.ms
       type: long
       description: >
-        Average amount of time for a write operation from the datastore.
+        Average amount of time for a write operation from the datastore in milliseconds.
 

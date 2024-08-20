@@ -24,12 +24,19 @@ import (
 )
 
 func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
+
 	usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
 	event := mapstr.M{
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
+		"host": mapstr.M{
+			"count": len(data.assetsName.outputHsNames),
+		},
+		"vm": mapstr.M{
+			"count": len(data.assetsName.outputVmNames),
+		},
 		"capacity": mapstr.M{
 			"total": mapstr.M{
 				"bytes": ds.Summary.Capacity,
@@ -45,16 +52,14 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 
 	var usedSpacePercent float64
 	if ds.Summary.Capacity > 0 {
-		usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
-		event.Put("capacity.used.pct", usedSpacePercent*100)
+		usedSpacePercent = float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity) * 100
+		event.Put("capacity.used.pct", usedSpacePercent)
 	}
 
-	event.Put("host.count", len(data.assetsName.outputHsNames))
 	if len(data.assetsName.outputHsNames) > 0 {
 		event.Put("host.names", data.assetsName.outputHsNames)
 	}
 
-	event.Put("vm.count", len(data.assetsName.outputVmNames))
 	if len(data.assetsName.outputVmNames) > 0 {
 		event.Put("vm.names", data.assetsName.outputVmNames)
 	}
@@ -65,14 +70,16 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 }
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+	const bytesMultiplier = 1000
+
 	if val, exist := perfMetricMap["datastore.read.average"]; exist {
-		event.Put("read.bytes", val.(int64)*1000)
+		event.Put("read.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["datastore.totalReadLatency.average"]; exist {
 		event.Put("read.latency.total.ms", val)
 	}
 	if val, exist := perfMetricMap["datastore.write.average"]; exist {
-		event.Put("write.bytes", val.(int64)*1000)
+		event.Put("write.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["datastore.totalWriteLatency.average"]; exist {
 		event.Put("write.latency.total.ms", val)
