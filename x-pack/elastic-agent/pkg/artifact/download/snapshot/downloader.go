@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	gohttp "net/http"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -104,17 +105,21 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 	defer resp.Body.Close()
 
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("reading artifactsURI response body: %w", err)
+	}
+
+	if resp.StatusCode != gohttp.StatusOK {
+		return "", fmt.Errorf("unsuccessful status code in artifactsURI response %d - %s, body: %s", resp.StatusCode, resp.Status, bodyBytes)
+	}
+
 	body := struct {
 		Packages map[string]interface{} `json:"packages"`
 	}{}
 
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("reading artifactsURI response: %w", err)
-	}
-
 	if err := json.Unmarshal(bodyBytes, &body); err != nil {
-		return "", fmt.Errorf("decoding artifactsURI response %s: %w", string(bodyBytes), err)
+		return "", fmt.Errorf("decoding GET %s response %s: %w", artifactsURI, string(bodyBytes), err)
 	}
 
 	if len(body.Packages) == 0 {
