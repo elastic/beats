@@ -47,7 +47,11 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 	defer cmd.Process.Kill()
 
 	for count := 1; count <= max; count++ {
-		fmt.Fprintf(w, "Count: %03d\n", count)
+		i, err := fmt.Fprintf(w, "Count: %03d\n", count)
+		if err != nil {
+			t.Errorf("could not write message to journald: %s", err)
+		}
+		fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", i, "bytes written")
 		time.Sleep(time.Millisecond)
 	}
 }
