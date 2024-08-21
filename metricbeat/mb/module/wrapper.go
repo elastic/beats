@@ -255,7 +255,13 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
-			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			if _, ok := err.(mb.PartialMetricsError); ok {
+				// mark module as running if metrics are partially available and display the error message
+				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			} else {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 		} else {
 			msw.module.UpdateStatus(status.Running, "")
