@@ -32,7 +32,7 @@
     # Only alnum is defined in the CEF spec. The other characters allow
     # non-conforming extension keys to be parsed.
     extension_key_start_chars = alnum | '_';
-    extension_key_chars = extension_key_start_chars | '.' | ',' | '[' | ']';
+    extension_key_chars = extension_key_start_chars | '.' | ',' | '[' | ']' | '-';
     extension_key_pattern = extension_key_start_chars extension_key_chars*;
     extension_value_chars_nospace = extension_value_escapes | (any -- equal -- escape -- space);
 

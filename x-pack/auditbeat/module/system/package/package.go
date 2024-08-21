@@ -17,8 +17,10 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/cespare/xxhash/v2"
@@ -233,6 +235,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found.")
 	}
 
+	if config.PackageSuidDrop != nil {
+		if os.Getuid() != 0 && int(*ms.config.PackageSuidDrop) != os.Getuid() {
+			return nil, fmt.Errorf("package.rpm_drop_to_suid is set to %d, but we're running as a different non-root user", *config.PackageSuidDrop)
+		}
+		ms.log.Debugf("Dropping to EUID %d from UID %d for RPM API calls", *ms.config.PackageSuidDrop, os.Getuid())
+	}
+
 	packages, err := loadPackages(ms.bucket)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load persisted package metadata from disk: %w", err)
@@ -293,7 +302,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	for _, pkg := range packages {
 		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
-		event.RootFields.Put("event.id", stateID.String()) //nolint:errcheck // This will not return an error as long as 'event' remains as a map.
+		_, _ = event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
 
@@ -481,26 +490,71 @@ func storePackages(bucket datastore.Bucket, packages []*Package) error {
 	return nil
 }
 
-func (ms *MetricSet) getPackages() (packages []*Package, err error) {
+func (ms *MetricSet) getPackages() ([]*Package, error) {
+	packages := []*Package{}
 	var foundPackageManager bool
-
-	_, err = os.Stat(rpmPath)
-	if err == nil {
+	_, statErr := os.Stat(rpmPath)
+	if statErr == nil {
 		foundPackageManager = true
+		if ms.config.PackageSuidDrop != nil {
 
-		rpmPackages, err := listRPMPackages()
-		if err != nil {
-			return nil, fmt.Errorf("error getting RPM packages: %w", err)
+			// This is rather ugly.
+			// Basically, older RPM setups will use BDB as a database for the RPM state, and
+			// BDB is incredibly easy to corrupt and does not handle parallel operations well.
+			// see https://github.com/rpm-software-management/rpm/issues/232
+			// The easiest way around this is to drop perms to non-root, so librpm can't write to any of the DB files.
+			// this means we can't corrupt anything, and it also means that BDB won't perform any of the failchk()
+			// operations that exibit some parallel access issues
+			// HOWEVER this is technically non-POSIX-compliant, as posix expects all threads in the process to
+			// have identical perms.
+
+			// lock our setreuid to one thread
+			runtime.LockOSThread()
+			doUnlock := true
+			defer func() {
+				// if for some reason the second setreuid call fails, we don't
+				// want to release the OS thread, as we'll have a non-root thread floating around that
+				// the go scheduler could assign to something that expects root permissions.
+				if doUnlock {
+					runtime.UnlockOSThread()
+				} else {
+					ms.log.Debugf("setreuid has failed; package query thread will remain locked")
+				}
+			}()
+
+			minus1 := -1
+			currentUID := os.Getuid()
+			_, _, serr := syscall.Syscall(syscall.SYS_SETREUID, uintptr(minus1), uintptr(*ms.config.PackageSuidDrop), uintptr(minus1))
+			if serr != 0 {
+				return nil, fmt.Errorf("got error from setreuid trying to drop out of root: %w", serr)
+			}
+
+			rpmPackages, err := listRPMPackages(true)
+			if err != nil {
+				return nil, fmt.Errorf("got error listing RPM packages: %w", err)
+			}
+
+			_, _, serr = syscall.Syscall(syscall.SYS_SETREUID, uintptr(minus1), uintptr(currentUID), uintptr(minus1))
+			if serr != 0 {
+				doUnlock = false
+				return nil, fmt.Errorf("got error from setreuid trying to reset euid: %w", serr)
+			}
+
+			packages = append(packages, rpmPackages...)
+		} else {
+			rpmPackages, err := listRPMPackages(false)
+			if err != nil {
+				return nil, fmt.Errorf("error listing RPM packages: %w", err)
+			}
+			packages = append(packages, rpmPackages...)
 		}
-		ms.log.Debugf("RPM packages: %v", len(rpmPackages))
 
-		packages = append(packages, rpmPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", rpmPath, err)
+	} else if !os.IsNotExist(statErr) {
+		return nil, fmt.Errorf("error opening %v: %w", rpmPath, statErr)
 	}
 
-	_, err = os.Stat(dpkgPath)
-	if err == nil {
+	_, statErr = os.Stat(dpkgPath)
+	if statErr == nil {
 		foundPackageManager = true
 
 		dpkgPackages, err := ms.listDebPackages()
@@ -510,17 +564,17 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 		ms.log.Debugf("DEB packages: %v", len(dpkgPackages))
 
 		packages = append(packages, dpkgPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, err)
+	} else if !os.IsNotExist(statErr) {
+		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, statErr)
 	}
 
 	for _, path := range homebrewCellarPath {
-		_, err = os.Stat(path)
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
+		_, statErr = os.Stat(path)
+		if statErr != nil {
+			if errors.Is(statErr, fs.ErrNotExist) {
 				continue
 			}
-			return nil, fmt.Errorf("error opening %v: %w", path, err)
+			return nil, fmt.Errorf("error opening %v: %w", path, statErr)
 		}
 		foundPackageManager = true
 		homebrewPackages, err := listBrewPackages(path)
