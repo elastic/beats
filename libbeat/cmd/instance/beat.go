@@ -524,7 +524,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 	svc.HandleSignals(stopBeat, cancel)
 	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(stopBeat)
+	b.Manager.SetStopCallback(beater.Stop)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -532,6 +532,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
+
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
