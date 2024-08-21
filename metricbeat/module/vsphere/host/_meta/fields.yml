@@ -19,7 +19,7 @@
     - name: datastore.names
       type: keyword
       description: >
-        Names of the datastores on the host.
+        List of all the datastore names.
     - name: datastore.count
       type: long
       description: >
@@ -31,11 +31,11 @@
     - name: disk.devicelatency.average.ms
       type: long
       description: >
-        Average amount of time it takes to complete an SCSI command from physical device.
+        Average amount of time it takes to complete an SCSI command from physical device in milliseconds.
     - name: disk.latency.total.ms
       type: long
       description: >
-        Highest latency value across all disks used by the host.
+        Highest latency value across all disks used by the host in milliseconds.
     - name: disk.read.bytes
       type: long
       description: >
@@ -77,7 +77,7 @@
     - name: network.names
       type: keyword
       description: >
-        Network names.
+        List of all the network names.
     - name: network.count
       type: long
       description: >
@@ -152,7 +152,7 @@
     - name: vm.names
       type: keyword
       description: >
-        Names of the virtual machines on the host.
+        List of all the VM names.
     - name: vm.count
       type: long
       description: >

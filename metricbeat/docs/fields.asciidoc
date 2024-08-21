@@ -66969,7 +66969,7 @@ type: long
 *`vsphere.host.datastore.names`*::
 +
 --
-Names of the datastores on the host.
+List of all the datastore names.
 
 
 type: keyword
@@ -66999,7 +66999,7 @@ type: long
 *`vsphere.host.disk.devicelatency.average.ms`*::
 +
 --
-Average amount of time it takes to complete an SCSI command from physical device.
+Average amount of time it takes to complete an SCSI command from physical device in milliseconds.
 
 
 type: long
@@ -67009,7 +67009,7 @@ type: long
 *`vsphere.host.disk.latency.total.ms`*::
 +
 --
-Highest latency value across all disks used by the host.
+Highest latency value across all disks used by the host in milliseconds.
 
 
 type: long
@@ -67111,7 +67111,7 @@ type: keyword
 *`vsphere.host.network.names`*::
 +
 --
-Network names.
+List of all the network names.
 
 
 type: keyword
@@ -67297,7 +67297,7 @@ type: long
 *`vsphere.host.vm.names`*::
 +
 --
-Names of the virtual machines on the host.
+List of all the VM names.
 
 
 type: keyword
