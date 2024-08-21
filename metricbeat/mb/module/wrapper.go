@@ -19,6 +19,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -255,7 +256,7 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
-			if _, ok := err.(mb.PartialMetricsError); ok {
+			if errors.As(err, &mb.PartialMetricsError{}) {
 				// mark module as running if metrics are partially available and display the error message
 				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 			} else {
@@ -271,7 +272,7 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(ctx, reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
-			if _, ok := err.(mb.PartialMetricsError); ok {
+			if errors.As(err, &mb.PartialMetricsError{}) {
 				// mark module as running if metrics are partially available and display the error message
 				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 			} else {
