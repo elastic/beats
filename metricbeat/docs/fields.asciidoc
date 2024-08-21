@@ -66994,6 +66994,8 @@ The amount of storage capacity currently being consumed by or on the entity.
 
 type: long
 
+format: bytes
+
 --
 
 *`vsphere.host.disk.devicelatency.average.ms`*::
@@ -67043,7 +67045,7 @@ format: bytes
 *`vsphere.host.disk.total.bytes`*::
 +
 --
-Aggregated disk I/O rate.
+Aggregated disk Input/Output rate.
 
 
 type: long

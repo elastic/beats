@@ -28,6 +28,7 @@
       type: long
       description: >
         The amount of storage capacity currently being consumed by or on the entity.
+      format: bytes
     - name: disk.devicelatency.average.ms
       type: long
       description: >
@@ -49,7 +50,7 @@
     - name: disk.total.bytes
       type: long
       description: >
-        Aggregated disk I/O rate.
+        Aggregated disk Input/Output rate.
       format: bytes
     - name: memory.free.bytes
       type: long
