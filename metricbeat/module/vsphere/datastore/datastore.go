@@ -65,12 +65,12 @@ type assetNames struct {
 }
 
 // Define metrics to be collected
-var metricNames = []string{
-	"datastore.read.average",
-	"datastore.write.average",
-	"datastore.datastoreIops.average",
-	"datastore.totalReadLatency.average",
-	"datastore.totalWriteLatency.average",
+var metricSet = map[string]struct{}{
+	"datastore.read.average":              {},
+	"datastore.write.average":             {},
+	"datastore.datastoreIops.average":     {},
+	"datastore.totalReadLatency.average":  {},
+	"datastore.totalWriteLatency.average": {},
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -116,79 +116,75 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Create a performance manager
 	perfManager := performance.NewManager(c)
 
-	// Retrieve metric IDs for the specified metric names
+	// Retrieve all available metrics
 	metrics, err := perfManager.CounterInfoByName(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
 
-	// Retrieve only the required metrics
-	requiredMetrics := make(map[string]*types.PerfCounterInfo)
-
-	for _, metricName := range metricNames {
-		metric, exists := metrics[metricName]
-		if !exists {
-			m.Logger().Debug("Metric ", metricName, " not found")
-			continue
+	// Filter for required metrics
+	var metricIds []types.PerfMetricId
+	for metricName := range metricSet {
+		if metric, ok := metrics[metricName]; ok {
+			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
+		} else {
+			m.Logger().Warnf("Metric %s not found", metricName)
 		}
-		requiredMetrics[metricName] = metric
-	}
-
-	metricIDs := make([]types.PerfMetricId, 0, len(requiredMetrics))
-	for _, metric := range requiredMetrics {
-		metricIDs = append(metricIDs, types.PerfMetricId{
-			CounterId: metric.Key,
-		})
 	}
 
 	pc := property.DefaultCollector(c)
 	for i := range dst {
-		assetNames, err := getAssetNames(ctx, pc, &dst[i])
-		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
-			continue
-		}
-
-		spec := types.PerfQuerySpec{
-			Entity:     dst[i].Reference(),
-			MetricId:   metricIDs,
-			MaxSample:  1,
-			IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-		}
-
-		// Query performance data
-		samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-		if err != nil {
-			m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
-			continue
-		}
-
-		if len(samples) == 0 {
-			m.Logger().Debugf("No samples returned from performance manager")
-			continue
-		}
-
-		results, err := perfManager.ToMetricSeries(ctx, samples)
-		if err != nil {
-			m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
-			continue
-		}
-
-		metricMap := make(map[string]interface{})
-		for _, result := range results[0].Value {
-			if len(result.Value) > 0 {
-				metricMap[result.Name] = result.Value[0]
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			assetNames, err := getAssetNames(ctx, pc, &dst[i])
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
 				continue
 			}
-			m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
-		}
 
-		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(dst[i], &metricData{
-				perfMetrics: metricMap,
-				assetsName:  *assetNames,
-			}),
-		})
+			spec := types.PerfQuerySpec{
+				Entity:     dst[i].Reference(),
+				MetricId:   metricIds,
+				MaxSample:  1,
+				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
+			}
+
+			// Query performance data
+			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+			if err != nil {
+				m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
+				continue
+			}
+
+			if len(samples) == 0 {
+				m.Logger().Debugf("No samples returned from performance manager")
+				continue
+			}
+
+			results, err := perfManager.ToMetricSeries(ctx, samples)
+			if err != nil {
+				m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
+				continue
+			}
+
+			metricMap := make(map[string]interface{})
+			for _, result := range results[0].Value {
+				if len(result.Value) > 0 {
+					metricMap[result.Name] = result.Value[0]
+					continue
+				}
+				m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
+			}
+
+			reporter.Event(mb.Event{
+				MetricSetFields: m.eventMapping(dst[i], &metricData{
+					perfMetrics: metricMap,
+					assetsName:  *assetNames,
+				}),
+			})
+		}
 	}
 
 	return nil
