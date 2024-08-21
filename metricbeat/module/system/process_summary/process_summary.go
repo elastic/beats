@@ -73,6 +73,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if degradeErr != nil && !errors.Is(degradeErr, process.NonFatalErr{}) {
 		// return only if the error is fatal in nature
 		return fmt.Errorf("error fetching process list: %w", degradeErr)
+	} else if (degradeErr != nil && errors.Is(degradeErr, process.NonFatalErr{})) {
+		degradeErr = mb.PartialMetricsError{Err: degradeErr}
 	}
 
 	procStates := map[string]int{}
@@ -103,7 +105,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		MetricSetFields: outMap,
 	})
 
-	return mb.PartialMetricsError{Err: degradeErr}
+	return degradeErr
 }
 
 // threadStats returns a map of state counts for running threads on a system

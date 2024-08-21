@@ -115,6 +115,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
 			// return only if the error is fatal in nature
 			return fmt.Errorf("process stats: %w", err)
+		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			err = mb.PartialMetricsError{Err: err}
 		}
 
 		for evtI := range procs {
@@ -126,7 +128,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				return err
 			}
 		}
-		return mb.PartialMetricsError{Err: err}
+		return err
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
 		if err != nil {
