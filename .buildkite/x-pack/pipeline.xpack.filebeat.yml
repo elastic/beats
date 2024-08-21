@@ -26,10 +26,40 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/filebeat Mandatory Tests"
-    key: "x-pack-filebeat-mandatory-tests"
+  - group: "Check/Update"
+    key: "x-pack-filebeat-check-update"
+
     steps:
-      - label: ":ubuntu: x-pack/filebeat Unit Tests"
+      - label: "x-pack/filebeat: Run check/update"
+        command: |
+          set -eo pipefail
+          make -C x-pack/filebeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:0.3"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack-filebeat: check/update"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-filebeat-check-update"
+
+
+  - group: "Mandatory Tests"
+    key: "x-pack-filebeat-mandatory-tests"
+
+    steps:
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests"
         key: "x-pack-filebeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/filebeat
@@ -46,9 +76,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Unit Tests"
+              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/filebeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
           cd x-pack/filebeat
@@ -67,7 +97,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Go Integration Tests"
 
-      - label: ":ubuntu: x-pack/filebeat Python Integration Tests"
+      - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
           cd x-pack/filebeat
@@ -86,7 +116,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/filebeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -105,9 +135,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2022 Unit Tests"
+              context: "x-pack/filebeat: Win 2022 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -126,14 +156,14 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2016 Unit Tests"
+              context: "x-pack/filebeat: Win 2016 Unit Tests"
 
-  - group: "x-pack/filebeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/filebeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -152,9 +182,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Win-2019 Unit Tests"
+              context: "x-pack/filebeat: Win 2019 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win 10 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -175,7 +205,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win 11 Unit Tests"
+      - label: ":windows: x-pack/filebeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -196,16 +226,19 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Win 11 Unit Tests"
 
-  - group: "x-pack/filebeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-filebeat-extended-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/filebeat Linux arm64 Unit Tests"
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
         command: |
           cd x-pack/filebeat
           mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -215,9 +248,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Linux arm64 Unit Tests"
+              context: "x-pack/filebeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: x-pack/filebeat macOS x86_64 Unit Tests"
+      - label: ":mac: x-pack/filebeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -237,7 +270,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: x-pack/filebeat macOS arm64 Unit Tests"
+      - label: ":mac: x-pack/filebeat: macOS arm64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
@@ -257,53 +290,23 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: macOS arm64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/filebeat Cloud (MODULE) Tests"
+      - label: ":ubuntu: x-pack/filebeat: AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
+        skip: "skipping as it was on Jenkins: elastic/ingest-dev#3467"
+        # Related issue: https://github.com/elastic/ingest-dev/issues/3467
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
-        command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/filebeat
-          echo "~~~ Running tests"
-          source .buildkite/scripts/setup_cloud_env.sh
-          cd x-pack/filebeat
-          mage build test
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
-          AWS_REGION: "eu-central-1"
           MODULE_DIR: "x-pack/filebeat/input/awss3/_meta/terraform"
-          REPO: beats
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Cloud (MODULE) Tests"
-
-      - label: ":ubuntu: x-pack/filebeat Cloud AWS (MODULE) Tests"
-        key: "x-pack-filebeat-extended-cloud-test-aws"
-        skip: "Skipping due to elastic/beats#36425"
-        # https://github.com/elastic/beats/issues/36425
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
+          MODULE: "aws"
+          #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
+          TEST_TAGS: "aws"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/filebeat
+          source .buildkite/scripts/initCloudEnv.sh
           echo "~~~ Running tests"
-          source .buildkite/scripts/setup_cloud_env.sh
           cd x-pack/filebeat
           mage build test goIntegTest
-        env:
-          ASDF_TERRAFORM_VERSION: 1.0.2
-          AWS_REGION: "eu-central-1"
-          MODULE_DIR: "x-pack/filebeat/input/awss3/_meta/terraform"
-          REPO: beats
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -313,7 +316,7 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Cloud AWS (MODULE) Tests"
+              context: "x-pack/filebeat: AWS Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -323,11 +326,14 @@ steps:
     depends_on:
       - step: "x-pack-filebeat-mandatory-tests"
 
-  - group: "x-pack/filebeat Packaging"
+  - group: "Packaging"
     key: "x-pack-filebeat-packaging"
+
     steps:
-      - label: ":linux: x-pack/filebeat Packaging Linux"
+      - label: ":linux: x-pack/filebeat: Packaging Linux"
         key: "packaging-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           cd x-pack/filebeat
           mage package
@@ -341,14 +347,15 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux"
 
-      - label: ":linux: x-pack/filebeat Packaging arm64"
+      - label: ":linux: x-pack/filebeat: Packaging arm64"
         key: "packaging-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
         command: |
           cd x-pack/filebeat
           mage package
@@ -360,9 +367,6 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux arm64"

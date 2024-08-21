@@ -68,6 +68,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Split split httpmon out of x-pack/filebeat/input/internal/httplog. {pull}36385[36385]
 - Beats publishing pipeline does not propagate the close signal to its clients any more. It's responsibility of the user to close the pipeline client. {issue}38197[38197] {pull}38556[38556]
 - Debug log entries from the acker (`stateful ack ...` or `stateless ack ...`) removed. {pull}39672[39672]
+- Rename x-pack/filebeat websocket input to streaming. {issue}40264[40264] {pull}40421[40421]
+- Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
 
 ==== Bugfixes
 
@@ -98,6 +100,10 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix copy arguments for strict aligned architectures. {pull}36976[36976]
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 - Skip flakey metrics test on windows in filebeat httpjson input. {issue}39676[39676] {pull}39678[39678]
+- Fix flakey test on Windows 2022 in packetbeat/route. {issue}39698[39698] {pull}39822[39822]
+- Fix bug in minimum length for request trace logging. {pull}39834[39834]
+- Close connections properly in Filbeat's HTTPJSON input. {pull}39790[39790]
+- Add the Offset property to libbeat/reader.Message to store the total number of bytes read and discarded before generating the message. This enables inputs to accurately determine how much data has been read up to the message, using Message.Bytes + Message.Offset. {pull}39873[39873] {issue}39653[39653]
 
 ==== Added
 
@@ -189,6 +195,12 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
 - Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
 - Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
+- Improve robustness and error reporting from packetbeat default route testing. {pull}39757[39757]
+- Move x-pack/filebeat/input/salesforce jwt import to v5. {pull}39823[39823]
+- Drop x-pack/filebeat/input dependency on github.com/lestrrat-go/jwx/v2. {pull}39968[39968]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Bump version of elastic/toutoumomoma to remove internal forks of stdlib debug packages. {pull}40325[40325]
+- Refactor x-pack/filebeat/input/websocket for generalisation. {pull}40308[40308]
 
 ==== Deprecated
 

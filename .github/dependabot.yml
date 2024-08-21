@@ -35,29 +35,34 @@ updates:
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
       - dependency-name: github.com/elastic/ebpfevents
+      # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
+      # AWS SDK dependencies
+      - dependency-name: github.com/aws/aws-sdk-go-v2/*
+      - dependency-name: github.com/aws/aws-lambda-go/*
+      - dependency-name: github.com/aws/smithy-go/*
+      # Azure SDK dependencies
+      - dependency-name: github.com/Azure/azure-sdk-for-go/*
+      - dependency-name: github.com/Azure/azure-event-hubs-go/*
+      - dependency-name: github.com/Azure/azure-storage-blob-go/*
+      - dependency-name: github.com/Azure/go-autorest/*
+      # GCP SDK dependencies
+      - dependency-name: cloud.google.com/go/*
+    groups:
+      # Cloud providers' SDK dependencies
+      aws-sdks:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2/*"
+      azure-sdks:
+        patterns:
+          - "github.com/Azure/azure-*-go"
+          - "github.com/Azure/go-autorest/*"
+      gcp-sdks:
+        patterns:
+          - "cloud.google.com/go/*"
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
     open-pull-requests-limit: 2
-
-  # Cloud providers' SDK dependencies
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - automation
-      - dependabot
-    reviewers:
-      - "elastic/obs-ds-hosted-services"
-      - "elastic/obs-infraobs-integrations"
-    groups:
-      azure-sdks:
-        patterns:
-          - "github.com/Azure/azure-sdk-for-go/*"
-          - "github.com/Azure/azure-event-hubs-go/*"
-          - "github.com/Azure/go-autorest/*"
-          - "github.com/Azure/azure-storage-blob-go/*"
 
   # GitHub actions
   - package-ecosystem: "github-actions"

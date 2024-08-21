@@ -54,6 +54,13 @@ eventLoop:
 		}
 	}
 
+	// Check the batch size so we can report to the metrics observer
+	batchByteCount := 0
+	for _, frame := range frames {
+		batchByteCount += int(frame.bytesOnDisk)
+	}
+	dq.observer.ConsumeEvents(len(frames), batchByteCount)
+
 	// There is a mild race condition here based on queue closure: events
 	// written to readerLoop.output may have been buffered before the
 	// queue was closed, and we may be reading its leftovers afterwards.

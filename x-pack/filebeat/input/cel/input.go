@@ -13,9 +13,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -380,7 +382,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return nil
 				}
 				log.Errorw("single event object returned by evaluation", "event", e)
-				env.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+				if err, ok := e["error"]; ok {
+					env.UpdateStatus(status.Degraded, fmt.Sprintf("single event error object returned by evaluation: %s", mapstr.M{"error": err}))
+				} else {
+					env.UpdateStatus(status.Degraded, "single event object returned by evaluation")
+				}
 				isDegraded = true
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
@@ -653,7 +659,7 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]interface{}, header 
 	}
 
 	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if limit == 0 {
+	if limit <= 0 {
 		w, ok := rateLimit["reset"]
 		if ok {
 			switch w := w.(type) {
@@ -706,7 +712,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	case float64:
 		limit = rate.Limit(r)
 	case string:
-		if !strings.EqualFold(r, "inf") {
+		if !strings.EqualFold(strings.TrimPrefix(r, "+"), "inf") && !strings.EqualFold(strings.TrimPrefix(r, "+"), "infinity") {
 			log.Errorw("unexpected value returned for rate limit "+which, "value", r, "rate_limit", mapstr.M(rateLimit))
 			return limit, false
 		}
@@ -716,6 +722,11 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	}
 	return limit, true
 }
+
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
@@ -740,7 +751,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	}
 
 	var trace *httplog.LoggingRoundTripper
-	if cfg.Resource.Tracer != nil {
+	if cfg.Resource.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -754,10 +765,29 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
 		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
 		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
+	} else if cfg.Resource.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err = os.Remove(cfg.Resource.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Resource.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 
 	if reg != nil {
@@ -883,10 +913,19 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
 // but return the last retry attempt's response and a nil error so that the CEL code
 // can evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
-// is returned unaltered.
+// is returned unaltered. Despite not being documented so, the error handler may be passed
+// a nil resp. retryErrorHandler will handle this case.
 func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
-		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		if resp != nil && resp.Request != nil {
+			reqURL := "unavailable"
+			if resp.Request.URL != nil {
+				reqURL = resp.Request.URL.String()
+			}
+			log.Warnw("giving up retries", "method", resp.Request.Method, "url", reqURL, "retries", max+1)
+		} else {
+			log.Warnw("giving up retries: no response available", "retries", max+1)
+		}
 		return resp, err
 	}
 }

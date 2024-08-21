@@ -24,11 +24,38 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/libbeat Mandatory Tests"
+  - group: "Check/Update"
+    key: "x-pack-libbeat-check-update"
+    steps:
+      - label: "x-pack/libbeat: Run check/update"
+        command: |
+          set -eo pipefail
+          make -C x-pack/libbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: check/update"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-libbeat-check-update"
+
+  - group: "Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/libbeat
@@ -45,9 +72,9 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Unit Tests"
+              context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
@@ -66,7 +93,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Python Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           cd x-pack/libbeat
@@ -85,7 +112,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -104,9 +131,9 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2016 Unit Tests"
+              context: "x-pack/libbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -125,14 +152,14 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2022 Unit Tests"
+              context: "x-pack/libbeat: Win 2022 Unit Tests"
 
-  - group: "x-pack/libbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-libbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/libbeat Win 10 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -153,7 +180,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win 11 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -174,7 +201,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
@@ -193,14 +220,14 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2019 Unit Tests"
+              context: "x-pack/libbeat: Win 2019 Unit Tests"
 
-  - group: "x-pack/libbeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat arm64 Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           cd x-pack/libbeat
@@ -217,4 +244,4 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Linux arm64 Unit Tests"
+              context: "x-pack/libbeat: Ubuntu arm64 Unit Tests"

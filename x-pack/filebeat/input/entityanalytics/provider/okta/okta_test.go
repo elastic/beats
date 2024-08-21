@@ -7,6 +7,7 @@ package okta
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -17,11 +18,17 @@ import (
 	"time"
 
 	"golang.org/x/time/rate"
+	"gopkg.in/natefinch/lumberjack.v2"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
+
 func TestOktaDoFetch(t *testing.T) {
+	logp.TestingSetup()
+
 	tests := []struct {
 		dataset     string
 		wantUsers   bool
@@ -49,11 +56,13 @@ func TestOktaDoFetch(t *testing.T) {
 				window  = time.Minute
 				key     = "token"
 				users   = `[{"id":"USERID","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/USERID"}}}]`
+				groups  = `[{"id":"USERID","profile":{"description":"All users in your organization","name":"Everyone"}}]`
 				devices = `[{"id":"DEVICEID","status":"STATUS","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"DEVICEID","_links":{"activate":{"href":"https://localhost/api/v1/devices/DEVICEID/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://localhost/api/v1/devices/DEVICEID","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://localhost/api/v1/devices/DEVICEID/users","hints":{"allow":["GET"]}}}}]`
 			)
 
 			data := map[string]string{
 				"users":   users,
+				"groups":  groups,
 				"devices": devices,
 			}
 
@@ -63,10 +72,18 @@ func TestOktaDoFetch(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to unmarshal user data: %v", err)
 				}
+				var wantGroups []okta.Group
+				err = json.Unmarshal([]byte(groups), &wantGroups)
+				if err != nil {
+					t.Fatalf("failed to unmarshal user data: %v", err)
+				}
+				for i, u := range wantUsers {
+					wantUsers[i].Groups = append(u.Groups, wantGroups...)
+				}
 			}
 			var wantDevices []Device
 			if test.wantDevices {
-				err := json.Unmarshal([]byte(users), &wantDevices)
+				err := json.Unmarshal([]byte(devices), &wantDevices)
 				if err != nil {
 					t.Fatalf("failed to unmarshal device data: %v", err)
 				}
@@ -83,6 +100,12 @@ func TestOktaDoFetch(t *testing.T) {
 				w.Header().Add("x-rate-limit-remaining", "49")
 				w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Add(time.Minute).Unix()))
 
+				if strings.HasPrefix(r.URL.Path, "/api/v1/users") && strings.HasSuffix(r.URL.Path, "groups") {
+					// Give the groups if this is a get user groups request.
+					userid := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/api/v1/users/"), "/groups")
+					fmt.Fprintln(w, strings.ReplaceAll(data["groups"], "USERID", userid))
+					return
+				}
 				if strings.HasPrefix(r.URL.Path, "/api/v1/device") && strings.HasSuffix(r.URL.Path, "users") {
 					// Give one user if this is a get device users request.
 					fmt.Fprintln(w, data["users"])
@@ -136,6 +159,17 @@ func TestOktaDoFetch(t *testing.T) {
 				lim:    rate.NewLimiter(1, 1),
 				logger: logp.L(),
 			}
+			if *trace {
+				name := test.dataset
+				if name == "" {
+					name = "default"
+				}
+				// Use legacy behaviour; nil enabled setting.
+				a.cfg.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+					Filename: fmt.Sprintf("test_trace_%s.ndjson", name),
+				}}
+			}
+			a.client = requestTrace(context.Background(), a.client, a.cfg, a.logger)
 
 			ss, err := newStateStore(store)
 			if err != nil {
@@ -158,8 +192,14 @@ func TestOktaDoFetch(t *testing.T) {
 					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantUsers))
 				}
 				for i, g := range got {
-					if wantID := fmt.Sprintf("userid%d", i+1); g.ID != wantID {
+					wantID := fmt.Sprintf("userid%d", i+1)
+					if g.ID != wantID {
 						t.Errorf("unexpected user ID for user %d: got:%s want:%s", i, g.ID, wantID)
+					}
+					for j, gg := range g.Groups {
+						if gg.ID != wantID {
+							t.Errorf("unexpected used ID for user group %d in %d: got:%s want:%s", j, i, gg.ID, wantID)
+						}
 					}
 					if g.State != wantStates[g.ID] {
 						t.Errorf("unexpected user state for user %s: got:%s want:%s", g.ID, g.State, wantStates[g.ID])

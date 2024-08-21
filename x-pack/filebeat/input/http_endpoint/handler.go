@@ -18,13 +18,13 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -53,8 +53,8 @@ type handler struct {
 	publish     func(beat.Event)
 	log         *logp.Logger
 	validator   apiValidator
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
 	reqLogger    *zap.Logger
 	host, scheme string
@@ -230,6 +230,8 @@ func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
 }
 
 func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	log.Errorw("request error", "tx_id", txID, "status_code", status, "error", apiError)
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 
@@ -290,7 +292,7 @@ func (h *handler) logRequest(txID string, r *http.Request, status int, respBody 
 }
 
 func (h *handler) nextTxID() string {
-	count := h.txIDCounter.Inc()
+	count := h.txIDCounter.Add(1)
 	return h.formatTxID(count)
 }
 
@@ -382,7 +384,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []js
 			objs = append(objs, nobjs...)
 			rawMessages = append(rawMessages, nrawMessages...)
 		default:
-			return nil, nil, errUnsupportedType
+			return nil, nil, fmt.Errorf("%w: %T", errUnsupportedType, v)
 		}
 	}
 	for i := range objs {
@@ -396,7 +398,7 @@ type program struct {
 	ast *cel.Ast
 }
 
-func newProgram(src string) (*program, error) {
+func newProgram(src string, log *logp.Logger) (*program, error) {
 	if src == "" {
 		return nil, nil
 	}
@@ -410,6 +412,7 @@ func newProgram(src string) (*program, error) {
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		cel.CustomTypeAdapter(&numberAdapter{registry}),
 		cel.CustomTypeProvider(registry),
+		lib.Debug(debug(log)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create env: %w", err)
@@ -427,6 +430,17 @@ func newProgram(src string) (*program, error) {
 	return &program{prg: prg, ast: ast}, nil
 }
 
+func debug(log *logp.Logger) func(string, any) {
+	log = log.Named("http_endpoint_cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		log.Debugw(level, "tag", tag, "value", value)
+	}
+}
+
 var _ types.Adapter = (*numberAdapter)(nil)
 
 type numberAdapter struct {
@@ -434,15 +448,36 @@ type numberAdapter struct {
 }
 
 func (a *numberAdapter) NativeToValue(value any) ref.Val {
-	if n, ok := value.(json.Number); ok {
+	switch value := value.(type) {
+	case []any:
+		for i, v := range value {
+			value[i] = a.NativeToValue(v)
+		}
+	case map[string]any:
+		for k, v := range value {
+			value[k] = a.NativeToValue(v)
+		}
+	case json.Number:
 		var errs []error
-		i, err := n.Int64()
+		i, err := value.Int64()
 		if err == nil {
 			return types.Int(i)
 		}
 		errs = append(errs, err)
-		f, err := n.Float64()
+		f, err := value.Float64()
 		if err == nil {
+			// Literalise floats that could have been an integer greater than
+			// can be stored without loss of precision in a double.
+			// This is any integer wider than the IEEE-754 double mantissa.
+			// As a heuristic, allow anything that includes a decimal point
+			// or uses scientific notation. We could be more careful, but
+			// it is likely not important, and other languages use the same
+			// rule.
+			if f >= 0x1p53 && !strings.ContainsFunc(string(value), func(r rune) bool {
+				return r == '.' || r == 'e' || r == 'E'
+			}) {
+				return types.String(value)
+			}
 			return types.Double(f)
 		}
 		errs = append(errs, err)

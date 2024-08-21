@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.11.0
+:mito_version: v1.15.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -134,7 +134,7 @@ After completion of a program's execution it should return a single object with 
 ----
 
 <1> The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements.
-The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged.
+The field should be an array, but in the case of an error condition in the CEL program it is acceptable to return a single object instead of an array; this will will be wrapped as an array for publication and an error will be logged. If the single object contains a key, "error", the error value will be used to update the status of the input to report to Elastic Agent. This can be used to more rapidly respond to API failures.
 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object it is will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 
@@ -163,6 +163,7 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Keys[Keys]
 ** {mito_docs}/lib#hdr-Max[Max]
 ** {mito_docs}/lib#hdr-Min[Min]
+** {mito_docs}/lib#hdr-Tail[Tail]
 ** {mito_docs}/lib#hdr-Values[Values]
 ** {mito_docs}/lib#hdr-With[With]
 ** {mito_docs}/lib#hdr-With_Replace[With Replace]
@@ -674,16 +675,22 @@ The value of the response that specifies the maximum overall resource request ra
 The maximum burst size. Burst is the maximum number of resource requests that can be made above the overall rate limit.
 
 [float]
-==== `resource.tracer.filename`
+==== `resource.tracer.enable`
 
 It is possible to log HTTP requests and responses in a CEL program to a local file-system for debugging configurations.
-This option is enabled by setting the `resource.tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+This option is enabled by setting `resource.tracer.enabled` to true and setting the `resource.tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `resource.tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `resource.tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`. Setting
+`resource.tracer.filename` with `resource.tracer.enable` set to false will cause any existing trace logs matching
+the filename option to be deleted.
 
 [float]
 ==== `resource.tracer.maxsize`

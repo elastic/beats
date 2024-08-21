@@ -13,9 +13,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -24,7 +26,6 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -163,7 +164,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 
 	var prg *program
 	if e.config.Program != "" {
-		prg, err = newProgram(e.config.Program)
+		prg, err = newProgram(e.config.Program, log)
 		if err != nil {
 			return err
 		}
@@ -327,10 +328,9 @@ func (s *server) getErr() error {
 
 func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
-		ctx:         ctx,
-		log:         log,
-		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
+		ctx:      ctx,
+		log:      log,
+		txBaseID: newID(),
 
 		publish: pub,
 		metrics: metrics,
@@ -355,7 +355,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
-	if c.Tracer != nil {
+	if c.Tracer.enabled() {
 		w := zapcore.AddSync(c.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -374,9 +374,33 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		} else {
 			h.scheme = "http"
 		}
+	} else if c.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err := os.Remove(c.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", c.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(c.Tracer.Filename)
+		base := strings.TrimSuffix(c.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 	return h
 }
+
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func htmlEscape(s string) string {
 	var buf bytes.Buffer

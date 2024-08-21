@@ -627,6 +627,18 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	return m, nil
 }
 
+// RemoveAllCLIArgs removes all CLI arguments configured.
+// It will also remove all configuration for home path and
+// logs, there fore some methods, like the ones that read logs,
+// might fail if Filebeat is not configured the way this framework
+// expects.
+//
+// The only CLI argument kept is the `--systemTest` that is necessary
+// to make the System Test Binary run Filebeat
+func (b *BeatProc) RemoveAllCLIArgs() {
+	b.baseArgs = []string{b.beatName, "--systemTest"}
+}
+
 func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -15,7 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
-// newInputMetrics creates a new `*inputMetrics` to track metrics.
+// newInputMetrics creates a new `*inputMetrics` to track input metrics.
 func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetrics {
 	reg, unregister := inputmon.NewInputRegistry(inputName, id, parentRegistry)
 	inputMetrics := inputMetrics{
@@ -34,6 +33,9 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 		// General
 		processingTime: metrics.NewUniformSample(1024), // TODO: set a reasonable value for the sample size.
 		decodeErrors:   monitoring.NewUint(reg, "decode_errors_total"),
+
+		// Processor
+		processorRestarts: monitoring.NewUint(reg, "processor_restarts_total"),
 	}
 	_ = adapter.
 		NewGoMetrics(reg, "processing_time", adapter.Accept).
@@ -83,6 +85,9 @@ type inputMetrics struct {
 	// General
 	processingTime metrics.Sample   // processingTime tracks the time it takes to process a message.
 	decodeErrors   *monitoring.Uint // decodeErrors tracks the number of errors that occurred while decoding a message.
+
+	// Processor
+	processorRestarts *monitoring.Uint // processorRestarts tracks the number of times the processor has restarted.
 }
 
 // Close unregisters the metrics from the registry.

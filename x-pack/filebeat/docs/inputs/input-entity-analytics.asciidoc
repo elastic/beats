@@ -18,6 +18,7 @@ The following identity providers are supported:
 
 - <<provider-activedirectory>>
 - <<provider-azure-ad>>
+- <<provider-jamf>>
 - <<provider-okta>>
 
 ==== Configuration options
@@ -188,6 +189,11 @@ The Active Directory Base Distinguished Name. Field is required.
 ===== `ad_user`
 
 The client user name. Used for authentication. The user must have Active Directory read access. Field is required.
+
+[float]
+===== `ad_paging_size`
+
+The number of records to request from the Active Directory server for each page, if set.
 
 [float]
 ===== `ad_password`
@@ -509,6 +515,195 @@ This is a list of optional query parameters. The default is `["accountEnabled", 
 "displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes",
 "alternativeSecurityIds"]`.
 
+[float]
+==== `tracer.enabled`
+
+It is possible to log HTTP requests and responses to the EntraID API to a local file-system for debugging configurations.
+This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled`
+to false without unsetting the filename option.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+
+[id="provider-jamf"]
+==== Jamf Computer Management (`jamf`)
+
+The `jamf` provider allows the input to retrieve computer records from the
+Jamf API.
+
+[float]
+==== How It Works
+
+[float]
+===== Overview
+
+The Jamf provider periodically contacts the Jamf API, retrieving updates for
+computers, updates its internal cache of managed computer metadata, and ships
+updated metadata to Elasticsearch.
+
+Fetching and shipping updates occurs in one of two processes: *full
+synchronizations* and *incremental updates*. Full synchronizations will send
+the entire list of computers in state, along with write markers to
+indicate the start and end of the synchronization event. Incremental updates
+will only send data for changed computers records during that event. Changes
+on a user or device can come in many forms, whether it be a change to the
+user's metadata, or a user was added or deleted.
+
+[float]
+===== API Interactions
+
+The provider periodically retrieves changes to user/device metadata from the
+Jamf computers-preview API. This is done through calls to:
+
+- https://developer.jamf.com/jamf-pro/reference/get_preview-computers[/api/preview/computers]
+
+Updates are tracked by the provider by retaining a record of the time of the last
+noted update in the returned user list. During provider updates the Jamf provider
+makes use of the Jamf API's query filtering to only request records updated at or
+since the provider's recorded last update.
+
+[float]
+===== Sending Computer Metadata to Elasticsearch
+
+During a full synchronization, all users/devices stored in state will be sent
+to the output, while incremental updates will only send users and devices
+that have been updated. Full synchronizations will be bounded on either side
+by write marker documents, which will look something like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "started",
+        "start": "2022-11-04T09:57:19.786056-05:00"
+    },
+    "labels": {
+        "identity_source": "jamf-1"
+    }
+}
+----
+
+Documents will show the current state of the computer record.
+
+Example document:
+
+["source","json",subs="attributes"]
+----
+{
+    "device": {
+        "id": "5982CE36-4526-580B-B4B9-ECC6782535BC"
+    },
+    "event": {
+        "action": "device-discovered"
+    },
+    "jamf": {
+        "location": {
+            "username": "john.doe",
+            "position": "Unknown Developer"
+        },
+        "site": null,
+        "name": "acme-C07DM3AZQ6NV",
+        "udid": "5982CE36-4526-580B-B4B9-ECC6782535BC",
+        "serialNumber": "C07DM3AZQ6NV",
+        "operatingSystemVersion": "14.0",
+        "operatingSystemBuild": "23A344",
+        "operatingSystemSupplementalBuildVersion": null,
+        "operatingSystemRapidSecurityResponse": null,
+        "macAddress": "64:0B:D7:AA:E4:B2",
+        "assetTag": null,
+        "modelIdentifier": "Macmini9,1",
+        "mdmAccessRights": 0,
+        "lastContactDate": "2024-04-18T14:26:51.514Z",
+        "lastReportDate": "2024-06-19T15:54:37.692Z",
+        "lastEnrolledDate": "2023-02-22T10:46:17.199Z",
+        "ipAddress": null,
+        "managementId": "1a59c510-b3a9-41cb-8afa-3d4187ac60d0",
+        "isManaged": true
+    },
+    "labels": {
+        "identity_source": "jamf-1"
+    }
+}
+----
+
+[float]
+==== Configuration
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: entity-analytics
+  enabled: true
+  id: jamf-1
+  provider: jamf
+  dataset: "all"
+  sync_interval: "12h"
+  update_interval: "30m"
+  jamf_tenant: "JAMF_TENANT"
+  jamf_username: "JAMF_USERNAME"
+  jamf_password: "JAMF_PASSWORD"
+----
+
+The `jamf` provider supports the following configuration:
+
+[float]
+===== `jamf_tenant`
+
+The Jamf tenant host. Field is required.
+
+[float]
+===== `jamf_username`
+
+The Jamf username, used for authentication. Field is required.
+
+[float]
+===== `jamf_password`
+
+The Jamf user password, used for authentication. Field is required.
+
+[float]
+===== `page_size`
+
+The number of computer records to collect with each API request. Defaults to https://developer.jamf.com/jamf-pro/reference/get_preview-computers[API default].
+
+[float]
+===== `sync_interval`
+
+The interval in which full synchronizations should occur. The interval must be
+longer than the update interval (`update_interval`) Expressed as a duration
+string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
+
+[float]
+===== `update_interval`
+
+The interval in which incremental updates should occur. The interval must be
+shorter than the full synchronization interval (`sync_interval`). Expressed as a
+duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
++==== `tracer.enabled`
+
+It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations.
+This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled`
+to false without unsetting the filename option.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
+
 [id="provider-okta"]
 ==== Okta User Identities (`okta`)
 
@@ -538,8 +733,8 @@ The Okta provider periodically contacts the Okta API, retrieving updates for
 users and devices, updates its internal cache of user metadata, and ships
 updated user/device metadata to Elasticsearch.
 
-Fetching and shipping updates occurs in one of two processes: **full
-synchronizations** and *incremental updates*. Full synchronizations will send
+Fetching and shipping updates occurs in one of two processes: *full
+synchronizations* and *incremental updates*. Full synchronizations will send
 the entire list of users and devices in state, along with write markers to
 indicate the start and end of the synchronization event. Incremental updates
 will only send data for changed users and devices during that event. Changes
@@ -796,6 +991,22 @@ string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
 The interval in which incremental updates should occur. The interval must be
 shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
+
+[float]
+==== `tracer.enabled`
+
+It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations.
+This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled`
+to false without unsetting the filename option.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== Metrics

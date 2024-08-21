@@ -47,6 +47,7 @@ var inputTests = []struct {
 	wantCursor    []map[string]interface{}
 	wantErr       error
 	wantFile      string
+	wantNoFile    string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -1142,6 +1143,102 @@ var inputTests = []struct {
 		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
+		name: "tracer_filename_sanitization_enabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+	},
+	{
+		name: "tracer_filename_sanitization_disabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  false,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
 		name:   "pagination_cursor_object",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
@@ -1453,14 +1550,32 @@ var inputTests = []struct {
 
 	// Programmer error.
 	{
-		name:   "type_error_message",
+		name:   "type_error_message_compile_time",
 		server: newChainTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-	bytes(get(state.url).Body).decode_json().records.map(r,
-		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
-	//                          ^~~~ r.id not converted to string: can't add integer to string.
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id converted to incorrect type.
+			"events": events,
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: fmt.Errorf(`failed to check program: failed compilation: ERROR: <input>:3:20: found no matching overload for '_+_' applied to '(string, int)'
+ |   get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+ | ...................^ accessing config`),
+	},
+	{
+		name:   "type_error_message_run_time",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id not converted to string: can't add integer to string.
 			"events": events,
 	})
 	`,
@@ -1469,10 +1584,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					// This is the best we get for some errors from CEL.
-					"message": `failed eval: ERROR: <input>:3:56: no such overload
- |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
- | .......................................................^`,
+					"message": `failed eval: ERROR: <input>:3:26: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | .........................^`,
 				},
 			},
 		},
@@ -1551,7 +1665,10 @@ func TestInput(t *testing.T) {
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				t.Fatalf("unexpected error unpacking config: %v", err)
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
 			}
 
 			var tempDir string
@@ -1623,6 +1740,15 @@ func TestInput(t *testing.T) {
 			if test.wantFile != "" {
 				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
 					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 		})

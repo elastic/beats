@@ -23,11 +23,14 @@ import (
 	"context"
 	"encoding/base64"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -104,6 +107,56 @@ func TestHeaders(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, req.Header, http.Header(td.expected))
+
+	}
+}
+
+func TestUserAgentHeader(t *testing.T) {
+
+	// remove some randomness from this test
+	version.SetPackageVersion("8.15")
+
+	cases := []struct {
+		connSettings ConnectionSettings
+		expectedUA   string
+		name         string
+	}{
+		{
+			name: "test-ua-set",
+			connSettings: ConnectionSettings{
+				Beatname:  "testbeat",
+				UserAgent: "Agent/8.15",
+			},
+			expectedUA: "Agent/8.15",
+		},
+		{
+			name: "beatname-fallback",
+			connSettings: ConnectionSettings{
+				Beatname: "testbeat",
+			},
+			expectedUA: "testbeat/8.15",
+		},
+		{
+			name:         "libbeat-fallback",
+			connSettings: ConnectionSettings{},
+			expectedUA:   "Libbeat/8.15",
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if !strings.Contains(r.UserAgent(), testCase.expectedUA) {
+					t.Errorf("User-Agent must be '%s', got '%s'", testCase.expectedUA, r.UserAgent())
+				}
+				_, _ = w.Write([]byte("{}"))
+			}))
+			defer server.Close()
+			testCase.connSettings.URL = server.URL
+			conn, err := NewConnection(testCase.connSettings)
+			require.NoError(t, err)
+			require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
+		})
 	}
 }
 

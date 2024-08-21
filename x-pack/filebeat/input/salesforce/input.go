@@ -14,16 +14,17 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"slices"
 	"time"
 
-	"github.com/g8rswimmer/go-sfdc"
-	"github.com/g8rswimmer/go-sfdc/credentials"
-	"github.com/g8rswimmer/go-sfdc/session"
-	"github.com/g8rswimmer/go-sfdc/soql"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
+
+	"github.com/elastic/go-sfdc"
+	"github.com/elastic/go-sfdc/credentials"
+	"github.com/elastic/go-sfdc/session"
+	"github.com/elastic/go-sfdc/soql"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -469,10 +470,19 @@ func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...
 // retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
 // but return the last retry attempt's response and a nil error to allow the retryablehttp.Client
 // evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
-// is returned unaltered.
+// is returned unaltered. Despite not being documented so, the error handler may be passed
+// a nil resp. retryErrorHandler will handle this case.
 func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
-		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		if resp != nil && resp.Request != nil {
+			reqURL := "unavailable"
+			if resp.Request.URL != nil {
+				reqURL = resp.Request.URL.String()
+			}
+			log.Warnw("giving up retries", "method", resp.Request.Method, "url", reqURL, "retries", max+1)
+		} else {
+			log.Warnw("giving up retries: no response available", "retries", max+1)
+		}
 		return resp, err
 	}
 }

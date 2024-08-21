@@ -1,0 +1,72 @@
+env:
+  ASDF_MAGE_VERSION: 1.15.0
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+steps:
+  - group: "Agentbeat tests"
+    key: "agentbeat-mandatory-tests"
+
+    steps:
+      - label: ":linux: Agentbeat packaging Linux"
+        key: "agentbeat-package-linux"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          set -euo pipefail
+          cd x-pack/agentbeat
+          mage package
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging"
+
+      - label: ":linux: Agentbeat/Integration tests Linux"
+        key: "agentbeat-it-linux"
+        depends_on:
+          - agentbeat-package-linux
+        env:
+          ASDF_NODEJS_VERSION: 18.17.1
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          set -euo pipefail
+          echo "~~~ Downloading artifacts"
+          buildkite-agent artifact download x-pack/agentbeat/build/distributions/** . --step 'agentbeat-package-linux'
+          ls -lah x-pack/agentbeat/build/distributions/
+          echo "~~~ Installing @elastic/synthetics with npm"
+          npm install -g @elastic/synthetics
+          echo "~~~ Running tests"
+          cd x-pack/agentbeat
+          mage goIntegTest
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 1
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Integration tests"

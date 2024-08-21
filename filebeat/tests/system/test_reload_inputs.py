@@ -31,7 +31,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
@@ -91,17 +91,17 @@ class Test(BaseTest):
             inputs=False,
         )
 
-        proc = self.start_beat()
-
         os.mkdir(self.working_dir + "/logs/")
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
+
+        proc = self.start_beat()
 
         self.wait_until(lambda: self.output_lines() == 1)
 
@@ -111,7 +111,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -158,7 +158,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
@@ -221,7 +221,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         # Update both log files, only 1 change should be picked up
@@ -293,8 +293,6 @@ class Test(BaseTest):
         assert output[0]["message"] == first_line
         assert output[1]["message"] == second_line
 
-    # 1/20 build fails https://github.com/elastic/beats/issues/21307
-    @pytest.mark.flaky(reruns=2, reruns_delay=10)
     def test_reload_same_config(self):
         """
         Test reload same config with same file but different config. Makes sure reloading also works on conflicts.
@@ -310,7 +308,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         proc = self.start_beat()
 

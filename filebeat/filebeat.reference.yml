@@ -839,7 +839,7 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_inactive: 0
+  #clean_inactive: -1
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -1182,9 +1182,8 @@ filebeat.inputs:
   # You may wish to have separate inputs for each service. You can use
   # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
-  #include_matches.or:
-    #- equals:
-      #- _SYSTEMD_UNIT=foo.service
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]

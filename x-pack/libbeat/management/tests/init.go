@@ -50,7 +50,7 @@ func fleetClientFactory(srv MockV2Handler) lbmanagement.ManagerFactory {
 // SetupTestEnv is a helper to initialize the common files and handlers for metricbeat.
 // This returns a string to the tmpdir location
 func SetupTestEnv(t *testing.T, config *proto.UnitExpectedConfig, runtime time.Duration) (string, MockV2Handler) {
-	tmpdir := os.TempDir()
+	tmpdir := t.TempDir()
 	filename := fmt.Sprintf("test-%d", time.Now().Unix())
 	outPath := filepath.Join(tmpdir, filename)
 	t.Logf("writing output to file %s", outPath)

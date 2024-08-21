@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
@@ -26,6 +28,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
 
 var usersResponse1 = apiUserResponse{
 	Users: []userAPI{
@@ -313,11 +317,17 @@ func TestGraph_Groups(t *testing.T) {
 	rawConf := graphConf{
 		APIEndpoint: "http://" + testSrv.addr,
 	}
+	if *trace {
+		// Use legacy behaviour; nil enabled setting.
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -372,11 +382,16 @@ func TestGraph_Users(t *testing.T) {
 	rawConf := graphConf{
 		APIEndpoint: "http://" + testSrv.addr,
 	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -477,11 +492,16 @@ func TestGraph_Devices(t *testing.T) {
 				APIEndpoint: "http://" + testSrv.addr,
 				Select:      test.selection,
 			}
+			if *trace {
+				rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+					Filename: "test_trace-*.ndjson",
+				}}
+			}
 			c, err := config.NewConfigFrom(&rawConf)
 			require.NoError(t, err)
 			auth := mock.New(mock.DefaultTokenValue)
 
-			f, err := New(c, logp.L(), auth)
+			f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

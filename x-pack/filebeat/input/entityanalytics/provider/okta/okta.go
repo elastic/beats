@@ -10,12 +10,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"golang.org/x/time/rate"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -23,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -105,8 +112,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	// Allow a single fetch operation to obtain limits from the API.
 	p.lim = rate.NewLimiter(1, 1)
 
+	if p.cfg.Tracer != nil {
+		id := sanitizeFileName(inputCtx.ID)
+		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
+	}
+
 	var err error
-	p.client, err = newClient(p.cfg, p.logger)
+	p.client, err = newClient(ctxtool.FromCanceller(inputCtx.Cancelation), p.cfg, p.logger)
 	if err != nil {
 		return err
 	}
@@ -152,11 +164,13 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	}
 }
 
-func newClient(cfg conf, log *logp.Logger) (*http.Client, error) {
+func newClient(ctx context.Context, cfg conf, log *logp.Logger) (*http.Client, error) {
 	c, err := cfg.Request.Transport.Client(clientOptions(cfg.Request.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
+
+	c = requestTrace(ctx, c, cfg, log)
 
 	c.CheckRedirect = checkRedirect(cfg.Request, log)
 
@@ -169,8 +183,69 @@ func newClient(cfg conf, log *logp.Logger) (*http.Client, error) {
 		CheckRetry:   retryablehttp.DefaultRetryPolicy,
 		Backoff:      retryablehttp.DefaultBackoff,
 	}
-
 	return client.StandardClient(), nil
+}
+
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
+// requestTrace decorates cli with an httplog.LoggingRoundTripper if cfg.Tracer
+// is non-nil.
+func requestTrace(ctx context.Context, cli *http.Client, cfg conf, log *logp.Logger) *http.Client {
+	if cfg.Tracer == nil {
+		return cli
+	}
+	if !cfg.Tracer.enabled() {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err := os.Remove(cfg.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
+		return cli
+	}
+
+	w := zapcore.AddSync(cfg.Tracer)
+	go func() {
+		// Close the logger when we are done.
+		<-ctx.Done()
+		cfg.Tracer.Close()
+	}()
+	core := ecszap.NewCore(
+		ecszap.NewDefaultEncoderConfig(),
+		w,
+		zap.DebugLevel,
+	)
+	traceLogger := zap.New(core)
+
+	const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+	maxSize := cfg.Tracer.MaxSize * 1e6
+	cli.Transport = httplog.NewLoggingRoundTripper(cli.Transport, traceLogger, max(0, maxSize-margin), log)
+	return cli
+}
+
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing
+// repeated instances. The request.tracer.filename may have ":" when an input
+// has cursor config and the macOS Finder will treat this as path-separator and
+// causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // clientOption returns constructed client configuration options, including
@@ -376,7 +451,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.cfg.LimitWindow)
+		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.cfg.LimitWindow, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d users from API", len(users))
 			return nil, err
@@ -385,7 +460,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				state.storeUser(u)
+				p.addGroup(ctx, u, state)
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -393,7 +468,8 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		} else {
 			users = grow(users, len(batch))
 			for _, u := range batch {
-				users = append(users, state.storeUser(u))
+				su := p.addGroup(ctx, u, state)
+				users = append(users, su)
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -422,6 +498,17 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 	p.logger.Debugf("received %d users from API", len(users))
 	return users, nil
+}
+
+func (p *oktaInput) addGroup(ctx context.Context, u okta.User, state *stateStore) *User {
+	su := state.storeUser(u)
+	groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow, p.logger)
+	if err != nil {
+		p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
+		return su
+	}
+	su.Groups = groups
+	return su
 }
 
 // doFetchDevices handles fetching device and associated user identities from Okta.
@@ -466,7 +553,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.cfg.LimitWindow)
+		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.cfg.LimitWindow, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d devices from API", len(devices))
 			return nil, err
@@ -485,7 +572,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
-				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.cfg.LimitWindow)
+				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.cfg.LimitWindow, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
 					return nil, err
