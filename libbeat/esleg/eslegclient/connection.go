@@ -19,6 +19,7 @@ package eslegclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -62,6 +63,11 @@ type Connection struct {
 	responseBuffer   *bytes.Buffer
 
 	isServerless bool
+
+	// requests will share the same cancellable context
+	// so they can be aborted on Close()
+	reqsContext context.Context
+	cancelReqs  func()
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -178,12 +184,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
+		reqsContext:        ctx,
+		cancelReqs:         cancelFunc,
 	}
 
 	if s.APIKey != "" {
@@ -317,6 +326,7 @@ func (conn *Connection) Ping() (ESPingData, error) {
 // Close closes a connection.
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
+	conn.cancelReqs()
 	return nil
 }
 
@@ -486,6 +496,7 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.Host = host
 	}
 
+	req = req.WithContext(conn.reqsContext)
 	resp, err := conn.HTTP.Do(req)
 	if err != nil {
 		return 0, nil, err

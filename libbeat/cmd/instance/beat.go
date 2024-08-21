@@ -402,10 +402,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
-	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
-	//       but refine publisher to disconnect clients on stop automatically
-	// defer pipeline.Close()
-
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
 	if err != nil {
@@ -520,9 +516,15 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	stopBeat := func() {
 		b.Instrumentation.Tracer().Close()
+		// If the publisher has a Close() method, call it before stopping the beater.
+		if c, ok := b.Publisher.(io.Closer); ok {
+			c.Close()
+		}
 		beater.Stop()
 	}
 	svc.HandleSignals(stopBeat, cancel)
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(stopBeat)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -530,9 +532,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
