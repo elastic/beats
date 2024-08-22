@@ -79,6 +79,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
+- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 
 *Filebeat*
