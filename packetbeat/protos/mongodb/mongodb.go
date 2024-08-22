@@ -27,12 +27,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var debugf = logp.MakeDebug("mongodb")
@@ -390,7 +391,7 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 	if limit > 0 && limit < 0x7fffffff {
 		query += fmt.Sprintf(".limit(%d)", limit)
 	}
-	return
+	return query
 }
 
 func (mongodb *mongodbPlugin) publishTransaction(t *transaction) {

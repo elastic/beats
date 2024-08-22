@@ -144,39 +144,6 @@ func addInt32(in []byte, v int32) []byte {
 	return append(in, byte(u), byte(u>>8), byte(u>>16), byte(u>>24))
 }
 
-func Test_extract_documents(t *testing.T) {
-	type io struct {
-		Input  map[string]interface{}
-		Output []interface{}
-	}
-	tests := []io{
-		{
-			Input: map[string]interface{}{
-				"a":         1,
-				"documents": []interface{}{"a", "b", "c"},
-			},
-			Output: []interface{}{"a", "b", "c"},
-		},
-		{
-			Input: map[string]interface{}{
-				"a": 1,
-			},
-			Output: []interface{}{},
-		},
-		{
-			Input: map[string]interface{}{
-				"a":         1,
-				"documents": 1,
-			},
-			Output: []interface{}{},
-		},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test.Output, extractDocuments(test.Input))
-	}
-}
-
 func Test_isDatabaseCommand(t *testing.T) {
 	type io struct {
 		Key   string

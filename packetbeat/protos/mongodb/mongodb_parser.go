@@ -237,19 +237,6 @@ func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	return true, true
 }
 
-func extractDocuments(query map[string]interface{}) []interface{} {
-	docsVi, present := query["documents"]
-	if !present {
-		return []interface{}{}
-	}
-
-	docs, ok := docsVi.([]interface{})
-	if !ok {
-		return []interface{}{}
-	}
-	return docs
-}
-
 // Try to guess whether this key:value pair found in
 // the query represents a command.
 func isDatabaseCommand(key string, val interface{}) bool {
