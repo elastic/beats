@@ -1,21 +1,21 @@
 - name: host
   type: group
   description: >
-    host
+    Host information from vSphere environment.
   release: ga
   fields:
     - name: cpu.used.mhz
       type: long
       description: >
-        Used CPU in Mhz.
+        Used CPU in MHz.
     - name: cpu.total.mhz
       type: long
       description: >
-        Total CPU in Mhz.
+        Total CPU in MHz.
     - name: cpu.free.mhz
       type: long
       description: >
-        Free CPU in Mhz.
+        Free CPU in MHz.
     - name: datastore.names
       type: keyword
       description: >
@@ -50,7 +50,7 @@
     - name: disk.total.bytes
       type: long
       description: >
-        Aggregated disk Input/Output rate.
+        Sum of disk read and write rates each second in bytes.
       format: bytes
     - name: memory.free.bytes
       type: long
@@ -96,7 +96,7 @@
     - name: network.bandwidth.total.bytes
       type: long
       description: >
-        Network utilization (combined transmit-rates and receive-rates).
+        Sum of network transmitted and received rates in bytes during the interval.
       format: bytes
     - name: network.packets.transmitted.count
       type: long

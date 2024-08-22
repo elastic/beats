@@ -66932,14 +66932,14 @@ format: percent
 [float]
 === host
 
-host
+Host information from vSphere environment.
 
 
 
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz.
+Used CPU in MHz.
 
 
 type: long
@@ -66949,7 +66949,7 @@ type: long
 *`vsphere.host.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total CPU in MHz.
 
 
 type: long
@@ -66959,7 +66959,7 @@ type: long
 *`vsphere.host.cpu.free.mhz`*::
 +
 --
-Free CPU in Mhz.
+Free CPU in MHz.
 
 
 type: long
@@ -67045,7 +67045,7 @@ format: bytes
 *`vsphere.host.disk.total.bytes`*::
 +
 --
-Aggregated disk Input/Output rate.
+Sum of disk read and write rates each second in bytes.
 
 
 type: long
@@ -67157,7 +67157,7 @@ format: bytes
 *`vsphere.host.network.bandwidth.total.bytes`*::
 +
 --
-Network utilization (combined transmit-rates and receive-rates).
+Sum of network transmitted and received rates in bytes during the interval.
 
 
 type: long
