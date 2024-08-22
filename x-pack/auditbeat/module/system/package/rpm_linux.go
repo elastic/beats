@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 	"unsafe"
 
@@ -168,9 +169,12 @@ const (
 )
 
 var openedLibrpm *librpm
+var librpmLock sync.Mutex
 
 // closeDataset performs cleanup when the dataset is closed.
 func closeDataset() error {
+	librpmLock.Lock()
+	defer librpmLock.Unlock()
 	if openedLibrpm != nil {
 		err := openedLibrpm.close()
 		openedLibrpm = nil
@@ -325,6 +329,8 @@ func openLibrpm() (*librpm, error) {
 }
 
 func listRPMPackages() ([]*Package, error) {
+	librpmLock.Lock()
+	defer librpmLock.Unlock()
 	// In newer versions, librpm is using the thread-local variable
 	// `disableInterruptSafety` in rpmio/rpmsq.c to disable signal
 	// traps. To make sure our settings remain in effect throughout
@@ -376,7 +382,6 @@ func listRPMPackages() ([]*Package, error) {
 
 		packages = append(packages, pkg)
 	}
-
 	return packages, nil
 }
 
