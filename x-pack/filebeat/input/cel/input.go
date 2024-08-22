@@ -366,9 +366,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			e, ok := state["events"]
 			if !ok {
-				log.Error("unexpected missing events array from evaluation")
-				env.UpdateStatus(status.Degraded, "unexpected missing events array from evaluation")
-				isDegraded = true
+				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
