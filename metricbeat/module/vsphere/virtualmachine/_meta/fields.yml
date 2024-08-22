@@ -7,71 +7,71 @@
     - name: host.id
       type: keyword
       description: >
-        Host id
+        Host id.
     - name: host.hostname
       type: keyword
       description: >
-        Host name of the host
+        Host name of the host.
     - name: name
       type: keyword
       description: >
-        Virtual Machine name
+        Virtual Machine name.
     - name: os
       type: keyword
       description: >
-        Virtual Machine Operating System name
+        Virtual Machine Operating System name.
     - name: cpu.used.mhz
       type: long
       description: >
-        Used CPU in Mhz
+        Used CPU in Mhz.
     - name: cpu.total.mhz
       type: long
       description: >
-        Total CPU in Mhz
+        Total CPU in Mhz.
     - name: cpu.free.mhz
       type: long
       description: >
-        Available CPU in Mhz
+        Available CPU in Mhz.
     - name: memory.used.guest.bytes
       type: long
       description: >
-        Used Memory of Guest in bytes
+        Used Memory of Guest in bytes.
       format: bytes
     - name: memory.used.host.bytes
       type: long
       description: >
-        Used Memory of Host in bytes
+        Used Memory of Host in bytes.
       format: bytes
     - name: memory.total.guest.bytes
       type: long
       description: >
-        Total Memory of Guest in bytes
+        Total Memory of Guest in bytes.
       format: bytes
     - name: memory.free.guest.bytes
       type: long
       description: >
-        Free Memory of Guest in bytes
+        Free Memory of Guest in bytes.
       format: bytes
     - name: custom_fields
       type: object
       object_type: keyword
       description: >
-        Custom fields
+        Custom fields.
     - name: network_names
       type: keyword
       description: >
-        Network names
+        Network names.
     - name: status
       type: keyword
       description: >
-        Overall health and status of a virtual machine
+        Overall health and status of a virtual machine.
     - name: uptime
       type: long
       description: >
-        The uptime of the VM in seconds
+        The uptime of the VM in seconds.
     - name: datastore.names
       type: keyword
       description: >
-        Datastore names associated with the virtual machine
+        Datastore names associated with the virtual machine.
 
 
