@@ -53,7 +53,7 @@ func TestEventMapping(t *testing.T) {
 			"datastore.totalReadLatency.average":  int64(100),
 			"datastore.totalWriteLatency.average": int64(100),
 		},
-		assetsNames: assetNames{
+		assetNames: assetNames{
 			outputHsNames: []string{"DC3_H0"},
 			outputVmNames: []string{"DC3_H0_VM0"},
 		},

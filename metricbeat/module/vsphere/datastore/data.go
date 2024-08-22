@@ -29,10 +29,10 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
 		"host": mapstr.M{
-			"count": len(data.assetsNames.outputHsNames),
+			"count": len(data.assetNames.outputHsNames),
 		},
 		"vm": mapstr.M{
-			"count": len(data.assetsNames.outputVmNames),
+			"count": len(data.assetNames.outputVmNames),
 		},
 		"capacity": mapstr.M{
 			"total": mapstr.M{
@@ -52,12 +52,12 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 		event.Put("capacity.used.pct", usedSpacePercent)
 	}
 
-	if len(data.assetsNames.outputHsNames) > 0 {
-		event.Put("host.names", data.assetsNames.outputHsNames)
+	if len(data.assetNames.outputHsNames) > 0 {
+		event.Put("host.names", data.assetNames.outputHsNames)
 	}
 
-	if len(data.assetsNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsNames.outputVmNames)
+	if len(data.assetNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetNames.outputVmNames)
 	}
 
 	mapPerfMetricToEvent(event, data.perfMetrics)

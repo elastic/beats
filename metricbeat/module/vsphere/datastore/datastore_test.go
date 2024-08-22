@@ -67,12 +67,12 @@ func TestFetchEventContents(t *testing.T) {
 			t.Error(field, err)
 			return
 		}
-		if field == "status" {
+		switch field {
+		case "status":
 			assert.NotNil(t, value)
-		} else if field == "vm.count" || field == "host.count" {
+		case "vm.count", "host.count":
 			assert.GreaterOrEqual(t, value, 0)
-
-		} else {
+		default:
 			assert.GreaterOrEqual(t, value, int64(0))
 		}
 	}

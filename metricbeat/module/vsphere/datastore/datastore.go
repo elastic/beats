@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 type metricData struct {
 	perfMetrics map[string]interface{}
-	assetsNames assetNames
+	assetNames  assetNames
 }
 
 type assetNames struct {
@@ -181,7 +181,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			reporter.Event(mb.Event{
 				MetricSetFields: m.eventMapping(dst[i], &metricData{
 					perfMetrics: metricMap,
-					assetsNames: *assetNames,
+					assetNames:  *assetNames,
 				}),
 			})
 		}
@@ -191,21 +191,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 }
 
 func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
-	referenceList := make([]types.ManagedObjectReference, 0, len(ds.Vm))
-	referenceList = append(referenceList, ds.Vm...)
-
-	var objects []mo.ManagedEntity
-	if len(referenceList) > 0 {
-		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
-			return nil, err
-		}
-	}
 
 	outputVmNames := make([]string, 0, len(ds.Vm))
-	for _, ob := range objects {
-		if ob.Reference().Type == "VirtualMachine" {
-			name := strings.ReplaceAll(ob.Name, ".", "_")
-			outputVmNames = append(outputVmNames, name)
+	if len(ds.Vm) > 0 {
+		var objects []mo.ManagedEntity
+		if err := pc.Retrieve(ctx, ds.Vm, []string{"name"}, &objects); err != nil {
+			return nil, err
+		}
+		for _, ob := range objects {
+			if ob.Reference().Type == "VirtualMachine" {
+				name := strings.ReplaceAll(ob.Name, ".", "_")
+				outputVmNames = append(outputVmNames, name)
+			}
 		}
 	}
 
