@@ -479,14 +479,14 @@ func (client *Client) applyItemStatus(
 			// Fatal error while sending an already-failed event to the dead letter
 			// index, drop.
 			client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look at the event log to view the event and cause.", itemStatus)
-			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+			client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event '%s' (status=%v): %s", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
 		if client.deadLetterIndex == "" {
 			// Fatal error and no dead letter index, drop.
 			client.log.Warnf("Cannot index event (status=%v): dropping event! Look at the event log to view the event and cause.", itemStatus)
-			client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+			client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, dropping event!", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 			stats.nonIndexable++
 			return false
 		}
@@ -495,7 +495,7 @@ func (client *Client) applyItemStatus(
 		// ingestion succeeds it is counted in the "deadLetter" counter
 		// rather than the "acked" counter.
 		client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", itemStatus)
-		client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
+		client.log.Warnw(fmt.Sprintf("Cannot index event '%s' (status=%v): %s, trying dead letter index", encodedEvent, itemStatus, itemMessage), logp.TypeKey, logp.EventType)
 		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
 	}
 
