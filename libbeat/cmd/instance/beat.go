@@ -35,6 +35,7 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -514,15 +515,24 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
+	// Since beater.Stop is not safe to be called more than once this is necessary.
+	var once sync.Once
 	stopBeat := func() {
-		b.Instrumentation.Tracer().Close()
-		// If the publisher has a Close() method, call it before stopping the beater.
-		if c, ok := b.Publisher.(io.Closer); ok {
-			c.Close()
-		}
-		beater.Stop()
+		once.Do(func() {
+			b.Instrumentation.Tracer().Close()
+			// If the publisher has a Close() method, call it before stopping the beater.
+			if c, ok := b.Publisher.(io.Closer); ok {
+				c.Close()
+			}
+			beater.Stop()
+		})
 	}
 	svc.HandleSignals(stopBeat, cancel)
+
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(stopBeat)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -530,9 +540,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
