@@ -22704,11 +22704,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/vmware/govmomi
-Version: v0.0.0-20170802214208-2cad15190b41
+Version: v0.39.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.0.0-20170802214208-2cad15190b41/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/vmware/govmomi@v0.39.0/LICENSE.txt:
 
 
                                  Apache License
