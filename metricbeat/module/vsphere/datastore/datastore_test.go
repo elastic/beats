@@ -32,6 +32,7 @@ func TestFetchEventContents(t *testing.T) {
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
+	defer model.Remove()
 
 	ts := model.Service.NewServer()
 	defer ts.Close()

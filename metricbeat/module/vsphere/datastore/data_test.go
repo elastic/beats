@@ -29,7 +29,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	var m *MetricSet
-	var DatastoreTest = mo.Datastore{
+	var datastoreTest = mo.Datastore{
 		Summary: types.DatastoreSummary{
 			Name:      "datastore-test",
 			Type:      "local",
@@ -53,13 +53,13 @@ func TestEventMapping(t *testing.T) {
 			"datastore.totalReadLatency.average":  int64(100),
 			"datastore.totalWriteLatency.average": int64(100),
 		},
-		assetsName: assetNames{
+		assetsNames: assetNames{
 			outputHsNames: []string{"DC3_H0"},
 			outputVmNames: []string{"DC3_H0_VM0"},
 		},
 	}
 
-	outputEvent := m.eventMapping(DatastoreTest, &metricDataTest)
+	outputEvent := m.eventMapping(datastoreTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"fstype": "local",
 		"status": types.ManagedEntityStatus("green"),

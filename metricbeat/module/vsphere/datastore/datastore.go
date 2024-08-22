@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 type metricData struct {
 	perfMetrics map[string]interface{}
-	assetsName  assetNames
+	assetsNames assetNames
 }
 
 type assetNames struct {
@@ -86,7 +86,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to logout from vshphere: %w", err)
+			m.Logger().Debugf("error trying to log out from vSphere: %w", err)
 		}
 	}()
 
@@ -102,7 +102,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debugf("error trying to destroy view from vshphere: %w", err)
+			m.Logger().Debugf("error trying to destroy view from vSphere: %w", err)
 		}
 	}()
 
@@ -181,7 +181,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			reporter.Event(mb.Event{
 				MetricSetFields: m.eventMapping(dst[i], &metricData{
 					perfMetrics: metricMap,
-					assetsName:  *assetNames,
+					assetsNames: *assetNames,
 				}),
 			})
 		}
