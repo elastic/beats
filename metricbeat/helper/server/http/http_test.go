@@ -263,8 +263,7 @@ MMbn7YyWGaClkcuHqavOU7kfaqF5S6vECOAtSWd+NPOHUALTDnmBUnLTE4KmzarO
 
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM(certPem); !ok {
-		t.Error("failed to append server certificate to the pool")
-		t.FailNow()
+		t.Fatal("failed to append server certificate to the pool")
 	}
 
 	cfg := &tls.Config{
