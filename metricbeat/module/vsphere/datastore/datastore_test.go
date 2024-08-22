@@ -48,7 +48,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "local", event["fstype"])
+	assert.EqualValues(t, "OTHER", event["fstype"])
 
 	// Values are based on the result 'df -k'.
 	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
