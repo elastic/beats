@@ -188,7 +188,7 @@ func TestBtmp(t *testing.T) {
 
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""
-	config["login.btmp_file_pattern"] = "./testdata/btmp_*"
+	config["login.btmp_file_pattern"] = "./testdata/btmp.amd"
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer func() {
 		if err := f.(*MetricSet).utmpReader.bucket.DeleteBucket(); err != nil {
