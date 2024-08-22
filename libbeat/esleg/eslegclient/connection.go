@@ -401,7 +401,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
+	req, err := http.NewRequestWithContext(conn.reqsContext, method, url, body) //nolint:noctx // keep legacy behaviour
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
@@ -496,7 +496,6 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.Host = host
 	}
 
-	req = req.WithContext(conn.reqsContext)
 	resp, err := conn.HTTP.Do(req)
 	if err != nil {
 		return 0, nil, err
