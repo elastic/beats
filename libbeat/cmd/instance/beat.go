@@ -393,6 +393,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
+		// Since now publisher is closed on Stop, we want to give some
+		// time to ack any pending events by default to avoid
+		// changing on stop behavior too much.
+		WaitClose:      5 * time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -517,7 +521,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
-	// Since beater.Stop is not safe to be called more than once this is necessary.
+	// Since publisher.Close is not safe to be called more than once this is necessary.
 	var once sync.Once
 	stopBeat := func() {
 		once.Do(func() {
