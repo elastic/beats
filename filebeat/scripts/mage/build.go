@@ -38,9 +38,6 @@ func GolangCrossBuild() error {
 // Do not use directly, use crossBuild instead.
 func golangCrossBuild() error {
 	conf := devtools.DefaultGolangCrossBuildArgs()
-	if devtools.Platform.GOOS == "linux" {
-		conf.ExtraFlags = append(conf.ExtraFlags, "-tags=withjournald")
-	}
 	return devtools.GolangCrossBuild(conf)
 }
 

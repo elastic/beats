@@ -56,7 +56,7 @@ func init() {
 func Build() error {
 	args := devtools.DefaultBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	} else {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}
@@ -75,21 +75,8 @@ func BuildSystemTestBinary() error {
 func GolangCrossBuild() error {
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
-	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 
-		// Work around two different CGO packages generating the same C function, resulting in an error like:
-		// /usr/bin/ld.gold: error: /tmp/go-link-1159962577/000059.o: multiple definition of 'my_strlen'.
-		//
-		// Newer versions of go-systemd contain the file: https://github.com/coreos/go-systemd/blob/v22.5.0/internal/dlopen/dlopen_example.go
-		// Which is copied from coreos/pkg: https://github.com/coreos/pkg/blob/bbd7aa9bf6fb51acc905bd45a5363ebecf065f30/dlopen/dlopen_example.go
-		// Agentbeat will import both go-systemd and coreos/pkg, resulting in two definitions of my_strlen from the two identical files.
-		//
-		// This can likely be removed once https://github.com/elastic/beats/pull/40061 is merged removing the need to use CGO for jounrald support.
-		args.LDFlags = append(args.LDFlags, "-extldflags=-Wl,--allow-multiple-definition")
-	} else {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
-	}
 	return multierr.Combine(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
@@ -217,7 +204,7 @@ func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
-	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../metricbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../osquerybeat/...", "../packetbeat/...")
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
