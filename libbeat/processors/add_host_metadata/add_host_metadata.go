@@ -145,10 +145,10 @@ func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 // deregister the callback.  But processors that can be used with the
 // `script` processor are not allowed to implement the Closer
 // interface (@see https://github.com/elastic/beats/pull/16349).
-//func (p *addHostMetadata) Close() error {
+// func (p *addHostMetadata) Close() error {
 //	features.RemoveFQDNOnChangeCallback(processorName)
 //	return nil
-//}
+// }
 
 func (p *addHostMetadata) expired() bool {
 
@@ -172,7 +172,7 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 		return nil
 	}
 
-	h, err := sysinfo.Host()
+	h, err := sysinfo.Host(sysinfo.WithLowerHostname())
 	if err != nil {
 		return fmt.Errorf("error collecting host info: %w", err)
 	}
