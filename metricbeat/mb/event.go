@@ -215,7 +215,7 @@ func tryToMapStr(v interface{}) (mapstr.M, bool) {
 	}
 }
 
-// Following error indicates that the metrics are partially filled.
+// PartialMetricsError indicates that metrics are only partially filled.
 // This will be removed once we fix the underlying problem.
 // See https://github.com/elastic/beats/issues/40542 for more details.
 type PartialMetricsError struct {
