@@ -64,15 +64,6 @@ type assetNames struct {
 	outputHsNames []string
 }
 
-// Define metrics to be collected
-var metricSet = map[string]struct{}{
-	"datastore.read.average":              {},
-	"datastore.write.average":             {},
-	"datastore.datastoreIops.average":     {},
-	"datastore.totalReadLatency.average":  {},
-	"datastore.totalWriteLatency.average": {},
-}
-
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
@@ -124,12 +115,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Filter for required metrics
 	var metricIds []types.PerfMetricId
-	for metricName := range metricSet {
+
+	// Define metrics to be collected
+	for metricName := range map[string]struct{}{
+		"datastore.read.average":              {},
+		"datastore.write.average":             {},
+		"datastore.datastoreIops.average":     {},
+		"datastore.totalReadLatency.average":  {},
+		"datastore.totalWriteLatency.average": {},
+	} {
 		if metric, ok := metrics[metricName]; ok {
 			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
-		} else {
-			m.Logger().Warnf("Metric %s not found", metricName)
+			continue
 		}
+		m.Logger().Warnf("Metric %s not found", metricName)
 	}
 
 	pc := property.DefaultCollector(c)
