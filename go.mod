@@ -55,7 +55,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.3
-	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
+	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/dgraph-io/badger/v3 v3.2103.1
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
 	github.com/docker/docker v26.1.5+incompatible
