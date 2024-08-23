@@ -87,7 +87,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	// websocket client
 	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.log)
-	handleConnctionResponse(resp, s.log)
+	handleConnectionResponse(resp, s.log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.log.Errorw("failed to establish websocket connection", "error", err)
@@ -106,7 +106,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				c.Close()
 				// since c is already a pointer, we can reassign it to the new connection and the defer will still handle it
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
-				handleConnctionResponse(resp, s.log)
+				handleConnectionResponse(resp, s.log)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
@@ -129,8 +129,8 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	}
 }
 
-// handleConnctionResponse logs the response body of the websocket connection.
-func handleConnctionResponse(resp *http.Response, log *logp.Logger) {
+// handleConnectionResponse logs the response body of the websocket connection.
+func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
 	if resp != nil && resp.Body != nil {
 		var buf bytes.Buffer
 		if log.Core().Enabled(zapcore.DebugLevel) {
