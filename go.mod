@@ -52,7 +52,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/denisenkom/go-mssqldb v0.12.3
-	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
+	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/dgraph-io/badger/v3 v3.2103.1
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
 	github.com/docker/docker v26.1.5+incompatible
