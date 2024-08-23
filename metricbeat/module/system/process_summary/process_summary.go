@@ -68,9 +68,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
+<<<<<<< HEAD
 	procList, err := process.ListStates(m.sys)
 	if err != nil {
 		return fmt.Errorf("error fetching process list: %w", err)
+=======
+	procList, degradeErr := process.ListStates(m.sys)
+	if degradeErr != nil && !errors.Is(degradeErr, process.NonFatalErr{}) {
+		// return only if the error is fatal in nature
+		return fmt.Errorf("error fetching process list: %w", degradeErr)
+	} else if (degradeErr != nil && errors.Is(degradeErr, process.NonFatalErr{})) {
+		degradeErr = mb.PartialMetricsError{Err: degradeErr}
+>>>>>>> 1f033c9eed ([metricbeat][system/process, system/process_summary]: mark module as healthy if metrics are partially filled (#40565))
 	}
 
 	procStates := map[string]int{}
