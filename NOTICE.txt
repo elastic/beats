@@ -35212,7 +35212,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
 Dependency : github.com/davecgh/go-xdr
 Version: v0.0.0-20161123171359-e6a2ba005892
 Licence type (autodetected): ISC
@@ -35235,39 +35234,6 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
-Dependency : github.com/devigned/tab
-Version: v0.1.2-0.20190607222403-0c15cf42f9a2
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/devigned/tab@v0.1.2-0.20190607222403-0c15cf42f9a2/LICENSE:
-
-MIT License
-
-Copyright (c) 2019 David Justice
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
---------------------------------------------------------------------------------
-=======
->>>>>>> e64ea44140 (Add a tracer to send (legacy) Azure Event Hub SDK logs to logp (#40451))
 Dependency : github.com/elastic/ristretto
 Version: v0.1.1-0.20220602190459-83b0895ca5b3
 Licence type (autodetected): Apache-2.0
