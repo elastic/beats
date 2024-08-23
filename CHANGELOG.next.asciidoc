@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
+- Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 
 *Osquerybeat*
