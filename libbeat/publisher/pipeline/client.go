@@ -29,6 +29,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type clientUnregisterer interface {
+	UnregisterClient(*client)
+}
+
 // client connects a beat with the processors and pipeline queue.
 type client struct {
 	logger     *logp.Logger
@@ -47,6 +51,8 @@ type client struct {
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
+
+	unregisterer clientUnregisterer
 }
 
 type clientCloseWaiter struct {
@@ -132,6 +138,9 @@ func (c *client) publish(e beat.Event) {
 
 func (c *client) Close() error {
 	if c.isOpen.Swap(false) {
+		// Unregister the client
+		c.unregisterer.UnregisterClient(c)
+
 		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 

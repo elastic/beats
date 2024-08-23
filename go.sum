@@ -1419,6 +1419,10 @@ github.com/pascaldekloe/goe v0.1.0/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144T
 github.com/paulbellamy/ratecounter v0.2.0/go.mod h1:Hfx1hDpSGoqxkVVpBi/IlYD7kChlfo5C6hzIHwPqfFE=
 github.com/pborman/getopt v0.0.0-20170112200414-7148bc3a4c30/go.mod h1:85jBQOZwpVEaDAr341tbn15RS4fCAsIst0qp7i8ex1o=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
+github.com/pchila/elastic-agent-client/v7 v7.0.0-20240628124107-987e33ca9e14 h1:s9OJHxfrHxOFBkQrKQAKOE4cYMKMO6s3UxZUxWk+utA=
+github.com/pchila/elastic-agent-client/v7 v7.0.0-20240628124107-987e33ca9e14/go.mod h1:h2yJHN8Q5rhfi9i6FfyPufh+StFN+UD9PYGv8blXKbE=
+github.com/pchila/elastic-agent-client/v7 v7.0.0-20240703134948-b26a8ccf196e h1:l3tZOaQGHhG6s6mmciPzr2ZLVHks4/na7VJj6nUxifc=
+github.com/pchila/elastic-agent-client/v7 v7.0.0-20240703134948-b26a8ccf196e/go.mod h1:h2yJHN8Q5rhfi9i6FfyPufh+StFN+UD9PYGv8blXKbE=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pelletier/go-toml v1.4.0/go.mod h1:PN7xzY2wHTK0K9p34ErDQMlFxa51Fk0OUruD3k1mMwo=
 github.com/pelletier/go-toml v1.7.0/go.mod h1:vwGMzjaWMwyfHwgIBhI2YUM4fB6nL6lVAvS1LBMMhTE=
