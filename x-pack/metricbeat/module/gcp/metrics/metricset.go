@@ -198,7 +198,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger(), sdc)
 
+<<<<<<< HEAD
 	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+=======
+	var metadataService gcp.MetadataService
+>>>>>>> 973af491a7 (x-pack/metricbeat/module/gcp: Fix missing ECS labels when using exclude_labels: true (#40467))
 	var err error
 
 	if !m.config.ExcludeLabels {
