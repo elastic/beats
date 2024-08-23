@@ -15182,11 +15182,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/AndersonQ/go-sysinfo
-Version: v0.0.0-20240822101111-6ed87cafa243
+Version: v0.0.0-20240823130150-199943165104
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/go-sysinfo@v0.0.0-20240822101111-6ed87cafa243/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/go-sysinfo@v0.0.0-20240823130150-199943165104/LICENSE.txt:
 
 
                                  Apache License
