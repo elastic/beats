@@ -192,6 +192,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 
 // pidIter wraps a few lines of generic code that all OS-specific FetchPids() functions must call.
 // this also handles the process of adding to the maps/lists in order to limit the code duplication in all the OS implementations
+// NOTE: this method will sometimes return a NonFatalError{} wrapper for errors that can optionally be ignored.
 func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState) (ProcsMap, []ProcState, error) {
 	status, saved, err := procStats.pidFill(pid, true)
 	var nonFatalErr error

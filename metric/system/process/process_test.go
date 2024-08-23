@@ -241,7 +241,10 @@ func TestFilter(t *testing.T) {
 	assert.NoError(t, err, "Init")
 
 	procData, _, err := testConfig.Get()
-	assert.NoError(t, err, "GetOne")
+	if err != nil {
+		assert.ErrorIs(t, err, NonFatalErr{})
+	}
+
 	// the total count of processes can either be one or two,
 	// depending on if the highest-mem-usage process and
 	// highest-cpu-usage process are the same.
@@ -261,13 +264,18 @@ func TestFilter(t *testing.T) {
 	assert.NoError(t, err, "Init")
 
 	oneData, _, err := testZero.Get()
-	assert.NoError(t, err, "GetOne with one event")
+	if err != nil {
+		assert.ErrorIs(t, err, NonFatalErr{})
+	}
+
 	assert.Equal(t, 1, len(oneData))
 }
 
 func TestProcessList(t *testing.T) {
 	plist, err := ListStates(resolve.NewTestResolver("/"))
-	assert.True(t, isNonFatal(err), fmt.Sprintf("Fatal Error: %s", err))
+	if err != nil {
+		assert.ErrorIs(t, err, NonFatalErr{})
+	}
 
 	for _, proc := range plist {
 		assert.NotEmpty(t, proc.State)
