@@ -6,9 +6,11 @@ package streaming
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -32,6 +34,8 @@ type config struct {
 	URL *urlConfig `config:"url" validate:"required"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
+	// Retry is the configuration for retrying failed connections.
+	Retry *retry `config:"retry"`
 }
 
 type redact struct {
@@ -41,6 +45,12 @@ type redact struct {
 	// Delete indicates that fields should be completely deleted
 	// before logging rather than redaction with a "*".
 	Delete bool `config:"delete"`
+}
+
+type retry struct {
+	MaxAttempts *int           `config:"max_attempts"`
+	WaitMin     *time.Duration `config:"wait_min"`
+	WaitMax     *time.Duration `config:"wait_max"`
 }
 
 type authConfig struct {
@@ -93,6 +103,23 @@ func (c config) Validate() error {
 	err = checkURLScheme(c.URL)
 	if err != nil {
 		return err
+	}
+
+	if c.Retry != nil {
+		switch {
+		case c.Retry.MaxAttempts != nil && *c.Retry.MaxAttempts <= 0:
+			return errors.New("max_attempts must be greater than zero")
+		case c.Retry.MaxAttempts != nil && c.Retry.WaitMin == nil || c.Retry.WaitMax == nil:
+			return errors.New("wait_min and wait_max must be set if max_attempts is set")
+		case (c.Retry.WaitMin != nil || c.Retry.WaitMax != nil) && c.Retry.MaxAttempts == nil:
+			return errors.New("max_attempts must be set if wait_min or wait_max is set")
+		case c.Retry.WaitMin != nil && c.Retry.WaitMax == nil:
+			return errors.New("wait_max must be set if wait_min is set")
+		case c.Retry.WaitMin == nil && c.Retry.WaitMax != nil:
+			return errors.New("wait_min must be set if wait_max is set")
+		case c.Retry.WaitMin != nil && c.Retry.WaitMax != nil && *c.Retry.WaitMin > *c.Retry.WaitMax:
+			return errors.New("wait_min must be less than or equal to wait_max")
+		}
 	}
 	return nil
 }

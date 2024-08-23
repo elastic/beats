@@ -266,6 +266,43 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
 
+[[retry-streaming]]
+[float]
+==== `retry`
+
+The `retry` configuration allows the user to specify the number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted. It has a `wait_min` and `wait_max` configuration which specifies the minimum and maximum time to wait between retries. 
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: streaming
+  url: ws://localhost:443/_stream
+  program: |
+    bytes(state.response).decode_json().as(inner_body,{
+      "events": {
+        "message":  inner_body.encode_json(),
+      }
+    })
+  retry:
+    max_attempts: 5
+    wait_min: 1s
+    wait_max: 10s
+----
+[float]
+==== `retry.max_attempts`
+
+The maximum number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted.
+
+[float]
+==== `retry.wait_min`
+
+The minimum time to wait between retries. This ensures that retries are spaced out enough to give the system time to recover or resolve transient issues, rather than bombarding the system with rapid retries. For example, `wait_min` might be set to 1 second, meaning that even if the calculated backoff is less than this, the client will wait at least 1 second before retrying.
+
+[float]
+==== `retry.wait_max`
+
+The maximum time to wait between retries. prevents the retry mechanism from becoming too slow, ensuring that the client does not wait indefinitely between retries. This is crucial in systems where timeouts or user experience are critical. For example, `wait_max` might be set to 10 seconds, meaning that even if the calculated backoff is greater than this, the client will wait at most 10 seconds before retrying.
+
 [float]
 === Metrics
 

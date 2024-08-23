@@ -95,6 +95,74 @@ var configTests = []struct {
 			},
 		},
 	},
+	{
+		name: "invalid_retry_missing_wait_max",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"max_attempts": 3,
+				"wait_min":     "1s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("wait_min and wait_max must be set if max_attempts is set accessing config"),
+	},
+	{
+		name: "invalid_retry_missing_wait_min",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"max_attempts": 3,
+				"wait_max":     "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("wait_min and wait_max must be set if max_attempts is set accessing config"),
+	},
+	{
+		name: "invalid_retry_wait_min_greater_than_wait_max",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"max_attempts": 3,
+				"wait_min":     "3s",
+				"wait_max":     "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("wait_min must be less than or equal to wait_max accessing config"),
+	},
+	{
+		name: "invalid_retry_missing_max_attempts",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"wait_min": "1s",
+				"wait_max": "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("max_attempts must be set if wait_min or wait_max is set accessing config"),
+	},
+	{
+		name: "invalid_retry_max_attempts_eq_zero",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"max_attempts": 0,
+				"wait_min":     "1s",
+				"wait_max":     "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("max_attempts must be greater than zero accessing config"),
+	},
+	{
+		name: "valid_retry",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"max_attempts": 3,
+				"wait_min":     "2s",
+				"wait_max":     "5s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
 }
 
 func TestConfig(t *testing.T) {

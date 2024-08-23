@@ -7,7 +7,11 @@ package streaming
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
+	"math"
+	"math/rand/v2"
+	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -82,25 +86,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	}
 
 	// websocket client
-	headers := formHeader(s.cfg)
-	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
-	if resp != nil && resp.Body != nil {
-		var buf bytes.Buffer
-		if s.log.Core().Enabled(zapcore.DebugLevel) {
-			const limit = 1e4
-			io.CopyN(&buf, resp.Body, limit)
-		}
-		if n, _ := io.Copy(io.Discard, resp.Body); n != 0 && buf.Len() != 0 {
-			buf.WriteString("... truncated")
-		}
-		s.log.Debugw("websocket connection response", "body", &buf)
-		resp.Body.Close()
-	}
+	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.log)
+	handleConnctionResponse(resp, s.log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.log.Errorw("failed to establish websocket connection", "error", err)
 		return err
 	}
+	// ensures this is the last connection closed when the function returns
 	defer c.Close()
 
 	for {
@@ -108,11 +101,21 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		if err != nil {
 			s.metrics.errorsTotal.Inc()
 			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				s.log.Errorw("websocket connection closed", "error", err)
+				s.log.Debugw("websocket connection closed, attempting to reconnect...", "error", err)
+				// close the old connection and reconnect
+				c.Close()
+				// since c is already a pointer, we can reassign it to the new connection and the defer will still handle it
+				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+				handleConnctionResponse(resp, s.log)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("failed to reconnect websocket connection", "error", err)
+					return err
+				}
 			} else {
 				s.log.Errorw("failed to read websocket data", "error", err)
+				return err
 			}
-			return err
 		}
 		s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 		state["response"] = message
@@ -124,6 +127,61 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			return err
 		}
 	}
+}
+
+// handleConnctionResponse logs the response body of the websocket connection.
+func handleConnctionResponse(resp *http.Response, log *logp.Logger) {
+	if resp != nil && resp.Body != nil {
+		var buf bytes.Buffer
+		if log.Core().Enabled(zapcore.DebugLevel) {
+			const limit = 1e4
+			io.CopyN(&buf, resp.Body, limit)
+		}
+		if n, _ := io.Copy(io.Discard, resp.Body); n != 0 && buf.Len() != 0 {
+			buf.WriteString("... truncated")
+		}
+		log.Debugw("websocket connection response", "body", &buf)
+		resp.Body.Close()
+	}
+}
+
+// connectWebSocket attempts to connect to the websocket server with exponential backoff if retry config is available else it connects without retry.
+func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Logger) (*websocket.Conn, *http.Response, error) {
+	var conn *websocket.Conn
+	var response *http.Response
+	var err error
+	headers := formHeader(cfg)
+
+	if cfg.Retry != nil {
+		retryConfig := cfg.Retry
+		for attempt := 1; attempt <= *retryConfig.MaxAttempts; attempt++ {
+			conn, response, err = websocket.DefaultDialer.Dial(url, nil)
+			if err == nil {
+				return conn, response, nil
+			}
+			log.Debugw("attempt %d: webSocket connection failed. retrying...\n", attempt)
+			waitTime := calculateWaitTime(*retryConfig.WaitMin, *retryConfig.WaitMax, attempt)
+			time.Sleep(waitTime)
+		}
+		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", *retryConfig.MaxAttempts, err)
+	}
+
+	return websocket.DefaultDialer.DialContext(ctx, url, headers)
+}
+
+// calculateWaitTime calculates the wait time for the next attempt based on the exponential backoff algorithm.
+func calculateWaitTime(waitMin, waitMax time.Duration, attempt int) time.Duration {
+	// Calculate exponential backoff
+	base := float64(waitMin)
+	backoff := base * math.Pow(2, float64(attempt-1))
+
+	// Calculate jitter proportional to the backoff
+	maxJitter := float64(waitMax-waitMin) * math.Pow(2, float64(attempt-1))
+	jitter := rand.Float64() * maxJitter
+
+	waitTime := time.Duration(backoff + jitter)
+
+	return waitTime
 }
 
 // now is time.Now with a modifiable time source.
