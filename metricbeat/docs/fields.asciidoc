@@ -4853,7 +4853,7 @@ type: long
 *`aws.sqs.oldest_message_age.sec`*::
 +
 --
-The approximate age of the oldest non-deleted message in the queue.
+The maximum approximate age of the oldest non-deleted message in the queue.
 
 
 type: long
@@ -4895,7 +4895,7 @@ type: long
 *`aws.sqs.messages.deleted`*::
 +
 --
-The number of messages deleted from the queue.
+The total number of messages deleted from the queue.
 
 
 type: long
@@ -4905,7 +4905,7 @@ type: long
 *`aws.sqs.messages.received`*::
 +
 --
-The number of messages returned by calls to the ReceiveMessage action.
+The total number of messages returned by calls to the ReceiveMessage action.
 
 
 type: long
@@ -4915,7 +4915,7 @@ type: long
 *`aws.sqs.messages.sent`*::
 +
 --
-The number of messages added to a queue.
+The total number of messages added to a queue.
 
 
 type: long
@@ -4925,7 +4925,7 @@ type: long
 *`aws.sqs.empty_receives`*::
 +
 --
-The number of ReceiveMessage API calls that did not return a message.
+The total number of ReceiveMessage API calls that did not return a message.
 
 
 type: long
@@ -44450,10 +44450,70 @@ alias to: service.version
 *`kibana.status.status.overall.state`*::
 +
 --
-Kibana overall state.
+Kibana overall state (v7 format).
 
 
 type: keyword
+
+--
+
+*`kibana.status.status.overall.level`*::
++
+--
+Kibana overall level (v8 format).
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.overall.summary`*::
++
+--
+Kibana overall state in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.elasticsearch.level`*::
++
+--
+Kibana Elasticsearch client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.elasticsearch.summary`*::
++
+--
+Kibana Elasticsearch client's status in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.savedObjects.level`*::
++
+--
+Kibana Saved Objects client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.savedObjects.summary`*::
++
+--
+Kibana Saved Objects client's status in a human-readable format.
+
+
+type: text
 
 --
 
@@ -66801,30 +66861,10 @@ datastore
 
 
 
-*`vsphere.datastore.name`*::
+*`vsphere.datastore.capacity.free.bytes`*::
 +
 --
-Datastore name
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.fstype`*::
-+
---
-Filesystem type
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.capacity.total.bytes`*::
-+
---
-Total bytes of the datastore
+Free bytes of the datastore.
 
 
 type: long
@@ -66833,10 +66873,10 @@ format: bytes
 
 --
 
-*`vsphere.datastore.capacity.free.bytes`*::
+*`vsphere.datastore.capacity.total.bytes`*::
 +
 --
-Free bytes of the datastore
+Total bytes of the datastore.
 
 
 type: long
@@ -66848,7 +66888,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.bytes`*::
 +
 --
-Used bytes of the datastore
+Used bytes of the datastore.
 
 
 type: long
@@ -66860,7 +66900,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.pct`*::
 +
 --
-Used percent of the datastore
+Percentage of datastore capacity used.
 
 
 type: scaled_float
@@ -66869,27 +66909,141 @@ format: percent
 
 --
 
-[float]
-=== host
-
-host
-
-
-
-*`vsphere.host.name`*::
+*`vsphere.datastore.fstype`*::
 +
 --
-Host name
+Filesystem type.
 
 
 type: keyword
 
 --
 
+*`vsphere.datastore.host.count`*::
++
+--
+Number of hosts.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.host.names`*::
++
+--
+List of all the host names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.iops`*::
++
+--
+Storage I/O Control aggregated Input/Output Operations Per Second.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.name`*::
++
+--
+Datastore name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.read.bytes`*::
++
+--
+Rate of reading data from the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.read.latency.total.ms`*::
++
+--
+Average amount of time for a read operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.status`*::
++
+--
+Status of the datastore.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.vm.count`*::
++
+--
+Number of VMs.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.write.bytes`*::
++
+--
+Rate of writing data to the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.write.latency.total.ms`*::
++
+--
+Average amount of time for a write operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+[float]
+=== host
+
+Host information from vSphere environment.
+
+
+
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in MHz.
 
 
 type: long
@@ -66899,7 +67053,7 @@ type: long
 *`vsphere.host.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in MHz.
 
 
 type: long
@@ -66909,17 +67063,37 @@ type: long
 *`vsphere.host.cpu.free.mhz`*::
 +
 --
-Free CPU in Mhz
+Free CPU in MHz.
 
 
 type: long
 
 --
 
-*`vsphere.host.memory.used.bytes`*::
+*`vsphere.host.datastore.names`*::
 +
 --
-Used Memory in bytes
+List of all the datastore names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.datastore.count`*::
++
+--
+Number of datastores on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by or on the entity.
 
 
 type: long
@@ -66928,10 +67102,54 @@ format: bytes
 
 --
 
-*`vsphere.host.memory.total.bytes`*::
+*`vsphere.host.disk.devicelatency.average.ms`*::
 +
 --
-Total Memory in bytes
+Average amount of time it takes to complete an SCSI command from physical device in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.latency.total.ms`*::
++
+--
+Highest latency value across all disks used by the host in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.read.bytes`*::
++
+--
+Average number of bytes read from the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.write.bytes`*::
++
+--
+Average number of bytes written to the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.total.bytes`*::
++
+--
+Sum of disk read and write rates each second in bytes.
 
 
 type: long
@@ -66943,7 +67161,7 @@ format: bytes
 *`vsphere.host.memory.free.bytes`*::
 +
 --
-Free Memory in bytes
+Free Memory in bytes.
 
 
 type: long
@@ -66952,13 +67170,253 @@ format: bytes
 
 --
 
-*`vsphere.host.network_names`*::
+*`vsphere.host.memory.total.bytes`*::
 +
 --
-Network names
+Total Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.memory.used.bytes`*::
++
+--
+Used Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.name`*::
++
+--
+Host name.
 
 
 type: keyword
+
+--
+
+*`vsphere.host.network_names`*::
++
+--
+Network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.names`*::
++
+--
+List of all the network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.count`*::
++
+--
+Number of networks on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.bandwidth.transmitted.bytes`*::
++
+--
+Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.received.bytes`*::
++
+--
+Average rate at which data was received during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.total.bytes`*::
++
+--
+Sum of network transmitted and received rates in bytes during the interval.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.packets.transmitted.count`*::
++
+--
+Number of packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.received.count`*::
++
+--
+Number of packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.transmitted.count`*::
++
+--
+Number of packets with errors transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.received.count`*::
++
+--
+Number of packets with errors received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.total.count`*::
++
+--
+Total number of packets with errors.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.transmitted.count`*::
++
+--
+Number of multicast packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.received.count`*::
++
+--
+Number of multicast packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.total.count`*::
++
+--
+Total number of multicast packets.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.transmitted.count`*::
++
+--
+Number of transmitted packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.received.count`*::
++
+--
+Number of received packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.total.count`*::
++
+--
+Total number of packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.uptime`*::
++
+--
+The total uptime of a host in seconds within the vSphere environment.
+
+
+type: long
+
+--
+
+*`vsphere.host.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.vm.count`*::
++
+--
+Number of virtual machines on the host.
+
+
+type: long
 
 --
 

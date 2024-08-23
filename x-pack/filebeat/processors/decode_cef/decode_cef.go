@@ -88,13 +88,12 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 
 	// If the version < 0 after parsing then none of the data is valid so return here.
 	var ce cef.Event
-	if err = ce.Unpack(cefData, cef.WithFullExtensionNames(), cef.WithTimezone(p.Timezone.Location())); ce.Version < 0 && err != nil {
+	if err = ce.Unpack(cefData, cef.WithFullExtensionNames(), cef.WithTimezone(p.Timezone.Location()), cef.WithRemoveEmptyValues()); ce.Version < 0 && err != nil {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		if err != nil {
-			err = fmt.Errorf("decode_cef failed to parse message: %w", err)
-		}
+
+		err = fmt.Errorf("decode_cef failed to parse message: %w", err)
 		return event, err
 	}
 
@@ -141,7 +140,6 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-//nolint:errcheck // All errors are from mapstr puts.
 func toCEFObject(cefEvent *cef.Event) mapstr.M {
 	// Add CEF header fields.
 	cefObject := mapstr.M{"version": strconv.Itoa(cefEvent.Version)}
@@ -180,32 +178,35 @@ func toCEFObject(cefEvent *cef.Event) mapstr.M {
 	return cefObject
 }
 
-//nolint:errcheck // All errors are from mapstr puts.
 func writeCEFHeaderToECS(cefEvent *cef.Event, event *beat.Event) {
 	if cefEvent.DeviceVendor != "" {
+		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("observer.vendor", cefEvent.DeviceVendor)
 	}
 	if cefEvent.DeviceProduct != "" {
-		// TODO: observer.product is not officially part of ECS.
+		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("observer.product", cefEvent.DeviceProduct)
 	}
 	if cefEvent.DeviceVersion != "" {
+		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("observer.version", cefEvent.DeviceVersion)
 	}
 	if cefEvent.DeviceEventClassID != "" {
+		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("event.code", cefEvent.DeviceEventClassID)
 	}
 	if cefEvent.Name != "" {
+		//nolint:errcheck // All errors are from mapstr puts.
 		event.PutValue("message", cefEvent.Name)
 	}
 	if cefEvent.Severity != "" {
 		if sev, ok := cefSeverityToNumber(cefEvent.Severity); ok {
+			//nolint:errcheck // All errors are from mapstr puts.
 			event.PutValue("event.severity", sev)
 		}
 	}
 }
 
-//nolint:errcheck // All errors are from mapstr puts.
 func appendErrorMessage(m mapstr.M, msg string) error {
 	const field = "error.message"
 	list, _ := m.GetValue(field)

@@ -104,8 +104,8 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime, endTime time.Time, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: awssdk.String(logGroup),
-		StartTime:    awssdk.Int64(startTime.UnixNano() / int64(time.Millisecond)),
-		EndTime:      awssdk.Int64(endTime.UnixNano() / int64(time.Millisecond)),
+		StartTime:    awssdk.Int64(unixMsFromTime(startTime)),
+		EndTime:      awssdk.Int64(unixMsFromTime(endTime)),
 	}
 
 	if len(p.config.LogStreams) > 0 {
@@ -184,4 +184,13 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupNames []string, 
 		// Advance to the next time span
 		startTime, endTime = endTime, clock().Add(-p.config.Latency)
 	}
+}
+
+// unixMsFromTime converts time to unix milliseconds.
+// Returns 0 both the init time `time.Time{}`, instead of -6795364578871
+func unixMsFromTime(v time.Time) int64 {
+	if v.IsZero() {
+		return 0
+	}
+	return v.UnixNano() / int64(time.Millisecond)
 }
