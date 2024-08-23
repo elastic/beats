@@ -30,6 +30,7 @@ func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event.Put("status", net.OverallStatus)
 	event.Put("accessible", net.Summary.GetNetworkSummary().Accessible)
 	event.Put("config.status", net.ConfigStatus)
+	event.Put("type", net.Self.Type)
 
 	if len(data.assetsName.outputHostNames) > 0 {
 		event.Put("host.names", data.assetsName.outputHostNames)

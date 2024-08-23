@@ -31,6 +31,10 @@
       type: keyword
       description: >
         General health of the Network.
+    - name: type
+      type: keyword
+      description: >
+        Type of the network.
     - name: vm
       type: group
       fields:

@@ -34,6 +34,11 @@ func TestEventMapping(t *testing.T) {
 		ManagedEntity: mo.ManagedEntity{
 			OverallStatus: "green",
 			ConfigStatus:  "green",
+			ExtensibleManagedObject: mo.ExtensibleManagedObject{
+				Self: types.ManagedObjectReference{
+					Type: "Network",
+				},
+			},
 		},
 	}
 
@@ -67,4 +72,7 @@ func TestEventMapping(t *testing.T) {
 	assert.Equal(t, metricDataTest.assetsName.outputVmNames, vmNames)
 	vmCount, _ := event.GetValue("vm.count")
 	assert.GreaterOrEqual(t, vmCount, 0)
+
+	typeName, _ := event.GetValue("type")
+	assert.Equal(t, "Network", typeName)
 }

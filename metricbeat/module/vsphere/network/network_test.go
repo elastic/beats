@@ -53,17 +53,17 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, true, event["accessible"])
 	assert.EqualValues(t, "green", event["status"])
 
+	assert.EqualValues(t, "Network", event["type"])
+
 	config := event["config"].(mapstr.M)
 	assert.NotNil(t, config)
 
-	host, ok := event["host"].(mapstr.M)
-	if ok {
+	if host, ok := event["host"].(mapstr.M); ok {
 		assert.GreaterOrEqual(t, host["count"], 0)
 		assert.NotEmpty(t, host["names"])
 	}
 
-	vm, ok := event["vm"].(mapstr.M)
-	if ok {
+	if vm, ok := event["vm"].(mapstr.M); ok {
 		assert.GreaterOrEqual(t, vm["count"], 0)
 		assert.NotEmpty(t, vm["names"])
 	}

@@ -67384,6 +67384,16 @@ type: keyword
 
 --
 
+*`vsphere.network.type`*::
++
+--
+Type of the network.
+
+
+type: keyword
+
+--
+
 
 *`vsphere.network.vm.names`*::
 +

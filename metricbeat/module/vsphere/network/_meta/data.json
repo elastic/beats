@@ -15,6 +15,7 @@
     },
     "vsphere": {
       "network": {
+        "type": "Network",
         "name": "VM Network",
         "status": "green",
         "accessible": true,
