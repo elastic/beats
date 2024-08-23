@@ -1,3 +1,8 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -15,35 +20,36 @@ package network
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/vmware/govmomi/simulator"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/vmware/govmomi/simulator"
 )
 
 func TestFetchEventContents(t *testing.T) {
 	model := simulator.VPX()
-	if err := model.Create(); err != nil {
+	err := model.Create()
+	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
+	require.Empty(t, errs, "expected no error")
 
-	assert.NotEmpty(t, events)
+	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	assert.NotNil(t, event["name"])
+	assert.NotEmpty(t, event["name"])
 	assert.EqualValues(t, true, event["accessible"])
 	assert.EqualValues(t, "green", event["status"])
 
@@ -53,30 +59,29 @@ func TestFetchEventContents(t *testing.T) {
 	host, ok := event["host"].(mapstr.M)
 	if ok {
 		assert.GreaterOrEqual(t, host["count"], 0)
-		assert.NotNil(t, host["names"])
+		assert.NotEmpty(t, host["names"])
 	}
 
 	vm, ok := event["vm"].(mapstr.M)
 	if ok {
 		assert.GreaterOrEqual(t, vm["count"], 0)
-		assert.NotNil(t, vm["names"])
+		assert.NotEmpty(t, vm["names"])
 	}
 }
 
-func TestData(t *testing.T) {
+func TestNetworkMetricSetData(t *testing.T) {
 	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err = mbtest.WriteEventsReporterV2WithContext(f, t, "")
+	assert.NoError(t, err, "failed to write events with reporter")
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {

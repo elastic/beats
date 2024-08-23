@@ -67319,14 +67319,14 @@ type: long
 [float]
 === network
 
-network
+Network-related information.
 
 
 
 *`vsphere.network.accessible`*::
 +
 --
-At least one host is configured to provide this network.
+Indicates whether at least one host is configured to provide this network.
 
 
 type: boolean
@@ -67336,7 +67336,7 @@ type: boolean
 *`vsphere.network.config.status`*::
 +
 --
-The configStatus indicates whether or not the system has detected a configuration issue.
+Indicates whether the system has detected a configuration issue.
 
 
 type: keyword
@@ -67347,7 +67347,7 @@ type: keyword
 *`vsphere.network.host.names`*::
 +
 --
-Names of the hosts on the network.
+Names of the hosts connected to this network.
 
 
 type: keyword
@@ -67357,7 +67357,7 @@ type: keyword
 *`vsphere.network.host.count`*::
 +
 --
-Number of hosts on the network.
+Number of hosts connected to this network.
 
 
 type: long
@@ -67367,7 +67367,7 @@ type: long
 *`vsphere.network.name`*::
 +
 --
-Name of Network.
+Name of the network.
 
 
 type: keyword
@@ -67377,7 +67377,7 @@ type: keyword
 *`vsphere.network.status`*::
 +
 --
-General health of Network.
+General health of the Network.
 
 
 type: keyword
@@ -67388,7 +67388,7 @@ type: keyword
 *`vsphere.network.vm.names`*::
 +
 --
-Names of the virtual machines on the network.
+Names of the virtual machines connected to this network.
 
 
 type: keyword
@@ -67398,7 +67398,7 @@ type: keyword
 *`vsphere.network.vm.count`*::
 +
 --
-Number of virtual machines on the network.
+Number of virtual machines connected to this network.
 
 
 type: long

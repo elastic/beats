@@ -2,43 +2,43 @@
   type: group
   release: beta
   description: >
-    network
+    Network-related information.
   fields:
     - name: accessible
       type: boolean
       description: >
-        At least one host is configured to provide this network.
+        Indicates whether at least one host is configured to provide this network.
     - name: config.status
       type: keyword
       description: >
-        The configStatus indicates whether or not the system has detected a configuration issue.
+        Indicates whether the system has detected a configuration issue.
     - name: host
       type: group
       fields:
         - name: names
           type: keyword
           description: >
-            Names of the hosts on the network.
+            Names of the hosts connected to this network.
         - name: count
           type: long
           description: >
-            Number of hosts on the network.
+            Number of hosts connected to this network.
     - name: name
       type: keyword
       description: >
-        Name of Network.
+        Name of the network.
     - name: status
       type: keyword
       description: >
-        General health of Network.
+        General health of the Network.
     - name: vm
       type: group
       fields:
         - name: names
           type: keyword
           description: >
-            Names of the virtual machines on the network.
+            Names of the virtual machines connected to this network.
         - name: count
           type: long
           description: >
-            Number of virtual machines on the network.
+            Number of virtual machines connected to this network.

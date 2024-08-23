@@ -26,8 +26,8 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *MetricSet
-	var NetworkTest = mo.Network{
+	m := &NetworkMetricSet{}
+	networkTest := mo.Network{
 		Summary: &types.NetworkSummary{
 			Accessible: true,
 		},
@@ -44,23 +44,27 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.eventMapping(NetworkTest, &metricDataTest)
+	event := m.mapEvent(networkTest, &metricDataTest)
 
 	name, _ := event.GetValue("name")
 	assert.NotNil(t, name)
 
 	status, _ := event.GetValue("status")
-	assert.EqualValues(t, "green", status)
+	assert.Equal(t, types.ManagedEntityStatus("green"), status)
 
-	ConfigStatus, _ := event.GetValue("config.status")
-	assert.EqualValues(t, "green", ConfigStatus)
+	configStatus, _ := event.GetValue("config.status")
+	assert.Equal(t, types.ManagedEntityStatus("green"), configStatus)
 
-	Accessible, _ := event.GetValue("accessible")
-	assert.EqualValues(t, true, Accessible)
+	accessible, _ := event.GetValue("accessible")
+	assert.True(t, accessible.(bool))
 
-	Hostname, _ := event.GetValue("host.names")
-	assert.EqualValues(t, metricDataTest.assetsName.outputHostNames, Hostname)
+	hostNames, _ := event.GetValue("host.names")
+	assert.Equal(t, metricDataTest.assetsName.outputHostNames, hostNames)
+	hostCount, _ := event.GetValue("host.count")
+	assert.GreaterOrEqual(t, hostCount, 0)
 
-	Vmname, _ := event.GetValue("vm.names")
-	assert.EqualValues(t, metricDataTest.assetsName.outputVmNames, Vmname)
+	vmNames, _ := event.GetValue("vm.names")
+	assert.Equal(t, metricDataTest.assetsName.outputVmNames, vmNames)
+	vmCount, _ := event.GetValue("vm.count")
+	assert.GreaterOrEqual(t, vmCount, 0)
 }
