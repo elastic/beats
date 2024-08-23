@@ -396,7 +396,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		// Since now publisher is closed on Stop, we want to give some
 		// time to ack any pending events by default to avoid
 		// changing on stop behavior too much.
-		WaitClose:      5 * time.Second,
+		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
