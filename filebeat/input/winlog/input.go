@@ -62,31 +62,14 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	var cfgs []*conf.C
-	if cfg.HasField("event_logs") {
-		multiCfg := struct {
-			EventLogs []*conf.C `config:"event_logs"`
-		}{}
-		if err := cfg.Unpack(&multiCfg); err != nil {
-			return nil, nil, err
-		}
-		cfgs = multiCfg.EventLogs
-	} else {
-		// TODO: Single event log configurations are accepted to support
-		// integration configs, it is an undocumented feature to avoid
-		// confusion. Should we remove this in the future?
-		cfgs = append(cfgs, cfg)
+	// TODO: do we want to allow to read multiple eventLogs using a single config
+	//       as is common for other inputs?
+	eventLog, err := eventlog.New(cfg)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}
 
-	sources := make([]cursor.Source, len(cfgs))
-	for i, cfg := range cfgs {
-		eventLog, err := eventlog.New(cfg)
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
-		}
-		sources[i] = eventLog
-	}
-
+	sources := []cursor.Source{eventLog}
 	return sources, eventlogRunner{}, nil
 }
 

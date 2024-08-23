@@ -9,11 +9,11 @@
 
 beta[]
 
-Use the `winlog` input to read Windows event logs. It reads from one or more 
-event logs using Windows APIs, filters the events based on user-configured criteria, 
+Use the `winlog` input to read Windows event logs. It reads from one 
+event log using Windows APIs, filters the events based on user-configured criteria, 
 then sends the event data to the configured outputs. It watches the event
-logs so that new event data is sent in a timely manner. The read position for
-each event log is persisted to disk to allow the input to resume after
+log so that new event data is sent in a timely manner. The read position for
+the event log is persisted to disk to allow the input to resume after
 restarts.
 
 The `winlog` input can capture event data from any event logs running on your system.
@@ -29,31 +29,15 @@ Here is a sample configuration:
 [source,yaml]
 --------------------------------------------------------------------------------
 - type: winlog
-  event_logs:
-    - name: Application
-      ignore_older: 72h
-    - name: Security
-    - name: System
+  name: Application
+  ignore_older: 72h
 --------------------------------------------------------------------------------
 
 [float]
 === Configuration options
 
 [float]
-==== `event_logs`
-
-A list of entries (called 'dictionaries' in YAML) that specify which event logs
-to monitor. Each entry in the list defines an event log to monitor as well as
-any information to be associated with the event log (filter, tags, and so on).
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
---------------------------------------------------------------------------------
-
-[float]
-==== `event_logs.batch_read_size`
+==== `batch_read_size`
 
 The maximum number of event log records to read from the Windows API in a single
 batch. The default batch size is 100. Most Windows versions return an error if
@@ -67,9 +51,9 @@ reading additional event log records.
 
 [float]
 [[configuration-winlogbeat-options-event_logs-name]]
-==== `event_logs.name`
+==== `name`
 
-The name of the event log to monitor. Each dictionary under `event_logs` must
+The name of the event log to monitor. It must
 have a `name` field, except for those which use a custom XML query.
 A channel is a named stream of events that transports events from an event
 source to an event log. Most channels are tied to specific event publishers.
@@ -117,8 +101,8 @@ You must specify the full name of the channel in the configuration file.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
+- type: winlog
+  name: Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 --------------------------------------------------------------------------------
 
 To read events from an archived `.evtx` file you can specify the `name` as the
@@ -126,35 +110,35 @@ absolute path (it cannot be relative) to the file.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: 'C:\backup\sysmon-2019.08.evtx'
-    no_more_events: stop
+- type: winlog
+  name: 'C:\backup\sysmon-2019.08.evtx'
+  no_more_events: stop
 --------------------------------------------------------------------------------
 
 The name key must not be used with custom XML queries.
 
 [float]
-==== `event_logs.id`
+==== `id`
 
 A unique identifier for the event log. This key is required when using a custom
 XML query.
 
 It is used to uniquely identify the event log reader in the registry file. This is
 useful if multiple event logs are being set up to watch the same channel or file. If an
-ID is not given, the `event_logs.name` value will be used.
+ID is not given, the `name` value will be used.
 
 This value must be unique.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
-    id: application-logs
-    ignore_older: 168h
+- type: winlog
+  name: Application
+  id: application-logs
+  ignore_older: 168h
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.ignore_older`
+==== `ignore_older`
 
 If this option is specified, the input filters events that are older than the
 specified amount of time. Valid time units are "ns", "us" (or "µs"), "ms", "s",
@@ -164,13 +148,13 @@ optional.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
-    ignore_older: 168h
+- type: winlog
+  name: Application
+  ignore_older: 168h
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.forwarded`
+==== `forwarded`
 
 A boolean flag to indicate that the log contains only events collected from
 remote hosts using the Windows Event Collector. The value defaults to true for
@@ -184,7 +168,7 @@ Collector subscription should be configured to use the "RenderedText" format
 and descriptions.
 
 [float]
-==== `event_logs.event_id`
+==== `event_id`
 
 An allowlist and blocklist of event IDs. The value is a comma-separated list. The
 accepted values are single event IDs to include (e.g. 4624), a range of event
@@ -193,9 +177,9 @@ IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735).
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    event_id: 4624, 4625, 4700-4800, -4735
+- type: winlog
+  name: Security
+  event_id: 4624, 4625, 4700-4800, -4735
 --------------------------------------------------------------------------------
 
 [WARNING]
@@ -221,19 +205,19 @@ event IDs.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    processors:
-      - drop_event.when.not.or:
-        - equals.winlog.event_id: 903
-        - equals.winlog.event_id: 1024
-        - equals.winlog.event_id: 4624
+- type: winlog
+  name: Security
+  processors:
+    - drop_event.when.not.or:
+      - equals.winlog.event_id: 903
+      - equals.winlog.event_id: 1024
+      - equals.winlog.event_id: 4624
 --------------------------------------------------------------------------------
 
 =======================================
 
 [float]
-==== `event_logs.language`
+==== `language`
 
 The language ID the events will be rendered in. The language will be forced regardless
 of the system language. A complete list of language IDs can be found
@@ -242,14 +226,14 @@ It defaults to `0`, which indicates to use the system language.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    event_id: 4624, 4625, 4700-4800, -4735
-    language: 0x0409 # en-US
+- type: winlog
+  name: Security
+  event_id: 4624, 4625, 4700-4800, -4735
+  language: 0x0409 # en-US
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.level`
+==== `level`
 
 A list of event levels to include. The value is a comma-separated list of
 levels. *{vista_and_newer}*
@@ -277,26 +261,26 @@ levels. *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    level: critical, error, warning
+- type: winlog
+  name: Security
+  level: critical, error, warning
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.provider`
+==== `provider`
 
 A list of providers (source names) to include. The value is a YAML list.
 *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Application
-    provider:
-      - Application Error
-      - Application Hang
-      - Windows Error Reporting
-      - EMET
+- type: winlog
+  name: Application
+  provider:
+    - Application Error
+    - Application Hang
+    - Windows Error Reporting
+    - EMET
 --------------------------------------------------------------------------------
 
 You can obtain a list of providers associated with a log by using PowerShell.
@@ -319,7 +303,7 @@ Microsoft-Windows-Eventlog
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.xml_query`
+==== `xml_query`
 
 Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`,
 `ignore_older`, `level`, and `provider` options. These options should be included in
@@ -331,16 +315,16 @@ Here is a configuration which will collect DHCP server events from multiple chan
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - id: dhcp-server-logs
-    xml_query: >
-      <QueryList>
-        <Query Id="0" Path="DhcpAdminEvents">
-          <Select Path="DhcpAdminEvents">*</Select>
-          <Select Path="Microsoft-Windows-Dhcp-Server/FilterNotifications">*</Select>
-          <Select Path="Microsoft-Windows-Dhcp-Server/Operational">*</Select>
-        </Query>
-      </QueryList>
+- type: winlog
+  id: dhcp-server-logs
+  xml_query: >
+    <QueryList>
+      <Query Id="0" Path="DhcpAdminEvents">
+        <Select Path="DhcpAdminEvents">*</Select>
+        <Select Path="Microsoft-Windows-Dhcp-Server/FilterNotifications">*</Select>
+        <Select Path="Microsoft-Windows-Dhcp-Server/Operational">*</Select>
+      </Query>
+    </QueryList>
 --------------------------------------------------------------------------------
 
 XML queries may also be created in Windows Event Viewer using custom views. The query
@@ -348,7 +332,7 @@ can be created using a graphical interface and the corresponding XML can be
 retrieved from the XML tab.
 
 [float]
-==== `event_logs.include_xml`
+==== `include_xml`
 
 Boolean option that controls if the raw XML representation of an event is
 included in the data sent by {beatname_uc}. The default is false.
@@ -362,13 +346,13 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Microsoft-Windows-Windows Defender/Operational
-    include_xml: true
+- type: winlog
+  name: Microsoft-Windows-Windows Defender/Operational
+  include_xml: true
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.tags`
+==== `tags`
 
 A list of tags that the Beat includes in the `tags` field of each published
 event. Tags make it easy to select specific events in Kibana or apply
@@ -379,14 +363,14 @@ Example:
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: CustomLog
-    tags: ["web"]
+- type: winlog
+  name: CustomLog
+  tags: ["web"]
 --------------------------------------------------------------------------------
 
 [float]
 [[winlogbeat-configuration-fields]]
-==== `event_logs.fields`
+==== `fields`
 
 Optional fields that you can specify to add additional information to the
 output. For example, you might add fields that you can use for filtering event
@@ -399,14 +383,14 @@ will be overwritten by the value declared here.
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: CustomLog
-    fields:
-      customer_id: 51415432
+- type: winlog
+  name: CustomLog
+  fields:
+    customer_id: 51415432
 --------------------------------------------------------------------------------
 
 [float]
-==== `event_logs.fields_under_root`
+==== `fields_under_root`
 
 If this option is set to true, the custom <<winlogbeat-configuration-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
@@ -415,7 +399,7 @@ field names added by {beatname_uc}, then the custom fields overwrite the other
 fields.
 
 [float]
-==== `event_logs.processors`
+==== `processors`
 
 A list of processors to apply to the data generated by the event log.
 
@@ -423,7 +407,7 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
-==== `event_logs.index`
+==== `index`
 
 If present, this formatted string overrides the index for events from this
 event log (for elasticsearch outputs), or sets the `raw_index` field of the event's
@@ -435,13 +419,13 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might
 expand to `"filebeat-myindex-2019.12.13"`.
 
 [float]
-==== `event_logs.keep_null`
+==== `keep_null`
 
 If this option is set to true, fields with `null` values will be published in
 the output document. By default, `keep_null` is set to `false`.
 
 [float]
-==== `event_logs.no_more_events`
+==== `no_more_events`
 
 The action that the event log reader should take when it receives a signal from
 Windows that there are no more events to read. It can either `wait` for more
@@ -453,7 +437,7 @@ Setting `no_more_events` to `stop` is useful when reading from archived event
 log files where you want to read the whole file then exit. 
 
 [float]
-==== `event_logs.api`
+==== `api`
 
 This selects the event log reader implementation that is used to read events
 from the Windows APIs. You should only set this option when testing experimental
@@ -464,9 +448,9 @@ performance and reduce CPU usage. *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: ForwardedEvents
-    api: wineventlog-experimental
+- type: winlog
+  name: ForwardedEvents
+  api: wineventlog-experimental
 --------------------------------------------------------------------------------
 
 There are a few notable differences in the events:
