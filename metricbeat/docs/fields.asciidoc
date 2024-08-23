@@ -66861,30 +66861,10 @@ datastore
 
 
 
-*`vsphere.datastore.name`*::
+*`vsphere.datastore.capacity.free.bytes`*::
 +
 --
-Datastore name
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.fstype`*::
-+
---
-Filesystem type
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.capacity.total.bytes`*::
-+
---
-Total bytes of the datastore
+Free bytes of the datastore.
 
 
 type: long
@@ -66893,10 +66873,10 @@ format: bytes
 
 --
 
-*`vsphere.datastore.capacity.free.bytes`*::
+*`vsphere.datastore.capacity.total.bytes`*::
 +
 --
-Free bytes of the datastore
+Total bytes of the datastore.
 
 
 type: long
@@ -66908,7 +66888,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.bytes`*::
 +
 --
-Used bytes of the datastore
+Used bytes of the datastore.
 
 
 type: long
@@ -66920,12 +66900,136 @@ format: bytes
 *`vsphere.datastore.capacity.used.pct`*::
 +
 --
-Used percent of the datastore
+Percentage of datastore capacity used.
 
 
 type: scaled_float
 
 format: percent
+
+--
+
+*`vsphere.datastore.fstype`*::
++
+--
+Filesystem type.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.host.count`*::
++
+--
+Number of hosts.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.host.names`*::
++
+--
+List of all the host names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.iops`*::
++
+--
+Storage I/O Control aggregated Input/Output Operations Per Second.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.name`*::
++
+--
+Datastore name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.read.bytes`*::
++
+--
+Rate of reading data from the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.read.latency.total.ms`*::
++
+--
+Average amount of time for a read operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.status`*::
++
+--
+Status of the datastore.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.vm.count`*::
++
+--
+Number of VMs.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.write.bytes`*::
++
+--
+Rate of writing data to the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.write.latency.total.ms`*::
++
+--
+Average amount of time for a write operation from the datastore in milliseconds.
+
+
+type: long
 
 --
 

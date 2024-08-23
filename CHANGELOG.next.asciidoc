@@ -33,6 +33,19 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Add support of Graphite series 1.1.0+ tagging extension for statsd module. {pull}39619[39619]
+- Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
+- Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Update metrics for the vSphere Host metricset. {pull}40429[40429]
+- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+
+*Osquerybeat*
+
+- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
 
 *Osquerybeat*
 
