@@ -275,7 +275,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
 - Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
-- Add support for multiple event_logs in `winlog` input. {issue}40074[40074] {pull}40462[40462]
 
 *Auditbeat*
 
