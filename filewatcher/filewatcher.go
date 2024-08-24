@@ -18,10 +18,10 @@
 package filewatcher
 
 import (
+	"encoding/binary"
+	"hash/fnv"
 	"os"
 	"time"
-
-	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -77,7 +77,7 @@ func (f *FileWatcher) Scan() ([]string, bool, error) {
 		files = append(files, path)
 	}
 
-	hash, err := hashstructure.Hash(files, nil)
+	hash, err := hash(files)
 	if err != nil {
 		return files, true, err
 	}
@@ -89,4 +89,29 @@ func (f *FileWatcher) Scan() ([]string, bool, error) {
 	}
 
 	return files, true, nil
+}
+
+func hash(files []string) (uint64, error) {
+	var u uint64
+
+	for _, f := range files {
+		current := hashString(f)
+
+		h := fnv.New64()
+		if err := binary.Write(h, binary.LittleEndian, u); err != nil {
+			return 0, err
+		}
+		if err := binary.Write(h, binary.LittleEndian, current); err != nil {
+			return 0, err
+		}
+		u = h.Sum64()
+	}
+
+	return u, nil
+}
+
+func hashString(s string) uint64 {
+	h := fnv.New64()
+	h.Write([]byte(s))
+	return h.Sum64()
 }

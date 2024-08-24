@@ -78,3 +78,11 @@ func TestFileWatcher(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, changed, "'changed' must be true, one file has been removed")
 }
+
+func TestHash(t *testing.T) {
+	files := []string{"file-1", "file-2", "file-3"}
+	i, err := hash(files)
+	assert.NoError(t, err)
+	// ensure custom hash function returns the same result as deprecated hashstructure lib
+	assert.Equal(t, uint64(11400963159482616226), i)
+}

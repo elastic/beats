@@ -11,7 +11,6 @@ require (
 	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-colorable v0.1.12
-	github.com/mitchellh/hashstructure v1.1.0
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.9.0
