@@ -28,7 +28,7 @@ import (
 	"syscall"
 	"time"
 
-	psutil "github.com/shirou/gopsutil/v3/process"
+	psutil "github.com/shirou/gopsutil/v4/process"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"

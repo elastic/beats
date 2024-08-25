@@ -24,7 +24,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-system-metrics/metric"

@@ -26,7 +26,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
@@ -150,7 +150,7 @@ func enablePerformanceCounters() error {
 // getLogicalDriveStrings calls the syscall GetLogicalDriveStrings in order to get the list of logical drives
 func getLogicalDriveStrings() ([]logicalDrive, error) {
 	lpBuffer := make([]byte, 254)
-	r1, _, e1 := syscall.Syscall(procGetLogicalDriveStringsW.Addr(), 2, uintptr(len(lpBuffer)), uintptr(unsafe.Pointer(&lpBuffer[0])), 0)
+	r1, _, e1 := syscall.SyscallN(procGetLogicalDriveStringsW.Addr(), uintptr(len(lpBuffer)), uintptr(unsafe.Pointer(&lpBuffer[0])))
 	if r1 == 0 {
 		err := e1
 		if e1 != errorSuccess {
@@ -190,7 +190,7 @@ func isValidLogicalDrive(path string) bool {
 	if err != nil {
 		return false
 	}
-	ret, _, err := syscall.Syscall(procGetDriveTypeW.Addr(), 1, uintptr(unsafe.Pointer(utfPath)), 0, 0)
+	ret, _, err := syscall.SyscallN(procGetDriveTypeW.Addr(), uintptr(unsafe.Pointer(utfPath)))
 
 	//DRIVE_NO_ROOT_DIR = 1 DRIVE_CDROM = 5 DRIVE_UNKNOWN = 0 DRIVE_RAMDISK = 6
 	if ret == 1 || ret == 5 || ret == 0 || ret == 6 || err != errorSuccess { //nolint: errorlint // keep old behaviour
