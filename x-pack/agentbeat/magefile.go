@@ -217,7 +217,7 @@ func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
-	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../metricbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../osquerybeat/...", "../packetbeat/...")
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 

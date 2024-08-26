@@ -122,7 +122,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 	}
 
 	strData := string(data)
-	eventMsg := "not a number"
+	eventMsg := `\"int\":\"not a number\"`
 	if !strings.Contains(strData, eventMsg) {
 		t.Errorf("expecting to find '%s' on '%s'", eventMsg, eventsLogFile)
 		t.Errorf("Contents:\n%s", strData)
