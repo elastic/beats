@@ -283,7 +283,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:       time.Now(),
 			EphemeralID:     eid,
 		},
-		Fields: fields,
+		Fields:   fields,
 		Registry: reload.NewRegistry(),
 	}
 
