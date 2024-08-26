@@ -1,3 +1,9 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
+//go:build windows
+
 package application_pool
 
 import (
@@ -25,7 +31,6 @@ func Run(commands string) (*string, *string, error) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
 
-	// TODO: we could remove the need for a file by running these commands via WinRM, maybe?
 	cmd := exec.Command("powershell.exe", "-ExecutionPolicy", "Bypass", "-NoLogo", "-NonInteractive", "-NoProfile", "-File", filename)
 
 	cmd.Stderr = &stderr
