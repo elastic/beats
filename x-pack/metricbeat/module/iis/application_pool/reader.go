@@ -8,6 +8,7 @@ package application_pool
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
@@ -35,6 +36,7 @@ type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
 	counters         map[string]string
+	status           string
 }
 
 // WorkerProcess struct contains the worker process details
@@ -202,9 +204,56 @@ func (r *Reader) close() error {
 	return r.query.Close()
 }
 
+func getAllAppPool() (map[string]string, error) {
+
+	commands := fmt.Sprintf(`
+	Import-Module WebAdministration
+	Get-IISAppPool`)
+
+	stdout, stderr, err := Run(commands)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving App Pool %q", err)
+	}
+	if *stderr != "" {
+		return nil, fmt.Errorf("error retrieving App Pool %q", *stderr)
+	}
+
+	allPooldata := parseApplicationPool(*stdout)
+	return allPooldata, nil
+}
+
+func parseApplicationPool(data string) map[string]string {
+	lines := strings.Split(data, "\n")
+	// Skip the header lines
+	lines = lines[2:]
+	var applicationPools = make(map[string]string)
+	if len(lines) == 0 {
+		return applicationPools
+	}
+	// Regular expression to match the name and status
+	re := regexp.MustCompile(`^(.+?)\s{2,}(\S+)`)
+
+	for _, line := range lines {
+		matches := re.FindStringSubmatch(line)
+		if len(matches) == 3 {
+			name := strings.TrimSpace(matches[1])
+			if name == "----" {
+				continue
+			}
+			status := matches[2]
+			applicationPools[name] = status
+		}
+	}
+	return applicationPools
+}
+
 // getApplicationPools method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
 func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	processes, err := getw3wpProceses()
+	if err != nil {
+		return nil, err
+	}
+	applicationPoolWithStatus, err := getAllAppPool()
 	if err != nil {
 		return nil, err
 	}
@@ -214,8 +263,19 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	}
 	var applicationPools []ApplicationPool
 	for key, value := range appPools {
-		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
+		if status, ok := applicationPoolWithStatus[key]; ok {
+			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value, status: status})
+		} else {
+			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
+		}
 	}
+
+	for key, status := range applicationPoolWithStatus {
+		if _, ok := appPools[key]; !ok { // adding only those values which are not present in appPools
+			applicationPools = append(applicationPools, ApplicationPool{name: key, status: status})
+		}
+	}
+
 	if len(names) == 0 {
 		return applicationPools, nil
 	}
@@ -249,7 +309,6 @@ func getw3wpProceses() (map[int]string, error) {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
 						wps[info.PID] = info.Args[i+1]
-						break
 					}
 				}
 			}
