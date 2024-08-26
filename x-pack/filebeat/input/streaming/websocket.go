@@ -7,11 +7,14 @@ package streaming
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math"
 	"math/rand/v2"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -97,36 +100,84 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	defer c.Close()
 
 	for {
-		_, message, err := c.ReadMessage()
-		if err != nil {
-			s.metrics.errorsTotal.Inc()
-			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				s.log.Debugw("websocket connection closed, attempting to reconnect...", "error", err)
-				// close the old connection and reconnect
-				c.Close()
-				// since c is already a pointer, we can reassign it to the new connection and the defer will still handle it
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
-				handleConnectionResponse(resp, s.log)
-				if err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.log.Errorw("failed to reconnect websocket connection", "error", err)
+		select {
+		case <-ctx.Done():
+			s.log.Debugw("context cancelled, closing websocket connection")
+			c.Close()
+			return ctx.Err()
+		default:
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				if isRetryableError(err) {
+					s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
+					// close the old connection and reconnect
+					c.Close()
+					// since c is already a pointer, we can reassign it to the new connection and the defer will still handle it
+					c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+					handleConnectionResponse(resp, s.log)
+					if err != nil {
+						s.metrics.errorsTotal.Inc()
+						s.log.Errorw("failed to reconnect websocket connection", "error", err)
+						return err
+					}
+				} else {
+					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
-			} else {
-				s.log.Errorw("failed to read websocket data", "error", err)
+			}
+			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
+			state["response"] = message
+			s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
+			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to process and publish data", "error", err)
 				return err
 			}
 		}
-		s.metrics.receivedBytesTotal.Add(uint64(len(message)))
-		state["response"] = message
-		s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
-		err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
-		if err != nil {
-			s.metrics.errorsTotal.Inc()
-			s.log.Errorw("failed to process and publish data", "error", err)
-			return err
+	}
+}
+
+// isRetryableError checks if the error is retryable based on the error type.
+func isRetryableError(err error) bool {
+	// check for specific network errors
+	var netErr *net.OpError
+	if errors.As(err, &netErr) {
+		switch {
+		case netErr.Op == "dial" && netErr.Err.Error() == "i/o timeout",
+			netErr.Op == "read" && netErr.Err.Error() == "i/o timeout",
+			netErr.Op == "read" && netErr.Err.Error() == "connection reset by peer",
+			netErr.Op == "read" && netErr.Err.Error() == "connection refused",
+			netErr.Op == "read" && netErr.Err.Error() == "connection reset",
+			netErr.Op == "read" && netErr.Err.Error() == "connection closed":
+			return true
 		}
 	}
+
+	// check for specific websocket close errors
+	var closeErr *websocket.CloseError
+	if errors.As(err, &closeErr) {
+		switch closeErr.Code {
+		case websocket.CloseGoingAway,
+			websocket.CloseNormalClosure,
+			websocket.CloseInternalServerErr,
+			websocket.CloseTryAgainLater,
+			websocket.CloseServiceRestart,
+			websocket.CloseTLSHandshake:
+			return true
+		}
+	}
+
+	// check for common error patterns
+	if strings.Contains(err.Error(), "timeout") ||
+		strings.Contains(err.Error(), "connection reset") ||
+		strings.Contains(err.Error(), "temporary failure") ||
+		strings.Contains(err.Error(), "server is busy") {
+		return true
+	}
+
+	return false
 }
 
 // handleConnectionResponse logs the response body of the websocket connection.
@@ -135,6 +186,7 @@ func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
 		var buf bytes.Buffer
 		if log.Core().Enabled(zapcore.DebugLevel) {
 			const limit = 1e4
+			//nolint:errcheck // ignore error since if this fails it signals deeper issues with the system and the code should panic
 			io.CopyN(&buf, resp.Body, limit)
 		}
 		if n, _ := io.Copy(io.Discard, resp.Body); n != 0 && buf.Len() != 0 {
