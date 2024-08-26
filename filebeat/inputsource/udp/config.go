@@ -18,6 +18,9 @@
 package udp
 
 import (
+	"errors"
+	"fmt"
+	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -29,4 +32,21 @@ type Config struct {
 	MaxMessageSize cfgtype.ByteSize `config:"max_message_size" validate:"positive,nonzero"`
 	Timeout        time.Duration    `config:"timeout"`
 	ReadBuffer     cfgtype.ByteSize `config:"read_buffer" validate:"positive"`
+	Network        string           `config:"network"`
+}
+
+var validUDPNetworkValues = []string{
+	"udp",
+	"udp4",
+	"udp6",
+}
+
+var ErrInvalidNetwork = errors.New("invalid network value")
+
+// Validate validates the Config option for the udp input.
+func (c *Config) Validate() error {
+	if c.Network != "" && !slices.Contains(validUDPNetworkValues, c.Network) {
+		return fmt.Errorf("%w: %s, expected: %v", ErrInvalidNetwork, c.Network, validUDPNetworkValues)
+	}
+	return nil
 }

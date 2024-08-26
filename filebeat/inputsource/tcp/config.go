@@ -18,7 +18,9 @@
 package tcp
 
 import (
+	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -35,12 +37,27 @@ type Config struct {
 	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
 	MaxConnections int                     `config:"max_connections"`
 	TLS            *tlscommon.ServerConfig `config:"ssl"`
+	Network        string                  `config:"network"`
 }
+
+var validTCPNetworkValues = []string{
+	"tcp",
+	"tcp4",
+	"tcp6",
+}
+
+var (
+	ErrInvalidNetwork  = errors.New("invalid network value")
+	ErrMissingHostPort = errors.New("need to specify the host using the `host:port` syntax")
+)
 
 // Validate validates the Config option for the tcp input.
 func (c *Config) Validate() error {
 	if len(c.Host) == 0 {
-		return fmt.Errorf("need to specify the host using the `host:port` syntax")
+		return ErrMissingHostPort
+	}
+	if c.Network != "" && !slices.Contains(validTCPNetworkValues, c.Network) {
+		return fmt.Errorf("%w: %s, expected: %v", ErrInvalidNetwork, c.Network, validTCPNetworkValues)
 	}
 	return nil
 }
