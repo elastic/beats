@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	gohttp "net/http"
 	"strings"
 
@@ -105,13 +106,9 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 	defer resp.Body.Close()
 
-	bodyBytes, err := io.ReadAll(resp.Body)
+	bodyBytes, err := checkResponse(resp)
 	if err != nil {
-		return "", fmt.Errorf("reading artifactsURI response body: %w", err)
-	}
-
-	if resp.StatusCode != gohttp.StatusOK {
-		return "", fmt.Errorf("unsuccessful status code in artifactsURI response %d - %s, body: %s", resp.StatusCode, resp.Status, bodyBytes)
+		return "", fmt.Errorf("checking artifacts api response: %w", err)
 	}
 
 	body := struct {
@@ -158,4 +155,27 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 
 	return "", fmt.Errorf("uri not detected")
+}
+
+func checkResponse(resp *gohttp.Response) ([]byte, error) {
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading artifactsURI response body: %w", err)
+	}
+
+	if resp.StatusCode != gohttp.StatusOK {
+		return nil, fmt.Errorf("unsuccessful status code in artifactsURI response %d - %s, body: %s", resp.StatusCode, resp.Status, bodyBytes)
+	}
+
+	responseContentType := resp.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(responseContentType)
+	if err != nil {
+		return nil, fmt.Errorf("parsing content-type %q: %w", responseContentType, err)
+	}
+
+	if mediatype != "application/json" {
+		return nil, fmt.Errorf("unexpected media type in artifacts API response %q (parsed from %q)", mediatype, responseContentType)
+	}
+
+	return bodyBytes, nil
 }
