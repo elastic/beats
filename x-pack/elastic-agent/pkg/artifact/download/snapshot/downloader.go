@@ -100,7 +100,12 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 
 	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", version)
-	resp, err := client.Get(artifactsURI)
+	req, err := gohttp.NewRequestWithContext(context.Background(), gohttp.MethodGet, artifactsURI, nil)
+	if err != nil {
+		return "", fmt.Errorf("creating artifacts API request to %q: %w", artifactsURI, err)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
 	}
