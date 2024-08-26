@@ -294,7 +294,7 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 		updatedAligner = inputAligner
 	}
 	// Default reducer for aggregation is REDUCE_NONE if it's not given
-	updatedReducer := gcp.DefaultAligner
+	updatedReducer := gcp.DefaultReducer
 	if inputAligner != "" && inputReducer != "" {
 		updatedReducer = inputReducer
 	}
