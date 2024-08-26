@@ -57,6 +57,7 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
 	r, err := http.Get("http://localhost:5066")
 	require.NoError(t, err)
@@ -88,6 +89,7 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
 	r, err := http.Get("http://localhost:5066/stats")
 	require.NoError(t, err)
@@ -121,6 +123,7 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
 	r, err := http.Get("http://localhost:5066/not-exist")
 	require.NoError(t, err)
@@ -143,6 +146,7 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
 	r, err := http.Get("http://localhost:5066/debug/pprof/")
 	require.NoError(t, err)
