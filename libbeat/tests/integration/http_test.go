@@ -21,7 +21,7 @@ package integration
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -57,12 +57,14 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
-	r, err := http.Get("http://localhost:5066")
+	r, err := http.Get("http://localhost:5066") //nolint:noctx // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
 	require.NoError(t, err)
 	var m map[string]interface{}
 	err = json.Unmarshal(body, &m)
@@ -88,12 +90,14 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
-	r, err := http.Get("http://localhost:5066/stats")
+	r, err := http.Get("http://localhost:5066/stats") //nolint:noctx // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
+	r.Body.Close()
 	require.NoError(t, err)
 	var m Stats
 
@@ -121,8 +125,10 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
-	r, err := http.Get("http://localhost:5066/not-exist")
+	r, err := http.Get("http://localhost:5066/not-exist") //nolint:noctx // fine for tests
+	r.Body.Close()
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
@@ -143,8 +149,10 @@ output.console:
 	mockbeat.WriteConfigFile(cfg)
 	mockbeat.Start()
 	mockbeat.WaitForLogs("Starting stats endpoint", 60*time.Second)
+	time.Sleep(time.Second)
 
-	r, err := http.Get("http://localhost:5066/debug/pprof/")
+	r, err := http.Get("http://localhost:5066/debug/pprof/") //nolint:noctx // fine for tests
+	r.Body.Close()
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
