@@ -18,7 +18,6 @@ func Test_checkResponse(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    []byte
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -33,7 +32,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`{"good": "job"}`)),
 				},
 			},
-			want:    []byte(`{"good": "job"}`),
 			wantErr: assert.NoError,
 		},
 		{
@@ -48,7 +46,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`{"not feeling": "too well"}`)),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusInternalServerError), "error should contain http status code")
 				retval = assert.ErrorContains(t, err, `{"not feeling": "too well"}`, "error should contain response body") && retval
@@ -67,7 +64,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`{"bad": "gateway"}`)),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusBadGateway), "error should contain http status code")
 				retval = assert.ErrorContains(t, err, `{"bad": "gateway"}`, "error should contain response body") && retval
@@ -86,7 +82,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(bytes.NewReader([]byte{})),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusServiceUnavailable), "error should contain http status code")
 			},
@@ -103,7 +98,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`{"gateway": "never got back to me"}`)),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusGatewayTimeout), "error should contain http status code")
 				retval = assert.ErrorContains(t, err, `{"gateway": "never got back to me"}`, "error should contain response body") && retval
@@ -122,7 +116,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`<?xml version='1.0' encoding='UTF-8'?><note>Those who cannot remember the past are condemned to repeat it.</note>`)),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				retval := assert.ErrorContains(t, err, "application/xml")
 				retval = assert.ErrorContains(t, err, `<?xml version='1.0' encoding='UTF-8'?><note>Those who cannot remember the past are condemned to repeat it.</note>`)
@@ -141,7 +134,6 @@ func Test_checkResponse(t *testing.T) {
 					Body: io.NopCloser(strings.NewReader(`<!DOCTYPE html><html><body>Hello world!</body></html>`)),
 				},
 			},
-			want: nil,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				retval := assert.ErrorContains(t, err, "text/html")
 				retval = assert.ErrorContains(t, err, `<!DOCTYPE html><html><body>Hello world!</body></html>`)
@@ -151,12 +143,9 @@ func Test_checkResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := checkResponse(tt.args.resp)
+			err := checkResponse(tt.args.resp)
 			if !tt.wantErr(t, err) {
 				return
-			}
-			if !bytes.Equal(got, tt.want) {
-				t.Errorf("checkResponse() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
