@@ -52,7 +52,7 @@ func TestValidate(t *testing.T) {
 		},
 	}
 
-	for _, network := range validTCPNetworkValues {
+	for _, network := range []string{networkTCP, networkTCP4, networkTCP6} {
 		tests = append(tests, testCfg{
 			name: "network_" + network,
 			cfg: Config{

@@ -48,7 +48,7 @@ func TestValidate(t *testing.T) {
 		},
 	}
 
-	for _, network := range validUDPNetworkValues {
+	for _, network := range []string{networkUDP, networkUDP4, networkUDP6} {
 		tests = append(tests, testCfg{
 			name: "network_" + network,
 			cfg: Config{

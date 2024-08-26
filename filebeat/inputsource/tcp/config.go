@@ -20,7 +20,6 @@ package tcp
 import (
 	"errors"
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -40,11 +39,11 @@ type Config struct {
 	Network        string                  `config:"network"`
 }
 
-var validTCPNetworkValues = []string{
-	"tcp",
-	"tcp4",
-	"tcp6",
-}
+const (
+	networkTCP  = "tcp"
+	networkTCP4 = "tcp4"
+	networkTCP6 = "tcp6"
+)
 
 var (
 	ErrInvalidNetwork  = errors.New("invalid network value")
@@ -56,8 +55,10 @@ func (c *Config) Validate() error {
 	if len(c.Host) == 0 {
 		return ErrMissingHostPort
 	}
-	if c.Network != "" && !slices.Contains(validTCPNetworkValues, c.Network) {
-		return fmt.Errorf("%w: %s, expected: %v", ErrInvalidNetwork, c.Network, validTCPNetworkValues)
+	switch c.Network {
+	case "", networkTCP, networkTCP4, networkTCP6:
+	default:
+		return fmt.Errorf("%w: %s, expected: %v or %v or %v ", ErrInvalidNetwork, c.Network, networkTCP, networkTCP4, networkTCP6)
 	}
 	return nil
 }

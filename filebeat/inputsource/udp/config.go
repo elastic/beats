@@ -20,7 +20,6 @@ package udp
 import (
 	"errors"
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -35,18 +34,20 @@ type Config struct {
 	Network        string           `config:"network"`
 }
 
-var validUDPNetworkValues = []string{
-	"udp",
-	"udp4",
-	"udp6",
-}
+const (
+	networkUDP  = "udp"
+	networkUDP4 = "udp4"
+	networkUDP6 = "udp6"
+)
 
 var ErrInvalidNetwork = errors.New("invalid network value")
 
 // Validate validates the Config option for the udp input.
 func (c *Config) Validate() error {
-	if c.Network != "" && !slices.Contains(validUDPNetworkValues, c.Network) {
-		return fmt.Errorf("%w: %s, expected: %v", ErrInvalidNetwork, c.Network, validUDPNetworkValues)
+	switch c.Network {
+	case "", networkUDP, networkUDP4, networkUDP6:
+	default:
+		return fmt.Errorf("%w: %s, expected: %v or %v or %v", ErrInvalidNetwork, c.Network, networkUDP, networkUDP4, networkUDP6)
 	}
 	return nil
 }
