@@ -35,7 +35,7 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) timeSeriesWithAligner {
+func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string, reducer string) timeSeriesWithAligner {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
@@ -44,8 +44,9 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
 		Filter:   r.getFilterForMetric(serviceName, metricType),
 		Aggregation: &monitoringpb.Aggregation{
-			PerSeriesAligner: gcp.AlignersMapToGCP[aligner],
-			AlignmentPeriod:  r.config.period,
+			PerSeriesAligner:   gcp.AlignersMapToGCP[aligner],
+			AlignmentPeriod:    r.config.period,
+			CrossSeriesReducer: monitoringpb.Aggregation_Reducer(monitoringpb.Aggregation_Reducer_value[reducer]),
 		},
 	}
 
@@ -73,7 +74,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	return out
 }
 
-func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, reducer string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
@@ -131,9 +132,9 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s", mt, metricMeta, aligner)
-			interval, aligner := getTimeIntervalAligner(largestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, serviceName, mt, interval, aligner)
+			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s, reducer=%s", mt, metricMeta, aligner, reducer)
+			interval, aligner, reducer := getTimeIntervalAligner(largestDelay, metricMeta.samplePeriod, r.config.period, aligner, reducer)
+			ts := r.Metric(ctx, serviceName, mt, interval, aligner, reducer)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
@@ -255,7 +256,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *durationpb.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *durationpb.Duration, inputAligner string, inputReducer string) (*monitoringpb.TimeInterval, string, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
 	currentTime = time.Now().UTC()
@@ -292,6 +293,11 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 	if needsAggregation && inputAligner != "" {
 		updatedAligner = inputAligner
 	}
+	// Default reducer for aggregation is REDUCE_NONE if it's not given
+	updatedReducer := gcp.DefaultAligner
+	if inputAligner != "" && inputReducer != "" {
+		updatedReducer = inputReducer
+	}
 
-	return interval, updatedAligner
+	return interval, updatedAligner, updatedReducer
 }

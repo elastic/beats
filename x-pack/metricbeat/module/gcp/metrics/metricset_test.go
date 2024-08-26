@@ -7,9 +7,9 @@ package metrics
 import "testing"
 
 var fakeMetricsConfig = []metricsConfig{
-	{"billing", "", []string{}, ""},
-	{"billing", "foobar/", []string{}, ""},
-	{"billing", "foobar", []string{}, ""},
+	{"billing", "", []string{}, "", ""},
+	{"billing", "foobar/", []string{}, "", ""},
+	{"billing", "foobar", []string{}, "", ""},
 }
 
 func Test_metricsConfig_AddPrefixTo(t *testing.T) {
@@ -36,7 +36,7 @@ func Test_metricsConfig_AddPrefixTo(t *testing.T) {
 		},
 		{
 			name:   "service metric prefix override (w/ dot)",
-			fields: metricsConfig{"billing", "foo.bar/", []string{}, ""},
+			fields: metricsConfig{"billing", "foo.bar/", []string{}, "",""},
 			want:   "foo.bar/" + metric,
 		},
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func TestCleanMetricNameString(t *testing.T) {
-	computeMC := metricsConfig{"compute", "", []string{}, ""}
+	computeMC := metricsConfig{"compute", "", []string{}, "",""}
 
 	cases := []struct {
 		title              string
