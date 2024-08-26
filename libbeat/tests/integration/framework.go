@@ -203,12 +203,7 @@ func (b *BeatProc) Start(args ...string) {
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
 		// 1. Kill the Beat
-		if err := b.Process.Signal(os.Interrupt); err != nil {
-			if !errors.Is(err, os.ErrProcessDone) {
-				t.Fatalf("could not stop process with PID: %d, err: %s",
-					b.Process.Pid, err)
-			}
-		}
+		b.stopUnsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
 		if b.RestartOnBeatOnExit {
@@ -220,7 +215,7 @@ func (b *BeatProc) Start(args ...string) {
 			// wg.Wait() or there is a possibility of
 			// deadlock.
 			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps ensuring
+			// 4. Wait for the goroutine to finish, this helps to ensure
 			// no other Beat process was started
 			wg.Wait()
 		} else {
@@ -275,12 +270,25 @@ func (b *BeatProc) waitBeatToExit() int {
 func (b *BeatProc) Stop() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+	b.stopUnsynced()
+}
+
+// stopUnsynced is the actual stop code, but without locking so it can be reused
+// by methods that have already acquired the lock.
+func (b *BeatProc) stopUnsynced() {
+	stopTimeout := 5 * time.Second
+
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
 		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
 	}
+
+	stoppedLog := fmt.Sprintf("%s stopped.", b.beatName)
+	b.WaitForLogs(fmt.Sprintf("%s stopped.", b.beatName), stopTimeout,
+		fmt.Sprintf("log %q not found to ensure mockbeat stopped after %s",
+			stoppedLog, stopTimeout))
 }
 
 // LogMatch tests each line of the logfile to see if contains any
