@@ -85,6 +85,7 @@ type Beat struct {
 	Instrumentation instrumentation.Instrumentation // instrumentation holds an APM agent for capturing and reporting traces
 
 	API *api.Server // API server. This is nil unless the http endpoint is enabled.
+	Registry *reload.Registry
 }
 
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct
