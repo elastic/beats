@@ -87,9 +87,9 @@ func (s *Server) createServer() (net.Listener, error) {
 	return l, nil
 }
 
-func (u *Server) network() string {
-	if u.config.Network != "" {
-		return u.config.Network
+func (s *Server) network() string {
+	if s.config.Network != "" {
+		return s.config.Network
 	}
 	return "tcp"
 }
