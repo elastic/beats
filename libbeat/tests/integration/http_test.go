@@ -21,6 +21,7 @@ package integration
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -62,7 +63,7 @@ output.console:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	body, err := os.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	require.NoError(t, err)
 	var m map[string]interface{}
@@ -95,7 +96,7 @@ output.console:
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	body, err := os.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	require.NoError(t, err)
 	var m Stats
