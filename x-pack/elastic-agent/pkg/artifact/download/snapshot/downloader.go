@@ -179,7 +179,7 @@ func checkResponse(resp *gohttp.Response) ([]byte, error) {
 	}
 
 	if mediatype != "application/json" {
-		return nil, fmt.Errorf("unexpected media type in artifacts API response %q (parsed from %q)", mediatype, responseContentType)
+		return nil, fmt.Errorf("unexpected media type in artifacts API response %q (parsed from %q), body: %s", mediatype, responseContentType, bodyBytes)
 	}
 
 	return bodyBytes, nil
