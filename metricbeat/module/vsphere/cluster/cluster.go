@@ -94,24 +94,27 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all Clusters
 	var clt []mo.ClusterComputeResource
-	if err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{}, &clt); err != nil {
+	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{}, &clt)
+	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	pc := property.DefaultCollector(c)
-
 	for i := range clt {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			assetNames, err := getAssetNames(ctx, pc, &clt[i])
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve object from host: %w", err)
+			}
 
-		assetNames, err := getAssetNames(ctx, pc, &clt[i])
-		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from host: %w", err)
+			reporter.Event(mb.Event{
+				MetricSetFields: m.eventMapping(clt[i], assetNames),
+			})
 		}
-
-		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(clt[i], assetNames),
-		})
 	}
-
 	return nil
 
 }
@@ -121,38 +124,38 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	referenceList = append(referenceList, cl.Datastore...)
 	referenceList = append(referenceList, cl.Host...)
 
-	var objects []mo.ManagedEntity
+	outputDsNames := make([]string, 0, len(cl.Datastore))
+	outputHsNames := make([]string, 0, len(cl.Host))
 	if len(referenceList) > 0 {
+		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
 			return nil, err
 		}
-	}
 
-	outputDsNames := make([]string, 0, len(cl.Datastore))
-	outputHsNames := make([]string, 0, len(cl.Host))
-	for _, ob := range objects {
-		name := strings.ReplaceAll(ob.Name, ".", "_")
-		switch ob.Reference().Type {
-		case "Datastore":
-			outputDsNames = append(outputDsNames, name)
-		case "HostSystem":
-			outputHsNames = append(outputHsNames, name)
+		for _, ob := range objects {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
+			switch ob.Reference().Type {
+			case "Datastore":
+				outputDsNames = append(outputDsNames, name)
+			case "HostSystem":
+				outputHsNames = append(outputHsNames, name)
+			}
 		}
 	}
 
 	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
 	// instead mo.Network.Name contains correct value of Network name
-	var netObjects []mo.Network
+	outputNtNames := make([]string, 0, len(cl.Network))
 	if len(cl.Network) > 0 {
+		var netObjects []mo.Network
 		if err := pc.Retrieve(ctx, cl.Network, []string{"name"}, &netObjects); err != nil {
 			return nil, err
 		}
-	}
 
-	outputNtNames := make([]string, 0, len(cl.Network))
-	for _, ob := range netObjects {
-		name := strings.ReplaceAll(ob.Name, ".", "_")
-		outputNtNames = append(outputNtNames, name)
+		for _, ob := range netObjects {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
+			outputNtNames = append(outputNtNames, name)
+		}
 	}
 
 	return &assetNames{

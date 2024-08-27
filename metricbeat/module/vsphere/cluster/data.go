@@ -24,7 +24,6 @@ import (
 )
 
 func (m *MetricSet) eventMapping(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
-
 	event := mapstr.M{
 		"das_config": mapstr.M{
 			"enabled": *cl.Configuration.DasConfig.Enabled,
