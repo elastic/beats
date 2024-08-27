@@ -1,4 +1,4 @@
-- name: cluter
+- name: cluster
   type: group
   release: beta
   description: >
