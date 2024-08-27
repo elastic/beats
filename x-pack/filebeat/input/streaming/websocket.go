@@ -96,14 +96,19 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		s.log.Errorw("failed to establish websocket connection", "error", err)
 		return err
 	}
+
 	// ensures this is the last connection closed when the function returns
-	defer c.Close()
+	defer func() {
+		if err := c.Close(); err != nil {
+			s.metrics.errorsTotal.Inc()
+			s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+		}
+	}()
 
 	for {
 		select {
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
-			c.Close()
 			return ctx.Err()
 		default:
 			_, message, err := c.ReadMessage()
@@ -112,8 +117,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				if isRetryableError(err) {
 					s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
 					// close the old connection and reconnect
-					c.Close()
-					// since c is already a pointer, we can reassign it to the new connection and the defer will still handle it
+					if err := c.Close(); err != nil {
+						s.metrics.errorsTotal.Inc()
+						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+					}
+					// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
 					c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
 					handleConnectionResponse(resp, s.log)
 					if err != nil {
@@ -184,16 +192,24 @@ func isRetryableError(err error) bool {
 func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
 	if resp != nil && resp.Body != nil {
 		var buf bytes.Buffer
+		defer resp.Body.Close()
+
 		if log.Core().Enabled(zapcore.DebugLevel) {
 			const limit = 1e4
-			//nolint:errcheck // ignore error since if this fails it signals deeper issues with the system and the code should panic
-			io.CopyN(&buf, resp.Body, limit)
+			if _, err := io.CopyN(&buf, resp.Body, limit); err != nil && !errors.Is(err, io.EOF) {
+				log.Errorw("failed to read websocket response body", "error", err)
+				return
+			}
 		}
-		if n, _ := io.Copy(io.Discard, resp.Body); n != 0 && buf.Len() != 0 {
+
+		// discard the remaining part of the body and check for truncation.
+		if n, err := io.Copy(io.Discard, resp.Body); err != nil {
+			log.Errorw("failed to discard remaining response body", "error", err)
+		} else if n != 0 && buf.Len() != 0 {
 			buf.WriteString("... truncated")
 		}
+
 		log.Debugw("websocket connection response", "body", &buf)
-		resp.Body.Close()
 	}
 }
 
@@ -206,16 +222,16 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 
 	if cfg.Retry != nil {
 		retryConfig := cfg.Retry
-		for attempt := 1; attempt <= *retryConfig.MaxAttempts; attempt++ {
+		for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
 			conn, response, err = websocket.DefaultDialer.Dial(url, nil)
 			if err == nil {
 				return conn, response, nil
 			}
 			log.Debugw("attempt %d: webSocket connection failed. retrying...\n", attempt)
-			waitTime := calculateWaitTime(*retryConfig.WaitMin, *retryConfig.WaitMax, attempt)
+			waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 			time.Sleep(waitTime)
 		}
-		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", *retryConfig.MaxAttempts, err)
+		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 	}
 
 	return websocket.DefaultDialer.DialContext(ctx, url, headers)

@@ -48,9 +48,9 @@ type redact struct {
 }
 
 type retry struct {
-	MaxAttempts *int           `config:"max_attempts"`
-	WaitMin     *time.Duration `config:"wait_min"`
-	WaitMax     *time.Duration `config:"wait_max"`
+	MaxAttempts int           `config:"max_attempts"`
+	WaitMin     time.Duration `config:"wait_min"`
+	WaitMax     time.Duration `config:"wait_max"`
 }
 
 type authConfig struct {
@@ -107,17 +107,9 @@ func (c config) Validate() error {
 
 	if c.Retry != nil {
 		switch {
-		case c.Retry.MaxAttempts != nil && *c.Retry.MaxAttempts <= 0:
+		case c.Retry.MaxAttempts <= 0:
 			return errors.New("max_attempts must be greater than zero")
-		case c.Retry.MaxAttempts != nil && c.Retry.WaitMin == nil || c.Retry.WaitMax == nil:
-			return errors.New("wait_min and wait_max must be set if max_attempts is set")
-		case (c.Retry.WaitMin != nil || c.Retry.WaitMax != nil) && c.Retry.MaxAttempts == nil:
-			return errors.New("max_attempts must be set if wait_min or wait_max is set")
-		case c.Retry.WaitMin != nil && c.Retry.WaitMax == nil:
-			return errors.New("wait_max must be set if wait_min is set")
-		case c.Retry.WaitMin == nil && c.Retry.WaitMax != nil:
-			return errors.New("wait_min must be set if wait_max is set")
-		case c.Retry.WaitMin != nil && c.Retry.WaitMax != nil && *c.Retry.WaitMin > *c.Retry.WaitMax:
+		case c.Retry.WaitMin > c.Retry.WaitMax:
 			return errors.New("wait_min must be less than or equal to wait_max")
 		}
 	}
