@@ -22,11 +22,11 @@ import (
 )
 
 func (m *MetricSet) eventMapping(data VMData) mapstr.M {
-
-	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
+	const bytesMultiplier = int64(1024 * 1024)
+	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * bytesMultiplier
 	usedCPU := data.VM.Summary.QuickStats.OverallCpuUsage
 	totalCPU := data.VM.Summary.Config.CpuReservation
-	totalMemory := int64(data.VM.Summary.Config.MemorySizeMB) * 1024 * 1024
+	totalMemory := int64(data.VM.Summary.Config.MemorySizeMB) * bytesMultiplier
 
 	freeCPU := max(0, totalCPU-usedCPU)
 	freeMemory := max(0, totalMemory-usedMemory)
@@ -46,7 +46,7 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 		"memory": mapstr.M{
 			"used": mapstr.M{
 				"guest": mapstr.M{"bytes": usedMemory},
-				"host":  mapstr.M{"bytes": int64(data.VM.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024},
+				"host":  mapstr.M{"bytes": int64(data.VM.Summary.QuickStats.HostMemoryUsage) * bytesMultiplier},
 			},
 			"total": mapstr.M{
 				"guest": mapstr.M{"bytes": totalMemory},
