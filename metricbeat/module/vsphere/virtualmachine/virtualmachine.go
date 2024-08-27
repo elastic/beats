@@ -128,7 +128,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	var vmt []mo.VirtualMachine
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
 	if err != nil {
-		return fmt.Errorf("virtualmachine:error in Retrieve: %w", err)
+		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
 
 	pc := property.DefaultCollector(c)
