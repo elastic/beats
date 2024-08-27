@@ -18,8 +18,6 @@
 package virtualmachine
 
 import (
-	"golang.org/x/exp/constraints"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -63,15 +61,12 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 	}
 	if len(data.NetworkNames) > 0 {
 		event["network_names"] = data.NetworkNames
+		event["network.names"] = data.NetworkNames
+		event["network.count"] = len(data.NetworkNames)
 	}
 	if len(data.DatastoreNames) > 0 {
 		event["datastore.names"] = data.DatastoreNames
+		event["datastore.count"] = len(data.DatastoreNames)
 	}
 	return event
-}
-func max[T constraints.Ordered](a T, b T) T {
-	if a > b {
-		return a
-	}
-	return b
 }

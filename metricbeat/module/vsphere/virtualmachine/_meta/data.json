@@ -15,46 +15,58 @@
     },
     "vsphere": {
         "virtualmachine": {
-          "os": "otherGuest",
+          "host.id": "host-30",
+          "datastore.count": 1,
+          "name": "PHX-NETLAB_to_PHX-VCF-IX-R1",
+          "network.count": 3,
           "memory": {
             "used": {
               "guest": {
-                "bytes": 0
+                "bytes": 256901120
               },
               "host": {
-                "bytes": 0
+                "bytes": 1290797056
               }
             },
             "total": {
               "guest": {
-                "bytes": 33554432
+                "bytes": 6442450944
               }
             },
             "free": {
               "guest": {
-                "bytes": 33554432
+                "bytes": 6185549824
               }
             }
           },
-          "name": "DC0_C0_RP0_VM1",
-          "uptime": 0,
           "status": "green",
-          "host.hostname": "DC0_C0_H2",
+          "os": "Other Linux (64-bit)",
+          "network.names": [
+            "Management Network - WLD1",
+            "vSphere vMotion -  WLD1",
+            "none"
+          ],
+          "datastore.names": [
+            "VxRail-Virtual-SAN-Datastore-247df533-ee20-4f0f-bc1d-5aad29a310fb"
+          ],
+          "uptime": 921104,
+          "host.hostname": "phx-w1c1-esxi03.lab.aheadaviation.com",
           "cpu": {
-            "used": {
-              "mhz": 0
-            },
             "total": {
               "mhz": 0
             },
             "free": {
               "mhz": 0
+            },
+            "used": {
+              "mhz": 80
             }
           },
-          "datastore_names": [
-            "LocalDS_0"
-          ],
-          "host.id": "host-58"
+          "network_names": [
+            "Management Network - WLD1",
+            "vSphere vMotion -  WLD1",
+            "none"
+          ]
         }
     }
 }

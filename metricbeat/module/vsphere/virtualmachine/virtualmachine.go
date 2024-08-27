@@ -226,20 +226,9 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	if len(vm.Network) == 0 {
 		return nil, errors.New("no networks found")
 	}
-	networkRefs := make([]types.ManagedObjectReference, 0, len(vm.Network))
-	for _, obj := range vm.Network {
-		if obj.Type == "Network" {
-			networkRefs = append(networkRefs, obj)
-		}
-	}
-
-	// If only "Distributed port group" was found, for example.
-	if len(networkRefs) == 0 {
-		return nil, errors.New("no networks found")
-	}
 
 	var nets []mo.Network
-	if err := pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets); err != nil {
+	if err := pc.Retrieve(ctx, vm.Network, []string{"name"}, &nets); err != nil {
 		return nil, fmt.Errorf("error retrieving network from virtual machine: %w", err)
 	}
 	outputNetworkNames := make([]string, 0, len(nets))

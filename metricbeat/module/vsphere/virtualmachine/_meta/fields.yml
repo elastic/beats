@@ -61,6 +61,28 @@
       type: keyword
       description: >
         Network names.
+    - name: datastore
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the datastore associated to this virtualmachine.
+        - name: count
+          type: long
+          description: >
+            Number of datastores associated to this virtualmachine.
+    - name: network
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the networks associated to this virtualmachine.
+        - name: count
+          type: long
+          description: >
+            Number of networks associated to this virtualmachine.
     - name: status
       type: keyword
       description: >
@@ -69,9 +91,5 @@
       type: long
       description: >
         The uptime of the VM in seconds.
-    - name: datastore.names
-      type: keyword
-      description: >
-        Datastore names associated with the virtual machine.
 
 
