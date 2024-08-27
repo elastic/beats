@@ -32,6 +32,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -50,6 +51,7 @@ type BeatProc struct {
 	RestartOnBeatOnExit bool
 	beatName            string
 	cmdMutex            sync.Mutex
+	waitingMutex        sync.Mutex
 	configFile          string
 	fullPath            string
 	logFileOffset       int64
@@ -202,7 +204,7 @@ func (b *BeatProc) Start(args ...string) {
 
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
-		// 1. Kill the Beat
+		// 1. Send an interrupt signal to the Beat
 		b.stopNonsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
@@ -252,17 +254,27 @@ func (b *BeatProc) startBeat() {
 	b.Process = cmd.Process
 }
 
-// waitBeatToExit blocks until the Beat exits, it returns
-// the process' exit code.
+// waitBeatToExit blocks until the Beat exits.
 // `startBeat` must be called before this method.
-func (b *BeatProc) waitBeatToExit() int {
+func (b *BeatProc) waitBeatToExit() {
+	if !b.waitingMutex.TryLock() {
+		// b.stopNonsynced must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+
 	processState, err := b.Process.Wait()
 	if err != nil {
-		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
-			b.beatName, err, processState.ExitCode())
+		exitCode := "unknown"
+		if processState != nil {
+			exitCode = strconv.Itoa(processState.ExitCode())
+		}
+
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
+			b.beatName, err, exitCode)
 	}
 
-	return processState.ExitCode()
+	return
 }
 
 // Stop stops the Beat process
@@ -284,6 +296,11 @@ func (b *BeatProc) stopNonsynced() {
 			b.Process.Pid, err)
 	}
 
+	if !b.waitingMutex.TryLock() {
+		// b.waitBeatToExit must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
 	ps, err := b.Process.Wait()
 	if err != nil {
 		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
