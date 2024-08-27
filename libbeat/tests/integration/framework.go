@@ -203,7 +203,7 @@ func (b *BeatProc) Start(args ...string) {
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
 		// 1. Kill the Beat
-		b.stopUnsynced()
+		b.stopNonsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
 		if b.RestartOnBeatOnExit {
@@ -270,12 +270,12 @@ func (b *BeatProc) waitBeatToExit() int {
 func (b *BeatProc) Stop() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
-	b.stopUnsynced()
+	b.stopNonsynced()
 }
 
-// stopUnsynced is the actual stop code, but without locking so it can be reused
+// stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
-func (b *BeatProc) stopUnsynced() {
+func (b *BeatProc) stopNonsynced() {
 	stopTimeout := 5 * time.Second
 
 	if err := b.Process.Signal(os.Interrupt); err != nil {
@@ -286,7 +286,7 @@ func (b *BeatProc) stopUnsynced() {
 	}
 
 	stoppedLog := fmt.Sprintf("%s stopped.", b.beatName)
-	b.WaitForLogs(fmt.Sprintf("%s stopped.", b.beatName), stopTimeout,
+	b.WaitForLogs(stoppedLog, stopTimeout,
 		fmt.Sprintf("log %q not found to ensure mockbeat stopped after %s",
 			stoppedLog, stopTimeout))
 }
