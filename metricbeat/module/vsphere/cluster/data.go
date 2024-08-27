@@ -24,15 +24,14 @@ import (
 )
 
 func (m *MetricSet) eventMapping(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
-	event := mapstr.M{
-		"das_config": mapstr.M{
-			"enabled": *cl.Configuration.DasConfig.Enabled,
-			"admission": mapstr.M{
-				"control": mapstr.M{
-					"enabled": *cl.Configuration.DasConfig.AdmissionControlEnabled,
-				},
-			},
-		},
+	event := mapstr.M{}
+
+	if cl.Configuration.DasConfig.Enabled != nil {
+		event.Put("das_config.enabled", *cl.Configuration.DasConfig.Enabled)
+	}
+
+	if cl.Configuration.DasConfig.AdmissionControlEnabled != nil {
+		event.Put("das_config.admission.control.enabled", *cl.Configuration.DasConfig.AdmissionControlEnabled)
 	}
 
 	event.Put("host.count", len(data.outputHsNames))

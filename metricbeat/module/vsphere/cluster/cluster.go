@@ -110,6 +110,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				m.Logger().Errorf("Failed to retrieve object from host: %w", err)
 			}
 
+			if clt[i].Configuration.DasConfig.AdmissionControlEnabled == nil {
+				m.Logger().Warnf("Metric das_config.admission.control.enabled not found")
+			}
+			if clt[i].Configuration.DasConfig.Enabled == nil {
+				m.Logger().Warnf("Metric das_config.enabled not found")
+			}
+
 			reporter.Event(mb.Event{
 				MetricSetFields: m.eventMapping(clt[i], assetNames),
 			})
