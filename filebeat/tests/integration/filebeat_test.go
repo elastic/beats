@@ -78,7 +78,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	require.Eventuallyf(t, func() bool {
 		f, err = os.Open(filebeatLogFile)
 		return err == nil
-	}, 10*time.Second, time.Millisecond, "could not read log file '%s'", filebeatLogFile)
+	}, 10*time.Second, 100*time.Millisecond, "could not read log file '%s'", filebeatLogFile)
 	defer f.Close()
 
 	r := bufio.NewScanner(f)

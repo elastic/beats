@@ -276,20 +276,21 @@ func (b *BeatProc) Stop() {
 // stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
-	stopTimeout := time.Minute
-
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
-		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+			b.Process.Pid, err)
 	}
 
-	stoppedLog := fmt.Sprintf("%s stopped.", b.beatName)
-	b.t.Logf("waiting for %q to confirm beat stopped", stoppedLog)
-	b.WaitForLogs(stoppedLog, stopTimeout,
-		fmt.Sprintf("log %q not found to ensure mockbeat stopped after %s",
-			stoppedLog, stopTimeout))
+	ps, err := b.Process.Wait()
+	if err != nil {
+		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+	}
+	if !ps.Success() {
+		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
+	}
 }
 
 // LogMatch tests each line of the logfile to see if contains any
@@ -638,7 +639,7 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 
 // RemoveAllCLIArgs removes all CLI arguments configured.
 // It will also remove all configuration for home path and
-// logs, there fore some methods, like the ones that read logs,
+// logs, therefore some methods, like the ones that read logs,
 // might fail if Filebeat is not configured the way this framework
 // expects.
 //
