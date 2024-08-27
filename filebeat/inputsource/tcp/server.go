@@ -91,5 +91,5 @@ func (s *Server) network() string {
 	if s.config.Network != "" {
 		return s.config.Network
 	}
-	return "tcp"
+	return networkTCP
 }

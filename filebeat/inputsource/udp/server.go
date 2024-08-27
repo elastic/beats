@@ -77,5 +77,5 @@ func (u *Server) network() string {
 	if u.config.Network != "" {
 		return u.config.Network
 	}
-	return "udp"
+	return networkUDP
 }
