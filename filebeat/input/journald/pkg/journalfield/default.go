@@ -85,4 +85,5 @@ var journaldEventFields = FieldConversion{
 	"_SOURCE_REALTIME_TIMESTAMP":  ignoredField, // saved in the registry
 	"__CURSOR":                    ignoredField, // saved in the registry
 	"__MONOTONIC_TIMESTAMP":       ignoredField, // saved in the registry
+	"__REALTIME_TIMESTAMP":        ignoredField, // dropped from the output, is used for the @timestamp
 }
