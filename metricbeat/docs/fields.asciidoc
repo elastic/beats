@@ -67440,7 +67440,7 @@ type: keyword
 *`vsphere.virtualmachine.host.hostname`*::
 +
 --
-Host name of the host.
+Hostname of the host.
 
 
 type: keyword

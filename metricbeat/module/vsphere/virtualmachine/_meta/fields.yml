@@ -11,7 +11,7 @@
     - name: host.hostname
       type: keyword
       description: >
-        Host name of the host.
+        Hostname of the host.
     - name: name
       type: keyword
       description: >

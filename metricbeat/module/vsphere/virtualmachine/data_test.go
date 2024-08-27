@@ -32,7 +32,7 @@ func TestEventMapping(t *testing.T) {
 
 	VirtualMachineTest := mo.VirtualMachine{
 		Summary: types.VirtualMachineSummary{
-			OverallStatus: "green",
+			OverallStatus: types.ManagedEntityStatus("green"),
 			Config: types.VirtualMachineConfigSummary{
 				Name:           "localhost.localdomain",
 				GuestFullName:  "otherGuest",
@@ -62,41 +62,51 @@ func TestEventMapping(t *testing.T) {
 
 	event := m.eventMapping(data)
 
-	// Test CPU values
-	cpuUsed, _ := event.GetValue("cpu.used.mhz")
-	assert.EqualValues(t, 30, cpuUsed)
+	// Expected event structure
+	expectedEvent := mapstr.M{
+		"name":          "localhost.localdomain",
+		"os":            "otherGuest",
+		"uptime":        int32(10),
+		"status":        types.ManagedEntityStatus("green"),
+		"host.id":       "host-1234",
+		"host.hostname": "test-host",
+		"cpu": mapstr.M{
+			"used":  mapstr.M{"mhz": int32(30)},
+			"total": mapstr.M{"mhz": int32(2294)},
+			"free":  mapstr.M{"mhz": int32(2264)},
+		},
+		"memory": mapstr.M{
+			"used": mapstr.M{
+				"guest": mapstr.M{
+					"bytes": int64(40 * 1024 * 1024),
+				},
+				"host": mapstr.M{
+					"bytes": int64(50 * 1024 * 1024),
+				},
+			},
+			"total": mapstr.M{
+				"guest": mapstr.M{
+					"bytes": int64(70 * 1024 * 1024),
+				},
+			},
+			"free": mapstr.M{
+				"guest": mapstr.M{
+					"bytes": int64(30 * 1024 * 1024),
+				},
+			},
+		},
+		"custom_fields": mapstr.M{
+			"customField1": "value1",
+			"customField2": "value2",
+		},
+		"network.count":   2,
+		"network.names":   []string{"network-1", "network-2"},
+		"network_names":   []string{"network-1", "network-2"},
+		"datastore.count": 2,
+		"datastore.names": []string{"ds1", "ds2"},
+	}
 
-	cpuTotal, _ := event.GetValue("cpu.total.mhz")
-	assert.EqualValues(t, 2294, cpuTotal)
+	// Assert that the output event matches the expected event
+	assert.Exactly(t, expectedEvent, event)
 
-	cpuFree, _ := event.GetValue("cpu.free.mhz")
-	assert.EqualValues(t, 2264, cpuFree)
-
-	// Test Memory values
-	memoryUsed, _ := event.GetValue("memory.used.guest.bytes")
-	assert.EqualValues(t, int64(40*1024*1024), memoryUsed)
-
-	memoryHostUsed, _ := event.GetValue("memory.used.host.bytes")
-	assert.EqualValues(t, int64(50*1024*1024), memoryHostUsed)
-
-	memoryTotal, _ := event.GetValue("memory.total.guest.bytes")
-	assert.EqualValues(t, int64(70*1024*1024), memoryTotal)
-
-	memoryFree, _ := event.GetValue("memory.free.guest.bytes")
-	assert.EqualValues(t, int64(30*1024*1024), memoryFree)
-
-	// Test custom fields
-	customField1, _ := event.GetValue("custom_fields.customField1")
-	assert.EqualValues(t, "value1", customField1)
-
-	customField2, _ := event.GetValue("custom_fields.customField2")
-	assert.EqualValues(t, "value2", customField2)
-
-	// Test network names
-	networkNames, _ := event.GetValue("network_names")
-	assert.ElementsMatch(t, []string{"network-1", "network-2"}, networkNames)
-
-	// Test datastore names
-	datastoreNames, _ := event.GetValue("datastore.names")
-	assert.ElementsMatch(t, []string{"ds1", "ds2"}, datastoreNames)
 }
