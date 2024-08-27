@@ -103,6 +103,8 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 	histograms := map[string]histogram{}
 	eventList := map[string]mb.Event{}
 
+	// NOTE(shmsr): Reason for pre-allocating the map with len(metrics)/2:
+	// https://github.com/elastic/beats/pull/40411#discussion_r1731734765
 	metricCounter := make(map[string]int64, len(metrics)/2)
 
 	for _, metric := range metrics {
@@ -134,7 +136,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				RootFields:   make(mapstr.M, 1),
+				RootFields:   make(mapstr.M),
 				ModuleFields: mapstr.M{},
 				Timestamp:    metric.Timestamp.Time(),
 			}

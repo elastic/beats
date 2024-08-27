@@ -40,6 +40,9 @@ func (p *remoteWriteEventGenerator) Stop()  {}
 
 func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
+
+	// NOTE(shmsr): Reason for pre-allocating the map with len(metrics)/2:
+	// https://github.com/elastic/beats/pull/40411#discussion_r1731734765
 	metricCounter := make(map[string]int64, len(metrics)/2)
 
 	for _, metric := range metrics {
@@ -65,7 +68,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				RootFields: make(mapstr.M, 1),
+				RootFields: make(mapstr.M),
 				ModuleFields: mapstr.M{
 					"metrics": mapstr.M{},
 				},
