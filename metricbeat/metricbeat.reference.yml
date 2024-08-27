@@ -1007,7 +1007,7 @@ metricbeat.modules:
 #------------------------------- VSphere Module -------------------------------
 - module: vsphere
   enabled: true
-  metricsets: ["datastore", "host", "virtualmachine"]
+  metricsets: ["cluster", "datastore", "host", "virtualmachine"]
   period: 10s
   hosts: ["https://localhost/sdk"]
 
