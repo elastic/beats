@@ -90,7 +90,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	// websocket client
 	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.log)
-	handleConnectionResponse(resp, s.log)
+	handleConnectionResponse(resp, s.metrics, s.log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.log.Errorw("failed to establish websocket connection", "error", err)
@@ -123,7 +123,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					}
 					// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
 					c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
-					handleConnectionResponse(resp, s.log)
+					handleConnectionResponse(resp, s.metrics, s.log)
 					if err != nil {
 						s.metrics.errorsTotal.Inc()
 						s.log.Errorw("failed to reconnect websocket connection", "error", err)
@@ -189,7 +189,7 @@ func isRetryableError(err error) bool {
 }
 
 // handleConnectionResponse logs the response body of the websocket connection.
-func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
+func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *logp.Logger) {
 	if resp != nil && resp.Body != nil {
 		var buf bytes.Buffer
 		defer resp.Body.Close()
@@ -197,6 +197,7 @@ func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
 		if log.Core().Enabled(zapcore.DebugLevel) {
 			const limit = 1e4
 			if _, err := io.CopyN(&buf, resp.Body, limit); err != nil && !errors.Is(err, io.EOF) {
+				metrics.errorsTotal.Inc()
 				log.Errorw("failed to read websocket response body", "error", err)
 				return
 			}
@@ -204,6 +205,7 @@ func handleConnectionResponse(resp *http.Response, log *logp.Logger) {
 
 		// discard the remaining part of the body and check for truncation.
 		if n, err := io.Copy(io.Discard, resp.Body); err != nil {
+			metrics.errorsTotal.Inc()
 			log.Errorw("failed to discard remaining response body", "error", err)
 		} else if n != 0 && buf.Len() != 0 {
 			buf.WriteString("... truncated")
