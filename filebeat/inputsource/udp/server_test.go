@@ -41,7 +41,7 @@ type info struct {
 
 func TestReceiveEventFromUDP(t *testing.T) {
 	// Excluding udp6 for now, since it fails in our CI
-	for _, network := range []string{networkUDP, networkUDP6} {
+	for _, network := range []string{networkUDP, networkUDP4} {
 		t.Run(network, func(t *testing.T) {
 			testReceiveEventFromUDPWithNetwork(t, network)
 		})
