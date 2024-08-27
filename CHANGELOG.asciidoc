@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 *Filebeat*
 
-- The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain upgrading to 8.15. See {issue}40608[40608]
+- The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.
 
 ==== Breaking changes
 
