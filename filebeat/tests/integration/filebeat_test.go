@@ -60,7 +60,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 	// 2. Create the log file
 	integration.GenerateLogFile(t, logFilePath, 10, false)
 
-	// 3. Write configuration file ans start Filebeat
+	// 3. Write configuration file and start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filebeatBasicConfig, logFilePath, tempDir))
 	filebeat.Start()
 

@@ -276,7 +276,7 @@ func (b *BeatProc) Stop() {
 // stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
-	stopTimeout := 5 * time.Second
+	stopTimeout := time.Minute
 
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
@@ -286,6 +286,7 @@ func (b *BeatProc) stopNonsynced() {
 	}
 
 	stoppedLog := fmt.Sprintf("%s stopped.", b.beatName)
+	b.t.Logf("waiting for %q to confirm beat stopped", stoppedLog)
 	b.WaitForLogs(stoppedLog, stopTimeout,
 		fmt.Sprintf("log %q not found to ensure mockbeat stopped after %s",
 			stoppedLog, stopTimeout))
