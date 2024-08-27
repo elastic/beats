@@ -201,6 +201,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
 - Bump version of elastic/toutoumomoma to remove internal forks of stdlib debug packages. {pull}40325[40325]
 - Refactor x-pack/filebeat/input/websocket for generalisation. {pull}40308[40308]
+- Add a configuration option for TCP/UDP network type. {issue}40407[40407] {pull}40623[40623]
 
 ==== Deprecated
 
