@@ -39,10 +39,10 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 	cmd := exec.Command("systemd-cat", "-t", syslogID)
 	w, err := cmd.StdinPipe()
 	if err != nil {
-		t.Fatalf("cannot get stdin pipe from systemd-cat: %s", err)
+		t.Errorf("cannot get stdin pipe from systemd-cat: %s", err)
 	}
 	if err := cmd.Start(); err != nil {
-		t.Fatalf("cannot start 'systemd-cat': %s", err)
+		t.Errorf("cannot start 'systemd-cat': %s", err)
 	}
 	defer func() {
 		// Make sure systemd-cat terminates successfully so the messages
@@ -95,7 +95,7 @@ func TestJournaldInput(t *testing.T) {
 	pidLine := filebeat.GetLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
 	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
-		t.Fatalf("could not parse PID log entry as JSON: %s", err)
+		t.Errorf("could not parse PID log entry as JSON: %s", err)
 	}
 
 	pid := 0

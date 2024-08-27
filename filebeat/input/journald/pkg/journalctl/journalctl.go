@@ -24,7 +24,6 @@ import (
 	"io"
 	"os/exec"
 	"strings"
-	"sync"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -37,7 +36,6 @@ type journalctl struct {
 	stdout   io.ReadCloser
 	stderr   io.ReadCloser
 
-	wg       sync.WaitGroup
 	logger   *logp.Logger
 	canceler input.Canceler
 }
@@ -66,11 +64,9 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
 	}
 
-	jctl.wg.Add(1)
 	go func() {
 		defer jctl.logger.Debug("stderr reader goroutine done")
 		defer close(jctl.errChan)
-		defer jctl.wg.Done()
 		reader := bufio.NewReader(jctl.stderr)
 		for {
 			line, err := reader.ReadString('\n')
@@ -82,16 +78,14 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 				return
 			}
 
-			jctl.errChan <- fmt.Sprintf("Journalctl wrote to stderr: %s", line)
+			logger.Errorf("Journalctl wrote to stderr: %s", line)
 		}
 	}()
 
 	// Goroutine to read events from stdout
-	jctl.wg.Add(1)
 	go func() {
 		defer jctl.logger.Debug("stdout reader goroutine done")
 		defer close(jctl.dataChan)
-		defer jctl.wg.Done()
 		reader := bufio.NewReader(jctl.stdout)
 		for {
 			data, err := reader.ReadBytes('\n')
@@ -128,8 +122,11 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 	return &jctl, nil
 }
 
+// Kill Terminates the journalctl process using a SIGKILL.
 func (j *journalctl) Kill() error {
-	return j.cmd.Process.Kill()
+	j.logger.Debug("sending SIGKILL to journalctl")
+	err := j.cmd.Process.Kill()
+	return err
 }
 
 func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {

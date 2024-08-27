@@ -18,12 +18,10 @@
 package journalctl
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -81,7 +79,6 @@ type Reader struct {
 
 	logger   *logp.Logger
 	canceler input.Canceler
-	wg       sync.WaitGroup
 
 	jctl        Jctl
 	jctlFactory JctlFactory
@@ -189,32 +186,12 @@ func New(
 // goroutines to return, the canceller passed to `New` should
 // be cancelled before `Close` is called
 func (r *Reader) Close() error {
-	// Try reading stderr until EOF. If there is too much data to read,
-	// timeout after 1 minute and proceed to kill the journalctl process.
-	readStderrTimeout, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
 	r.logger.Infof("shutting down journalctl, waiting up to: %s", time.Minute)
-ReadErrForLoop:
-	for {
-		select {
-		case <-readStderrTimeout.Done():
-			r.logger.Error("timedout while reading stderr from journalctl, the process will be killed")
-			break ReadErrForLoop
-		case stderrLine, isOpen := <-r.jctl.Error():
-			r.logger.Error(stderrLine)
-			if !isOpen {
-				break ReadErrForLoop
-			}
-		}
-	}
 
 	if err := r.jctl.Kill(); err != nil {
-		return fmt.Errorf("cannot stop journalctl: %w", err)
+		return fmt.Errorf("error stopping journalctl: %w", err)
 	}
 
-	r.logger.Debug("waiting for all goroutines to finish")
-	r.wg.Wait()
 	return nil
 }
 
