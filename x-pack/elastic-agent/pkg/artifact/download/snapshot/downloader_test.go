@@ -51,9 +51,8 @@ func Test_checkResponse(t *testing.T) {
 				},
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusInternalServerError), "error should contain http status code")
-				retval = assert.ErrorContains(t, err, `{"not feeling": "too well"}`, "error should contain response body") && retval
-				return retval
+				return assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusInternalServerError), "error should contain http status code") &&
+					assert.ErrorContains(t, err, `{"not feeling": "too well"}`, "error should contain response body")
 			},
 		},
 		{
@@ -69,9 +68,8 @@ func Test_checkResponse(t *testing.T) {
 				},
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusBadGateway), "error should contain http status code")
-				retval = assert.ErrorContains(t, err, `{"bad": "gateway"}`, "error should contain response body") && retval
-				return retval
+				return assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusBadGateway), "error should contain http status code") &&
+					assert.ErrorContains(t, err, `{"bad": "gateway"}`, "error should contain response body")
 			},
 		},
 		{
@@ -103,9 +101,8 @@ func Test_checkResponse(t *testing.T) {
 				},
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				retval := assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusGatewayTimeout), "error should contain http status code")
-				retval = assert.ErrorContains(t, err, `{"gateway": "never got back to me"}`, "error should contain response body") && retval
-				return retval
+				return assert.ErrorContains(t, err, strconv.Itoa(gohttp.StatusGatewayTimeout), "error should contain http status code") &&
+					assert.ErrorContains(t, err, `{"gateway": "never got back to me"}`, "error should contain response body")
 			},
 		},
 		{
@@ -121,9 +118,8 @@ func Test_checkResponse(t *testing.T) {
 				},
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				retval := assert.ErrorContains(t, err, "application/xml")
-				retval = assert.ErrorContains(t, err, `<?xml version='1.0' encoding='UTF-8'?><note>Those who cannot remember the past are condemned to repeat it.</note>`)
-				return retval
+				return assert.ErrorContains(t, err, "application/xml") &&
+					assert.ErrorContains(t, err, `<?xml version='1.0' encoding='UTF-8'?><note>Those who cannot remember the past are condemned to repeat it.</note>`)
 			},
 		},
 		{
@@ -139,9 +135,8 @@ func Test_checkResponse(t *testing.T) {
 				},
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				retval := assert.ErrorContains(t, err, "text/html")
-				retval = assert.ErrorContains(t, err, `<!DOCTYPE html><html><body>Hello world!</body></html>`)
-				return retval
+				return assert.ErrorContains(t, err, "text/html") &&
+					assert.ErrorContains(t, err, `<!DOCTYPE html><html><body>Hello world!</body></html>`)
 			},
 		},
 	}
