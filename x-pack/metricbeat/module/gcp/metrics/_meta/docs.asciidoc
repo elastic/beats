@@ -45,6 +45,12 @@ services under "Google Cloud metrics", but does not work for other services
 (`kubernetes` aka GKE for example).
 This option allow to override the default and specify an arbitrary metric prefix.
 
+* *reducer*: A Reducer operation describes how to aggregate data points from multiple 
+time series into a single time series, where the value of each data point in the resulting series 
+is a function of all the already aligned values in the input time series. Default value is REDUCE_NONE but 
+other values supported are REDUCE_MEAN, REDUCE_MIN, REDUCE_MAX etc. 
+Please check https://cloud.google.com/monitoring/api/ref_v3/rpc/google.monitoring.v3#reducer[Reducers] for the full list.
+
 [float]
 === Example Configuration
 * `metrics` metricset is enabled to collect metrics from all zones under
