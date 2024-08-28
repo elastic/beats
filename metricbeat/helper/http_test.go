@@ -321,7 +321,7 @@ func TestRefreshAuthorizationHeader(t *testing.T) {
 	expected := fmt.Sprintf("Bearer %s", firstToken)
 	assert.Equal(t, expected, getAuth(helper))
 
-	secondToken := "token-1"
+	secondToken := "token-2"
 	err = os.WriteFile(bearerFilePath, []byte(secondToken), 0644)
 	assert.NoError(t, err)
 
