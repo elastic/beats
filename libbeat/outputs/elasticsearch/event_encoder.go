@@ -151,3 +151,10 @@ func (e *encodedEvent) setDeadLetter(
 	}
 	e.encoding = []byte(deadLetterReencoding.String())
 }
+
+// String converts e.encoding to string and returns it.
+// The goal of this method is to provide an easy way to log
+// the event encoded.
+func (e *encodedEvent) String() string {
+	return string(e.encoding)
+}
