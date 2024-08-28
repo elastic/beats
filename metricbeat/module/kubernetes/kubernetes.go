@@ -164,7 +164,6 @@ func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 		// If we got an unauthorized error from our HTTP request, it is possible the token has expired.
 		// We should update the Authorization header in that case. We only try this for the first time
 		// we get HTTP 401 to avoid getting in a loop in case the cause of the error is something different.
-		// For example, an incorrect bearer token file in the configuration.
 		if statsCache.lastFetchErr != nil && strings.Contains(statsCache.lastFetchErr.Error(), errorMsg) {
 			if _, err := http.RefreshAuthorizationHeader(); err == nil {
 				statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
