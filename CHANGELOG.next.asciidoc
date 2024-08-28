@@ -54,7 +54,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
+- Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
+- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 
 *Osquerybeat*
 
@@ -106,10 +110,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow port number 0 in the community ID flowhash processor {pull}40259[40259]
 - Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 - Update Go version to 1.22.6. {pull}40528[40528]
+- Aborts all active connections for Elasticsearch output. {pull}40572[40572]
+- Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
 
 *Auditbeat*
 
 - Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
+- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 
 *Filebeat*
@@ -153,6 +160,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
 - Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
 - The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
+- Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
+- awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
 
 *Heartbeat*
 
@@ -180,6 +189,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 
 *Osquerybeat*
 
@@ -356,13 +366,3 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
