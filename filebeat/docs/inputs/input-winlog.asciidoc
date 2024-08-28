@@ -50,7 +50,6 @@ configured outputs, and waits for an acknowledgement from the outputs before
 reading additional event log records.
 
 [float]
-[[configuration-winlogbeat-options-event_logs-name]]
 ==== `name`
 
 The name of the event log to monitor. It must
@@ -369,7 +368,7 @@ Example:
 --------------------------------------------------------------------------------
 
 [float]
-[[winlogbeat-configuration-fields]]
+[[winlog-configuration-fields]]
 ==== `fields`
 
 Optional fields that you can specify to add additional information to the
@@ -392,7 +391,7 @@ will be overwritten by the value declared here.
 [float]
 ==== `fields_under_root`
 
-If this option is set to true, the custom <<winlogbeat-configuration-fields,fields>>
+If this option is set to true, the custom <<winlog-configuration-fields,fields>>
 are stored as top-level fields in the output document instead of being grouped
 under a `fields` sub-dictionary. If the custom field names conflict with other
 field names added by {beatname_uc}, then the custom fields overwrite the other
@@ -441,7 +440,7 @@ log files where you want to read the whole file then exit.
 
 This selects the event log reader implementation that is used to read events
 from the Windows APIs. You should only set this option when testing experimental
-features. When the value is set to `wineventlog-experimental` Winlogbeat will
+features. When the value is set to `wineventlog-experimental` {beatname_uc} will
 replace the default event log reader with the **experimental** implementation.
 We are evaluating this implementation to see if it can provide increased
 performance and reduce CPU usage. *{vista_and_newer}*
