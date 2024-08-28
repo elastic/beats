@@ -189,7 +189,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 
 		reporter.Event(mb.Event{
-			MetricSetFields: m.eventMapping(data),
+			MetricSetFields: m.mapEvent(data),
 		})
 	}
 

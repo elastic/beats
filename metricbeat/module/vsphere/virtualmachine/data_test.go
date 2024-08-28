@@ -60,7 +60,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.eventMapping(data)
+	event := m.mapEvent(data)
 
 	// Expected event structure
 	expectedEvent := mapstr.M{
@@ -95,14 +95,18 @@ func TestEventMapping(t *testing.T) {
 				},
 			},
 		},
+		"network": mapstr.M{
+			"count": 2,
+		},
+		"datastore": mapstr.M{
+			"count": 2,
+		},
 		"custom_fields": mapstr.M{
 			"customField1": "value1",
 			"customField2": "value2",
 		},
-		"network.count":   2,
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
-		"datastore.count": 2,
 		"datastore.names": []string{"ds1", "ds2"},
 	}
 

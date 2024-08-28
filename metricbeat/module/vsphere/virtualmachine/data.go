@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(data VMData) mapstr.M {
+func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	const bytesMultiplier = int64(1024 * 1024)
 	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * bytesMultiplier
 	usedCPU := data.VM.Summary.QuickStats.OverallCpuUsage
@@ -55,6 +55,12 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 				"guest": mapstr.M{"bytes": freeMemory},
 			},
 		},
+		"network": mapstr.M{
+			"count": len(data.NetworkNames),
+		},
+		"datastore": mapstr.M{
+			"count": len(data.DatastoreNames),
+		},
 	}
 	if len(data.CustomFields) > 0 {
 		event["custom_fields"] = data.CustomFields
@@ -62,11 +68,9 @@ func (m *MetricSet) eventMapping(data VMData) mapstr.M {
 	if len(data.NetworkNames) > 0 {
 		event["network_names"] = data.NetworkNames
 		event["network.names"] = data.NetworkNames
-		event["network.count"] = len(data.NetworkNames)
 	}
 	if len(data.DatastoreNames) > 0 {
 		event["datastore.names"] = data.DatastoreNames
-		event["datastore.count"] = len(data.DatastoreNames)
 	}
 	return event
 }

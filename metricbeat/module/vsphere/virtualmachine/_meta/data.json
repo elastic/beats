@@ -15,58 +15,58 @@
     },
     "vsphere": {
         "virtualmachine": {
-          "host.id": "host-30",
-          "datastore.count": 1,
-          "name": "PHX-NETLAB_to_PHX-VCF-IX-R1",
-          "network.count": 3,
-          "memory": {
-            "used": {
-              "guest": {
-                "bytes": 256901120
+            "network.names": [
+              "PROD_VCF"
+            ],
+            "os": "Microsoft Windows 10 (64-bit)",
+            "datastore": {
+              "count": 1
+            },
+            "memory": {
+              "used": {
+                "guest": {
+                  "bytes": 0
+                },
+                "host": {
+                  "bytes": 0
+                }
               },
-              "host": {
-                "bytes": 1290797056
+              "total": {
+                "guest": {
+                  "bytes": 4294967296
+                }
+              },
+              "free": {
+                "guest": {
+                  "bytes": 4294967296
+                }
               }
             },
-            "total": {
-              "guest": {
-                "bytes": 6442450944
+            "network": {
+              "count": 1
+            },
+            "host.hostname": "phx-w1c1",
+            "name": "phx-14",
+            "cpu": {
+              "free": {
+                "mhz": 0
+              },
+              "used": {
+                "mhz": 0
+              },
+              "total": {
+                "mhz": 0
               }
             },
-            "free": {
-              "guest": {
-                "bytes": 6185549824
-              }
-            }
-          },
-          "status": "green",
-          "os": "Other Linux (64-bit)",
-          "network.names": [
-            "Management Network - WLD1",
-            "vSphere vMotion -  WLD1",
-            "none"
-          ],
-          "datastore.names": [
-            "VxRail-Virtual-SAN-Datastore-247df533-ee20-4f0f-bc1d-5aad29a310fb"
-          ],
-          "uptime": 921104,
-          "host.hostname": "phx-w1c1-esxi03.lab.aheadaviation.com",
-          "cpu": {
-            "total": {
-              "mhz": 0
-            },
-            "free": {
-              "mhz": 0
-            },
-            "used": {
-              "mhz": 80
-            }
-          },
-          "network_names": [
-            "Management Network - WLD1",
-            "vSphere vMotion -  WLD1",
-            "none"
-          ]
+            "uptime": 0,
+            "status": "green",
+            "network_names": [
+              "PROD_VCF"
+            ],
+            "datastore.names": [
+              "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
+            ],
+            "host.id": "host-20"
+          }
         }
     }
-}
