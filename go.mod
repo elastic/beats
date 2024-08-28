@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.22.5
+go 1.22
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
@@ -132,7 +132,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
+	github.com/vmware/govmomi v0.39.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.1
 	go.etcd.io/bbolt v1.3.10
@@ -193,7 +193,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.8.1
-	github.com/elastic/elastic-agent-libs v0.9.15
+	github.com/elastic/elastic-agent-libs v0.10.0
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff

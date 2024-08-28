@@ -10,11 +10,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Update Go version to 1.22.5. {pull}40082[40082]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
-- Elevate effective capability set to match the Permitted set for agentbeat {pull}40466[40466]
 - Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
+- Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
 
 *Auditbeat*
 
@@ -55,6 +54,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
+- Update metrics for the vSphere Host metricset. {pull}40429[40429]
 
 *Osquerybeat*
 
@@ -103,10 +103,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 - Rename the field "apache2.module.error" to "apache.module.error" in Apache error visualization. {issue}39480[39480] {pull}39481[39481]
 - Validate config of the `replace` processor {pull}40047[40047]
+- Allow port number 0 in the community ID flowhash processor {pull}40259[40259]
 - Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
+- Update Go version to 1.22.6. {pull}40528[40528]
 
 *Auditbeat*
 
+- Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
 
 
 *Filebeat*
@@ -149,6 +152,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix crashes in the journald input. {pull}40061[40061]
 - Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
 - Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
+- The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
 
 *Heartbeat*
 
