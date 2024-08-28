@@ -8,26 +8,31 @@
       type: keyword
       description: Shell Id.
       example: Microsoft Powershell
+      overwrite: true
 
     - name: pipeline_id
       type: keyword
       description: Pipeline id.
       example: "1"
+      overwrite: true
 
     - name: runspace_id
       type: keyword
       description: Runspace id.
       example: "4fa9074d-45ab-4e53-9195-e91981ac2bbb"
+      overwrite: true
 
     - name: sequence
       type: long
       description: Sequence number of the powershell execution.
       example: 1
+      overwrite: true
 
     - name: total
       type: long
       description: Total number of messages in the sequence.
       example: 10
+      overwrite: true
 
     - name: command
       type: group
@@ -37,48 +42,57 @@
           type: keyword
           description: Path of the executed command.
           example: "C:\\Windows\\system32\\cmd.exe"
+          overwrite: true
 
         - name: name
           type: keyword
           description: Name of the executed command.
           example: "cmd.exe"
+          overwrite: true
 
         - name: type
           type: keyword
           description: Type of the executed command.
           example: Application
+          overwrite: true
 
         - name: value
           type: text
           description: The invoked command.
           example: Import-LocalizedData  LocalizedData -filename ArchiveResources
+          overwrite: true
 
         - name: invocation_details
           type: array
           description: >
             An array of objects containing detailed information of the executed command.
+          overwrite: true
 
         - name: invocation_details.type
           type: keyword
           description: The type of detail.
           example: CommandInvocation
+          overwrite: true
 
         - name: invocation_details.related_command
           type: keyword
           description: The command to which the detail is related to.
           example: Add-Type
+          overwrite: true
 
         - name: invocation_details.name
           type: keyword
           description: >
             Only used for ParameterBinding detail type. Indicates the parameter name.
           example: AssemblyName
+          overwrite: true
 
         - name: invocation_details.value
           type: text
           description: >
             The value of the detail. The meaning of it will depend on the detail type.
           example: System.IO.Compression.FileSystem
+          overwrite: true
 
     - name: connected_user
       type: group
@@ -88,11 +102,13 @@
           type: keyword
           description: User domain.
           example: VAGRANT
+          overwrite: true
 
         - name: name
           type: keyword
           description: User name.
           example: vagrant
+          overwrite: true
 
     - name: engine
       type: group
@@ -102,18 +118,21 @@
           type: keyword
           description: Version of the PowerShell engine version used to execute the command.
           example: "5.1.17763.1007"
+          overwrite: true
 
         - name: previous_state
           type: keyword
           description: >
             Previous state of the PowerShell engine.
           example: Available
+          overwrite: true
 
         - name: new_state
           type: keyword
           description: >
             New state of the PowerShell engine.
           example: Stopped
+          overwrite: true
 
     - name: file
       type: group
@@ -123,6 +142,7 @@
           type: keyword
           description: Id of the executed script block.
           example: "50d2dbda-7361-4926-a94d-d9eadfdb43fa"
+          overwrite: true
 
         - name: script_block_text
           type: text
@@ -137,11 +157,13 @@
           description: >
             Text of the executed script block.
           example: ".\\a_script.ps1"
+          overwrite: true
 
     - name: process.executable_version
       type: keyword
       description: Version of the engine hosting process executable.
       example: "5.1.17763.1007"
+      overwrite: true
 
     - name: provider
       type: group
@@ -152,9 +174,11 @@
           description: >
             New state of the PowerShell provider.
           example: Active
+          overwrite: true
 
         - name: name
           type: keyword
           description: >
             Provider name.
           example: Variable
+          overwrite: true
