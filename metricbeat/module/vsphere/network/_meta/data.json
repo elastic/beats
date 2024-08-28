@@ -1,27 +1,38 @@
 {
     "@timestamp": "2024-08-09T05:42:55.582Z",
     "service": {
-      "address": "https://localhost:8989/sdk",
-      "type": "vsphere"
+        "address": "https://localhost:8989/sdk",
+        "type": "vsphere"
     },
     "event": {
-      "duration": 110445057,
-      "dataset": "vsphere.network",
-      "module": "vsphere"
+        "duration": 110445057,
+        "dataset": "vsphere.network",
+        "module": "vsphere"
     },
     "metricset": {
-      "period": 10000,
-      "name": "network"
+        "period": 10000,
+        "name": "network"
     },
     "vsphere": {
-      "network": {
-        "type": "Network",
-        "name": "VM Network",
-        "status": "green",
-        "accessible": true,
-        "config": {
-          "status": "green"
+        "network": {
+            "vm": {
+                "names": [
+                  "DC0_H0_VM0", 
+                  "DC0_H0_VM1"
+                ],
+                "count": 2
+            },
+            "name": "VM Network",
+            "status": "green",
+            "accessible": true,
+            "config": {
+                "status": "green"
+            },
+            "type": "Network",
+            "host": {
+                "names": ["DC0_H0"],
+                "count": 1
+            }
         }
-      }
     }
-  }
+}
