@@ -23,8 +23,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -188,7 +188,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.name, resp.Status)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // FetchScanner returns a Scanner for the content.
@@ -235,7 +235,7 @@ func (h *HTTP) RefreshAuthorizationHeader() (bool, error) {
 func getAuthHeaderFromToken(path string) (string, error) {
 	var token string
 
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("reading bearer token file: %w", err)
 	}
