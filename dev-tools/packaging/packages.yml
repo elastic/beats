@@ -673,7 +673,7 @@ shared:
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: 'registry.access.redhat.com/ubi9/ubi-minimal:9.3'
+      from: 'registry.access.redhat.com/ubi9/ubi-minimal:9.4'
 
   - &elastic_docker_spec
     extra_vars:
