@@ -24,13 +24,38 @@ import (
 )
 
 func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
+	var e beat.Event
 	switch flow.Type {
 	case record.Flow:
-		return flowToBeatEvent(flow, internalNetworks)
+		e = flowToBeatEvent(flow, internalNetworks)
 	case record.Options:
-		return optionsToBeatEvent(flow)
+		e = optionsToBeatEvent(flow)
 	default:
-		return toBeatEventCommon(flow)
+		e = toBeatEventCommon(flow)
+	}
+
+	normaliseIPFields(e.Fields)
+	return e
+}
+
+// normaliseIPFields normalises net.IP fields in the given map from []byte to string. Note that
+// this function mutates the given map and relies on the fact that every net.IP field is direct
+// entry in the map. net.IP fields that do not meet the former convention, such being part of a struct,
+// etc., are not normalised.
+func normaliseIPFields(fields mapstr.M) {
+	for key, value := range fields {
+		switch valueType := value.(type) {
+		case net.IP:
+			fields[key] = valueType.String()
+		case []net.IP:
+			stringIPs := make([]string, len(valueType))
+			for i, ip := range valueType {
+				stringIPs[i] = ip.String()
+			}
+			fields[key] = stringIPs
+		case mapstr.M:
+			normaliseIPFields(valueType)
+		}
 	}
 }
 
