@@ -692,7 +692,7 @@ filebeat.inputs:
 ----
 +
 
-With this configuration, filebeat avoids polling and utilize SQS notifications to extract logs from the S3 bucket.
+With this configuration, filebeat avoids polling and utilizes SQS notifications to extract logs from the S3 bucket.
 
 [float]
 === S3 -> SNS -> SQS setup
