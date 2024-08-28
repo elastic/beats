@@ -70,7 +70,7 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestNetworkMetricSetData(t *testing.T) {
-	model := simulator.ESX()
+	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })

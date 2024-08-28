@@ -104,19 +104,19 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 	}
 
 	pc := property.DefaultCollector(c)
-	for _, network := range networks {
+	for i := range networks {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			assetNames, err := getAssetNames(ctx, pc, &network)
+			assetNames, err := getAssetNames(ctx, pc, &networks[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from network %s: %v", network.Name, err)
+				m.Logger().Errorf("Failed to retrieve object from network %s: %v", networks[i].Name, err)
 				continue
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(network, &metricData{assetsName: assetNames}),
+				MetricSetFields: m.mapEvent(networks[i], &metricData{assetsName: assetNames}),
 			})
 		}
 	}

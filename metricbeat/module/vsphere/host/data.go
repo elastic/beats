@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
+func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
 		"status": hs.Summary.OverallStatus,
@@ -66,7 +66,7 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
 	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
-		event.Put("disk.capacity.usage.bytes", val.(int64)*1000)
+		event.Put("disk.capacity.usage.bytes", val.(int64)*1024)
 	}
 	if val, exist := perfMetricMap["disk.deviceLatency.average"]; exist {
 		event.Put("disk.devicelatency.average.ms", val)
@@ -75,23 +75,23 @@ func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) 
 		event.Put("disk.latency.total.ms", val)
 	}
 	if val, exist := perfMetricMap["disk.usage.average"]; exist {
-		event.Put("disk.total.bytes", val.(int64)*1000)
+		event.Put("disk.total.bytes", val.(int64)*1024)
 	}
 	if val, exist := perfMetricMap["disk.read.average"]; exist {
-		event.Put("disk.read.bytes", val.(int64)*1000)
+		event.Put("disk.read.bytes", val.(int64)*1024)
 	}
 	if val, exist := perfMetricMap["disk.write.average"]; exist {
-		event.Put("disk.write.bytes", val.(int64)*1000)
+		event.Put("disk.write.bytes", val.(int64)*1024)
 	}
 
 	if val, exist := perfMetricMap["net.transmitted.average"]; exist {
-		event.Put("network.bandwidth.transmitted.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.transmitted.bytes", val.(int64)*1024)
 	}
 	if val, exist := perfMetricMap["net.received.average"]; exist {
-		event.Put("network.bandwidth.received.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.received.bytes", val.(int64)*1024)
 	}
 	if val, exist := perfMetricMap["net.usage.average"]; exist {
-		event.Put("network.bandwidth.total.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.total.bytes", val.(int64)*1024)
 	}
 
 	if val, exist := perfMetricMap["net.packetsTx.summation"]; exist {

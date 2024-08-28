@@ -27,7 +27,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *MetricSet
+	var m *HostMetricSet
 	var HostSystemTest = mo.HostSystem{
 		Summary: types.HostListSummary{
 			Host: &types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},
@@ -73,7 +73,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.eventMapping(HostSystemTest, &metricDataTest)
+	event := m.mapEvent(HostSystemTest, &metricDataTest)
 
 	cpuUsed, _ := event.GetValue("cpu.used.mhz")
 	assert.EqualValues(t, 67, cpuUsed)
@@ -95,24 +95,24 @@ func TestEventMapping(t *testing.T) {
 
 	// New asserts for PerformanceMetricsTest
 	diskCapacityUsage, _ := event.GetValue("disk.capacity.usage.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["disk.capacity.usage.average"].(int64)*1000, diskCapacityUsage)
+	assert.EqualValues(t, metricDataTest.perfMetrics["disk.capacity.usage.average"].(int64)*1024, diskCapacityUsage)
 	diskDevicelatency, _ := event.GetValue("disk.devicelatency.average.ms")
 	assert.EqualValues(t, metricDataTest.perfMetrics["disk.deviceLatency.average"], diskDevicelatency)
 	diskLatency, _ := event.GetValue("disk.latency.total.ms")
 	assert.EqualValues(t, metricDataTest.perfMetrics["disk.maxTotalLatency.latest"], diskLatency)
 	diskTotal, _ := event.GetValue("disk.total.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["disk.usage.average"].(int64)*1000, diskTotal)
+	assert.EqualValues(t, metricDataTest.perfMetrics["disk.usage.average"].(int64)*1024, diskTotal)
 	diskRead, _ := event.GetValue("disk.read.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["disk.read.average"].(int64)*1000, diskRead)
+	assert.EqualValues(t, metricDataTest.perfMetrics["disk.read.average"].(int64)*1024, diskRead)
 	diskWrite, _ := event.GetValue("disk.write.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["disk.write.average"].(int64)*1000, diskWrite)
+	assert.EqualValues(t, metricDataTest.perfMetrics["disk.write.average"].(int64)*1024, diskWrite)
 
 	networkBandwidthTransmitted, _ := event.GetValue("network.bandwidth.transmitted.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["net.transmitted.average"].(int64)*1000, networkBandwidthTransmitted)
+	assert.EqualValues(t, metricDataTest.perfMetrics["net.transmitted.average"].(int64)*1024, networkBandwidthTransmitted)
 	networkBandwidthReceived, _ := event.GetValue("network.bandwidth.received.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["net.received.average"].(int64)*1000, networkBandwidthReceived)
+	assert.EqualValues(t, metricDataTest.perfMetrics["net.received.average"].(int64)*1024, networkBandwidthReceived)
 	networkBandwidthTotal, _ := event.GetValue("network.bandwidth.total.bytes")
-	assert.EqualValues(t, metricDataTest.perfMetrics["net.usage.average"].(int64)*1000, networkBandwidthTotal)
+	assert.EqualValues(t, metricDataTest.perfMetrics["net.usage.average"].(int64)*1024, networkBandwidthTotal)
 	networkPacketsTransmitted, _ := event.GetValue("network.packets.transmitted.count")
 	assert.EqualValues(t, metricDataTest.perfMetrics["net.packetsTx.summation"], networkPacketsTransmitted)
 	networkPacketsReceived, _ := event.GetValue("network.packets.received.count")
