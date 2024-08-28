@@ -17,7 +17,7 @@
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -37,7 +37,7 @@
   #ssl.key: "/etc/pki/server/cert.key"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name

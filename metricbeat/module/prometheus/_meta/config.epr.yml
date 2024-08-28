@@ -11,7 +11,7 @@
   password: "secret"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # This can be used for service account based authorization:
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -32,7 +32,7 @@
   port: "9201"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  count_metrics: false
+  metrics_count: false
 
   # Secure settings for the server using TLS/SSL:
   ssl.enabled: false

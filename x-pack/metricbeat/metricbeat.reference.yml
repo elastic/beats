@@ -1326,7 +1326,7 @@ metricbeat.modules:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -1346,7 +1346,7 @@ metricbeat.modules:
   #ssl.key: "/etc/pki/server/cert.key"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -1400,7 +1400,7 @@ metricbeat.modules:
   #password: "secret"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # This can be used for service account based authorization:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -1415,7 +1415,7 @@ metricbeat.modules:
 #  port: "9201"
 
   # Count number of metrics present in Elasticsearch document (default: false)
-  #count_metrics: false
+  #metrics_count: false
 
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"

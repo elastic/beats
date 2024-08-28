@@ -27,12 +27,12 @@ import (
 )
 
 // DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
-func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, countMetrics bool) (RemoteWriteEventsGenerator, error) {
-	return &remoteWriteEventGenerator{countMetrics: countMetrics}, nil
+func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, metricsCount bool) (RemoteWriteEventsGenerator, error) {
+	return &remoteWriteEventGenerator{metricsCount: metricsCount}, nil
 }
 
 type remoteWriteEventGenerator struct {
-	countMetrics bool
+	metricsCount bool
 }
 
 func (p *remoteWriteEventGenerator) Start() {}
@@ -84,7 +84,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
 
-		if p.countMetrics {
+		if p.metricsCount {
 			metricCounter[labelsHash]++
 			e.RootFields["metrics_count"] = metricCounter[labelsHash]
 		}

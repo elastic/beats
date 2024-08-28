@@ -5,4 +5,4 @@ remove_fields_from_comparison: ["prometheus.labels.instance"]
 module:
   use_types: true
   rate_counters: true
-  count_metrics: true
+  metrics_count: true

@@ -52,7 +52,7 @@ type RemoteWriteEventsGenerator interface {
 }
 
 // RemoteWriteEventsGeneratorFactory creates a RemoteWriteEventsGenerator when instanciating a metricset
-type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet, countMetrics bool) (RemoteWriteEventsGenerator, error)
+type RemoteWriteEventsGeneratorFactory func(ms mb.BaseMetricSet, metricsCount bool) (RemoteWriteEventsGenerator, error)
 
 type MetricSet struct {
 	mb.BaseMetricSet
@@ -69,7 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	promEventsGen, err := DefaultRemoteWriteEventsGeneratorFactory(base, config.CountMetrics)
+	promEventsGen, err := DefaultRemoteWriteEventsGeneratorFactory(base, config.MetricsCount)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb
 			return nil, err
 		}
 
-		promEventsGen, err := genFactory(base, config.CountMetrics)
+		promEventsGen, err := genFactory(base, config.MetricsCount)
 		if err != nil {
 			return nil, err
 		}

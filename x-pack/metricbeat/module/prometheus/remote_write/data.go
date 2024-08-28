@@ -36,7 +36,7 @@ type histogram struct {
 	metricName string
 }
 
-func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool) (rw.RemoteWriteEventsGenerator, error) {
+func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, metricsCount bool) (rw.RemoteWriteEventsGenerator, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool)
 		g := remoteWriteTypedGenerator{
 			counterCache: counters,
 			rateCounters: config.RateCounters,
-			countMetrics: countMetrics,
+			metricsCount: metricsCount,
 		}
 
 		var err error
@@ -67,11 +67,11 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool)
 		return &g, nil
 	}
 
-	return rw.DefaultRemoteWriteEventsGeneratorFactory(base, countMetrics)
+	return rw.DefaultRemoteWriteEventsGeneratorFactory(base, metricsCount)
 }
 
 type remoteWriteTypedGenerator struct {
-	countMetrics      bool
+	metricsCount      bool
 	counterCache      collector.CounterCache
 	rateCounters      bool
 	counterPatterns   []*regexp.Regexp
@@ -153,7 +153,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 		e := eventList[labelsHash]
 
-		if g.countMetrics {
+		if g.metricsCount {
 			metricCounter[labelsHash]++
 			e.RootFields["metrics_count"] = metricCounter[labelsHash]
 		}

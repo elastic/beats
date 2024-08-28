@@ -83,7 +83,7 @@ type MetricSet struct {
 	promEventsGen   PromEventsGenerator
 	host            string
 	eventGenStarted bool
-	countMetrics    bool
+	metricsCount    bool
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -110,7 +110,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			namespace:       namespace,
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
-			countMetrics:    config.CountMetrics,
+			metricsCount:    config.MetricsCount,
 		}
 
 		// store host here to use it as a pointer when building `up` metric
@@ -175,7 +175,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 
-			if m.countMetrics {
+			if m.metricsCount {
 				metricCounter[labelsHash]++
 			}
 
@@ -187,7 +187,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// Report events
 	for labelHash, e := range eventList {
 		event := mb.Event{RootFields: mapstr.M{m.namespace: e}}
-		if m.countMetrics {
+		if m.metricsCount {
 			event.RootFields.Put("metrics_count", metricCounter[labelHash])
 		}
 		isOpen := reporter.Event(event)

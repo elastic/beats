@@ -25,7 +25,7 @@ func BenchmarkGenerateEvents(b *testing.B) {
 	// Create an instance of remoteWriteTypedGenerator
 	generator := remoteWriteTypedGenerator{
 		// Initialize with appropriate values
-		countMetrics: true,
+		metricsCount: true,
 		// Add other necessary fields
 	}
 

@@ -58261,7 +58261,7 @@ Stats scraped from a Prometheus endpoint.
 *`metrics_count`*::
 +
 --
-Count the number of metrics
+Number of metrics per Elasticsearch document.
 
 
 type: long

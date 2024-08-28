@@ -18,7 +18,7 @@
 package collector
 
 type metricsetConfig struct {
-	CountMetrics   bool          `config:"count_metrics"`
+	MetricsCount   bool          `config:"metrics_count"`
 	MetricsFilters MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
 }
 
