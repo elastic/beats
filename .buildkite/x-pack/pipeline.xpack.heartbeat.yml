@@ -111,7 +111,7 @@ steps:
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
-        skip: "skipping due missing deps"
+        skip: "skipping due missing deps, elastic/ingest-dev#3844"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
