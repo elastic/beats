@@ -224,7 +224,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 	if cfg.Retry != nil {
 		retryConfig := cfg.Retry
 		for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
-			conn, response, err = websocket.DefaultDialer.Dial(url, nil)
+			conn, response, err = websocket.DefaultDialer.DialContext(ctx, url, headers)
 			if err == nil {
 				return conn, response, nil
 			}
