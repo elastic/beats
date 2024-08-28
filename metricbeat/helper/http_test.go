@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
@@ -293,6 +294,42 @@ func TestUserAgentCheck(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Contains(t, ua, "Metricbeat")
+}
+
+func TestRefreshAuthorizationHeader(t *testing.T) {
+	path := t.TempDir()
+	bearerFileName := "token"
+	bearerFilePath := filepath.Join(path, bearerFileName)
+
+	getAuth := func(helper *HTTP) string {
+		for k, v := range helper.headers {
+			if k == "Authorization" {
+				return v[0]
+			}
+		}
+		return ""
+	}
+
+	firstToken := "token-1"
+	err := os.WriteFile(bearerFilePath, []byte(firstToken), 0644)
+	assert.NoError(t, err)
+
+	helper := &HTTP{bearerFile: bearerFilePath, headers: make(http.Header)}
+	updated, err := helper.RefreshAuthorizationHeader()
+	assert.NoError(t, err)
+	assert.True(t, updated)
+	expected := fmt.Sprintf("Bearer %s", firstToken)
+	assert.Equal(t, expected, getAuth(helper))
+
+	secondToken := "token-1"
+	err = os.WriteFile(bearerFilePath, []byte(secondToken), 0644)
+	assert.NoError(t, err)
+
+	updated, err = helper.RefreshAuthorizationHeader()
+	assert.NoError(t, err)
+	assert.True(t, updated)
+	expected = fmt.Sprintf("Bearer %s", secondToken)
+	assert.Equal(t, expected, getAuth(helper))
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {
