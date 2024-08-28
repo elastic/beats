@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
-By default it enables the metricsets `datastore`, `host` and `virtualmachine`.
+By default it enables the metricsets `network`, `datastore`, `host` and `virtualmachine`.
 
 [float]
 === Dashboard
@@ -35,7 +35,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: vsphere
   enabled: true
-  metricsets: ["datastore", "host", "virtualmachine"]
+  metricsets: ["datastore", "host", "virtualmachine", "network"]
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
   period: 20s
   hosts: ["https://localhost/sdk"]
