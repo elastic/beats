@@ -41,7 +41,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type MetricSet struct {
+type DsMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &DsMetricSet{ms}, nil
 }
 
 type metricData struct {
@@ -64,10 +64,19 @@ type assetNames struct {
 	outputHsNames []string
 }
 
+// Define metrics to be collected
+var metricSet = map[string]struct{}{
+	"datastore.read.average":              {},
+	"datastore.write.average":             {},
+	"datastore.datastoreIops.average":     {},
+	"datastore.totalReadLatency.average":  {},
+	"datastore.totalWriteLatency.average": {},
+}
+
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *DsMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -115,20 +124,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Filter for required metrics
 	var metricIds []types.PerfMetricId
-
-	// Define metrics to be collected
-	for metricName := range map[string]struct{}{
-		"datastore.read.average":              {},
-		"datastore.write.average":             {},
-		"datastore.datastoreIops.average":     {},
-		"datastore.totalReadLatency.average":  {},
-		"datastore.totalWriteLatency.average": {},
-	} {
+	for metricName := range metricSet {
 		if metric, ok := metrics[metricName]; ok {
 			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
-			continue
+		} else {
+			m.Logger().Warnf("Metric %s not found", metricName)
 		}
-		m.Logger().Warnf("Metric %s not found", metricName)
 	}
 
 	pc := property.DefaultCollector(c)
@@ -178,7 +179,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.eventMapping(dst[i], &metricData{
+				MetricSetFields: m.mapEvent(dst[i], &metricData{
 					perfMetrics: metricMap,
 					assetNames:  *assetNames,
 				}),
@@ -205,7 +206,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		}
 	}
 
-	// calling Host explicitly because of mo.Datastore.hHost has types.DatastoreHostMount instead of mo.ManagedEntity
+	// calling Host explicitly because of mo.Datastore.Host has types.DatastoreHostMount instead of mo.ManagedEntity
 	outputHsNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
 		hsRefs := make([]types.ManagedObjectReference, 0, len(ds.Host))

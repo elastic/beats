@@ -28,7 +28,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *MetricSet
+	var m *ClusterMetricSet
 	var ClusterTest = mo.ClusterComputeResource{
 		Configuration: types.ClusterConfigInfo{
 			DasConfig: types.ClusterDasConfigInfo{
@@ -44,7 +44,7 @@ func TestEventMapping(t *testing.T) {
 		outputNtNames: []string{"Network_0"},
 	}
 
-	outputEvent := m.eventMapping(ClusterTest, &assetNames)
+	outputEvent := m.mapEvent(ClusterTest, &assetNames)
 	testEvent := mapstr.M{
 		"das_config": mapstr.M{
 			"enabled": false,

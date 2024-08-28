@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
+func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
 	event := mapstr.M{}
 
 	if cl.Configuration.DasConfig.Enabled != nil {

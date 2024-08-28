@@ -28,7 +28,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *MetricSet
+	var m *DsMetricSet
 	var datastoreTest = mo.Datastore{
 		Summary: types.DatastoreSummary{
 			Name:      "datastore-test",
@@ -59,7 +59,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	outputEvent := m.eventMapping(datastoreTest, &metricDataTest)
+	outputEvent := m.mapEvent(datastoreTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"fstype": "local",
 		"status": types.ManagedEntityStatus("green"),
@@ -74,7 +74,7 @@ func TestEventMapping(t *testing.T) {
 			"names": []string{"DC3_H0_VM0"},
 		},
 		"read": mapstr.M{
-			"bytes": int64(100000),
+			"bytes": int64(102400),
 			"latency": mapstr.M{
 				"total": mapstr.M{
 					"ms": int64(100),
@@ -82,7 +82,7 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		"write": mapstr.M{
-			"bytes": int64(200000),
+			"bytes": int64(204800),
 			"latency": mapstr.M{
 				"total": mapstr.M{
 					"ms": int64(100),

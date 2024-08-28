@@ -23,30 +23,32 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/vmware/govmomi/simulator"
 )
 
 func TestFetchEventContents(t *testing.T) {
 	// Creating a new simulator model with VPX server to collect broad range of data.
 	model := simulator.VPX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
-	defer model.Remove()
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	assert.NotEmpty(t, events)
+	require.Empty(t, errs, "expected no error")
+
+	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
 	assert.EqualValues(t, "OTHER", event["fstype"])
@@ -78,20 +80,19 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func TestData(t *testing.T) {
+func TestDsMetricsetData(t *testing.T) {
 	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err = mbtest.WriteEventsReporterV2WithContext(f, t, "")
+	assert.NoError(t, err, "failed to write events with reporter")
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
