@@ -26,6 +26,6 @@ var:
 
 ingest_pipeline:
   - ../ingest/routing.yml
-  - ./ingest/powershell.yml
+  - ./ingest/powershell_operational.yml
 input: config/input.yml
 
