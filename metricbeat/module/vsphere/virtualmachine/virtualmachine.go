@@ -49,6 +49,15 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+type VMData struct {
+	VM             mo.VirtualMachine
+	HostID         string
+	HostName       string
+	NetworkNames   []string
+	DatastoreNames []string
+	CustomFields   mapstr.M
+}
+
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := vsphere.NewMetricSet(base)
@@ -80,12 +89,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return fmt.Errorf("error in NewClient: %w", err)
+		return fmt.Errorf("virtualmachine: error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
+			m.Logger().Debugf("Error logging out from vsphere: %v", err)
 		}
 	}()
 
@@ -97,7 +106,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		customFieldsMap, err = setCustomFieldsMap(ctx, c)
 		if err != nil {
-			return fmt.Errorf("error in setCustomFieldsMap: %w", err)
+			return fmt.Errorf("virtualmachine: error in setCustomFieldsMap: %w", err)
 		}
 	}
 
@@ -106,72 +115,33 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
+		return fmt.Errorf("virtualmachine: error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Debug("Error destroying view from vsphere %w", err)
 		}
 	}()
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
 	if err != nil {
-		return fmt.Errorf("error in Retrieve: %w", err)
+		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
 
+	pc := property.DefaultCollector(c)
 	for _, vm := range vmt {
-		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
-		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
-		event := mapstr.M{
-			"name": vm.Summary.Config.Name,
-			"os":   vm.Summary.Config.GuestFullName,
-			"cpu": mapstr.M{
-				"used": mapstr.M{
-					"mhz": usedCPU,
-				},
-			},
-			"memory": mapstr.M{
-				"used": mapstr.M{
-					"guest": mapstr.M{
-						"bytes": usedMemory,
-					},
-					"host": mapstr.M{
-						"bytes": int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024,
-					},
-				},
-			},
-		}
-
-		totalCPU := vm.Summary.Config.CpuReservation
-		if totalCPU > 0 {
-			freeCPU := totalCPU - usedCPU
-			// Avoid negative values if reported used CPU is slightly over total configured.
-			if freeCPU < 0 {
-				freeCPU = 0
-			}
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", freeCPU)
-		}
-
-		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
-		if totalMemory > 0 {
-			freeMemory := totalMemory - usedMemory
-			// Avoid negative values if reported used memory is slightly over total configured.
-			if freeMemory < 0 {
-				freeMemory = 0
-			}
-			event.Put("memory.total.guest.bytes", totalMemory)
-			event.Put("memory.free.guest.bytes", freeMemory)
-		}
+		var hostID, hostName string
+		var networkNames, datastoreNames []string
+		var customFields mapstr.M
 
 		if host := vm.Summary.Runtime.Host; host != nil {
-			event["host.id"] = host.Value
+			hostID = host.Value
 			hostSystem, err := getHostSystem(ctx, c, host.Reference())
 			if err == nil {
-				event["host.hostname"] = hostSystem.Summary.Config.Name
+				hostName = hostSystem.Summary.Config.Name
 			} else {
 				m.Logger().Debug(err.Error())
 			}
@@ -181,32 +151,45 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 				"from host/guest")
 		}
 
-		// Get custom fields (attributes) values if get_custom_fields is true.
+		// Retrieve custom fields if enabled
 		if m.GetCustomFields && vm.Summary.CustomValue != nil {
-			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
-
-			if len(customFields) > 0 {
-				event["custom_fields"] = customFields
-			}
-		} else {
+			customFields = getCustomFields(vm.Summary.CustomValue, customFieldsMap)
+		}
+		if len(customFields) <= 0 {
 			m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
 				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
 				"information returned from host/guest")
 		}
-
+		// Retrieve network names
 		if vm.Summary.Vm != nil {
-			networkNames, err := getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
+			networkNames, err = getNetworkNames(ctx, c, vm.Summary.Vm.Reference())
 			if err != nil {
 				m.Logger().Debug(err.Error())
-			} else {
-				if len(networkNames) > 0 {
-					event["network_names"] = networkNames
-				}
 			}
 		}
 
+		// Retrieve the datastore names associated with the Virtualmachine
+		for _, datastoreRef := range vm.Datastore {
+			var ds mo.Datastore
+			err = pc.RetrieveOne(ctx, datastoreRef, []string{"name"}, &ds)
+			if err == nil {
+				datastoreNames = append(datastoreNames, ds.Name)
+			} else {
+				m.Logger().Debug("error retrieving datastore name for VM %s: %v", vm.Summary.Config.Name, err)
+			}
+		}
+
+		data := VMData{
+			VM:             vm,
+			HostID:         hostID,
+			HostName:       hostName,
+			NetworkNames:   networkNames,
+			DatastoreNames: datastoreNames,
+			CustomFields:   customFields,
+		}
+
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: m.mapEvent(data),
 		})
 	}
 
@@ -232,38 +215,23 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	var outputNetworkNames []string
-
 	pc := property.DefaultCollector(c)
 
 	var vm mo.VirtualMachine
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &vm)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err)
+		return nil, fmt.Errorf("error retrieving virtual machine information: %w", err)
 	}
 
 	if len(vm.Network) == 0 {
 		return nil, errors.New("no networks found")
 	}
 
-	var networkRefs []types.ManagedObjectReference
-	for _, obj := range vm.Network {
-		if obj.Type == "Network" {
-			networkRefs = append(networkRefs, obj)
-		}
-	}
-
-	// If only "Distributed port group" was found, for example.
-	if len(networkRefs) == 0 {
-		return nil, errors.New("no networks found")
-	}
-
 	var nets []mo.Network
-	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err)
+	if err := pc.Retrieve(ctx, vm.Network, []string{"name"}, &nets); err != nil {
+		return nil, fmt.Errorf("error retrieving network from virtual machine: %w", err)
 	}
-
+	outputNetworkNames := make([]string, 0, len(nets))
 	for _, net := range nets {
 		name := strings.Replace(net.Name, ".", "_", -1)
 		outputNetworkNames = append(outputNetworkNames, name)
@@ -298,7 +266,7 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
+		return nil, fmt.Errorf("error retrieving host information: %w", err)
 	}
 	return &hs, nil
 }
