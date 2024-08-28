@@ -43,7 +43,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type MetricSet struct {
+type HostMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -53,13 +53,48 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &HostMetricSet{ms}, nil
 }
 
+<<<<<<< HEAD
+=======
+type metricData struct {
+	perfMetrics map[string]interface{}
+	assetNames  assetNames
+}
+
+type assetNames struct {
+	outputNetworkNames []string
+	outputDsNames      []string
+	outputVmNames      []string
+}
+
+// Define metrics to be collected
+var metricSet = map[string]struct{}{
+	"disk.capacity.usage.average": {},
+	"disk.deviceLatency.average":  {},
+	"disk.maxTotalLatency.latest": {},
+	"disk.usage.average":          {},
+	"disk.read.average":           {},
+	"disk.write.average":          {},
+	"net.transmitted.average":     {},
+	"net.received.average":        {},
+	"net.usage.average":           {},
+	"net.packetsTx.summation":     {},
+	"net.packetsRx.summation":     {},
+	"net.errorsTx.summation":      {},
+	"net.errorsRx.summation":      {},
+	"net.multicastTx.summation":   {},
+	"net.multicastRx.summation":   {},
+	"net.droppedTx.summation":     {},
+	"net.droppedRx.summation":     {},
+}
+
+>>>>>>> 93ee5ca3ff ([vSphere][network] Add support for new metrics in network metricset (#40559))
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -124,6 +159,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 					event["network_names"] = networkNames
 				}
 			}
+<<<<<<< HEAD
+=======
+
+			reporter.Event(mb.Event{
+				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
+			})
+>>>>>>> 93ee5ca3ff ([vSphere][network] Add support for new metrics in network metricset (#40559))
 		}
 		reporter.Event(mb.Event{
 			MetricSetFields: event,

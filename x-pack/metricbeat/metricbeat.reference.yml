@@ -1568,8 +1568,14 @@ metricbeat.modules:
 #------------------------------- VSphere Module -------------------------------
 - module: vsphere
   enabled: true
+<<<<<<< HEAD
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
+=======
+  metricsets: ["datastore", "host", "virtualmachine", "network"]
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  period: 20s
+>>>>>>> 93ee5ca3ff ([vSphere][network] Add support for new metrics in network metricset (#40559))
   hosts: ["https://localhost/sdk"]
 
   username: "user"

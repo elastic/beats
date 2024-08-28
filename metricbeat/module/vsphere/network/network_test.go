@@ -15,21 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package host
+package network
 
 import (
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/vmware/govmomi/simulator"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	model := simulator.ESX()
+	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
@@ -47,33 +47,28 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	assert.EqualValues(t, "localhost.localdomain", event["name"])
+	assert.NotEmpty(t, event["name"])
+	assert.EqualValues(t, true, event["accessible"])
+	assert.EqualValues(t, "green", event["status"])
 
-	cpu := event["cpu"].(mapstr.M)
+	assert.EqualValues(t, "Network", event["type"])
 
-	cpuUsed := cpu["used"].(mapstr.M)
-	assert.EqualValues(t, 67, cpuUsed["mhz"])
+	config := event["config"].(mapstr.M)
+	assert.NotNil(t, config)
 
-	cpuTotal := cpu["total"].(mapstr.M)
-	assert.EqualValues(t, 4588, cpuTotal["mhz"])
+	if host, ok := event["host"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, host["count"], 0)
+		assert.NotEmpty(t, host["names"])
+	}
 
-	cpuFree := cpu["free"].(mapstr.M)
-	assert.EqualValues(t, 4521, cpuFree["mhz"])
-
-	memory := event["memory"].(mapstr.M)
-
-	memoryUsed := memory["used"].(mapstr.M)
-	assert.EqualValues(t, uint64(1472200704), memoryUsed["bytes"])
-
-	memoryTotal := memory["total"].(mapstr.M)
-	assert.EqualValues(t, uint64(4294430720), memoryTotal["bytes"])
-
-	memoryFree := memory["free"].(mapstr.M)
-	assert.EqualValues(t, uint64(2822230016), memoryFree["bytes"])
+	if vm, ok := event["vm"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, vm["count"], 0)
+		assert.NotEmpty(t, vm["names"])
+	}
 }
 
-func TestHostMetricSetData(t *testing.T) {
-	model := simulator.ESX()
+func TestNetworkMetricSetData(t *testing.T) {
+	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
@@ -92,7 +87,7 @@ func getConfig(ts *simulator.Server) map[string]interface{} {
 
 	return map[string]interface{}{
 		"module":     "vsphere",
-		"metricsets": []string{"host"},
+		"metricsets": []string{"network"},
 		"hosts":      []string{urlSimulator},
 		"username":   "user",
 		"password":   "pass",
