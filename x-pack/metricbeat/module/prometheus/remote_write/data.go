@@ -37,9 +37,8 @@ type histogram struct {
 }
 
 func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool) (remote_write.RemoteWriteEventsGenerator, error) {
-	var err error
 	config := defaultConfig
-	if err = base.Module().UnpackConfig(&config); err != nil {
+	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
@@ -55,6 +54,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool)
 			countMetrics: countMetrics,
 		}
 
+		var err error
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
 		if err != nil {
 			return nil, fmt.Errorf("unable to compile counter patterns: %w", err)

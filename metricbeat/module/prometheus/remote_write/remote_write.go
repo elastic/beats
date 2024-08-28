@@ -60,7 +60,6 @@ type MetricSet struct {
 	events          chan mb.Event
 	promEventsGen   RemoteWriteEventsGenerator
 	eventGenStarted bool
-	countMetrics    bool
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -80,7 +79,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		events:          make(chan mb.Event),
 		promEventsGen:   promEventsGen,
 		eventGenStarted: false,
-		countMetrics:    config.CountMetrics,
 	}
 
 	svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
@@ -112,6 +110,7 @@ func MetricSetBuilder(genFactory RemoteWriteEventsGeneratorFactory) func(base mb
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
 		}
+
 		svc, err := httpserver.NewHttpServerWithHandler(base, m.handleFunc)
 		if err != nil {
 			return nil, err
