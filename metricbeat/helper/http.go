@@ -129,7 +129,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	resp, err := h.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
+		return nil, fmt.Errorf("error making http request: %w", err)
 	}
 
 	return resp, nil
