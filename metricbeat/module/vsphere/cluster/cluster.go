@@ -32,6 +32,10 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+// init registers the MetricSet with the central registry as soon as the program
+// starts. The New function will be called later to instantiate an instance of
+// the MetricSet for each network is defined in the module's configuration. After the
+// MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "cluster", New,
 		mb.WithHostParser(vsphere.HostParser),
@@ -88,7 +92,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
+			m.Logger().Errorf("error trying to destroy view from vshphere: %w", err)
 		}
 	}()
 
@@ -107,7 +111,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &clt[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host: %w", err)
+				m.Logger().Errorf("Failed to retrieve object from cluster %s: %v", clt[i].Name, err)
 			}
 
 			if clt[i].Configuration.DasConfig.AdmissionControlEnabled == nil {

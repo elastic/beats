@@ -35,19 +35,11 @@ func (m *MetricSet) eventMapping(cl mo.ClusterComputeResource, data *assetNames)
 	}
 
 	event.Put("host.count", len(data.outputHsNames))
-	if len(data.outputHsNames) > 0 {
-		event.Put("host.names", data.outputHsNames)
-	}
-
+	event.Put("host.names", data.outputHsNames)
 	event.Put("datastore.count", len(data.outputDsNames))
-	if len(data.outputDsNames) > 0 {
-		event.Put("datastore.names", data.outputDsNames)
-	}
-
+	event.Put("datastore.names", data.outputDsNames)
 	event.Put("network.count", len(data.outputNtNames))
-	if len(data.outputNtNames) > 0 {
-		event.Put("network.names", data.outputNtNames)
-	}
+	event.Put("network.names", data.outputNtNames)
 
 	return event
 }
