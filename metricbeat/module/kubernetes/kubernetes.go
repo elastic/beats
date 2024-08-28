@@ -150,8 +150,7 @@ func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
 
 	// Check if the last time we tried to make a request to the Kubelet API ended in a 401 Unauthorized error.
-	// If this is the case, it is possible the bearer token file in the configuration is not correct. We should
-	// not keep making requests in this case.
+	// If this is the case, we should not keep making requests.
 	errorMsg := fmt.Sprintf(fmt.Sprintf("HTTP error %d", httpnet.StatusUnauthorized))
 	if statsCache.lastFetchErr != nil && strings.Contains(statsCache.lastFetchErr.Error(), errorMsg) {
 		return statsCache.sharedStats, statsCache.lastFetchErr
