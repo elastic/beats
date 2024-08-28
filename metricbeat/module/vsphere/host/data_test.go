@@ -28,7 +28,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	var m *HostMetricSet
-	var HostSystemTest = mo.HostSystem{
+	HostSystemTest := mo.HostSystem{
 		Summary: types.HostListSummary{
 			Host: &types.ManagedObjectReference{Type: "HostSystem", Value: "ha-host"},
 			Hardware: &types.HostHardwareSummary{
