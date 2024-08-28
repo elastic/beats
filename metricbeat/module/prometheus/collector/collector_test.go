@@ -20,6 +20,10 @@
 package collector
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -379,4 +383,109 @@ func TestSkipMetricFamily(t *testing.T) {
 
 func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "prometheus", "collector")
+}
+
+func sortPromEvents(events []mb.Event) {
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].RootFields["prometheus"].(mapstr.M)["labels"].(mapstr.M).String() < events[j].RootFields["prometheus"].(mapstr.M)["labels"].(mapstr.M).String()
+	})
+}
+
+// TestFetchEventForCountingMetrics tests the functionality of fetching events for counting metrics in the Prometheus collector.
+// NOTE: For the remote_write metricset, the test will be similar. So, we will only test this for the collector metricset.
+func TestFetchEventForCountingMetrics(t *testing.T) {
+	metricsPath := "/metrics"
+	server := initServer(metricsPath)
+	defer server.Close()
+
+	host := strings.TrimPrefix(server.URL, "http://")
+
+	testCases := []struct {
+		name                 string
+		config               map[string]interface{}
+		expectedEvents       int
+		expectedLabels       []mapstr.M
+		expectedMetricsCount []int64
+	}{
+		{
+			name: "Default metrics",
+			config: map[string]interface{}{
+				"module":        "prometheus",
+				"metricsets":    []string{"collector"},
+				"hosts":         []string{server.URL},
+				"metrics_path":  metricsPath,
+				"metrics_count": true,
+			},
+			expectedEvents: 5,
+			expectedLabels: []mapstr.M{
+				{"environment": "prod", "instance": host, "job": "prometheus", "service": "api"},
+				{"environment": "prod", "instance": host, "job": "prometheus", "service": "db"},
+				{"environment": "staging", "instance": host, "job": "prometheus", "service": "api"},
+				{"environment": "staging", "instance": host, "job": "prometheus", "service": "db"},
+				{"instance": host, "job": "prometheus"},
+			},
+			expectedMetricsCount: []int64{2, 2, 3, 2, 1},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			f := mbtest.NewReportingMetricSetV2Error(t, tc.config)
+			events, errs := mbtest.ReportingFetchV2Error(f)
+
+			for _, err := range errs {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			assert.Equal(t, tc.expectedEvents, len(events), "Number of events does not match expected")
+
+			sortPromEvents(events)
+
+			for i, event := range events {
+				validateEvent(t, event, tc.expectedLabels[i], tc.expectedMetricsCount[i])
+			}
+		})
+	}
+}
+
+func validateEvent(t *testing.T, event mb.Event, expectedLabels mapstr.M, expectedMetricsCount int64) {
+	t.Helper()
+
+	metricsCount, err := event.RootFields.GetValue("metrics_count")
+	assert.NoError(t, err, "Failed to get metrics_count")
+
+	labels, ok := event.RootFields["prometheus"].(mapstr.M)["labels"].(mapstr.M)
+	assert.True(t, ok, "Failed to get labels")
+
+	assert.Equal(t, expectedLabels, labels, "Labels do not match expected")
+	assert.Equal(t, expectedMetricsCount, metricsCount, "Metrics count does not match expected")
+}
+
+func initServer(endpoint string) *httptest.Server {
+	data := []byte(`# HELP test_gauge A test gauge metric
+# TYPE test_gauge gauge
+test_gauge{environment="prod",service="api"} 10.5
+test_gauge{environment="staging",service="api"} 8.2
+test_gauge{environment="prod",service="db"} 20.7
+test_gauge{environment="staging",service="db"} 15.1
+
+# HELP test_counter A test counter metric
+# TYPE test_counter counter
+test_counter{environment="prod",service="api"} 42
+test_counter{environment="staging",service="api"} 30
+test_counter{environment="staging",service="api"} 444
+test_counter{environment="prod",service="db"} 123
+test_counter{environment="staging",service="db"} 98`)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == endpoint {
+			// https://github.com/prometheus/client_golang/blob/dbf72fc1a20e87bea6e15281eda7ef4d139a01ec/prometheus/registry_test.go#L364
+			w.Header().Set("Content-Type", "text/plain; version=0.0.4")
+			w.WriteHeader(http.StatusOK)
+			w.Write(data)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	return server
 }
