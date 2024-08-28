@@ -67319,37 +67319,46 @@ type: long
 [float]
 === resourcepool
 
-resourcepool
+Resource pool information from vSphere environment.
 
 
 
-
-
-*`vsphere.resourcepool.cpu.entitlement.mhz`*::
-+
---
-Amount of CPU resources allocated to the resource pool.
-
-
-type: long
-
---
-
-
-*`vsphere.resourcepool.cpu.usage.pct`*::
-+
---
-CPU usage average in percentage.
-
-
-type: long
-
---
 
 *`vsphere.resourcepool.cpu.usage.mhz`*::
 +
 --
-CPU usage average in Mhz.
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.demand.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.entitlment.mhz`*::
++
+--
+This is the amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.entitlment.static.mhz`*::
++
+--
+The static CPU resource entitlement for a virtual machine.
 
 
 type: long
@@ -67358,55 +67367,92 @@ type: long
 
 
 
-*`vsphere.resourcepool.cpu.active.average.pct`*::
+*`vsphere.resourcepool.memory.usage.guest.bytes`*::
 +
 --
-CPU active average in percentage.
+Guest memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.host.bytes`*::
++
+--
+Host memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.entitlement.bytes`*::
++
+--
+This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.entitlement.static.mhz`*::
++
+--
+The static memory resource entitlement for a virtual machine.
 
 
 type: long
 
 --
 
-
-*`vsphere.resourcepool.cpu.active.max.pct`*::
+*`vsphere.resourcepool.memory.usage.private.bytes`*::
 +
 --
-CPU active max in percentage.
+The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
 
 
 type: long
 
+format: bytes
+
 --
 
-
-
-*`vsphere.resourcepool.memory.entitlement.mhz`*::
+*`vsphere.resourcepool.memory.usage.shared.bytes`*::
 +
 --
-Amount of Memory resources allocated to the resource pool.
+The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
 
 
 type: long
 
+format: bytes
+
 --
 
-
-*`vsphere.resourcepool.memory.usage.pct`*::
+*`vsphere.resourcepool.memory.usage.swapped.bytes`*::
 +
 --
-Memory usage average in percentage.
+The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
 
 
 type: long
 
+format: bytes
+
 --
 
-
-*`vsphere.resourcepool.memory.shared.bytes`*::
+*`vsphere.resourcepool.memory.usage.ballooned.bytes`*::
 +
 --
-Memory shared average in bytes.
+The size of the balloon driver in a virtual machine, in bytes.
 
 
 type: long
@@ -67416,10 +67462,34 @@ format: bytes
 --
 
 
-*`vsphere.resourcepool.memory.swap.bytes`*::
+*`vsphere.resourcepool.memory.usage.overhead.bytes`*::
 +
 --
-Memory swap in average in bytes.
+The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.overhead.consumed.bytes`*::
++
+--
+The amount of overhead memory, in bytes, currently being consumed to run a VM.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.compressed.bytes`*::
++
+--
+The amount of compressed memory currently consumed by VM, in bytes.
 
 
 type: long
@@ -67462,7 +67532,7 @@ type: long
 *`vsphere.resourcepool.vm.names`*::
 +
 --
-Names of the virtual machines on the resource pool.
+List of all the VM names.
 
 
 type: keyword

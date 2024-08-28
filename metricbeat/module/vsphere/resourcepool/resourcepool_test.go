@@ -24,29 +24,28 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/vmware/govmomi/simulator"
 )
 
 func TestFetchEventContents(t *testing.T) {
 	model := simulator.VPX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
+	require.Empty(t, errs, "expected no error")
 
-	assert.NotEmpty(t, events)
+	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	assert.EqualValues(t, "Resources", event["name"])
 	assert.EqualValues(t, "green", event["status"])
@@ -55,66 +54,41 @@ func TestFetchEventContents(t *testing.T) {
 	assert.NotNil(t, vm["names"])
 	assert.GreaterOrEqual(t, vm["count"], 0)
 
-	cpu := event["cpu"].(mapstr.M)
-
-	cpuUsageMhz, ok := cpu["usage.mhz"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, cpuUsageMhz, int64(0))
+	if cpu, ok := event["cpu"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, cpu["usage.mhz"], 0)
+		assert.GreaterOrEqual(t, cpu["demand.mhz"], 0)
+		assert.GreaterOrEqual(t, cpu["entitlement.mhz"], 0)
+		assert.GreaterOrEqual(t, cpu["static.entitlement.mhz"], 0)
 	}
 
-	cpuUsagPct, ok := cpu["usage.pct"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, cpuUsagPct, int64(0))
-	}
-
-	cpuEntitlement, ok := cpu["entitlement"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, cpuEntitlement["mhz"], int64(0))
-	}
-
-	cpuActive, ok := cpu["active"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, cpuActive["average.pct"], int64(0))
-		assert.GreaterOrEqual(t, cpuActive["max.pct"], int64(0))
-	}
-
-	memory := event["memory"].(mapstr.M)
-
-	memoryUsage, ok := memory["usage"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, memoryUsage["pct"], int64(0))
-	}
-
-	memoryShared, ok := memory["shared"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, memoryShared["bytes"], int64(0))
-	}
-
-	memorySwap, ok := memory["swap"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, memorySwap["bytes"], int64(0))
-	}
-
-	memoryEntitlement, ok := memory["entitlement"].(mapstr.M)
-	if ok {
-		assert.GreaterOrEqual(t, memoryEntitlement["mhz"], int64(0))
+	if memory, ok := event["memory"].(mapstr.M); ok {
+		assert.GreaterOrEqual(t, memory["usage.guest.mb"], 0)
+		assert.GreaterOrEqual(t, memory["usage.host.mb"], 0)
+		assert.GreaterOrEqual(t, memory["entitlement.mb"], 0)
+		assert.GreaterOrEqual(t, memory["static.entitlement.mhz"], 0)
+		assert.GreaterOrEqual(t, memory["private.mb"], 0)
+		assert.GreaterOrEqual(t, memory["shared.mb"], 0)
+		assert.GreaterOrEqual(t, memory["swapped.mb"], 0)
+		assert.GreaterOrEqual(t, memory["ballooned.mb"], 0)
+		assert.GreaterOrEqual(t, memory["overhead.mb"], 0)
+		assert.GreaterOrEqual(t, memory["overhead.consumed.mb"], 0)
+		assert.GreaterOrEqual(t, memory["compressed.mb"], 0)
 	}
 }
 
-func TestData(t *testing.T) {
-	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+func TestResourcePoolMetricSetData(t *testing.T) {
+	model := simulator.VPX()
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err = mbtest.WriteEventsReporterV2WithContext(f, t, "")
+	assert.NoError(t, err, "failed to write events with reporter")
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {

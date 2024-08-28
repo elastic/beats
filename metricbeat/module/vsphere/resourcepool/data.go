@@ -23,47 +23,33 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(rp mo.ResourcePool, data *metricData) mapstr.M {
+func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) mapstr.M {
 	event := mapstr.M{
-		"name":   rp.Summary.GetResourcePoolSummary().Name,
+		"name":   rp.Name,
 		"status": rp.OverallStatus,
 	}
-	mapPerfMetricToEvent(event, data.perfMetrics)
 
-	if len(data.assetsName.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsName.outputVmNames)
-		event.Put("vm.count", len(data.assetsName.outputVmNames))
+	if rp.Summary.GetResourcePoolSummary().QuickStats != nil {
+		event.Put("cpu.usage.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.OverallCpuUsage)
+		event.Put("cpu.demand.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.OverallCpuDemand)
+		event.Put("cpu.entitlement.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.DistributedCpuEntitlement)
+		event.Put("cpu.entitlement.static.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.StaticCpuEntitlement)
+		event.Put("memory.usage.guest.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.GuestMemoryUsage*1024*1024)
+		event.Put("memory.usage.host.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.HostMemoryUsage*1024*1024)
+		event.Put("memory.entitlement.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.DistributedMemoryEntitlement*1024*1024)
+		event.Put("memory.entitlement.static.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.StaticMemoryEntitlement)
+		event.Put("memory.private.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.PrivateMemory*1024*1024)
+		event.Put("memory.shared.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.SharedMemory*1024*1024)
+		event.Put("memory.swapped.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.SwappedMemory*1024*1024)
+		event.Put("memory.ballooned.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.BalloonedMemory*1024*1024)
+		event.Put("memory.overhead.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.OverheadMemory*1024*1024)
+		event.Put("memory.overhead.consumed.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.ConsumedOverheadMemory*1024*1024)
+		event.Put("memory.compressed.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.CompressedMemory*1024)
+	}
+
+	if len(data.assetsNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetsNames.outputVmNames)
+		event.Put("vm.count", len(data.assetsNames.outputVmNames))
 	}
 	return event
-}
-
-func mapPerfMetricToEvent(event mapstr.M, perfMetrics map[string]interface{}) {
-	if val, exist := perfMetrics["cpu.usage.average"]; exist {
-		event.Put("cpu.usage.pct", val)
-	}
-	if val, exist := perfMetrics["cpu.usagemhz.average"]; exist {
-		event.Put("cpu.usage.mhz", val)
-	}
-	if val, exist := perfMetrics["cpu.cpuentitlement.latest"]; exist {
-		event.Put("cpu.entitlement.mhz", val)
-	}
-	if val, exist := perfMetrics["rescpu.actav1.latest"]; exist {
-		event.Put("cpu.active.average.pct", val)
-	}
-	if val, exist := perfMetrics["rescpu.actpk1.average"]; exist {
-		event.Put("cpu.active.max.pct", val)
-	}
-
-	if val, exist := perfMetrics["mem.usage.average"]; exist {
-		event.Put("memory.usage.pct", val)
-	}
-	if val, exist := perfMetrics["mem.shared.average"]; exist {
-		event.Put("memory.shared.bytes", val.(int64)*1000)
-	}
-	if val, exist := perfMetrics["mem.swapin.average"]; exist {
-		event.Put("memory.swap.bytes", val.(int64)*1000)
-	}
-	if val, exist := perfMetrics["mem.mementitlement.latest"]; exist {
-		event.Put("memory.entitlement.mhz", val)
-	}
 }

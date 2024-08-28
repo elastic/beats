@@ -2,78 +2,92 @@
   type: group
   release: beta
   description: >
-    resourcepool
+    Resource pool information from vSphere environment.
   fields:
     - name: cpu
       type: group
       fields:
-        - name: entitlement
+        - name: usage.mhz
+          type: long
+          description: >
+            Basic CPU performance statistics, in MHz.
+        - name: demand.mhz
+          type: long
+          description: >
+            Basic CPU performance statistics, in MHz.
+        - name: entitlment
           type: group
           fields:
             - name: mhz
               type: long
               description: >
-                Amount of CPU resources allocated to the resource pool.
-        - name: usage
-          type: group
-          fields:
-            - name: pct
+                This is the amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+            - name: static.mhz
               type: long
               description: >
-                CPU usage average in percentage.
-            - name: mhz
-              type: long
-              description: >
-                CPU usage average in Mhz.
-        - name: active
-          type: group
-          fields:
-            - name: average
-              type: group
-              fields:
-                - name: pct
-                  type: long
-                  description: >
-                    CPU active average in percentage.
-            - name: max
-              type: group
-              fields:
-                - name: pct
-                  type: long
-                  description: >
-                    CPU active max in percentage.
+                The static CPU resource entitlement for a virtual machine.
     - name: memory
       type: group
       fields:
-        - name: entitlement
-          type: group
-          fields:
-            - name: mhz
-              type: long
-              description: >
-                Amount of Memory resources allocated to the resource pool.
         - name: usage
           type: group
           fields:
-            - name: pct
+            - name: guest.bytes
               type: long
               description: >
-                Memory usage average in percentage.
-        - name: shared
-          type: group
-          fields:
-            - name: bytes
-              type: long
-              description: >
-                Memory shared average in bytes.
+                Guest memory utilization statistics, in bytes.
               format: bytes
-        - name: swap
-          type: group
-          fields:
-            - name: bytes
+            - name: host.bytes
               type: long
               description: >
-                Memory swap in average in bytes.
+                Host memory utilization statistics, in bytes.
+              format: bytes
+            - name: entitlement.bytes
+              type: long
+              description: >
+                This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+              format: bytes
+            - name: entitlement.static.mhz
+              type: long
+              description: >
+                The static memory resource entitlement for a virtual machine.
+            - name: private.bytes
+              type: long
+              description: >
+                The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
+              format: bytes
+            - name: shared.bytes
+              type: long
+              description: >
+                The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
+              format: bytes
+            - name: swapped.bytes
+              type: long
+              description: >
+                The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
+              format: bytes
+            - name: ballooned.bytes
+              type: long
+              description: >
+                The size of the balloon driver in a virtual machine, in bytes.
+              format: bytes
+            - name: overhead
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+                  description: >
+                    The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
+                  format: bytes
+                - name: consumed.bytes
+                  type: long
+                  description: >
+                    The amount of overhead memory, in bytes, currently being consumed to run a VM.
+                  format: bytes
+            - name: compressed.bytes
+              type: long
+              description: >
+                The amount of compressed memory currently consumed by VM, in bytes.
               format: bytes
     - name: name
       type: keyword
@@ -93,4 +107,4 @@
         - name: names
           type: keyword
           description: >
-            Names of the virtual machines on the resource pool.
+            List of all the VM names.

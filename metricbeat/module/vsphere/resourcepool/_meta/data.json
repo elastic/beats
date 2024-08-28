@@ -19,40 +19,64 @@
             "status": "green",
             "vm": {
                 "names": [
-                  "DC0_H0_VM0", 
-                  "DC0_H0_VM1"
+                    "DC0_H0_VM0", 
+                    "DC0_H0_VM1"
                 ],
                 "count": 2
             },
             "cpu": {
-                "active": {
-                    "average": {
-                        "pct": 0
-                    },
-                    "max": {
-                        "pct": 0
-                    }
+                "usage": {
+                    "mhz": 3344
+                },
+                "demand": {
+                    "mhz": 3365
                 },
                 "entitlement": {
-                    "mhz": 0
+                    "mhz": 3176
                 },
-                "usage": {
-                    "pct": 0,
-                    "mhz": 2018
+                "static": {
+                    "entitlement": {
+                        "mhz": 21294
+                    }
                 }
             },
             "memory": {
-                "entitlement": {
-                    "mhz": 0
+                "compressed": {
+                    "mb": 0
                 },
-                "usage": {
-                    "pct": 0
+                "static": {
+                    "entitlement": {
+                        "mhz": 122907
+                    }
                 },
                 "shared": {
-                    "bytes": 1078817000
+                    "mb": 45
                 },
-                "swap": {
-                    "bytes": 0
+                "overhead": {
+                    "mb": 1617,
+                    "consumed": {
+                        "mb": 953
+                    }
+                },
+                "ballooned": {
+                    "mb": 0
+                },
+                "swapped": {
+                    "mb": 0
+                },
+                "entitlement": {
+                    "mb": 38068
+                },
+                "private": {
+                    "mb": 115395
+                },
+                "usage": {
+                    "guest": {
+                        "mb": 7975
+                    },
+                    "host": {
+                        "mb": 116347
+                    }
                 }
             }
         }
