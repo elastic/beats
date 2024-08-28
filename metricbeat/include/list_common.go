@@ -182,6 +182,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore_cluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"

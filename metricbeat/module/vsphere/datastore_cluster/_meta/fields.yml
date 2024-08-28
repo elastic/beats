@@ -1,0 +1,20 @@
+- name: datastorecluster
+  type: group
+  release: beta
+  description: >
+    datastorecluster
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        datastorecluster name.
+    - name: capacity.bytes
+      type: long
+      description: >
+        Total capacity of this storage pod, in bytes.
+      format: bytes
+    - name: free_space.bytes
+      type: long
+      description: >
+        Total free space on this storage pod, in bytes.
+      format: bytes

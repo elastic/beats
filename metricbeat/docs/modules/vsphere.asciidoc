@@ -55,11 +55,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-vsphere-datastore,datastore>>
 
+* <<metricbeat-metricset-vsphere-datastore_cluster,datastore_cluster>>
+
 * <<metricbeat-metricset-vsphere-host,host>>
 
 * <<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>
 
 include::vsphere/datastore.asciidoc[]
+
+include::vsphere/datastore_cluster.asciidoc[]
 
 include::vsphere/host.asciidoc[]
 
