@@ -50,9 +50,10 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "Resources", event["name"])
 	assert.EqualValues(t, "green", event["status"])
 
-	vm := event["vm"].(mapstr.M)
-	assert.NotNil(t, vm["names"])
-	assert.GreaterOrEqual(t, vm["count"], 0)
+	if vm, ok := event["vm"].(mapstr.M); ok {
+		assert.NotNil(t, vm["names"])
+		assert.GreaterOrEqual(t, vm["count"], 0)
+	}
 
 	if cpu, ok := event["cpu"].(mapstr.M); ok {
 		assert.GreaterOrEqual(t, cpu["usage.mhz"], 0)

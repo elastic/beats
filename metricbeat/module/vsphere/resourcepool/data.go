@@ -23,29 +23,36 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const (
+	mbToBytes = 1024 * 1024
+	kbToBytes = 1024
+)
+
 func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   rp.Name,
 		"status": rp.OverallStatus,
 	}
 
-	if rp.Summary.GetResourcePoolSummary().QuickStats != nil {
-		event.Put("cpu.usage.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.OverallCpuUsage)
-		event.Put("cpu.demand.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.OverallCpuDemand)
-		event.Put("cpu.entitlement.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.DistributedCpuEntitlement)
-		event.Put("cpu.entitlement.static.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.StaticCpuEntitlement)
-		event.Put("memory.usage.guest.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.GuestMemoryUsage*1024*1024)
-		event.Put("memory.usage.host.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.HostMemoryUsage*1024*1024)
-		event.Put("memory.entitlement.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.DistributedMemoryEntitlement*1024*1024)
-		event.Put("memory.entitlement.static.mhz", rp.Summary.GetResourcePoolSummary().QuickStats.StaticMemoryEntitlement)
-		event.Put("memory.private.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.PrivateMemory*1024*1024)
-		event.Put("memory.shared.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.SharedMemory*1024*1024)
-		event.Put("memory.swapped.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.SwappedMemory*1024*1024)
-		event.Put("memory.ballooned.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.BalloonedMemory*1024*1024)
-		event.Put("memory.overhead.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.OverheadMemory*1024*1024)
-		event.Put("memory.overhead.consumed.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.ConsumedOverheadMemory*1024*1024)
-		event.Put("memory.compressed.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.CompressedMemory*1024)
+	quickStats := rp.Summary.GetResourcePoolSummary().QuickStats
+	if quickStats == nil {
+		return event
 	}
+	event.Put("cpu.usage.mhz", quickStats.OverallCpuUsage)
+	event.Put("cpu.demand.mhz", quickStats.OverallCpuDemand)
+	event.Put("cpu.entitlement.mhz", quickStats.DistributedCpuEntitlement)
+	event.Put("cpu.entitlement.static.mhz", quickStats.StaticCpuEntitlement)
+	event.Put("memory.usage.guest.bytes", quickStats.GuestMemoryUsage*mbToBytes)
+	event.Put("memory.usage.host.bytes", quickStats.HostMemoryUsage*mbToBytes)
+	event.Put("memory.entitlement.bytes", quickStats.DistributedMemoryEntitlement*mbToBytes)
+	event.Put("memory.entitlement.static.mhz", quickStats.StaticMemoryEntitlement)
+	event.Put("memory.private.bytes", quickStats.PrivateMemory*mbToBytes)
+	event.Put("memory.shared.bytes", quickStats.SharedMemory*mbToBytes)
+	event.Put("memory.swapped.bytes", quickStats.SwappedMemory*mbToBytes)
+	event.Put("memory.ballooned.bytes", quickStats.BalloonedMemory*mbToBytes)
+	event.Put("memory.overhead.bytes", quickStats.OverheadMemory*mbToBytes)
+	event.Put("memory.overhead.consumed.bytes", quickStats.ConsumedOverheadMemory*mbToBytes)
+	event.Put("memory.compressed.bytes", quickStats.CompressedMemory*kbToBytes)
 
 	if len(data.assetNames.outputVmNames) > 0 {
 		event.Put("vm.names", data.assetNames.outputVmNames)

@@ -27,7 +27,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	var m *ResourcePoolMetricSet
-	var ResourcePoolTest = mo.ResourcePool{
+	ResourcePoolTest := mo.ResourcePool{
 		ManagedEntity: mo.ManagedEntity{
 			OverallStatus: "green",
 			Name:          "resourcepool-test",
@@ -36,19 +36,19 @@ func TestEventMapping(t *testing.T) {
 			QuickStats: &types.ResourcePoolQuickStats{
 				OverallCpuUsage:              100,
 				OverallCpuDemand:             100,
-				GuestMemoryUsage:             100 * 1024 * 1024,
-				HostMemoryUsage:              70 * 1024 * 1024,
+				GuestMemoryUsage:             100 * mbToBytes,
+				HostMemoryUsage:              70 * mbToBytes,
 				DistributedCpuEntitlement:    50,
-				DistributedMemoryEntitlement: 50 * 1024 * 1024,
+				DistributedMemoryEntitlement: 50 * mbToBytes,
 				StaticCpuEntitlement:         40,
 				StaticMemoryEntitlement:      78,
-				PrivateMemory:                10 * 1024 * 1024,
-				SharedMemory:                 20 * 1024 * 1024,
-				SwappedMemory:                30 * 1024 * 1024,
-				BalloonedMemory:              40 * 1024 * 1024,
-				OverheadMemory:               50 * 1024 * 1024,
-				ConsumedOverheadMemory:       60 * 1024 * 1024,
-				CompressedMemory:             70 * 1024,
+				PrivateMemory:                10 * mbToBytes,
+				SharedMemory:                 20 * mbToBytes,
+				SwappedMemory:                30 * mbToBytes,
+				BalloonedMemory:              40 * mbToBytes,
+				OverheadMemory:               50 * mbToBytes,
+				ConsumedOverheadMemory:       60 * mbToBytes,
+				CompressedMemory:             70 * kbToBytes,
 			},
 		},
 	}
