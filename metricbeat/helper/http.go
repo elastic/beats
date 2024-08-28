@@ -127,16 +127,10 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		req.SetBasicAuth(h.hostData.User, h.hostData.Password)
 	}
 
-	fmt.Println(">>>> Making a request with HEADERS:")
-	for k, v := range req.Header {
-		fmt.Println(">>>> ", k, " : ", v)
-	}
 	resp, err := h.client.Do(req)
 	if err != nil {
-		fmt.Println(">>>>>> Request failed.", err)
 		return nil, fmt.Errorf("error making http request: %v", err)
 	}
-	fmt.Println(">>>>>> Request succeeded.")
 
 	return resp, nil
 }
