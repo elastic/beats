@@ -31,9 +31,7 @@ import (
 func TestFetchEventContents(t *testing.T) {
 	model := simulator.ESX()
 	err := model.Create()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
