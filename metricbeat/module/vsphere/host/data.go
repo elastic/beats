@@ -24,7 +24,7 @@ import (
 )
 
 func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
-	const bytesMultiplier = int64(1024 * 1024)
+	const bytesMultiplier int64 = 1024 * 1024
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
 		"status": hs.Summary.OverallStatus,
@@ -66,7 +66,7 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 }
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
-	const bytesMultiplier = int64(1024)
+	const bytesMultiplier int64 = 1024
 	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
 		event.Put("disk.capacity.usage.bytes", val.(int64)*bytesMultiplier)
 	}

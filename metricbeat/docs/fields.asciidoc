@@ -67491,7 +67491,7 @@ type: keyword
 *`vsphere.network.type`*::
 +
 --
-Type of the network.
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
 
 
 type: keyword

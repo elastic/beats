@@ -98,7 +98,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	// Retrieve property for all networks
 	var networks []mo.Network
-	err = v.Retrieve(ctx, []string{"Network"}, []string{"summary", "name", "overallStatus", "configStatus", "vm", "host", "name"}, &networks)
+	err = v.Retrieve(ctx, []string{"Network"}, []string{"summary", "name", "overallStatus", "configStatus", "vm", "host"}, &networks)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
