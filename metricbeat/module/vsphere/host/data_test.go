@@ -66,7 +66,7 @@ func TestEventMapping(t *testing.T) {
 			"net.droppedTx.summation":     int64(50),
 			"net.droppedRx.summation":     int64(80),
 		},
-		assetsName: assetNames{
+		assetsNames: assetNames{
 			outputNetworkNames: []string{"network-1", "network-2"},
 			outputDsNames:      []string{"datastore-1", "datastore-2"},
 			outputVmNames:      []string{"vm-1", "vm-2"},
@@ -137,11 +137,11 @@ func TestEventMapping(t *testing.T) {
 	assert.EqualValues(t, metricDataTest.perfMetrics["net.droppedTx.summation"].(int64)+metricDataTest.perfMetrics["net.droppedRx.summation"].(int64), networkPacketsDroppedTotal)
 
 	networkNames, _ := event.GetValue("network_names")
-	assert.EqualValues(t, metricDataTest.assetsName.outputNetworkNames, networkNames)
+	assert.EqualValues(t, metricDataTest.assetsNames.outputNetworkNames, networkNames)
 
 	vmNames, _ := event.GetValue("vm.names")
-	assert.EqualValues(t, metricDataTest.assetsName.outputVmNames, vmNames)
+	assert.EqualValues(t, metricDataTest.assetsNames.outputVmNames, vmNames)
 
 	datastoreNames, _ := event.GetValue("datastore.names")
-	assert.EqualValues(t, metricDataTest.assetsName.outputDsNames, datastoreNames)
+	assert.EqualValues(t, metricDataTest.assetsNames.outputDsNames, datastoreNames)
 }

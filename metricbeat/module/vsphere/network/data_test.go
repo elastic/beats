@@ -43,7 +43,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	metricDataTest := metricData{
-		assetsName: assetNames{
+		assetsNames: assetNames{
 			outputHostNames: []string{"Host1"},
 			outputVmNames:   []string{"VM1"},
 		},
@@ -64,12 +64,12 @@ func TestEventMapping(t *testing.T) {
 	assert.True(t, accessible.(bool))
 
 	hostNames, _ := event.GetValue("host.names")
-	assert.Equal(t, metricDataTest.assetsName.outputHostNames, hostNames)
+	assert.Equal(t, metricDataTest.assetsNames.outputHostNames, hostNames)
 	hostCount, _ := event.GetValue("host.count")
 	assert.GreaterOrEqual(t, hostCount, 0)
 
 	vmNames, _ := event.GetValue("vm.names")
-	assert.Equal(t, metricDataTest.assetsName.outputVmNames, vmNames)
+	assert.Equal(t, metricDataTest.assetsNames.outputVmNames, vmNames)
 	vmCount, _ := event.GetValue("vm.count")
 	assert.GreaterOrEqual(t, vmCount, 0)
 
