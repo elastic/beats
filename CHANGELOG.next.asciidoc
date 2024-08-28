@@ -290,7 +290,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
 - Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
 - Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
-- Disable event normalisation for netflow input {pull}40635[40635]
+- Disable event normalization for netflow input {pull}40635[40635]
 
 *Auditbeat*
 

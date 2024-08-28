@@ -38,10 +38,10 @@ func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Even
 	return e
 }
 
-// normaliseIPFields normalises net.IP fields in the given map from []byte to string. Note that
-// this function mutates the given map and relies on the fact that every net.IP field is direct
-// entry in the map. net.IP fields that do not meet the former convention, such being part of a struct,
-// etc., are not normalised.
+// normaliseIPFields normalizes net.IP fields in the given map from []byte to string.
+// This function mutates the map and assumes every net.IP field is a direct entry.
+// Fields that don't adhere to this convention (e.g. part of a struct) are not
+// normalized.
 func normaliseIPFields(fields mapstr.M) {
 	for key, value := range fields {
 		switch valueType := value.(type) {
