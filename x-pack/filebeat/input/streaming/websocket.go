@@ -198,15 +198,14 @@ func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *l
 			const limit = 1e4
 			if _, err := io.CopyN(&buf, resp.Body, limit); err != nil && !errors.Is(err, io.EOF) {
 				metrics.errorsTotal.Inc()
-				log.Errorw("failed to read websocket response body", "error", err)
-				return
+				fmt.Fprintf(&buf, "failed to read websocket response body with error: (%s) \n", err)
 			}
 		}
 
 		// discard the remaining part of the body and check for truncation.
 		if n, err := io.Copy(io.Discard, resp.Body); err != nil {
 			metrics.errorsTotal.Inc()
-			log.Errorw("failed to discard remaining response body", "error", err)
+			fmt.Fprintf(&buf, "failed to discard remaining response body with error: (%s) ", err)
 		} else if n != 0 && buf.Len() != 0 {
 			buf.WriteString("... truncated")
 		}
