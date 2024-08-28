@@ -15,7 +15,7 @@
           type: long
           description: >
             Basic CPU performance statistics, in MHz.
-        - name: entitlment
+        - name: entitlement
           type: group
           fields:
             - name: mhz
@@ -47,10 +47,11 @@
               description: >
                 This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
               format: bytes
-            - name: entitlement.static.mhz
+            - name: entitlement.static.bytes
               type: long
               description: >
-                The static memory resource entitlement for a virtual machine.
+                The static memory resource entitlement for a virtual machine, in bytes.
+              format: bytes
             - name: private.bytes
               type: long
               description: >
@@ -92,7 +93,7 @@
     - name: name
       type: keyword
       description: >
-        Name of resource pool.
+        The name of the resource pool.
     - name: status
       type: keyword
       description: >

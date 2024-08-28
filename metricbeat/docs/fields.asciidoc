@@ -67449,7 +67449,7 @@ type: long
 --
 
 
-*`vsphere.resourcepool.cpu.entitlment.mhz`*::
+*`vsphere.resourcepool.cpu.entitlement.mhz`*::
 +
 --
 This is the amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
@@ -67459,7 +67459,7 @@ type: long
 
 --
 
-*`vsphere.resourcepool.cpu.entitlment.static.mhz`*::
+*`vsphere.resourcepool.cpu.entitlement.static.mhz`*::
 +
 --
 The static CPU resource entitlement for a virtual machine.
@@ -67507,13 +67507,15 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.entitlement.static.mhz`*::
+*`vsphere.resourcepool.memory.usage.entitlement.static.bytes`*::
 +
 --
-The static memory resource entitlement for a virtual machine.
+The static memory resource entitlement for a virtual machine, in bytes.
 
 
 type: long
+
+format: bytes
 
 --
 
@@ -67605,7 +67607,7 @@ format: bytes
 *`vsphere.resourcepool.name`*::
 +
 --
-Name of resource pool.
+The name of the resource pool.
 
 
 type: keyword

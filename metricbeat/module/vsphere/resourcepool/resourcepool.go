@@ -26,7 +26,6 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -43,7 +42,7 @@ func init() {
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet.
+// ResourcePoolMetricSet type defines all fields of the MetricSet.
 type ResourcePoolMetricSet struct {
 	*vsphere.MetricSet
 }
@@ -58,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &ResourcePoolMetricSet{ms}, nil
 }
 
-// Structure to hold performance metrics values
+// metricData holds performance metrics values.
 type metricData struct {
 	assetNames assetNames
 }
@@ -129,25 +128,23 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 }
 
 func getAssetNames(ctx context.Context, pc *property.Collector, rp *mo.ResourcePool) (assetNames, error) {
-	referenceList := append([]types.ManagedObjectReference{}, rp.Vm...)
-
-	var objects []mo.ManagedEntity
-	if len(referenceList) > 0 {
-		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
-			return assetNames{}, err
-		}
+	if len(rp.Vm) == 0 {
+		return assetNames{}, nil
 	}
 
-	outputVmNames := make([]string, 0, len(rp.Vm))
+	var objects []mo.ManagedEntity
+	err := pc.Retrieve(ctx, rp.Vm, []string{"name"}, &objects)
+	if err != nil {
+		return assetNames{}, err
+	}
+
+	outputVmNames := make([]string, 0, len(objects))
 	for _, ob := range objects {
-		name := strings.ReplaceAll(ob.Name, ".", "_")
-		switch ob.Reference().Type {
-		case "VirtualMachine":
+		if ob.Reference().Type == "VirtualMachine" {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
 			outputVmNames = append(outputVmNames, name)
 		}
 	}
 
-	return assetNames{
-		outputVmNames: outputVmNames,
-	}, nil
+	return assetNames{outputVmNames: outputVmNames}, nil
 }
