@@ -54,7 +54,7 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	var metricDataTest = metricData{
-		assetsNames: assetNames{
+		assetNames: assetNames{
 			outputVmNames: []string{"vm-1", "vm-2"},
 		},
 	}
@@ -62,10 +62,10 @@ func TestEventMapping(t *testing.T) {
 	event := m.mapEvent(ResourcePoolTest, &metricDataTest) // Ensure this is within a function
 
 	vmName, _ := event.GetValue("vm.names")
-	assert.EqualValues(t, metricDataTest.assetsNames.outputVmNames, vmName)
+	assert.EqualValues(t, metricDataTest.assetNames.outputVmNames, vmName)
 
 	vmCount, _ := event.GetValue("vm.count")
-	assert.EqualValues(t, vmCount, len(metricDataTest.assetsNames.outputVmNames))
+	assert.EqualValues(t, vmCount, len(metricDataTest.assetNames.outputVmNames))
 
 	status, _ := event.GetValue("status")
 	assert.EqualValues(t, "green", status)

@@ -47,9 +47,9 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 		event.Put("memory.compressed.bytes", rp.Summary.GetResourcePoolSummary().QuickStats.CompressedMemory*1024)
 	}
 
-	if len(data.assetsNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsNames.outputVmNames)
-		event.Put("vm.count", len(data.assetsNames.outputVmNames))
+	if len(data.assetNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetNames.outputVmNames)
+		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 	return event
 }

@@ -60,7 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Structure to hold performance metrics values
 type metricData struct {
-	assetsNames assetNames
+	assetNames assetNames
 }
 
 type assetNames struct {
@@ -120,7 +120,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(rps[i], &metricData{assetsNames: assetNames}),
+				MetricSetFields: m.mapEvent(rps[i], &metricData{assetNames: assetNames}),
 			})
 		}
 	}
