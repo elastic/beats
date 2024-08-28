@@ -18,8 +18,9 @@
 package datastore_cluster
 
 import (
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/vmware/govmomi/vim25/mo"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod) mapstr.M {
