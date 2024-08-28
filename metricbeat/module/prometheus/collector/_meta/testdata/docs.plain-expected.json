@@ -5,17 +5,20 @@
             "duration": 115000,
             "module": "prometheus"
         },
+        "metrics_count": 2,
         "metricset": {
             "name": "collector",
             "period": 10000
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:41103",
-                "job": "prometheus"
+                "instance": "127.0.0.1:62086",
+                "job": "prometheus",
+                "listener_name": "http"
             },
             "metrics": {
-                "up": 1
+                "net_conntrack_listener_conn_accepted_total": 3,
+                "net_conntrack_listener_conn_closed_total": 0
             }
         },
         "service": {
@@ -29,19 +32,18 @@
             "duration": 115000,
             "module": "prometheus"
         },
+        "metrics_count": 1,
         "metricset": {
             "name": "collector",
             "period": 10000
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:41103",
-                "job": "prometheus",
-                "listener_name": "http"
+                "instance": "127.0.0.1:62086",
+                "job": "prometheus"
             },
             "metrics": {
-                "net_conntrack_listener_conn_accepted_total": 3,
-                "net_conntrack_listener_conn_closed_total": 0
+                "up": 1
             }
         },
         "service": {

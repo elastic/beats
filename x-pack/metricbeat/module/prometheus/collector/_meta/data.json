@@ -5,6 +5,7 @@
         "duration": 115000,
         "module": "prometheus"
     },
+    "metrics_count": 1,
     "metricset": {
         "name": "collector",
         "period": 10000
