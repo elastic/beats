@@ -46,20 +46,20 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
-	if len(data.assetsNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsNames.outputVmNames)
-		event.Put("vm.count", len(data.assetsNames.outputVmNames))
+	if len(data.assetNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetNames.outputVmNames)
+		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 
-	if len(data.assetsNames.outputDsNames) > 0 {
-		event.Put("datastore.names", data.assetsNames.outputDsNames)
-		event.Put("datastore.count", len(data.assetsNames.outputDsNames))
+	if len(data.assetNames.outputDsNames) > 0 {
+		event.Put("datastore.names", data.assetNames.outputDsNames)
+		event.Put("datastore.count", len(data.assetNames.outputDsNames))
 	}
 
-	if len(data.assetsNames.outputNetworkNames) > 0 {
-		event.Put("network_names", data.assetsNames.outputNetworkNames)
-		event.Put("network.names", data.assetsNames.outputNetworkNames)
-		event.Put("network.count", len(data.assetsNames.outputNetworkNames))
+	if len(data.assetNames.outputNetworkNames) > 0 {
+		event.Put("network_names", data.assetNames.outputNetworkNames)
+		event.Put("network.names", data.assetNames.outputNetworkNames)
+		event.Put("network.count", len(data.assetNames.outputNetworkNames))
 	}
 
 	return event

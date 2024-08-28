@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 type metricData struct {
 	perfMetrics map[string]interface{}
-	assetsNames assetNames
+	assetNames  assetNames
 }
 
 type assetNames struct {
@@ -191,7 +191,7 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetsNames: assetNames}),
+				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
 			})
 		}
 	}

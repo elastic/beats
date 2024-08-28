@@ -32,14 +32,14 @@ func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event.Put("config.status", net.ConfigStatus)
 	event.Put("type", net.Self.Type)
 
-	if len(data.assetsNames.outputHostNames) > 0 {
-		event.Put("host.names", data.assetsNames.outputHostNames)
-		event.Put("host.count", len(data.assetsNames.outputHostNames))
+	if len(data.assetNames.outputHostNames) > 0 {
+		event.Put("host.names", data.assetNames.outputHostNames)
+		event.Put("host.count", len(data.assetNames.outputHostNames))
 	}
 
-	if len(data.assetsNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsNames.outputVmNames)
-		event.Put("vm.count", len(data.assetsNames.outputVmNames))
+	if len(data.assetNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetNames.outputVmNames)
+		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 
 	return event

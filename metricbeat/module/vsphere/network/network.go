@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 type metricData struct {
-	assetsNames assetNames
+	assetNames assetNames
 }
 
 type assetNames struct {
@@ -116,7 +116,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(networks[i], &metricData{assetsNames: assetNames}),
+				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames}),
 			})
 		}
 	}
