@@ -67032,7 +67032,7 @@ virtualmachine
 *`vsphere.virtualmachine.host.id`*::
 +
 --
-Host id
+Host id.
 
 
 type: keyword
@@ -67042,7 +67042,7 @@ type: keyword
 *`vsphere.virtualmachine.host.hostname`*::
 +
 --
-Host name of the host
+Hostname of the host.
 
 
 type: keyword
@@ -67052,7 +67052,7 @@ type: keyword
 *`vsphere.virtualmachine.name`*::
 +
 --
-Virtual Machine name
+Virtual Machine name.
 
 
 type: keyword
@@ -67062,7 +67062,7 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-Virtual Machine Operating System name
+Virtual Machine Operating System name.
 
 
 type: keyword
@@ -67072,7 +67072,7 @@ type: keyword
 *`vsphere.virtualmachine.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in Mhz.
 
 
 type: long
@@ -67082,7 +67082,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in Mhz.
 
 
 type: long
@@ -67092,7 +67092,7 @@ type: long
 *`vsphere.virtualmachine.cpu.free.mhz`*::
 +
 --
-Available CPU in Mhz
+Available CPU in Mhz.
 
 
 type: long
@@ -67102,7 +67102,7 @@ type: long
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
-Used Memory of Guest in bytes
+Used Memory of Guest in bytes.
 
 
 type: long
@@ -67114,7 +67114,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.used.host.bytes`*::
 +
 --
-Used Memory of Host in bytes
+Used Memory of Host in bytes.
 
 
 type: long
@@ -67126,7 +67126,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Total Memory of Guest in bytes
+Total Memory of Guest in bytes.
 
 
 type: long
@@ -67138,7 +67138,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.free.guest.bytes`*::
 +
 --
-Free Memory of Guest in bytes
+Free Memory of Guest in bytes.
 
 
 type: long
@@ -67150,7 +67150,7 @@ format: bytes
 *`vsphere.virtualmachine.custom_fields`*::
 +
 --
-Custom fields
+Custom fields.
 
 
 type: object
@@ -67160,10 +67160,72 @@ type: object
 *`vsphere.virtualmachine.network_names`*::
 +
 --
-Network names
+Network names.
 
 
 type: keyword
+
+--
+
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
 
 --
 
