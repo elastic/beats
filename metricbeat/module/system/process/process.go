@@ -115,6 +115,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
 			// return only if the error is fatal in nature
 			return fmt.Errorf("process stats: %w", err)
+		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			err = mb.PartialMetricsError{Err: err}
 		}
 
 		for evtI := range procs {
