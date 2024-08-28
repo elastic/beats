@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
 - The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
 - Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
+- awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
 
 *Heartbeat*
 
