@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
+	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -36,7 +36,7 @@ type histogram struct {
 	metricName string
 }
 
-func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool) (remote_write.RemoteWriteEventsGenerator, error) {
+func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool) (rw.RemoteWriteEventsGenerator, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, countMetrics bool)
 		return &g, nil
 	}
 
-	return remote_write.DefaultRemoteWriteEventsGeneratorFactory(base, countMetrics)
+	return rw.DefaultRemoteWriteEventsGeneratorFactory(base, countMetrics)
 }
 
 type remoteWriteTypedGenerator struct {
