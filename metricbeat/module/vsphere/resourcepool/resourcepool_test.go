@@ -66,7 +66,7 @@ func TestFetchEventContents(t *testing.T) {
 		assert.GreaterOrEqual(t, memory["usage.guest.mb"], 0)
 		assert.GreaterOrEqual(t, memory["usage.host.mb"], 0)
 		assert.GreaterOrEqual(t, memory["entitlement.mb"], 0)
-		assert.GreaterOrEqual(t, memory["static.entitlement.mhz"], 0)
+		assert.GreaterOrEqual(t, memory["static.entitlement.bytes"], 0)
 		assert.GreaterOrEqual(t, memory["private.mb"], 0)
 		assert.GreaterOrEqual(t, memory["shared.mb"], 0)
 		assert.GreaterOrEqual(t, memory["swapped.mb"], 0)

@@ -41,7 +41,7 @@ func TestEventMapping(t *testing.T) {
 				DistributedCpuEntitlement:    50,
 				DistributedMemoryEntitlement: 50 * mbToBytes,
 				StaticCpuEntitlement:         40,
-				StaticMemoryEntitlement:      78,
+				StaticMemoryEntitlement:      78 * mbToBytes,
 				PrivateMemory:                10 * mbToBytes,
 				SharedMemory:                 20 * mbToBytes,
 				SwappedMemory:                30 * mbToBytes,
@@ -94,7 +94,7 @@ func TestEventMapping(t *testing.T) {
 	cpuStaticEntitlement, _ := event.GetValue("cpu.entitlement.static.mhz")
 	assert.GreaterOrEqual(t, cpuStaticEntitlement, int32(0))
 
-	memoryStaticEntitlement, _ := event.GetValue("memory.entitlement.static.mhz")
+	memoryStaticEntitlement, _ := event.GetValue("memory.entitlement.static.bytes")
 	assert.GreaterOrEqual(t, memoryStaticEntitlement, int32(0))
 
 	memoryPrivate, _ := event.GetValue("memory.private.bytes")

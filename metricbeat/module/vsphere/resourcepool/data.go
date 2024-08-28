@@ -45,7 +45,7 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 	event.Put("memory.usage.guest.bytes", quickStats.GuestMemoryUsage*mbToBytes)
 	event.Put("memory.usage.host.bytes", quickStats.HostMemoryUsage*mbToBytes)
 	event.Put("memory.entitlement.bytes", quickStats.DistributedMemoryEntitlement*mbToBytes)
-	event.Put("memory.entitlement.static.mhz", quickStats.StaticMemoryEntitlement)
+	event.Put("memory.entitlement.static.bytes", quickStats.StaticMemoryEntitlement*mbToBytes)
 	event.Put("memory.private.bytes", quickStats.PrivateMemory*mbToBytes)
 	event.Put("memory.shared.bytes", quickStats.SharedMemory*mbToBytes)
 	event.Put("memory.swapped.bytes", quickStats.SwappedMemory*mbToBytes)

@@ -67495,7 +67495,8 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.entitlement.bytes`*::
+
+*`vsphere.resourcepool.memory.entitlement.bytes`*::
 +
 --
 This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
@@ -67507,7 +67508,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.entitlement.static.bytes`*::
+*`vsphere.resourcepool.memory.entitlement.static.bytes`*::
 +
 --
 The static memory resource entitlement for a virtual machine, in bytes.
@@ -67519,7 +67520,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.private.bytes`*::
+*`vsphere.resourcepool.memory.private.bytes`*::
 +
 --
 The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
@@ -67531,7 +67532,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.shared.bytes`*::
+*`vsphere.resourcepool.memory.shared.bytes`*::
 +
 --
 The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
@@ -67543,7 +67544,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.swapped.bytes`*::
+*`vsphere.resourcepool.memory.swapped.bytes`*::
 +
 --
 The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
@@ -67555,7 +67556,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.ballooned.bytes`*::
+*`vsphere.resourcepool.memory.ballooned.bytes`*::
 +
 --
 The size of the balloon driver in a virtual machine, in bytes.
@@ -67568,7 +67569,7 @@ format: bytes
 --
 
 
-*`vsphere.resourcepool.memory.usage.overhead.bytes`*::
+*`vsphere.resourcepool.memory.overhead.bytes`*::
 +
 --
 The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
@@ -67580,7 +67581,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.overhead.consumed.bytes`*::
+*`vsphere.resourcepool.memory.overhead.consumed.bytes`*::
 +
 --
 The amount of overhead memory, in bytes, currently being consumed to run a VM.
@@ -67592,7 +67593,7 @@ format: bytes
 
 --
 
-*`vsphere.resourcepool.memory.usage.compressed.bytes`*::
+*`vsphere.resourcepool.memory.compressed.bytes`*::
 +
 --
 The amount of compressed memory currently consumed by VM, in bytes.

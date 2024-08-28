@@ -18,64 +18,57 @@
             "name": "Resources",
             "status": "green",
             "vm": {
-                "names": [
-                    "DC0_H0_VM0", 
-                    "DC0_H0_VM1"
-                ],
+                "names": ["DC0_H0_VM0", "DC0_H0_VM1"],
                 "count": 2
             },
             "cpu": {
                 "usage": {
-                    "mhz": 3344
+                    "mhz": 3323
                 },
                 "demand": {
-                    "mhz": 3365
+                    "mhz": 3344
                 },
                 "entitlement": {
-                    "mhz": 3176
-                },
-                "static": {
-                    "entitlement": {
+                    "mhz": 3197,
+                    "static": {
                         "mhz": 21294
                     }
                 }
             },
             "memory": {
                 "compressed": {
-                    "mb": 0
-                },
-                "static": {
-                    "entitlement": {
-                        "mhz": 122907
-                    }
-                },
-                "shared": {
-                    "mb": 45
-                },
-                "overhead": {
-                    "mb": 1617,
-                    "consumed": {
-                        "mb": 953
-                    }
-                },
-                "ballooned": {
-                    "mb": 0
-                },
-                "swapped": {
-                    "mb": 0
-                },
-                "entitlement": {
-                    "mb": 38068
-                },
-                "private": {
-                    "mb": 115395
+                    "bytes": 0
                 },
                 "usage": {
                     "guest": {
-                        "mb": 7975
+                        "bytes": 6515851264
                     },
                     "host": {
-                        "mb": 116347
+                        "bytes": 122227261440
+                    }
+                },
+                "entitlement": {
+                    "bytes": 38726008832,
+                    "static": {
+                        "bytes": 14680064
+                    }
+                },
+                "private": {
+                    "bytes": 121226919936
+                },
+                "shared": {
+                    "bytes": 45088768
+                },
+                "swapped": {
+                    "bytes": 0
+                },
+                "ballooned": {
+                    "bytes": 0
+                },
+                "overhead": {
+                    "bytes": 1695547392,
+                    "consumed": {
+                        "bytes": 1001390080
                     }
                 }
             }
