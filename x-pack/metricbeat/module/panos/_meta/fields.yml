@@ -1,0 +1,10 @@
+- key: panos
+  title: "panos"
+  release: beta
+  description: >
+    panos module
+  fields:
+    - name: panos
+      type: group
+      description: >
+      fields:

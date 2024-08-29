@@ -1,0 +1,10 @@
+- name: licenses
+  type: group
+  release: beta
+  description: >
+    licenses
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

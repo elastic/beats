@@ -1268,6 +1268,14 @@ metricbeat.modules:
   # username: ""
   # password: ""
 
+#-------------------------------- Panos Module --------------------------------
+- module: panos
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
