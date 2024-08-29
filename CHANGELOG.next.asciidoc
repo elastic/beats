@@ -317,6 +317,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 
 *Metricbeat*
 
