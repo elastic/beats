@@ -66,7 +66,7 @@ func (m *DsMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
 }
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
-	const bytesMultiplier = int64(1024)
+	const bytesMultiplier int64 = 1024
 
 	if val, exist := perfMetricMap["datastore.read.average"]; exist {
 		event.Put("read.bytes", val.(int64)*bytesMultiplier)

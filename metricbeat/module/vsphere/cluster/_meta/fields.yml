@@ -2,7 +2,7 @@
   type: group
   release: beta
   description: >
-    cluster
+    Cluster information
   fields:
     - name: datastore.names
       type: keyword
@@ -11,27 +11,27 @@
     - name: datastore.count
       type: long
       description: >
-        Number of datastore.
+         Number of Datastores.
     - name: das_config.admission.control.enabled
       type: boolean
       description: >
-        Flag that determines whether strict admission control is enabled.
+        Indicates whether strict admission control is enabled.
     - name: das_config.enabled
       type: boolean
       description: >
-        Flag to indicate whether or not vSphere HA feature is enabled.
+        Indicates whether vSphere HA feature is enabled.
     - name: host.count
       type: long
       description: >
-        Number of hosts.
+        Number of Hosts.
     - name: host.names
       type: keyword
       description: >
-        list of all the Host names associated with the cluster.
+        List of all the Host names associated with the cluster.
     - name: network.count
       type: long
       description: >
-        Number of network.
+        Number of Networks.
     - name: network.names
       type: keyword
       description: >

@@ -29,7 +29,6 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/types"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -115,10 +114,10 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 			}
 
 			if clt[i].Configuration.DasConfig.AdmissionControlEnabled == nil {
-				m.Logger().Warnf("Metric das_config.admission.control.enabled not found")
+				m.Logger().Warn("Metric das_config.admission.control.enabled not found")
 			}
 			if clt[i].Configuration.DasConfig.Enabled == nil {
-				m.Logger().Warnf("Metric das_config.enabled not found")
+				m.Logger().Warn("Metric das_config.enabled not found")
 			}
 
 			reporter.Event(mb.Event{
@@ -131,16 +130,14 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 }
 
 func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterComputeResource) (*assetNames, error) {
-	referenceList := make([]types.ManagedObjectReference, 0, len(cl.Datastore)+len(cl.Host))
-	referenceList = append(referenceList, cl.Datastore...)
-	referenceList = append(referenceList, cl.Host...)
+	referenceList := append(cl.Datastore, cl.Host...)
 
 	outputDsNames := make([]string, 0, len(cl.Datastore))
 	outputHsNames := make([]string, 0, len(cl.Host))
 	if len(referenceList) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to retrieve managed entities: %w", err)
 		}
 
 		for _, ob := range objects {
@@ -160,7 +157,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	if len(cl.Network) > 0 {
 		var netObjects []mo.Network
 		if err := pc.Retrieve(ctx, cl.Network, []string{"name"}, &netObjects); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to retrieve network objects: %w", err)
 		}
 
 		for _, ob := range netObjects {
