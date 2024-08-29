@@ -41,7 +41,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type MetricSet struct {
+type HostMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -51,12 +51,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &HostMetricSet{ms}, nil
 }
 
 type metricData struct {
 	perfMetrics map[string]interface{}
-	assetsName  assetNames
+	assetNames  assetNames
 }
 
 type assetNames struct {
@@ -89,7 +89,7 @@ var metricSet = map[string]struct{}{
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -191,10 +191,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.eventMapping(hst[i], &metricData{
-					perfMetrics: metricMap,
-					assetsName:  assetNames,
-				}),
+				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
 			})
 		}
 	}
