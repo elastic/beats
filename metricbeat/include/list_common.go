@@ -184,6 +184,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/network"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/resourcepool"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
