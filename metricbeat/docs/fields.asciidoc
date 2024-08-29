@@ -67421,6 +67421,105 @@ type: long
 --
 
 [float]
+=== network
+
+Network-related information.
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+Indicates whether at least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+Indicates whether the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts connected to this network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of the Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.type`*::
++
+--
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines connected to this network.
+
+
+type: long
+
+--
+
+[float]
 === virtualmachine
 
 virtualmachine
@@ -67430,7 +67529,7 @@ virtualmachine
 *`vsphere.virtualmachine.host.id`*::
 +
 --
-Host id
+Host id.
 
 
 type: keyword
@@ -67440,7 +67539,7 @@ type: keyword
 *`vsphere.virtualmachine.host.hostname`*::
 +
 --
-Host name of the host
+Hostname of the host.
 
 
 type: keyword
@@ -67450,7 +67549,7 @@ type: keyword
 *`vsphere.virtualmachine.name`*::
 +
 --
-Virtual Machine name
+Virtual Machine name.
 
 
 type: keyword
@@ -67460,7 +67559,7 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-Virtual Machine Operating System name
+Virtual Machine Operating System name.
 
 
 type: keyword
@@ -67470,7 +67569,7 @@ type: keyword
 *`vsphere.virtualmachine.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in Mhz.
 
 
 type: long
@@ -67480,7 +67579,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in Mhz.
 
 
 type: long
@@ -67490,7 +67589,7 @@ type: long
 *`vsphere.virtualmachine.cpu.free.mhz`*::
 +
 --
-Available CPU in Mhz
+Available CPU in Mhz.
 
 
 type: long
@@ -67500,7 +67599,7 @@ type: long
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
-Used Memory of Guest in bytes
+Used Memory of Guest in bytes.
 
 
 type: long
@@ -67512,7 +67611,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.used.host.bytes`*::
 +
 --
-Used Memory of Host in bytes
+Used Memory of Host in bytes.
 
 
 type: long
@@ -67524,7 +67623,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Total Memory of Guest in bytes
+Total Memory of Guest in bytes.
 
 
 type: long
@@ -67536,7 +67635,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.free.guest.bytes`*::
 +
 --
-Free Memory of Guest in bytes
+Free Memory of Guest in bytes.
 
 
 type: long
@@ -67548,7 +67647,7 @@ format: bytes
 *`vsphere.virtualmachine.custom_fields`*::
 +
 --
-Custom fields
+Custom fields.
 
 
 type: object
@@ -67558,10 +67657,72 @@ type: object
 *`vsphere.virtualmachine.network_names`*::
 +
 --
-Network names
+Network names.
 
 
 type: keyword
+
+--
+
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
 
 --
 
