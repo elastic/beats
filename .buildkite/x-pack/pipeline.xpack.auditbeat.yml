@@ -37,7 +37,7 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
           cpu: "4000m"
@@ -88,7 +88,7 @@ steps:
           mage update build test
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -100,6 +100,75 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Build (MODULE) Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
+        key: "mandatory-rhel9-unit-test"
+        command: |
+          cd x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_RHEL9_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: RHEL9 Unit Tests"
+
+      - label: ":windows: x-pack/auditbeat: Win 2022 Unit Tests"
+        key: "mandatory-win-2022-unit-tests"
+        command: |
+          Set-Location -Path x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Win 2022 Unit Tests"
+
+      - label: ":windows: x-pack/auditbeat: Win 2016 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/auditbeat
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Win 2016 Unit Tests"
+
+  - group: "Extended Windows Tests"
+    key: "x-pack-auditbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
       - label: ":windows: x-pack/auditbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/auditbeat
@@ -107,7 +176,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -155,7 +224,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -167,7 +236,32 @@ steps:
           - "x-pack/auditbeat/build/*.json"
         notify:
           - github_commit_status:
+<<<<<<< HEAD
               context: "x-pack/auditbeat: Win 10 Extended Tests"
+=======
+              context: "x-pack/auditbeat: Win 10 Unit Tests"
+
+      - label: ":windows: x-pack/auditbeat: Win 11 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/auditbeat
+          mage build unitTest
+        key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Win 11 Unit Tests"
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
 
   - group: "Extended Tests"
     key: "x-pack-auditbeat-extended-tests"
@@ -183,7 +277,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -194,6 +288,48 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: macOS x86_64 Unit Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":mac: x-pack/auditbeat: macOS arm64 Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: macOS arm64 Unit Tests"
+
+      - label: ":ubuntu: x-pack/auditbeat: Ubuntu arm64 Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        command: |
+          cd x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Ubuntu arm64 Unit Tests"
+
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
@@ -213,7 +349,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -234,7 +370,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

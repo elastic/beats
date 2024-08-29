@@ -37,7 +37,7 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
           cpu: "4000m"
@@ -65,7 +65,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -111,7 +111,7 @@ steps:
           cd x-pack/metricbeat && mage pythonIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -156,7 +156,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -170,6 +170,35 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 2016 Unit Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/metricbeat
+          mage build unitTest
+        key: "mandatory-win-2022-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Win 2022 Unit Tests"
+
+  - group: "Extended Windows Tests"
+    key: "x-pack-metricbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
       - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
@@ -177,7 +206,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -191,6 +220,51 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 10 Unit Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/metricbeat
+          mage build unitTest
+        key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Win 11 Unit Tests"
+
+      - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/metricbeat
+          mage build unitTest
+        key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Win 2019 Unit Tests"
+
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
   - group: "Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
@@ -204,7 +278,7 @@ steps:
           cd x-pack/metricbeat && mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -215,6 +289,30 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":mac: x-pack/metricbeat: macOS arm64 Unit Tests"
+        skip: "Skipping due to elastic/beats#33036 & elastic/beats#40496"
+        # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/beats/issues/40496
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/metricbeat && mage build unitTest
+        retry:
+          automatic:
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: macOS arm64 Unit Tests"
+
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
       - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
@@ -259,7 +357,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -280,7 +378,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

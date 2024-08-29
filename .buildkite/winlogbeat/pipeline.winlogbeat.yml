@@ -33,7 +33,7 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
           cpu: "4000m"
@@ -59,7 +59,7 @@ steps:
         command: "make -C winlogbeat crosscompile"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -71,6 +71,30 @@ steps:
           - github_commit_status:
               context: "winlogbeat: Crosscompile"
 
+<<<<<<< HEAD
+=======
+      - label: ":windows: Winlogbeat: Win 2016 Unit Tests"
+        command: |
+          Set-Location -Path winlogbeat
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "winlogbeat/build/*.xml"
+          - "winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "winlogbeat: Win 2016 Unit Tests"
+
+>>>>>>> a5f258c962 ([CI] Set Buildkite retries to 1 (#40440))
       - label: ":windows: Winlogbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
@@ -78,7 +102,7 @@ steps:
         key: "mandatory-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -99,7 +123,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -125,7 +149,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -146,7 +170,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -180,7 +204,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
