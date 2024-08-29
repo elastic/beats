@@ -54,7 +54,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
-- Add metrics for the vSphere Cluster metricset. {pull}40536[40536]
 - Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
@@ -290,6 +289,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
 - Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
+- Add new metricset Cluster for the vSphere module. {pull}40536[40536]
 
 *Auditbeat*
 
