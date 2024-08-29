@@ -28,7 +28,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *DsMetricSet
+	var m *DataStoreMetricSet
 	var datastoreTest = mo.Datastore{
 		Summary: types.DatastoreSummary{
 			Name:      "datastore-test",
@@ -54,8 +54,8 @@ func TestEventMapping(t *testing.T) {
 			"datastore.totalWriteLatency.average": int64(100),
 		},
 		assetNames: assetNames{
-			outputHsNames: []string{"DC3_H0"},
-			outputVmNames: []string{"DC3_H0_VM0"},
+			outputHostNames: []string{"DC3_H0"},
+			outputVmNames:   []string{"DC3_H0_VM0"},
 		},
 	}
 

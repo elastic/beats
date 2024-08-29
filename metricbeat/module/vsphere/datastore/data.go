@@ -23,16 +23,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *DsMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
+func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
 		"host": mapstr.M{
-			"count": len(data.assetNames.outputHsNames),
+			"count": len(data.assetNames.outputHostNames),
+			"names": data.assetNames.outputHostNames,
 		},
 		"vm": mapstr.M{
 			"count": len(data.assetNames.outputVmNames),
+			"names": data.assetNames.outputVmNames,
 		},
 		"capacity": mapstr.M{
 			"total": mapstr.M{
@@ -50,14 +52,6 @@ func (m *DsMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
 	if ds.Summary.Capacity > 0 {
 		usedSpacePercent := float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
 		event.Put("capacity.used.pct", usedSpacePercent)
-	}
-
-	if len(data.assetNames.outputHsNames) > 0 {
-		event.Put("host.names", data.assetNames.outputHsNames)
-	}
-
-	if len(data.assetNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetNames.outputVmNames)
 	}
 
 	mapPerfMetricToEvent(event, data.perfMetrics)

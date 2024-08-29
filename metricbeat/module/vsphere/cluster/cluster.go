@@ -48,9 +48,9 @@ type ClusterMetricSet struct {
 }
 
 type assetNames struct {
-	outputNtNames []string
-	outputDsNames []string
-	outputHsNames []string
+	outputNetworkNames   []string
+	outputDatastoreNames []string
+	outputHostNames      []string
 }
 
 // New creates a new instance of the MetricSet.
@@ -75,7 +75,7 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vSphere: %w", err))
 		}
 	}()
 
@@ -91,13 +91,13 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vshphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
 		}
 	}()
 
 	// Retrieve summary property for all Clusters
 	var clt []mo.ClusterComputeResource
-	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{}, &clt)
+	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{"name", "host", "network", "datastore", "configuration"}, &clt)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -132,8 +132,8 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterComputeResource) (*assetNames, error) {
 	referenceList := append(cl.Datastore, cl.Host...)
 
-	outputDsNames := make([]string, 0, len(cl.Datastore))
-	outputHsNames := make([]string, 0, len(cl.Host))
+	outputDatastoreNames := make([]string, 0, len(cl.Datastore))
+	outputHostNames := make([]string, 0, len(cl.Host))
 	if len(referenceList) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
@@ -144,16 +144,16 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 			name := strings.ReplaceAll(ob.Name, ".", "_")
 			switch ob.Reference().Type {
 			case "Datastore":
-				outputDsNames = append(outputDsNames, name)
+				outputDatastoreNames = append(outputDatastoreNames, name)
 			case "HostSystem":
-				outputHsNames = append(outputHsNames, name)
+				outputHostNames = append(outputHostNames, name)
 			}
 		}
 	}
 
 	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
 	// instead mo.Network.Name contains correct value of Network name
-	outputNtNames := make([]string, 0, len(cl.Network))
+	outputNetworkNames := make([]string, 0, len(cl.Network))
 	if len(cl.Network) > 0 {
 		var netObjects []mo.Network
 		if err := pc.Retrieve(ctx, cl.Network, []string{"name"}, &netObjects); err != nil {
@@ -162,13 +162,13 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 
 		for _, ob := range netObjects {
 			name := strings.ReplaceAll(ob.Name, ".", "_")
-			outputNtNames = append(outputNtNames, name)
+			outputNetworkNames = append(outputNetworkNames, name)
 		}
 	}
 
 	return &assetNames{
-		outputNtNames: outputNtNames,
-		outputDsNames: outputDsNames,
-		outputHsNames: outputHsNames,
+		outputNetworkNames:   outputNetworkNames,
+		outputDatastoreNames: outputDatastoreNames,
+		outputHostNames:      outputHostNames,
 	}, nil
 }

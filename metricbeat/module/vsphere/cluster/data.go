@@ -24,7 +24,21 @@ import (
 )
 
 func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
-	event := mapstr.M{}
+	event := mapstr.M{
+		"host": mapstr.M{
+			"count": len(data.outputHostNames),
+			"names": data.outputHostNames,
+		},
+		"datastore": mapstr.M{
+			"count": len(data.outputDatastoreNames),
+			"names": data.outputDatastoreNames,
+		},
+		"network": mapstr.M{
+			"count": len(data.outputNetworkNames),
+			"names": data.outputNetworkNames,
+		},
+		"name": cl.Name,
+	}
 
 	if cl.Configuration.DasConfig.Enabled != nil {
 		event.Put("das_config.enabled", *cl.Configuration.DasConfig.Enabled)
@@ -33,13 +47,6 @@ func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *assetNam
 	if cl.Configuration.DasConfig.AdmissionControlEnabled != nil {
 		event.Put("das_config.admission.control.enabled", *cl.Configuration.DasConfig.AdmissionControlEnabled)
 	}
-
-	event.Put("host.count", len(data.outputHsNames))
-	event.Put("host.names", data.outputHsNames)
-	event.Put("datastore.count", len(data.outputDsNames))
-	event.Put("datastore.names", data.outputDsNames)
-	event.Put("network.count", len(data.outputNtNames))
-	event.Put("network.names", data.outputNtNames)
 
 	return event
 }

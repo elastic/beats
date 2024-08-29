@@ -41,7 +41,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type DsMetricSet struct {
+type DataStoreMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DsMetricSet{ms}, nil
+	return &DataStoreMetricSet{ms}, nil
 }
 
 type metricData struct {
@@ -61,7 +61,7 @@ type metricData struct {
 
 type assetNames struct {
 	outputVmNames []string
-	outputHsNames []string
+	outputHostNames []string
 }
 
 // Define metrics to be collected
@@ -76,7 +76,7 @@ var metricSet = map[string]struct{}{
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *DsMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -205,9 +205,8 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 			}
 		}
 	}
-
 	// calling Host explicitly because of mo.Datastore.Host has types.DatastoreHostMount instead of mo.ManagedEntity
-	outputHsNames := make([]string, 0, len(ds.Host))
+	outputHostNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
 		hsRefs := make([]types.ManagedObjectReference, 0, len(ds.Host))
 		for _, obj := range ds.Host {
@@ -227,12 +226,12 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 
 		for _, host := range hosts {
 			name := strings.ReplaceAll(host.Name, ".", "_")
-			outputHsNames = append(outputHsNames, name)
+			outputHostNames = append(outputHostNames, name)
 		}
 	}
 
 	return &assetNames{
-		outputHsNames: outputHsNames,
+		outputHostNames: outputHostNames,
 		outputVmNames: outputVmNames,
 	}, nil
 }

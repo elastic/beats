@@ -47,9 +47,10 @@ func TestFetchEventContents(t *testing.T) {
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	testEvent := mapstr.M{
+		"name": "DC0_C0",
 		"host": mapstr.M{
 			"count": 3,
 			"names": []string{"DC0_C0_H0", "DC0_C0_H1", "DC0_C0_H2"},
@@ -67,7 +68,7 @@ func TestFetchEventContents(t *testing.T) {
 	assert.Exactly(t, event, testEvent)
 }
 
-func TestData(t *testing.T) {
+func TestClusterMetricSetData(t *testing.T) {
 	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")

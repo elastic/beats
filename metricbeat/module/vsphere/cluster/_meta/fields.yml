@@ -2,37 +2,49 @@
   type: group
   release: beta
   description: >
-    Cluster information
+    Cluster information.
   fields:
-    - name: datastore.names
+    - name: datastore
+      type: group  
+        - name: names
+          type: keyword
+          description: >
+            List of all the Datastore names associated with the cluster.
+        - name: count
+          type: long
+          description: >
+            Number of Datastores.
+    - name: das_config
+      type: group  
+        - name: admission.control.enabled
+          type: boolean
+          description: >
+            Indicates whether strict admission control is enabled.
+        - name: enabled
+          type: boolean
+          description: >
+            Indicates whether vSphere HA feature is enabled.
+    - name: host
+      type: group     
+        - name: count
+          type: long
+          description: >
+            Number of Hosts.
+        - name: names
+          type: keyword
+          description: >
+            List of all the Host names associated with the cluster.
+    - name: name
       type: keyword
       description: >
-        List of all the Datastore names associated with the cluster.
-    - name: datastore.count
-      type: long
-      description: >
-         Number of Datastores.
-    - name: das_config.admission.control.enabled
-      type: boolean
-      description: >
-        Indicates whether strict admission control is enabled.
-    - name: das_config.enabled
-      type: boolean
-      description: >
-        Indicates whether vSphere HA feature is enabled.
-    - name: host.count
-      type: long
-      description: >
-        Number of Hosts.
-    - name: host.names
-      type: keyword
-      description: >
-        List of all the Host names associated with the cluster.
-    - name: network.count
-      type: long
-      description: >
-        Number of Networks.
-    - name: network.names
-      type: keyword
-      description: >
-        List of all the Network names associated with the cluster.
+        Cluster name.
+    - name: network
+      type: group 
+        - name: count
+          type: long
+          description: >
+            Number of Networks.
+        - name: names
+          type: keyword
+          description: >
+            List of all the Network names associated with the cluster.

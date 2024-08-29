@@ -80,7 +80,7 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func TestDsMetricsetData(t *testing.T) {
+func TestDataStoreMetricSetData(t *testing.T) {
 	model := simulator.ESX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")

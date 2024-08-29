@@ -30,6 +30,11 @@ import (
 func TestEventMapping(t *testing.T) {
 	var m *ClusterMetricSet
 	var ClusterTest = mo.ClusterComputeResource{
+		ComputeResource: mo.ComputeResource{
+			ManagedEntity: mo.ManagedEntity{
+				Name: "Cluster_0",
+			},
+		},
 		Configuration: types.ClusterConfigInfo{
 			DasConfig: types.ClusterDasConfigInfo{
 				Enabled:                 types.NewBool(false),
@@ -39,9 +44,9 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	var assetNames = assetNames{
-		outputHsNames: []string{"Host_0"},
-		outputDsNames: []string{"Datastore_0"},
-		outputNtNames: []string{"Network_0"},
+		outputHostNames:      []string{"Host_0"},
+		outputDatastoreNames: []string{"Datastore_0"},
+		outputNetworkNames:   []string{"Network_0"},
 	}
 
 	outputEvent := m.mapEvent(ClusterTest, &assetNames)
@@ -54,6 +59,7 @@ func TestEventMapping(t *testing.T) {
 				},
 			},
 		},
+		"name": "Cluster_0",
 		"host": mapstr.M{
 			"count": 1,
 			"names": []string{"Host_0"},
