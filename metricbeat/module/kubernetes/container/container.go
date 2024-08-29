@@ -20,7 +20,12 @@ package container
 import (
 	"fmt"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/logp"
+=======
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+>>>>>>> 2491f08379 ([metricbeat][Kubernetes] Update token on the first HTTP 401 when making requests to kubelet API (#40636))
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"

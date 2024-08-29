@@ -23,8 +23,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 
 	"github.com/pkg/errors"
 
@@ -39,13 +42,14 @@ var userAgent = useragent.UserAgent("Metricbeat", true)
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
 type HTTP struct {
-	hostData mb.HostData
-	client   *http.Client // HTTP client that is reused across requests.
-	headers  http.Header
-	name     string
-	uri      string
-	method   string
-	body     []byte
+	hostData   mb.HostData
+	bearerFile string
+	client     *http.Client // HTTP client that is reused across requests.
+	headers    http.Header
+	name       string
+	uri        string
+	method     string
+	body       []byte
 }
 
 // NewHTTP creates new http helper
@@ -58,8 +62,13 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	return newHTTPFromConfig(config, base.Name(), base.HostData())
 }
 
+<<<<<<< HEAD
 // newHTTPWithConfig creates a new http helper from some configuration
 func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP, error) {
+=======
+// NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
+func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
+>>>>>>> 2491f08379 ([metricbeat][Kubernetes] Update token on the first HTTP 401 when making requests to kubelet API (#40636))
 	headers := http.Header{}
 	if config.Headers == nil {
 		config.Headers = map[string]string{}
@@ -97,12 +106,13 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 	}
 
 	return &HTTP{
-		hostData: hostData,
-		client:   client,
-		headers:  headers,
-		method:   "GET",
-		uri:      hostData.SanitizedURI,
-		body:     nil,
+		hostData:   hostData,
+		bearerFile: config.BearerTokenFile,
+		client:     client,
+		headers:    headers,
+		method:     "GET",
+		uri:        hostData.SanitizedURI,
+		body:       nil,
 	}, nil
 }
 
@@ -127,7 +137,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	resp, err := h.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
+		return nil, fmt.Errorf("error making http request: %w", err)
 	}
 
 	return resp, nil
@@ -180,7 +190,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.name, resp.Status)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // FetchScanner returns a Scanner for the content.
@@ -211,11 +221,23 @@ func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
 	return data, nil
 }
 
-// getAuthHeaderFromToken reads a bearer authorizaiton token from the given file
+func (h *HTTP) RefreshAuthorizationHeader() (bool, error) {
+	if h.bearerFile != "" {
+		header, err := getAuthHeaderFromToken(h.bearerFile)
+		if err != nil {
+			return false, err
+		}
+		h.headers.Set("Authorization", header)
+		return true, nil
+	}
+	return false, nil
+}
+
+// getAuthHeaderFromToken reads a bearer authorization token from the given file
 func getAuthHeaderFromToken(path string) (string, error) {
 	var token string
 
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return "", errors.Wrap(err, "reading bearer token file")
 	}
