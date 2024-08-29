@@ -6,10 +6,11 @@ package gcs
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"net/url"
 
 	"cloud.google.com/go/storage"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -30,5 +31,9 @@ func fetchStorageClient(ctx context.Context, cfg config, log *logp.Logger) (*sto
 	} else if cfg.Auth.CredentialsFile != nil {
 		return storage.NewClient(ctx, option.WithCredentialsFile(cfg.Auth.CredentialsFile.Path))
 	}
-	return nil, errors.New("no valid auth specified")
+	cred, err := google.FindDefaultCredentials(ctx, storage.ScopeReadOnly)
+	if err != nil {
+		return nil, fmt.Errorf("no valid auth specified: %w", err)
+	}
+	return storage.NewClient(ctx, option.WithCredentials(cred))
 }
