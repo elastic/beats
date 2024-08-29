@@ -25,7 +25,7 @@ func Run(commands string) (*string, *string, error) {
 	filename := fmt.Sprintf("command-%d.ps1", rInt)
 	err := os.WriteFile(filename, []byte(commands), os.FileMode(0700))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error writing command file: %+q", err)
+		return nil, nil, fmt.Errorf("error writing command file: %w", err)
 	}
 
 	var stderr bytes.Buffer
@@ -39,11 +39,11 @@ func Run(commands string) (*string, *string, error) {
 	defer os.Remove(filename)
 
 	if err := cmd.Start(); err != nil {
-		return nil, nil, fmt.Errorf("error starting: %+v", err)
+		return nil, nil, fmt.Errorf("error starting: %w", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return nil, nil, fmt.Errorf("error waiting: %+v", err)
+		return nil, nil, fmt.Errorf("error waiting: %w", err)
 	}
 
 	stdOutStr := stdout.String()

@@ -7,6 +7,7 @@
 package application_pool
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -35,7 +36,6 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
-	counters         map[string]string
 	status           string
 }
 
@@ -99,7 +99,7 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
+			if errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) || errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) || errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) || errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value)
 			} else {
@@ -179,7 +179,7 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
 					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
-					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+					if errors.Is(val.Err.Error, pdh.PDH_CALC_NEGATIVE_VALUE) || errors.Is(val.Err.Error, pdh.PDH_INVALID_DATA) {
 						r.log.Debugw("Counter value retrieval returned",
 							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("application_pool"), "query", counterPath)
 						continue
@@ -206,16 +206,13 @@ func (r *Reader) close() error {
 
 func getAllAppPool() (map[string]string, error) {
 
-	commands := fmt.Sprintf(`
-	Import-Module WebAdministration
-	Get-IISAppPool`)
-
+	commands := "Import-Module WebAdministration\r\n\tGet-IISAppPool"
 	stdout, stderr, err := Run(commands)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving App Pool %q", err)
+		return nil, fmt.Errorf("error retrieving App Pool %w", err)
 	}
 	if *stderr != "" {
-		return nil, fmt.Errorf("error retrieving App Pool %q", *stderr)
+		return nil, fmt.Errorf("error retrieving App Pool %v", *stderr)
 	}
 
 	allPooldata := parseApplicationPool(*stdout)
