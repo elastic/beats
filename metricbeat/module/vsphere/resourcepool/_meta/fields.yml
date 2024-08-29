@@ -111,4 +111,4 @@
         - name: names
           type: keyword
           description: >
-            List of all the VM names.
+            Names of virtual machines on the resource pool.
