@@ -9,7 +9,7 @@
       description: >
         application pool name
     - name: status
-      type: string
+      type: keyword
       description: >
         status of application pool
     - name: process
