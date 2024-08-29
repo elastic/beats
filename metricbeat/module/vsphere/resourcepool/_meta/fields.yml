@@ -21,7 +21,7 @@
             - name: mhz
               type: long
               description: >
-                This is the amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+                The amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
             - name: static.mhz
               type: long
               description: >
