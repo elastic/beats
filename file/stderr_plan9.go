@@ -15,32 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build unix
+//go:build plan9
 
 package file
 
 import (
-	"errors"
 	"os"
-	"syscall"
+
+	"golang.org/x/sys/plan9"
 )
 
-func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInfo, error) {
-	info, err := statFunc(name)
-	if err != nil {
-		return nil, err
-	}
-
-	return wrap(info)
-}
-
-func wrap(info os.FileInfo) (FileInfo, error) {
-	stat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok {
-		return nil, errors.New("failed to get uid/gid")
-	}
-
-	uid := int(stat.Uid)
-	gid := int(stat.Gid)
-	return fileInfo{FileInfo: info, uid: &uid, gid: &gid}, nil
+// RedirectStandardError causes all standard error output to be directed to the
+// given file.
+func RedirectStandardError(toFile *os.File) error {
+	_, err := plan9.Dup(int(toFile.Fd()), 2)
+	return err
 }
