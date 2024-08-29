@@ -68,6 +68,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Split split httpmon out of x-pack/filebeat/input/internal/httplog. {pull}36385[36385]
 - Beats publishing pipeline does not propagate the close signal to its clients any more. It's responsibility of the user to close the pipeline client. {issue}38197[38197] {pull}38556[38556]
 - Debug log entries from the acker (`stateful ack ...` or `stateless ack ...`) removed. {pull}39672[39672]
+- Rename x-pack/filebeat websocket input to streaming. {issue}40264[40264] {pull}40421[40421]
+- Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
 
 ==== Bugfixes
 
@@ -196,6 +198,10 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Improve robustness and error reporting from packetbeat default route testing. {pull}39757[39757]
 - Move x-pack/filebeat/input/salesforce jwt import to v5. {pull}39823[39823]
 - Drop x-pack/filebeat/input dependency on github.com/lestrrat-go/jwx/v2. {pull}39968[39968]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Bump version of elastic/toutoumomoma to remove internal forks of stdlib debug packages. {pull}40325[40325]
+- Refactor x-pack/filebeat/input/websocket for generalisation. {pull}40308[40308]
+- Add a configuration option for TCP/UDP network type. {issue}40407[40407] {pull}40623[40623]
 
 ==== Deprecated
 

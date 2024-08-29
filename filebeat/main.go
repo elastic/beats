@@ -19,6 +19,7 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"

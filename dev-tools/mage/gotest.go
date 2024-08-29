@@ -168,7 +168,22 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	module := EnvOr("MODULE", "")
+	modules := EnvOr("MODULE", "")
+	if modules == "" {
+		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
+	}
+	moduleArr := strings.Split(modules, ",")
+
+	for _, module := range moduleArr {
+		err := goTestIntegrationForSingleModule(ctx, module)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func goTestIntegrationForSingleModule(ctx context.Context, module string) error {
 	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
 		return err

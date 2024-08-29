@@ -451,7 +451,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.cfg.LimitWindow)
+		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.cfg.LimitWindow, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d users from API", len(users))
 			return nil, err
@@ -502,7 +502,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 func (p *oktaInput) addGroup(ctx context.Context, u okta.User, state *stateStore) *User {
 	su := state.storeUser(u)
-	groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow)
+	groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow, p.logger)
 	if err != nil {
 		p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
 		return su
@@ -553,7 +553,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.cfg.LimitWindow)
+		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.cfg.LimitWindow, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d devices from API", len(devices))
 			return nil, err
@@ -572,7 +572,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
-				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.cfg.LimitWindow)
+				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.cfg.LimitWindow, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
 					return nil, err
