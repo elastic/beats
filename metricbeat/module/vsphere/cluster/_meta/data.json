@@ -1,12 +1,12 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "event": {
-        "dataset": "vsphere.datastore",
+        "dataset": "vsphere.cluster",
         "duration": 115000,
         "module": "vsphere"
     },
     "metricset": {
-        "name": "datastore",
+        "name": "cluster",
         "period": 10000
     },
     "service": {

@@ -66857,7 +66857,8 @@ vSphere module
 [float]
 === cluster
 
-Cluster information
+Cluster information.
+
 
 
 
@@ -66881,6 +66882,7 @@ type: long
 
 --
 
+
 *`vsphere.cluster.das_config.admission.control.enabled`*::
 +
 --
@@ -66901,6 +66903,7 @@ type: boolean
 
 --
 
+
 *`vsphere.cluster.host.count`*::
 +
 --
@@ -66920,6 +66923,17 @@ List of all the Host names associated with the cluster.
 type: keyword
 
 --
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
 
 *`vsphere.cluster.network.count`*::
 +
