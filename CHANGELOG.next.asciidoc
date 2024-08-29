@@ -292,6 +292,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
 - Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
 - Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Disable event normalization for netflow input {pull}40635[40635]
 
 *Auditbeat*
 
