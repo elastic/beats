@@ -1,13 +1,13 @@
-- name: datastorecluster
+- name: datastore_cluster
   type: group
   release: beta
   description: >
-    datastorecluster
+    Datastore Cluster
   fields:
     - name: name
       type: keyword
       description: >
-        datastorecluster name.
+        The Datastore Cluster name.
     - name: capacity.bytes
       type: long
       description: >

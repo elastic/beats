@@ -11,15 +11,16 @@
     },
     "metricset": {
         "period": 20000,
-        "name": "generic"
+        "name": "datastore_cluster"
     },
     "vsphere": {
-        "datastorecluster": {
+        "datastore_cluster": {
+                "name": "datastore_cluster1",
                 "capacity": {
-                    "bytes": 0
+                    "bytes": 8795019280384
                 },
                 "free_space": {
-                    "bytes": 0
+                    "bytes": 8788836876288
                 }
         }
     }
