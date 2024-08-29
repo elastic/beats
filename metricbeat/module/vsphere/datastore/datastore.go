@@ -60,7 +60,7 @@ type metricData struct {
 }
 
 type assetNames struct {
-	outputVmNames []string
+	outputVmNames   []string
 	outputHostNames []string
 }
 
@@ -232,6 +232,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 
 	return &assetNames{
 		outputHostNames: outputHostNames,
-		outputVmNames: outputVmNames,
+		outputVmNames:   outputVmNames,
 	}, nil
 }
