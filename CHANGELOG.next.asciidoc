@@ -185,7 +185,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Packetbeat*
- - Fix mishandling of fragmented RPC records
+ - nfs protocol: Fix mishandling of fragmented RPC records. {pull}40206[40206]
 
 *Winlogbeat*
 
