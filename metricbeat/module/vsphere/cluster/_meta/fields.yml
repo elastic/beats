@@ -5,7 +5,8 @@
     Cluster information.
   fields:
     - name: datastore
-      type: group  
+      type: group
+      fields:
         - name: names
           type: keyword
           description: >
@@ -15,7 +16,8 @@
           description: >
             Number of Datastores.
     - name: das_config
-      type: group  
+      type: group
+      fields:
         - name: admission.control.enabled
           type: boolean
           description: >
@@ -25,7 +27,8 @@
           description: >
             Indicates whether vSphere HA feature is enabled.
     - name: host
-      type: group     
+      type: group
+      fields:
         - name: count
           type: long
           description: >
@@ -39,7 +42,8 @@
       description: >
         Cluster name.
     - name: network
-      type: group 
+      type: group
+      fields:
         - name: count
           type: long
           description: >
