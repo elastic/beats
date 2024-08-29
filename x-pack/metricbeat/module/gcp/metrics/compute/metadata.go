@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	compute "cloud.google.com/go/compute/apiv1"
 	"cloud.google.com/go/compute/apiv1/computepb"
@@ -187,6 +188,12 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 	}
 
 	defer instancesClient.Close()
+
+	start := time.Now()
+	defer func() {
+		totalTime := time.Since(start)
+		s.logger.Debugf("total time taken for compute AggregatedList request: %s", totalTime)
+	}()
 
 	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
 		Project: s.projectID,
