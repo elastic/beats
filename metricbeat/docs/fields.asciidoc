@@ -67421,6 +67421,105 @@ type: long
 --
 
 [float]
+=== network
+
+Network-related information.
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+Indicates whether at least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+Indicates whether the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts connected to this network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of the Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.type`*::
++
+--
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines connected to this network.
+
+
+type: long
+
+--
+
+[float]
 === virtualmachine
 
 virtualmachine
