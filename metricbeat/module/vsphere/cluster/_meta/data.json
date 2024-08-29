@@ -15,6 +15,7 @@
     },
     "vsphere": {
       "cluster": {
+        "name": "Cluster_1",
         "das_config": {
           "enabled": false,
           "admission": {
