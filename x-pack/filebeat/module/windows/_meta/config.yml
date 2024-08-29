@@ -1,11 +1,13 @@
 - module: windows
   powershell:
     enabled: false
-    id: windows-module-powershell
-    name: Windows PowerShell
-    event_id: 400, 403, 600, 800
+    var:
+      id: windows-module-powershell
+      name: Windows PowerShell
+      event_id: 400, 403, 600, 800
   powershell_operational:
     enabled: false
-    id: windows-module-powershell-operational
-    name: Microsoft-Windows-PowerShell/Operational
-    event_id: 4103, 4104, 4105, 4106
+    var:
+      id: windows-module-powershell-operational
+      name: Microsoft-Windows-PowerShell/Operational
+      event_id: 4103, 4104, 4105, 4106
