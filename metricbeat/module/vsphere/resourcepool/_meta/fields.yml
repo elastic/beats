@@ -48,7 +48,7 @@
             - name: bytes
               type: long
               description: >
-                This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+                The amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
               format: bytes
             - name: static.bytes
               type: long
