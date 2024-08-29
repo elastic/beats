@@ -11,7 +11,11 @@ This file is generated! See scripts/mage/docs_collector.go
 
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
+<<<<<<< HEAD
 By default it enables the metricsets `datastore`, `host` and `virtualmachine`.
+=======
+By default it enables the metricsets `network`, `resourcepool`, `datastore`, `host` and `virtualmachine`.
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
 
 [float]
 === Dashboard
@@ -35,8 +39,14 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: vsphere
   enabled: true
+<<<<<<< HEAD
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
+=======
+  metricsets: ["datastore", "host", "virtualmachine", "network", "resourcepool"]
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  period: 20s
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
   hosts: ["https://localhost/sdk"]
 
   username: "user"
@@ -56,12 +66,26 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-vsphere-host,host>>
 
+<<<<<<< HEAD
+=======
+* <<metricbeat-metricset-vsphere-network,network>>
+
+* <<metricbeat-metricset-vsphere-resourcepool,resourcepool>>
+
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
 * <<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>
 
 include::vsphere/datastore.asciidoc[]
 
 include::vsphere/host.asciidoc[]
 
+<<<<<<< HEAD
+=======
+include::vsphere/network.asciidoc[]
+
+include::vsphere/resourcepool.asciidoc[]
+
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
 include::vsphere/virtualmachine.asciidoc[]
 
 :edit_url!:

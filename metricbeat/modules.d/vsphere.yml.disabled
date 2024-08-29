@@ -6,7 +6,14 @@
   #  - datastore
   #  - host
   #  - virtualmachine
+<<<<<<< HEAD
   period: 10s
+=======
+  #  - network
+  #  - resourcepool
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  period: 20s
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
   hosts: ["https://localhost/sdk"]
 
   username: "user"

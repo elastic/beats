@@ -183,6 +183,11 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
+<<<<<<< HEAD
+=======
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/network"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/resourcepool"
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"

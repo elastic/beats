@@ -31,6 +31,11 @@ Now setup your metricbeat config to connect to Govcsim:
     - datastore
     - host
     - virtualmachine
+<<<<<<< HEAD
+=======
+    - network
+    - resourcepool
+>>>>>>> 1f77e6e69c ([vSphere][resourcepool] Add support for new metrics in resourcepool metricset (#40456))
   enabled: true
   period: 5s
   hosts: ["https://127.0.0.1:8989/sdk"]
