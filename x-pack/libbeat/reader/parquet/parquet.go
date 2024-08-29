@@ -15,6 +15,7 @@ import (
 	"github.com/apache/arrow/go/v14/parquet"
 	"github.com/apache/arrow/go/v14/parquet/file"
 	"github.com/apache/arrow/go/v14/parquet/pqarrow"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -31,7 +32,7 @@ type BufferedReader struct {
 // Note: As io.ReadAll is used, the entire data stream would be read into memory, so very large data streams
 // may cause memory bottleneck issues.
 func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
-	log := initLogger()
+	log := logp.L().Named("reader.parquet")
 	start := time.Now()
 
 	if cfg.BatchSize == 0 {
@@ -70,20 +71,14 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet record reader: %w", err)
 	}
-	log.Debugw("created parquet record reader", "duration", fmt.Sprintf("%v", time.Since(start)))
-
 	log.Debugw("initialization process completed", "duration", fmt.Sprintf("%v", time.Since(start)))
+
 	return &BufferedReader{
 		cfg:          cfg,
 		recordReader: rr,
 		fileReader:   pf,
 		log:          log,
 	}, nil
-}
-
-// initLogger initializes a logger for the parquet reader.
-func initLogger() *logp.Logger {
-	return logp.L().Named("reader.parquet")
 }
 
 // Next advances the pointer to point to the next record and returns true if the next record exists.
@@ -100,7 +95,6 @@ func (sr *BufferedReader) Next() bool {
 // If no more records are available, the []byte slice will be nil and io.EOF will be returned as an error.
 // A JSON marshal error will be returned if the record cannot be marshalled.
 func (sr *BufferedReader) Record() ([]byte, error) {
-	start := time.Now()
 	rec := sr.recordReader.Record()
 	if rec == nil {
 		sr.log.Debugw("reached the end of the record reader", "record_reader", rec)
@@ -111,7 +105,7 @@ func (sr *BufferedReader) Record() ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal JSON for parquet value: %w", err)
 	}
-	sr.log.Debugw("records successfully read", "batch_size", sr.cfg.BatchSize, "duration", fmt.Sprintf("%v", time.Since(start)))
+	sr.log.Debugw("records successfully read", "batch_size", sr.cfg.BatchSize)
 
 	return val, nil
 }
