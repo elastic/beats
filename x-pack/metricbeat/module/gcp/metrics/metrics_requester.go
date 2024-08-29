@@ -124,6 +124,13 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 		}
 	}
 
+	start := time.Now()
+	r.logger.Debug("started ListTimeSeries requests")
+	defer func() {
+		totalTime := time.Since(start)
+		r.logger.Debugf("total time taken for all ListTimeSeries requests: %s config period: %s", totalTime, r.config.period.AsDuration())
+	}()
+
 	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
