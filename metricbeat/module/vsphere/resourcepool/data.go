@@ -38,6 +38,7 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 	if quickStats == nil {
 		return event
 	}
+
 	event.Put("cpu.usage.mhz", quickStats.OverallCpuUsage)
 	event.Put("cpu.demand.mhz", quickStats.OverallCpuDemand)
 	event.Put("cpu.entitlement.mhz", quickStats.DistributedCpuEntitlement)
@@ -58,5 +59,6 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 		event.Put("vm.names", data.assetNames.outputVmNames)
 		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
+
 	return event
 }

@@ -27,7 +27,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 	var m *ResourcePoolMetricSet
-	ResourcePoolTest := mo.ResourcePool{
+	resourcePoolTest := mo.ResourcePool{
 		ManagedEntity: mo.ManagedEntity{
 			OverallStatus: "green",
 			Name:          "resourcepool-test",
@@ -59,7 +59,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.mapEvent(ResourcePoolTest, &metricDataTest) // Ensure this is within a function
+	event := m.mapEvent(resourcePoolTest, &metricDataTest) // Ensure this is within a function
 
 	vmName, _ := event.GetValue("vm.names")
 	assert.EqualValues(t, metricDataTest.assetNames.outputVmNames, vmName)
