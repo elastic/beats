@@ -67421,6 +67421,105 @@ type: long
 --
 
 [float]
+=== network
+
+Network-related information.
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+Indicates whether at least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+Indicates whether the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts connected to this network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of the Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.type`*::
++
+--
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines connected to this network.
+
+
+type: long
+
+--
+
+[float]
 === resourcepool
 
 Resource pool information from vSphere environment.
@@ -67452,7 +67551,7 @@ type: long
 *`vsphere.resourcepool.cpu.entitlement.mhz`*::
 +
 --
-This is the amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+The amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
 
 
 type: long
@@ -67499,7 +67598,7 @@ format: bytes
 *`vsphere.resourcepool.memory.entitlement.bytes`*::
 +
 --
-This is the amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+The amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
 
 
 type: long
@@ -67639,7 +67738,7 @@ type: long
 *`vsphere.resourcepool.vm.names`*::
 +
 --
-List of all the VM names.
+Names of virtual machines on the resource pool.
 
 
 type: keyword
