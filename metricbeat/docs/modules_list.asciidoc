@@ -311,10 +311,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-uwsgi,uWSGI>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
 |<<metricbeat-module-vsphere,vSphere>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.5+| .5+|  |<<metricbeat-metricset-vsphere-datastore,datastore>>   
+.6+| .6+|  |<<metricbeat-metricset-vsphere-datastore,datastore>>   
 |<<metricbeat-metricset-vsphere-datastore_cluster,datastore_cluster>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>>   
 |<<metricbeat-metricset-vsphere-network,network>> beta[]  
+|<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   

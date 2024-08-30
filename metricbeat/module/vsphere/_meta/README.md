@@ -33,6 +33,7 @@ Now setup your metricbeat config to connect to Govcsim:
     - virtualmachine
     - datastore_cluster
     - network
+    - resourcepool
   enabled: true
   period: 5s
   hosts: ["https://127.0.0.1:8989/sdk"]
