@@ -209,7 +209,6 @@ file_selectors:
 func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
-		pipeline := &fakePipeline{}
 
 		conf := makeBenchmarkConfig(t)
 		conf.MaxNumberOfMessages = maxMessagesInflight
@@ -303,6 +302,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
+		pipeline := pubtest.PublisherWithClient(client)
 
 		defer func() {
 			_ = client.Close()
@@ -344,7 +344,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,
-					client:          client,
+					pipeline:        pipeline,
 					s3ObjectHandler: s3EventHandlerFactory,
 					states:          states,
 					provider:        "provider",

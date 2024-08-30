@@ -36,7 +36,7 @@ func TestS3Poller(t *testing.T) {
 		defer ctrl.Finish()
 		mockAPI := NewMockS3API(ctrl)
 		mockPager := NewMockS3Pager(ctrl)
-		mockPublisher := NewMockBeatClient(ctrl)
+		mockPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -139,7 +139,7 @@ func TestS3Poller(t *testing.T) {
 				RegionName:         "region",
 			},
 			s3:              mockAPI,
-			client:          mockPublisher,
+			pipeline:        mockPipeline,
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
@@ -162,7 +162,7 @@ func TestS3Poller(t *testing.T) {
 		mockS3 := NewMockS3API(ctrl)
 		mockErrorPager := NewMockS3Pager(ctrl)
 		mockSuccessPager := NewMockS3Pager(ctrl)
-		mockPublisher := NewMockBeatClient(ctrl)
+		mockPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
@@ -277,7 +277,7 @@ func TestS3Poller(t *testing.T) {
 				RegionName:         "region",
 			},
 			s3:              mockS3,
-			client:          mockPublisher,
+			pipeline:        mockPipeline,
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",

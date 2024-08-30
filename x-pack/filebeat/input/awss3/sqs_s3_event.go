@@ -118,6 +118,7 @@ func newSQSS3EventProcessor(
 }
 
 type sqsProcessingResult struct {
+	log             *logp.Logger
 	processor       *sqsS3EventProcessor
 	msg             *types.Message
 	receiveCount    int // How many times this SQS object has been read
