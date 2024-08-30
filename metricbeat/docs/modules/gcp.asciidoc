@@ -303,6 +303,7 @@ metricbeat.modules:
   period: 1m
   metrics:
     - aligner: ALIGN_NONE
+      reducer: REDUCE_NONE 
       service: compute
       metric_types:
         - "instance/cpu/reserved_cores"
