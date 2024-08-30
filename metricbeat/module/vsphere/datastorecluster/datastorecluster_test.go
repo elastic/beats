@@ -65,10 +65,10 @@ func TestDatastoreCluster(t *testing.T) {
 	model.Pod = 1
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
-	t.Cleanup(func() { model.Remove() })
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	t.Cleanup(func() { ts.Close() })
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
