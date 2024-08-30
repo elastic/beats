@@ -26,8 +26,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	m := &DatastoreClusterMetricSet{}
-
 	datastoreclusterTest := mo.StoragePod{
 		Summary: &types.StoragePodSummary{
 			Capacity:  100,
@@ -40,7 +38,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := m.mapEvent(datastoreclusterTest)
+	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreclusterTest)
 
 	name, _ := event.GetValue("name")
 	assert.Equal(t, "Folder1", name)

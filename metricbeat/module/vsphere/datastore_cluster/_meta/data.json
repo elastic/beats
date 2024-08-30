@@ -5,7 +5,7 @@
         "type": "vsphere"
     },
     "event": {
-        "dataset": "vsphere.generic",
+        "dataset": "vsphere.datastore_cluster",
         "module": "vsphere",
         "duration": 15443161
     },

@@ -74,7 +74,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	v, err := view.NewManager(c).CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Network"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
+		return fmt.Errorf("error in creating container view: %w", err)
 	}
 
 	defer func() {
@@ -84,9 +84,9 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{}, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, nil, &datastoreCluster)
 	if err != nil {
-		return fmt.Errorf("error in Retrieve: %w", err)
+		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
 
 	for i := range datastoreCluster {

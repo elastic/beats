@@ -41,25 +41,24 @@ func TestFetchEventContents(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	require.Empty(t, errs, "expected no error")
-
-	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
 
 	event := events[0].MetricSetFields
 
 	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	if name, ok := event["name"].(mapstr.M); ok {
-		assert.NotNil(t, name)
-	}
+	name, ok := event["name"].(mapstr.M)
+	require.True(t, ok, "Expected 'name' field to be of type mapstr.M")
+	assert.NotNil(t, name, "Expected 'name' field to be non-nil")
 
-	if capacity, ok := event["capacity"].(mapstr.M); ok {
-		assert.GreaterOrEqual(t, capacity["bytes"], int64(0))
-	}
+	capacity, ok := event["capacity"].(mapstr.M)
+	require.True(t, ok, "Expected 'capacity' field to be of type mapstr.M")
+	assert.GreaterOrEqual(t, capacity["bytes"], int64(0), "Expected 'capacity.bytes' to be non-negative")
 
-	if freespace, ok := event["free_space"].(mapstr.M); ok {
-		assert.GreaterOrEqual(t, freespace["bytes"], int64(0))
-	}
+	freeSpace, ok := event["free_space"].(mapstr.M)
+	require.True(t, ok, "Expected 'free_space' field to be of type mapstr.M")
+	assert.GreaterOrEqual(t, freeSpace["bytes"], int64(0), "Expected 'free_space.bytes' to be non-negative")
 }
 
 func TestDatastoreCluster(t *testing.T) {
