@@ -14,7 +14,7 @@
         - name: count
           type: long
           description: >
-            Number of Datastores.
+            Number of Datastores associated with the cluster.
     - name: das_config
       type: group
       fields:
@@ -32,7 +32,7 @@
         - name: count
           type: long
           description: >
-            Number of Hosts.
+            Number of Hosts associated with the cluster.
         - name: names
           type: keyword
           description: >
@@ -47,7 +47,7 @@
         - name: count
           type: long
           description: >
-            Number of Networks.
+            Number of Networks associated with the cluster.
         - name: names
           type: keyword
           description: >

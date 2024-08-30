@@ -66875,7 +66875,7 @@ type: keyword
 *`vsphere.cluster.datastore.count`*::
 +
 --
-Number of Datastores.
+Number of Datastores associated with the cluster.
 
 
 type: long
@@ -66907,7 +66907,7 @@ type: boolean
 *`vsphere.cluster.host.count`*::
 +
 --
-Number of Hosts.
+Number of Hosts associated with the cluster.
 
 
 type: long
@@ -66938,7 +66938,7 @@ type: keyword
 *`vsphere.cluster.network.count`*::
 +
 --
-Number of Networks.
+Number of Networks associated with the cluster.
 
 
 type: long
