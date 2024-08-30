@@ -72,7 +72,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	c := client.Client
 
-	v, err := view.NewManager(c).CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Network"}, true)
+	v, err := view.NewManager(c).CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"StoragePod"}, true)
 	if err != nil {
 		return fmt.Errorf("error in creating container view: %w", err)
 	}

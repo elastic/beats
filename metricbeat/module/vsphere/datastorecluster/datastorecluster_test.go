@@ -30,14 +30,13 @@ import (
 
 func TestFetchEventContents(t *testing.T) {
 	model := simulator.VPX()
+	model.Pod = 1
 	err := model.Create()
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { model.Remove() })
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	t.Cleanup(func() { ts.Close() })
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
@@ -48,7 +47,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	name, ok := event["name"].(mapstr.M)
+	name, ok := event["name"].(string)
 	require.True(t, ok, "Expected 'name' field to be of type mapstr.M")
 	assert.NotNil(t, name, "Expected 'name' field to be non-nil")
 
@@ -62,7 +61,8 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestDatastoreCluster(t *testing.T) {
-	model := simulator.ESX()
+	model := simulator.VPX()
+	model.Pod = 1
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })

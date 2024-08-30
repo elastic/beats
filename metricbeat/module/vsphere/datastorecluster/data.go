@@ -29,6 +29,6 @@ func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod) map
 	event.Put("name", datastoreCluster.Name)
 	event.Put("capacity.bytes", datastoreCluster.Summary.Capacity)
 	event.Put("free_space.bytes", datastoreCluster.Summary.FreeSpace)
-	
+
 	return event
 }
