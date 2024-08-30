@@ -90,12 +90,11 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 	}
 
 	for i := range datastoreCluster {
-		select {
-		case <-ctx.Done():
+		if ctx.Err() != nil {
 			return ctx.Err()
-		default:
-			reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i])})
 		}
+
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i])})
 	}
 
 	return nil
