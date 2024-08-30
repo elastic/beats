@@ -32,7 +32,6 @@ import (
 type journalctl struct {
 	cmd      *exec.Cmd
 	dataChan chan []byte
-	errChan  chan string
 	stdout   io.ReadCloser
 	stderr   io.ReadCloser
 
@@ -50,7 +49,6 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		canceler: canceller,
 		cmd:      cmd,
 		dataChan: make(chan []byte),
-		errChan:  make(chan string),
 		logger:   logger,
 	}
 
@@ -66,7 +64,6 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 
 	go func() {
 		defer jctl.logger.Debug("stderr reader goroutine done")
-		defer close(jctl.errChan)
 		reader := bufio.NewReader(jctl.stderr)
 		for {
 			line, err := reader.ReadString('\n')
@@ -139,8 +136,4 @@ func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
 		}
 		return d, nil
 	}
-}
-
-func (j *journalctl) Error() <-chan string {
-	return j.errChan
 }

@@ -58,7 +58,6 @@ type JctlFactory func(canceller input.Canceler, logger *logp.Logger, binary stri
 //go:generate moq --fmt gofmt -out jctlmock_test.go . Jctl
 type Jctl interface {
 	Next(input.Canceler) ([]byte, error)
-	Error() <-chan string
 	Kill() error
 }
 
