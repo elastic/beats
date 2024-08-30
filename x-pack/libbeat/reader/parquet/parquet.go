@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/apache/arrow/go/v14/arrow/memory"
 	"github.com/apache/arrow/go/v14/parquet"
@@ -33,7 +32,6 @@ type BufferedReader struct {
 // may cause memory bottleneck issues.
 func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	log := logp.L().Named("reader.parquet")
-	start := time.Now()
 
 	if cfg.BatchSize == 0 {
 		cfg.BatchSize = 1
@@ -45,7 +43,7 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read data from stream reader: %w", err)
 	}
-	log.Debugw("read data from stream reader", "size", len(data), "duration", fmt.Sprintf("%v", time.Since(start)))
+	log.Debugw("read data from stream reader", "size", len(data))
 
 	// defines a memory allocator for allocating memory for Arrow objects
 	pool := memory.NewCheckedAllocator(&memory.GoAllocator{})
@@ -54,7 +52,7 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet reader: %w", err)
 	}
-	log.Debugw("created parquet reader", "duration", fmt.Sprintf("%v", time.Since(start)))
+	log.Debugw("created parquet reader")
 
 	// constructs a reader for converting to Arrow objects from an existing parquet file reader object
 	reader, err := pqarrow.NewFileReader(pf, pqarrow.ArrowReadProperties{
@@ -64,14 +62,14 @@ func NewBufferedReader(r io.Reader, cfg *Config) (*BufferedReader, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create pqarrow parquet reader: %w", err)
 	}
-	log.Debugw("created pqarrow parquet reader", "duration", fmt.Sprintf("%v", time.Since(start)))
+	log.Debugw("created pqarrow parquet reader")
 
 	// constructs a record reader that is capable of reding entire sets of arrow records
 	rr, err := reader.GetRecordReader(context.Background(), nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create parquet record reader: %w", err)
 	}
-	log.Debugw("initialization process completed", "duration", fmt.Sprintf("%v", time.Since(start)))
+	log.Debugw("initialization process completed")
 
 	return &BufferedReader{
 		cfg:          cfg,
