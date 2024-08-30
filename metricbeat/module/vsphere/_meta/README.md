@@ -29,11 +29,11 @@ Now setup your metricbeat config to connect to Govcsim:
 - module: vsphere
   metricsets:
     - datastore
-    - host
-    - virtualmachine
     - datastore_cluster
+    - host
     - network
     - resourcepool
+    - virtualmachine
   enabled: true
   period: 5s
   hosts: ["https://127.0.0.1:8989/sdk"]
