@@ -292,6 +292,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
 - Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
 - Added `windows` module with `powershell` and `powershell_operational` filesets. {pull}40519[40519]
+- Disable event normalization for netflow input {pull}40635[40635]
 
 *Auditbeat*
 
@@ -319,6 +320,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 
 *Metricbeat*
 
