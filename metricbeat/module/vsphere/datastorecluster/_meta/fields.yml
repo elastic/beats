@@ -1,4 +1,4 @@
-- name: datastore_cluster
+- name: datastorecluster
   type: group
   release: beta
   description: >

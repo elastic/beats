@@ -67034,13 +67034,13 @@ type: long
 --
 
 [float]
-=== datastore_cluster
+=== datastorecluster
 
 Datastore Cluster
 
 
 
-*`vsphere.datastore_cluster.name`*::
+*`vsphere.datastorecluster.name`*::
 +
 --
 The Datastore Cluster name.
@@ -67050,7 +67050,7 @@ type: keyword
 
 --
 
-*`vsphere.datastore_cluster.capacity.bytes`*::
+*`vsphere.datastorecluster.capacity.bytes`*::
 +
 --
 Total capacity of this storage pod, in bytes.
@@ -67062,7 +67062,7 @@ format: bytes
 
 --
 
-*`vsphere.datastore_cluster.free_space.bytes`*::
+*`vsphere.datastorecluster.free_space.bytes`*::
 +
 --
 Total free space on this storage pod, in bytes.

@@ -14,14 +14,14 @@
         "name": "datastore_cluster"
     },
     "vsphere": {
-        "datastore_cluster": {
-                "name": "datastore_cluster1",
-                "capacity": {
-                    "bytes": 8795019280384
-                },
-                "free_space": {
-                    "bytes": 8788836876288
-                }
+        "datastorecluster": {
+            "name": "datastore_cluster1",
+            "capacity": {
+                "bytes": 8795019280384
+            },
+            "free_space": {
+                "bytes": 8788836876288
+            }
         }
     }
 }

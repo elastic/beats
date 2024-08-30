@@ -15,37 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastore_cluster
+package datastorecluster
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/types"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestEventMapping(t *testing.T) {
-	datastoreclusterTest := mo.StoragePod{
-		Summary: &types.StoragePodSummary{
-			Capacity:  100,
-			FreeSpace: 50,
-		},
-		Folder: mo.Folder{
-			ManagedEntity: mo.ManagedEntity{
-				Name: "Folder1",
-			},
-		},
-	}
+func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod) mapstr.M {
+	event := mapstr.M{}
 
-	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreclusterTest)
-
-	name, _ := event.GetValue("name")
-	assert.Equal(t, "Folder1", name)
-
-	capacity, _ := event.GetValue("capacity.bytes")
-	assert.Equal(t, int64(100), capacity)
-
-	freeSpace, _ := event.GetValue("free_space.bytes")
-	assert.Equal(t, int64(50), freeSpace)
+	event.Put("name", datastoreCluster.Name)
+	event.Put("capacity.bytes", datastoreCluster.Summary.Capacity)
+	event.Put("free_space.bytes", datastoreCluster.Summary.FreeSpace)
+	
+	return event
 }

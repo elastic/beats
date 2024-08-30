@@ -4,7 +4,7 @@
 - module: vsphere
   # metricsets:
   #  - datastore
-  #  - datastore_cluster
+  #  - datastorecluster
   #  - host
   #  - network
   #  - resourcepool
