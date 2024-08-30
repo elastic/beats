@@ -135,7 +135,7 @@ func HandleFlags() error {
 	err = cliCfg.Unpack(&managementSettings)
 	if err != nil {
 		fleetmode.SetAgentMode(false)
-		return nil
+		return nil //nolint:nilerr // unpacking failing isn't an error for this case
 	}
 	fleetmode.SetAgentMode(managementSettings.Enabled)
 	return nil
