@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 
 *Auditbeat*
 
