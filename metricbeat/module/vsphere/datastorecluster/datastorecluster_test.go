@@ -18,6 +18,7 @@
 package datastorecluster
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -77,12 +78,11 @@ func TestDatastoreCluster(t *testing.T) {
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
+	fmt.Printf("ts.URL.String(): %v\n", ts.URL.String())
 	return map[string]interface{}{
 		"module":     "vsphere",
 		"metricsets": []string{"datastorecluster"},
-		"hosts":      []string{urlSimulator},
+		"hosts":      []string{ts.URL.String()},
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,
