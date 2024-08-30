@@ -11,7 +11,7 @@
     },
     "metricset": {
         "period": 20000,
-        "name": "datastore_cluster"
+        "name": "datastorecluster"
     },
     "vsphere": {
         "datastorecluster": {
