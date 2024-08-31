@@ -1,0 +1,10 @@
+- name: disk
+  type: group
+  release: beta
+  description: >
+    disk
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
