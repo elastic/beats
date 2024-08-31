@@ -1,7 +1,13 @@
 - module: vsphere
   enabled: true
+<<<<<<< HEAD
   metricsets: ["datastore", "host", "virtualmachine"]
   period: 10s
+=======
+  metricsets: ["cluster", "datastore", "host", "virtualmachine", "network", "resourcepool"]
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  period: 20s
+>>>>>>> 1058457a28 ([vSphere] Add new Cluster metricset (#40536))
   hosts: ["https://localhost/sdk"]
 
   username: "user"

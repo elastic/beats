@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastore
+package cluster
 
 import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,75 +29,47 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-<<<<<<< HEAD
-	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
-=======
 	// Creating a new simulator model with VPX server to collect broad range of data.
 	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
->>>>>>> 1058457a28 ([vSphere] Add new Cluster metricset (#40536))
 
 	ts := model.Service.NewServer()
 	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
-	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-<<<<<<< HEAD
 
-	assert.NotEmpty(t, events)
-=======
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	require.Empty(t, errs, "expected no error")
 
 	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
->>>>>>> 1058457a28 ([vSphere] Add new Cluster metricset (#40536))
 
 	event := events[0].MetricSetFields
 
 	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "local", event["fstype"])
-
-	// Values are based on the result 'df -k'.
-	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes"}
-	for _, field := range fields {
-		value, err := event.GetValue(field)
-		if err != nil {
-			t.Error(err)
-		} else {
-			isNonNegativeInt64(t, field, value)
-		}
+	testEvent := mapstr.M{
+		"name": "DC0_C0",
+		"host": mapstr.M{
+			"count": 3,
+			"names": []string{"DC0_C0_H0", "DC0_C0_H1", "DC0_C0_H2"},
+		},
+		"datastore": mapstr.M{
+			"count": 1,
+			"names": []string{"LocalDS_0"},
+		},
+		"network": mapstr.M{
+			"count": 3,
+			"names": []string{"VM Network", "DVS0-DVUplinks-9", "DC0_DVPG0"},
+		},
 	}
+
+	assert.Exactly(t, event, testEvent)
 }
 
-<<<<<<< HEAD
-func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
-	i, ok := v.(int64)
-	if !ok {
-		t.Errorf("%v: got %T, but expected int64", field, v)
-		return
-	}
-
-	if i < 0 {
-		t.Errorf("%v: value is negative (%v)", field, i)
-		return
-	}
-}
-
-func TestData(t *testing.T) {
-=======
-func TestDataStoreMetricSetData(t *testing.T) {
->>>>>>> 1058457a28 ([vSphere] Add new Cluster metricset (#40536))
-	model := simulator.ESX()
+func TestClusterMetricSetData(t *testing.T) {
+	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
@@ -115,7 +88,7 @@ func getConfig(ts *simulator.Server) map[string]interface{} {
 
 	return map[string]interface{}{
 		"module":     "vsphere",
-		"metricsets": []string{"datastore"},
+		"metricsets": []string{"cluster"},
 		"hosts":      []string{urlSimulator},
 		"username":   "user",
 		"password":   "pass",
