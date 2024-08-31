@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastore
+package cluster
 
 import (
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -38,10 +39,8 @@ func TestFetchEventContents(t *testing.T) {
 	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
+
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
 	require.Empty(t, errs, "expected no error")
 
 	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
@@ -50,38 +49,27 @@ func TestFetchEventContents(t *testing.T) {
 
 	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
-	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "OTHER", event["fstype"])
+	testEvent := mapstr.M{
+		"name": "DC0_C0",
+		"host": mapstr.M{
+			"count": 3,
+			"names": []string{"DC0_C0_H0", "DC0_C0_H1", "DC0_C0_H2"},
+		},
+		"datastore": mapstr.M{
+			"count": 1,
+			"names": []string{"LocalDS_0"},
+		},
+		"network": mapstr.M{
+			"count": 3,
+			"names": []string{"VM Network", "DVS0-DVUplinks-9", "DC0_DVPG0"},
+		},
+	}
 
-	// Values are based on the result 'df -k'.
-	fields := []string{
-		"capacity.total.bytes",
-		"capacity.free.bytes",
-		"status",
-		"host.count",
-		"vm.count",
-		"write.bytes",
-		"capacity.used.bytes",
-	}
-	for _, field := range fields {
-		value, err := event.GetValue(field)
-		if err != nil {
-			t.Error(field, err)
-			return
-		}
-		switch field {
-		case "status":
-			assert.NotNil(t, value)
-		case "vm.count", "host.count":
-			assert.GreaterOrEqual(t, value, 0)
-		default:
-			assert.GreaterOrEqual(t, value, int64(0))
-		}
-	}
+	assert.Exactly(t, event, testEvent)
 }
 
-func TestDataStoreMetricSetData(t *testing.T) {
-	model := simulator.ESX()
+func TestClusterMetricSetData(t *testing.T) {
+	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
 	t.Cleanup(func() { model.Remove() })
@@ -100,7 +88,7 @@ func getConfig(ts *simulator.Server) map[string]interface{} {
 
 	return map[string]interface{}{
 		"module":     "vsphere",
-		"metricsets": []string{"datastore"},
+		"metricsets": []string{"cluster"},
 		"hosts":      []string{urlSimulator},
 		"username":   "user",
 		"password":   "pass",
