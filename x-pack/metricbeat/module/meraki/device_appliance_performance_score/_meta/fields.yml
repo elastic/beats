@@ -1,0 +1,10 @@
+- name: device_appliance_performance_score
+  type: group
+  release: beta
+  description: >
+    device_appliance_performance_score
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

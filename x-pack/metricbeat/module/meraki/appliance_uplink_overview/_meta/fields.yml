@@ -1,0 +1,10 @@
+- name: appliance_uplink_overview
+  type: group
+  release: beta
+  description: >
+    appliance_uplink_overview
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

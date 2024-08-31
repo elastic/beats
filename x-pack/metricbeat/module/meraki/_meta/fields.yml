@@ -1,0 +1,10 @@
+- key: meraki
+  title: "meraki"
+  release: beta
+  description: >
+    meraki module
+  fields:
+    - name: meraki
+      type: group
+      description: >
+      fields:

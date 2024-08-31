@@ -1,0 +1,25 @@
+# Module: meraki
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-meraki.html
+
+- module: meraki
+  metricsets: [
+               "device_status",
+               "appliance_uplink_overview",
+               "appliance_uplink_status_and_ha",
+               "cellular_gateway_uplink_status",
+               "device_appliance_performance_score",
+               "device_uplink_loss_and_latency",
+               "license_overview",
+               "network_health_channel_utilization",
+               "wireless_device_channel_utilization"
+               ]
+  enabled: true
+  period: 60s
+  hosts: ["https://api.meraki.com"]
+  # This can be used for token based authorization:
+  bearer_token_file: /var/run/secrets/meraki/token
+  headers:
+    Accept: application/json  
+  apiKey: <token>
+  organizations: ["orgId"]  
+

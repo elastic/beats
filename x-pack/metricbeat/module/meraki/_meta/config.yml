@@ -1,0 +1,6 @@
+- module: meraki
+  metricsets: ["appliance_uplinks_status_and_ha"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+

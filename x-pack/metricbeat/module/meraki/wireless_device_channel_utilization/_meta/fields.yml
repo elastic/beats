@@ -1,0 +1,10 @@
+- name: wireless_device_channel_utilization
+  type: group
+  release: beta
+  description: >
+    wireless_device_channel_utilization
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

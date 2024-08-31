@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"meraki",
+        "name":"device_uplink_loss_and_latency",
+        "rtt":44269
+    },
+    "meraki":{
+        "device_uplink_loss_and_latency":{
+            "example": "device_uplink_loss_and_latency"
+        }
+    },
+    "type":"metricsets"
+}

@@ -1,0 +1,10 @@
+- name: network_health_channel_utilization
+  type: group
+  release: beta
+  description: >
+    network_health_channel_utilization
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

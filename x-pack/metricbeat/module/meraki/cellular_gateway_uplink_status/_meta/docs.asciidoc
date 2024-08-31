@@ -1,0 +1,1 @@
+This is the cellular_gateway_uplink_status metricset of the module meraki.
