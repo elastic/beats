@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -128,6 +127,9 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
+	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
+	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
+
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
@@ -169,13 +171,21 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	}
 }
 
-// clientOption returns constructed client configuration options, including
-// setting up http+unix and http+npipe transports if requested.
-func clientOptions(keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
-	return []httpcommon.TransportOption{
-		httpcommon.WithAPMHTTPInstrumentation(),
-		keepalive,
+// withMandatory adds the required attribute names to attr unless attr is empty.
+func withMandatory(attr []string, include ...string) []string {
+	if len(attr) == 0 {
+		return nil
 	}
+outer:
+	for _, m := range include {
+		for _, a := range attr {
+			if m == a {
+				continue outer
+			}
+		}
+		attr = append(attr, m)
+	}
+	return attr
 }
 
 // runFullSync performs a full synchronization. It will fetch user and group
@@ -316,7 +326,7 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
