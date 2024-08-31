@@ -400,54 +400,51 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 
 	host := strings.TrimPrefix(server.URL, "http://")
 
-	testCases := []struct {
-		name                 string
-		config               map[string]interface{}
-		expectedEvents       int
-		expectedLabels       []mapstr.M
-		expectedMetricsCount []int64
-	}{
-		{
-			name: "Default metrics",
-			config: map[string]interface{}{
-				"module":        "prometheus",
-				"metricsets":    []string{"collector"},
-				"hosts":         []string{server.URL},
-				"metrics_path":  metricsPath,
-				"metrics_count": true,
-			},
-			expectedEvents: 5,
-			expectedLabels: []mapstr.M{
-				{"environment": "prod", "instance": host, "job": "prometheus", "service": "api"},
-				{"environment": "prod", "instance": host, "job": "prometheus", "service": "db"},
-				{"environment": "staging", "instance": host, "job": "prometheus", "service": "api"},
-				{"environment": "staging", "instance": host, "job": "prometheus", "service": "db"},
-				{"instance": host, "job": "prometheus"},
-			},
-			expectedMetricsCount: []int64{2, 2, 3, 2, 1},
-		},
+	config := map[string]interface{}{
+		"module":        "prometheus",
+		"metricsets":    []string{"collector"},
+		"hosts":         []string{server.URL},
+		"metrics_path":  metricsPath,
+		"metrics_count": true,
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			f := mbtest.NewReportingMetricSetV2Error(t, tc.config)
-			events, errs := mbtest.ReportingFetchV2Error(f)
+	expectedEvents := 11
 
-			for _, err := range errs {
-				t.Errorf("Unexpected error: %v", err)
-			}
+	testCases := []struct {
+		name                string
+		expectedLabel       mapstr.M
+		expectedMetricCount int64
+	}{
+		{"Prod API Inf", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "+Inf", "service": "api"}, 1},
+		{"Prod API 0.5", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "0.5", "service": "api"}, 1},
+		{"Prod API 1", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "1", "service": "api"}, 1},
+		{"Prod API Quantile 0.5", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.5", "service": "api"}, 1},
+		{"Prod API Quantile 0.9", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.9", "service": "api"}, 1},
+		{"Prod API Quantile 0.99", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.99", "service": "api"}, 1},
+		{"Prod API", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "service": "api"}, 6},
+		{"Prod DB", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "service": "db"}, 2},
+		{"Staging API", mapstr.M{"environment": "staging", "instance": host, "job": "prometheus", "service": "api"}, 2},
+		{"Staging DB", mapstr.M{"environment": "staging", "instance": host, "job": "prometheus", "service": "db"}, 2},
+		{"Default", mapstr.M{"instance": host, "job": "prometheus"}, 1},
+	}
 
-			assert.Equal(t, tc.expectedEvents, len(events), "Number of events does not match expected")
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
 
-			sortPromEvents(events)
+	for _, err := range errs {
+		t.Errorf("Unexpected error: %v", err)
+	}
 
-			for i, event := range events {
-				validateEvent(t, event, tc.expectedLabels[i], tc.expectedMetricsCount[i])
-			}
+	assert.Equal(t, expectedEvents, len(events), "Number of events does not match expected")
+
+	sortPromEvents(events)
+
+	for i := range expectedEvents {
+		t.Run(testCases[i].name, func(t *testing.T) {
+			validateEvent(t, events[i], testCases[i].expectedLabel, testCases[i].expectedMetricCount)
 		})
 	}
 }
-
 func validateEvent(t *testing.T, event mb.Event, expectedLabels mapstr.M, expectedMetricsCount int64) {
 	t.Helper()
 
@@ -472,10 +469,26 @@ test_gauge{environment="staging",service="db"} 15.1
 # HELP test_counter A test counter metric
 # TYPE test_counter counter
 test_counter{environment="prod",service="api"} 42
-test_counter{environment="staging",service="api"} 30
 test_counter{environment="staging",service="api"} 444
 test_counter{environment="prod",service="db"} 123
-test_counter{environment="staging",service="db"} 98`)
+test_counter{environment="staging",service="db"} 98
+
+# HELP test_histogram A test histogram metric
+# TYPE test_histogram histogram
+test_histogram_bucket{environment="prod",service="api",le="0.1"} 0
+test_histogram_bucket{environment="prod",service="api",le="0.5"} 1
+test_histogram_bucket{environment="prod",service="api",le="1.0"} 2
+test_histogram_bucket{environment="prod",service="api",le="+Inf"} 3
+test_histogram_sum{environment="prod",service="api"} 2.7
+test_histogram_count{environment="prod",service="api"} 3
+
+# HELP test_summary A test summary metric
+# TYPE test_summary summary
+test_summary{environment="prod",service="api",quantile="0.5"} 0.2
+test_summary{environment="prod",service="api",quantile="0.9"} 0.7
+test_summary{environment="prod",service="api",quantile="0.99"} 1.2
+test_summary_sum{environment="prod",service="api"} 1234.5
+test_summary_count{environment="prod",service="api"} 1000`)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == endpoint {

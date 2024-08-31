@@ -84,13 +84,17 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
 
-		if p.metricsCount {
-			metricCounter[labelsHash]++
-			e.RootFields["metrics_count"] = metricCounter[labelsHash]
-		}
-
 		data := mapstr.M{name: val}
 		e.ModuleFields["metrics"].(mapstr.M).Update(data)
+
+		if p.metricsCount {
+			v, ok := e.ModuleFields["metrics"].(mapstr.M)
+			if ok {
+				metricCounter[labelsHash] += int64(len(v))
+			}
+
+			e.RootFields["metrics_count"] = metricCounter[labelsHash]
+		}
 	}
 
 	return eventList

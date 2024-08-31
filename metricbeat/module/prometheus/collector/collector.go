@@ -84,6 +84,7 @@ type MetricSet struct {
 	host            string
 	eventGenStarted bool
 	metricsCount    bool
+	xPack           bool
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -104,6 +105,13 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			return nil, err
 		}
 
+		// NOTE: We need to know if the generator is is of type *promEventGenerator
+		// to know if it is xpack or not. If it is promEventsGen is of type *promEventGenerator
+		// then it is not xpack. Else, it is xpack.
+		// This is required because how data is nested in x-pack and non-xpack if
+		// use_types is used in the former.
+		_, nonXPack := promEventsGen.(*promEventGenerator)
+
 		ms := &MetricSet{
 			BaseMetricSet:   base,
 			prometheus:      prometheus,
@@ -111,6 +119,7 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
 			metricsCount:    config.MetricsCount,
+			xPack:           !nonXPack,
 		}
 
 		// store host here to use it as a pointer when building `up` metric
@@ -176,7 +185,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 
 			if m.metricsCount {
-				metricCounter[labelsHash]++
+				switch m.xPack {
+				case true:
+					metricCounter[labelsHash] += int64(len(promEvent.Data))
+				default:
+					v, ok := promEvent.Data["metrics"].(mapstr.M)
+					if ok {
+						metricCounter[labelsHash] += int64(len(v))
+					}
+				}
 			}
 
 			// Accumulate metrics in the event

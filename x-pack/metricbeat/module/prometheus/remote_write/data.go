@@ -153,11 +153,6 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 
 		e := eventList[labelsHash]
 
-		if g.metricsCount {
-			metricCounter[labelsHash]++
-			e.RootFields["metrics_count"] = metricCounter[labelsHash]
-		}
-
 		switch promType {
 		case counterType:
 			data = mapstr.M{
@@ -197,6 +192,11 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 
 		e.ModuleFields.Update(data)
+
+		if g.metricsCount {
+			metricCounter[labelsHash] += int64(len(e.ModuleFields)) - 1 // Subtracct 1 to remove the "labels" that's also present in e.ModuleFields
+			e.RootFields["metrics_count"] = metricCounter[labelsHash]
+		}
 	}
 
 	// process histograms together
