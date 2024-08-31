@@ -57,6 +57,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle/tablespace"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/licenses"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/system"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/remote_write"

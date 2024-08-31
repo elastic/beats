@@ -1,9 +1,0 @@
-# Module: panos
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-panos.html
-
-- module: panos
-  metricsets: ["licenses"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-

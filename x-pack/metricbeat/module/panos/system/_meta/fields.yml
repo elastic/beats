@@ -1,0 +1,10 @@
+- name: system
+  type: group
+  release: beta
+  description: >
+    system
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

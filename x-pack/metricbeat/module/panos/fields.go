@@ -19,5 +19,5 @@ func init() {
 // AssetPanos returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/panos.
 func AssetPanos() string {
-	return "eJx8j00OwiAYRPecYtJ9L8DCnQfBMhpSCoSPRnt70+JPbYhvBxPeDD1GLhrJhCgKKK54anTbuVNApqcRalxYjAIsZcguFReDxkkBqG8xRTt7KuDq6K3oLeoRzMSvfqUsiRq3HOf0umk4fzV7lXcDg1A+Qcu4clz+ptlWabiPM/ZT+DBT2v68p64ZudxjtofsT/fKuQprqXoGAAD//0kFbSc="
+	return "eJzEj0tOgDAYhPc9xYQ9F+jCnQepdDQNfaV/ifb2BuoDoXFn/Hbwp9/MzFjZNLKJSRRQXfXUmI7vSQGFnkao8cRqFGApS3G5uhQ1HhSA/hYh2c1TAc+O3oo+TjOiCfzW79SWqfFS0pY//gycPzVnlXcLo1C+DiPjzrX5J8O0zsB9rXGuwjcT8rH5TG+zsr2mYi+3X7J3Hruwh96WS5PK8Be7b+Z/XP0eAAD//wwMqSs="
 }
