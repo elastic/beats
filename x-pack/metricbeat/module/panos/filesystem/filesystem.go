@@ -1,4 +1,4 @@
-package disk
+package filesystem
 
 import (
 	"encoding/xml"
@@ -33,7 +33,7 @@ type Filesystem struct {
 }
 
 const (
-	metricsetName = "disk"
+	metricsetName = "filesystem"
 	vsys          = "shared"
 	query         = "<show><system><disk-space></disk-space></system></show>"
 )
@@ -43,7 +43,7 @@ const (
 // the MetricSet for each host is defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("panos", "disk", New)
+	mb.Registry.MustAddMetricSet(panos.ModuleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -143,15 +143,17 @@ func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 
 	for _, filesystem := range filesystems {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"filesystem.name":     filesystem.Name,
-			"filesystem.size":     filesystem.Size,
-			"filesystem.used":     filesystem.Used,
-			"filesystem.avail":    filesystem.Avail,
-			"filesystem.use_perc": filesystem.UsePerc,
-			"filesystem.mounted":  filesystem.Mounted,
-			"observer.ip":         m.config.HostIp,
+			"name":        filesystem.Name,
+			"size":        filesystem.Size,
+			"used":        filesystem.Used,
+			"available":   filesystem.Avail,
+			"use_percent": filesystem.UsePerc,
+			"mounted":     filesystem.Mounted,
 		}}
 		event.Timestamp = currentTime
+		event.RootFields = mapstr.M{
+			"observer.ip": m.config.HostIp,
+		}
 
 		events = append(events, event)
 	}

@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"panos",
-        "name":"filesystem",
+        "name":"bgp_peers",
         "rtt":44269
     },
     "panos":{
-        "filesystem":{
-            "example": "filesystem"
+        "bgp_peers":{
+            "example": "bgp_peers"
         }
     },
     "type":"metricsets"

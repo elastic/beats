@@ -1,8 +1,4 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
-
-package licenses
+package bgp_peers
 
 import (
 	"encoding/xml"
@@ -17,29 +13,10 @@ import (
 	"github.com/PaloAltoNetworks/pango"
 )
 
-type Response struct {
-	Status string `xml:"status,attr"`
-	Result Result `xml:"result"`
-}
-
-type Result struct {
-	Licenses []License `xml:"licenses>entry"`
-}
-
-type License struct {
-	Feature     string `xml:"feature"`
-	Description string `xml:"description"`
-	Serial      string `xml:"serial"`
-	Issued      string `xml:"issued"`
-	Expires     string `xml:"expires"`
-	Expired     string `xml:"expired"`
-	AuthCode    string `xml:"authcode"`
-}
-
 const (
-	metricsetName = "licenses"
+	metricsetName = "bgp_peers"
 	vsys          = "shared"
-	query         = "<request><license><info></info></license></request>"
+	query         = "<show><routing><protocol><bgp><peer><virtual-router>default</virtual-router></peer></bgp></protocol></routing></show>"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -96,7 +73,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		log.Error("Failed to initialize client: %s", err)
 		return err
 	}
-	log.Infof("panos_licenses.Fetch initialized client")
+	log.Infof("============================= panos/bgp_peers.Fetch initialized client ==============================")
 
 	output, err := m.client.Op(query, vsys, nil, nil)
 	if err != nil {
@@ -110,29 +87,65 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return err
 	}
 
-	events := getEvents(m, response.Result.Licenses)
+	events := getEvents(m, response.Result.Entries)
 
 	for _, event := range events {
+		log.Debugf("====================================================")
+		log.Debugf("Reporting event: %v", event)
+		log.Debugf("====================================================")
 		reporter.Event(event)
 	}
 
 	return nil
 }
 
-func getEvents(m *MetricSet, licenses []License) []mb.Event {
-	events := make([]mb.Event, 0, len(licenses))
-
+func getEvents(m *MetricSet, entries []Entry) []mb.Event {
+	events := make([]mb.Event, 0, len(entries))
 	currentTime := time.Now()
+	log := m.Logger()
 
-	for _, license := range licenses {
+	for _, entry := range entries {
+		log.Debugf("====================================================")
+		log.Debugf("Processing entry: %v", entry)
+		log.Debugf("====================================================")
+
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"feature":     license.Feature,
-			"description": license.Description,
-			"serial":      license.Serial,
-			"issued":      license.Issued,
-			"expires":     license.Expires,
-			"expired":     license.Expired,
-			"auth_code":   license.AuthCode,
+			"peer_name":              entry.Peer,
+			"virtual_router":         entry.Vr,
+			"peer_group":             entry.PeerGroup,
+			"peer_router_id":         entry.PeerRouterID,
+			"remote_as_asn":          entry.RemoteAS,
+			"status":                 entry.Status,
+			"status_duration":        entry.StatusDuration,
+			"password_set":           entry.PasswordSet,
+			"passive":                entry.Passive,
+			"multi_hop_ttl":          entry.MultiHopTTL,
+			"peer_address":           entry.PeerAddress,
+			"local_address":          entry.LocalAddress,
+			"reflector_client":       entry.ReflectorClient,
+			"same_confederation":     entry.SameConfederation,
+			"aggregate_confed_as":    entry.AggregateConfedAS,
+			"peering_type":           entry.PeeringType,
+			"connect_retry_interval": entry.ConnectRetryInterval,
+			"open_delay":             entry.OpenDelay,
+			"idle_hold":              entry.IdleHold,
+			"prefix_limit":           entry.PrefixLimit,
+			"holdtime":               entry.Holdtime,
+			"holdtime_config":        entry.HoldtimeConfig,
+			"keepalive":              entry.Keepalive,
+			"keepalive_config":       entry.KeepaliveConfig,
+			"msg_update_in":          entry.MsgUpdateIn,
+			"msg_update_out":         entry.MsgUpdateOut,
+			"msg_total_in":           entry.MsgTotalIn,
+			"msg_total_out":          entry.MsgTotalOut,
+			"last_update_age":        entry.LastUpdateAge,
+			"last_error":             entry.LastError,
+			"status_flap_counts":     entry.StatusFlapCounts,
+			"established_counts":     entry.EstablishedCounts,
+			"orf_entry_received":     entry.ORFEntryReceived,
+			"nexthop_self":           entry.NexthopSelf,
+			"nexthop_thirdparty":     entry.NexthopThirdparty,
+			"nexthop_peer":           entry.NexthopPeer,
 		}}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
@@ -143,5 +156,4 @@ func getEvents(m *MetricSet, licenses []License) []mb.Event {
 	}
 
 	return events
-
 }

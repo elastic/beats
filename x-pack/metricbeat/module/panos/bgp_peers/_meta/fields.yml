@@ -1,8 +1,8 @@
-- name: filesystem
+- name: bgp_peers
   type: group
   release: beta
   description: >
-    filesystem
+    bgp_peers
   fields:
     - name: example
       type: keyword

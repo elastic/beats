@@ -1,0 +1,1 @@
+This is the bgp_peers metricset of the module panos.

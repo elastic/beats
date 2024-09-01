@@ -1,1 +1,1 @@
-This is the disk metricset of the module panos.
+This is the filesystem metricset of the module panos.

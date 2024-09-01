@@ -191,9 +191,11 @@ func getEvent(m *MetricSet, input string) mb.Event {
 		"system.swap.free":           swapInfo.Free,
 		"system.swap.used":           swapInfo.Used,
 		"system.swap.available":      swapInfo.Available,
-		"observer.ip":                m.config.HostIp,
 	}}
 	event.Timestamp = currentTime
+	event.RootFields = mapstr.M{
+		"observer.ip": m.config.HostIp,
+	}
 
 	return event
 }
