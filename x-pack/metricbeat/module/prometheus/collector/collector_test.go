@@ -13,11 +13,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestData(t *testing.T) {
