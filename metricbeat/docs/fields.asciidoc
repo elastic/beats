@@ -66865,6 +66865,107 @@ vSphere module
 
 
 [float]
+=== cluster
+
+Cluster information.
+
+
+
+
+*`vsphere.cluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.datastore.count`*::
++
+--
+Number of Datastores associated with the cluster.
+
+
+type: long
+
+--
+
+
+*`vsphere.cluster.das_config.admission.control.enabled`*::
++
+--
+Indicates whether strict admission control is enabled.
+
+
+type: boolean
+
+--
+
+*`vsphere.cluster.das_config.enabled`*::
++
+--
+Indicates whether vSphere HA feature is enabled.
+
+
+type: boolean
+
+--
+
+
+*`vsphere.cluster.host.count`*::
++
+--
+Number of Hosts associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.host.names`*::
++
+--
+List of all the Host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.cluster.network.count`*::
++
+--
+Number of Networks associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.network.names`*::
++
+--
+List of all the Network names associated with the cluster.
+
+
+type: keyword
+
+--
+
+[float]
 === datastore
 
 datastore
@@ -67526,6 +67627,232 @@ Number of virtual machines connected to this network.
 
 
 type: long
+
+--
+
+[float]
+=== resourcepool
+
+Resource pool information from vSphere environment.
+
+
+
+
+*`vsphere.resourcepool.cpu.usage.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.demand.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.entitlement.mhz`*::
++
+--
+The amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.entitlement.static.mhz`*::
++
+--
+The static CPU resource entitlement for a virtual machine.
+
+
+type: long
+
+--
+
+
+
+*`vsphere.resourcepool.memory.usage.guest.bytes`*::
++
+--
+Guest memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.host.bytes`*::
++
+--
+Host memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.entitlement.bytes`*::
++
+--
+The amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.entitlement.static.bytes`*::
++
+--
+The static memory resource entitlement for a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.private.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.shared.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.swapped.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.ballooned.bytes`*::
++
+--
+The size of the balloon driver in a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.overhead.bytes`*::
++
+--
+The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.overhead.consumed.bytes`*::
++
+--
+The amount of overhead memory, in bytes, currently being consumed to run a VM.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.compressed.bytes`*::
++
+--
+The amount of compressed memory currently consumed by VM, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.name`*::
++
+--
+The name of the resource pool.
+
+
+type: keyword
+
+--
+
+*`vsphere.resourcepool.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.resourcepool.vm.count`*::
++
+--
+Number of virtual machines on the resource pool.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.vm.names`*::
++
+--
+Names of virtual machines on the resource pool.
+
+
+type: keyword
 
 --
 

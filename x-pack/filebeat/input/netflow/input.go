@@ -155,7 +155,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{
-				EventNormalization: boolPtr(true),
+				EventNormalization: boolPtr(false),
 			},
 			EventListener: nil,
 		})
