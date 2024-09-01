@@ -13,163 +13,7 @@
         "prometheus": {
             "labels": {
                 "device": "br-425cb4c454a6",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-38425a39f36b",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-210476dc4ef8",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-10229e3512d9",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-0cb306323b90",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-33d819d5f834",
-                "instance": "127.0.0.1:61501",
-                "job": "prometheus"
-            },
-            "node_network_carrier": {
-                "value": 0
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "device": "br-4e623477470e",
-                "instance": "127.0.0.1:61501",
+                "instance": "127.0.0.1:65340",
                 "job": "prometheus"
             },
             "node_network_carrier": {
@@ -195,7 +39,7 @@
         "prometheus": {
             "labels": {
                 "device": "br-38feb0aad6ab",
-                "instance": "127.0.0.1:61501",
+                "instance": "127.0.0.1:65340",
                 "job": "prometheus"
             },
             "node_network_carrier": {
@@ -220,7 +64,137 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:61501",
+                "device": "br-10229e3512d9",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "device": "br-4e623477470e",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "device": "br-38425a39f36b",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "device": "br-3a285aa5e58c",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "device": "br-210476dc4ef8",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:65340",
                 "job": "prometheus"
             },
             "up": {
@@ -245,8 +219,34 @@
         },
         "prometheus": {
             "labels": {
-                "device": "br-3a285aa5e58c",
-                "instance": "127.0.0.1:61501",
+                "device": "br-33d819d5f834",
+                "instance": "127.0.0.1:65340",
+                "job": "prometheus"
+            },
+            "node_network_carrier": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "device": "br-0cb306323b90",
+                "instance": "127.0.0.1:65340",
                 "job": "prometheus"
             },
             "node_network_carrier": {

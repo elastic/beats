@@ -17,6 +17,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
+
+	// Import common fields for validation
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

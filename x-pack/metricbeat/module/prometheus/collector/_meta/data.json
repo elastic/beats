@@ -12,7 +12,7 @@
     },
     "prometheus": {
         "labels": {
-            "device": "br-4e623477470e",
+            "device": "br-38425a39f36b",
             "job": "prometheus"
         },
         "node_network_carrier": {
