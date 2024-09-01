@@ -88,6 +88,10 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		e.ModuleFields["metrics"].(mapstr.M).Update(data)
 
 		if p.metricsCount {
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each e.ModuleFields["metrics"] may have more than 1 metric.
+			// See unit tests for the same.
 			v, ok := e.ModuleFields["metrics"].(mapstr.M)
 			if ok {
 				metricCounter[labelsHash] += int64(len(v))

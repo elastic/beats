@@ -194,7 +194,19 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		e.ModuleFields.Update(data)
 
 		if g.metricsCount {
-			metricCounter[labelsHash] += int64(len(e.ModuleFields)) - 1 // Subtracct 1 to remove the "labels" that's also present in e.ModuleFields
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each e.ModuleFields["metrics"] may have more than 1 metric.
+			// As, metrics are nested under the "prometheus" key, labels is also nested under the "prometheus" key. So, we need to make sure
+			// we subtract 1 in case the e.ModuleFields["labels"] also exists.
+			//
+			// See unit tests for the same.
+			_, ok := e.ModuleFields["labels"]
+			if ok {
+				metricCounter[labelsHash] += int64(len(e.ModuleFields)) - 1
+			} else {
+				metricCounter[labelsHash] += int64(len(e.ModuleFields))
+			}
 			e.RootFields["metrics_count"] = metricCounter[labelsHash]
 		}
 	}
