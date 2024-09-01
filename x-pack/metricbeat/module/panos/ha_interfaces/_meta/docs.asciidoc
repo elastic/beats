@@ -1,0 +1,1 @@
+This is the ha_interfaces metricset of the module panos.

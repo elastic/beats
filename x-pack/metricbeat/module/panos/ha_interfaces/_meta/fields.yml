@@ -1,0 +1,10 @@
+- name: ha_interfaces
+  type: group
+  release: beta
+  description: >
+    ha_interfaces
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

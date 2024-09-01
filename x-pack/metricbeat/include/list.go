@@ -60,6 +60,8 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/licenses"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/system"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/bgp_peers"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/ha_interfaces"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panos/temperature"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/remote_write"

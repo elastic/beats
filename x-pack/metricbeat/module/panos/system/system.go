@@ -72,7 +72,7 @@ type SwapInfo struct {
 
 const (
 	metricsetName = "system"
-	vsys          = "shared"
+	vsys          = ""
 	query         = "<show><system><resources></resources></system></show>"
 )
 
@@ -121,7 +121,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch method implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	log := m.Logger()
 	var response Response
 
@@ -145,7 +145,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	event := getEvent(m, response.Result)
-	reporter.Event(event)
+	report.Event(event)
 
 	return nil
 }
@@ -164,33 +164,33 @@ func getEvent(m *MetricSet, input string) mb.Event {
 	swapInfo := parseSwapInfo(lines[4])
 
 	event := mb.Event{MetricSetFields: mapstr.M{
-		"system.uptime.days":         systemInfo.Uptime.Days,
-		"system.uptime.hours":        systemInfo.Uptime.Hours,
-		"system.user_count":          systemInfo.UserCount,
-		"system.load_average.1m":     systemInfo.LoadAverage.one_minute,
-		"system.load_average.5m":     systemInfo.LoadAverage.five_minute,
-		"system.load_average.15m":    systemInfo.LoadAverage.fifteen_minute,
-		"system.tasks.total":         taskInfo.Total,
-		"system.tasks.running":       taskInfo.Running,
-		"system.tasks.sleeping":      taskInfo.Sleeping,
-		"system.tasks.stopped":       taskInfo.Stopped,
-		"system.tasks.zombie":        taskInfo.Zombie,
-		"system.cpu.user":            cpuInfo.User,
-		"system.cpu.system":          cpuInfo.System,
-		"system.cpu.nice":            cpuInfo.Nice,
-		"system.cpu.idle":            cpuInfo.Idle,
-		"system.cpu.wait":            cpuInfo.Wait,
-		"system.cpu.hi":              cpuInfo.Hi,
-		"system.cpu.system_int":      cpuInfo.SystemInt,
-		"system.cpu.steal":           cpuInfo.Steal,
-		"system.memory.total":        memoryInfo.Total,
-		"system.memory.free":         memoryInfo.Free,
-		"system.memory.used":         memoryInfo.Used,
-		"system.memory.buffer_cache": memoryInfo.BufferCache,
-		"system.swap.total":          swapInfo.Total,
-		"system.swap.free":           swapInfo.Free,
-		"system.swap.used":           swapInfo.Used,
-		"system.swap.available":      swapInfo.Available,
+		"uptime.days":         systemInfo.Uptime.Days,
+		"uptime.hours":        systemInfo.Uptime.Hours,
+		"user_count":          systemInfo.UserCount,
+		"load_average.1m":     systemInfo.LoadAverage.one_minute,
+		"load_average.5m":     systemInfo.LoadAverage.five_minute,
+		"load_average.15m":    systemInfo.LoadAverage.fifteen_minute,
+		"tasks.total":         taskInfo.Total,
+		"tasks.running":       taskInfo.Running,
+		"tasks.sleeping":      taskInfo.Sleeping,
+		"tasks.stopped":       taskInfo.Stopped,
+		"tasks.zombie":        taskInfo.Zombie,
+		"cpu.user":            cpuInfo.User,
+		"cpu.system":          cpuInfo.System,
+		"cpu.nice":            cpuInfo.Nice,
+		"cpu.idle":            cpuInfo.Idle,
+		"cpu.wait":            cpuInfo.Wait,
+		"cpu.hi":              cpuInfo.Hi,
+		"cpu.system_int":      cpuInfo.SystemInt,
+		"cpu.steal":           cpuInfo.Steal,
+		"memory.total":        memoryInfo.Total,
+		"memory.free":         memoryInfo.Free,
+		"memory.used":         memoryInfo.Used,
+		"memory.buffer_cache": memoryInfo.BufferCache,
+		"swap.total":          swapInfo.Total,
+		"swap.free":           swapInfo.Free,
+		"swap.used":           swapInfo.Used,
+		"swap.available":      swapInfo.Available,
 	}}
 	event.Timestamp = currentTime
 	event.RootFields = mapstr.M{
