@@ -41,10 +41,6 @@ func (p *remoteWriteEventGenerator) Stop()  {}
 func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
 
-	// NOTE(shmsr): Reason for pre-allocating the map with len(metrics)/2:
-	// https://github.com/elastic/beats/pull/40411#discussion_r1731734765
-	metricCounter := make(map[string]int64, len(metrics)/2)
-
 	for _, metric := range metrics {
 		labels := mapstr.M{}
 
@@ -86,18 +82,18 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 
 		data := mapstr.M{name: val}
 		e.ModuleFields["metrics"].(mapstr.M).Update(data)
+	}
 
-		if p.metricsCount {
+	if p.metricsCount {
+		for _, e := range eventList {
 			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
 			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
 			// Also, it is important that we do not just increment by 1 for each e.ModuleFields["metrics"] may have more than 1 metric.
 			// See unit tests for the same.
 			v, ok := e.ModuleFields["metrics"].(mapstr.M)
 			if ok {
-				metricCounter[labelsHash] += int64(len(v))
+				e.RootFields["metrics_count"] = int64(len(v))
 			}
-
-			e.RootFields["metrics_count"] = metricCounter[labelsHash]
 		}
 	}
 

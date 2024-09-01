@@ -157,8 +157,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		families = append(families, m.upMetricFamily(1.0))
 	}
 
-	metricCounter := make(map[string]int64, len(families))
-
 	for _, family := range families {
 		if m.skipFamily(family) {
 			continue
@@ -184,49 +182,47 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 
-			if m.metricsCount {
-				// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
-				// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
-				// Also, it is important that we do not just increment by 1 for each metric because histograms and summaries are special.
-				// For example, if you notice histogram's implementation in data.go, then you'd notice single PromEvent holds 2 metrics. Here:
-				//
-				//	 PromEvent{
-				//	 	Data: mapstr.M{
-				//	 		"metrics": mapstr.M{
-				//	 			name + "_sum":   histogram.GetSampleSum(),
-				//	 			name + "_count": histogram.GetSampleCount(),
-				//	 		},
-				//	 	},
-				//	 	Labels: labels,
-				// 	}
-				//
-				// Here, name +  "_sum" and name + "_count" are the 2 metrics.
-				//
-				// So, len(v) will be 2 in the above example.
-				// Similarly, it will happen for x-pack prometheus module too. Please see
-				// the unit tests for the same.
-				switch m.xPack {
-				case true:
-					metricCounter[labelsHash] += int64(len(promEvent.Data))
-				default:
-					v, ok := promEvent.Data["metrics"].(mapstr.M)
-					if ok {
-						metricCounter[labelsHash] += int64(len(v))
-					}
-				}
-			}
-
 			// Accumulate metrics in the event
 			eventList[labelsHash].DeepUpdate(promEvent.Data)
 		}
 	}
 
 	// Report events
-	for labelHash, e := range eventList {
+	for _, e := range eventList {
 		event := mb.Event{RootFields: mapstr.M{m.namespace: e}}
+
 		if m.metricsCount {
-			event.RootFields.Put("metrics_count", metricCounter[labelHash])
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each metric because histograms and summaries are special.
+			// For example, if you notice histogram's implementation in data.go, then you'd notice single PromEvent holds 2 metrics. Here:
+			//
+			//	 PromEvent{
+			//	 	Data: mapstr.M{
+			//	 		"metrics": mapstr.M{
+			//	 			name + "_sum":   histogram.GetSampleSum(),
+			//	 			name + "_count": histogram.GetSampleCount(),
+			//	 		},
+			//	 	},
+			//	 	Labels: labels,
+			// 	}
+			//
+			// Here, name +  "_sum" and name + "_count" are the 2 metrics.
+			//
+			// So, len(v) will be 2 in the above example.
+			// Similarly, it will happen for x-pack prometheus module too. Please see
+			// the unit tests for the same.
+			switch m.xPack {
+			case true:
+				event.RootFields.Put("metrics_count", int64(len(e)))
+			default:
+				v, ok := e["metrics"].(mapstr.M)
+				if ok {
+					event.RootFields.Put("metrics_count", int64(len(v)))
+				}
+			}
 		}
+
 		isOpen := reporter.Event(event)
 		if !isOpen {
 			break

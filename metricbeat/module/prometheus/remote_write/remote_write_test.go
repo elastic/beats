@@ -160,7 +160,7 @@ func TestMetricsCount(t *testing.T) {
 			},
 			expected: map[string]int64{
 				`{"handler":"/home","le":"+Inf"}`: 1,
-				`{"handler":"/home"}`:             3,
+				`{"handler":"/home"}`:             2,
 				`{"handler":"/home","le":"0.1"}`:  1,
 				`{"handler":"/home","le":"0.5"}`:  1,
 			},
@@ -198,7 +198,7 @@ func TestMetricsCount(t *testing.T) {
 				`{"le":"0.5"}`:                    1,
 				`{"method":"GET","status":"200"}`: 1,
 				`{"core":"0"}`:                    1,
-				`{}`:                              3,
+				`{}`:                              2,
 			},
 		},
 		{
