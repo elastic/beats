@@ -15,7 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	xcollector "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -1429,7 +1428,7 @@ func TestMetricsCount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			generator := remoteWriteTypedGenerator{
 				metricsCount: true,
-				counterCache: collector.NewCounterCache(time.Minute),
+				counterCache: xcollector.NewCounterCache(time.Minute),
 			}
 
 			events := generator.GenerateEvents(tt.samples)
