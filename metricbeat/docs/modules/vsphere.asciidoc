@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
 
-By default it enables the metricsets `datastore`, `datastorecluster`, `host`, `network`, `resourcepool` and `virtualmachine`.
+By default it enables the metricsets `cluster`, `datastore`, `datastorecluster`, `host`, `network`, `resourcepool` and `virtualmachine`.
 
 [float]
 === Dashboard
@@ -35,7 +35,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: vsphere
   enabled: true
-  metricsets: ["datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
+  metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
   period: 20s
   hosts: ["https://localhost/sdk"]
@@ -53,6 +53,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-vsphere-cluster,cluster>>
+
 * <<metricbeat-metricset-vsphere-datastore,datastore>>
 
 * <<metricbeat-metricset-vsphere-datastorecluster,datastorecluster>>
@@ -64,6 +66,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-vsphere-resourcepool,resourcepool>>
 
 * <<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>
+
+include::vsphere/cluster.asciidoc[]
 
 include::vsphere/datastore.asciidoc[]
 
