@@ -11,12 +11,38 @@
             "period": 10000
         },
         "prometheus": {
+            "go_gc_duration_seconds": {
+                "value": 0.000098154
+            },
+            "labels": {
+                "instance": "127.0.0.1:61503",
+                "job": "prometheus",
+                "quantile": "0.75"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "prometheus"
+        }
+    },
+    {
+        "event": {
+            "dataset": "prometheus.collector",
+            "duration": 115000,
+            "module": "prometheus"
+        },
+        "metrics_count": 1,
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "prometheus": {
             "kafka_consumer_records_lag_records": {
                 "value": 5
             },
             "labels": {
                 "client_id": "consumer4",
-                "instance": "127.0.0.1:62410",
+                "instance": "127.0.0.1:61503",
                 "job": "prometheus"
             }
         },
@@ -42,7 +68,7 @@
                 "rate": 0
             },
             "labels": {
-                "instance": "127.0.0.1:62410",
+                "instance": "127.0.0.1:61503",
                 "job": "prometheus",
                 "method": "GET"
             }
@@ -58,33 +84,7 @@
             "duration": 115000,
             "module": "prometheus"
         },
-        "metrics_count": 1,
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "prometheus": {
-            "labels": {
-                "instance": "127.0.0.1:62410",
-                "job": "prometheus",
-                "listener_name": "http"
-            },
-            "net_conntrack_listener_conn_accepted_total": {
-                "value": 1568652315554
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "prometheus"
-        }
-    },
-    {
-        "event": {
-            "dataset": "prometheus.collector",
-            "duration": 115000,
-            "module": "prometheus"
-        },
-        "metrics_count": 3,
+        "metrics_count": 4,
         "metricset": {
             "name": "collector",
             "period": 10000
@@ -117,7 +117,7 @@
                 }
             },
             "labels": {
-                "instance": "127.0.0.1:62410",
+                "instance": "127.0.0.1:61503",
                 "job": "prometheus"
             },
             "up": {
@@ -141,13 +141,13 @@
             "period": 10000
         },
         "prometheus": {
-            "go_gc_duration_seconds": {
-                "value": 0.011689149
-            },
             "labels": {
-                "instance": "127.0.0.1:62410",
+                "instance": "127.0.0.1:61503",
                 "job": "prometheus",
-                "quantile": "1"
+                "listener_name": "http"
+            },
+            "net_conntrack_listener_conn_accepted_total": {
+                "value": 1568652315554
             }
         },
         "service": {
@@ -168,12 +168,12 @@
         },
         "prometheus": {
             "go_gc_duration_seconds": {
-                "value": 0.000098154
+                "value": 0.011689149
             },
             "labels": {
-                "instance": "127.0.0.1:62410",
+                "instance": "127.0.0.1:61503",
                 "job": "prometheus",
-                "quantile": "0.75"
+                "quantile": "1"
             }
         },
         "service": {

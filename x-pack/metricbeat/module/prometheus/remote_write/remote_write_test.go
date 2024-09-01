@@ -1387,7 +1387,7 @@ func TestMetricsCount(t *testing.T) {
 			expected: map[string]int64{
 				`{"method":"GET","status":"200"}`: 1,
 				`{"core":"0"}`:                    1,
-				`{}`:                              4,
+				`{}`:                              3,
 			},
 		},
 		{

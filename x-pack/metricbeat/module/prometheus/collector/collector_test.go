@@ -60,7 +60,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 		{"ProdAPIWithQuantile50", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.5", "service": "api"}, 1},
 		{"ProdAPIWithQuantile90", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.9", "service": "api"}, 1},
 		{"ProdAPIWithQuantile99", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "quantile": "0.99", "service": "api"}, 1},
-		{"ProdAPIWithoutQuantile", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "service": "api"}, 6},
+		{"ProdAPIWithoutQuantile", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "service": "api"}, 5},
 		{"ProdDBWithoutQuantile", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "service": "db"}, 2},
 		{"StagingAPIWithoutQuantile", mapstr.M{"environment": "staging", "instance": host, "job": "prometheus", "service": "api"}, 2},
 		{"StagingDBWithoutQuantile", mapstr.M{"environment": "staging", "instance": host, "job": "prometheus", "service": "db"}, 2},

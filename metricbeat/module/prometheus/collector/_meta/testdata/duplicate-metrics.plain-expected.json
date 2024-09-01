@@ -12,7 +12,7 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:54073",
+                "instance": "127.0.0.1:61485",
                 "job": "prometheus",
                 "name": "PS MarkSweep"
             },
@@ -38,12 +38,11 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:54073",
-                "job": "prometheus",
-                "name": "PS Scavenge"
+                "instance": "127.0.0.1:61485",
+                "job": "prometheus"
             },
             "metrics": {
-                "base_gc_total_total": 34
+                "up": 1
             }
         },
         "service": {
@@ -64,11 +63,12 @@
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:54073",
-                "job": "prometheus"
+                "instance": "127.0.0.1:61485",
+                "job": "prometheus",
+                "name": "PS Scavenge"
             },
             "metrics": {
-                "up": 1
+                "base_gc_total_total": 34
             }
         },
         "service": {
