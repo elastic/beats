@@ -105,7 +105,7 @@ func getEvents(m *MetricSet, input string) []mb.Event {
 
 	for _, certificate := range certificates {
 		event := mb.Event{
-			ModuleFields: mapstr.M{
+			MetricSetFields: mapstr.M{
 				"cert_name":           certificate.CertName,
 				"issuer":              certificate.Issuer,
 				"issuer_subject_hash": certificate.IssuerSubjectHash,
