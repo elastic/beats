@@ -469,7 +469,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	var c metadata.Config
 	err := c.Unmarshal(commonConfig)
 	if err != nil {
-		return nil, fmt.Errorf("could not create the metadata generator, as the configuration falied to unmarshal", resourceName)
+		return nil, fmt.Errorf("could not create the metadata generator, as the configuration failed to unmarshal", resourceName)
 	}
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
@@ -503,7 +503,7 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	var c metadata.Config
 	err := c.Unmarshal(commonConfig)
 	if err != nil {
-		return nil, fmt.Errorf("could not create the metadata generator, as the configuration falied to unmarshal", resourceName)
+		return nil, fmt.Errorf("could not create the metadata generator, as the configuration failed to unmarshal", resourceName)
 	}
 	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
 	addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, c.KubeAdm)
