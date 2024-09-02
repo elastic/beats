@@ -27,19 +27,19 @@ require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.44.0
 	github.com/aws/aws-sdk-go-v2 v1.30.4
-	github.com/aws/aws-sdk-go-v2/config v1.27.29
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.29
+	github.com/aws/aws-sdk-go-v2/config v1.27.31
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.30
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.5
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.37.5
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/costexplorer v1.40.4
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.176.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.177.0
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.34.2
 	github.com/aws/aws-sdk-go-v2/service/iam v1.35.0
-	github.com/aws/aws-sdk-go-v2/service/organizations v1.30.3
+	github.com/aws/aws-sdk-go-v2/service/organizations v1.31.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.82.2
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.23.5
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.60.1
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.5
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.61.0
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.6
 	github.com/aws/aws-sdk-go-v2/service/sts v1.30.5
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
@@ -183,7 +183,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.16
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5
 	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.29.5
