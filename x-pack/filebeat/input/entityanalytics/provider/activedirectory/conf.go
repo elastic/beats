@@ -31,6 +31,9 @@ type conf struct {
 	User     string `config:"ad_user" validate:"required"`
 	Password string `config:"ad_password" validate:"required"`
 
+	UserAttrs []string `config:"user_attributes"`
+	GrpAttrs  []string `config:"group_attributes"`
+
 	PagingSize uint32 `config:"ad_paging_size"`
 
 	// SyncInterval is the time between full
