@@ -466,11 +466,6 @@ func createAllWatchers(
 func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
-	var c metadata.Config
-	err := c.Unmarshal(commonConfig)
-	if err != nil {
-		return nil, fmt.Errorf("could not create the metadata generator, as the configuration failed to unmarshal", resourceName)
-	}
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -483,8 +478,6 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	var metaGen *metadata.Resource
 	namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 	if namespaceMetaWatcher != nil {
-		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-		addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, c.KubeAdm)
 		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceMetaWatcher).watcher.Store(), client)
 		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
@@ -499,15 +492,6 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 // A metaGen struct implements a MetaGen interface and is designed to utilize the necessary watchers to collect(Generate) metadata for a specific resource.
 func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
-
-	var c metadata.Config
-	err := c.Unmarshal(commonConfig)
-	if err != nil {
-		return nil, fmt.Errorf("could not create the metadata generator, as the configuration failed to unmarshal", resourceName)
-	}
-	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-	addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, c.KubeAdm)
-	addResourceMetadata.Node.SetBool("use_kubeadm", -1, c.KubeAdm)
 
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
@@ -605,6 +589,10 @@ func NewResourceMetadataEnricher(
 
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
