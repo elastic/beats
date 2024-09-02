@@ -92,7 +92,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 			// See unit tests for the same.
 			v, ok := e.ModuleFields["metrics"].(mapstr.M)
 			if ok {
-				e.RootFields["metrics_count"] = int64(len(v))
+				e.RootFields["metrics_count"] = len(v)
 			}
 		}
 	}

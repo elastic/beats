@@ -204,9 +204,9 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			// See unit tests for the same.
 			_, ok := e.ModuleFields["labels"]
 			if ok {
-				e.RootFields["metrics_count"] = int64(len(e.ModuleFields)) - 1
+				e.RootFields["metrics_count"] = len(e.ModuleFields) - 1
 			} else {
-				e.RootFields["metrics_count"] = int64(len(e.ModuleFields)) - 1
+				e.RootFields["metrics_count"] = len(e.ModuleFields)
 			}
 		}
 	}

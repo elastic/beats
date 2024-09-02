@@ -413,7 +413,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 	testCases := []struct {
 		name                string
 		expectedLabel       mapstr.M
-		expectedMetricCount int64
+		expectedMetricCount int
 	}{
 		{"Prod API Inf", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "+Inf", "service": "api"}, 1},
 		{"Prod API 0.5", mapstr.M{"environment": "prod", "instance": host, "job": "prometheus", "le": "0.5", "service": "api"}, 1},
@@ -445,7 +445,7 @@ func TestFetchEventForCountingMetrics(t *testing.T) {
 		})
 	}
 }
-func validateEvent(t *testing.T, event mb.Event, expectedLabels mapstr.M, expectedMetricsCount int64) {
+func validateEvent(t *testing.T, event mb.Event, expectedLabels mapstr.M, expectedMetricsCount int) {
 	t.Helper()
 
 	metricsCount, err := event.RootFields.GetValue("metrics_count")

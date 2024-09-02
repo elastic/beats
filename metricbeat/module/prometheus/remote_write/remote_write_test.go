@@ -83,7 +83,7 @@ func TestMetricsCount(t *testing.T) {
 	tests := []struct {
 		name     string
 		samples  model.Samples
-		expected map[string]int64
+		expected map[string]int
 	}{
 		{
 			name: "HTTP requests counter with multiple dimensions",
@@ -101,7 +101,7 @@ func TestMetricsCount(t *testing.T) {
 					Value:  10,
 				},
 			},
-			expected: map[string]int64{
+			expected: map[string]int{
 				`{"method":"GET","path":"/api/v1/users","status":"200"}`:    1,
 				`{"method":"POST","path":"/api/v1/users","status":"201"}`:   1,
 				`{"method":"GET","path":"/api/v1/products","status":"404"}`: 1,
@@ -127,7 +127,7 @@ func TestMetricsCount(t *testing.T) {
 					Value:  8589934592,
 				},
 			},
-			expected: map[string]int64{
+			expected: map[string]int{
 				`{"cpu":"0","mode":"user"}`:   1,
 				`{"cpu":"0","mode":"system"}`: 1,
 				`{"type":"used"}`:             1,
@@ -158,7 +158,7 @@ func TestMetricsCount(t *testing.T) {
 					Value:  500,
 				},
 			},
-			expected: map[string]int64{
+			expected: map[string]int{
 				`{"handler":"/home","le":"+Inf"}`: 1,
 				`{"handler":"/home"}`:             2,
 				`{"handler":"/home","le":"0.1"}`:  1,
@@ -193,7 +193,7 @@ func TestMetricsCount(t *testing.T) {
 					Value:  60,
 				},
 			},
-			expected: map[string]int64{
+			expected: map[string]int{
 				`{"le":"0.1"}`:                    1,
 				`{"le":"0.5"}`:                    1,
 				`{"method":"GET","status":"200"}`: 1,
@@ -225,7 +225,7 @@ func TestMetricsCount(t *testing.T) {
 					Value:  2.0,
 				},
 			},
-			expected: map[string]int64{
+			expected: map[string]int{
 				`{"endpoint":"/users","method":"GET"}`:    1,
 				`{"endpoint":"/users","method":"POST"}`:   1,
 				`{"endpoint":"/products","method":"GET"}`: 1,

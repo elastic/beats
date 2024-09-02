@@ -214,11 +214,20 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			// the unit tests for the same.
 			switch m.xPack {
 			case true:
-				event.RootFields.Put("metrics_count", int64(len(e)))
+				// As, metrics are nested under the "prometheus" key in case of x-pack,
+				// labels is also nested under the "prometheus" key. So, we need to
+				// make sure we subtract 1 in case the e["labels"]
+				// also exists.
+				_, ok := e["labels"].(mapstr.M)
+				if ok {
+					event.RootFields.Put("metrics_count", len(e)-1)
+				} else {
+					event.RootFields.Put("metrics_count", len(e))
+				}
 			default:
 				v, ok := e["metrics"].(mapstr.M)
 				if ok {
-					event.RootFields.Put("metrics_count", int64(len(v)))
+					event.RootFields.Put("metrics_count", len(v))
 				}
 			}
 		}
