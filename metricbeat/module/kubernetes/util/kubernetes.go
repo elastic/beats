@@ -476,6 +476,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	}
 
 	var metaGen *metadata.Resource
+
 	namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 	if namespaceMetaWatcher != nil {
 		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
@@ -572,6 +573,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 	commonConfig, _ := conf.NewConfigFrom(&commonMetaConfig)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		log.Errorf("Error creating Kubernetes client: %s", err)
@@ -742,6 +744,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 	commonConfig, _ := conf.NewConfigFrom(&commonMetaConfig)
+
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		log.Errorf("Error creating Kubernetes client: %s", err)
