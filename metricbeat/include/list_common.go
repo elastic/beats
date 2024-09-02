@@ -183,6 +183,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/cluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastorecluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/network"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/resourcepool"
