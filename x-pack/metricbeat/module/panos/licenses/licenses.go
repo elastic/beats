@@ -17,25 +17,6 @@ import (
 	"github.com/PaloAltoNetworks/pango"
 )
 
-type Response struct {
-	Status string `xml:"status,attr"`
-	Result Result `xml:"result"`
-}
-
-type Result struct {
-	Licenses []License `xml:"licenses>entry"`
-}
-
-type License struct {
-	Feature     string `xml:"feature"`
-	Description string `xml:"description"`
-	Serial      string `xml:"serial"`
-	Issued      string `xml:"issued"`
-	Expires     string `xml:"expires"`
-	Expired     string `xml:"expired"`
-	AuthCode    string `xml:"authcode"`
-}
-
 const (
 	metricsetName = "licenses"
 	vsys          = ""
@@ -136,7 +117,10 @@ func getEvents(m *MetricSet, licenses []License) []mb.Event {
 		}}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
-			"observer.ip": m.config.HostIp,
+			"observer.ip":     m.config.HostIp,
+			"host.ip":         m.config.HostIp,
+			"observer.vendor": "Palo Alto",
+			"observer.type":   "firewall",
 		}
 
 		events = append(events, event)

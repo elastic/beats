@@ -15,61 +15,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-type Response struct {
-	Status string `xml:"status,attr"`
-	Result string `xml:"result"`
-}
-
-type SystemLoad struct {
-	one_minute     float64
-	five_minute    float64
-	fifteen_minute float64
-}
-
-type Uptime struct {
-	Days  int
-	Hours string
-}
-
-type SystemInfo struct {
-	Uptime      Uptime
-	UserCount   int
-	LoadAverage SystemLoad
-}
-
-type TaskInfo struct {
-	Total    int
-	Running  int
-	Sleeping int
-	Stopped  int
-	Zombie   int
-}
-
-type CPUInfo struct {
-	User      float64
-	System    float64
-	Nice      float64
-	Idle      float64
-	Wait      float64
-	Hi        float64
-	SystemInt float64
-	Steal     float64
-}
-
-type MemoryInfo struct {
-	Total       float64
-	Free        float64
-	Used        float64
-	BufferCache float64
-}
-
-type SwapInfo struct {
-	Total     float64
-	Free      float64
-	Used      float64
-	Available float64
-}
-
 const (
 	metricsetName = "system"
 	vsys          = ""
@@ -145,12 +90,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	event := getEvent(m, response.Result)
-	report.Event(event)
+	report.Event(*event)
 
 	return nil
 }
 
-func getEvent(m *MetricSet, input string) mb.Event {
+func getEvent(m *MetricSet, input string) *mb.Event {
 	currentTime := time.Now()
 
 	// The output is standard "top" output, and we only need the top 5 lines
@@ -194,10 +139,13 @@ func getEvent(m *MetricSet, input string) mb.Event {
 	}}
 	event.Timestamp = currentTime
 	event.RootFields = mapstr.M{
-		"observer.ip": m.config.HostIp,
+		"observer.ip":     m.config.HostIp,
+		"host.ip":         m.config.HostIp,
+		"observer.vendor": "Palo Alto",
+		"observer.type":   "firewall",
 	}
 
-	return event
+	return &event
 }
 
 func parseSystemInfo(line string) SystemInfo {

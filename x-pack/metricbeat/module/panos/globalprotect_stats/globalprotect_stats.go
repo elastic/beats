@@ -1,22 +1,22 @@
-package filesystem
+package globalprotect_stats
 
 import (
 	"encoding/xml"
-	"strings"
 	"time"
 
-	"github.com/PaloAltoNetworks/pango"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panos"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/PaloAltoNetworks/pango"
 )
 
 const (
-	metricsetName = "filesystem"
+	metricsetName = "globalprotect_stats"
 	vsys          = ""
-	query         = "<show><system><disk-space></disk-space></system></show>"
+	query         = "<show><global-protect-gateway><statistics></statistics></global-protect-gateway></show>"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,7 +41,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos licenses metricset is beta.")
+	cfgwarn.Beta("The panos globalprotect_stats metricset is beta.")
 
 	config := panos.Config{}
 	logger := logp.NewLogger(base.FullyQualifiedName())
@@ -87,49 +87,29 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	filesystems := getFilesystems(response.Result.Data)
-	events := getEvents(m, filesystems)
+	events := getEvents(m, response)
 
 	for _, event := range events {
 		report.Event(event)
 	}
+
 	return nil
 }
 
-func getFilesystems(input string) []Filesystem {
-	lines := strings.Split(input, "\n")
-	filesystems := make([]Filesystem, 0)
-
-	for _, line := range lines[1:] {
-		fields := strings.Fields(line)
-		if len(fields) == 6 {
-			filesystem := Filesystem{
-				Name:    fields[0],
-				Size:    fields[1],
-				Used:    fields[2],
-				Avail:   fields[3],
-				UsePerc: fields[4],
-				Mounted: fields[5],
-			}
-			filesystems = append(filesystems, filesystem)
-		}
-	}
-	return filesystems
-}
-
-func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
-	events := make([]mb.Event, 0, len(filesystems))
+func getEvents(m *MetricSet, response Response) []mb.Event {
+	events := make([]mb.Event, 0, len(response.Result.Gateways))
 
 	currentTime := time.Now()
+	totalCurrent := response.Result.TotalCurrentUsers
+	totalPrevious := response.Result.TotalPreviousUsers
 
-	for _, filesystem := range filesystems {
+	for _, gateway := range response.Result.Gateways {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"name":        filesystem.Name,
-			"size":        filesystem.Size,
-			"used":        filesystem.Used,
-			"available":   filesystem.Avail,
-			"use_percent": filesystem.UsePerc,
-			"mounted":     filesystem.Mounted,
+			"gateway.name":           gateway.Name,
+			"gateway.current_users":  gateway.CurrentUsers,
+			"gateway.previous_users": gateway.PreviousUsers,
+			"total_current_users":    totalCurrent,
+			"total_previous_users":   totalPrevious,
 		}}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
@@ -143,5 +123,4 @@ func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 	}
 
 	return events
-
 }

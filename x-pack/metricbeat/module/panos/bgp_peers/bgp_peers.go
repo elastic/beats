@@ -49,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	logger.Debugf("panos_licenses metricset config: %v", config)
+	logger.Debugf("panos_bgp_peers metricset config: %v", config)
 
 	client := &pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
 
@@ -73,7 +73,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		log.Error("Failed to initialize client: %s", err)
 		return err
 	}
-	log.Infof("============================= panos/bgp_peers.Fetch initialized client ==============================")
 
 	output, err := m.client.Op(query, vsys, nil, nil)
 	if err != nil {
@@ -90,9 +89,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events := getEvents(m, response.Result.Entries)
 
 	for _, event := range events {
-		log.Debugf("====================================================")
-		log.Debugf("Reporting event: %v", event)
-		log.Debugf("====================================================")
 		report.Event(event)
 	}
 
@@ -102,13 +98,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func getEvents(m *MetricSet, entries []Entry) []mb.Event {
 	events := make([]mb.Event, 0, len(entries))
 	currentTime := time.Now()
-	log := m.Logger()
 
 	for _, entry := range entries {
-		log.Debugf("====================================================")
-		log.Debugf("Processing entry: %v", entry)
-		log.Debugf("====================================================")
-
 		event := mb.Event{MetricSetFields: mapstr.M{
 			"peer_name":              entry.Peer,
 			"virtual_router":         entry.Vr,
@@ -150,6 +141,7 @@ func getEvents(m *MetricSet, entries []Entry) []mb.Event {
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
 			"observer.ip": m.config.HostIp,
+			"host.ip":     m.config.HostIp,
 		}
 
 		events = append(events, event)

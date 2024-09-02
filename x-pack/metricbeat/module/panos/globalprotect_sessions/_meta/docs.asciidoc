@@ -1,0 +1,1 @@
+This is the globalprotect_sessions metricset of the module panos.

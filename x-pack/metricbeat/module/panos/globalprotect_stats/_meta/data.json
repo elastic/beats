@@ -1,0 +1,19 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"panos",
+        "name":"globalprotect_stats",
+        "rtt":44269
+    },
+    "panos":{
+        "globalprotect_stats":{
+            "example": "globalprotect_stats"
+        }
+    },
+    "type":"metricsets"
+}

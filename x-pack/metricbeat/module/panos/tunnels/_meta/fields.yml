@@ -1,0 +1,10 @@
+- name: tunnels
+  type: group
+  release: beta
+  description: >
+    tunnels
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

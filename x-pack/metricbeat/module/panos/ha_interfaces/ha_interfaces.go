@@ -170,7 +170,10 @@ func makeGroupEvent(m *MetricSet, input Result) *mb.Event {
 
 	event.Timestamp = currentTime
 	event.RootFields = mapstr.M{
-		"observer.ip": m.config.HostIp,
+		"observer.ip":     m.config.HostIp,
+		"host.ip":         m.config.HostIp,
+		"observer.vendor": "Palo Alto",
+		"observer.type":   "firewall",
 	}
 
 	return &event

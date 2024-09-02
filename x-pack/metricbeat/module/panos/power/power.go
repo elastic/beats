@@ -1,22 +1,22 @@
-package filesystem
+package power
 
 import (
 	"encoding/xml"
-	"strings"
 	"time"
 
-	"github.com/PaloAltoNetworks/pango"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panos"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/PaloAltoNetworks/pango"
 )
 
 const (
-	metricsetName = "filesystem"
+	metricsetName = "power"
 	vsys          = ""
-	query         = "<show><system><disk-space></disk-space></system></show>"
+	query         = "<show><system><environmentals><power></power></environmentals></system></show>"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,7 +41,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos licenses metricset is beta.")
+	cfgwarn.Beta("The panos power metricset is beta.")
 
 	config := panos.Config{}
 	logger := logp.NewLogger(base.FullyQualifiedName())
@@ -49,7 +49,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	logger.Debugf("panos_licenses metricset config: %v", config)
+	logger.Debugf("panos_power metricset config: %v", config)
 
 	client := &pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
 
@@ -87,50 +87,33 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	filesystems := getFilesystems(response.Result.Data)
-	events := getEvents(m, filesystems)
+	events := getEvents(m, &response)
 
 	for _, event := range events {
 		report.Event(event)
 	}
+
 	return nil
 }
 
-func getFilesystems(input string) []Filesystem {
-	lines := strings.Split(input, "\n")
-	filesystems := make([]Filesystem, 0)
-
-	for _, line := range lines[1:] {
-		fields := strings.Fields(line)
-		if len(fields) == 6 {
-			filesystem := Filesystem{
-				Name:    fields[0],
-				Size:    fields[1],
-				Used:    fields[2],
-				Avail:   fields[3],
-				UsePerc: fields[4],
-				Mounted: fields[5],
-			}
-			filesystems = append(filesystems, filesystem)
-		}
-	}
-	return filesystems
-}
-
-func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
-	events := make([]mb.Event, 0, len(filesystems))
-
+func getEvents(m *MetricSet, response *Response) []mb.Event {
+	log := m.Logger()
+	events := make([]mb.Event, 0, len(response.Result.Power.Slots))
 	currentTime := time.Now()
+	var event mb.Event
+	for _, slot := range response.Result.Power.Slots {
+		for _, entry := range slot.Entries {
+			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
+			event = mb.Event{MetricSetFields: mapstr.M{
 
-	for _, filesystem := range filesystems {
-		event := mb.Event{MetricSetFields: mapstr.M{
-			"name":        filesystem.Name,
-			"size":        filesystem.Size,
-			"used":        filesystem.Used,
-			"available":   filesystem.Avail,
-			"use_percent": filesystem.UsePerc,
-			"mounted":     filesystem.Mounted,
-		}}
+				"slot_number":   entry.Slot,
+				"description":   entry.Description,
+				"alarm":         entry.Alarm,
+				"volts":         entry.Volts,
+				"minimum_volts": entry.MinimumVolts,
+				"maximum_volts": entry.MaximumVolts,
+			}}
+		}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
 			"observer.ip":     m.config.HostIp,
@@ -138,10 +121,8 @@ func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 			"observer.vendor": "Palo Alto",
 			"observer.type":   "firewall",
 		}
-
 		events = append(events, event)
 	}
 
 	return events
-
 }

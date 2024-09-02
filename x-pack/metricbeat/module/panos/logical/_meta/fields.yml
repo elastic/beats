@@ -1,0 +1,10 @@
+- name: logical
+  type: group
+  release: beta
+  description: >
+    logical
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

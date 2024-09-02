@@ -2,7 +2,6 @@ package temperature
 
 import (
 	"encoding/xml"
-	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -87,7 +86,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		log.Error("Error: %s", err)
 		return err
 	}
-	fmt.Printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^temperature response: %+v^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^", response)
 
 	events := getEvents(m, &response)
 
@@ -100,12 +98,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func getEvents(m *MetricSet, response *Response) []mb.Event {
 	log := m.Logger()
-	fmt.Printf("^^^^^^^^^^^^^^^^^^^^temperature slots size: %d ^^^^^^^^^^^^^^^^^^^^^^^", len(response.Result.Thermal.Slots))
 	events := make([]mb.Event, 0, len(response.Result.Thermal.Slots))
 	currentTime := time.Now()
 	var event mb.Event
 	for _, slot := range response.Result.Thermal.Slots {
-		fmt.Printf("^^^^^^^^^^^^^^^^^^^^temperature slot entries size: %d ^^^^^^^^^^^^^^^^^^^^^^^", len(slot.Entries))
 		for _, entry := range slot.Entries {
 			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
 			event = mb.Event{MetricSetFields: mapstr.M{
@@ -120,7 +116,10 @@ func getEvents(m *MetricSet, response *Response) []mb.Event {
 		}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
-			"observer.ip": m.config.HostIp,
+			"observer.ip":     m.config.HostIp,
+			"host.ip":         m.config.HostIp,
+			"observer.vendor": "Palo Alto",
+			"observer.type":   "firewall",
 		}
 		events = append(events, event)
 	}

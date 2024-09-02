@@ -1,22 +1,22 @@
-package filesystem
+package tunnels
 
 import (
 	"encoding/xml"
-	"strings"
 	"time"
 
-	"github.com/PaloAltoNetworks/pango"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panos"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/PaloAltoNetworks/pango"
 )
 
 const (
-	metricsetName = "filesystem"
+	metricsetName = "tunnels"
 	vsys          = ""
-	query         = "<show><system><disk-space></disk-space></system></show>"
+	query         = "<show><vpn><tunnel></tunnel></vpn></show>"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,7 +41,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos licenses metricset is beta.")
+	cfgwarn.Beta("The panos tunnels metricset is beta.")
 
 	config := panos.Config{}
 	logger := logp.NewLogger(base.FullyQualifiedName())
@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		log.Error("Failed to initialize client: %s", err)
 		return err
 	}
-	log.Infof("panos_licenses.Fetch initialized client")
+	log.Infof("panos_tunnels.Fetch initialized client")
 
 	output, err := m.client.Op(query, vsys, nil, nil)
 	if err != nil {
@@ -87,49 +87,40 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	filesystems := getFilesystems(response.Result.Data)
-	events := getEvents(m, filesystems)
+	events := getEvents(m, response.Result.Entries)
 
 	for _, event := range events {
 		report.Event(event)
 	}
+
 	return nil
 }
 
-func getFilesystems(input string) []Filesystem {
-	lines := strings.Split(input, "\n")
-	filesystems := make([]Filesystem, 0)
-
-	for _, line := range lines[1:] {
-		fields := strings.Fields(line)
-		if len(fields) == 6 {
-			filesystem := Filesystem{
-				Name:    fields[0],
-				Size:    fields[1],
-				Used:    fields[2],
-				Avail:   fields[3],
-				UsePerc: fields[4],
-				Mounted: fields[5],
-			}
-			filesystems = append(filesystems, filesystem)
-		}
-	}
-	return filesystems
-}
-
-func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
-	events := make([]mb.Event, 0, len(filesystems))
+func getEvents(m *MetricSet, entries []Entry) []mb.Event {
+	events := make([]mb.Event, 0, len(entries))
 
 	currentTime := time.Now()
 
-	for _, filesystem := range filesystems {
+	for _, entry := range entries {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"name":        filesystem.Name,
-			"size":        filesystem.Size,
-			"used":        filesystem.Used,
-			"available":   filesystem.Avail,
-			"use_percent": filesystem.UsePerc,
-			"mounted":     filesystem.Mounted,
+			"id":         entry.ID,
+			"name":       entry.Name,
+			"gw":         entry.GW,
+			"TSi_ip":     entry.TSiIP,
+			"TSi_prefix": entry.TSiPrefix,
+			"TSi_proto":  entry.TSiProto,
+			"TSi_port":   entry.TSiPort,
+			"TSr_ip":     entry.TSrIP,
+			"TSr_prefix": entry.TSrPrefix,
+			"TSr_proto":  entry.TSrProto,
+			"TSr_port":   entry.TSrPort,
+			"proto":      entry.Proto,
+			"mode":       entry.Mode,
+			"dh":         entry.DH,
+			"enc":        entry.Enc,
+			"hash":       entry.Hash,
+			"life":       entry.Life,
+			"kb":         entry.KB,
 		}}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{

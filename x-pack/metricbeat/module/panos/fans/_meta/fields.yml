@@ -1,0 +1,10 @@
+- name: fans
+  type: group
+  release: beta
+  description: >
+    fans
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

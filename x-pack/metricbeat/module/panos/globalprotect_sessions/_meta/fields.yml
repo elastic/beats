@@ -1,0 +1,10 @@
+- name: globalprotect_sessions
+  type: group
+  release: beta
+  description: >
+    globalprotect_sessions
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

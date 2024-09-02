@@ -1,22 +1,22 @@
-package filesystem
+package globalprotect_sessions
 
 import (
 	"encoding/xml"
-	"strings"
 	"time"
 
-	"github.com/PaloAltoNetworks/pango"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panos"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/PaloAltoNetworks/pango"
 )
 
 const (
-	metricsetName = "filesystem"
+	metricsetName = "globalprotect_sessions"
 	vsys          = ""
-	query         = "<show><system><disk-space></disk-space></system></show>"
+	query         = "<show><global-protect-gateway><current-user></current-user></global-protect-gateway></show>"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -41,7 +41,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos licenses metricset is beta.")
+	cfgwarn.Beta("The panos globalprotect_sessions metricset is beta.")
 
 	config := panos.Config{}
 	logger := logp.NewLogger(base.FullyQualifiedName())
@@ -87,49 +87,46 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	filesystems := getFilesystems(response.Result.Data)
-	events := getEvents(m, filesystems)
+	events := getEvents(m, response.Result.Sessions)
 
 	for _, event := range events {
 		report.Event(event)
 	}
+
 	return nil
 }
 
-func getFilesystems(input string) []Filesystem {
-	lines := strings.Split(input, "\n")
-	filesystems := make([]Filesystem, 0)
-
-	for _, line := range lines[1:] {
-		fields := strings.Fields(line)
-		if len(fields) == 6 {
-			filesystem := Filesystem{
-				Name:    fields[0],
-				Size:    fields[1],
-				Used:    fields[2],
-				Avail:   fields[3],
-				UsePerc: fields[4],
-				Mounted: fields[5],
-			}
-			filesystems = append(filesystems, filesystem)
-		}
-	}
-	return filesystems
-}
-
-func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
-	events := make([]mb.Event, 0, len(filesystems))
+func getEvents(m *MetricSet, sessions []Session) []mb.Event {
+	events := make([]mb.Event, 0, len(sessions))
 
 	currentTime := time.Now()
 
-	for _, filesystem := range filesystems {
+	for _, session := range sessions {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"name":        filesystem.Name,
-			"size":        filesystem.Size,
-			"used":        filesystem.Used,
-			"available":   filesystem.Avail,
-			"use_percent": filesystem.UsePerc,
-			"mounted":     filesystem.Mounted,
+			"domain":                 session.Domain,
+			"is_local":               session.IsLocal,
+			"username":               session.Username,
+			"primary_username":       session.PrimaryUsername,
+			"region_for_config":      session.RegionForConfig,
+			"source_region":          session.SourceRegion,
+			"computer":               session.Computer,
+			"client":                 session.Client,
+			"vpn_type":               session.VPNType,
+			"host_id":                session.HostID,
+			"app_version":            session.AppVersion,
+			"virtual_ip":             session.VirtualIP,
+			"virtual_ipv6":           session.VirtualIPv6,
+			"public_ip":              session.PublicIP,
+			"public_ipv6":            session.PublicIPv6,
+			"tunnel_type":            session.TunnelType,
+			"public_connection_ipv6": session.PublicConnectionIPv6,
+			"client_ip":              session.ClientIP,
+			"login_time":             session.LoginTime,
+			"login_time_utc":         session.LoginTimeUTC,
+			"lifetime":               session.Lifetime,
+			"request_login":          session.RequestLogin,
+			"request_get_config":     session.RequestGetConfig,
+			"request_sslvpn_connect": session.RequestSSLVPNConnect,
 		}}
 		event.Timestamp = currentTime
 		event.RootFields = mapstr.M{
@@ -143,5 +140,4 @@ func getEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 	}
 
 	return events
-
 }
