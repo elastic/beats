@@ -1,7 +1,7 @@
 # Testing using GOVCSIM.
 
 
-To test the vsphere module without a real Vmware SDK URL you can use the following setup. Govcsim is a vCenter Server and ESXi API based simulator written using govmomi. It creates a vCenter Server model with a datacenter, hosts, cluster, resource pools, networks and a datastore.
+To test the vsphere module without a real Vmware SDK URL you can use the following setup. Govcsim is a vCenter Server and ESXi API based simulator written using govmomi. It creates a vCenter Server model with a datacenter, datastore cluster, hosts, cluster, resource pools, networks and a datastore.
 
 
 Requirements:
@@ -29,7 +29,13 @@ Now setup your metricbeat config to connect to Govcsim:
 - module: vsphere
   metricsets:
     - datastore
+    - datastorecluster
     - host
+<<<<<<< HEAD
+=======
+    - network
+    - resourcepool
+>>>>>>> 30320a3bfc ([vSphere][datastore_cluster] Add support for new metrics in datastore_cluster metricset (#40634))
     - virtualmachine
   enabled: true
   period: 5s
