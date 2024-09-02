@@ -235,7 +235,6 @@ func TestCreateMetaGen(t *testing.T) {
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
-		KubeAdm:    true,
 		Node:       "test-node",
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
@@ -244,7 +243,7 @@ func TestCreateMetaGen(t *testing.T) {
 	}
 	client := k8sfake.NewSimpleClientset()
 
-	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, DeploymentResource, resourceWatchers)
+	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, DeploymentResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -254,7 +253,7 @@ func TestCreateMetaGen(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the generators, this time without error
-	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, DeploymentResource, resourceWatchers)
+	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, DeploymentResource, resourceWatchers)
 	require.NoError(t, err)
 }
 
@@ -280,7 +279,6 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
-		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: true,
@@ -293,7 +291,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	// For pod:
 	metricsetPod := "pod"
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -301,11 +299,11 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(client, metricsetPod, PodResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	require.NoError(t, err)
 
 	// For service:
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -314,7 +312,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(client, metricsetService, ServiceResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
 	require.NoError(t, err)
 }
 
@@ -348,7 +346,6 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
-		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -433,7 +430,6 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
-		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -505,7 +501,6 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
-		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
@@ -649,7 +644,6 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
 		Node:       "test-node",
-		KubeAdm:    true,
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,

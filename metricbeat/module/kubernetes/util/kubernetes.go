@@ -42,7 +42,6 @@ import (
 type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
-	KubeAdm           bool                         `config:"use_kubeadm"`
 	Node              string                       `config:"node"`
 	SyncPeriod        time.Duration                `config:"sync_period"`
 
@@ -464,9 +463,14 @@ func createAllWatchers(
 
 // createMetadataGen creates and returns the metadata generator for resources other than pod and service
 // metaGen is a struct of type Resource and implements Generate method for metadata generation for a given resource kind.
-func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig, kubeadm bool,
+func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
+	var c metadata.Config
+	err := c.Unmarshal(commonConfig)
+	if err != nil {
+		return nil, fmt.Errorf("could not create the metadata generator, as the configuration falied to unmarshal", resourceName)
+	}
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -480,7 +484,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	namespaceMetaWatcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 	if namespaceMetaWatcher != nil {
 		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-		addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, kubeadm)
+		addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, c.KubeAdm)
 		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceMetaWatcher).watcher.Store(), client)
 		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
@@ -493,8 +497,17 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 
 // createMetadataGenSpecific creates and returns the metadata generator for a specific resource - pod or service
 // A metaGen struct implements a MetaGen interface and is designed to utilize the necessary watchers to collect(Generate) metadata for a specific resource.
-func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig, kubeadm bool,
+func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
+
+	var c metadata.Config
+	err := c.Unmarshal(commonConfig)
+	if err != nil {
+		return nil, fmt.Errorf("could not create the metadata generator, as the configuration falied to unmarshal", resourceName)
+	}
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, c.KubeAdm)
+	addResourceMetadata.Node.SetBool("use_kubeadm", -1, c.KubeAdm)
 
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
@@ -528,9 +541,6 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		}
 		// For example for pod named redis in namespace default, the generator uses the pod watcher for pod metadata,
 		// collects all node metadata using the node watcher's store and all namespace metadata using the namespacewatcher's store.
-		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-		addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, kubeadm)
-		addResourceMetadata.Node.SetBool("use_kubeadm", -1, kubeadm)
 		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
@@ -539,8 +549,6 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		if namespaceMetaWatcher == nil {
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
 		}
-
-		addResourceMetadata.Namespace.SetBool("use_kubeadm", -1, kubeadm)
 		namespaceMeta := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceMetaWatcher).watcher.Store(), client)
 		metaGen = metadata.NewServiceMetadataGenerator(commonConfig, (*resourceMetaWatcher).watcher.Store(),
@@ -600,9 +608,9 @@ func NewResourceMetadataEnricher(
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
-		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, resourceName, resourceWatchers)
+		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	} else {
-		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, resourceName, resourceWatchers)
+		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	}
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
@@ -760,7 +768,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, commonMetaConfig.KubeAdm, PodResource, resourceWatchers)
+	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
@@ -887,7 +895,6 @@ func GetConfig(base mb.BaseMetricSet) (*kubernetesConfig, error) {
 	config := &kubernetesConfig{
 		AddMetadata:         true,
 		SyncPeriod:          time.Minute * 10,
-		KubeAdm:             true,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 
