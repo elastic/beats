@@ -23,7 +23,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
+func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
+	const bytesMultiplier int64 = 1024 * 1024
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
 		"status": hs.Summary.OverallStatus,
@@ -35,7 +36,7 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
 
 	if hw := hs.Summary.Hardware; hw != nil {
 		totalCPU := int64(hw.CpuMhz) * int64(hw.NumCpuCores)
-		usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
+		usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * bytesMultiplier
 		event.Put("cpu.total.mhz", totalCPU)
 		event.Put("cpu.free.mhz", totalCPU-int64(hs.Summary.QuickStats.OverallCpuUsage))
 		event.Put("memory.used.bytes", usedMemory)
@@ -45,28 +46,29 @@ func (m *MetricSet) eventMapping(hs mo.HostSystem, data *metricData) mapstr.M {
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
-	if len(data.assetsName.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetsName.outputVmNames)
-		event.Put("vm.count", len(data.assetsName.outputVmNames))
+	if len(data.assetNames.outputVmNames) > 0 {
+		event.Put("vm.names", data.assetNames.outputVmNames)
+		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 
-	if len(data.assetsName.outputDsNames) > 0 {
-		event.Put("datastore.names", data.assetsName.outputDsNames)
-		event.Put("datastore.count", len(data.assetsName.outputDsNames))
+	if len(data.assetNames.outputDsNames) > 0 {
+		event.Put("datastore.names", data.assetNames.outputDsNames)
+		event.Put("datastore.count", len(data.assetNames.outputDsNames))
 	}
 
-	if len(data.assetsName.outputNetworkNames) > 0 {
-		event.Put("network_names", data.assetsName.outputNetworkNames)
-		event.Put("network.names", data.assetsName.outputNetworkNames)
-		event.Put("network.count", len(data.assetsName.outputNetworkNames))
+	if len(data.assetNames.outputNetworkNames) > 0 {
+		event.Put("network_names", data.assetNames.outputNetworkNames)
+		event.Put("network.names", data.assetNames.outputNetworkNames)
+		event.Put("network.count", len(data.assetNames.outputNetworkNames))
 	}
 
 	return event
 }
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
+	const bytesMultiplier int64 = 1024
 	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
-		event.Put("disk.capacity.usage.bytes", val.(int64)*1000)
+		event.Put("disk.capacity.usage.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["disk.deviceLatency.average"]; exist {
 		event.Put("disk.devicelatency.average.ms", val)
@@ -75,23 +77,23 @@ func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) 
 		event.Put("disk.latency.total.ms", val)
 	}
 	if val, exist := perfMetricMap["disk.usage.average"]; exist {
-		event.Put("disk.total.bytes", val.(int64)*1000)
+		event.Put("disk.total.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["disk.read.average"]; exist {
-		event.Put("disk.read.bytes", val.(int64)*1000)
+		event.Put("disk.read.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["disk.write.average"]; exist {
-		event.Put("disk.write.bytes", val.(int64)*1000)
+		event.Put("disk.write.bytes", val.(int64)*bytesMultiplier)
 	}
 
 	if val, exist := perfMetricMap["net.transmitted.average"]; exist {
-		event.Put("network.bandwidth.transmitted.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.transmitted.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["net.received.average"]; exist {
-		event.Put("network.bandwidth.received.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.received.bytes", val.(int64)*bytesMultiplier)
 	}
 	if val, exist := perfMetricMap["net.usage.average"]; exist {
-		event.Put("network.bandwidth.total.bytes", val.(int64)*1000)
+		event.Put("network.bandwidth.total.bytes", val.(int64)*bytesMultiplier)
 	}
 
 	if val, exist := perfMetricMap["net.packetsTx.summation"]; exist {

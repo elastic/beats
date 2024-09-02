@@ -191,6 +191,20 @@ The Active Directory Base Distinguished Name. Field is required.
 The client user name. Used for authentication. The user must have Active Directory read access. Field is required.
 
 [float]
+===== `user_attributes`
+
+The set of directory attributes to request from the Active Directory server when collecting user data.
+If not set, all user attributes are requested. If set, only listed attributes are requested, including
+`distinguishedDomain` and `whenChanged`. Note that the Active Directory attribute names are used.
+
+[float]
+===== `group_attributes`
+
+The set of directory attributes to request from the Active Directory server when collecting group data.
+If not set, all group attributes are requested. If set, only listed attributes are requested, including
+`distinguishedDomain` and `whenChanged`. Note that the Active Directory attribute names are used.
+
+[float]
 ===== `ad_paging_size`
 
 The number of records to request from the Active Directory server for each page, if set.
