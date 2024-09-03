@@ -58,6 +58,16 @@ func TestEventMapping(t *testing.T) {
 			"customField1": "value1",
 			"customField2": "value2",
 		},
+		Snapshots: []VMSnapshotData{
+			{
+				Name:        "Snapshot1",
+				Description: "Test snapshot 1",
+			},
+			{
+				Name:        "Snapshot2",
+				Description: "Test snapshot 2",
+			},
+		},
 	}
 
 	event := m.mapEvent(data)
@@ -108,6 +118,17 @@ func TestEventMapping(t *testing.T) {
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
 		"datastore.names": []string{"ds1", "ds2"},
+		"snapshots": []VMSnapshotData{
+			{
+				Name:        "Snapshot1",
+				Description: "Test snapshot 1",
+			},
+			{
+				Name:        "Snapshot2",
+				Description: "Test snapshot 2",
+			},
+		},
+		"snapshots.count": 2,
 	}
 
 	// Assert that the output event matches the expected event
