@@ -191,8 +191,7 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 
 	start := time.Now()
 	defer func() {
-		totalTime := time.Since(start)
-		s.logger.Debugf("Total time taken for compute AggregatedList request: %s", totalTime)
+		s.logger.Debugf("Total time taken for compute AggregatedList request: %s", time.Since(start))
 	}()
 
 	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
