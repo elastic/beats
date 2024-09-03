@@ -522,6 +522,20 @@ func TestParseStructuredData(t *testing.T) {
 				},
 			},
 		},
+		"multi-key-with-escape": {
+			in: `[exampleSDID@32473 iut="3" eventSource="Application" eventID="1011" somekey="[value\] more data"][examplePriority@32473 class="high"]`,
+			want: map[string]interface{}{
+				"exampleSDID@32473": map[string]interface{}{
+					"iut":         "3",
+					"eventSource": "Application",
+					"eventID":     "1011",
+					"somekey":     "[value] more data",
+				},
+				"examplePriority@32473": map[string]interface{}{
+					"class": "high",
+				},
+			},
+		},
 		"repeated-id": {
 			in: `[exampleSDID@32473 iut="3"][exampleSDID@32473 class="high"]`,
 			want: map[string]interface{}{

@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
@@ -243,4 +244,27 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		return remaining.Load() == 0
 	})
 	assert.True(t, allFinished, "All queueProducer requests should be unblocked once an output is set")
+}
+
+func TestQueueMetrics(t *testing.T) {
+	// More thorough testing of queue metrics are in the queue package,
+	// here we just want to make sure that they appear under the right
+	// monitoring namespace.
+	reg := monitoring.NewRegistry()
+	controller := outputController{
+		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
+		consumer: &eventConsumer{
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
+		},
+		monitors: Monitors{Metrics: reg},
+	}
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+	entry := reg.Get("pipeline.queue.max_events")
+	require.NotNil(t, entry, "pipeline.queue.max_events must exist")
+	value, ok := entry.(*monitoring.Uint)
+	require.True(t, ok, "pipeline.queue.max_events must be a *monitoring.Uint")
+	assert.Equal(t, uint64(1000), value.Get(), "pipeline.queue.max_events should match the events configuration key")
 }

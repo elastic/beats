@@ -32,6 +32,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -49,6 +50,7 @@ type BeatProc struct {
 	RestartOnBeatOnExit bool
 	beatName            string
 	cmdMutex            sync.Mutex
+	waitingMutex        sync.Mutex
 	configFile          string
 	fullPath            string
 	logFileOffset       int64
@@ -201,13 +203,8 @@ func (b *BeatProc) Start(args ...string) {
 
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
-		// 1. Kill the Beat
-		if err := b.Process.Signal(os.Interrupt); err != nil {
-			if !errors.Is(err, os.ErrProcessDone) {
-				t.Fatalf("could not stop process with PID: %d, err: %s",
-					b.Process.Pid, err)
-			}
-		}
+		// 1. Send an interrupt signal to the Beat
+		b.stopNonsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
 		if b.RestartOnBeatOnExit {
@@ -219,7 +216,7 @@ func (b *BeatProc) Start(args ...string) {
 			// wg.Wait() or there is a possibility of
 			// deadlock.
 			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps ensuring
+			// 4. Wait for the goroutine to finish, this helps to ensure
 			// no other Beat process was started
 			wg.Wait()
 		} else {
@@ -256,17 +253,27 @@ func (b *BeatProc) startBeat() {
 	b.Process = cmd.Process
 }
 
-// waitBeatToExit blocks until the Beat exits, it returns
-// the process' exit code.
+// waitBeatToExit blocks until the Beat exits.
 // `startBeat` must be called before this method.
-func (b *BeatProc) waitBeatToExit() int {
+func (b *BeatProc) waitBeatToExit() {
+	if !b.waitingMutex.TryLock() {
+		// b.stopNonsynced must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+
 	processState, err := b.Process.Wait()
 	if err != nil {
-		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
-			b.beatName, err, processState.ExitCode())
+		exitCode := "unknown"
+		if processState != nil {
+			exitCode = strconv.Itoa(processState.ExitCode())
+		}
+
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
+			b.beatName, err, exitCode)
 	}
 
-	return processState.ExitCode()
+	return
 }
 
 // Stop stops the Beat process
@@ -274,11 +281,31 @@ func (b *BeatProc) waitBeatToExit() int {
 func (b *BeatProc) Stop() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+	b.stopNonsynced()
+}
+
+// stopNonsynced is the actual stop code, but without locking so it can be reused
+// by methods that have already acquired the lock.
+func (b *BeatProc) stopNonsynced() {
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
-		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+			b.Process.Pid, err)
+	}
+
+	if !b.waitingMutex.TryLock() {
+		// b.waitBeatToExit must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+	ps, err := b.Process.Wait()
+	if err != nil {
+		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+	}
+	if !ps.Success() {
+		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
 	}
 }
 
@@ -628,7 +655,7 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 
 // RemoveAllCLIArgs removes all CLI arguments configured.
 // It will also remove all configuration for home path and
-// logs, there fore some methods, like the ones that read logs,
+// logs, therefore some methods, like the ones that read logs,
 // might fail if Filebeat is not configured the way this framework
 // expects.
 //

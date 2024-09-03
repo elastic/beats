@@ -7,6 +7,7 @@
 package netflow_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -22,7 +23,6 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -35,13 +35,14 @@ import (
 )
 
 const (
-	waitFor = 10 * time.Second
+	waitFor = 20 * time.Second
 	tick    = 200 * time.Millisecond
 )
 
 func TestNetFlowIntegration(t *testing.T) {
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
@@ -49,16 +50,26 @@ func TestNetFlowIntegration(t *testing.T) {
 	outputHost := fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())
 	outputHosts := []interface{}{outputHost}
 
+	kibanaURL, kibanaUser := integration.GetKibana(t)
+	kibanaUsername := kibanaUser.Username()
+	kibanaPassword, ok := kibanaUser.Password()
+	require.True(t, ok, "kibana user should have a password")
+
+	// since beat is managed by a mocked elastic-agent we need to install the netflow package
+	// through the Kibana API
+	err := installNetflowPackage(ctx, kibanaURL.String(), kibanaUsername, kibanaPassword)
+	require.NoError(t, err, "failed to install netflow package")
+
 	// we are going to need admin access to query ES about the logs-netflow.log-default data_stream
 	outputUsername := os.Getenv("ES_SUPERUSER_USER")
-	require.NotEmpty(t, outputUsername)
+	require.NotEmpty(t, outputUsername, "ES_SUPERUSER_USER env var must be set")
 	outputPassword := os.Getenv("ES_SUPERUSER_PASS")
-	require.NotEmpty(t, outputPassword)
+	require.NotEmpty(t, outputPassword, "ES_SUPERUSER_PASS env var must be set")
 	outputProtocol := esConnectionDetails.Scheme
 
 	deleted, err := DeleteDataStream(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
-	require.NoError(t, err)
-	require.True(t, deleted)
+	require.NoError(t, err, "failed to delete data stream")
+	require.True(t, deleted, "failed to delete data stream")
 
 	// construct expected Agent units
 	allStreams := []*proto.UnitExpected{
@@ -128,6 +139,7 @@ func TestNetFlowIntegration(t *testing.T) {
 							"queue_size":            2 * 4 * 1600,
 							"detect_sequence_reset": true,
 							"max_message_size":      "10KiB",
+							"workers":               8,
 						}),
 					},
 				},
@@ -188,38 +200,31 @@ func TestNetFlowIntegration(t *testing.T) {
 	case err := <-beatRunErr:
 		t.Fatalf("beat run err: %v", err)
 	case <-time.After(waitFor):
-		t.Fatalf("timed out waiting for beat to become healthy")
+		t.Fatalf("timed out waiting for filebeat to report healthy")
 	}
 
 	registry := monitoring.GetNamespace("dataset").GetRegistry().GetRegistry("netflow_integration_test")
 
 	discardedEventsTotalVar, ok := registry.Get("discarded_events_total").(*monitoring.Uint)
-	require.True(t, ok)
+	require.True(t, ok, "failed to get discarded_events_total metric")
 
 	receivedEventTotalVar, ok := registry.Get("received_events_total").(*monitoring.Uint)
-	require.True(t, ok)
+	require.True(t, ok, "failed to get received_events_total metric")
 
 	udpAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:6006")
-	require.NoError(t, err)
+	require.NoError(t, err, "failed to resolve UDP address")
 
 	conn, err := net.DialUDP("udp", nil, udpAddr)
-	require.NoError(t, err)
+	require.NoError(t, err, "failed to open UDP connection")
 
-	data, err := os.ReadFile("testdata/golden/ipfix_cisco.pcap.golden.json")
-	require.NoError(t, err)
-
-	var expectedFlows struct {
-		Flows []beat.Event `json:"events,omitempty"`
-	}
-	err = json.Unmarshal(data, &expectedFlows)
-	require.NoError(t, err)
-
-	f, err := pcap.OpenOffline("testdata/pcap/ipfix_cisco.pcap")
-	require.NoError(t, err)
+	// for more info look testdata/integration/test.md
+	f, err := pcap.OpenOffline("testdata/integration/test.pcap")
+	require.NoError(t, err, "failed to open pcap file")
 	defer f.Close()
+	expectedEventsNumbers := 32
 
 	var totalBytes, totalPackets int
-	rateLimit := 10000
+	rateLimit := 3000
 	limiter := rate.NewLimiter(rate.Limit(rateLimit), rateLimit)
 
 	packetSource := gopacket.NewPacketSource(f, f.LinkType())
@@ -227,33 +232,35 @@ func TestNetFlowIntegration(t *testing.T) {
 
 		if totalPackets%rateLimit == 0 {
 			err = limiter.WaitN(ctx, rateLimit)
-			require.NoError(t, err)
+			require.NoError(t, err, "failed to wait for rate limiter")
 		}
 
 		payloadData := pkt.TransportLayer().LayerPayload()
 
 		n, err := conn.Write(payloadData)
-		require.NoError(t, err)
+		require.NoError(t, err, "failed to write payload to UDP connection")
 
 		totalBytes += n
 		totalPackets++
 	}
 
-	require.Zero(t, discardedEventsTotalVar.Get())
+	require.Zero(t, discardedEventsTotalVar.Get(), "expected no discarded events")
 
 	require.Eventually(t, func() bool {
 		return receivedEventTotalVar.Get() == uint64(totalPackets)
-	}, waitFor, tick)
+	}, waitFor, tick, "expected all events to be received")
 
 	require.Eventually(t, func() bool {
 		return HasDataStream(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default") == nil
-	}, waitFor, tick)
+	}, waitFor, tick, "expected netflow data stream to be created")
 
 	require.Eventually(t, func() bool {
-		eventsCount, err := DataStreamEventsCount(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
-		require.NoError(t, err)
-		return eventsCount == uint64(len(expectedFlows.Flows))
-	}, waitFor, tick)
+		streamEventsCount, err := DataStreamEventsCount(ctx, outputUsername, outputPassword, outputHost, "logs-netflow.log-default")
+		if err != nil {
+			return false
+		}
+		return streamEventsCount == uint64(expectedEventsNumbers)
+	}, waitFor, tick, fmt.Sprintf("expected netflow data stream to have %d events", expectedEventsNumbers))
 }
 
 type unitPayload map[string]interface{}
@@ -297,7 +304,7 @@ type DataStreamResult struct {
 }
 
 func HasDataStream(ctx context.Context, username string, password string, url string, name string) error {
-	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name), nil, nil)
 	if err != nil {
 		return err
 	}
@@ -331,35 +338,13 @@ func HasDataStream(ctx context.Context, username string, password string, url st
 	return nil
 }
 
-// Hit represents a single search hit.
-type Hit struct {
-	Index  string                 `json:"_index"`
-	Type   string                 `json:"_type"`
-	ID     string                 `json:"_id"`
-	Score  float64                `json:"_score"`
-	Source map[string]interface{} `json:"_source"`
-}
-
-type Total struct {
-	Value uint64 `json:"value"`
-}
-
-// Hits are the collections of search hits.
-type Hits struct {
-	Total Total // model when needed
-	Hits  []Hit `json:"hits"`
-}
-
-// SearchResults are the results returned from a _search.
-type SearchResults struct {
-	Took   int
-	Hits   Hits                       `json:"hits"`
-	Shards json.RawMessage            // model when needed
-	Aggs   map[string]json.RawMessage // model when needed
+// CountResults are the results returned from a _search.
+type CountResults struct {
+	Count uint64 `json:"count"`
 }
 
 func DataStreamEventsCount(ctx context.Context, username string, password string, url string, name string) (uint64, error) {
-	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_search?q=!_ignored:*+AND+!event.message:*", url, name))
+	resultBytes, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/%s/_count?q=!_ignored:*+AND+!event.message:*", url, name), nil, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -368,12 +353,12 @@ func DataStreamEventsCount(ctx context.Context, username string, password string
 		return 0, errors.New("http not found error")
 	}
 
-	var results SearchResults
+	var results CountResults
 	err = json.Unmarshal(resultBytes, &results)
 	if err != nil {
 		return 0, err
 	}
-	return results.Hits.Total.Value, nil
+	return results.Count, nil
 }
 
 // DeleteResults are the results returned from a _data_stream delete.
@@ -382,7 +367,7 @@ type DeleteResults struct {
 }
 
 func DeleteDataStream(ctx context.Context, username string, password string, url string, name string) (bool, error) {
-	_, err := request(ctx, http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name))
+	_, err := request(ctx, http.MethodDelete, username, password, fmt.Sprintf("%s/_data_stream/%s", url, name), nil, nil)
 	if err != nil {
 		return false, err
 	}
@@ -390,12 +375,55 @@ func DeleteDataStream(ctx context.Context, username string, password string, url
 	return true, nil
 }
 
-func request(ctx context.Context, httpMethod string, username string, password string, url string) ([]byte, error) {
+func installNetflowPackage(ctx context.Context, url string, username string, password string) error {
+
+	type Response struct {
+		Item struct {
+			Version string `json:"version"`
+		} `json:"item"`
+	}
+
+	resp, err := request(ctx, http.MethodGet, username, password, fmt.Sprintf("%s/api/fleet/epm/packages/netflow?prerelease=true", url), nil, nil)
+	if err != nil {
+		return err
+	}
+
+	var results Response
+	err = json.Unmarshal(resp, &results)
+	if err != nil {
+		return err
+	}
+
+	version := results.Item.Version
+
+	resp, err = request(ctx, http.MethodPost, username, password, fmt.Sprintf("%s/api/fleet/epm/packages/netflow/%s", url, version), map[string]string{
+		"kbn-xsrf": "true",
+	}, []byte(`{"force":true}`))
+	if err != nil {
+		return err
+	}
+
+	if resp == nil {
+		return errors.New("http not found error")
+	}
+
+	return nil
+}
+
+func request(ctx context.Context, httpMethod string, username string, password string, url string, headers map[string]string, reqBody []byte) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, httpMethod, url, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.SetBasicAuth(username, password)
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	if reqBody != nil {
+		req.Body = io.NopCloser(bytes.NewReader(reqBody))
+	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -404,7 +432,10 @@ func request(ctx context.Context, httpMethod string, username string, password s
 	defer res.Body.Close()
 	if res.StatusCode == http.StatusNotFound {
 		return nil, nil
+	} else if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
+
 	resultBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
