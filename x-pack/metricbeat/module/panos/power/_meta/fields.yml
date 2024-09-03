@@ -1,10 +1,23 @@
 - name: power
   type: group
   release: beta
-  description: >
-    power
+  description: power
   fields:
-    - name: example
+    - name: slot_number
       type: keyword
-      description: >
-        Example field
+      description: Slot number field
+    - name: description
+      type: text
+      description: Description field
+    - name: alarm
+      type: boolean
+      description: Indicates if alarm is active
+    - name: volts
+      type: float
+      description: Current Volts 
+    - name: minimum_volts
+      type: float
+      description: Minimum volts recorded
+    - name: maximum_volts
+      type: float
+      description: Maximum volts recorded

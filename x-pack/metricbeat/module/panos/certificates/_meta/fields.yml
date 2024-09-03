@@ -4,7 +4,83 @@
   description: >
     certificates
   fields:
-    - name: example
+    - name: issuer
       type: keyword
       description: >
-        Example field
+        issuer field
+
+    - name: issuer_subject_hash
+      type: keyword
+      description: >
+        issuer_subject_hash field
+
+    - name: issuer_key_hash
+      type: keyword
+      description: >
+        issuer_key_hash field
+
+    - name: db_type
+      type: keyword
+      description: >
+        db_type field
+
+    - name: db_exp_date
+      type: keyword
+      description: >
+        expiration date, format: 310329235959Z(Mar 29 23:59:59 2031 GMT)
+
+    - name: db_rev_date
+      type: keyword
+      description: >
+        db_rev_date field
+
+    - name: db_serial_no
+      type: keyword
+      description: >
+        db_serial_no field
+
+    - name: db_file
+      type: keyword
+      description: >
+        db_file field
+
+    - name: db_name
+      type: keyword
+      description: >
+        db_name field
+
+    - name: db_status
+      type: keyword
+      description: >
+        db_status field
+
+    
+
+  
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"cert_name":           certificate.CertName,
+				"issuer":              certificate.Issuer,
+				"issuer_subject_hash": certificate.IssuerSubjectHash,
+				"issuer_key_hash":     certificate.IssuerKeyHash,
+				"db_type":             certificate.DBType,
+				"db_exp_date":         certificate.DBExpDate,
+				"db_rev_date":         certificate.DBRevDate,
+				"db_serial_no":        certificate.DBSerialNo,
+				"db_file":             certificate.DBFile,
+				"db_name":             certificate.DBName,
+				"db_status":           certificate.DBStatus,

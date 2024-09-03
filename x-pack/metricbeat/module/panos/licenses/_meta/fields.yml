@@ -1,10 +1,26 @@
 - name: licenses
   type: group
   release: beta
-  description: >
-    licenses
+  description: licenses
   fields:
-    - name: example
+    - name: feature
       type: keyword
-      description: >
-        Example field
+      description: Feature licensed
+    - name: description
+      type: text
+      description: Description field
+    - name: serial
+      type: keyword
+      description: Serial number of license
+    - name: issued
+      type: date
+      description: Issued date field
+    - name: expires
+      type: date
+      description: Expires date field
+    - name: expired
+      type: boolean
+      description: Expired field
+    - name: auth_code
+      type: keyword
+      description: Auth code field

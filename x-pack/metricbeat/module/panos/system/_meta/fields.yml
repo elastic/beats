@@ -4,7 +4,111 @@
   description: >
     system
   fields:
-    - name: example
+    - name: uptime.days
+      type: integer
+      description: >
+        Uptime in days
+    - name: uptime.hours
       type: keyword
       description: >
-        Example field
+        Uptime in hours
+    - name: user_count
+      type: integer
+      description: >
+        Number of users
+    - name: load_average.1m
+      type: float
+      description: >
+        Load average in 1 minute
+    - name: load_average.5m
+      type: float
+      description: >
+        Load average in 5 minutes
+    - name: load_average.15m
+      type: float
+      description: >
+        Load average in 15 minutes
+    - name: tasks.total
+      type: integer
+      description: >
+        Total number of tasks
+    - name: tasks.running
+      type: integer
+      description: >
+        Number of running tasks
+    - name: tasks.sleeping
+      type: integer
+      description: >
+        Number of sleeping tasks
+    - name: tasks.stopped
+      type: integer
+      description: >
+        Number of stopped tasks
+    - name: tasks.zombie
+      type: integer
+      description: >
+        Number of zombie tasks
+    - name: cpu.user
+      type: float
+      description: >
+        CPU usage by user processes
+    - name: cpu.system
+      type: float
+      description: >
+        CPU usage by system processes
+    - name: cpu.nice
+      type: float
+      description: >
+        CPU usage by processes with a positive nice value
+    - name: cpu.idle
+      type: float
+      description: >
+        CPU idle time
+    - name: cpu.wait
+      type: float
+      description: >
+        CPU wait time
+    - name: cpu.hi
+      type: float
+      description: >
+        CPU hardware interrupts
+    - name: cpu.system_int
+      type: float
+      description: >
+        CPU software interrupts
+    - name: cpu.steal
+      type: float
+      description: >
+        CPU steal time
+    - name: memory.total
+      type: float
+      description: >
+        Total memory
+    - name: memory.free
+      type: float
+      description: >
+        Free memory
+    - name: memory.used
+      type: float
+      description: >
+        Used memory
+    - name: memory.buffer_cache
+      type: keyflaotword
+      description: >
+        Memory used for buffers and cache
+    - name: swap.total
+      type: float
+      description: >
+        Total swap space
+    - name: swap.free
+      type: float
+      description: >
+        Free swap space
+    - name: swap.used
+      type: float
+      description: >
+        Used swap space
+    - name: swap.available
+      type: float
+      description: >
+        Available swap space

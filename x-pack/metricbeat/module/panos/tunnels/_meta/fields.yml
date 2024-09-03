@@ -1,10 +1,59 @@
 - name: tunnels
   type: group
   release: beta
-  description: >
-    tunnels
+  description: ipsec tunnels
   fields:
-    - name: example
+    - name: id
+      type: integer
+      description: ID field
+    - name: name
       type: keyword
-      description: >
-        Example field
+      description: Name field
+    - name: gw
+      type: keyword
+      description: Gateway field
+    - name: TSi_ip
+      type: ip
+      description: TSi IP field
+    - name: TSi_prefix
+      type: integer
+      description: TSi Prefix field
+    - name: TSi_proto
+      type: integer
+      description: TSi Protocol field
+    - name: TSi_port
+      type: integer
+      description: TSi Port field
+    - name: TSr_ip
+      type: ip
+      description: TSr IP field
+    - name: TSr_prefix
+      type: integer
+      description: TSr Prefix field
+    - name: TSr_proto
+      type: integer
+      description: TSr Protocol field
+    - name: TSr_port
+      type: integer
+      description: TSr Port field
+    - name: proto
+      type: integer
+      description: Protocol field
+    - name: mode
+      type: keyword
+      description: Mode field
+    - name: dh
+      type: keyword
+      description: DH field
+    - name: enc
+      type: keyword
+      description: Encryption field
+    - name: hash
+      type: keyword
+      description: Hash field
+    - name: life
+      type: integer
+      description: Life field
+    - name: kb
+      type: integer
+      description: KB field

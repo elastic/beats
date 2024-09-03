@@ -4,7 +4,193 @@
   description: >
     bgp_peers
   fields:
-    - name: example
+    - name: peer_name
       type: keyword
       description: >
-        Example field
+        The name of the peer.
+
+    - name: virtual_router  
+      type: keyword
+      description: >
+        The virtual router.   
+
+    - name: peer_group
+      type: keyword
+      description: >
+        The peer group.
+
+    - name: peer_router_id
+      type: keyword
+      description: >
+        The peer router ID.
+
+    - name: remote_as_asn 
+      type: keyword
+      description: >
+        The remote AS ASN.
+
+    - name: status  
+      type: keyword
+      description: >
+        The status.
+
+    - name: status_duration 
+      type: keyword
+      description: >
+        The status duration.  
+
+    - name: password_set
+      type: keyword
+      description: >
+        The password set.
+
+    - name: passive
+      type: keyword
+      description: >
+        The passive.
+
+    - name: multi_hop_ttl
+      type: integer
+      description: >
+        The multi hop TTL.
+
+    - name: peer_address
+      type: keyword
+      description: >
+        The peer address.
+
+    - name: local_address 
+      type: keyword
+      description: >
+        The local address.
+
+    - name: reflector_client
+      type: keyword
+      description: >
+        The reflector client.
+
+    - name: same_confederation
+      type: keyword
+      description: >
+        The same confederation.
+
+    - name: aggregate_confed_as
+      type: keyword
+      description: >
+        The aggregate confed AS.
+
+    - name: peering_type
+      type: keyword
+      description: >
+        The peering type.
+
+    - name: connect_retry_interval
+      type: integer
+      description: >
+        The connect retry interval.
+
+    - name: open_delay 
+      type: integer
+      description: >
+        The open delay.
+
+    - name: idle_hold
+      type: integer
+      description: >
+        The idle hold.
+
+    - name: prefix_limit
+      type: integer
+      description: >
+        The prefix limit.
+
+    - name: holdtime
+      type: integer
+      description: >
+        The holdtime.
+
+    - name: holdtime_config
+      type: integer
+      description: >
+        The holdtime config.
+
+    - name: keepalive
+      type: integer
+      description: >
+        The keepalive.
+
+    - name: keepalive_config
+      type: integer
+      description: >
+        The keepalive config.
+
+    - name: msg_update_in
+      type: integer
+      description: >
+        The msg update in.
+
+    - name: msg_update_out
+      type: integer
+      description: >
+        The msg update out.
+
+    - name: msg_total_in
+      type: integer
+      description: >
+        The msg total in. 
+
+    - name: msg_total_out
+      type: integer
+      description: >
+        The msg total out.
+
+    - name: last_update_age
+      type: integer
+      description: >
+        The last update age.
+
+    - name: last_error
+      type: keyword
+      description: >
+        The last error.
+
+    - name: status_flap_counts
+      type: integer
+      description: >
+        The status flap counts.
+
+    - name: established_counts  
+      type: integer
+      description: >
+        The established counts.
+
+    - name: orf_entry_received
+      type: keyword
+      description: >
+        The ORF entry received.
+
+    - name: nexthop_self
+      type: keyword
+      description: >
+        The nexthop self.
+
+    - name: nexthop_thirdparty
+      type: keyword
+      description: >
+        The nexthop thirdparty.
+
+    - name: nexthop_peer
+      type: keyword
+      description: >
+        The nexthop peer.
+
+    - name: nexthop
+      type: keyword
+      description: >
+        The nexthop.
+
+    - name: nexthop_local
+      type: keyword
+      description: >
+        The nexthop local.
+

@@ -1,10 +1,35 @@
 - name: logical
   type: group
   release: beta
-  description: >
-    logical
+  description: logical
   fields:
-    - name: example
+    - name: name
       type: keyword
-      description: >
-        Example field
+      description: Name of logical interface
+    - name: id
+      type: keyword
+      description: ID of logical interface
+    - name: tag
+      type: keyword
+      description: Tag field
+    - name: vsys
+      type: keyword
+      description: Virtual system for this interface
+    - name: zone
+      type: keyword
+      description: Zone field
+    - name: fwd
+      type: keyword
+      description: Forward field
+    - name: ip
+      type: ip
+      description: IP field
+    - name: addr
+      type: keyword
+      description: Address field
+    - name: dyn_addr
+      type: keyword
+      description: Dynamic Address field
+    - name: addr6
+      type: keyword
+      description: IPv6 Address field

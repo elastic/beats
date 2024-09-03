@@ -4,7 +4,32 @@
   description: >
     filesystem
   fields:
-    - name: example
+    - name: name
       type: keyword
       description: >
-        Example field
+        Filesystem name
+
+    - name: size
+      type: keyword
+      description: >
+        Size, including units, e,g 9.5G.        
+
+    - name: used
+      type: keyword
+      description: >
+        Amount used, including units, e.g. 4.0G   
+
+    - name: available
+      type: keyword
+      description: >
+        Disk space available, including units, e.g. 5.5G
+
+    - name: use_percent
+      type: keyword
+      description: >
+        Percent of filesystem used
+
+    - name: mounted
+      type: keyword
+      description: >
+        Filesystem mount point

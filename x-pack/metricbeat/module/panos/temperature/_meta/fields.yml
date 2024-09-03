@@ -1,10 +1,23 @@
 - name: temperature
   type: group
   release: beta
-  description: >
-    temperature
+  description: temperature
   fields:
-    - name: example
-      type: keyword
-      description: >
-        Example field
+    - name: slot_number
+      type: integer
+      description: Slot number field
+    - name: description
+      type: text
+      description: Description field
+    - name: alarm
+      type: boolean
+      description: Alarm field
+    - name: degrees_celsius
+      type: float
+      description: Degrees Celsius field
+    - name: minimum_temp
+      type: float
+      description: Minimum temperature field
+    - name: maximum_temp
+      type: float
+      description: Maximum temperature field

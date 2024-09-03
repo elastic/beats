@@ -4,7 +4,24 @@
   description: >
     globalprotect_stats
   fields:
-    - name: example
+    - name: gateway.name
       type: keyword
       description: >
-        Example field
+        Name of the GlobalProtect gateway
+    - name: gateway.current_users
+      type: integer
+      description: >
+        Number of current sessions on the gateway
+    - name: gateway.previous_users
+      type: integer
+      description: >
+        Number of previous sessions on the gateway
+    - name: total_current_users
+      type: integer
+      description: >
+        Total current users across all gateways
+    - name: total_previous_users
+      type: integer
+      description: >
+        Total previous users across all gateways
+
