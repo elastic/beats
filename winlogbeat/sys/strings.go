@@ -21,7 +21,26 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"golang.org/x/sys/windows"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
 )
+
+var ansiDecoder *encoding.Decoder
+
+func init() {
+	ansiCP := windows.GetACP()
+	for _, enc := range charmap.All {
+		cm, ok := enc.(*charmap.Charmap)
+		cmID, _ := cm.ID()
+		if !ok || uint32(cmID) != ansiCP {
+			continue
+		}
+		ansiDecoder = cm.NewDecoder()
+		return
+	}
+	ansiDecoder = charmap.Windows1250.NewDecoder()
+}
 
 // UTF16BytesToString converts the given UTF-16 bytes to a string.
 func UTF16BytesToString(b []byte) (string, error) {
@@ -43,4 +62,29 @@ func UTF16BytesToString(b []byte) (string, error) {
 func RemoveWindowsLineEndings(s string) string {
 	s = strings.Replace(s, "\r\n", "\n", -1)
 	return strings.TrimRight(s, "\n")
+}
+
+func ANSIBytesToString(enc []byte) (string, error) {
+	out, err := ansiDecoder.Bytes(enc)
+	return string(out), err
+}
+
+func BinaryToString(bin []byte) string {
+	if len(bin) == 0 {
+		return ""
+	}
+
+	const hexTable = "0123456789ABCDEF"
+
+	size := len(bin) * 2
+	buffer := make([]byte, size)
+
+	for i := 0; i < len(bin); i++ {
+		for j := 0; j < 2; j++ {
+			idx := (bin[i] >> (j * 4) & 0x0F)
+			buffer[2*i+(1-j)] = hexTable[idx]
+		}
+	}
+
+	return string(buffer)
 }
