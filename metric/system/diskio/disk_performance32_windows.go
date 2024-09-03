@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
-// +build windows
+//go:build windows && (386 || arm)
 
 package diskio
 
 // diskPerformance struct provides disk performance information. It is used by the IOCTL_DISK_PERFORMANCE control code.
+// DeviceIoControl() will fail with ERROR_INSUFFICIENT_BUFFER (The data area passed to a system call is too small) on 32 bit systems.
+// The memory layout is different for 32 bit vs 64 bit so an alignment (AlignmentPadding) is necessary in order to increase the buffer size
 type diskPerformance struct {
 	BytesRead    int64
 	BytesWritten int64
@@ -37,4 +38,5 @@ type diskPerformance struct {
 	QueryTime           int64
 	StorageDeviceNumber uint32
 	StorageManagerName  [8]uint16
+	AlignmentPadding    uint32
 }
