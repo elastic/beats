@@ -1,2 +1,86 @@
-This is the panos module.
+:modulename: panos
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The panos Metricbeat module uses the Palo Alto [pango](https://pkg.go.dev/github.com/PaloAltoNetworks/pango#section-documentation) package to extract metrics
+information from a firewall device via the XML API.
+
+[float]
+=== Dashboards
+
+
+[float]
+=== Module-specific configuration notes
+
+The panos module configuration requires the ip address of the target firewall device and an API Key generated from that firewall. It is assumed
+that network access to the firewall is available. All access by the panos module is read-only.
+
+***Limitations***
+The current version of the module is configured to run against **exactly 1** firewall. Multiple firewalls will require multiple agent configurations. 
+The module has also not been tested with Panorama, though it should work since it only relies on lower level Client.Op calls to send XML API commands 
+to the server.
+
+Required credentials for the `panos` module:
+
+`host_ip` :: IP address of the firewall - must be network accessible.
+
+`apiKey`:: An API Key generated via an XML API call to the firewall or via the management dashboard. This
+
+
+[float]
+== Metricsets
+
+[float]
+=== `bgp_peers`
+This metricset reports information on BGP Peers defined in the firewall.
+
+[float]
+=== `certificates`
+This metricset will capture certificates defined on the firewall including expiration dates.
+
+[float]
+=== `fans`
+This metricset will collect information from hardware fans (RPMS) and will report if an alarm is active for a given fan.
+
+[float]
+=== `filesystem`
+This metricset reports disk usage for filesystems defined on the device, based on df output.
+
+[float]
+=== `globalprotect_sessions`
+This metricset will collect metrics on current user sessions established on Global Protect gateways.
+
+[float]
+=== `globalprotect_stats`
+This metricset reports the number of user per GlobalProtect gateway and totals across all gateways.
+
+[float]
+=== `ha_interfaces`
+This metricset will collect metrics from the device on High Availabilty configuration for interfaces.
+
+[float]
+=== `licenses`
+This metricset reports on licenses for sofware features with expiration dates.
+
+[float]
+=== `logical`
+This metricset will collect metrics on logical interfaces in the device's network.
+
+[float]
+=== `power`
+This metricset reports power usage and alarms.
+
+[float]
+=== `system`
+This metricset captures system informate such as uptime, user count, CPU, memory and swap: essentiallyl the first 5 lines of 'top' output. 
+
+[float]
+=== `temperature`
+This metricset reports temperature for various slots on the device and reports on alarm status. 
+
+[float]
+=== `tunnels`
+This metricset enumerates ipsec tunnels and their status.
 
