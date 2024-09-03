@@ -79,10 +79,12 @@ var journaldEventFields = FieldConversion{
 	"CONTAINER_NAME":            text("container.name"),
 	"CONTAINER_TAG":             text("container.log.tag"),
 	"CONTAINER_PARTIAL_MESSAGE": text("container.partial"),
+	"IMAGE_NAME":                text("container.image.name"),
 
 	// dropped fields
-	"_SOURCE_MONOTONIC_TIMESTAMP": ignoredField, // received timestamp stored in @timestamp
+	"_SOURCE_MONOTONIC_TIMESTAMP": ignoredField, // saved in the registry
 	"_SOURCE_REALTIME_TIMESTAMP":  ignoredField, // saved in the registry
 	"__CURSOR":                    ignoredField, // saved in the registry
 	"__MONOTONIC_TIMESTAMP":       ignoredField, // saved in the registry
+	"__REALTIME_TIMESTAMP":        ignoredField, // dropped from the output, is used for the @timestamp
 }
