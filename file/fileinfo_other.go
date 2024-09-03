@@ -15,34 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build plan9
+//go:build !unix
 
 package file
 
 import (
-	"errors"
 	"os"
-
-	"golang.org/x/sys/plan9"
 )
 
-func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInfo, error) {
-	info, err := statFunc(name)
-	if err != nil {
-		return nil, err
-	}
-
-	return wrap(info)
-}
-
 func wrap(info os.FileInfo) (FileInfo, error) {
-	stat, ok := info.Sys().(*plan9.Dir)
-	if !ok {
-		return nil, errors.New("failed to get uid/gid")
-	}
-
-	// on plan9 uid/gid is a string so we can't cast to int
-	_ = stat.Uid
-	_ = stat.Gid
-	return fileInfo{FileInfo: info, uid: nil, gid: nil}, nil
+	return fileInfo{FileInfo: info}, nil
 }

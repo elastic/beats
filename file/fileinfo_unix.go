@@ -25,15 +25,6 @@ import (
 	"syscall"
 )
 
-func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInfo, error) {
-	info, err := statFunc(name)
-	if err != nil {
-		return nil, err
-	}
-
-	return wrap(info)
-}
-
 func wrap(info os.FileInfo) (FileInfo, error) {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
