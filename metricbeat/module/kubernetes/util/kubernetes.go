@@ -758,6 +758,9 @@ func NewContainerMetadataEnricher(
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
 	}
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
 
 	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	if err != nil {

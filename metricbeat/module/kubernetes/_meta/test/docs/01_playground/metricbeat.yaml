@@ -157,7 +157,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: metricbeat
-          image: docker.elastic.co/beats/metricbeat:8.15.0-SNAPSHOT
+          image: docker.elastic.co/beats/metricbeat:8.16.0-SNAPSHOT
           command: [ "sleep" ]
           args: [ "infinity" ]
           env:
