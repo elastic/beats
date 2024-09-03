@@ -93,6 +93,12 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	period := m.Module().Config().Period
+	if !isValidPeriod(period.Seconds()) {
+		m.Logger().Errorf("Invalid period: %v", period)
+		return nil
+	}
+
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
 		return fmt.Errorf("error in NewClient: %w", err)
@@ -157,37 +163,9 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 				m.Logger().Errorf("Failed to retrieve object from host %s: %w", hst[i].Name, err)
 			}
 
-			spec := types.PerfQuerySpec{
-				Entity:     hst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
-
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+			metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metricIds)
 			if err != nil {
-				m.Logger().Errorf("Failed to query performance data from host %s: %v", hst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debug("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Errorf("Failed to convert performance data to metric series for host %s: %v", hst[i].Name, err)
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
+				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %w", hst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
@@ -239,4 +217,63 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputDsNames:      outputDsNames,
 		outputVmNames:      outputVmNames,
 	}, nil
+}
+
+func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metricIds []types.PerfMetricId) (map[string]interface{}, error) {
+	metricMap := make(map[string]interface{})
+	summary, err := perfManager.ProviderSummary(ctx, hst.Reference())
+	if err != nil {
+		return metricMap, fmt.Errorf("failed to get summary: %w", err)
+	}
+
+	var refreshRate = int32(m.Module().Config().Period.Seconds())
+	if summary.CurrentSupported {
+		refreshRate = summary.RefreshRate
+		if int32(m.Module().Config().Period.Seconds()) != refreshRate {
+			m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", m.Module().Config().Period, refreshRate)
+		}
+	} else {
+		m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval (300, 1800, 7200, 86400). Risk of data duplication. Consider adjusting period.")
+	}
+
+	spec := types.PerfQuerySpec{
+		Entity:     hst.Reference(),
+		MetricId:   metricIds,
+		MaxSample:  1,
+		IntervalId: int32(refreshRate),
+	}
+
+	// Query performance data
+	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+	if err != nil {
+		return metricMap, fmt.Errorf("failed to query performance data: %v", err)
+	}
+
+	if len(samples) == 0 {
+		m.Logger().Debug("No samples returned from performance manager")
+		return metricMap, nil
+	}
+
+	results, err := perfManager.ToMetricSeries(ctx, samples)
+	if err != nil {
+		m.Logger().Errorf("failed to convert performance data to metric series: %v", err)
+	}
+
+	for _, result := range results[0].Value {
+		if len(result.Value) > 0 {
+			metricMap[result.Name] = result.Value[0]
+			continue
+		}
+		m.Logger().Debugf("For host %s, Metric %v: No result found", hst.Name, result.Name)
+	}
+
+	return metricMap, nil
+}
+
+func isValidPeriod(period float64) bool {
+	switch period {
+	case 20, 300, 1800, 7200, 86400:
+		return true
+	}
+	return false
 }
