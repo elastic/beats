@@ -3,12 +3,9 @@ scm:
   owner: elastic
   repository: beats
   branch: main
+  commitusingapi: true
   # begin updatecli-compose policy values
   user: 'github-actions[bot]'
   email: '41898282+github-actions[bot]@users.noreply.github.com'
-  commitusingapi: true
   # end updatecli-compose policy values
 
-# This will be moved to the scm section in the future and use
-# commitusingapi instead.
-signedcommit: true
