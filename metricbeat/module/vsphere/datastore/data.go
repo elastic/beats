@@ -23,16 +23,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
+func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   ds.Summary.Name,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
 		"host": mapstr.M{
-			"count": len(data.assetNames.outputHsNames),
+			"count": len(data.assetNames.outputHostNames),
+			"names": data.assetNames.outputHostNames,
 		},
 		"vm": mapstr.M{
 			"count": len(data.assetNames.outputVmNames),
+			"names": data.assetNames.outputVmNames,
 		},
 		"capacity": mapstr.M{
 			"total": mapstr.M{
@@ -52,21 +54,13 @@ func (m *MetricSet) eventMapping(ds mo.Datastore, data *metricData) mapstr.M {
 		event.Put("capacity.used.pct", usedSpacePercent)
 	}
 
-	if len(data.assetNames.outputHsNames) > 0 {
-		event.Put("host.names", data.assetNames.outputHsNames)
-	}
-
-	if len(data.assetNames.outputVmNames) > 0 {
-		event.Put("vm.names", data.assetNames.outputVmNames)
-	}
-
 	mapPerfMetricToEvent(event, data.perfMetrics)
 
 	return event
 }
 
 func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) {
-	const bytesMultiplier = 1000
+	const bytesMultiplier int64 = 1024
 
 	if val, exist := perfMetricMap["datastore.read.average"]; exist {
 		event.Put("read.bytes", val.(int64)*bytesMultiplier)

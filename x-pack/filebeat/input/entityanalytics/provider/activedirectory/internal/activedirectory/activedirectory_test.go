@@ -45,7 +45,7 @@ func Test(t *testing.T) {
 
 	var times []time.Time
 	t.Run("full", func(t *testing.T) {
-		users, err := GetDetails(url, user, pass, base, time.Time{}, 0, nil, nil)
+		users, err := GetDetails(url, user, pass, base, time.Time{}, nil, nil, 0, nil, nil)
 		if err != nil {
 			t.Fatalf("unexpected error from GetDetails: %v", err)
 		}
@@ -91,7 +91,7 @@ func Test(t *testing.T) {
 				want++
 			}
 		}
-		users, err := GetDetails(url, user, pass, base, since, 0, nil, nil)
+		users, err := GetDetails(url, user, pass, base, since, nil, nil, 0, nil, nil)
 		if err != nil {
 			t.Fatalf("unexpected error from GetDetails: %v", err)
 		}
