@@ -272,8 +272,6 @@ func (b *BeatProc) waitBeatToExit() {
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
 			b.beatName, err, exitCode)
 	}
-
-	return
 }
 
 // Stop stops the Beat process
