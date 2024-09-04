@@ -35,6 +35,7 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -282,7 +283,8 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:       time.Now(),
 			EphemeralID:     eid,
 		},
-		Fields: fields,
+		Fields:   fields,
+		Registry: reload.NewRegistry(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -392,6 +394,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
+		// Since now publisher is closed on Stop, we want to give some
+		// time to ack any pending events by default to avoid
+		// changing on stop behavior too much.
+		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -400,11 +406,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
-
-	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
-	//       but refine publisher to disconnect clients on stop automatically
-	// defer pipeline.Close()
+	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
@@ -518,11 +520,24 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
+	// Since publisher.Close is not safe to be called more than once this is necessary.
+	var once sync.Once
 	stopBeat := func() {
-		b.Instrumentation.Tracer().Close()
-		beater.Stop()
+		once.Do(func() {
+			b.Instrumentation.Tracer().Close()
+			// If the publisher has a Close() method, call it before stopping the beater.
+			if c, ok := b.Publisher.(io.Closer); ok {
+				c.Close()
+			}
+			beater.Stop()
+		})
 	}
 	svc.HandleSignals(stopBeat, cancel)
+
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(stopBeat)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -530,9 +545,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
@@ -850,7 +862,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, b.Registry)
 	if err != nil {
 		return err
 	}

@@ -33,9 +33,9 @@ var moduleList = monitoring.NewUniqueList()
 var moduleListMetricsOnce sync.Once
 
 // RegisterMonitoringModules registers the modules list with the monitoring system.
-func RegisterMonitoringModules() {
+func RegisterMonitoringModules(namespace string) {
 	moduleListMetricsOnce.Do(func() {
-		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), namespace, moduleList.Report, monitoring.Report)
 	})
 }
 

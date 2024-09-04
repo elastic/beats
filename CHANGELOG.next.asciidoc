@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
 - Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 
 
 *Heartbeat*
@@ -54,6 +55,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Update metrics for the vSphere Host metricset. {pull}40429[40429]
+- Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
+- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 
 *Osquerybeat*
 
@@ -105,10 +111,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow port number 0 in the community ID flowhash processor {pull}40259[40259]
 - Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 - Update Go version to 1.22.6. {pull}40528[40528]
+- Aborts all active connections for Elasticsearch output. {pull}40572[40572]
+- Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
 
 *Auditbeat*
 
 - Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
+- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 
 *Filebeat*
@@ -152,6 +161,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
 - Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
 - The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
+- Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
+- awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
+- Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 
 *Heartbeat*
 
@@ -159,6 +172,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix first HTTP 401 error when fetching metrics from the Kubelet API caused by a token update {pull}40636[40636]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
@@ -179,6 +193,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Fix http server helper SSL config. {pull}39405[39405]
 
 *Osquerybeat*
@@ -278,6 +293,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.15.0. {pull}40294[40294]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
+- Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
+- Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Disable event normalization for netflow input {pull}40635[40635]
+- Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 
 *Auditbeat*
 
@@ -304,7 +324,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-
+- Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 
 *Metricbeat*
 
@@ -355,13 +377,3 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-

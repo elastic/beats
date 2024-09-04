@@ -66855,36 +66855,117 @@ vSphere module
 
 
 [float]
+=== cluster
+
+Cluster information.
+
+
+
+
+*`vsphere.cluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.datastore.count`*::
++
+--
+Number of Datastores associated with the cluster.
+
+
+type: long
+
+--
+
+
+*`vsphere.cluster.das_config.admission.control.enabled`*::
++
+--
+Indicates whether strict admission control is enabled.
+
+
+type: boolean
+
+--
+
+*`vsphere.cluster.das_config.enabled`*::
++
+--
+Indicates whether vSphere HA feature is enabled.
+
+
+type: boolean
+
+--
+
+
+*`vsphere.cluster.host.count`*::
++
+--
+Number of Hosts associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.host.names`*::
++
+--
+List of all the Host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.cluster.network.count`*::
++
+--
+Number of Networks associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.network.names`*::
++
+--
+List of all the Network names associated with the cluster.
+
+
+type: keyword
+
+--
+
+[float]
 === datastore
 
 datastore
 
 
 
-*`vsphere.datastore.name`*::
+*`vsphere.datastore.capacity.free.bytes`*::
 +
 --
-Datastore name
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.fstype`*::
-+
---
-Filesystem type
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.capacity.total.bytes`*::
-+
---
-Total bytes of the datastore
+Free bytes of the datastore.
 
 
 type: long
@@ -66893,10 +66974,10 @@ format: bytes
 
 --
 
-*`vsphere.datastore.capacity.free.bytes`*::
+*`vsphere.datastore.capacity.total.bytes`*::
 +
 --
-Free bytes of the datastore
+Total bytes of the datastore.
 
 
 type: long
@@ -66908,7 +66989,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.bytes`*::
 +
 --
-Used bytes of the datastore
+Used bytes of the datastore.
 
 
 type: long
@@ -66920,7 +67001,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.pct`*::
 +
 --
-Used percent of the datastore
+Percentage of datastore capacity used.
 
 
 type: scaled_float
@@ -66929,27 +67010,182 @@ format: percent
 
 --
 
-[float]
-=== host
-
-host
-
-
-
-*`vsphere.host.name`*::
+*`vsphere.datastore.fstype`*::
 +
 --
-Host name
+Filesystem type.
 
 
 type: keyword
 
 --
 
+*`vsphere.datastore.host.count`*::
++
+--
+Number of hosts.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.host.names`*::
++
+--
+List of all the host names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.iops`*::
++
+--
+Storage I/O Control aggregated Input/Output Operations Per Second.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.name`*::
++
+--
+Datastore name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.read.bytes`*::
++
+--
+Rate of reading data from the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.read.latency.total.ms`*::
++
+--
+Average amount of time for a read operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.status`*::
++
+--
+Status of the datastore.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.vm.count`*::
++
+--
+Number of VMs.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.write.bytes`*::
++
+--
+Rate of writing data to the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.write.latency.total.ms`*::
++
+--
+Average amount of time for a write operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+[float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== host
+
+Host information from vSphere environment.
+
+
+
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in MHz.
 
 
 type: long
@@ -66959,7 +67195,7 @@ type: long
 *`vsphere.host.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in MHz.
 
 
 type: long
@@ -66969,17 +67205,37 @@ type: long
 *`vsphere.host.cpu.free.mhz`*::
 +
 --
-Free CPU in Mhz
+Free CPU in MHz.
 
 
 type: long
 
 --
 
-*`vsphere.host.memory.used.bytes`*::
+*`vsphere.host.datastore.names`*::
 +
 --
-Used Memory in bytes
+List of all the datastore names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.datastore.count`*::
++
+--
+Number of datastores on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by or on the entity.
 
 
 type: long
@@ -66988,10 +67244,54 @@ format: bytes
 
 --
 
-*`vsphere.host.memory.total.bytes`*::
+*`vsphere.host.disk.devicelatency.average.ms`*::
 +
 --
-Total Memory in bytes
+Average amount of time it takes to complete an SCSI command from physical device in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.latency.total.ms`*::
++
+--
+Highest latency value across all disks used by the host in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.read.bytes`*::
++
+--
+Average number of bytes read from the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.write.bytes`*::
++
+--
+Average number of bytes written to the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.total.bytes`*::
++
+--
+Sum of disk read and write rates each second in bytes.
 
 
 type: long
@@ -67003,7 +67303,7 @@ format: bytes
 *`vsphere.host.memory.free.bytes`*::
 +
 --
-Free Memory in bytes
+Free Memory in bytes.
 
 
 type: long
@@ -67012,10 +67312,575 @@ format: bytes
 
 --
 
+*`vsphere.host.memory.total.bytes`*::
++
+--
+Total Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.memory.used.bytes`*::
++
+--
+Used Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.name`*::
++
+--
+Host name.
+
+
+type: keyword
+
+--
+
 *`vsphere.host.network_names`*::
 +
 --
-Network names
+Network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.names`*::
++
+--
+List of all the network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.count`*::
++
+--
+Number of networks on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.bandwidth.transmitted.bytes`*::
++
+--
+Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.received.bytes`*::
++
+--
+Average rate at which data was received during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.total.bytes`*::
++
+--
+Sum of network transmitted and received rates in bytes during the interval.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.packets.transmitted.count`*::
++
+--
+Number of packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.received.count`*::
++
+--
+Number of packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.transmitted.count`*::
++
+--
+Number of packets with errors transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.received.count`*::
++
+--
+Number of packets with errors received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.total.count`*::
++
+--
+Total number of packets with errors.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.transmitted.count`*::
++
+--
+Number of multicast packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.received.count`*::
++
+--
+Number of multicast packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.total.count`*::
++
+--
+Total number of multicast packets.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.transmitted.count`*::
++
+--
+Number of transmitted packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.received.count`*::
++
+--
+Number of received packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.total.count`*::
++
+--
+Total number of packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.uptime`*::
++
+--
+The total uptime of a host in seconds within the vSphere environment.
+
+
+type: long
+
+--
+
+*`vsphere.host.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.vm.count`*::
++
+--
+Number of virtual machines on the host.
+
+
+type: long
+
+--
+
+[float]
+=== network
+
+Network-related information.
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+Indicates whether at least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+Indicates whether the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts connected to this network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of the Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.type`*::
++
+--
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines connected to this network.
+
+
+type: long
+
+--
+
+[float]
+=== resourcepool
+
+Resource pool information from vSphere environment.
+
+
+
+
+*`vsphere.resourcepool.cpu.usage.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.demand.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.entitlement.mhz`*::
++
+--
+The amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.entitlement.static.mhz`*::
++
+--
+The static CPU resource entitlement for a virtual machine.
+
+
+type: long
+
+--
+
+
+
+*`vsphere.resourcepool.memory.usage.guest.bytes`*::
++
+--
+Guest memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.host.bytes`*::
++
+--
+Host memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.entitlement.bytes`*::
++
+--
+The amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.entitlement.static.bytes`*::
++
+--
+The static memory resource entitlement for a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.private.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.shared.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.swapped.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.ballooned.bytes`*::
++
+--
+The size of the balloon driver in a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.overhead.bytes`*::
++
+--
+The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.overhead.consumed.bytes`*::
++
+--
+The amount of overhead memory, in bytes, currently being consumed to run a VM.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.compressed.bytes`*::
++
+--
+The amount of compressed memory currently consumed by VM, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.name`*::
++
+--
+The name of the resource pool.
+
+
+type: keyword
+
+--
+
+*`vsphere.resourcepool.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.resourcepool.vm.count`*::
++
+--
+Number of virtual machines on the resource pool.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.vm.names`*::
++
+--
+Names of virtual machines on the resource pool.
 
 
 type: keyword
@@ -67032,7 +67897,7 @@ virtualmachine
 *`vsphere.virtualmachine.host.id`*::
 +
 --
-Host id
+Host id.
 
 
 type: keyword
@@ -67042,7 +67907,7 @@ type: keyword
 *`vsphere.virtualmachine.host.hostname`*::
 +
 --
-Host name of the host
+Hostname of the host.
 
 
 type: keyword
@@ -67052,7 +67917,7 @@ type: keyword
 *`vsphere.virtualmachine.name`*::
 +
 --
-Virtual Machine name
+Virtual Machine name.
 
 
 type: keyword
@@ -67062,7 +67927,7 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-Virtual Machine Operating System name
+Virtual Machine Operating System name.
 
 
 type: keyword
@@ -67072,7 +67937,7 @@ type: keyword
 *`vsphere.virtualmachine.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in Mhz.
 
 
 type: long
@@ -67082,7 +67947,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in Mhz.
 
 
 type: long
@@ -67092,7 +67957,7 @@ type: long
 *`vsphere.virtualmachine.cpu.free.mhz`*::
 +
 --
-Available CPU in Mhz
+Available CPU in Mhz.
 
 
 type: long
@@ -67102,7 +67967,7 @@ type: long
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
-Used Memory of Guest in bytes
+Used Memory of Guest in bytes.
 
 
 type: long
@@ -67114,7 +67979,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.used.host.bytes`*::
 +
 --
-Used Memory of Host in bytes
+Used Memory of Host in bytes.
 
 
 type: long
@@ -67126,7 +67991,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Total Memory of Guest in bytes
+Total Memory of Guest in bytes.
 
 
 type: long
@@ -67138,7 +68003,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.free.guest.bytes`*::
 +
 --
-Free Memory of Guest in bytes
+Free Memory of Guest in bytes.
 
 
 type: long
@@ -67150,7 +68015,7 @@ format: bytes
 *`vsphere.virtualmachine.custom_fields`*::
 +
 --
-Custom fields
+Custom fields.
 
 
 type: object
@@ -67160,10 +68025,72 @@ type: object
 *`vsphere.virtualmachine.network_names`*::
 +
 --
-Network names
+Network names.
 
 
 type: keyword
+
+--
+
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
 
 --
 
