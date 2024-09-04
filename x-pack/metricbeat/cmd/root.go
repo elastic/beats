@@ -48,7 +48,7 @@ func init() {
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
 	}
-	settings := mbcmd.MetricbeatSettings()
+	settings := mbcmd.MetricbeatSettings("")
 	settings.ElasticLicensed = true
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta())
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)

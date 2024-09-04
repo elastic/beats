@@ -142,7 +142,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx, bt.log)
+	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
