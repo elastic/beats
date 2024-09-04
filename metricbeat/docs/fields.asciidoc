@@ -68094,6 +68094,24 @@ type: long
 
 --
 
+*`vsphere.virtualmachine.snapshots`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
+
+type: long
+
+--
+
 [[exported-fields-windows]]
 == Windows fields
 

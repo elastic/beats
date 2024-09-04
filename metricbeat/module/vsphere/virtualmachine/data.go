@@ -74,7 +74,7 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	}
 	if len(data.Snapshots) > 0 {
 		event["snapshots"] = data.Snapshots
-		event["snapshots.count"] = len(data.Snapshots)
+		event["snapshot.count"] = len(data.Snapshots)
 	}
 
 	return event

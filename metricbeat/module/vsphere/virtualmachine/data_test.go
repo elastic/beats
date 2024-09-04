@@ -128,7 +128,7 @@ func TestEventMapping(t *testing.T) {
 				Description: "Test snapshot 2",
 			},
 		},
-		"snapshots.count": 2,
+		"snapshot.count": 2,
 	}
 
 	// Assert that the output event matches the expected event
