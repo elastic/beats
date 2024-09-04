@@ -91,7 +91,7 @@ func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
 	// Measure load times
 	start := time.Now()
 	defer func() {
-		took := time.Now().Sub(start)
+		took := time.Since(start)
 		logger.Debugf("Load of javascript pipeline took %v", took)
 	}()
 	// Setup JS runtime.
@@ -217,9 +217,9 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 			}
 			err = fmt.Errorf("unexpected panic in javascript processor: %v", r)
 			if s.tagOnException != "" {
-				mapstr.AddTags(b.Fields, []string{s.tagOnException})
+				_ = mapstr.AddTags(b.Fields, []string{s.tagOnException})
 			}
-			appendString(b.Fields, "error.message", err.Error(), false)
+			_ = appendString(b.Fields, "error.message", err.Error(), false)
 		}
 	}()
 
@@ -238,9 +238,9 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 
 	if _, err = s.processFunc(goja.Undefined(), s.evt.JSObject()); err != nil {
 		if s.tagOnException != "" {
-			mapstr.AddTags(b.Fields, []string{s.tagOnException})
+			_ = mapstr.AddTags(b.Fields, []string{s.tagOnException})
 		}
-		appendString(b.Fields, "error.message", err.Error(), false)
+		_ = appendString(b.Fields, "error.message", err.Error(), false)
 		return b, fmt.Errorf("failed in process function: %w", err)
 	}
 
