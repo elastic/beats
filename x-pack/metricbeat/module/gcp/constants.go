@@ -48,9 +48,9 @@ const (
 
 	ECSCloudRegion = "region"
 
-	ECSCloudAccount     = "account"
-	ECSCloudAccountID   = "id"
-	ECSCloudAccountName = "name"
+	ECSCloudAccount = "account"
+	ECSCloudID      = "id"
+	ECSCloudName    = "name"
 
 	ECSCloudInstance        = "instance"
 	ECSCloudInstanceKey     = ECSCloud + "." + ECSCloudInstance

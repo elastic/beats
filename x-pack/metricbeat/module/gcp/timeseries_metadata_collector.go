@@ -27,11 +27,12 @@ func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zo
 
 // NewStackdriverMetadataServiceForTimeSeries apart from having a long name takes a time series object to return the
 // Stackdriver canonical Metadata extractor
-func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName string) MetadataService {
+func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName string, projectName string) MetadataService {
 	return &StackdriverTimeSeriesMetadataCollector{
 		timeSeries:       ts,
 		organizationID:   organizationID,
 		organizationName: organizationName,
+		projectName:      projectName,
 	}
 }
 
@@ -41,6 +42,7 @@ type StackdriverTimeSeriesMetadataCollector struct {
 	timeSeries       *monitoringpb.TimeSeries
 	organizationID   string
 	organizationName string
+	projectName      string
 }
 
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
@@ -58,17 +60,17 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	ecs := mapstr.M{
 		ECSCloud: mapstr.M{
 			ECSCloudProject: mapstr.M{
-				ECSCloudAccountID:   accountID,
-				ECSCloudAccountName: accountID,
+				ECSCloudID:   accountID,
+				ECSCloudName: s.projectName,
 			},
 			ECSCloudProvider: "gcp",
 		},
 	}
 	if s.organizationID != "" {
-		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudAccountID, s.organizationID)
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudID, s.organizationID)
 	}
 	if s.organizationName != "" {
-		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudAccountName, s.organizationName)
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudName, s.organizationName)
 	}
 	if availabilityZone != "" {
 		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAvailabilityZone, availabilityZone)

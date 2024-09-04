@@ -112,6 +112,7 @@ type config struct {
 	period           *durationpb.Duration
 	organizationID   string
 	organizationName string
+	projectName      string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -157,8 +158,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
 	// set organization id
-	if err := m.setOrganization(ctx); err != nil {
-		m.Logger().Warnf("organization details has not been set: %s", err)
+	if err := m.setOrgAndProjectDetails(ctx); err != nil {
+		m.Logger().Warnf("error occurred while fetching organization and project name: %s", err)
 	}
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
@@ -361,14 +362,21 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 	return hostRootFields
 }
 
-func (m *MetricSet) setOrganization(ctx context.Context) error {
+func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) error {
 
 	// Initialize the Cloud Resource Manager service
 	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
 	if err != nil {
 		return fmt.Errorf("failed to create cloudresourcemanager service: %w", err)
 	}
-
+	// Get Project name
+	project, err := srv.Projects.Get(m.config.ProjectID).Context(ctx).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project name: %w", err)
+	}
+	if project != nil {
+		m.config.projectName = project.Name
+	}
 	// Get the project ancestor details
 	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
 	if err != nil {

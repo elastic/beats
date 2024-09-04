@@ -16,11 +16,11 @@ import (
 func NewMetadataServiceForConfig(c config, serviceName string) (gcp.MetadataService, error) {
 	switch serviceName {
 	case gcp.ServiceCompute:
-		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.opt...)
+		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	case gcp.ServiceCloudSQL:
-		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.opt...)
+		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	case gcp.ServiceRedis:
-		return redis.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.opt...)
+		return redis.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	default:
 		return nil, nil
 	}

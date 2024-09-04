@@ -21,9 +21,10 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Redis resource
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
+		projectName:      projectName,
 		organizationID:   organizationID,
 		organizationName: organizationName,
 		zone:             zone,
@@ -51,6 +52,7 @@ type redisMetadata struct {
 
 type metadataCollector struct {
 	projectID        string
+	projectName      string
 	organizationID   string
 	organizationName string
 	zone             string
@@ -70,7 +72,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		return gcp.MetadataCollectorData{}, err
 	}
 
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
