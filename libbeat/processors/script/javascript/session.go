@@ -273,9 +273,9 @@ func init() {
 }
 
 type sessionPool struct {
-	New        func() *session
-	C          chan *session
-	NewAllowed bool
+	New                func() *session
+	C                  chan *session
+	NewSessionsAllowed bool
 }
 
 func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
@@ -289,22 +289,28 @@ func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
 			s, _ := newSession(p, c, false)
 			return s
 		},
-		C:          make(chan *session, c.MaxCachedSessions),
-		NewAllowed: !c.OnlyCachedSessions,
+		C:                  make(chan *session, c.MaxCachedSessions),
+		NewSessionsAllowed: !c.OnlyCachedSessions,
 	}
 	pool.Put(s)
+
+	// If we are not allowed to create new sessions, pre-cache requested sessions
+	if !pool.NewSessionsAllowed {
+		for i := 0; i < c.MaxCachedSessions-1; i++ {
+			pool.Put(pool.New())
+		}
+	}
 
 	return &pool, nil
 }
 
 func (p *sessionPool) Get() *session {
 
-	// Only create a new session if it is allowed.
-	if !p.NewAllowed {
-		// wait for a session to be available
+	if !p.NewSessionsAllowed {
 		return <-p.C
 	}
 
+	// Try to get a session from the pool, if none is available, create a new one
 	select {
 	case s := <-p.C:
 		return s
