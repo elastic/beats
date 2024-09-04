@@ -60,11 +60,11 @@ func TestEventMapping(t *testing.T) {
 		},
 		Snapshots: []VMSnapshotData{
 			{
-				Name:        "Snapshot1",
+				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
 			},
 			{
-				Name:        "Snapshot2",
+				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
 			},
 		},
@@ -120,11 +120,11 @@ func TestEventMapping(t *testing.T) {
 		"datastore.names": []string{"ds1", "ds2"},
 		"snapshots": []VMSnapshotData{
 			{
-				Name:        "Snapshot1",
+				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
 			},
 			{
-				Name:        "Snapshot2",
+				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
 			},
 		},
