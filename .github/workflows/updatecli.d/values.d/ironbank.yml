@@ -1,7 +1,7 @@
 config:
   - path: dev-tools/packaging/templates/ironbank/auditbeat
   - path: dev-tools/packaging/templates/ironbank/filebeat
-  - path: dev-tools/packaging/templates/ironbank/hearbeat
+  - path: dev-tools/packaging/templates/ironbank/heartbeat
   - path: dev-tools/packaging/templates/ironbank/metricbeat
   - path: dev-tools/packaging/templates/ironbank/packetbeat
   - beats_packages: dev-tools/packaging/packages.yml
