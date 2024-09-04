@@ -335,7 +335,6 @@ func copyMapWithoutKey(d map[string]interface{}, keys ...string) map[string]inte
 			if k == excludeKey {
 				found = true
 				break
-
 			}
 		}
 		if !found {

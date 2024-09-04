@@ -100,16 +100,15 @@ func TestMongodbParser_OpMsg(t *testing.T) {
 
 		ok, complete := mongodbMessageParser(st)
 
-		_, err = json.Marshal(st.message.documents)
-		if err != nil {
-			t.Fatal(err)
-		}
-
 		if !ok {
 			t.Errorf("Parsing returned error")
 		}
 		if !complete {
 			t.Errorf("Expecting a complete message")
+		}
+		_, err = json.Marshal(st.message.documents)
+		if err != nil {
+			t.Fatal(err)
 		}
 	}
 }
