@@ -7,7 +7,11 @@ package snapshot
 import (
 	"context"
 	"encoding/json"
+	goerrors "errors"
 	"fmt"
+	"mime"
+	gohttp "net/http"
+	"net/http/httputil"
 	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -97,19 +101,28 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 
 	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", version)
-	resp, err := client.Get(artifactsURI)
+	req, err := gohttp.NewRequestWithContext(context.Background(), gohttp.MethodGet, artifactsURI, nil)
+	if err != nil {
+		return "", fmt.Errorf("creating artifacts API request to %q: %w", artifactsURI, err)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
+	err = checkResponse(resp)
+	if err != nil {
+		return "", fmt.Errorf("checking artifacts api response: %w", err)
+	}
+
 	body := struct {
 		Packages map[string]interface{} `json:"packages"`
 	}{}
 
-	dec := json.NewDecoder(resp.Body)
-	if err := dec.Decode(&body); err != nil {
-		return "", err
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return "", fmt.Errorf("decoding GET %s response: %w", artifactsURI, err)
 	}
 
 	if len(body.Packages) == 0 {
@@ -148,4 +161,34 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 	}
 
 	return "", fmt.Errorf("uri not detected")
+}
+
+func checkResponse(resp *gohttp.Response) error {
+	if resp.StatusCode != gohttp.StatusOK {
+		responseDump, dumpErr := httputil.DumpResponse(resp, true)
+		if dumpErr != nil {
+			return goerrors.Join(fmt.Errorf("unsuccessful status code %d in artifactsURI response", resp.StatusCode), fmt.Errorf("dumping response: %w", dumpErr))
+		}
+		return fmt.Errorf("unsuccessful status code %d in artifactsURI\nfull response:\n%s", resp.StatusCode, responseDump)
+	}
+
+	responseContentType := resp.Header.Get("Content-Type")
+	mediatype, _, err := mime.ParseMediaType(responseContentType)
+	if err != nil {
+		responseDump, dumpErr := httputil.DumpResponse(resp, true)
+		if dumpErr != nil {
+			return goerrors.Join(fmt.Errorf("parsing content-type %q: %w", responseContentType, err), fmt.Errorf("dumping response: %w", dumpErr))
+		}
+		return fmt.Errorf("parsing content-type %q: %w\nfull response:\n%s", responseContentType, err, responseDump)
+	}
+
+	if mediatype != "application/json" {
+		responseDump, dumpErr := httputil.DumpResponse(resp, true)
+		if dumpErr != nil {
+			return goerrors.Join(fmt.Errorf("unexpected media type in artifacts API response %q (parsed from %q)", mediatype, responseContentType), fmt.Errorf("dumping response: %w", dumpErr))
+		}
+		return fmt.Errorf("unexpected media type in artifacts API response %q (parsed from %q), response:\n%s", mediatype, responseContentType, responseDump)
+	}
+
+	return nil
 }
