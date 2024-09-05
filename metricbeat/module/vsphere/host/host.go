@@ -240,13 +240,13 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 		Entity:     hst.Reference(),
 		MetricId:   metricIds,
 		MaxSample:  1,
-		IntervalId: int32(refreshRate),
+		IntervalId: refreshRate,
 	}
 
 	// Query performance data
 	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 	if err != nil {
-		return metricMap, fmt.Errorf("failed to query performance data: %v", err)
+		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
 	}
 
 	if len(samples) == 0 {

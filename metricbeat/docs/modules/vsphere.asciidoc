@@ -9,14 +9,77 @@ This file is generated! See scripts/mage/docs_collector.go
 [[metricbeat-module-vsphere]]
 == vSphere module
 
-The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
+The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any VMware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0, and 6.5.
 
-By default it enables the metricsets `cluster`, `datastore`, `datastorecluster`, `host`, `network`, `resourcepool` and `virtualmachine`.
+By default, the vSphere module enables the following metric sets:
+
+1. cluster
+
+2. datastore
+
+3. datastorecluster
+
+4. host
+
+5. network
+
+6. resourcepool
+
+7. virtualmachine
+
+[float]
+=== Supported Periods:
+The Datastore and Host metric sets support performance data collection using the vSphere performance API. Since the performance API has usage restrictions based on data collection intervals, users should ensure that the period is configured optimally to receive real-time data. This configuration can be determined based on the https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html[Data Collection Intervals] and https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html[Data Collection Levels].
+
+[IMPORTANT]
+
+Only host and datastore metric sets have limitation of period restrictions.
+
+[float]
+==== Real-time data collection interval:
+- 20
+
+[float]
+==== Historical data collection interval:
+- 300
+- 1800
+- 7200
+- 86400
+
+[float]
+=== Example:
+If you need to configure multiple metric sets with different periods, you can achieve this by setting up multiple vSphere modules with different metric sets as demonstrated below:
+
+[source,yaml]
+----
+- module: vsphere
+  metricsets:
+   - cluster
+   - datastorecluster
+   - network
+   - resourcepool
+   - virtualmachine
+  period: 10s
+  hosts: ["https://localhost/sdk"]
+  username: "user"
+  password: "password"
+  insecure: false
+
+- module: vsphere
+  metricsets:
+   - datastore
+   - host
+  period: 300s
+  hosts: ["https://localhost/sdk"]
+  username: "user"
+  password: "password"
+  insecure: false
+----
 
 [float]
 === Dashboard
 
-The vsphere module comes with a predefined dashboard. For example:
+The vSphere module includes a predefined dashboard. For example:
 
 image::./images/metricbeat_vsphere_dashboard.png[]
 image::./images/metricbeat_vsphere_vm_dashboard.png[]
@@ -36,7 +99,16 @@ metricbeat.modules:
 - module: vsphere
   enabled: true
   metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
+  
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  # Supported Periods:
+  # The Datastore and Host metric sets support performance data collection using the vSphere performance API.
+  # Since the performance API has usage restrictions based on data collection intervals,
+  # users should ensure that the period is configured optimally to receive real-time data.
+  # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
+  # Reference Links:
+  # Data Collection Intervals: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html
+  # Data Collection Levels: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html
   period: 20s
   hosts: ["https://localhost/sdk"]
 

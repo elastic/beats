@@ -233,13 +233,13 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 		Entity:     dst.Reference(),
 		MetricId:   metricIds,
 		MaxSample:  1,
-		IntervalId: int32(refreshRate), // using refreshRate as interval
+		IntervalId: refreshRate, // using refreshRate as interval
 	}
 
 	// Query performance data
 	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 	if err != nil {
-		return metricMap, fmt.Errorf("failed to query performance data: %v", err)
+		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
 	}
 
 	if len(samples) == 0 {
