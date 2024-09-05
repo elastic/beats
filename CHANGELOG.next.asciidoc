@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
 
 *Auditbeat*
 
@@ -115,6 +116,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
 - Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
 - awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
+- Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 
 *Heartbeat*
 
@@ -124,6 +127,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix first HTTP 401 error when fetching metrics from the Kubelet API caused by a token update {pull}40636[40636]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
