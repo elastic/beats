@@ -67947,7 +67947,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -68094,7 +68094,8 @@ type: long
 
 --
 
-*`vsphere.virtualmachine.snapshots`*::
+
+*`vsphere.virtualmachine.snapshot.info`*::
 +
 --
 Deatils of the snapshots of this virtualmachine.

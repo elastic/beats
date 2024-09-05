@@ -118,10 +118,10 @@ func TestEventMapping(t *testing.T) {
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
 		"datastore.names": []string{"ds1", "ds2"},
-		"snapshots": []VMSnapshotData{
+		"snapshot.info": []VMSnapshotData{
 			{
 				Name:        "Snapshot_1",
-				Description: "Test snapshot 1",
+				Description: "Test snapshot 1",	
 			},
 			{
 				Name:        "Snapshot_2",
