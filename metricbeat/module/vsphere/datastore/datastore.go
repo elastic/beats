@@ -33,6 +33,10 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+const (
+	LiveInterval float64 = 20
+)
+
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "datastore", New,
 		mb.WithHostParser(vsphere.HostParser),
@@ -82,8 +86,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 	period := m.Module().Config().Period
 	if !isValidPeriod(period.Seconds()) {
-		m.Logger().Errorf("Invalid period %v. Please provide one of the following values: 20, 300, 1800, 7200, 86400", period)
-		return nil
+		return fmt.Errorf("invalid period %v. Please provide one of the following values: 20, 300, 1800, 7200, 86400", period)
 	}
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
@@ -92,7 +95,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to log out from vSphere: %w", err)
+			m.Logger().Debugf("error trying to log out from vSphere: %v", err)
 		}
 	}()
 
@@ -108,7 +111,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debugf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Debugf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -146,19 +149,18 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &dst[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
-				continue
+				m.Logger().Errorf("Failed to retrieve object from host %s: %v", dst[i].Name, err)
 			}
 
 			metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metricIds)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %w", dst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", dst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
 				MetricSetFields: m.mapEvent(dst[i], &metricData{
 					perfMetrics: metricMap,
-					assetNames:  *assetNames,
+					assetNames:  assetNames,
 				}),
 			})
 		}
@@ -167,12 +169,12 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	return nil
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
+func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (assetNames, error) {
 	outputVmNames := make([]string, 0, len(ds.Vm))
 	if len(ds.Vm) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, ds.Vm, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return assetNames{}, err
 		}
 		for _, ob := range objects {
 			if ob.Reference().Type == "VirtualMachine" {
@@ -196,7 +198,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		if len(hsRefs) > 0 {
 			err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
 			if err != nil {
-				return nil, err
+				return assetNames{}, err
 			}
 		}
 
@@ -206,7 +208,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		}
 	}
 
-	return &assetNames{
+	return assetNames{
 		outputHostNames: outputHostNames,
 		outputVmNames:   outputVmNames,
 	}, nil
@@ -219,14 +221,17 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 		return metricMap, fmt.Errorf("failed to get summary: %w", err)
 	}
 
-	var refreshRate = int32(m.Module().Config().Period.Seconds())
-	if summary.CurrentSupported {
-		refreshRate = summary.RefreshRate
-		if int32(m.Module().Config().Period.Seconds()) != refreshRate {
-			m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", m.Module().Config().Period, refreshRate)
+	period := m.Module().Config().Period
+	refreshRate := int32(period.Seconds())
+	if period.Seconds() == LiveInterval {
+		if summary.CurrentSupported {
+			refreshRate = summary.RefreshRate
+			if int32(m.Module().Config().Period.Seconds()) != refreshRate {
+				m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", period, refreshRate)
+			}
+		} else {
+			m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval (300, 1800, 7200, 86400). Risk of data duplication. Consider adjusting period.")
 		}
-	} else {
-		m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval (300, 1800, 7200, 86400). Risk of data duplication. Consider adjusting period.")
 	}
 
 	spec := types.PerfQuerySpec{
@@ -249,7 +254,7 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 
 	results, err := perfManager.ToMetricSeries(ctx, samples)
 	if err != nil {
-		m.Logger().Errorf("failed to convert performance data to metric series: %v", err)
+		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
 	}
 
 	for _, result := range results[0].Value {
@@ -257,7 +262,7 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 			metricMap[result.Name] = result.Value[0]
 			continue
 		}
-		m.Logger().Debugf("For datastore %s, Metric %v: No result found", dst.Name, result.Name)
+		m.Logger().Debugf("For datastore %s, Metric %s: No result found", dst.Name, result.Name)
 	}
 
 	return metricMap, nil
@@ -265,7 +270,7 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 
 func isValidPeriod(period float64) bool {
 	switch period {
-	case 20, 300, 1800, 7200, 86400:
+	case LiveInterval, 300, 1800, 7200, 86400:
 		return true
 	}
 	return false

@@ -11,7 +11,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any VMware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0, and 6.5.
 
-By default, the vSphere module enables the following metric sets:
+By default, the vSphere module enables the following metricsets:
 
 1. cluster
 
@@ -29,11 +29,11 @@ By default, the vSphere module enables the following metric sets:
 
 [float]
 === Supported Periods:
-The Datastore and Host metric sets support performance data collection using the vSphere performance API. Since the performance API has usage restrictions based on data collection intervals, users should ensure that the period is configured optimally to receive real-time data. This configuration can be determined based on the https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html[Data Collection Intervals] and https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html[Data Collection Levels].
+The Datastore and Host metricsets support performance data collection using the vSphere performance API. Since the performance API has usage restrictions based on data collection intervals, users should ensure that the period is configured optimally to receive real-time data. This configuration can be determined based on the https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html[Data Collection Intervals] and https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html[Data Collection Levels].
 
 [IMPORTANT]
 
-Only host and datastore metric sets have limitation of period restrictions.
+Only host and datastore metricsets have limitation of period restrictions.
 
 [float]
 ==== Real-time data collection interval:
@@ -48,7 +48,7 @@ Only host and datastore metric sets have limitation of period restrictions.
 
 [float]
 === Example:
-If you need to configure multiple metric sets with different periods, you can achieve this by setting up multiple vSphere modules with different metric sets as demonstrated below:
+If you need to configure multiple metricsets with different periods, you can achieve this by setting up multiple vSphere modules with different metricsets as demonstrated below:
 
 [source,yaml]
 ----
@@ -102,7 +102,7 @@ metricbeat.modules:
   
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
   # Supported Periods:
-  # The Datastore and Host metric sets support performance data collection using the vSphere performance API.
+  # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
   # Since the performance API has usage restrictions based on data collection intervals,
   # users should ensure that the period is configured optimally to receive real-time data.
   # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
@@ -116,7 +116,7 @@ metricbeat.modules:
   password: "password"
   # If insecure is true, don't verify the server's certificate chain
   insecure: false
-  # Get custom fields when using virtualmachine metric set. Default false.
+  # Get custom fields when using virtualmachine metricset. Default false.
   # get_custom_fields: false
 ----
 
