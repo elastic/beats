@@ -109,7 +109,36 @@ RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+
+{{- if (and (eq .BeatName "heartbeat") (contains .from "wolfi"))  }}
+# Install required dependencies from wolfi repository
+RUN apk add --no-interactive --no-progress nodejs-18=18.20.4-r0 npm=10.8.3-r0 glib dbus-glib libatk-1.0 \
+    libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
+    font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji
+
+USER {{ .user }}
+
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV TZ=UTC
+ENV NPM_CONFIG_PREFIX={{ $beatHome }}/.npm
+ENV PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+
+RUN echo \
+    $NPM_CONFIG_PREFIX \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/.synthetics \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -m 0775 -p DIR'
+
+RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1') 
+
+USER root
+
+{{- end }}
+
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubuntu")) }}
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
@@ -122,8 +151,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=18.20.3
+ENV NODE_VERSION=18.20.4
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

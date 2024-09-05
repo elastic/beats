@@ -66855,6 +66855,107 @@ vSphere module
 
 
 [float]
+=== cluster
+
+Cluster information.
+
+
+
+
+*`vsphere.cluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.datastore.count`*::
++
+--
+Number of Datastores associated with the cluster.
+
+
+type: long
+
+--
+
+
+*`vsphere.cluster.das_config.admission.control.enabled`*::
++
+--
+Indicates whether strict admission control is enabled.
+
+
+type: boolean
+
+--
+
+*`vsphere.cluster.das_config.enabled`*::
++
+--
+Indicates whether vSphere HA feature is enabled.
+
+
+type: boolean
+
+--
+
+
+*`vsphere.cluster.host.count`*::
++
+--
+Number of Hosts associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.host.names`*::
++
+--
+List of all the Host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.cluster.network.count`*::
++
+--
+Number of Networks associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.network.names`*::
++
+--
+List of all the Network names associated with the cluster.
+
+
+type: keyword
+
+--
+
+[float]
 === datastore
 
 datastore
@@ -67030,6 +67131,47 @@ Average amount of time for a write operation from the datastore in milliseconds.
 
 
 type: long
+
+--
+
+[float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
 
 --
 
