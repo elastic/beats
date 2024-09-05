@@ -94,7 +94,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, nil, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity"}, &datastoreCluster)
 	if err != nil {
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
