@@ -327,6 +327,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add support for new metrics for vSphere module datastorecluster metricset. {pull}40694[40694]
 
 *Osquerybeat*
 
