@@ -19,6 +19,7 @@ package virtualmachine
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
@@ -62,10 +63,12 @@ func TestEventMapping(t *testing.T) {
 			{
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
+				CreateTime:  time.Time{},
 			},
 			{
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
+				CreateTime:  time.Time{},
 			},
 		},
 	}
@@ -122,10 +125,12 @@ func TestEventMapping(t *testing.T) {
 			{
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
+				CreateTime:  time.Time{},
 			},
 			{
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
+				CreateTime:  time.Time{},
 			},
 		},
 		"snapshot.count": 2,
