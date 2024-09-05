@@ -291,11 +291,11 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
 	for _, snapshot := range snapshotTree {
 		snapshots = append(snapshots, VMSnapshotData{
-			ID:			 snapshot.Id,
+			ID:          snapshot.Id,
 			Name:        snapshot.Name,
 			Description: snapshot.Description,
 			CreateTime:  snapshot.CreateTime,
-			State:       snapshot.State,		
+			State:       snapshot.State,
 		})
 
 		// Recursively add child snapshots
