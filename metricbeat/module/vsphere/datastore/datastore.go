@@ -149,12 +149,12 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &dst[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %v", dst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve object from datastore %s: %v", dst[i].Name, err)
 			}
 
 			metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metricIds)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", dst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
