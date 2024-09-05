@@ -61,9 +61,11 @@ type VMData struct {
 }
 
 type VMSnapshotData struct {
+	ID          int32
 	Name        string
 	Description string
 	CreateTime  time.Time
+	State       types.VirtualMachinePowerState
 }
 
 // New creates a new instance of the MetricSet.
@@ -286,12 +288,14 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 }
 
 func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapshotData {
-	var snapshots []VMSnapshotData
+	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
 	for _, snapshot := range snapshotTree {
 		snapshots = append(snapshots, VMSnapshotData{
+			ID:			 snapshot.Id,
 			Name:        snapshot.Name,
 			Description: snapshot.Description,
 			CreateTime:  snapshot.CreateTime,
+			State:       snapshot.State,		
 		})
 
 		// Recursively add child snapshots
