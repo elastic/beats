@@ -20,8 +20,10 @@ package datastorecluster
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 
@@ -53,6 +55,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to create vSphere metricset: %w", err)
 	}
 	return &DatastoreClusterMetricSet{ms}, nil
+}
+
+type metricData struct {
+	assetNames assetNames
+}
+
+type assetNames struct {
+	outputDsNames []string
 }
 
 func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
@@ -89,13 +99,40 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
 
+	pc := property.DefaultCollector(c)
 	for i := range datastoreCluster {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i])})
+		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from host %s: %w", datastoreCluster[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames})})
 	}
 
 	return nil
+}
+
+func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StoragePod) (assetNames, error) {
+	var objects []mo.ManagedEntity
+	if len(dsc.ChildEntity) > 0 {
+		if err := pc.Retrieve(ctx, dsc.ChildEntity, []string{"name"}, &objects); err != nil {
+			return assetNames{}, err
+		}
+	}
+
+	outputDsNames := make([]string, 0, len(objects))
+	for _, ob := range objects {
+		name := strings.ReplaceAll(ob.Name, ".", "_")
+		if ob.Reference().Type == "Datastore" {
+			outputDsNames = append(outputDsNames, name)
+		}
+	}
+
+	return assetNames{
+		outputDsNames: outputDsNames,
+	}, nil
 }

@@ -23,12 +23,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod) mapstr.M {
-	event := mapstr.M{}
-
-	event.Put("name", datastoreCluster.Name)
-	event.Put("capacity.bytes", datastoreCluster.Summary.Capacity)
-	event.Put("free_space.bytes", datastoreCluster.Summary.FreeSpace)
+func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, data *metricData) mapstr.M {
+	event := mapstr.M{
+		"name": datastoreCluster.Name,
+		"capacity": mapstr.M{
+			"bytes": datastoreCluster.Summary.Capacity,
+		},
+		"free_space": mapstr.M{
+			"bytes": datastoreCluster.Summary.FreeSpace,
+		},
+		"datastore": mapstr.M{
+			"names": data.assetNames.outputDsNames,
+			"count": len(data.assetNames.outputDsNames),
+		},
+	}
 
 	return event
 }
