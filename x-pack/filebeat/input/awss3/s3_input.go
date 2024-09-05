@@ -134,6 +134,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		return
 	}
 	defer client.Close()
+	defer acks.Close()
 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 
