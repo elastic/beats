@@ -61,18 +61,18 @@ func TestEventMapping(t *testing.T) {
 		},
 		Snapshots: []VMSnapshotData{
 			{
-				ID:			 123,
+				ID:          123,
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
 				CreateTime:  time.Time{},
-				State:		 types.VirtualMachinePowerStatePoweredOff,
+				State:       types.VirtualMachinePowerStatePoweredOff,
 			},
 			{
-				ID:			 745,
+				ID:          745,
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
 				CreateTime:  time.Time{},
-				State:		 types.VirtualMachinePowerStatePoweredOn,
+				State:       types.VirtualMachinePowerStatePoweredOn,
 			},
 		},
 	}
@@ -127,18 +127,18 @@ func TestEventMapping(t *testing.T) {
 		"datastore.names": []string{"ds1", "ds2"},
 		"snapshot.info": []VMSnapshotData{
 			{
-				ID:			 123,
+				ID:          123,
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
 				CreateTime:  time.Time{},
-				State:		 types.VirtualMachinePowerStatePoweredOff,
+				State:       types.VirtualMachinePowerStatePoweredOff,
 			},
 			{
-				ID:			 745,
+				ID:          745,
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
 				CreateTime:  time.Time{},
-				State:		 types.VirtualMachinePowerStatePoweredOn,
+				State:       types.VirtualMachinePowerStatePoweredOn,
 			},
 		},
 		"snapshot.count": 2,
