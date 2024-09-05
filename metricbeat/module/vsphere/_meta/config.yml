@@ -1,11 +1,12 @@
 - module: vsphere
-  #metricsets:
+  # metricsets:
   #  - cluster
   #  - datastore
+  #  - datastorecluster
   #  - host
-  #  - virtualmachine
   #  - network
   #  - resourcepool
+  #  - virtualmachine
   # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
   period: 20s
   hosts: ["https://localhost/sdk"]

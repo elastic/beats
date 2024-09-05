@@ -67145,6 +67145,47 @@ type: long
 --
 
 [float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
 === host
 
 Host information from vSphere environment.

@@ -15,20 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fleetmode
+package datastorecluster
 
-var managementEnabled bool
+import (
+	"testing"
 
-// SetAgentMode stores if the Beat is running under Elastic Agent.
-// Normally this is called when the command line flags are parsed.
-// This is stored as a package level variable because some components
-// (like filebeat/metricbeat modules) don't have access to the
-// configuration information to determine this on their own.
-func SetAgentMode(enabled bool) {
-	managementEnabled = enabled
-}
+	"github.com/stretchr/testify/assert"
+	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
+)
 
-// Enabled returns true if the Beat is running under Elastic Agent.
-func Enabled() bool {
-	return managementEnabled
+func TestEventMapping(t *testing.T) {
+	datastoreClusterTest := mo.StoragePod{
+		Summary: &types.StoragePodSummary{
+			Capacity:  100,
+			FreeSpace: 50,
+		},
+		Folder: mo.Folder{
+			ManagedEntity: mo.ManagedEntity{
+				Name: "Folder1",
+			},
+		},
+	}
+
+	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreClusterTest)
+
+	name, _ := event.GetValue("name")
+	assert.Equal(t, "Folder1", name)
+
+	capacity, _ := event.GetValue("capacity.bytes")
+	assert.Equal(t, int64(100), capacity)
+
+	freeSpace, _ := event.GetValue("free_space.bytes")
+	assert.Equal(t, int64(50), freeSpace)
 }
