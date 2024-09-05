@@ -106,7 +106,7 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to log out from vSphere: %v", err)
 		}
 	}()
 
@@ -122,7 +122,7 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -160,12 +160,12 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &hst[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", hst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
 			}
 
 			metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metricIds)
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %w", hst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
