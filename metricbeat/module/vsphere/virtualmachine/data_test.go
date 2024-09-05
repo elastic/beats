@@ -121,7 +121,7 @@ func TestEventMapping(t *testing.T) {
 		"snapshot.info": []VMSnapshotData{
 			{
 				Name:        "Snapshot_1",
-				Description: "Test snapshot 1",	
+				Description: "Test snapshot 1",
 			},
 			{
 				Name:        "Snapshot_2",
