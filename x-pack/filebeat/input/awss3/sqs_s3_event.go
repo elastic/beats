@@ -164,6 +164,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	finalizers, processingErr := p.processS3Events(ctx, log, *msg.Body, eventCallback)
 
 	return sqsProcessingResult{
+		log:             p.log,
 		msg:             msg,
 		receiveCount:    receiveCount,
 		keepaliveCancel: keepaliveCancel,
@@ -185,36 +186,35 @@ func (r sqsProcessingResult) Done() {
 	// No error. Delete SQS.
 	if processingErr == nil {
 		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
-			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
+			p.log.Errorf("failed deleting message from SQS queue (it may be reprocessed): %v", msgDelErr.Error())
+			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
 		// SQS message finished and deleted, finalize s3 objects
 		if finalizeErr := r.finalizeS3Objects(); finalizeErr != nil {
-			return fmt.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %w", finalizeErr)
+			p.log.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %v", finalizeErr.Error())
 		}
-		return nil
+		return
 	}
 
-	if p.maxReceiveCount > 0 && !errors.Is(processingErr, &nonRetryableError{}) {
+	if p.maxReceiveCount > 0 && r.receiveCount >= p.maxReceiveCount {
 		// Prevent poison pill messages from consuming all workers. Check how
 		// many times this message has been received before making a disposition.
-		if r.receiveCount >= p.maxReceiveCount {
-			processingErr = nonRetryableErrorWrap(fmt.Errorf(
-				"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-				r.receiveCount, p.maxReceiveCount, processingErr))
-		}
+		processingErr = nonRetryableErrorWrap(fmt.Errorf(
+			"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
+			r.receiveCount, p.maxReceiveCount, processingErr))
 	}
 
 	// An error that reprocessing cannot correct. Delete SQS.
 	if errors.Is(processingErr, &nonRetryableError{}) {
 		if msgDelErr := p.sqs.DeleteMessage(context.Background(), r.msg); msgDelErr != nil {
-			return multierr.Combine(
-				fmt.Errorf("failed processing SQS message (attempted to delete message): %w", processingErr),
-				fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr),
-			)
+			p.log.Errorf("failed processing SQS message (attempted to delete message): %v", processingErr.Error())
+			p.log.Errorf("failed deleting message from SQS queue (it may be reprocessed): %v", msgDelErr.Error())
+			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
-		return fmt.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
+		p.log.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
+		return
 	}
 
 	// An error that may be resolved by letting the visibility timeout
@@ -222,7 +222,7 @@ func (r sqsProcessingResult) Done() {
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
+	p.log.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, msg *types.Message) {

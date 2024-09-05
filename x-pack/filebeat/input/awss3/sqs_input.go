@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -195,6 +194,7 @@ func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
 
 func (w *sqsWorker) run(ctx context.Context) {
 	defer w.client.Close()
+	defer w.ackHandler.Close()
 
 	for ctx.Err() == nil {
 		// Send a work request
@@ -216,24 +216,21 @@ func (w *sqsWorker) run(ctx context.Context) {
 
 func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 	publishCount := 0
-	start := time.Now()
 	id := w.input.metrics.beginSQSWorker()
 	result := w.input.msgHandler.ProcessSQS(ctx, &msg, func(e beat.Event) {
 		w.client.Publish(e)
 		publishCount++
-		// hi fae, finish this function
 	})
 
-	if result.processingErr != nil {
-		w.input.log.Warnw("Failed processing SQS message.",
-			"error", result.processingErr,
-			"message_id", *msg.MessageId,
-			"elapsed_time_ns", time.Since(start))
+	if publishCount == 0 {
+		// No events made it through (probably an error state), wrap up immediately
+		result.Done()
+	} else {
+		// Add this result's Done callback to the pending ACKs list
+		w.ackHandler.Add(publishCount, result.Done)
 	}
-	w.input.metrics.endSQSWorker(id)
 
-	// Add this result's Done callback to the pending ACKs list
-	w.ackHandler.Add(publishCount, result.Done)
+	w.input.metrics.endSQSWorker(id)
 }
 
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
