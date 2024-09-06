@@ -19,6 +19,7 @@ package virtualmachine
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
@@ -57,6 +58,22 @@ func TestEventMapping(t *testing.T) {
 		CustomFields: mapstr.M{
 			"customField1": "value1",
 			"customField2": "value2",
+		},
+		Snapshots: []VMSnapshotData{
+			{
+				ID:          123,
+				Name:        "Snapshot_1",
+				Description: "Test snapshot 1",
+				CreateTime:  time.Time{},
+				State:       types.VirtualMachinePowerStatePoweredOff,
+			},
+			{
+				ID:          745,
+				Name:        "Snapshot_2",
+				Description: "Test snapshot 2",
+				CreateTime:  time.Time{},
+				State:       types.VirtualMachinePowerStatePoweredOn,
+			},
 		},
 	}
 
@@ -108,6 +125,23 @@ func TestEventMapping(t *testing.T) {
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
 		"datastore.names": []string{"ds1", "ds2"},
+		"snapshot.info": []VMSnapshotData{
+			{
+				ID:          123,
+				Name:        "Snapshot_1",
+				Description: "Test snapshot 1",
+				CreateTime:  time.Time{},
+				State:       types.VirtualMachinePowerStatePoweredOff,
+			},
+			{
+				ID:          745,
+				Name:        "Snapshot_2",
+				Description: "Test snapshot 2",
+				CreateTime:  time.Time{},
+				State:       types.VirtualMachinePowerStatePoweredOn,
+			},
+		},
+		"snapshot.count": 2,
 	}
 
 	// Assert that the output event matches the expected event
