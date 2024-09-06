@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 
 *Osquerybeat*
 
@@ -164,6 +165,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
 - awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 
 *Heartbeat*
 
@@ -296,6 +298,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset cluster for the vSphere module. {pull}40536[40536]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
+- Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
 
 *Auditbeat*
 
@@ -324,6 +327,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 
 *Metricbeat*
 
