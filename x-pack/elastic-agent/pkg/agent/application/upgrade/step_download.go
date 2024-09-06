@@ -84,18 +84,28 @@ func newDownloader(version string, log *logger.Logger, settings *artifact.Config
 		return downloader.NewDownloader(log, settings)
 	}
 
+	// We can use up to 3 downloaders
+	downloaders := make([]download.Downloader, 0, 3)
+
+	downloaders = append(downloaders, fs.NewDownloader(settings))
+
 	// try snapshot repo before official
 	snapDownloader, err := snapshot.NewDownloader(log, settings, version)
 	if err != nil {
-		return nil, err
+		log.Error("Error initializing snapshot downloader: %s", err)
+		//return nil, err
+	} else {
+		downloaders = append(downloaders, snapDownloader)
 	}
 
 	httpDownloader, err := http.NewDownloader(log, settings)
 	if err != nil {
-		return nil, err
+		log.Error("Error initializing http downloader: %s", err)
+	} else {
+		downloaders = append(downloaders, httpDownloader)
 	}
 
-	return composed.NewDownloader(fs.NewDownloader(settings), snapDownloader, httpDownloader), nil
+	return composed.NewDownloader(log, downloaders...), nil
 }
 
 func newVerifier(version string, log *logger.Logger, settings *artifact.Config) (download.Verifier, error) {

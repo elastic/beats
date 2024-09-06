@@ -6,13 +6,13 @@ package composed
 
 import (
 	"context"
-
-	"github.com/hashicorp/go-multierror"
+	goerrors "errors"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // Downloader is a downloader with a predefined set of downloaders.
@@ -20,16 +20,18 @@ import (
 // the next one.
 // Error is returned if all of them fail.
 type Downloader struct {
-	dd []download.Downloader
+	log *logger.Logger
+	dd  []download.Downloader
 }
 
 // NewDownloader creates a downloader out of predefined set of downloaders.
 // During each download call it tries to call the first one and on failure fallbacks to
 // the next one.
 // Error is returned if all of them fail.
-func NewDownloader(downloaders ...download.Downloader) *Downloader {
+func NewDownloader(log *logger.Logger, downloaders ...download.Downloader) *Downloader {
 	return &Downloader{
-		dd: downloaders,
+		log: log,
+		dd:  downloaders,
 	}
 }
 
@@ -37,14 +39,14 @@ func NewDownloader(downloaders ...download.Downloader) *Downloader {
 // Returns absolute path to downloaded package and an error.
 func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (string, error) {
 	var err error
-
 	for _, d := range e.dd {
-		s, e := d.Download(ctx, spec, version)
-		if e == nil {
+		e.log.Debugf("attempting download using downloader %T", d)
+		s, downloadErr := d.Download(ctx, spec, version)
+		if downloadErr == nil {
 			return s, nil
 		}
-
-		err = multierror.Append(err, e)
+		e.log.Debugf("error using downloader %T: %s", d, downloadErr)
+		err = goerrors.Join(err, downloadErr)
 	}
 
 	return "", err

@@ -37,5 +37,5 @@ func NewDownloader(log *logger.Logger, config *artifact.Config) (download.Downlo
 	}
 
 	downloaders = append(downloaders, httpDownloader)
-	return composed.NewDownloader(downloaders...), nil
+	return composed.NewDownloader(log, downloaders...), nil
 }
