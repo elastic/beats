@@ -1478,7 +1478,7 @@ func TestInsertTags(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
 			for _, subIdentifier := range subIdentifiers {
-				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
+				insertTags(events, c.identifier, subIdentifier, subIdentifier, resourceTagMap)
 			}
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)

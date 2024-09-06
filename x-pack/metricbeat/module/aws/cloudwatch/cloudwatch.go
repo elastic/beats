@@ -156,7 +156,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
 
-			m.logger.Debugf("Collected metrics of metrics = %d", len(eventsWithIdentifier))
+			m.logger.Infof("Collected metrics of metrics = %d", len(eventsWithIdentifier))
 
 			for _, event := range eventsWithIdentifier {
 				_ = event.RootFields.Delete(aws.CloudWatchPeriodName)
@@ -195,7 +195,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
-
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
@@ -511,6 +510,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 		m.logger.Debugf("resourceType = %s", resourceType)
 		m.logger.Debugf("tagsFilter = %s", tagsFilter)
 		resourceTagMap, err := aws.GetResourcesTags(svcResourceAPI, []string{resourceType})
+
 		if err != nil {
 			// If GetResourcesTags failed, continue report event just without tags.
 			m.logger.Info(fmt.Errorf("getResourcesTags failed, skipping region %s: %w", regionName, err))
@@ -521,65 +521,73 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 		}
 
 		// filter resourceTagMap
-		for identifier, tags := range resourceTagMap {
+		for identifierapi, tags := range resourceTagMap {
 			if exists := aws.CheckTagFiltersExist(tagsFilter, tags); !exists {
-				m.logger.Debugf("In region %s, service %s tags does not match tags_filter", regionName, identifier)
-				delete(resourceTagMap, identifier)
+				m.logger.Debugf("In region %s, service %s tags does not match tags_filter", regionName, identifierapi)
+				delete(resourceTagMap, identifierapi)
 				continue
 			}
-			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifier)
-		}
-
-		for _, output := range metricDataResults {
-			if len(output.Values) == 0 {
-				continue
-			}
-
-			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
-			for valI, metricDataResultValue := range output.Values {
-				if len(labels) != aws.LabelConst.LabelLengthTotal {
-					// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
-					if len(tagsFilter) != 0 {
-						continue
-					}
-
-					// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
-					identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
-					if _, ok := events[identifier]; !ok {
-						if labels[aws.LabelConst.AccountIdIdx] != "" {
-							events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
-						} else {
-							events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
-						}
-					}
-					events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
+			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifierapi)
+			for _, output := range metricDataResults {
+				if len(output.Values) == 0 {
 					continue
 				}
 
-				identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
-				uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
-
-				// add tags to event based on identifierValue
-				// Check if identifier includes dimensionSeparator (comma in this case),
-				// split the identifier and check for each sub-identifier.
-				// For example, identifier might be [storageType, s3BucketName].
-				// And tags are only store under s3BucketName in resourceTagMap.
-				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
-				for _, subIdentifier := range subIdentifiers {
-					if _, ok := events[uniqueIdentifierValue]; !ok {
-						// when tagsFilter is not empty but no entry in
-						// resourceTagMap for this identifier, do not initialize
-						// an event for this identifier.
-						if len(tagsFilter) != 0 && resourceTagMap[subIdentifier] == nil {
+				labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
+				for valI, metricDataResultValue := range output.Values {
+					if len(labels) != aws.LabelConst.LabelLengthTotal {
+						// if there is no tag in labels but there is a tagsFilter, then no event should be reported.
+						if len(tagsFilter) != 0 {
 							continue
 						}
-						events[uniqueIdentifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+
+						// when there is no identifier value in label, use id+label+region+accountID+namespace+index instead
+						identifier := labels[aws.LabelConst.AccountIdIdx] + labels[aws.LabelConst.AccountLabelIdx] + regionName + m.MonitoringAccountID + labels[aws.LabelConst.NamespaceIdx] + fmt.Sprint("-", valI)
+						if _, ok := events[identifier]; !ok {
+							if labels[aws.LabelConst.AccountIdIdx] != "" {
+								events[identifier] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+							} else {
+								events[identifier] = aws.InitEvent(regionName, m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+							}
+						}
+						events[identifier] = insertRootFields(events[identifier], metricDataResultValue, labels)
+						continue
 					}
-					events[uniqueIdentifierValue] = insertRootFields(events[uniqueIdentifierValue], metricDataResultValue, labels)
-					insertTags(events, uniqueIdentifierValue, subIdentifier, resourceTagMap)
+
+					identifierValue := labels[aws.LabelConst.IdentifierValueIdx]
+					uniqueIdentifierValue := identifierValue + fmt.Sprint("-", valI)
+
+					// add tags to event based on identifierValue
+					// Check if identifier includes dimensionSeparator (comma in this case),
+					// split the identifier and check for each sub-identifier.
+					// For example, identifier might be [storageType, s3BucketName].
+					// And tags are only store under s3BucketName in resourceTagMap.
+					subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
+					for _, subIdentifier := range subIdentifiers {
+						if _, ok := events[uniqueIdentifierValue]; !ok {
+							// when tagsFilter is not empty but no entry in
+							// resourceTagMap for this identifier, do not initialize
+							// an event for this identifier.
+
+							// if len(tagsFilter) != 0 && resourceTagMap[subIdentifier] == nil {
+							// 	continue
+							// }
+							events[uniqueIdentifierValue] = aws.InitEvent(regionName, labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], labels[aws.LabelConst.PeriodLabelIdx])
+						}
+						events[uniqueIdentifierValue] = insertRootFields(events[uniqueIdentifierValue], metricDataResultValue, labels)
+						m.Logger().Infof("PASSSS 5 insertTags: %v / %v / %v / %v\n", events, uniqueIdentifierValue, subIdentifier, resourceTagMap)
+						insertTags(events, uniqueIdentifierValue, subIdentifier, identifierapi, resourceTagMap)
+						tags := resourceTagMap[subIdentifier]
+						for _, tag := range tags {
+							m.Logger().Infof("PASSSS 6 Print: %s , %s \n", *tag.Key, *tag.Value)
+						}
+						m.Logger().Infof("PASSSS 6 insertTags: %v / %v / %v / %v\n", events, uniqueIdentifierValue, subIdentifier, identifierapi)
+
+					}
 				}
 			}
 		}
+
 	}
 	return events, nil
 }
@@ -617,8 +625,8 @@ func compareAWSDimensions(dim1 []types.Dimension, dim2 []types.Dimension) bool {
 	return reflect.DeepEqual(dim1NameToValue, dim2NameToValue)
 }
 
-func insertTags(events map[string]mb.Event, uniqueIdentifierValue string, subIdentifier string, resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag) {
-	tags := resourceTagMap[subIdentifier]
+func insertTags(events map[string]mb.Event, uniqueIdentifierValue string, subIdentifier string, identifierapi string, resourceTagMap map[string][]resourcegroupstaggingapitypes.Tag) {
+	tags := resourceTagMap[identifierapi]
 	// some metric dimension values are arn format, eg: AWS/DDOS namespace metric
 	if len(tags) == 0 && strings.HasPrefix(subIdentifier, "arn:") {
 		resourceID, err := aws.FindShortIdentifierFromARN(subIdentifier)
