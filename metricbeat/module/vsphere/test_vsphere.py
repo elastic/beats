@@ -24,7 +24,7 @@ class TestVsphere(metricbeat.BaseTest):
             "name": "vsphere",
             "metricsets": ["datastore"],
             "hosts": self.get_hosts(),
-            "period": "5s",
+            "period": "10s",
             "username": "user",
             "password": "pass",
             "extras": {
@@ -55,7 +55,7 @@ class TestVsphere(metricbeat.BaseTest):
             "name": "vsphere",
             "metricsets": ["host"],
             "hosts": self.get_hosts(),
-            "period": "5s",
+            "period": "10s",
             "username": "user",
             "password": "pass",
             "extras": {
