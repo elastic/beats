@@ -214,14 +214,14 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 	}, nil
 }
 
-func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metricIds []types.PerfMetricId) (map[string]interface{}, error) {
+func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metricIds []types.PerfMetricId) (metricMap map[string]interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			m.Logger().Errorf("failed to convert performance data to metric series: %v", r)
+			err = fmt.Errorf("failed to convert performance data to metric series: %v", r)
 		}
 	}()
 
-	metricMap := make(map[string]interface{})
+	metricMap = make(map[string]interface{})
 	summary, err := perfManager.ProviderSummary(ctx, dst.Reference())
 	if err != nil {
 		return metricMap, fmt.Errorf("failed to get summary: %w", err)
