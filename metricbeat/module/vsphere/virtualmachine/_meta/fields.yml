@@ -27,7 +27,7 @@
     - name: cpu.total.mhz
       type: long
       description: >
-        Total CPU in Mhz.
+        Total Reserved CPU in Mhz.
     - name: cpu.free.mhz
       type: long
       description: >
@@ -91,5 +91,14 @@
       type: long
       description: >
         The uptime of the VM in seconds.
+    - name: snapshot
+      type: group
+      fields:
+        - name: info
+          type: object
+          description: Deatils of the snapshots of this virtualmachine.
+        - name: count
+          type: long
+          description: The number of snapshots of this virtualmachine.
 
 

@@ -67967,7 +67967,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -68109,6 +68109,25 @@ type: keyword
 --
 The uptime of the VM in seconds.
 
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
 
 type: long
 
