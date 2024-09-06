@@ -35,7 +35,7 @@ The Datastore and Host metricsets support performance data collection using the 
 
 [IMPORTANT]
 
-Only host and datastore metricsets have limitation of period restrictions.
+Only host and datastore metricsets have the limitation of period restrictions.
 
 [float]
 ==== Real-time data collection interval:
