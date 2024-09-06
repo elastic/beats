@@ -271,10 +271,6 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	nodeConfig, err := conf.NewConfigFrom(map[string]interface{}{
-		"enabled": true,
-	})
-	require.NoError(t, err)
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
@@ -283,7 +279,6 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 			CronJob:    false,
 			Deployment: true,
 			Namespace:  namespaceConfig,
-			Node:       nodeConfig,
 		},
 	}
 	client := k8sfake.NewSimpleClientset()
