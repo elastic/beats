@@ -223,6 +223,12 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 }
 
 func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metricIds []types.PerfMetricId) (map[string]interface{}, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			m.Logger().Errorf("failed to convert performance data to metric series: %v", r)
+		}
+	}()
+
 	metricMap := make(map[string]interface{})
 	summary, err := perfManager.ProviderSummary(ctx, hst.Reference())
 	if err != nil {
