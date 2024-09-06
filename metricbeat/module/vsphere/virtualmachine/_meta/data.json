@@ -20,6 +20,7 @@
                     "mhz": 0
                 }
             },
+<<<<<<< HEAD
             "host.hostname": "localhost.localdomain",
             "host.id": "ha-host",
             "memory": {
@@ -44,6 +45,32 @@
             },
             "name": "ha-host_VM0",
             "os": "otherGuest"
+=======
+            "uptime": 0,
+            "status": "green",
+            "network_names": [
+              "PROD_VCF"
+            ],
+            "datastore.names": [
+              "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
+            ],
+            "host.id": "host-20",
+            "snapshot.info": [
+              {
+                "Name":        "Snapshot_1",
+                "Description": "Test snapshot 1",
+                "CreateTime": "2024-09-01T12:34:56Z"
+
+              },
+              {
+                "Name":        "Snapshot_2",
+                "Description": "Test snapshot 2",
+                "CreateTime": "2024-09-03T2:34:56Z"
+              }
+            ],
+            "snapshot.count": 2
+          }
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
         }
     }
 }

@@ -67480,7 +67480,11 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
+<<<<<<< HEAD
 Total CPU in Mhz
+=======
+Total Reserved CPU in Mhz.
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
 
 
 type: long
@@ -67565,6 +67569,90 @@ type: keyword
 
 --
 
+<<<<<<< HEAD
+=======
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
+
+type: long
+
+--
+
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
 [[exported-fields-windows]]
 == Windows fields
 

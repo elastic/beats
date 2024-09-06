@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -49,6 +50,27 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+<<<<<<< HEAD
+=======
+type VMData struct {
+	VM             mo.VirtualMachine
+	HostID         string
+	HostName       string
+	NetworkNames   []string
+	DatastoreNames []string
+	CustomFields   mapstr.M
+	Snapshots      []VMSnapshotData
+}
+
+type VMSnapshotData struct {
+	ID          int32
+	Name        string
+	Description string
+	CreateTime  time.Time
+	State       types.VirtualMachinePowerState
+}
+
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := vsphere.NewMetricSet(base)
@@ -123,6 +145,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 
 	for _, vm := range vmt {
+<<<<<<< HEAD
 		usedMemory := int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024
 		usedCPU := vm.Summary.QuickStats.OverallCpuUsage
 		event := mapstr.M{
@@ -166,6 +189,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			event.Put("memory.total.guest.bytes", totalMemory)
 			event.Put("memory.free.guest.bytes", freeMemory)
 		}
+=======
+		var hostID, hostName string
+		var networkNames, datastoreNames []string
+		var customFields mapstr.M
+		var snapshots []VMSnapshotData
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
 
 		if host := vm.Summary.Runtime.Host; host != nil {
 			event["host.id"] = host.Value
@@ -205,6 +234,23 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 		}
 
+<<<<<<< HEAD
+=======
+		if vm.Snapshot != nil {
+			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
+		}
+
+		data := VMData{
+			VM:             vm,
+			HostID:         hostID,
+			HostName:       hostName,
+			NetworkNames:   networkNames,
+			DatastoreNames: datastoreNames,
+			CustomFields:   customFields,
+			Snapshots:      snapshots,
+		}
+
+>>>>>>> 7f29f6021b (Add support of snapshot in vSphere virtualmachine metricset (#40683))
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
 		})
@@ -301,4 +347,23 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 		return nil, fmt.Errorf("error retrieving host information: %v", err)
 	}
 	return &hs, nil
+}
+
+func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapshotData {
+	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
+	for _, snapshot := range snapshotTree {
+		snapshots = append(snapshots, VMSnapshotData{
+			ID:          snapshot.Id,
+			Name:        snapshot.Name,
+			Description: snapshot.Description,
+			CreateTime:  snapshot.CreateTime,
+			State:       snapshot.State,
+		})
+
+		// Recursively add child snapshots
+		if len(snapshot.ChildSnapshotList) > 0 {
+			snapshots = append(snapshots, fetchSnapshots(snapshot.ChildSnapshotList)...)
+		}
+	}
+	return snapshots
 }
