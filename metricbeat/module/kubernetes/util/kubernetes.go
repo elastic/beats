@@ -41,6 +41,7 @@ import (
 
 type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
+	KubeAdm           bool                         `config:"use_kubeadm"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 	Node              string                       `config:"node"`
 	SyncPeriod        time.Duration                `config:"sync_period"`
