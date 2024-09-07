@@ -2,8 +2,16 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-panos.html
 
 - module: panos
-  metricsets: ["licenses"]
+  metricsets:
+    - "interfaces"
+    - "system"
+    - "routing"
+    - "vpn"
+
   enabled: false
   period: 10s
-  hosts: ["localhost"]
+  host_ip: "127.0.0.1"
+  apiKey: "<API Key>"
+  apiDebugMode: false
+
 

@@ -94,7 +94,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	ipsecTunnelsEvents, err := getIPSecTunnelEvents(m)
 	if err != nil {
-		m.logger.Error("Error get GlobalProtect stats events: %s", err)
+		m.logger.Error("Error get IPSec Tunnel events: %s", err)
 		errs = append(errs, err.Error())
 	}
 
