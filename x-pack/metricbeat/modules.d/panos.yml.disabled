@@ -2,26 +2,8 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-panos.html
 
 - module: panos
-  metricsets:
-    - "bgp_peers"
-    - "certificates"
-    - "fans"
-    - "filesystem"
-    - "globalprotect_sessions"
-    - "globalprotect_stats"
-    - "ha_interfaces"
-    - "licenses"
-    - "logical"
-    - "power"
-    - "power"
-    - "system"
-    - "temperature"
-    - "tunnels"
-
+  metricsets: ["licenses"]
   enabled: false
   period: 10s
-  host_ip: "127.0.0.1"
-  apiKey: "<API Key>"
-  apiDebugMode: false
-
+  hosts: ["localhost"]
 

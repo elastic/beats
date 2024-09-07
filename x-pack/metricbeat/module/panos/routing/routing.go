@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package system
+package routing
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	metricsetName = "system"
+	metricsetName = "routing"
 	vsys          = ""
 )
 
@@ -41,7 +41,7 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos system metricset is beta.")
+	cfgwarn.Beta("The panos routing metricset is beta.")
 
 	config, err := panos.NewConfig(base)
 	if err != nil {
@@ -50,7 +50,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	logger := logp.NewLogger(base.FullyQualifiedName())
 
-	//client := &pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
 	client, err := panos.GetPanosClient(config)
 	if err != nil {
 		return nil, err
@@ -72,74 +71,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// stop processing events if one of the fetches fails
 	var errs []string
 
-	certificateEvents, err := getCertificateEvents(m)
+	bgpEvents, err := getBGPEvents(m)
 	if err != nil {
-		m.logger.Error("Error get certificate events: %s", err)
+		m.logger.Error("Error get BGP events: %s", err)
 		errs = append(errs, err.Error())
 	}
 
-	for _, event := range certificateEvents {
-		report.Event(event)
-	}
-
-	resourceEvents, err := getResourceEvents(m)
-	if err != nil {
-		m.logger.Error("Error get resource events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range resourceEvents {
-		report.Event(event)
-	}
-
-	powerEvents, err := getPowerEvents(m)
-	if err != nil {
-		m.logger.Error("Error get power events: %s", err)
-		errs = append(errs, err.Error())
-
-	}
-
-	for _, event := range powerEvents {
-		report.Event(event)
-	}
-
-	fanEvents, err := getFanEvents(m)
-	if err != nil {
-		m.logger.Error("Error get fan events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range fanEvents {
-		report.Event(event)
-	}
-
-	thermalEvents, err := getThermalEvents(m)
-	if err != nil {
-		m.logger.Error("Error get thermal events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range thermalEvents {
-		report.Event(event)
-	}
-
-	licenesEvents, err := getLicenseEvents(m)
-	if err != nil {
-		m.logger.Error("Error get license events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range licenesEvents {
-		report.Event(event)
-	}
-
-	filesystemEvents, err := getFilesystemEvents(m)
-	if err != nil {
-		m.logger.Error("Error get filesystem events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range filesystemEvents {
+	for _, event := range bgpEvents {
 		report.Event(event)
 	}
 
@@ -148,5 +86,4 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	} else {
 		return nil
 	}
-
 }

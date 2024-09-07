@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package system
+package interfaces
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	metricsetName = "system"
+	metricsetName = "interfaces"
 	vsys          = ""
 )
 
@@ -41,7 +41,7 @@ func init() {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The panos system metricset is beta.")
+	cfgwarn.Beta("The panos interfaces metricset is beta.")
 
 	config, err := panos.NewConfig(base)
 	if err != nil {
@@ -72,74 +72,23 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// stop processing events if one of the fetches fails
 	var errs []string
 
-	certificateEvents, err := getCertificateEvents(m)
+	intefaceEvents, err := getIFNetInterfaceEvents(m)
 	if err != nil {
-		m.logger.Error("Error get certificate events: %s", err)
+		m.logger.Error("Error get IFInterface events: %s", err)
 		errs = append(errs, err.Error())
 	}
 
-	for _, event := range certificateEvents {
+	for _, event := range intefaceEvents {
 		report.Event(event)
 	}
 
-	resourceEvents, err := getResourceEvents(m)
+	haEvents, err := getHAInterfaceEvents(m)
 	if err != nil {
-		m.logger.Error("Error get resource events: %s", err)
+		m.logger.Error("Error get HAInterface events: %s", err)
 		errs = append(errs, err.Error())
 	}
 
-	for _, event := range resourceEvents {
-		report.Event(event)
-	}
-
-	powerEvents, err := getPowerEvents(m)
-	if err != nil {
-		m.logger.Error("Error get power events: %s", err)
-		errs = append(errs, err.Error())
-
-	}
-
-	for _, event := range powerEvents {
-		report.Event(event)
-	}
-
-	fanEvents, err := getFanEvents(m)
-	if err != nil {
-		m.logger.Error("Error get fan events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range fanEvents {
-		report.Event(event)
-	}
-
-	thermalEvents, err := getThermalEvents(m)
-	if err != nil {
-		m.logger.Error("Error get thermal events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range thermalEvents {
-		report.Event(event)
-	}
-
-	licenesEvents, err := getLicenseEvents(m)
-	if err != nil {
-		m.logger.Error("Error get license events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range licenesEvents {
-		report.Event(event)
-	}
-
-	filesystemEvents, err := getFilesystemEvents(m)
-	if err != nil {
-		m.logger.Error("Error get filesystem events: %s", err)
-		errs = append(errs, err.Error())
-	}
-
-	for _, event := range filesystemEvents {
+	for _, event := range haEvents {
 		report.Event(event)
 	}
 
@@ -148,5 +97,4 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	} else {
 		return nil
 	}
-
 }

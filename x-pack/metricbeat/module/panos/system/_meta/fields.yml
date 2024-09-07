@@ -93,7 +93,7 @@
       description: >
         Used memory
     - name: memory.buffer_cache
-      type: keyflaotword
+      type: float
       description: >
         Memory used for buffers and cache
     - name: swap.total

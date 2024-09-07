@@ -1,1 +1,0 @@
-This is the fans metricset of the module panos.

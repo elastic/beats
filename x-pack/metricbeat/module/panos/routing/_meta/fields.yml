@@ -1,0 +1,10 @@
+- name: routing
+  type: group
+  release: beta
+  description: >
+    routing
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
