@@ -77,12 +77,12 @@ func formatFilesytemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 
 	for _, filesystem := range filesystems {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"name":        filesystem.Name,
-			"size":        filesystem.Size,
-			"used":        filesystem.Used,
-			"available":   filesystem.Avail,
-			"use_percent": filesystem.UsePerc,
-			"mounted":     filesystem.Mounted,
+			"filesystem.name":        filesystem.Name,
+			"filesystem.size":        filesystem.Size,
+			"filesystem.used":        filesystem.Used,
+			"filesystem.available":   filesystem.Avail,
+			"filesystem.use_percent": filesystem.UsePerc,
+			"filesystem.mounted":     filesystem.Mounted,
 		},
 			RootFields: mapstr.M{
 				"observer.ip":     m.config.HostIp,

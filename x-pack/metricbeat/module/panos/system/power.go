@@ -44,12 +44,12 @@ func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
 			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
 			event = mb.Event{MetricSetFields: mapstr.M{
 
-				"slot_number":   entry.Slot,
-				"description":   entry.Description,
-				"alarm":         entry.Alarm,
-				"volts":         entry.Volts,
-				"minimum_volts": entry.MinimumVolts,
-				"maximum_volts": entry.MaximumVolts,
+				"power.slot_number":   entry.Slot,
+				"power.description":   entry.Description,
+				"power.alarm":         entry.Alarm,
+				"power.volts":         entry.Volts,
+				"power.minimum_volts": entry.MinimumVolts,
+				"power.maximum_volts": entry.MaximumVolts,
 			},
 				RootFields: mapstr.M{
 					"observer.ip":     m.config.HostIp,

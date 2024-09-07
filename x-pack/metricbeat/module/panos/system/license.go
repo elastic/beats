@@ -41,13 +41,13 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 
 	for _, license := range licenses {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"feature":     license.Feature,
-			"description": license.Description,
-			"serial":      license.Serial,
-			"issued":      license.Issued,
-			"expires":     license.Expires,
-			"expired":     license.Expired,
-			"auth_code":   license.AuthCode,
+			"license.feature":    license.Feature,
+			"license.escription": license.Description,
+			"license.serial":     license.Serial,
+			"license.issued":     license.Issued,
+			"license.expires":    license.Expires,
+			"license.expired":    license.Expired,
+			"license.auth_code":  license.AuthCode,
 		},
 			RootFields: mapstr.M{
 				"observer.ip":     m.config.HostIp,

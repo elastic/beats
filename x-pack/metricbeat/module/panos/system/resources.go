@@ -116,13 +116,23 @@ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
 	return events
 }
 
+func convertUptime(uptime string) (int, int) {
+	// 07:51
+	hourstr := strings.Split(uptime, ":")
+	hours := parseInt(hourstr[0])
+	minutes := parseInt(hourstr[1])
+
+	return hours, minutes
+}
+
 func parseSystemInfo(line string) SystemInfo {
 	// top - 07:51:37 up 108 days,  1:38,  0 users,  load average: 5.52, 5.79, 5.99
 	re := regexp.MustCompile(`\s+`)
 	normal := re.ReplaceAllString(line, " ")
 	fields := strings.Split(normal, " ")
+	upHours, upMinutes := convertUptime(fields[6])
 
-	uptime := Uptime{parseInt(fields[4]), fields[6]}
+	uptime := Uptime{parseInt(fields[4]), upHours, upMinutes}
 	loadAverage := strings.Split(normal, ": ")[1]
 	loadAverageValues := strings.Split(loadAverage, ", ")
 

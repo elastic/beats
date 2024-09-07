@@ -44,17 +44,17 @@ func formatCertificateEvents(m *MetricSet, input string) []mb.Event {
 	for _, certificate := range certificates {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
-				"cert_name":           certificate.CertName,
-				"issuer":              certificate.Issuer,
-				"issuer_subject_hash": certificate.IssuerSubjectHash,
-				"issuer_key_hash":     certificate.IssuerKeyHash,
-				"db_type":             certificate.DBType,
-				"db_exp_date":         certificate.DBExpDate,
-				"db_rev_date":         certificate.DBRevDate,
-				"db_serial_no":        certificate.DBSerialNo,
-				"db_file":             certificate.DBFile,
-				"db_name":             certificate.DBName,
-				"db_status":           certificate.DBStatus,
+				"certificate.name":                certificate.CertName,
+				"certificate.issuer":              certificate.Issuer,
+				"certificate.issuer_subject_hash": certificate.IssuerSubjectHash,
+				"certificate.issuer_key_hash":     certificate.IssuerKeyHash,
+				"certificate.db_type":             certificate.DBType,
+				"certificate.db_exp_date":         certificate.DBExpDate,
+				"certificate.db_rev_date":         certificate.DBRevDate,
+				"certificate.db_serial_no":        certificate.DBSerialNo,
+				"certificate.db_file":             certificate.DBFile,
+				"certificate.db_name":             certificate.DBName,
+				"certificate.db_status":           certificate.DBStatus,
 			},
 			RootFields: mapstr.M{
 				"observer.ip":     m.config.HostIp,

@@ -42,11 +42,11 @@ func formatFanEvents(m *MetricSet, response *FanResponse) []mb.Event {
 		for _, entry := range slot.Entries {
 			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
 			event = mb.Event{MetricSetFields: mapstr.M{
-				"slot_number": entry.Slot,
-				"description": entry.Description,
-				"alarm":       entry.Alarm,
-				"rpm":         entry.RPMs,
-				"min_rpm":     entry.Min,
+				"fan.slot_number": entry.Slot,
+				"fan.description": entry.Description,
+				"fan.alarm":       entry.Alarm,
+				"fan.rpm":         entry.RPMs,
+				"fan.min_rpm":     entry.Min,
 			},
 				RootFields: mapstr.M{
 					"observer.ip":     m.config.HostIp,

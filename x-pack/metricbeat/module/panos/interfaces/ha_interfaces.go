@@ -124,13 +124,13 @@ func makeLinkMonitoringEvents(m *MetricSet, links HALinkMonitoring) []mb.Event {
 	for _, group := range links.Groups {
 		for _, interface_entry := range group.Interface {
 			event = mb.Event{MetricSetFields: mapstr.M{
-				"ha.link_monitoring.enabled":                  links.Enabled,
-				"ha.llink_monitoring.failure_condition":       links.FailureCondition,
-				"ha.llink_monitoring.group.name":              group.Name,
-				"ha.llink_monitoring.group.enabled":           group.Enabled,
-				"ha.llink_monitoring.group.failure_condition": group.FailureCondition,
-				"ha.llink_monitoring.group.interface.name":    interface_entry.Name,
-				"ha.llink_monitoring.group.interface.status":  interface_entry.Status,
+				"ha.link_monitoring.enabled":                 links.Enabled,
+				"ha.link_monitoring.failure_condition":       links.FailureCondition,
+				"ha.link_monitoring.group.name":              group.Name,
+				"ha.link_monitoring.group.enabled":           group.Enabled,
+				"ha.link_monitoring.group.failure_condition": group.FailureCondition,
+				"ha.link_monitoring.group.interface.name":    interface_entry.Name,
+				"ha.link_monitoring.group.interface.status":  interface_entry.Status,
 			},
 				RootFields: mapstr.M{
 					"observer.ip":     m.config.HostIp,

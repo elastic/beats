@@ -4,7 +4,9 @@
 
 package system
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+)
 
 // system resources
 type ResourceResponse struct {
@@ -19,8 +21,9 @@ type SystemLoad struct {
 }
 
 type Uptime struct {
-	Days  int
-	Hours string
+	Days    int
+	Hours   int
+	Minutes int
 }
 
 type SystemInfo struct {

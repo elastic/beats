@@ -45,12 +45,12 @@ func formatThermalEvents(m *MetricSet, response *ThermalResponse) []mb.Event {
 			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
 			event = mb.Event{MetricSetFields: mapstr.M{
 
-				"slot_number":     entry.Slot,
-				"description":     entry.Description,
-				"alarm":           entry.Alarm,
-				"degress_celsius": entry.DegreesCelsius,
-				"minimum_temp":    entry.MinimumTemp,
-				"maximum_temp":    entry.MaximumTemp,
+				"thermal.slot_number":     entry.Slot,
+				"thermal.description":     entry.Description,
+				"thermal.alarm":           entry.Alarm,
+				"thermal.degress_celsius": entry.DegreesCelsius,
+				"thermal.minimum_temp":    entry.MinimumTemp,
+				"thermal.maximum_temp":    entry.MaximumTemp,
 			},
 				RootFields: mapstr.M{
 					"observer.ip":     m.config.HostIp,

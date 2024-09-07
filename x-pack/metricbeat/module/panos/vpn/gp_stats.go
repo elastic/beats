@@ -43,11 +43,11 @@ func formatGPStatsEvents(m *MetricSet, response GPStatsResponse) []mb.Event {
 
 	for _, gateway := range response.Result.Gateways {
 		event := mb.Event{MetricSetFields: mapstr.M{
-			"gateway.name":           gateway.Name,
-			"gateway.current_users":  gateway.CurrentUsers,
-			"gateway.previous_users": gateway.PreviousUsers,
-			"total_current_users":    totalCurrent,
-			"total_previous_users":   totalPrevious,
+			"globalprotect.gateway.name":           gateway.Name,
+			"globalprotect.gateway.current_users":  gateway.CurrentUsers,
+			"globalprotect.gateway.previous_users": gateway.PreviousUsers,
+			"globalprotect.total_current_users":    totalCurrent,
+			"globalprotect.total_previous_users":   totalPrevious,
 		},
 			RootFields: mapstr.M{
 				"observer.ip":     m.config.HostIp,
