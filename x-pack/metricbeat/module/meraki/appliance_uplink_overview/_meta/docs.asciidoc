@@ -1,1 +1,0 @@
-This is the appliance_uplink_overview metricset of the module meraki.

@@ -1,1 +1,0 @@
-This is the wireless_device_channel_utilization metricset of the module meraki.

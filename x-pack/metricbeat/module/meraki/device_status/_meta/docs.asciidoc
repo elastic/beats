@@ -1,1 +1,0 @@
-This is the device_status metricset of the module meraki.

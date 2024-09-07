@@ -1,8 +1,8 @@
-- name: network_health_channel_utilization
+- name: device_health
   type: group
   release: beta
   description: >
-    network_health_channel_utilization
+    device_health
   fields:
     - name: example
       type: keyword

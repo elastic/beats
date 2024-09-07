@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"meraki",
-        "name":"appliance_uplink_overview",
+        "name":"device_health",
         "rtt":44269
     },
     "meraki":{
-        "appliance_uplink_overview":{
-            "example": "appliance_uplink_overview"
+        "device_health":{
+            "example": "device_health"
         }
     },
     "type":"metricsets"

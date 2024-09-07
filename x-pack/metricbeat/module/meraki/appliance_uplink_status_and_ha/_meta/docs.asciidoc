@@ -1,1 +1,0 @@
-This is the appliance_uplink_status_and_ha metricset of the module meraki.
