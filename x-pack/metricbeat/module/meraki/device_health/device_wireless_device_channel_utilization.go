@@ -16,19 +16,19 @@ func reportWirelessDeviceChannelUtilization(reporter mb.ReporterV2, organization
 		if device, ok := devices[Serial(wirelessDevice.Serial)]; ok {
 
 			metric := mapstr.M{
-				"wireless.device.address":      device.Address,
-				"wireless.device.firmware":     device.Firmware,
-				"wireless.device.imei":         device.Imei,
-				"wireless.device.lan_ip":       device.LanIP,
-				"wireless.device.location":     device.Location,
-				"wireless.device.mac":          device.Mac,
-				"wireless.device.model":        device.Model,
-				"wireless.device.name":         device.Name,
-				"wireless.device.network_id":   device.NetworkID,
-				"wireless.device.notes":        device.Notes,
-				"wireless.device.product_type": device.ProductType,
-				"wireless.device.serial":       device.Serial,
-				"wireless.device.tags":         device.Tags,
+				"device.address":      device.Address,
+				"device.firmware":     device.Firmware,
+				"device.imei":         device.Imei,
+				"device.lan_ip":       device.LanIP,
+				"device.location":     device.Location,
+				"device.mac":          device.Mac,
+				"device.model":        device.Model,
+				"device.name":         device.Name,
+				"device.network_id":   device.NetworkID,
+				"device.notes":        device.Notes,
+				"device.product_type": device.ProductType,
+				"device.serial":       device.Serial,
+				"device.tags":         device.Tags,
 			}
 
 			for _, v := range wirelessDevice.ByBand {

@@ -11,6 +11,8 @@ import (
 // device unique identifier
 type Serial string
 
+type NetworkID string
+
 // Device contains static device attributes (i.e. dimensions)
 type Device struct {
 	Address     string

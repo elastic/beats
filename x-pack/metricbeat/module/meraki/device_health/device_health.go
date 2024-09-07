@@ -168,6 +168,22 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 		reportWirelessDeviceChannelUtilization(reporter, org, devices, wirelessDevices)
 
+		//Use Org Networks Retrieved above
+		//Get VPN site_to_site
+		//Report VPN site_to_site
+		networkVPNSiteToSites, err := getNetworkApplianceVPNSiteToSite(m.client, orgNetworks)
+		if err != nil {
+			return err
+		}
+		reportNetwrokApplianceVPNSiteToSite(reporter, org, devices, networkVPNSiteToSites)
+
+		//Get &  Report Organization License by Device
+		license_val, license_res, license_err := m.client.Organizations.GetOrganizationLicenses(org, &meraki_api.GetOrganizationLicensesQueryParams{})
+		if license_err != nil {
+			return fmt.Errorf("Organizations.GetOrganizationLicensesfailed; [%d] %s. %w", license_res.StatusCode(), license_res.Body(), license_err)
+		}
+		reportOrganizationDeviceLicenses(reporter, org, devices, license_val)
+
 	}
 
 	return nil

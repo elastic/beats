@@ -79,30 +79,26 @@ func reportPerformanceScoreMetrics(reporter mb.ReporterV2, organizationID string
 	devicePerformanceScoreMetrics := []mapstr.M{}
 	for serial, device := range devices {
 		metric := mapstr.M{
-			"device.appliance.address":      device.Address,
-			"device.appliance.firmware":     device.Firmware,
-			"device.appliance.imei":         device.Imei,
-			"device.appliance.lan_ip":       device.LanIP,
-			"device.appliance.location":     device.Location,
-			"device.appliance.mac":          device.Mac,
-			"device.appliance.model":        device.Model,
-			"device.appliance.name":         device.Name,
-			"device.appliance.network_id":   device.NetworkID,
-			"device.appliance.notes":        device.Notes,
-			"device.appliance.product_type": device.ProductType,
-			"device.appliance.serial":       device.Serial,
-			"device.appliance.tags":         device.Tags,
-		}
-
-		for k, v := range device.Details {
-			metric[fmt.Sprintf("device.appliance.details.%s", k)] = v
+			"device.address":      device.Address,
+			"device.firmware":     device.Firmware,
+			"device.imei":         device.Imei,
+			"device.lan_ip":       device.LanIP,
+			"device.location":     device.Location,
+			"device.mac":          device.Mac,
+			"device.model":        device.Model,
+			"device.name":         device.Name,
+			"device.network_id":   device.NetworkID,
+			"device.notes":        device.Notes,
+			"device.product_type": device.ProductType,
+			"device.serial":       device.Serial,
+			"device.tags":         device.Tags,
 		}
 
 		if score, ok := devicePerformanceScores[serial]; ok {
 			if score.HttpStatusCode == 204 {
-				metric["device.appliance.performance.http_status_code"] = score.HttpStatusCode
+				metric["device.performance.http_status_code"] = score.HttpStatusCode
 			} else {
-				metric["device.appliance.performance.score"] = score.PerformanceScore
+				metric["device.performance.score"] = score.PerformanceScore
 			}
 
 		}

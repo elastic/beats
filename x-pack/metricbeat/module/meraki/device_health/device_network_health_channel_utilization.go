@@ -49,20 +49,20 @@ func reportNetworkHealthChannelUtilization(reporter mb.ReporterV2, organizationI
 				"network.health.channel.radio.tags":   network.Tags,
 			}
 
-			for _, wifi0 := range *network.Wifi0 {
-				metric["network.health.channel.radio.wifi0.start_time"] = wifi0.StartTime
-				metric["network.health.channel.radio.wifi0.end_time"] = wifi0.EndTime
-				metric["network.health.channel.radio.wifi0.utilization80211"] = wifi0.Utilization80211
-				metric["network.health.channel.radio.wifi0.utilizationNon80211"] = wifi0.UtilizationNon80211
-				metric["network.health.channel.radio.wifi0.utilizationTotal"] = wifi0.UtilizationTotal
+			for k, wifi0 := range *network.Wifi0 {
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.start_time", k)] = wifi0.StartTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.end_time", k)] = wifi0.EndTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilization80211", k)] = wifi0.Utilization80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilizationNon80211", k)] = wifi0.UtilizationNon80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilizationTotal", k)] = wifi0.UtilizationTotal
 			}
 
-			for _, wifi1 := range *network.Wifi1 {
-				metric["network.health.channel.radio.wifi1.start_time"] = wifi1.StartTime
-				metric["network.health.channel.radio.wifi1.end_time"] = wifi1.EndTime
-				metric["network.health.channel.radio.wifi1.utilization80211"] = wifi1.Utilization80211
-				metric["network.health.channel.radio.wifi1.utilizationNon80211"] = wifi1.UtilizationNon80211
-				metric["network.health.channel.radio.wifi1.utilizationTotal"] = wifi1.UtilizationTotal
+			for k, wifi1 := range *network.Wifi1 {
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.start_time", k)] = wifi1.StartTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.end_time", k)] = wifi1.EndTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilization80211", k)] = wifi1.Utilization80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilizationNon80211", k)] = wifi1.UtilizationNon80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilizationTotal", k)] = wifi1.UtilizationTotal
 			}
 
 			if device, ok := devices[Serial(network.Serial)]; ok {
