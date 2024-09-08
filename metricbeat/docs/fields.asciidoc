@@ -66855,6 +66855,44 @@ vSphere module
 
 
 [float]
+=== alert
+
+Alert information.
+
+
+
+
+*`vsphere.alert.entity.name`*::
++
+--
+Name of the entity which triggered alert.
+
+
+type: keyword
+
+--
+
+*`vsphere.alert.name`*::
++
+--
+Name of the alert.
+
+
+type: keyword
+
+--
+
+*`vsphere.alert.status`*::
++
+--
+Status of the alarm.
+
+
+type: keyword
+
+--
+
+[float]
 === cluster
 
 Cluster information.

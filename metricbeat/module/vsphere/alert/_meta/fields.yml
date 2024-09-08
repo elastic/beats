@@ -1,0 +1,21 @@
+- name: alert
+  type: group
+  release: beta
+  description: >
+    Alert information.
+  fields:
+    - name: entity
+      type: group
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            Name of the entity which triggered alert.
+    - name: name
+      type: keyword
+      description: >
+        Name of the alert.
+    - name: status
+      type: keyword
+      description: >
+        Status of the alarm.
