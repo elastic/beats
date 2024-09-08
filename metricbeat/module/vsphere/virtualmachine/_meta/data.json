@@ -14,73 +14,78 @@
         "type": "vsphere"
     },
     "vsphere": {
-        "virtualmachine": {
-            "network.names": [
-              "PROD_VCF"
-            ],
-            "os": "Microsoft Windows 10 (64-bit)",
-            "datastore": {
-              "count": 1
-            },
-            "memory": {
-              "used": {
-                "guest": {
-                  "bytes": 0
-                },
-                "host": {
-                  "bytes": 0
-                }
-              },
-              "total": {
-                "guest": {
-                  "bytes": 4294967296
-                }
-              },
-              "free": {
-                "guest": {
-                  "bytes": 4294967296
-                }
-              }
-            },
-            "network": {
-              "count": 1
-            },
-            "host.hostname": "phx-w1c1",
-            "name": "phx-14",
-            "cpu": {
-              "free": {
-                "mhz": 0
-              },
-              "used": {
-                "mhz": 0
-              },
-              "total": {
-                "mhz": 0
-              }
-            },
-            "uptime": 0,
-            "status": "green",
-            "network_names": [
-              "PROD_VCF"
-            ],
-            "datastore.names": [
-              "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
-            ],
-            "host.id": "host-20",
-            "snapshot.info": [
-              {
-                "Name":        "Snapshot_1",
-                "Description": "Test snapshot 1",
-                "CreateTime": "2024-09-01T12:34:56Z"
-
-              },
-              {
-                "Name":        "Snapshot_2",
-                "Description": "Test snapshot 2",
-                "CreateTime": "2024-09-03T2:34:56Z"
-              }
-            ],
-            "snapshot.count": 2
+      "virtualmachine": {
+        "name": "xt0nmfpv9",
+        "uptime": 5348978,
+        "host.id": "host-32",
+        "host.hostname": "phx-w1c1-esxi04.com",
+        "status": "green",
+        "cpu": {
+          "free": {
+            "mhz": 0
+          },
+          "used": {
+            "mhz": 161
+          },
+          "total": {
+            "mhz": 0
           }
-        }
+        },
+        "network": {
+          "names": [
+            "PROD_VCF_VMS"
+          ],
+          "count": 1
+        },
+        "memory": {
+          "used": {
+            "guest": {
+              "bytes": 686817280
+            },
+            "host": {
+              "bytes": 29027729408
+            }
+          },
+          "total": {
+            "guest": {
+              "bytes": 68719476736
+            }
+          },
+          "free": {
+            "guest": {
+              "bytes": 68032659456
+            }
+          }
+        },
+        "network_names": [
+          "PROD_VCF_VMS"
+        ],
+        "datastore": {
+          "count": 1,
+          "names": [
+            "VxRailtoup-Virtual-Datastore-bc1d-5aa310fb"
+          ]
+        },
+        "os": "CentOS 4/5/6/7 (64-bit)",
+        "snapshot": {
+          "info": [
+            {
+             "ID":         123,
+            "Name":        "Snapshot_1",
+            "Description": "Test snapshot 1",
+            "CreateTime":  "2024-09-01T12:34:56Z",
+            "State":       "PoweredOff"
+            },
+            {
+            "ID":          745,
+            "Name":        "Snapshot_2",
+            "Description": "Test snapshot 2",
+            "CreateTime":  "2024-09-03T2:34:56Z",
+            "State":       "PoweredOn"
+            }
+          ],
+          "count": 2
+      }
+      }
     }
+  }
