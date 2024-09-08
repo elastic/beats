@@ -58,11 +58,9 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, []string{"LocalDS_0"}, datastore["names"])
 	assert.EqualValues(t, 1, datastore["count"])
 
-
 	network := event["network"].(mapstr.M)
 	assert.EqualValues(t, []string{"VM Network"}, network["names"])
 	assert.EqualValues(t, 1, network["count"])
-
 
 	cpu := event["cpu"].(mapstr.M)
 

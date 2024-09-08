@@ -61,16 +61,16 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	}
 	if len(data.NetworkNames) > 0 {
 		event.Put("network.count", len(data.NetworkNames))
-		event.Put("network.names",data.NetworkNames)
+		event.Put("network.names", data.NetworkNames)
 		event["network_names"] = data.NetworkNames
 	}
 	if len(data.DatastoreNames) > 0 {
 		event.Put("datastore.count", len(data.DatastoreNames))
-		event.Put("datastore.names",data.DatastoreNames)
+		event.Put("datastore.names", data.DatastoreNames)
 	}
 	if len(data.Snapshots) > 0 {
 		event.Put("snapshot.count", len(data.Snapshots))
-		event.Put("snapshot.info",data.Snapshots)
+		event.Put("snapshot.info", data.Snapshots)
 	}
 
 	return event

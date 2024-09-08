@@ -124,8 +124,8 @@ func TestEventMapping(t *testing.T) {
 			"customField1": "value1",
 			"customField2": "value2",
 		},
-		"network_names":   []string{"network-1", "network-2"},
-		"snapshot": mapstr.M {
+		"network_names": []string{"network-1", "network-2"},
+		"snapshot": mapstr.M{
 			"info": []VMSnapshotData{
 				{
 					ID:          123,
@@ -143,7 +143,7 @@ func TestEventMapping(t *testing.T) {
 				},
 			},
 			"count": 2,
-	},	
+		},
 	}
 
 	// Assert that the output event matches the expected event
