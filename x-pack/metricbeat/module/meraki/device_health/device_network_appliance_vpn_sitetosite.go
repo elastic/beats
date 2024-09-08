@@ -18,7 +18,7 @@ func getNetworkApplianceVPNSiteToSite(client *meraki_api.Client, networks *merak
 		networkVPNSiteToSite, res, err := client.Appliance.GetNetworkApplianceVpnSiteToSiteVpn(network.ID)
 		if err != nil {
 			//Error: "This endpoint only supports MX networks"
-			// We just swallow this error but do not append to the list
+			// We just ignore this error but do not append to the list
 			if !(strings.Contains(string(res.Body()), "MX network")) {
 				//Any other problem we are going to return an error
 				return nil, fmt.Errorf("Appliance.GetNetworkApplianceVpnSiteToSiteVpn failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)

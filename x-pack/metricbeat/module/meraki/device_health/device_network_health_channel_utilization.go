@@ -22,7 +22,7 @@ func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *mer
 				networkHealthUtilization, res, err := client.Networks.GetNetworkNetworkHealthChannelUtilization(network.ID, &meraki_api.GetNetworkNetworkHealthChannelUtilizationQueryParams{})
 				if err != nil {
 					//"This endpoint is only available for networks on MR 27.0 or above."
-					// We just swallow this error but do not append to the list
+					// We just ignore this error but do not append to the list
 					if !(strings.Contains(string(res.Body()), "MR 27.0")) {
 						//Any other problem we are going to return an error
 						return nil, fmt.Errorf("Networks.GetNetworkNetworkHealthChannelUtilization failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)

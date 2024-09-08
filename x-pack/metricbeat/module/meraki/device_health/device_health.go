@@ -180,9 +180,34 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		//Get &  Report Organization License by Device
 		license_val, license_res, license_err := m.client.Organizations.GetOrganizationLicenses(org, &meraki_api.GetOrganizationLicensesQueryParams{})
 		if license_err != nil {
-			return fmt.Errorf("Organizations.GetOrganizationLicensesfailed; [%d] %s. %w", license_res.StatusCode(), license_res.Body(), license_err)
+			return fmt.Errorf("Organizations.GetOrganizationLicenses failed; [%d] %s. %w", license_res.StatusCode(), license_res.Body(), license_err)
 		}
 		reportOrganizationDeviceLicenses(reporter, org, devices, license_val)
+
+		//Use Org Networks Retrieved above
+		//Get Network Ports
+		//Report Network Ports By Device
+		networkPorts, err := getNetworkAppliancePorts(m.client, orgNetworks)
+		if err != nil {
+			return err
+		}
+		reportNetwrokAppliancePorts(reporter, org, devices, networkPorts)
+
+		//Get &  Report Organization License by Device
+		switchPorts_val, switchPorts_res, switchPorts_err := m.client.Switch.GetOrganizationSwitchPortsBySwitch(org, &meraki_api.GetOrganizationSwitchPortsBySwitchQueryParams{})
+		if switchPorts_err != nil {
+			return fmt.Errorf("Switch.GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", switchPorts_res.StatusCode(), switchPorts_res.Body(), switchPorts_err)
+		}
+		reportOrganizationDeviceSwitchPortBySwitch(reporter, org, devices, switchPorts_val)
+
+		//Use Org Networks Retrieved above
+		//Get Network Ports
+		//Report Network Ports By Device
+		switchPortStatusBySerials, err := getSwitchPortStatusBySerial(m.client, org)
+		if err != nil {
+			return err
+		}
+		reportSwitchPortStatusBySerial(reporter, org, devices, switchPortStatusBySerials)
 
 	}
 

@@ -11,6 +11,7 @@ import (
 // device unique identifier
 type Serial string
 
+// network unique identifier
 type NetworkID string
 
 // Device contains static device attributes (i.e. dimensions)
