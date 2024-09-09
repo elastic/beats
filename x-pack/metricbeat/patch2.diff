@@ -1,0 +1,717 @@
+diff --git a/go.mod b/go.mod
+index a47bf7ec15..193648d401 100644
+--- a/go.mod
++++ b/go.mod
+@@ -181,6 +181,7 @@ require (
+ 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
+ 	github.com/Azure/azure-storage-blob-go v0.15.0
+ 	github.com/Azure/go-autorest/autorest/adal v0.9.24
++	github.com/PaloAltoNetworks/pango v0.10.2
+ 	github.com/apache/arrow/go/v14 v14.0.2
+ 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
+ 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
+diff --git a/go.sum b/go.sum
+index ec32ee823d..d9ce04d812 100644
+--- a/go.sum
++++ b/go.sum
+@@ -215,6 +215,8 @@ github.com/PaesslerAG/gval v1.2.2/go.mod h1:XRFLwvmkTEdYziLdaCeCa5ImcGVrfQbeNUbV
+ github.com/PaesslerAG/jsonpath v0.1.0/go.mod h1:4BzmtoM/PI8fPO4aQGIusjGxGir2BzcV0grWtFzq1Y8=
+ github.com/PaesslerAG/jsonpath v0.1.1 h1:c1/AToHQMVsduPAa4Vh6xp2U0evy4t8SWp8imEsylIk=
+ github.com/PaesslerAG/jsonpath v0.1.1/go.mod h1:lVboNxFGal/VwW6d9JzIy56bUsYAP6tH/x80vjnCseY=
++github.com/PaloAltoNetworks/pango v0.10.2 h1:Tjn6vIzzAq6Dd7N0mDuiP8w8pz8k5W9zz/TTSUQCsQY=
++github.com/PaloAltoNetworks/pango v0.10.2/go.mod h1:GztcRnVLur7G+VFG7Z5ZKNFgScLtsycwPMp1qVebE5g=
+ github.com/PuerkitoBio/purell v1.0.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
+ github.com/PuerkitoBio/purell v1.1.0/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
+ github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
+diff --git a/x-pack/metricbeat/module/panos/system/certificates.go b/x-pack/metricbeat/module/panos/system/certificates.go
+index ca81bfcc91..1ae5c5cf39 100644
+--- a/x-pack/metricbeat/module/panos/system/certificates.go
++++ b/x-pack/metricbeat/module/panos/system/certificates.go
+@@ -6,6 +6,8 @@ package system
+ 
+ import (
+ 	"encoding/xml"
++	"errors"
++	"fmt"
+ 	"regexp"
+ 	"strings"
+ 	"time"
+@@ -20,29 +22,39 @@ func getCertificateEvents(m *MetricSet) ([]mb.Event, error) {
+ 
+ 	output, err := m.client.Op(query, vsys, nil, nil)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to execute query: %w", err)
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to unmarshal XML response: %w", err)
+ 	}
+ 
+-	events := formatCertificateEvents(m, response.Result)
++	if response.Result == "" {
++		return nil, fmt.Errorf("empty result from XML response")
++	}
++
++	events, err := formatCertificateEvents(m, response.Result)
++	if err != nil {
++		return nil, fmt.Errorf("failed to format certificate events: %w", err)
++	}
+ 
+ 	return events, nil
+ }
+ 
+-func formatCertificateEvents(m *MetricSet, input string) []mb.Event {
+-	currentTime := time.Now()
++func formatCertificateEvents(m *MetricSet, input string) ([]mb.Event, error) {
++	timestamp := time.Now()
++
++	certificates, err := parseCertificates(input)
++	if err != nil {
++		return nil, err
++	}
+ 
+-	certificates := parseCertificates(input)
+ 	events := make([]mb.Event, 0, len(certificates))
+ 
+ 	for _, certificate := range certificates {
+ 		event := mb.Event{
++			Timestamp: timestamp,
+ 			MetricSetFields: mapstr.M{
+ 				"certificate.name":                certificate.CertName,
+ 				"certificate.issuer":              certificate.Issuer,
+@@ -61,59 +73,78 @@ func formatCertificateEvents(m *MetricSet, input string) []mb.Event {
+ 				"host.ip":         m.config.HostIp,
+ 				"observer.vendor": "Palo Alto",
+ 				"observer.type":   "firewall",
+-				"@Timestamp":      currentTime,
+-			}}
++			},
++		}
+ 
+ 		events = append(events, event)
+ 	}
+ 
+-	return events
++	return events, nil
+ }
+ 
+-func parseCertificates(input string) []Certificate {
++const (
++	issuerPrefix            = "issuer: "
++	issuerSubjectHashPrefix = "issuer-subjecthash: "
++	issuerKeyHashPrefix     = "issuer-keyhash: "
++	dbTypePrefix            = "db-type: "
++	dbExpDatePrefix         = "db-exp-date: "
++	dbRevDatePrefix         = "db-rev-date: "
++	dbSerialNoPrefix        = "db-serialno: "
++	dbFilePrefix            = "db-file: "
++	dbNamePrefix            = "db-name: "
++	dbStatusPrefix          = "db-status: "
++)
++
++func parseCertificates(input string) ([]Certificate, error) {
+ 	lines := strings.Split(input, "\n")
+ 	pattern := `^[0-9A-Fa-f]{1,40}:[0-9A-Fa-f]{40}([0-9A-Fa-f]{24})?$`
+ 	regex := regexp.MustCompile(pattern)
+-	var certificates []Certificate
++
++	certificates := make([]Certificate, 0)
+ 	var currentSN Certificate
+ 
+ 	for _, line := range lines {
+ 		line = strings.TrimSpace(line)
+-		if regex.MatchString(line) {
++		switch {
++		case regex.MatchString(line):
+ 			if currentSN.CertName != "" {
+ 				certificates = append(certificates, currentSN)
+ 				currentSN = Certificate{}
+ 			}
+ 			currentSN.CertName = line
+-		} else if strings.HasPrefix(line, "issuer:") {
+-			currentSN.Issuer = strings.TrimPrefix(line, "issuer: ")
+-		} else if strings.HasPrefix(line, "issuer-subjecthash:") {
+-			currentSN.IssuerSubjectHash = strings.TrimPrefix(line, "issuer-subjecthash: ")
+-		} else if strings.HasPrefix(line, "issuer-keyhash:") {
+-			currentSN.IssuerKeyHash = strings.TrimPrefix(line, "issuer-keyhash: ")
+-			if strings.HasPrefix(currentSN.IssuerKeyHash, "issuer-keyhash:") {
++		case strings.HasPrefix(line, issuerPrefix):
++			currentSN.Issuer = strings.TrimPrefix(line, issuerPrefix)
++		case strings.HasPrefix(line, issuerSubjectHashPrefix):
++			currentSN.IssuerSubjectHash = strings.TrimPrefix(line, issuerSubjectHashPrefix)
++		case strings.HasPrefix(line, issuerKeyHashPrefix):
++			currentSN.IssuerKeyHash = strings.TrimPrefix(line, issuerKeyHashPrefix)
++			if strings.HasPrefix(currentSN.IssuerKeyHash, issuerKeyHashPrefix) {
+ 				currentSN.IssuerKeyHash = ""
+ 			}
+-		} else if strings.HasPrefix(line, "db-type:") {
+-			currentSN.DBType = strings.TrimPrefix(line, "db-type: ")
+-		} else if strings.HasPrefix(line, "db-exp-date:") {
+-			currentSN.DBExpDate = strings.TrimPrefix(line, "db-exp-date: ")
+-		} else if strings.HasPrefix(line, "db-rev-date:") {
+-			currentSN.DBRevDate = strings.TrimPrefix(line, "db-rev-date: ")
+-		} else if strings.HasPrefix(line, "db-serialno:") {
+-			currentSN.DBSerialNo = strings.TrimPrefix(line, "db-serialno: ")
+-		} else if strings.HasPrefix(line, "db-file:") {
+-			currentSN.DBFile = strings.TrimPrefix(line, "db-file: ")
+-		} else if strings.HasPrefix(line, "db-name:") {
+-			currentSN.DBName = strings.TrimPrefix(line, "db-name: ")
+-		} else if strings.HasPrefix(line, "db-status:") {
+-			currentSN.DBStatus = strings.TrimPrefix(line, "db-status: ")
++		case strings.HasPrefix(line, dbTypePrefix):
++			currentSN.DBType = strings.TrimPrefix(line, dbTypePrefix)
++		case strings.HasPrefix(line, dbExpDatePrefix):
++			currentSN.DBExpDate = strings.TrimPrefix(line, dbExpDatePrefix)
++		case strings.HasPrefix(line, dbRevDatePrefix):
++			currentSN.DBRevDate = strings.TrimPrefix(line, dbRevDatePrefix)
++		case strings.HasPrefix(line, dbSerialNoPrefix):
++			currentSN.DBSerialNo = strings.TrimPrefix(line, dbSerialNoPrefix)
++		case strings.HasPrefix(line, dbFilePrefix):
++			currentSN.DBFile = strings.TrimPrefix(line, dbFilePrefix)
++		case strings.HasPrefix(line, dbNamePrefix):
++			currentSN.DBName = strings.TrimPrefix(line, dbNamePrefix)
++		case strings.HasPrefix(line, dbStatusPrefix):
++			currentSN.DBStatus = strings.TrimPrefix(line, dbStatusPrefix)
+ 		}
+ 	}
+ 
+-	if currentSN.Issuer != "" {
++	if currentSN.CertName != "" {
+ 		certificates = append(certificates, currentSN)
+ 	}
+ 
+-	return certificates
++	if len(certificates) == 0 {
++		return nil, errors.New("no valid certificates found")
++	}
++
++	return certificates, nil
+ }
+diff --git a/x-pack/metricbeat/module/panos/system/fans.go b/x-pack/metricbeat/module/panos/system/fans.go
+index 3e04299b2f..b725d83966 100644
+--- a/x-pack/metricbeat/module/panos/system/fans.go
++++ b/x-pack/metricbeat/module/panos/system/fans.go
+@@ -6,6 +6,7 @@ package system
+ 
+ import (
+ 	"encoding/xml"
++	"fmt"
+ 	"time"
+ 
+ 	"github.com/elastic/beats/v7/metricbeat/mb"
+@@ -18,46 +19,46 @@ func getFanEvents(m *MetricSet) ([]mb.Event, error) {
+ 
+ 	output, err := m.client.Op(query, vsys, nil, nil)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("error querying fan data: %w", err)
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("error unmarshaling fan data: %w", err)
+ 	}
+ 
+-	events := formatFanEvents(m, &response)
+-
+-	return events, nil
++	return formatFanEvents(m, &response), nil
+ }
+ 
+ func formatFanEvents(m *MetricSet, response *FanResponse) []mb.Event {
+-	log := m.Logger()
+-	events := make([]mb.Event, 0, len(response.Result.Fan.Slots))
+-	currentTime := time.Now()
+-	var event mb.Event
++	if response == nil || len(response.Result.Fan.Slots) == 0 {
++		return nil
++	}
++
++	events := make([]mb.Event, 0)
++	timestamp := time.Now()
++
+ 	for _, slot := range response.Result.Fan.Slots {
+ 		for _, entry := range slot.Entries {
+-			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
+-			event = mb.Event{MetricSetFields: mapstr.M{
+-				"fan.slot_number": entry.Slot,
+-				"fan.description": entry.Description,
+-				"fan.alarm":       entry.Alarm,
+-				"fan.rpm":         entry.RPMs,
+-				"fan.min_rpm":     entry.Min,
+-			},
++			m.Logger().Debugf("Processing slot %d entry %+v", entry.Slot, entry)
++			event := mb.Event{
++				Timestamp: timestamp,
++				MetricSetFields: mapstr.M{
++					"fan.slot_number": entry.Slot,
++					"fan.description": entry.Description,
++					"fan.alarm":       entry.Alarm,
++					"fan.rpm":         entry.RPMs,
++					"fan.min_rpm":     entry.Min,
++				},
+ 				RootFields: mapstr.M{
+ 					"observer.ip":     m.config.HostIp,
+ 					"host.ip":         m.config.HostIp,
+ 					"observer.vendor": "Palo Alto",
+ 					"observer.type":   "firewall",
+-					"@Timestamp":      currentTime,
+-				}}
++				},
++			}
++			events = append(events, event)
+ 		}
+-
+-		events = append(events, event)
+ 	}
+ 
+ 	return events
+diff --git a/x-pack/metricbeat/module/panos/system/filesystem.go b/x-pack/metricbeat/module/panos/system/filesystem.go
+index 4adc63c3dc..e75eac63ef 100644
+--- a/x-pack/metricbeat/module/panos/system/filesystem.go
++++ b/x-pack/metricbeat/module/panos/system/filesystem.go
+@@ -6,6 +6,7 @@ package system
+ 
+ import (
+ 	"encoding/xml"
++	"fmt"
+ 	"strings"
+ 	"time"
+ 
+@@ -20,39 +21,38 @@ func getFilesystemEvents(m *MetricSet) ([]mb.Event, error) {
+ 
+ 	output, err := m.client.Op(query, vsys, nil, nil)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("error querying filesystem info: %w", err)
++	}
++
++	if len(output) == 0 {
++		return nil, fmt.Errorf("received empty output from filesystem query")
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("error unmarshaling filesystem response: %w", err)
+ 	}
+ 
+ 	filesystems := getFilesystems(response.Result.Data)
+-	events := formatFilesytemEvents(m, filesystems)
++	events := formatFilesystemEvents(m, filesystems)
+ 
+ 	return events, nil
+ }
+ 
+-/*
+-Result from the XML API call is basically linux df -h output:
+-Filesystem      Size  Used Avail Use% Mounted on
+-/dev/root       9.5G  4.0G  5.1G  44% /
+-none            2.5G   64K  2.5G   1% /dev
+-/dev/sda5        19G  9.1G  9.0G  51% /opt/pancfg
+-/dev/sda6       7.6G  3.1G  4.2G  43% /opt/panrepo
+-tmpfs           2.5G  399M  2.1G  16% /dev/shm
+-cgroup_root     2.5G     0  2.5G   0% /cgroup
+-/dev/sda8       173G   63G  102G  39% /opt/panlogs
+-tmpfs            12M   44K   12M   1% /opt/pancfg/mgmt/ssl/private
+-*/
+ func getFilesystems(input string) []Filesystem {
+ 	lines := strings.Split(input, "\n")
+ 	filesystems := make([]Filesystem, 0)
+ 
+-	// Skip the first line which is the header
++	// Skip the first line which is the header:
++	//
++	// Example:
++	// Result from the XML API call is basically a command in Linux distribution i.e., "df -h"'s output:
++	//
++	//	Filesystem      Size  Used Avail Use% Mounted on
++	//	/dev/root       9.5G  4.0G  5.1G  44% /
++	//	none            2.5G   64K  2.5G   1% /dev
++	//	/dev/sda5        19G  9.1G  9.0G  51% /opt/pancfg
++	//
+ 	for _, line := range lines[1:] {
+ 		fields := strings.Fields(line)
+ 		if len(fields) == 6 {
+@@ -70,31 +70,35 @@ func getFilesystems(input string) []Filesystem {
+ 	return filesystems
+ }
+ 
+-func formatFilesytemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
+-	events := make([]mb.Event, 0, len(filesystems))
++func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
++	if len(filesystems) == 0 {
++		return nil
++	}
+ 
+-	currentTime := time.Now()
++	events := make([]mb.Event, 0, len(filesystems))
++	timestamp := time.Now()
+ 
+ 	for _, filesystem := range filesystems {
+-		event := mb.Event{MetricSetFields: mapstr.M{
+-			"filesystem.name":        filesystem.Name,
+-			"filesystem.size":        filesystem.Size,
+-			"filesystem.used":        filesystem.Used,
+-			"filesystem.available":   filesystem.Avail,
+-			"filesystem.use_percent": filesystem.UsePerc,
+-			"filesystem.mounted":     filesystem.Mounted,
+-		},
++		event := mb.Event{
++			Timestamp: timestamp,
++			MetricSetFields: mapstr.M{
++				"filesystem.name":        filesystem.Name,
++				"filesystem.size":        filesystem.Size,
++				"filesystem.used":        filesystem.Used,
++				"filesystem.available":   filesystem.Avail,
++				"filesystem.use_percent": filesystem.UsePerc,
++				"filesystem.mounted":     filesystem.Mounted,
++			},
+ 			RootFields: mapstr.M{
+ 				"observer.ip":     m.config.HostIp,
+ 				"host.ip":         m.config.HostIp,
+ 				"observer.vendor": "Palo Alto",
+ 				"observer.type":   "firewall",
+-				"@Timestamp":      currentTime,
+-			}}
++			},
++		}
+ 
+ 		events = append(events, event)
+ 	}
+ 
+ 	return events
+-
+ }
+diff --git a/x-pack/metricbeat/module/panos/system/license.go b/x-pack/metricbeat/module/panos/system/license.go
+index d12f03b8c1..88ae64050d 100644
+--- a/x-pack/metricbeat/module/panos/system/license.go
++++ b/x-pack/metricbeat/module/panos/system/license.go
+@@ -6,6 +6,7 @@ package system
+ 
+ import (
+ 	"encoding/xml"
++	"fmt"
+ 	"time"
+ 
+ 	"github.com/elastic/beats/v7/metricbeat/mb"
+@@ -18,48 +19,52 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
+ 
+ 	output, err := m.client.Op(query, vsys, nil, nil)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to execute query: %w", err)
++	}
++
++	if len(output) == 0 {
++		return nil, fmt.Errorf("empty response from PanOS")
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to unmarshal XML response: %w", err)
+ 	}
+ 
+-	events := formatLicenseEvents(m, response.Result.Licenses)
+-
+-	return events, nil
++	if len(response.Result.Licenses) == 0 {
++		m.logger.Warn("No licenses found in the response")
++		return nil, nil
++	}
+ 
++	return formatLicenseEvents(m, response.Result.Licenses), nil
+ }
+ 
+ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
+ 	events := make([]mb.Event, 0, len(licenses))
+-
+-	currentTime := time.Now()
++	timestamp := time.Now()
+ 
+ 	for _, license := range licenses {
+-		event := mb.Event{MetricSetFields: mapstr.M{
+-			"license.feature":    license.Feature,
+-			"license.escription": license.Description,
+-			"license.serial":     license.Serial,
+-			"license.issued":     license.Issued,
+-			"license.expires":    license.Expires,
+-			"license.expired":    license.Expired,
+-			"license.auth_code":  license.AuthCode,
+-		},
++		event := mb.Event{
++			Timestamp: timestamp,
++			MetricSetFields: mapstr.M{
++				"license.feature":     license.Feature,
++				"license.description": license.Description, // Fixed typo
++				"license.serial":      license.Serial,
++				"license.issued":      license.Issued,
++				"license.expires":     license.Expires,
++				"license.expired":     license.Expired,
++				"license.auth_code":   license.AuthCode,
++			},
+ 			RootFields: mapstr.M{
+ 				"observer.ip":     m.config.HostIp,
+ 				"host.ip":         m.config.HostIp,
+ 				"observer.vendor": "Palo Alto",
+ 				"observer.type":   "firewall",
+-				"@Timestamp":      currentTime,
+-			}}
++			},
++		}
+ 
+ 		events = append(events, event)
+ 	}
+ 
+ 	return events
+-
+ }
+diff --git a/x-pack/metricbeat/module/panos/system/power.go b/x-pack/metricbeat/module/panos/system/power.go
+index d5a4aa8487..a7540ad618 100644
+--- a/x-pack/metricbeat/module/panos/system/power.go
++++ b/x-pack/metricbeat/module/panos/system/power.go
+@@ -6,27 +6,31 @@ package system
+ 
+ import (
+ 	"encoding/xml"
++	"fmt"
+ 	"time"
+ 
+ 	"github.com/elastic/beats/v7/metricbeat/mb"
+ 	"github.com/elastic/elastic-agent-libs/mapstr"
+ )
+ 
++// getPowerEvents retrieves power-related events from a PAN-OS device.
+ func getPowerEvents(m *MetricSet) ([]mb.Event, error) {
+-
+ 	query := "<show><system><environmentals><power></power></environmentals></system></show>"
+ 	var response PowerResponse
+ 
+ 	output, err := m.client.Op(query, vsys, nil, nil)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to execute operation: %w", err)
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to unmarshal XML response: %w", err)
++	}
++
++	if len(response.Result.Power.Slots) == 0 {
++		m.logger.Warn("No power events found in the response")
++		return nil, nil
+ 	}
+ 
+ 	events := formatPowerEvents(m, &response)
+@@ -35,32 +39,31 @@ func getPowerEvents(m *MetricSet) ([]mb.Event, error) {
+ }
+ 
+ func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
+-	log := m.Logger()
+-	events := make([]mb.Event, 0, len(response.Result.Power.Slots))
+-	currentTime := time.Now()
+-	var event mb.Event
++	events := make([]mb.Event, 0)
++	timestamp := time.Now()
++
+ 	for _, slot := range response.Result.Power.Slots {
+ 		for _, entry := range slot.Entries {
+-			log.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
+-			event = mb.Event{MetricSetFields: mapstr.M{
+-
+-				"power.slot_number":   entry.Slot,
+-				"power.description":   entry.Description,
+-				"power.alarm":         entry.Alarm,
+-				"power.volts":         entry.Volts,
+-				"power.minimum_volts": entry.MinimumVolts,
+-				"power.maximum_volts": entry.MaximumVolts,
+-			},
++			m.Logger().Debugf("Processing slot %d entry %+v", entry.Slot, entry)
++			event := mb.Event{
++				Timestamp: timestamp,
++				MetricSetFields: mapstr.M{
++					"power.slot_number":   entry.Slot,
++					"power.description":   entry.Description,
++					"power.alarm":         entry.Alarm,
++					"power.volts":         entry.Volts,
++					"power.minimum_volts": entry.MinimumVolts,
++					"power.maximum_volts": entry.MaximumVolts,
++				},
+ 				RootFields: mapstr.M{
+ 					"observer.ip":     m.config.HostIp,
+ 					"host.ip":         m.config.HostIp,
+ 					"observer.vendor": "Palo Alto",
+ 					"observer.type":   "firewall",
+-					"@Timestamp":      currentTime,
+-				}}
++				},
++			}
++			events = append(events, event)
+ 		}
+-
+-		events = append(events, event)
+ 	}
+ 
+ 	return events
+diff --git a/x-pack/metricbeat/module/panos/system/resources.go b/x-pack/metricbeat/module/panos/system/resources.go
+index 1ad18bb92b..6f9a2b6716 100644
+--- a/x-pack/metricbeat/module/panos/system/resources.go
++++ b/x-pack/metricbeat/module/panos/system/resources.go
+@@ -16,19 +16,17 @@ import (
+ )
+ 
+ func getResourceEvents(m *MetricSet) ([]mb.Event, error) {
+-	var response ResourceResponse
+ 	query := "<show><system><resources></resources></system></show>"
+ 
+-	output, err := m.client.Op(query, vsys, nil, nil)
++	var response ResourceResponse
++	output, err := m.client.Op(query, vsys, nil, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to execute operation: %w", err)
+ 	}
+ 
+ 	err = xml.Unmarshal(output, &response)
+ 	if err != nil {
+-		m.logger.Error("Error: %s", err)
+-		return nil, err
++		return nil, fmt.Errorf("failed to unmarshal XML response: %w", err)
+ 	}
+ 
+ 	events := formatResourceEvents(m, response.Result)
+@@ -62,8 +60,8 @@ MiB Swap:   5961.0 total,   4403.5 free,   1557.6 used.   1530.0 avail Mem
+ 	2       20   0       0      0      0 S   0.0   0.0   0:00.83 kthreadd
+ */
+ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
+-	currentTime := time.Now()
+-	events := make([]mb.Event, 0, 1)
++	timestamp := time.Now()
++	events := make([]mb.Event, 0)
+ 
+ 	// We only need the top 5 lines
+ 	lines := strings.Split(input, "\n")
+@@ -75,42 +73,57 @@ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
+ 	memoryInfo := parseMemoryInfo(lines[3])
+ 	swapInfo := parseSwapInfo(lines[4])
+ 
+-	event := mb.Event{MetricSetFields: mapstr.M{
+-		"uptime.days":         systemInfo.Uptime.Days,
+-		"uptime.hours":        systemInfo.Uptime.Hours,
+-		"user_count":          systemInfo.UserCount,
+-		"load_average.1m":     systemInfo.LoadAverage.one_minute,
+-		"load_average.5m":     systemInfo.LoadAverage.five_minute,
+-		"load_average.15m":    systemInfo.LoadAverage.fifteen_minute,
+-		"tasks.total":         taskInfo.Total,
+-		"tasks.running":       taskInfo.Running,
+-		"tasks.sleeping":      taskInfo.Sleeping,
+-		"tasks.stopped":       taskInfo.Stopped,
+-		"tasks.zombie":        taskInfo.Zombie,
+-		"cpu.user":            cpuInfo.User,
+-		"cpu.system":          cpuInfo.System,
+-		"cpu.nice":            cpuInfo.Nice,
+-		"cpu.idle":            cpuInfo.Idle,
+-		"cpu.wait":            cpuInfo.Wait,
+-		"cpu.hi":              cpuInfo.Hi,
+-		"cpu.system_int":      cpuInfo.SystemInt,
+-		"cpu.steal":           cpuInfo.Steal,
+-		"memory.total":        memoryInfo.Total,
+-		"memory.free":         memoryInfo.Free,
+-		"memory.used":         memoryInfo.Used,
+-		"memory.buffer_cache": memoryInfo.BufferCache,
+-		"swap.total":          swapInfo.Total,
+-		"swap.free":           swapInfo.Free,
+-		"swap.used":           swapInfo.Used,
+-		"swap.available":      swapInfo.Available,
+-	},
++	event := mb.Event{
++		Timestamp: timestamp,
++		MetricSetFields: mapstr.M{
++			"uptime": mapstr.M{
++				"days":    systemInfo.Uptime.Days,
++				"hours":   systemInfo.Uptime.Hours,
++				"minutes": systemInfo.Uptime.Minutes,
++			},
++			"user_count": systemInfo.UserCount,
++			"load_average": mapstr.M{
++				"1m":  systemInfo.LoadAverage.OneMinute,
++				"5m":  systemInfo.LoadAverage.FiveMinute,
++				"15m": systemInfo.LoadAverage.FifteenMinute,
++			},
++			"tasks": mapstr.M{
++				"total":    taskInfo.Total,
++				"running":  taskInfo.Running,
++				"sleeping": taskInfo.Sleeping,
++				"stopped":  taskInfo.Stopped,
++				"zombie":   taskInfo.Zombie,
++			},
++			"cpu": mapstr.M{
++				"user":       cpuInfo.User,
++				"system":     cpuInfo.System,
++				"nice":       cpuInfo.Nice,
++				"idle":       cpuInfo.Idle,
++				"wait":       cpuInfo.Wait,
++				"hi":         cpuInfo.Hi,
++				"system_int": cpuInfo.SystemInt,
++				"steal":      cpuInfo.Steal,
++			},
++			"memory": mapstr.M{
++				"total":        memoryInfo.Total,
++				"free":         memoryInfo.Free,
++				"used":         memoryInfo.Used,
++				"buffer_cache": memoryInfo.BufferCache,
++			},
++			"swap": mapstr.M{
++				"total":     swapInfo.Total,
++				"free":      swapInfo.Free,
++				"used":      swapInfo.Used,
++				"available": swapInfo.Available,
++			},
++		},
+ 		RootFields: mapstr.M{
+ 			"observer.ip":     m.config.HostIp,
+ 			"host.ip":         m.config.HostIp,
+ 			"observer.vendor": "Palo Alto",
+ 			"observer.type":   "firewall",
+-			"@Timestamp":      currentTime,
+-		}}
++		},
++	}
+ 
+ 	events = append(events, event)
+ 	return events
+diff --git a/x-pack/metricbeat/module/panos/system/system_types.go b/x-pack/metricbeat/module/panos/system/system_types.go
+index d130b9a2e7..4f821477ec 100644
+--- a/x-pack/metricbeat/module/panos/system/system_types.go
++++ b/x-pack/metricbeat/module/panos/system/system_types.go
+@@ -15,9 +15,9 @@ type ResourceResponse struct {
+ }
+ 
+ type SystemLoad struct {
+-	one_minute     float64
+-	five_minute    float64
+-	fifteen_minute float64
++	OneMinute     float64
++	FiveMinute    float64
++	FifteenMinute float64
+ }
+ 
+ type Uptime struct {

@@ -1,0 +1,290 @@
+- name: system
+  type: group
+  release: beta
+  description: >
+    system
+  fields:
+    - name: uptime.days
+      type: integer
+      description: >
+        Uptime in days
+    - name: uptime.hours
+      type: integer
+      description: >
+        Hours component of uptime
+    - name: uptime.minutes
+      type: integer
+      description: >
+        Minutes component of uptime       
+    - name: user_count
+      type: long
+      description: >
+        Number of users
+    - name: load_average.1m
+      type: float
+      description: >
+        Load average in 1 minute
+    - name: load_average.5m
+      type: float
+      description: >
+        Load average in 5 minutes
+    - name: load_average.15m
+      type: float
+      description: >
+        Load average in 15 minutes
+    - name: tasks.total
+      type: long
+      description: >
+        Total number of tasks
+    - name: tasks.running
+      type: long
+      description: >
+        Number of running tasks
+    - name: tasks.sleeping
+      type: long
+      description: >
+        Number of sleeping tasks
+    - name: tasks.stopped
+      type: long
+      description: >
+        Number of stopped tasks
+    - name: tasks.zombie
+      type: long
+      description: >
+        Number of zombie tasks
+    - name: cpu.user
+      type: float
+      description: >
+        CPU usage by user processes
+    - name: cpu.system
+      type: float
+      description: >
+        CPU usage by system processes
+    - name: cpu.nice
+      type: float
+      description: >
+        CPU usage by processes with a positive nice value
+    - name: cpu.idle
+      type: float
+      description: >
+        CPU idle time
+    - name: cpu.wait
+      type: float
+      description: >
+        CPU wait time
+    - name: cpu.hi
+      type: float
+      description: >
+        CPU hardware interrupts
+    - name: cpu.system_int
+      type: float
+      description: >
+        CPU software interrupts
+    - name: cpu.steal
+      type: float
+      description: >
+        CPU steal time
+    - name: memory.total
+      type: float
+      description: >
+        Total memory
+    - name: memory.free
+      type: float
+      description: >
+        Free memory
+    - name: memory.used
+      type: float
+      description: >
+        Used memory
+    - name: memory.buffer_cache
+      type: float
+      description: >
+        Memory used for buffers and cache
+    - name: swap.total
+      type: float
+      description: >
+        Total swap space
+    - name: swap.free
+      type: float
+      description: >
+        Free swap space
+    - name: swap.used
+      type: float
+      description: >
+        Used swap space
+    - name: swap.available
+      type: float
+      description: >
+        Available swap space
+    - name: license.feature
+      type: keyword
+      description: >
+        Feature licensed
+    - name: license.description
+      type: text
+      description: >
+        Description field
+    - name: license.serial
+      type: keyword
+      description: >
+        Serial number of license
+    - name: license.issued
+      type: date
+      description: >
+        Issued date field
+    - name: license.expires
+      type: date
+      description: >
+        Expires date field
+    - name: license.expired
+      type: boolean
+      description: >
+        Expired field
+    - name: license.auth_code
+      type: keyword
+      description: >
+        Auth code field
+    - name: filesystem.name
+      type: keyword
+      description: >
+        Filesystem name
+    - name: filesystem.size
+      type: keyword
+      description: >
+        Size, including units, e.g., 9.5G.        
+    - name: filesystem.used
+      type: keyword
+      description: >
+        Amount used, including units, e.g., 4.0G   
+    - name: filesystem.available
+      type: keyword
+      description: >
+        Disk space available, including units, e.g., 5.5G
+    - name: filesystem.use_percent
+      type: keyword
+      description: >
+        Percent of filesystem used
+    - name: filesystem.mounted
+      type: keyword
+      description: >
+        Filesystem mount point
+    - name: fan.slot_number
+      type: integer
+      description: >
+        The number of the hardware slot
+    - name: fan.description
+      type: keyword
+      description: >
+        The description of the fan
+    - name: fan.alarm
+      type: boolean
+      description: >
+        Is there an alarm status of the fan
+    - name: fan.rpm
+      type: integer
+      description: >
+        The speed of the fan in RPM
+    - name: fan.min_rpm
+      type: integer
+      description: >
+        The minimum speed of the fan in RPM
+    - name: thermal.slot_number
+      type: integer
+      description: >
+        Slot number field
+    - name: thermal.description
+      type: text
+      description: >
+        Description field
+    - name: thermal.alarm
+      type: boolean
+      description: >
+        Alarm field
+    - name: thermal.degrees_celsius
+      type: float
+      description: >
+        Degrees Celsius field
+    - name: thermal.minimum_temp
+      type: float
+      description: >
+        Minimum temperature field
+    - name: thermal.maximum_temp
+      type: float
+      description: >
+        Maximum temperature field
+    - name: power.slot_number
+      type: keyword
+      description: >
+        Slot number field
+    - name: power.description
+      type: text
+      description: >
+        Description field
+    - name: power.alarm
+      type: boolean
+      description: >
+        Indicates if alarm is active
+    - name: power.volts
+      type: float
+      description: >
+        Current Volts 
+    - name: power.minimum_volts
+      type: float
+      description: >
+        Minimum volts recorded
+    - name: power.maximum_volts
+      type: float
+      description: >
+        Maximum volts recorded      
+    - name: certificate.issuer
+      type: keyword
+      description: >
+        issuer field
+
+    - name: certificate.issuer_subject_hash
+      type: keyword
+      description: >
+        issuer_subject_hash field
+
+    - name: certificate.issuer_key_hash
+      type: keyword
+      description: >
+        issuer_key_hash field
+
+    - name: certificate.db_type
+      type: keyword
+      description: >
+        db_type field
+
+    - name: certificate.db_exp_date
+      type: keyword
+      description: >
+        expiration date, format: 310329235959Z(Mar 29 23:59:59 2031 GMT)
+
+    - name: certificate.db_rev_date
+      type: keyword
+      description: >
+        db_rev_date field
+
+    - name: certificate.db_serial_no
+      type: keyword
+      description: >
+        db_serial_no field
+
+    - name: certificate.db_file
+      type: keyword
+      description: >
+        db_file field
+
+    - name: certificate.db_name
+      type: keyword
+      description: >
+        db_name field
+
+    - name: certificate.db_status
+      type: keyword
+      description: >
+        db_status field
+
+
+    

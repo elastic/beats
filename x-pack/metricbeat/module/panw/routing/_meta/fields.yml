@@ -1,0 +1,150 @@
+- name: routing
+  type: group
+  release: beta
+  description: >
+    routing
+  fields:
+    - name: bgp.peer_name
+      type: keyword
+      description: >
+        BGP peer name
+    - name: bgp.virtual_router
+      type: keyword
+      description: >
+        BGP virtual router
+    - name: bgp.peer_group
+      type: keyword
+      description: >
+        BGP peer group
+    - name: bgp.peer_router_id
+      type: keyword
+      description: >
+        BGP peer router ID
+    - name: bgp.remote_as_asn
+      type: keyword
+      description: >
+        BGP remote AS ASN
+    - name: bgp.status
+      type: keyword
+      description: >
+        BGP status
+    - name: bgp.status_duration
+      type: long
+      description: >
+        BGP status duration
+    - name: bgp.password_set
+      type: boolean
+      description: >
+        BGP password set
+    - name: bgp.passive
+      type: boolean
+      description: >
+        BGP passive
+    - name: bgp.multi_hop_ttl
+      type: long
+      description: >
+        BGP multi-hop TTL
+    - name: bgp.peer_address
+      type: ip
+      description: >
+        BGP peer address
+    - name: bgp.local_address
+      type: ip
+      description: >
+        BGP local address
+    - name: bgp.reflector_client
+      type: boolean
+      description: >
+        BGP reflector client
+    - name: bgp.same_confederation
+      type: boolean
+      description: >
+        BGP same confederation
+    - name: bgp.aggregate_confed_as
+      type: boolean
+      description: >
+        BGP aggregate confederation AS
+    - name: bgp.peering_type
+      type: keyword
+      description: >
+        BGP peering type
+    - name: bgp.connect_retry_interval
+      type: long
+      description: >
+        BGP connect retry interval
+    - name: bgp.open_delay
+      type: long
+      description: >
+        BGP open delay
+    - name: bgp.idle_hold
+      type: long
+      description: >
+        BGP idle hold
+    - name: bgp.prefix_limit
+      type: long
+      description: >
+        BGP prefix limit
+    - name: bgp.holdtime
+      type: long
+      description: >
+        BGP holdtime
+    - name: bgp.holdtime_config
+      type: long
+      description: >
+        BGP holdtime config
+    - name: bgp.keepalive
+      type: long
+      description: >
+        BGP keepalive
+    - name: bgp.keepalive_config
+      type: long
+      description: >
+        BGP keepalive config
+    - name: bgp.msg_update_in
+      type: long
+      description: >
+        BGP message updates in
+    - name: bgp.msg_update_out
+      type: long
+      description: >
+        BGP message updates out
+    - name: bgp.msg_total_in
+      type: long
+      description: >
+        BGP total messages in
+    - name: bgp.msg_total_out
+      type: long
+      description: >
+        BGP total messages out
+    - name: bgp.last_update_age
+      type: long
+      description: >
+        BGP last update age
+    - name: bgp.last_error
+      type: keyword
+      description: >
+        BGP last error
+    - name: bgp.status_flap_counts
+      type: long
+      description: >
+        BGP status flap counts
+    - name: bgp.established_counts
+      type: long
+      description: >
+        BGP established counts
+    - name: bgp.orf_entry_received
+      type: long
+      description: >
+        BGP ORF entry received
+    - name: bgp.nexthop_self
+      type: boolean
+      description: >
+        BGP next-hop self
+    - name: bgp.nexthop_thirdparty
+      type: boolean
+      description: >
+        BGP next-hop third-party
+    - name: bgp.nexthop_peer
+      type: boolean
+      description: >
+        BGP next-hop peer

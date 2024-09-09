@@ -1,0 +1,194 @@
+- name: vpn
+  type: group
+  release: beta
+  description: >
+    vpn
+  fields:
+    - name: globalprotect.session.domain
+      type: keyword
+      description: >
+        Domain of the GlobalProtect session
+    - name: globalprotect.session.is_local
+      type: boolean
+      description: >
+        Indicates if the session is local
+    - name: globalprotect.session.username
+      type: keyword
+      description: >
+       Username of the session
+    - name: globalprotect.session.primary_username
+      type: keyword
+      description: >
+        Primary username of the session
+    - name: globalprotect.session.region_for_config
+      type: keyword
+      description: >
+        Region for configuration
+    - name: globalprotect.session.source_region
+      type: keyword
+      description: >
+        Source region of the session
+    - name: globalprotect.session.computer
+      type: keyword
+      description: >
+        Computer name in the session
+    - name: globalprotect.session.client
+      type: keyword
+      description: >
+        Client information of the session
+    - name: globalprotect.session.vpn_type
+      type: keyword
+      description: >
+        Type of VPN used in the session
+    - name: globalprotect.session.host_id
+      type: keyword
+      description: >
+        Host ID of the session
+    - name: globalprotect.session.app_version
+      type: keyword
+      description: >
+        Application version used in the session
+    - name: globalprotect.session.virtual_ip
+      type: ip
+      description: >
+        Virtual IP address of the session
+    - name: globalprotect.session.virtual_ipv6
+      type: ip
+      description: >
+        Virtual IPv6 address of the session
+    - name: globalprotect.session.public_ip
+      type: ip
+      description: >
+        Public IP address of the session
+    - name: globalprotect.session.public_ipv6
+      type: ip
+      description: >
+        Public IPv6 address of the session
+    - name: globalprotect.session.tunnel_type
+      type: keyword
+      description: >
+        Type of tunnel used in the session
+    - name: globalprotect.session.public_connection_ipv6
+      type: ip
+      description: >
+        Public connection IPv6 address of the session
+    - name: globalprotect.session.client_ip
+      type: ip
+      description: >
+        Client IP address of the session
+    - name: globalprotect.session.login_time
+      type: date
+      description: >
+        Login time of the session
+    - name: globalprotect.session.login_time_utc
+      type: date
+      description: >
+        Login time in UTC of the session
+    - name: globalprotect.session.lifetime
+      type: long
+      description: >
+        Lifetime of the session
+    - name: globalprotect.session.request_login
+      type: keyword
+      description: >
+        Request login information of the session
+    - name: globalprotect.session.request_get_config
+      type: keyword
+      description: >
+        Request get configuration information of the session
+    - name: globalprotect.session.request_sslvpn_connect
+      type: keyword
+      description: >
+        Request SSL VPN connect information of the session
+    - name: globalprotect.gateway.name
+      type: keyword
+      description: >
+        Name of the GlobalProtect gateway
+    - name: globalprotect.gateway.current_users
+      type: long
+      description: >
+        Current number of users connected to the GlobalProtect gateway
+    - name: globalprotect.gateway.previous_users
+      type: long
+      description: >
+        Previous number of users connected to the GlobalProtect gateway
+    - name: globalprotect.total_current_users
+      type: long
+      description: >
+       Total current number of users connected to GlobalProtect
+    - name: globalprotect.total_previous_users
+      type: long
+      description: >
+        Total previous number of users connected to GlobalProtect
+    - name: ipsec_tunnel.id
+      type: keyword
+      description: >
+        ID of the IPsec tunnel
+    - name: ipsec_tunnel.name
+      type: keyword
+      description: >
+        Name of the IPsec tunnel
+    - name: ipsec_tunnel.gw
+      type: keyword
+      description: >
+        Gateway of the IPsec tunnel
+    - name: ipsec_tunnel.TSi_ip
+      type: ip
+      description: >
+        TSi IP address of the IPsec tunnel
+    - name: ipsec_tunnel.TSi_prefix
+      type: keyword
+      description: >
+        TSi prefix of the IPsec tunnel
+    - name: ipsec_tunnel.TSi_proto
+      type: keyword
+      description: >
+        TSi protocol of the IPsec tunnel
+    - name: ipsec_tunnel.TSi_port
+      type: long
+      description: >
+        TSi port of the IPsec tunnel
+    - name: ipsec_tunnel.TSr_ip
+      type: ip
+      description: >
+        TSr IP address of the IPsec tunnel
+    - name: ipsec_tunnel.TSr_prefix
+      type: keyword
+      description: >
+        TSr prefix of the IPsec tunnel
+    - name: ipsec_tunnel.TSr_proto
+      type: keyword
+      description: >
+        TSr protocol of the IPsec tunnel
+    - name: ipsec_tunnel.TSr_port
+      type: long
+      description: >
+        TSr port of the IPsec tunnel
+    - name: ipsec_tunnel.proto
+      type: keyword
+      description: >
+        Protocol of the IPsec tunnel
+    - name: ipsec_tunnel.mode
+      type: keyword
+      description: >
+        Mode of the IPsec tunnel
+    - name: ipsec_tunnel.dh
+      type: keyword
+      description: >
+        Diffie-Hellman group of the IPsec tunnel
+    - name: ipsec_tunnel.enc
+      type: keyword
+      description: >
+        Encryption algorithm of the IPsec tunnel
+    - name: ipsec_tunnel.hash
+      type: keyword
+      description: >
+        Hash algorithm of the IPsec tunnel
+    - name: ipsec_tunnel.life
+      type: long
+      description: >
+        Lifetime of the IPsec tunnel
+    - name: ipsec_tunnel.kb
+      type: long
+      description: >
+        Key bytes of the IPsec tunnel
