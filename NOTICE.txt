@@ -11,11 +11,11 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go
-Version: v0.115.0
+Version: v0.115.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.115.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.115.1/LICENSE:
 
 
                                  Apache License
@@ -435,11 +435,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.62
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/compute
-Version: v1.27.4
+Version: v1.28.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.27.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.28.0/LICENSE:
 
 
                                  Apache License
@@ -647,11 +647,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.27.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/monitoring
-Version: v1.20.4
+Version: v1.21.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.20.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.21.0/LICENSE:
 
 
                                  Apache License
@@ -859,11 +859,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/pubsub
-Version: v1.41.0
+Version: v1.42.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.41.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.42.0/LICENSE:
 
 
                                  Apache License
@@ -1071,11 +1071,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.41.0
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/redis
-Version: v1.16.4
+Version: v1.17.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/redis@v1.16.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/redis@v1.17.0/LICENSE:
 
 
                                  Apache License
@@ -9817,11 +9817,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cespare/xxhash/v2
-Version: v2.2.0
+Version: v2.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cespare/xxhash/v2@v2.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/cespare/xxhash/v2@v2.3.0/LICENSE.txt:
 
 Copyright (c) 2016 Caleb Spare
 
@@ -24487,13 +24487,13 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.25.0
+Version: v0.26.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.25.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.26.0/LICENSE:
 
-Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -24505,7 +24505,7 @@ notice, this list of conditions and the following disclaimer.
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google LLC nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -24561,13 +24561,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.27.0
+Version: v0.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.27.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.28.0/LICENSE:
 
-Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -24579,7 +24579,7 @@ notice, this list of conditions and the following disclaimer.
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google LLC nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -24672,13 +24672,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.22.0
+Version: v0.24.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.22.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.24.0/LICENSE:
 
-Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -24690,7 +24690,7 @@ notice, this list of conditions and the following disclaimer.
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google LLC nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -24709,13 +24709,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-Version: v0.16.0
+Version: v0.17.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.16.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.17.0/LICENSE:
 
-Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -24727,7 +24727,7 @@ notice, this list of conditions and the following disclaimer.
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google LLC nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -24820,11 +24820,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/api
-Version: v0.191.0
+Version: v0.193.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.191.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.193.0/LICENSE:
 
 Copyright (c) 2011 Google Inc. All rights reserved.
 
@@ -24857,11 +24857,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto/googleapis/api
-Version: v0.0.0-20240725223205-93522f1f2a9f
+Version: v0.0.0-20240814211410-ddb44dafa142
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20240725223205-93522f1f2a9f/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20240814211410-ddb44dafa142/LICENSE:
 
 
                                  Apache License
@@ -25069,11 +25069,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googlea
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/grpc
-Version: v1.64.1
+Version: v1.65.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.64.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.65.0/LICENSE:
 
 
                                  Apache License
@@ -27167,11 +27167,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/auth
-Version: v0.8.0
+Version: v0.9.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.9.0/LICENSE:
 
 
                                  Apache License
@@ -27803,11 +27803,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute/metada
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/datacatalog
-Version: v1.20.5
+Version: v1.21.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1.20.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1.21.0/LICENSE:
 
 
                                  Apache License
@@ -28015,11 +28015,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/iam
-Version: v1.1.12
+Version: v1.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.1.12/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.2.0/LICENSE:
 
 
                                  Apache License
@@ -28439,11 +28439,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/kms@v1.18.4/LI
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/longrunning
-Version: v0.5.11
+Version: v0.5.12
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.5.11/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.5.12/LICENSE:
 
 
                                  Apache License
@@ -52797,11 +52797,11 @@ Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.24.0/LICENSE:
 
 --------------------------------------------------------------------------------
 Dependency : go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
-Version: v0.49.0
+Version: v0.52.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.49.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.52.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -54793,13 +54793,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.22.0
+Version: v0.23.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.22.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.23.0/LICENSE:
 
-Copyright (c) 2009 The Go Authors. All rights reserved.
+Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -54811,7 +54811,7 @@ notice, this list of conditions and the following disclaimer.
 copyright notice, this list of conditions and the following disclaimer
 in the documentation and/or other materials provided with the
 distribution.
-   * Neither the name of Google Inc. nor the names of its
+   * Neither the name of Google LLC nor the names of its
 contributors may be used to endorse or promote products derived from
 this software without specific prior written permission.
 
@@ -54899,11 +54899,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto
-Version: v0.0.0-20240730163845-b1a4ccb954bf
+Version: v0.0.0-20240814211410-ddb44dafa142
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20240730163845-b1a4ccb954bf/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20240814211410-ddb44dafa142/LICENSE:
 
 
                                  Apache License
@@ -55111,11 +55111,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto/googleapis/rpc
-Version: v0.0.0-20240730163845-b1a4ccb954bf
+Version: v0.0.0-20240814211410-ddb44dafa142
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/rpc@v0.0.0-20240730163845-b1a4ccb954bf/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/rpc@v0.0.0-20240814211410-ddb44dafa142/LICENSE:
 
 
                                  Apache License
