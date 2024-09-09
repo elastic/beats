@@ -213,7 +213,14 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		//   - Error, journalctl is not running any more, restart it
 		if err != nil {
 			r.logger.Warnf("reader error: '%s', restarting...", err)
-			jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", append(r.args, "--after-cursor", r.cursor)...)
+			// Copy r.args and if needed, add the cursor flag
+			args := append([]string{}, r.args...)
+			if r.cursor != "" {
+				args = append(args, "--after-cursor", r.cursor)
+			}
+
+			// TODO (belimawr): Restart with exponential backoff
+			jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", args...)
 			if err != nil {
 				// If we cannot restart journalct, there is nothing we can do.
 				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
