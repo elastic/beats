@@ -33,7 +33,7 @@ type loggingConn struct {
 
 func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
 	return DialerFunc(func(ctx context.Context, network, addr string) (net.Conn, error) {
-		logger := logger.With("network", network, "address", addr)
+		logger := logger.With("network.transport", network, "server.address", addr)
 		c, err := d.DialContext(ctx, network, addr)
 		if err != nil {
 			logger.Errorf("Error dialing %v", err)
