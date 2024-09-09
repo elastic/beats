@@ -21,6 +21,12 @@
             },
             "free_space": {
                 "bytes": 8788836876288
+            },
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "LocalDS_0"
+                ]
             }
         }
     }
