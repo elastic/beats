@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
+func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData, alerts []string) mapstr.M {
 	const bytesMultiplier int64 = 1024 * 1024
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
@@ -33,6 +33,10 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 	}
 
 	mapPerfMetricToEvent(event, data.perfMetrics)
+
+	if len(alerts) > 0 {
+		event.Put("alert.names", alerts)
+	}
 
 	if hw := hs.Summary.Hardware; hw != nil {
 		totalCPU := int64(hw.CpuMhz) * int64(hw.NumCpuCores)
