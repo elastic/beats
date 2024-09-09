@@ -67178,7 +67178,7 @@ format: bytes
 *`vsphere.datastorecluster.datastore.names`*::
 +
 --
-List of all the datastore names.
+List of all the Datastore names associated with the Datastore Cluster.
 
 
 type: keyword

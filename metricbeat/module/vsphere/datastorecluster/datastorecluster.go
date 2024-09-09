@@ -124,10 +124,10 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 		}
 	}
 
-	outputDsNames := make([]string, 0, len(objects))
+	outputDsNames := make([]string, 0)
 	for _, ob := range objects {
-		name := strings.ReplaceAll(ob.Name, ".", "_")
 		if ob.Reference().Type == "Datastore" {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
 			outputDsNames = append(outputDsNames, name)
 		}
 	}
