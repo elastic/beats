@@ -30,12 +30,16 @@ func TestMode_Unpack(t *testing.T) {
 			"since":  SeekSince,
 		}
 
+<<<<<<< HEAD:filebeat/input/journald/pkg/journalread/mode_test.go
 		for str, want := range tests {
 			t.Run(str, func(t *testing.T) {
 				var m SeekMode
 				if err := m.Unpack(str); err != nil {
 					t.Fatal(err)
 				}
+=======
+	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreClusterTest, &metricData{assetNames: assetNames{outputDsNames: []string{"DCS_0"}}})
+>>>>>>> 83a880f47b ([vSphere][datastore_cluster] Add support for new metrics in datastore_cluster metricset (#40694)):metricbeat/module/vsphere/datastorecluster/data_test.go
 
 				if m != want {
 					t.Errorf("wrong mode, expected %v, got %v", want, m)
@@ -47,6 +51,7 @@ func TestMode_Unpack(t *testing.T) {
 	t.Run("failing", func(t *testing.T) {
 		cases := []string{"invalid", "", "unknown"}
 
+<<<<<<< HEAD:filebeat/input/journald/pkg/journalread/mode_test.go
 		for _, str := range cases {
 			t.Run(str, func(t *testing.T) {
 				var m SeekMode
@@ -56,4 +61,14 @@ func TestMode_Unpack(t *testing.T) {
 			})
 		}
 	})
+=======
+	freeSpace, _ := event.GetValue("free_space.bytes")
+	assert.Equal(t, int64(50), freeSpace)
+
+	datastoreNames, _ := event.GetValue("datastore.names")
+	assert.Equal(t, []string{"DCS_0"}, datastoreNames)
+
+	datastoreCount, _ := event.GetValue("datastore.count")
+	assert.Equal(t, 1, datastoreCount)
+>>>>>>> 83a880f47b ([vSphere][datastore_cluster] Add support for new metrics in datastore_cluster metricset (#40694)):metricbeat/module/vsphere/datastorecluster/data_test.go
 }

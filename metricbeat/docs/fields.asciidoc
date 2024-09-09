@@ -67034,6 +67034,70 @@ type: long
 --
 
 [float]
+<<<<<<< HEAD
+=======
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
+[float]
+>>>>>>> 83a880f47b ([vSphere][datastore_cluster] Add support for new metrics in datastore_cluster metricset (#40694))
 === host
 
 Host information from vSphere environment.
