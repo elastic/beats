@@ -33,10 +33,6 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-const (
-	LiveInterval float64 = 20
-)
-
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "host", New,
 		mb.WithHostParser(vsphere.HostParser),
@@ -96,11 +92,6 @@ var metricSet = map[string]struct{}{
 func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
-	period := m.Module().Config().Period
-	if !isValidPeriod(period.Seconds()) {
-		return fmt.Errorf("invalid period %v. Please provide one of the following values: 20, 300, 1800, 7200, 86400", period)
-	}
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
@@ -237,15 +228,13 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 
 	period := m.Module().Config().Period
 	refreshRate := int32(period.Seconds())
-	if period.Seconds() == LiveInterval {
-		if summary.CurrentSupported {
-			refreshRate = summary.RefreshRate
-			if int32(period.Seconds()) != refreshRate {
-				m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", period, refreshRate)
-			}
-		} else {
-			m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval (300, 1800, 7200, 86400). Risk of data duplication. Consider adjusting period.")
+	if summary.CurrentSupported {
+		refreshRate = summary.RefreshRate
+		if int32(period.Seconds()) != refreshRate {
+			m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", period, refreshRate)
 		}
+	} else {
+		m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval. Risk of data duplication. Consider adjusting period.")
 	}
 
 	spec := types.PerfQuerySpec{
@@ -280,12 +269,4 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 	}
 
 	return metricMap, nil
-}
-
-func isValidPeriod(period float64) bool {
-	switch period {
-	case LiveInterval, 300, 1800, 7200, 86400:
-		return true
-	}
-	return false
 }

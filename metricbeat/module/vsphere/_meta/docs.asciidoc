@@ -24,14 +24,14 @@ The Datastore and Host metricsets support performance data collection using the 
 
 [IMPORTANT]
 
-Only host and datastore metricsets have limitation of period restrictions.
+Only host and datastore metricsets have limitation of system configured period from vSphere instance.
 
 [float]
-==== Real-time data collection interval:
+==== Real-time data collection default interval:
 - 20s
 
 [float]
-==== Historical data collection interval:
+==== Historical data collection default intervals:
 - 300s
 - 1800s
 - 7200s
