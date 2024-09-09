@@ -130,7 +130,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug("Error destroying view from vsphere %w", err)
+			m.Logger().Debug("Error destroying view from vsphere %v", err)
 		}
 	}()
 
