@@ -214,12 +214,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 }
 
 func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metricIds []types.PerfMetricId) (metricMap map[string]interface{}, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to convert performance data to metric series: %v", r)
-		}
-	}()
-
 	metricMap = make(map[string]interface{})
 
 	period := m.Module().Config().Period
@@ -250,6 +244,11 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 	results, err := perfManager.ToMetricSeries(ctx, samples)
 	if err != nil {
 		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
+	}
+
+	if len(results) == 0 {
+		m.Logger().Debug("No results returned from metric series conversion")
+		return metricMap, nil
 	}
 
 	for _, result := range results[0].Value {
