@@ -43,13 +43,13 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		return true, false
 	}
 
-	if length > len(s.data) {
+	if int(length) > len(s.data) {
 		// Not yet reached the end of message
 		return true, false
 	}
 
 	// Tell decoder to only consider current message
-	d.truncate(length)
+	d.truncate(int(length))
 
 	// fill up the header common to all messages
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
@@ -72,8 +72,7 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	}
 
 	s.message.opCode = opCode
-	s.message.isResponse = false // default is that the message is a request. If not opReplyParse will set this to false
-	s.message.expectsResponse = false
+	s.message.isResponse = false // default is that the message is a request. If not opReplyParse will set this to true
 	debugf("opCode = %d (%v)", s.message.opCode, s.message.opCode)
 
 	// then split depending on operation type
@@ -93,11 +92,9 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		s.message.method = "insert"
 		return opInsertParse(d, s.message)
 	case opQuery:
-		s.message.expectsResponse = true
 		return opQueryParse(d, s.message)
 	case opGetMore:
 		s.message.method = "getMore"
-		s.message.expectsResponse = true
 		return opGetMoreParse(d, s.message)
 	case opDelete:
 		s.message.method = "delete"
@@ -107,6 +104,11 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 		return opKillCursorsParse(d, s.message)
 	case opMsg:
 		s.message.method = "msg"
+		// The assumption is that the message with responseTo == 0 is the request
+		// TODO: handle the cases where moreToCome flag is set (multiple responses chained by responseTo)
+		if s.message.responseTo > 0 {
+			s.message.isResponse = true
+		}
 		return opMsgParse(d, s.message)
 	}
 
@@ -141,7 +143,7 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	debugf("Prepare to read %d document from reply", m.event["numberReturned"])
 
 	documents := make([]interface{}, numberReturned)
-	for i := 0; i < numberReturned; i++ {
+	for i := int32(0); i < numberReturned; i++ {
 		var document bson.M
 		document, err = d.readDocument()
 		if err != nil {
@@ -233,19 +235,6 @@ func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	}
 
 	return true, true
-}
-
-func extractDocuments(query map[string]interface{}) []interface{} {
-	docsVi, present := query["documents"]
-	if !present {
-		return []interface{}{}
-	}
-
-	docs, ok := docsVi.([]interface{})
-	if !ok {
-		return []interface{}{}
-	}
-	return docs
 }
 
 // Try to guess whether this key:value pair found in
@@ -387,11 +376,13 @@ func opKillCursorsParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	// ignore flagbits
-	_, err := d.readInt32()
+	flagBits, err := d.readInt32()
 	if err != nil {
 		logp.Err("An error occurred while parsing OP_MSG message: %s", err)
 		return false, false
 	}
+
+	m.SetFlagBits(flagBits)
 
 	// read sections
 	kind, err := d.readByte()
@@ -423,7 +414,7 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 		}
 		m.event["message"] = cstring
 		var documents []interface{}
-		for d.i < start+size {
+		for d.i < start+int(size) {
 			document, err := d.readDocument()
 			if err != nil {
 				logp.Err("An error occurred while parsing OP_MSG message: %s", err)
@@ -432,7 +423,8 @@ func opMsgParse(d *decoder, m *mongodbMessage) (bool, bool) {
 			documents = append(documents, document)
 		}
 		m.documents = documents
-
+	case msgKindInternal:
+		// Ignore the internal purposes section
 	default:
 		logp.Err("Unknown message kind: %v", kind)
 		return false, false
@@ -482,25 +474,25 @@ func (d *decoder) readByte() (byte, error) {
 	return d.in[i], nil
 }
 
-func (d *decoder) readInt32() (int, error) {
+func (d *decoder) readInt32() (int32, error) {
 	b, err := d.readBytes(4)
 	if err != nil {
 		return 0, err
 	}
 
-	return int((uint32(b[0]) << 0) |
+	return int32((uint32(b[0]) << 0) |
 		(uint32(b[1]) << 8) |
 		(uint32(b[2]) << 16) |
 		(uint32(b[3]) << 24)), nil
 }
 
-func (d *decoder) readInt64() (int, error) {
+func (d *decoder) readInt64() (int64, error) {
 	b, err := d.readBytes(8)
 	if err != nil {
 		return 0, err
 	}
 
-	return int((uint64(b[0]) << 0) |
+	return int64((uint64(b[0]) << 0) |
 		(uint64(b[1]) << 8) |
 		(uint64(b[2]) << 16) |
 		(uint64(b[3]) << 24) |
@@ -516,7 +508,7 @@ func (d *decoder) readDocument() (bson.M, error) {
 	if err != nil {
 		return nil, err
 	}
-	d.i = start + documentLength
+	d.i = start + int(documentLength)
 	if len(d.in) < d.i {
 		return nil, errors.New("document out of bounds")
 	}

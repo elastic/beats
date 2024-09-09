@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2016-05-23T08:05:34.853Z",
+    "service": {
+        "address": "https://localhost:8980/sdk",
+        "type": "vsphere"
+    },
+    "event": {
+        "dataset": "vsphere.datastorecluster",
+        "module": "vsphere",
+        "duration": 15443161
+    },
+    "metricset": {
+        "period": 20000,
+        "name": "datastorecluster"
+    },
+    "vsphere": {
+        "datastorecluster": {
+            "name": "datastore_cluster1",
+            "capacity": {
+                "bytes": 8795019280384
+            },
+            "free_space": {
+                "bytes": 8788836876288
+            }
+        }
+    }
+}
