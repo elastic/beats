@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -82,8 +82,12 @@ func (h *Harvester) Run() error {
 	default:
 	}
 	// Writes Slowlog get and slowlog reset both to the buffer so they are executed together
-	h.conn.Send("SLOWLOG", "GET")
-	h.conn.Send("SLOWLOG", "RESET")
+	if err := h.conn.Send("SLOWLOG", "GET"); err != nil {
+		return fmt.Errorf("error sending slowlog get: %w", err)
+	}
+	if err := h.conn.Send("SLOWLOG", "RESET"); err != nil {
+		return fmt.Errorf("error sending slowlog reset: %w", err)
+	}
 
 	// Flush the buffer to execute both commands and receive the reply from SLOWLOG GET
 	h.conn.Flush()
@@ -91,13 +95,13 @@ func (h *Harvester) Run() error {
 	// Receives first reply from redis which is the one from GET
 	logs, err := rd.Values(h.conn.Receive())
 	if err != nil {
-		return fmt.Errorf("error receiving slowlog data: %s", err)
+		return fmt.Errorf("error receiving slowlog data: %w", err)
 	}
 
 	// Read reply from RESET
 	_, err = h.conn.Receive()
 	if err != nil {
-		return fmt.Errorf("error receiving reset data: %s", err)
+		return fmt.Errorf("error receiving reset data: %w", err)
 	}
 
 	for _, item := range logs {
@@ -115,7 +119,11 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		if err != nil {
+			logp.Err("Error scanning slowlog entry: %s", err)
+			continue
+		}
 
 		// This splits up the args into cmd, key, args.
 		argsLen := len(args)
@@ -144,7 +152,7 @@ func (h *Harvester) Run() error {
 			slowlogEntry["args"] = log.args
 		}
 
-		h.forwarder.Send(beat.Event{
+		err = h.forwarder.Send(beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
 			Fields: mapstr.M{
 				"message": strings.Join(args, " "),
@@ -156,6 +164,10 @@ func (h *Harvester) Run() error {
 				},
 			},
 		})
+		if err != nil {
+			logp.Err("Error sending beat event: %s", err)
+			continue
+		}
 	}
 	return nil
 }
