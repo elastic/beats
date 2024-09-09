@@ -213,21 +213,9 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 	}()
 
 	metricMap = make(map[string]interface{})
-	summary, err := perfManager.ProviderSummary(ctx, dst.Reference())
-	if err != nil {
-		return metricMap, fmt.Errorf("failed to get summary: %w", err)
-	}
 
 	period := m.Module().Config().Period
 	refreshRate := int32(period.Seconds())
-	if summary.CurrentSupported {
-		refreshRate = summary.RefreshRate
-		if int32(m.Module().Config().Period.Seconds()) != refreshRate {
-			m.Logger().Warnf("User-provided period %v does not match system's refresh rate %v. Risk of data duplication. Consider adjusting period.", period, refreshRate)
-		}
-	} else {
-		m.Logger().Warnf("Live data collection not supported. Use one of the system's historical interval. Risk of data duplication. Consider adjusting period.")
-	}
 
 	spec := types.PerfQuerySpec{
 		Entity:     dst.Reference(),
@@ -239,6 +227,10 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 	// Query performance data
 	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
 	if err != nil {
+		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
+			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
+		}
+
 		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
 	}
 
