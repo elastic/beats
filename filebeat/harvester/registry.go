@@ -21,7 +21,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
