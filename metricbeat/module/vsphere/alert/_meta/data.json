@@ -1,0 +1,23 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "vsphere.alert",
+        "duration": 115000,
+        "module": "vsphere"
+    },
+    "metricset": {
+        "name": "alert",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:33365",
+        "type": "vsphere"
+    },
+    "vsphere": {
+      "alert": {
+        "status": "red",
+        "entity": "Host_name",
+        "name": "Host hardware system board status"
+      }
+    }
+}

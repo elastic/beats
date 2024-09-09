@@ -181,6 +181,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi"
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/alert"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/cluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastorecluster"

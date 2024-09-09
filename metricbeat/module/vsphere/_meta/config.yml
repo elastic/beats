@@ -1,5 +1,6 @@
 - module: vsphere
   # metricsets:
+  #  - alert
   #  - cluster
   #  - datastore
   #  - datastorecluster
