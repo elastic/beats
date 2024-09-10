@@ -132,7 +132,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				RootFields:   make(mapstr.M),
+				RootFields:   mapstr.M{},
 				ModuleFields: mapstr.M{},
 				Timestamp:    metric.Timestamp.Time(),
 			}
@@ -202,8 +202,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			// we subtract 1 in case the e.ModuleFields["labels"] also exists.
 			//
 			// See unit tests for the same.
-			_, ok := e.ModuleFields["labels"]
-			if ok {
+			if _, hasLabels := e.ModuleFields["labels"]; hasLabels {
 				e.RootFields["metrics_count"] = len(e.ModuleFields) - 1
 			} else {
 				e.RootFields["metrics_count"] = len(e.ModuleFields)

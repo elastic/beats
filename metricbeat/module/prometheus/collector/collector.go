@@ -218,15 +218,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				// labels is also nested under the "prometheus" key. So, we need to
 				// make sure we subtract 1 in case the e["labels"]
 				// also exists.
-				_, ok := e["labels"].(mapstr.M)
-				if ok {
+				if _, hasLabels := e["labels"].(mapstr.M); hasLabels {
 					event.RootFields.Put("metrics_count", len(e)-1)
 				} else {
 					event.RootFields.Put("metrics_count", len(e))
 				}
 			default:
-				v, ok := e["metrics"].(mapstr.M)
-				if ok {
+				if v, ok := e["metrics"].(mapstr.M); ok {
 					event.RootFields.Put("metrics_count", len(v))
 				}
 			}
