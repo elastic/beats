@@ -68,6 +68,7 @@ func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	input := &netflowInput{
 		cfg:              inputCfg,
+		customFields:     customFields,
 		internalNetworks: inputCfg.InternalNetworks,
 		logger:           im.log,
 		queueSize:        inputCfg.PacketQueueSize,
