@@ -13,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	restapi "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/smithy-go/middleware"
@@ -1255,6 +1257,14 @@ func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourc
 	}, nil
 }
 
+// MockResourceGroupsTaggingClient2 is used for unit tests.
+type MockResourceGroupsTaggingClient2 struct{}
+
+// GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
+func (m *MockResourceGroupsTaggingClient2) GetResources(context.Context, *resourcegroupstaggingapi.GetResourcesInput, ...func(*apigateway.Options)) (*restapi.GetResourcesOutput, error) {
+	return &restapi.GetResourcesOutput{}, nil
+}
+
 func TestCreateEventsWithIdentifier(t *testing.T) {
 	m := MetricSet{}
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
@@ -1262,6 +1272,9 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	m.logger = logp.NewLogger("test")
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
+	mockTaggingSvc2 := &MockResourceGroupsTaggingClient2{}
+	infoAPImap := make(map[string]string)
+
 	mockCloudwatchSvc := &MockCloudWatchClient{}
 	listMetricWithStatsTotal := []metricsWithStatistics{{
 		listMetric1,
@@ -1270,8 +1283,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
-
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockTaggingSvc2, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
 
@@ -1292,6 +1304,8 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 
 	mockTaggingSvc := &MockResourceGroupsTaggingClient{}
 	mockCloudwatchSvc := &MockCloudWatchClientWithoutDim{}
+	mockTaggingSvc2 := &MockResourceGroupsTaggingClient2{}
+	infoAPImap := make(map[string]string)
 	listMetricWithStatsTotal := []metricsWithStatistics{
 		{
 			cloudwatchMetric: aws.MetricWithID{
@@ -1316,7 +1330,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
 
-	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, mockTaggingSvc2, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
 
 	expectedID := " " + " " + regionName + accountID + namespace
@@ -1478,7 +1492,7 @@ func TestInsertTags(t *testing.T) {
 		t.Run(c.title, func(t *testing.T) {
 			subIdentifiers := strings.Split(c.identifier, dimensionSeparator)
 			for _, subIdentifier := range subIdentifiers {
-				insertTags(events, c.identifier, subIdentifier, subIdentifier, resourceTagMap)
+				insertTags(events, c.identifier, subIdentifier, resourceTagMap)
 			}
 			value, err := events[c.identifier].RootFields.GetValue(c.expectedTagKey)
 			assert.NoError(t, err)

@@ -36,6 +36,7 @@ type Config struct {
 	AWSConfig             awscommon.ConfigAWS `config:",inline"`
 	TagsFilter            []Tag               `config:"tags_filter"`
 	IncludeLinkedAccounts *bool               `config:"include_linked_accounts"`
+	LimitRestAPI          int64               `config:"limit_rest_api"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
