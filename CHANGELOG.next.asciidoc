@@ -163,6 +163,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {pull}1[1]
 
 *Heartbeat*
 
