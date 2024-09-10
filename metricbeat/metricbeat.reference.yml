@@ -522,8 +522,6 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -575,8 +573,6 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -617,8 +613,6 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
   # Set the namespace to watch for events
   #namespace: staging
   # Set the sync period of the watchers
@@ -639,8 +633,6 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -650,8 +642,6 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
 
 # Kubernetes controller manager
 # (URL and deployment method should be adapted to match the controller manager deployment / service / endpoint)
@@ -661,8 +651,6 @@ metricbeat.modules:
     - controllermanager
   hosts: ["http://localhost:10252"]
   period: 10s
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
 
 # Kubernetes scheduler
 # (URL and deployment method should be adapted to match scheduler deployment / service / endpoint)
@@ -672,8 +660,6 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true
 
 #--------------------------------- KVM Module ---------------------------------
 - module: kvm
