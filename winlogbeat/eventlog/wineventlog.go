@@ -317,7 +317,9 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var err error
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil {
+		l.metrics = newInputMetrics(l.channelName, l.id)
+	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
 	} else if state.RecordNumber > 0 && l.channelName != "" {

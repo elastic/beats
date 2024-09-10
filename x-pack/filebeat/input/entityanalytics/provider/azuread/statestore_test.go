@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
@@ -116,10 +116,10 @@ func TestStateStore_Close(t *testing.T) {
 	ss.devicesLink = "devices-link"
 	ss.groupsLink = "groups-link"
 
-	user1ID := uuid.MustParse("a77e8cbb-27a5-49d3-9d5e-801997621f87")
-	device1ID := uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f")
-	group1ID := uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80")
-	group2ID := uuid.MustParse("ec8b17ae-ce9d-4099-97ee-4a959638bc29")
+	user1ID := uuid.Must(uuid.FromString("a77e8cbb-27a5-49d3-9d5e-801997621f87"))
+	device1ID := uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f"))
+	group1ID := uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80"))
+	group2ID := uuid.Must(uuid.FromString("ec8b17ae-ce9d-4099-97ee-4a959638bc29"))
 
 	ss.users = map[uuid.UUID]*fetcher.User{
 		user1ID: {

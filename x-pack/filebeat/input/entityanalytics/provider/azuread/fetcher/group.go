@@ -4,7 +4,7 @@
 
 package fetcher
 
-import "github.com/google/uuid"
+import "github.com/gofrs/uuid/v5"
 
 // MemberType indicates the type of member in a Group.
 type MemberType int
