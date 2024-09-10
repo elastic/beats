@@ -42,6 +42,9 @@ func DefineModules() {
 	}
 
 	beatPath := os.Getenv("BEAT_PATH")
+	if beatPath == "" {
+		log.Fatal("BEAT_PATH is not defined")
+	}
 
 	var modulePattern = fmt.Sprintf("^%s\\/module\\/([^\\/]+)\\/.*", beatPath)
 
@@ -93,7 +96,10 @@ func shouldIgnore(file string) bool {
 
 func getDiff() []string {
 	commitRange := getCommitRange()
-	var output, _ = sh.Output("git", "diff", "--name-only", commitRange)
+	var output, err = sh.Output("git", "diff", "--name-only", commitRange)
+	if err != nil {
+		log.Fatal("git Diff failed: %w", err)
+	}
 
 	printWhenVerbose("Git Diff result: %s\n", output)
 
@@ -105,12 +111,6 @@ func getFromCommit() string {
 		printWhenVerbose("PR branch: %s\n", baseBranch)
 
 		return getBranchName(baseBranch)
-	}
-
-	if branch := os.Getenv("BUILDKITE_BRANCH"); branch != "" {
-		printWhenVerbose("Target branch: %s\n", branch)
-
-		return getBranchName(branch)
 	}
 
 	if previousCommit := getPreviousCommit(); previousCommit != "" {
@@ -127,9 +127,7 @@ func getFromCommit() string {
 
 func getPreviousCommit() string {
 	var output, _ = sh.Output("git", "rev-parse", "HEAD^")
-	if mg.Verbose() {
-		_ = fmt.Sprintf("Git previous commit: %s\n", output)
-	}
+	printWhenVerbose("Git previous commit: %s\n", output)
 
 	return strings.TrimSpace(output)
 }
@@ -146,6 +144,6 @@ func getBranchName(branch string) string {
 
 func printWhenVerbose(template string, parameter string) {
 	if mg.Verbose() {
-		_ = fmt.Sprintf(template, parameter)
+		fmt.Printf(template, parameter)
 	}
 }
