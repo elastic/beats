@@ -29,7 +29,7 @@ data:
                 logs_path: "/var/log/containers/"
 
     # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
-    # filebeat.autodiscover:
+    #filebeat.autodiscover:
     #  providers:
     #    - type: kubernetes
     #      node: ${NODE_NAME}
