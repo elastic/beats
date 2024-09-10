@@ -29,6 +29,7 @@ import (
 type kubeAnnotatorConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	kubeAdm           bool                         `config:"use_kubeadm"`
 	Node              string                       `config:"node"`
 	Scope             string                       `config:"scope"`
 	Namespace         string                       `config:"namespace"`

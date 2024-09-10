@@ -72,6 +72,7 @@ var DefaultCleanupTimeout time.Duration = 0
 func defaultConfig() *Config {
 	return &Config{
 		SyncPeriod:          10 * time.Minute,
+		KubeAdm:             true,
 		Resource:            "pod",
 		CleanupTimeout:      DefaultCleanupTimeout,
 		Prefix:              "co.elastic",
