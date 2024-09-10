@@ -329,6 +329,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
+- Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
 
 *Metricbeat*
 
