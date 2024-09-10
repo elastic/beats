@@ -4,14 +4,17 @@
     virtualmachine
   release: ga
   fields:
-    - name: host.id
-      type: keyword
-      description: >
-        Host id.
-    - name: host.hostname
-      type: keyword
-      description: >
-        Hostname of the host.
+    - name: host
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            Host id.
+        - name: hostname
+          type: keyword
+          description: >
+            Hostname of the host.
     - name: name
       type: keyword
       description: >

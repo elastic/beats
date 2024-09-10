@@ -56,9 +56,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
-- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+
 
 *Osquerybeat*
 
@@ -329,6 +331,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Add new metricset datastorecluster for vSphere module. {pull}40634[40634] {pull}40694[40694]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
 
 *Metricbeat*
 
