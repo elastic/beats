@@ -17,7 +17,7 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
