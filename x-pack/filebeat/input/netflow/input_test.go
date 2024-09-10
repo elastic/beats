@@ -7,6 +7,7 @@
 package netflow
 
 import (
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -28,4 +29,25 @@ func TestNewInputDone(t *testing.T) {
 
 	_, err = Plugin(logp.NewLogger("netflow_test")).Manager.Create(config)
 	require.NoError(t, err)
+}
+
+func TestConfig_CustomDefinitions(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	wantDefinitions, err := LoadFieldDefinitionsFromFile("testdata/fields/netflow9_cisco_asa_custom.yaml")
+	require.NoError(t, err)
+	want := []fields.FieldDict{wantDefinitions}
+
+	config, err := conf.NewConfigFrom(mapstr.M{
+		"custom_definitions": []string{"testdata/fields/netflow9_cisco_asa_custom.yaml"},
+	})
+	require.NoError(t, err)
+
+	v2input, err := Plugin(logp.NewLogger("netflow_test")).Manager.Create(config)
+	require.NoError(t, err)
+
+	input := v2input.(*netflowInput)
+
+	require.EqualValues(t, input.customFields, want)
 }
