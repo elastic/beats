@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"

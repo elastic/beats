@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
