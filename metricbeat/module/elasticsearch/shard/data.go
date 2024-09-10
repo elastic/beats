@@ -32,6 +32,7 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -70,9 +71,9 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	// Only proceed if the cluster state has changed
 	// See https://github.com/elastic/beats/issues/39058
 	if stateData.StateID == previousStateID {
-		fmt.Printf("cluster state hasn't changed since last run, ignoring.")
 		return nil
 	}
+	logp.Info("cluster state has changed, sending new shard data")
 	previousStateID = stateData.StateID
 
 	var errs multierror.Errors
