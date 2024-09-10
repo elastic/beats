@@ -62,6 +62,9 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		return &journalctl{}, fmt.Errorf("cannot get stderr pipe: %w", err)
 	}
 
+	// This gorroutune reads the stderr from the journalctl process, if the
+	// process exits for any reason, then its stderr is closed, this goroutine
+	// gets an EOF error and exits
 	go func() {
 		defer jctl.logger.Debug("stderr reader goroutine done")
 		reader := bufio.NewReader(jctl.stderr)
@@ -79,7 +82,10 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		}
 	}()
 
-	// Goroutine to read events from stdout
+	// This goroutine reads the stdout from the journalctl process and makes
+	// the data available via the `Next()` method.
+	// If the journalctl process exits for any reason, then its stdout is closed
+	// this goroutine gets an EOF error and exits.
 	go func() {
 		defer jctl.logger.Debug("stdout reader goroutine done")
 		defer close(jctl.dataChan)
@@ -110,6 +116,8 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 
 	logger.Infof("journalctl started with PID %d", cmd.Process.Pid)
 
+	// Whenever the journalctl process exits, the `Wait` call returns,
+	// if there was an error it is logged and this goroutine exits.
 	go func() {
 		if err := cmd.Wait(); err != nil {
 			jctl.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
