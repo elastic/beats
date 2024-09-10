@@ -67175,6 +67175,26 @@ format: bytes
 
 --
 
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
 [float]
 === host
 

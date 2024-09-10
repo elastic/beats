@@ -38,7 +38,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreClusterTest)
+	event := (&DatastoreClusterMetricSet{}).mapEvent(datastoreClusterTest, &metricData{assetNames: assetNames{outputDsNames: []string{"DCS_0"}}})
 
 	name, _ := event.GetValue("name")
 	assert.Equal(t, "Folder1", name)
@@ -48,4 +48,10 @@ func TestEventMapping(t *testing.T) {
 
 	freeSpace, _ := event.GetValue("free_space.bytes")
 	assert.Equal(t, int64(50), freeSpace)
+
+	datastoreNames, _ := event.GetValue("datastore.names")
+	assert.Equal(t, []string{"DCS_0"}, datastoreNames)
+
+	datastoreCount, _ := event.GetValue("datastore.count")
+	assert.Equal(t, 1, datastoreCount)
 }
