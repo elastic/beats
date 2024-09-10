@@ -17,9 +17,11 @@
       "virtualmachine": {
         "name": "xt0nmfpv9",
         "uptime": 5348978,
-        "host.id": "host-32",
-        "host.hostname": "phx-w1c1-esxi04.com",
         "status": "green",
+        "host": {
+          "id":       "host-32",
+          "hostname": "phx-w1c1-esxi04.com"
+        },
         "cpu": {
           "free": {
             "mhz": 0
@@ -70,18 +72,18 @@
         "snapshot": {
           "info": [
             {
-             "ID":         123,
-            "Name":        "Snapshot_1",
-            "Description": "Test snapshot 1",
-            "CreateTime":  "2024-09-01T12:34:56Z",
-            "State":       "PoweredOff"
+            "id":         123,
+            "name":        "Snapshot_1",
+            "description": "Test snapshot 1",
+            "createtime":  "2024-09-01T12:34:56Z",
+            "state":       "PoweredOff"
             },
             {
-            "ID":          745,
-            "Name":        "Snapshot_2",
-            "Description": "Test snapshot 2",
-            "CreateTime":  "2024-09-03T2:34:56Z",
-            "State":       "PoweredOn"
+            "id":          745,
+            "name":       "Snapshot_2",
+            "description": "Test snapshot 2",
+            "createtime":  "2024-09-03T2:34:56Z",
+            "state":       "PoweredOn"
             }
           ],
           "count": 2

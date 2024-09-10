@@ -32,12 +32,14 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	freeMemory := max(0, totalMemory-usedMemory)
 
 	event := mapstr.M{
-		"name":          data.VM.Summary.Config.Name,
-		"os":            data.VM.Summary.Config.GuestFullName,
-		"uptime":        data.VM.Summary.QuickStats.UptimeSeconds,
-		"status":        data.VM.Summary.OverallStatus,
-		"host.id":       data.HostID,
-		"host.hostname": data.HostName,
+		"name":   data.VM.Summary.Config.Name,
+		"os":     data.VM.Summary.Config.GuestFullName,
+		"uptime": data.VM.Summary.QuickStats.UptimeSeconds,
+		"status": data.VM.Summary.OverallStatus,
+		"host": mapstr.M{
+			"id":       data.HostID,
+			"hostname": data.HostName,
+		},
 		"cpu": mapstr.M{
 			"used":  mapstr.M{"mhz": usedCPU},
 			"total": mapstr.M{"mhz": totalCPU},

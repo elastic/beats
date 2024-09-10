@@ -81,12 +81,10 @@ func TestEventMapping(t *testing.T) {
 
 	// Expected event structure
 	expectedEvent := mapstr.M{
-		"name":          "localhost.localdomain",
-		"os":            "otherGuest",
-		"uptime":        int32(10),
-		"status":        types.ManagedEntityStatus("green"),
-		"host.id":       "host-1234",
-		"host.hostname": "test-host",
+		"name":   "localhost.localdomain",
+		"os":     "otherGuest",
+		"uptime": int32(10),
+		"status": types.ManagedEntityStatus("green"),
 		"cpu": mapstr.M{
 			"used":  mapstr.M{"mhz": int32(30)},
 			"total": mapstr.M{"mhz": int32(2294)},
@@ -111,6 +109,10 @@ func TestEventMapping(t *testing.T) {
 					"bytes": int64(30 * 1024 * 1024),
 				},
 			},
+		},
+		"host": mapstr.M{
+			"id":       "host-1234",
+			"hostname": "test-host",
 		},
 		"network": mapstr.M{
 			"count": 2,
