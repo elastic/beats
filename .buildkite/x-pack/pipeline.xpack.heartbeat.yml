@@ -111,10 +111,9 @@ steps:
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
-        skip: "skipping due missing deps, elastic/ingest-dev#3844"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         retry:
           automatic:
             - limit: 1
@@ -161,7 +160,7 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
@@ -183,7 +182,7 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
@@ -204,7 +203,7 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         retry:
           automatic:
             - limit: 1
