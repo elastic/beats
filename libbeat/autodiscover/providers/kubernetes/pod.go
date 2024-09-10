@@ -85,7 +85,6 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, kubeadm bool, client k8s.Interfa
 	}
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
-	logger.Errorf("------PASSS---- %v- , %v", config.KubeAdm, config.Resource)
 
 	watcher, err := kubernetes.NewNamedWatcher("pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
