@@ -67202,6 +67202,16 @@ Host information from vSphere environment.
 
 
 
+*`vsphere.host.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
+
 *`vsphere.host.cpu.used.mhz`*::
 +
 --

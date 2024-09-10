@@ -15,6 +15,13 @@
     },
     "vsphere": {
         "host": {
+            "alert": {
+                "names": [
+                  "Host hardware system board status",
+                  "Host storage status",
+                  "CPU Utilization"
+                ]
+              },
             "cpu": {
                 "used": {
                     "mhz": 67

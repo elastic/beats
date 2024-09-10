@@ -4,6 +4,10 @@
     Host information from vSphere environment.
   release: ga
   fields:
+    - name: alert.names
+      type: keyword
+      description: >
+        List of all the alert names.
     - name: cpu.used.mhz
       type: long
       description: >
