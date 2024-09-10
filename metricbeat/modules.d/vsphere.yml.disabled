@@ -16,6 +16,7 @@
   # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
   # Since the performance API has usage restrictions based on data collection intervals,
   # users should ensure that the period is configured optimally to receive real-time data.
+  # users can still collect summary metrics if performance metrics are not supported for the configured instance.
   # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
   # Reference Links:
   # Data Collection Intervals: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html

@@ -24,7 +24,7 @@ The Datastore and Host metricsets support performance data collection using the 
 
 [IMPORTANT]
 
-Only host and datastore metricsets have limitation of system configured period from vSphere instance.
+Only host and datastore metricsets have limitation of system configured period from vSphere instance. Users can still collect summary metrics if performance metrics are not supported for the configured instance.
 
 [float]
 ==== Real-time data collection default interval:
