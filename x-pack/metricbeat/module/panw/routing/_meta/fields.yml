@@ -7,144 +7,144 @@
     - name: bgp.peer_name
       type: keyword
       description: >
-        BGP peer name
+        The name of the current peer in the BGP peer group
     - name: bgp.virtual_router
       type: keyword
       description: >
-        BGP virtual router
+        The virtual router with which the BGP peer is associated
     - name: bgp.peer_group
       type: keyword
       description: >
-        BGP peer group
+        The name of the BGP peer group this peer belongs to
     - name: bgp.peer_router_id
-      type: keyword
+      type: ip
       description: >
         BGP peer router ID
     - name: bgp.remote_as_asn
-      type: keyword
+      type: long
       description: >
-        BGP remote AS ASN
+        The remote Autonomous System (AS) number of the peer
     - name: bgp.status
       type: keyword
       description: >
-        BGP status
+        The BGP session status, e.g., "Established" means the session is up and running
     - name: bgp.status_duration
       type: long
       description: >
-        BGP status duration
+        Time in seconds since the current status was set
     - name: bgp.password_set
       type: boolean
       description: >
-        BGP password set
+        Indicates whether a password is set for the BGP peer
     - name: bgp.passive
       type: boolean
       description: >
-        BGP passive
+        Indicates if the BGP peer is in passive mode: if yes then router will not initiate a connection to the peer
     - name: bgp.multi_hop_ttl
       type: long
       description: >
-        BGP multi-hop TTL
+        Time to Live (TTL) value for multi-hop BGP sessions.
     - name: bgp.peer_address
-      type: ip
+      type: keyword
       description: >
-        BGP peer address
+        IP address and port of the peer
     - name: bgp.local_address
-      type: ip
+      type: keyword
       description: >
-        BGP local address
+        Local address and port used for BGP connection
     - name: bgp.reflector_client
-      type: boolean
+      type: keyword
       description: >
-        BGP reflector client
+        Indicates if the BGP peer is a route reflector client
     - name: bgp.same_confederation
       type: boolean
       description: >
-        BGP same confederation
+        Peers in the same confederation exchange routes using internal BGP (iBGP) instead of external BGP (eBGP)
     - name: bgp.aggregate_confed_as
       type: boolean
       description: >
-        BGP aggregate confederation AS
+        Indicates that Autonomous System (AS) aggregation is enabled for the confederation
     - name: bgp.peering_type
       type: keyword
       description: >
-        BGP peering type
+        Defines the type of relationship between peers, e.g., "External BGP", "Internal BGP", or "Unspecified"
     - name: bgp.connect_retry_interval
       type: long
       description: >
-        BGP connect retry interval
+        The interval (in seconds) between connection retries
     - name: bgp.open_delay
       type: long
       description: >
-        BGP open delay
+        Delay before sending an Open message (in seconds)
     - name: bgp.idle_hold
       type: long
       description: >
-        BGP idle hold
+        The idle hold time (in seconds) before retrying a connection after failure
     - name: bgp.prefix_limit
       type: long
       description: >
-        BGP prefix limit
+        The maximum number of prefixes that can be received from the peer (0 = no limit)
     - name: bgp.holdtime
       type: long
       description: >
-        BGP holdtime
+        Time in seconds that the BGP peer will wait for a keepalive message, negotiated between peers
     - name: bgp.holdtime_config
       type: long
       description: >
-        BGP holdtime config
+        Represents the locally configured hold time on this peer
     - name: bgp.keepalive
       type: long
       description: >
-        BGP keepalive
+        The interval (in seconds) at which BGP keepalive messages are sent, negotiated between peers
     - name: bgp.keepalive_config
       type: long
       description: >
-        BGP keepalive config
+        The keepalive configured on this peer
     - name: bgp.msg_update_in
       type: long
       description: >
-        BGP message updates in
+        The number of BGP UPDATE messages received by the router from this peer
     - name: bgp.msg_update_out
       type: long
       description: >
-        BGP message updates out
+        the number of BGP UPDATE messages sent from the local router to the peer
     - name: bgp.msg_total_in
       type: long
       description: >
-        BGP total messages in
+        Total of all messages received from the peer
     - name: bgp.msg_total_out
       type: long
       description: >
-        BGP total messages out
+        Total of all messages sent to the peer
     - name: bgp.last_update_age
       type: long
       description: >
-        BGP last update age
+        Time in seconds since the last update message was received from the peer
     - name: bgp.last_error
       type: keyword
       description: >
-        BGP last error
+        The last BGP error message received from the peer
     - name: bgp.status_flap_counts
       type: long
       description: >
-        BGP status flap counts
+        Indicates the number of times the BGP session has "flapped" or transitioned between up and down states
     - name: bgp.established_counts
       type: long
       description: >
-        BGP established counts
+        Number of times the BGP session has successfully transitioned to the "Established" state
     - name: bgp.orf_entry_received
       type: long
       description: >
-        BGP ORF entry received
+        Number of ORF (Outbound Route Filtering) entries received from the peer
     - name: bgp.nexthop_self
       type: boolean
       description: >
-        BGP next-hop self
+        Whether the router is configured to use itself as the next-hop for routes sent to this peer
     - name: bgp.nexthop_thirdparty
       type: boolean
       description: >
-        BGP next-hop third-party
+        Third-party next-hop feature is enabled
     - name: bgp.nexthop_peer
       type: boolean
       description: >
-        BGP next-hop peer
+        Indicates whether the peer is being used as the next-hop for the routes received from this peer

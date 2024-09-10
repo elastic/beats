@@ -1268,8 +1268,8 @@ metricbeat.modules:
   # username: ""
   # password: ""
 
-#-------------------------------- Panos Module --------------------------------
-- module: panos
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
   metricsets: ["licenses"]
   enabled: false
   period: 10s

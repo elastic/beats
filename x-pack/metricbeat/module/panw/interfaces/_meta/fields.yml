@@ -15,7 +15,7 @@
     - name: physical.type
       type: keyword
       description: >
-        Physical interface type:
+        Physical interface type (numeric value in source XML, string value sent to elasticsearch):
           0:  "Ethernet interface",
           1:  "Aggregate Ethernet (AE) interface",
           2:  "High Availability (HA) interface",
@@ -50,7 +50,7 @@
     - name: physical.ae_member
       type: keyword
       description: >
-        For aggregate interfaces, the member interfaces
+        For aggregate interfaces, the array of member interfaces
     - name: logical.name
       type: keyword
       description: >
@@ -66,7 +66,7 @@
     - name: logical.vsys
       type: integer
       description: >
-        Logical virtual system 
+        Virtual system to which this interface belongs 
     - name: logical.zone
       type: keyword
       description: >
@@ -199,7 +199,7 @@
     - name: ha.local_info.iot_version
       type: keyword
       description: >
-        HA local info IoT version
+        HA local info IoT database version
     - name: ha.local_info.av_version
       type: keyword
       description: >

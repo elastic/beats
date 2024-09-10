@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -17,7 +18,7 @@ const thermalQuery = "<show><system><environmentals><thermal></thermal></environ
 func getThermalEvents(m *MetricSet) ([]mb.Event, error) {
 	var response ThermalResponse
 
-	output, err := m.client.Op(thermalQuery, vsys, nil, nil)
+	output, err := m.client.Op(thermalQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		m.logger.Error("Error: %s", err)
 		return nil, err
@@ -46,13 +47,17 @@ func formatThermalEvents(m *MetricSet, response *ThermalResponse) []mb.Event {
 
 	for _, slot := range response.Result.Thermal.Slots {
 		for _, entry := range slot.Entries {
+			alarm, err := panw.StringToBool(entry.Alarm)
+			if err != nil {
+				m.logger.Warn("Failed to convert alarm value %s to boolean: %s. Defaulting to false.", entry.Alarm, err)
+			}
 			m.logger.Debugf("Processing slot %d entry %+v", entry.Slot, entry)
 			event = mb.Event{
 				Timestamp: timestamp,
 				MetricSetFields: mapstr.M{
 					"thermal.slot_number":     entry.Slot,
 					"thermal.description":     entry.Description,
-					"thermal.alarm":           entry.Alarm,
+					"thermal.alarm":           alarm,
 					"thermal.degress_celsius": entry.DegreesCelsius,
 					"thermal.minimum_temp":    entry.MinimumTemp,
 					"thermal.maximum_temp":    entry.MaximumTemp,

@@ -1,10 +1,10 @@
-- key: panos
-  title: "panos"
+- key: panw
+  title: "panw"
   release: beta
   description: >
-    panos module
+    panw module
   fields:
-    - name: panos
+    - name: panw
       type: group
       description: >
       fields:

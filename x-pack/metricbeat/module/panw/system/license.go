@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -19,7 +20,7 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 
 	var response LicenseResponse
 
-	output, err := m.client.Op(licenseQuery, vsys, nil, nil)
+	output, err := m.client.Op(licenseQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
@@ -46,15 +47,29 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 	timestamp := time.Now()
 
 	for _, license := range licenses {
+		expired, err := panw.StringToBool(license.Expired)
+		if err != nil {
+			m.logger.Warn("Failed to convert expired value %s to boolean: %s. Defaulting to false.", license.Expired, err)
+		}
+
+		//
+		// <issued>March 20, 2024</issued>
+		// <expires>May 27, 2025</expires>
+		//
+		issued, err := time.Parse("January 2, 2006", license.Issued)
+		if err != nil {
+			m.logger.Warn("Failed to parse issued date %s: %s", license.Issued, err)
+		}
+
 		event := mb.Event{
 			Timestamp: timestamp,
 			MetricSetFields: mapstr.M{
 				"license.feature":     license.Feature,
-				"license.description": license.Description, // Fixed typo
+				"license.description": license.Description,
 				"license.serial":      license.Serial,
-				"license.issued":      license.Issued,
+				"license.issued":      issued.Format(time.RFC3339),
 				"license.expires":     license.Expires,
-				"license.expired":     license.Expired,
+				"license.expired":     expired,
 				"license.auth_code":   license.AuthCode,
 			},
 			RootFields: mapstr.M{

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -20,7 +21,7 @@ func getPowerEvents(m *MetricSet) ([]mb.Event, error) {
 
 	var response PowerResponse
 
-	output, err := m.client.Op(powerQuery, vsys, nil, nil)
+	output, err := m.client.Op(powerQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute operation: %w", err)
 	}

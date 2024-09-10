@@ -135,27 +135,27 @@
     - name: ipsec_tunnel.TSi_ip
       type: ip
       description: >
-        TSi IP address of the IPsec tunnel
+        Traffic Selector Initiator IP. This is the local IP (0.0.0.0 means any IP address)
     - name: ipsec_tunnel.TSi_prefix
       type: keyword
       description: >
-        TSi prefix of the IPsec tunnel
+        Network prefix for the TSi IP, 0 means no specific network is defined.
     - name: ipsec_tunnel.TSi_proto
       type: keyword
       description: >
-        TSi protocol of the IPsec tunnel
+        Protocol associated with the TSi (0 means any protocol)
     - name: ipsec_tunnel.TSi_port
       type: long
       description: >
-        TSi port of the IPsec tunnel
+        Port number associated with TSi (0 means any port)
     - name: ipsec_tunnel.TSr_ip
       type: ip
       description: >
-        TSr IP address of the IPsec tunnel
+        Traffic Selector Responder IP.
     - name: ipsec_tunnel.TSr_prefix
       type: keyword
       description: >
-        TSr prefix of the IPsec tunnel
+        Network prefix for the TSr IP. Similar to TSi_prefix
     - name: ipsec_tunnel.TSr_proto
       type: keyword
       description: >
@@ -171,7 +171,7 @@
     - name: ipsec_tunnel.mode
       type: keyword
       description: >
-        Mode of the IPsec tunnel
+        This specifies the IPsec mode. e.g., 'tunl'
     - name: ipsec_tunnel.dh
       type: keyword
       description: >
@@ -187,8 +187,8 @@
     - name: ipsec_tunnel.life
       type: long
       description: >
-        Lifetime of the IPsec tunnel
+        The lifetime of the IPsec Security Association (SA) in seconds
     - name: ipsec_tunnel.kb
       type: long
       description: >
-        Key bytes of the IPsec tunnel
+        Traffic volume limit for SA rekeying

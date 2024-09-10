@@ -11,6 +11,10 @@ import (
 	"github.com/PaloAltoNetworks/pango"
 )
 
+// Vsys is the virtual system to query. If empty, the default vsys is used. This is a placeholder for future use,
+// as the module currently only supports the default vsys.
+const Vsys = ""
+
 // PanwClient interface with an Op function
 type PanwClient interface {
 	Op(req interface{}, vsys string, extras interface{}, ans interface{}) ([]byte, error)
@@ -35,7 +39,7 @@ func GetPanwClient(config *Config) (PanwClient, error) {
 		return &PanwTestClient{}, nil
 	}
 
-	firewall := pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey}}
+	firewall := pango.Firewall{Client: pango.Client{Hostname: config.HostIp, ApiKey: config.ApiKey, Port: config.Port}}
 	err := firewall.Initialize()
 	if err != nil {
 		return nil, fmt.Errorf("error initializing firewall client: %w", err)

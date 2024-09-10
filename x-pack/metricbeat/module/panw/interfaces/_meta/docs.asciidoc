@@ -1,1 +1,1 @@
-This is the interfaces metricset of the module panos.
+This is the interfaces metricset of the module panw.

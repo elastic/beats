@@ -1,10 +1,10 @@
-:modulename: panos
+:modulename: panw
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 :modulename!:
 
-The panos Metricbeat module uses the Palo Alto [pango](https://pkg.go.dev/github.com/PaloAltoNetworks/pango#section-documentation) package to extract metrics
+The panw Metricbeat module uses the Palo Alto [pango](https://pkg.go.dev/github.com/PaloAltoNetworks/pango#section-documentation) package to extract metrics
 information from a firewall device via the XML API.
 
 [float]
@@ -14,15 +14,15 @@ information from a firewall device via the XML API.
 [float]
 === Module-specific configuration notes
 
-The panos module configuration requires the ip address of the target firewall device and an API Key generated from that firewall. It is assumed
-that network access to the firewall is available. All access by the panos module is read-only.
+The panw module configuration requires the ip address of the target firewall device and an API Key generated from that firewall. It is assumed
+that network access to the firewall is available. All access by the panw module is read-only.
 
 ***Limitations***
 The current version of the module is configured to run against **exactly 1** firewall. Multiple firewalls will require multiple agent configurations. 
 The module has also not been tested with Panorama, though it should work since it only relies on lower level Client.Op calls to send XML API commands 
 to the server.
 
-Required credentials for the `panos` module:
+Required credentials for the `panw` module:
 
 `host_ip` :: IP address of the firewall - must be network accessible.
 

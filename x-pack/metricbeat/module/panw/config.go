@@ -16,6 +16,7 @@ const (
 
 type Config struct {
 	HostIp    string `config:"host_ip"`
+	Port      uint   `config:"port"`
 	ApiKey    string `config:"apiKey"`
 	DebugMode string `config:"apiDebugMode"`
 }

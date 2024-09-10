@@ -6,11 +6,11 @@
     },
     "metricset":{
         "host":"localhost",
-        "module":"panos",
+        "module":"panw",
         "name":"vpn",
         "rtt":44269
     },
-    "panos":{
+    "panw":{
         "vpn":{
             "example": "vpn"
         }

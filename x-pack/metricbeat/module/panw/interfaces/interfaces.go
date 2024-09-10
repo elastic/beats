@@ -16,7 +16,6 @@ import (
 
 const (
 	metricsetName = "interfaces"
-	vsys          = ""
 )
 
 // MetricSet holds any configuration or state information. It must implement

@@ -6,11 +6,11 @@
     },
     "metricset":{
         "host":"localhost",
-        "module":"panos",
+        "module":"panw",
         "name":"system",
         "rtt":44269
     },
-    "panos":{
+    "panw":{
         "system":{
             "example": "system"
         }

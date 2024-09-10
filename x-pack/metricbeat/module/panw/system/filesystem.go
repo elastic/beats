@@ -7,20 +7,32 @@ package system
 import (
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+)
+
+const (
+	KBytes = 1024
+	MBytes = 1024 * KBytes
+	GBytes = 1024 * MBytes
 )
 
 const filesystemQuery = "<show><system><disk-space></disk-space></system></show>"
 
-func getFilesystemEvents(m *MetricSet) ([]mb.Event, error) {
+var filesystemLogger *logp.Logger
 
+func getFilesystemEvents(m *MetricSet) ([]mb.Event, error) {
+	// Set logger so all the parse functions have access
+	filesystemLogger = m.logger
 	var response FilesystemResponse
 
-	output, err := m.client.Op(filesystemQuery, vsys, nil, nil)
+	output, err := m.client.Op(filesystemQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error querying filesystem info: %w", err)
 	}
@@ -41,6 +53,8 @@ func getFilesystemEvents(m *MetricSet) ([]mb.Event, error) {
 }
 
 func getFilesystems(input string) []Filesystem {
+
+	filesystemLogger.Debugf("getFilesystems input:\n %s", input)
 	lines := strings.Split(input, "\n")
 	filesystems := make([]Filesystem, 0)
 
@@ -71,6 +85,45 @@ func getFilesystems(input string) []Filesystem {
 	return filesystems
 }
 
+func convertToBytes(field string, value string) float64 {
+	if len(value) == 0 {
+		filesystemLogger.Warn("convertToBytes called with empty value")
+		return -1
+	}
+
+	// value, for instance for "used", can be just "0", so just return that
+	if value == "0" {
+		return 0
+	}
+
+	//filesystemLogger.Warnf("convertToBytes field %s, value: %s.", field, value)
+	numstr := value[:len(value)-1]
+	units := strings.ToLower(value[len(value)-1:])
+	result, err := strconv.ParseFloat(numstr, 32)
+	if err != nil {
+		filesystemLogger.Warnf("parseFloat failed to parse field %s, value: %s. Error: %v", field, value, err)
+		return -1
+	}
+
+	switch units {
+	case "k":
+		return result * KBytes
+	case "m":
+		return result * MBytes
+	case "g":
+		return result * GBytes
+	default:
+		// Handle values without units
+		if units == "" {
+			return result
+		} else {
+			filesystemLogger.Warnf("Unhandled units for field %s, value %s: %s", field, value, units)
+			return result
+		}
+	}
+
+}
+
 func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 	if len(filesystems) == 0 {
 		return nil
@@ -78,16 +131,20 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 
 	events := make([]mb.Event, 0, len(filesystems))
 	timestamp := time.Now()
-
 	for _, filesystem := range filesystems {
+		used, err := strconv.ParseInt(filesystem.UsePerc[:len(filesystem.UsePerc)-1], 10, 64)
+		if err != nil {
+			filesystemLogger.Warnf("Failed to parse used percent: %v", err)
+		}
+
 		event := mb.Event{
 			Timestamp: timestamp,
 			MetricSetFields: mapstr.M{
 				"filesystem.name":        filesystem.Name,
-				"filesystem.size":        filesystem.Size,
-				"filesystem.used":        filesystem.Used,
-				"filesystem.available":   filesystem.Avail,
-				"filesystem.use_percent": filesystem.UsePerc,
+				"filesystem.size":        convertToBytes("filesystem.size", filesystem.Size),
+				"filesystem.used":        convertToBytes("filesystem.used", filesystem.Used),
+				"filesystem.available":   convertToBytes("filesystem.available", filesystem.Avail),
+				"filesystem.use_percent": used,
 				"filesystem.mounted":     filesystem.Mounted,
 			},
 			RootFields: mapstr.M{

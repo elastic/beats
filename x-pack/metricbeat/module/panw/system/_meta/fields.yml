@@ -119,11 +119,11 @@
     - name: license.feature
       type: keyword
       description: >
-        Feature licensed
+        Feature licensed, e.g. Advanced Threat Prevention
     - name: license.description
       type: text
       description: >
-        Description field
+        Description of the licensed feature
     - name: license.serial
       type: keyword
       description: >
@@ -131,37 +131,41 @@
     - name: license.issued
       type: date
       description: >
-        Issued date field
+        Date the license was issued
     - name: license.expires
-      type: date
+      type: keyword
       description: >
-        Expires date field
+        Date the license expires, but this is a keyword because value might be "never" 
     - name: license.expired
       type: boolean
       description: >
-        Expired field
+        Indicates if the license is expired
     - name: license.auth_code
       type: keyword
       description: >
-        Auth code field
+        Authorization code to activate or install the license
     - name: filesystem.name
       type: keyword
       description: >
         Filesystem name
     - name: filesystem.size
-      type: keyword
+      type: float
+      format: bytes
       description: >
-        Size, including units, e.g., 9.5G.        
+        Total size of the filesystem        
     - name: filesystem.used
-      type: keyword
+      type: float
+      format: bytes
       description: >
-        Amount used, including units, e.g., 4.0G   
+        Amount used on the filesystem  
     - name: filesystem.available
-      type: keyword
+      type: float
+      format: bytes
       description: >
-        Disk space available, including units, e.g., 5.5G
+        Disk space available on the filesystem
     - name: filesystem.use_percent
-      type: keyword
+      type: integer
+      format: percent
       description: >
         Percent of filesystem used
     - name: filesystem.mounted

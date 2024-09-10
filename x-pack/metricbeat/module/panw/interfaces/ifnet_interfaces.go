@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -29,7 +30,7 @@ func getIFNetInterfaceEvents(m *MetricSet) ([]mb.Event, error) {
 
 	var response InterfaceResponse
 
-	output, err := m.client.Op(IFNetInterfaceQuery, vsys, nil, nil)
+	output, err := m.client.Op(IFNetInterfaceQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		m.logger.Error("Error: %s", err)
 		return nil, err

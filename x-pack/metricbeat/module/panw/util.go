@@ -10,9 +10,14 @@ func StringToBool(s string) (bool, error) {
 	switch s {
 	case "yes":
 		return true, nil
+	case "true":
+		return true, nil
 	case "no":
 		return false, nil
-	default:
-		return false, fmt.Errorf("invalid value: %s", s)
+	case "false":
+		return false, nil
 	}
+
+	// Default to false
+	return false, fmt.Errorf("invalid value: %s", s)
 }

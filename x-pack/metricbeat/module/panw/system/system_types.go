@@ -87,7 +87,7 @@ type ThermalSlot struct {
 type ThermalEntry struct {
 	Slot           int     `xml:"slot"`
 	Description    string  `xml:"description"`
-	Alarm          bool    `xml:"alarm"`
+	Alarm          string  `xml:"alarm"`
 	DegreesCelsius float64 `xml:"DegreesC"`
 	MinimumTemp    float64 `xml:"min"`
 	MaximumTemp    float64 `xml:"max"`

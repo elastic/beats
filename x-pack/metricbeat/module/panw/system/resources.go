@@ -13,20 +13,21 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const resourceQuery = "<show><system><resources></resources></system></show>"
 
-var logger *logp.Logger
+var resourcesLogger *logp.Logger
 
 func getResourceEvents(m *MetricSet) ([]mb.Event, error) {
 	// Set logger so all the parse functions have access
-	logger = m.logger
+	resourcesLogger = m.logger
 
 	var response ResourceResponse
-	output, err := m.client.Op(resourceQuery, vsys, nil, &response)
+	output, err := m.client.Op(resourceQuery, panw.Vsys, nil, &response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute operation: %w", err)
 	}
@@ -190,7 +191,7 @@ func parseUptime(line string) Uptime {
 	}
 
 	if matches == nil {
-		logger.Errorf("Failed to parse uptime: %s", line)
+		resourcesLogger.Errorf("Failed to parse uptime: %s", line)
 		return Uptime{}
 	}
 
@@ -216,7 +217,7 @@ func parseTaskInfo(line string) TaskInfo {
 	re := regexp.MustCompile(`Tasks:\s*(\d+)\s*total,\s*(\d+)\s*running,\s*(\d+)\s*sleeping,\s*(\d+)\s*stopped,\s*(\d+)\s*zombie`)
 	matches := re.FindStringSubmatch(line)
 	if matches == nil {
-		logger.Errorf("Failed to parse task info: %s", line)
+		resourcesLogger.Errorf("Failed to parse task info: %s", line)
 		return TaskInfo{}
 	}
 
@@ -237,10 +238,10 @@ func parseTaskInfo(line string) TaskInfo {
 
 func parseCPUInfo(line string) CPUInfo {
 	//%Cpu(s): 73.0 us,  4.6 sy,  0.0 ni, 21.7 id,  0.0 wa,  0.0 hi,  0.7 si,  0.0 st
-	re := regexp.MustCompile(`(\d+\.\d+) us, (\d+\.\d+) sy, (\d+\.\d+) ni, (\d+\.\d+) id, (\d+\.\d+) wa, (\d+\.\d+) hi, (\d+\.\d+) si, (\d+\.\d+) st`)
+	re := regexp.MustCompile(`(\d+\.\d+)\s+us,\s+(\d+\.\d+)\s+sy,\s+(\d+\.\d+)\s+ni,\s+(\d+\.\d+)\s+id,\s+(\d+\.\d+)\s+wa,\s+(\d+\.\d+)\s+hi,\s+(\d+\.\d+)\s+si,\s+(\d+\.\d+)\s+st`)
 	matches := re.FindStringSubmatch(line)
 	if matches == nil {
-		logger.Errorf("Failed to parse CPU info: %s", line)
+		resourcesLogger.Errorf("Failed to parse CPU info: %s", line)
 		return CPUInfo{}
 	}
 
@@ -306,7 +307,7 @@ func parseFloat(field string, value string) float64 {
 	var result float64
 	result, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		logger.Errorf("parseFloat failed to parse field %s: %v", field, err)
+		resourcesLogger.Errorf("parseFloat failed to parse field %s: %v", field, err)
 		return -1
 	}
 
@@ -316,7 +317,7 @@ func parseFloat(field string, value string) float64 {
 func parseInt(field string, value string) int {
 	result, err := strconv.Atoi(value)
 	if err != nil {
-		logger.Errorf("parseInt failed to parse field %s: %v", field, err)
+		resourcesLogger.Errorf("parseInt failed to parse field %s: %v", field, err)
 		return -1
 	}
 	return result

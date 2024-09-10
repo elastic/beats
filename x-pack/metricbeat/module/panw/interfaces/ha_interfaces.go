@@ -16,14 +16,14 @@ import (
 
 const haInterfaceQuery = "<show><high-availability><all></all></high-availability></show>"
 
-var logger *logp.Logger
+var haLogger *logp.Logger
 
 func getHAInterfaceEvents(m *MetricSet) ([]mb.Event, error) {
 	// Set logger so all the parse functions have access
-	logger = m.logger
+	haLogger = m.logger
 	var response HAResponse
 
-	output, err := m.client.Op(haInterfaceQuery, vsys, nil, nil)
+	output, err := m.client.Op(haInterfaceQuery, panw.Vsys, nil, nil)
 	if err != nil {
 		m.logger.Error("Error: %s", err)
 		return nil, err
@@ -59,15 +59,15 @@ func makeGroupEvent(m *MetricSet, input HAResult) *mb.Event {
 	timestamp := time.Now()
 	linkMonitoringEnabled, err := panw.StringToBool(group.LinkMonitoring.Enabled)
 	if err != nil {
-		logger.Warn("Error converting LinkMonitoring.Enabled to boolean: %s", err)
+		haLogger.Warn("Error converting LinkMonitoring.Enabled to boolean: %s", err)
 	}
 	enabled, err := panw.StringToBool(input.Enabled)
 	if err != nil {
-		logger.Warn("Error converting Enabled to boolean: %s", err)
+		haLogger.Warn("Error converting Enabled to boolean: %s", err)
 	}
 	syncEnabled, err := panw.StringToBool(group.RunningSyncEnabled)
 	if err != nil {
-		logger.Warn("Error converting RunningSyncEnabled to boolean: %s", err)
+		haLogger.Warn("Error converting RunningSyncEnabled to boolean: %s", err)
 	}
 
 	event := mb.Event{
@@ -151,11 +151,11 @@ func makeLinkMonitoringEvents(m *MetricSet, links HALinkMonitoring) []mb.Event {
 		for _, interface_entry := range group.Interface {
 			linkEnabled, err := panw.StringToBool(links.Enabled)
 			if err != nil {
-				logger.Warn("Error converting links.Enabled to boolean: %s", err)
+				haLogger.Warn("Error converting links.Enabled to boolean: %s", err)
 			}
 			groupEnabled, err := panw.StringToBool(group.Enabled)
 			if err != nil {
-				logger.Warn("Error converting group.Enabled to boolean: %s", err)
+				haLogger.Warn("Error converting group.Enabled to boolean: %s", err)
 			}
 
 			event = mb.Event{

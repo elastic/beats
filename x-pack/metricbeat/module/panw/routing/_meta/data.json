@@ -6,11 +6,11 @@
     },
     "metricset":{
         "host":"localhost",
-        "module":"panos",
+        "module":"panw",
         "name":"routing",
         "rtt":44269
     },
-    "panos":{
+    "panw":{
         "routing":{
             "example": "routing"
         }

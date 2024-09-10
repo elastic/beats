@@ -1,4 +1,4 @@
-- module: panos
+- module: panw
   metricsets: ["licenses"]
   enabled: false
   period: 10s
