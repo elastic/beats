@@ -56,7 +56,7 @@ type pod struct {
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
-func NewPodEventer(uuid uuid.UUID, cfg *conf.C, kubeadm bool, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
 	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher

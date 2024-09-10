@@ -241,11 +241,11 @@ func NewEventerManager(
 	em := &eventerManager{}
 	switch cfg.Resource {
 	case "pod":
-		em.eventer, err = NewPodEventer(uuid, c, cfg.KubeAdm, client, publish)
+		em.eventer, err = NewPodEventer(uuid, c, client, publish)
 	case "node":
-		em.eventer, err = NewNodeEventer(uuid, c, cfg.KubeAdm, client, publish)
+		em.eventer, err = NewNodeEventer(uuid, c, client, publish)
 	case "service":
-		em.eventer, err = NewServiceEventer(uuid, c, cfg.KubeAdm, client, publish)
+		em.eventer, err = NewServiceEventer(uuid, c, client, publish)
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", cfg.Resource)
 	}

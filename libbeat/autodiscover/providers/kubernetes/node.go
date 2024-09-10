@@ -49,7 +49,7 @@ type node struct {
 }
 
 // NewNodeEventer creates an eventer that can discover and process node objects
-func NewNodeEventer(uuid uuid.UUID, cfg *config.C, kubeadm bool, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.node")
 
 	config := defaultConfig()
@@ -89,7 +89,6 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, kubeadm bool, client k8s.Inte
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Node{}, err)
 	}
 
-	cfg.SetBool("use_kubeadm", -1, kubeadm)
 	p := &node{
 		config:  config,
 		uuid:    uuid,

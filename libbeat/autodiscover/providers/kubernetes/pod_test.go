@@ -2203,7 +2203,7 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			err = config.Unpack(&c)
 			assert.NoError(t, err)
 
-			eventer, err := NewPodEventer(uuid, config, true, client, nil)
+			eventer, err := NewPodEventer(uuid, config, client, nil)
 			if err != nil {
 				t.Fatal(err)
 			}

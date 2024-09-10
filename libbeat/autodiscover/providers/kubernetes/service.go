@@ -48,7 +48,7 @@ type service struct {
 }
 
 // NewServiceEventer creates an eventer that can discover and process service objects
-func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, kubeadm bool, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
+func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.service")
 
 	config := defaultConfig()
@@ -73,7 +73,6 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, kubeadm bool, client k8s.Int
 	metaConf := config.AddResourceMetadata
 	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
 	metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
-	metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
@@ -84,7 +83,6 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, kubeadm bool, client k8s.Int
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
 		}
-		metaConf.Namespace.SetBool("use_kubeadm", -1, kubeadm)
 		namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
 	}
 

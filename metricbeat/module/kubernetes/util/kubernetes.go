@@ -464,7 +464,7 @@ func createAllWatchers(
 
 // createMetadataGen creates and returns the metadata generator for resources other than pod and service
 // metaGen is a struct of type Resource and implements Generate method for metadata generation for a given resource kind.
-func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig, kubeadm bool,
+func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
 	resourceWatchers.lock.RLock()
@@ -492,7 +492,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 
 // createMetadataGenSpecific creates and returns the metadata generator for a specific resource - pod or service
 // A metaGen struct implements a MetaGen interface and is designed to utilize the necessary watchers to collect(Generate) metadata for a specific resource.
-func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig, kubeadm bool,
+func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
 
 	resourceWatchers.lock.RLock()
@@ -599,9 +599,9 @@ func NewResourceMetadataEnricher(
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
-		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, resourceName, resourceWatchers)
+		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	} else {
-		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, resourceName, resourceWatchers)
+		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	}
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
@@ -763,7 +763,7 @@ func NewContainerMetadataEnricher(
 	config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
 	config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
 
-	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, config.KubeAdm, PodResource, resourceWatchers)
+	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
