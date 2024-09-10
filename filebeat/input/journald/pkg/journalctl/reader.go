@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -81,6 +82,8 @@ type Reader struct {
 
 	jctl        Jctl
 	jctlFactory JctlFactory
+
+	backoff backoff.Backoff
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
@@ -177,6 +180,7 @@ func New(
 		logger:      logger,
 		canceler:    canceler,
 		jctlFactory: newJctl,
+		backoff:     backoff.NewExpBackoff(canceler.Done(), 100*time.Millisecond, 2*time.Second),
 	}
 
 	return &r, nil
@@ -220,7 +224,17 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 				args = append(args, "--after-cursor", r.cursor)
 			}
 
-			// TODO (belimawr): Restart with exponential backoff
+			// If the last restart (if any) was more than 5s ago,
+			// recreate the backoff and do not wait.
+			// We recreate the backoff so r.backoff.Last().IsZero()
+			// will return true next time it's called making us to
+			// wait in case jouranlctl crashes in less than 5s.
+			if !r.backoff.Last().IsZero() && time.Now().Sub(r.backoff.Last()) > 5*time.Second {
+				r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
+			} else {
+				r.backoff.Wait()
+			}
+
 			jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", args...)
 			if err != nil {
 				// If we cannot restart journalct, there is nothing we can do.
