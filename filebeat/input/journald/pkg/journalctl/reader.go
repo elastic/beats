@@ -141,6 +141,7 @@ func New(
 	newJctl JctlFactory,
 ) (*Reader, error) {
 
+	logger = logger.Named("reader")
 	args := []string{"--utc", "--output=json", "--follow"}
 	if file != "" && file != localSystemJournalID {
 		args = append(args, "--file", file)
@@ -173,7 +174,7 @@ func New(
 		args:        args,
 		cursor:      cursor,
 		jctl:        jctl,
-		logger:      logger.Named("reader"),
+		logger:      logger,
 		canceler:    canceler,
 		jctlFactory: newJctl,
 	}
