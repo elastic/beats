@@ -148,7 +148,7 @@ pull_request_rules:
           branches, such as:
           * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
 
-          **NOTE**: `backport-v8.x` has been added to help with the transition to the new branch 8.x.
+          **NOTE**: `backport-8.x` has been added to help with the transition to the new branch 8.x.
       label:
         add:
           - backport-8.x
@@ -349,7 +349,7 @@ pull_request_rules:
   - name: backport patches to 8.x branch
     conditions:
       - merged
-      - label=backport-8.x
+      - label~=^(backport-v8.x|backport-8.x)$
     actions:
       backport:
         assignees:
