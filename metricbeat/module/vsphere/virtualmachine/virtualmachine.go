@@ -56,6 +56,18 @@ type VMData struct {
 	NetworkNames   []string
 	DatastoreNames []string
 	CustomFields   mapstr.M
+<<<<<<< HEAD
+=======
+	Snapshots      []VMSnapshotData
+}
+
+type VMSnapshotData struct {
+	ID          int32                          `json:"id"`
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	CreateTime  time.Time                      `json:"createtime"`
+	State       types.VirtualMachinePowerState `json:"state"`
+>>>>>>> e7637c08b2 (Update fields to use mapstr in vSphere virtualmachine metricset (#40707))
 }
 
 // New creates a new instance of the MetricSet.

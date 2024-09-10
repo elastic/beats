@@ -64,12 +64,10 @@ func TestEventMapping(t *testing.T) {
 
 	// Expected event structure
 	expectedEvent := mapstr.M{
-		"name":          "localhost.localdomain",
-		"os":            "otherGuest",
-		"uptime":        int32(10),
-		"status":        types.ManagedEntityStatus("green"),
-		"host.id":       "host-1234",
-		"host.hostname": "test-host",
+		"name":   "localhost.localdomain",
+		"os":     "otherGuest",
+		"uptime": int32(10),
+		"status": types.ManagedEntityStatus("green"),
 		"cpu": mapstr.M{
 			"used":  mapstr.M{"mhz": int32(30)},
 			"total": mapstr.M{"mhz": int32(2294)},
@@ -95,19 +93,48 @@ func TestEventMapping(t *testing.T) {
 				},
 			},
 		},
+		"host": mapstr.M{
+			"id":       "host-1234",
+			"hostname": "test-host",
+		},
 		"network": mapstr.M{
 			"count": 2,
+			"names": []string{"network-1", "network-2"},
 		},
 		"datastore": mapstr.M{
 			"count": 2,
+			"names": []string{"ds1", "ds2"},
 		},
 		"custom_fields": mapstr.M{
 			"customField1": "value1",
 			"customField2": "value2",
 		},
+<<<<<<< HEAD
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
 		"datastore.names": []string{"ds1", "ds2"},
+=======
+		"network_names": []string{"network-1", "network-2"},
+		"snapshot": mapstr.M{
+			"info": []VMSnapshotData{
+				{
+					ID:          123,
+					Name:        "Snapshot_1",
+					Description: "Test snapshot 1",
+					CreateTime:  time.Time{},
+					State:       types.VirtualMachinePowerStatePoweredOff,
+				},
+				{
+					ID:          745,
+					Name:        "Snapshot_2",
+					Description: "Test snapshot 2",
+					CreateTime:  time.Time{},
+					State:       types.VirtualMachinePowerStatePoweredOn,
+				},
+			},
+			"count": 2,
+		},
+>>>>>>> e7637c08b2 (Update fields to use mapstr in vSphere virtualmachine metricset (#40707))
 	}
 
 	// Assert that the output event matches the expected event

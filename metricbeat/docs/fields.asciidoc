@@ -67853,6 +67853,7 @@ virtualmachine
 
 
 
+
 *`vsphere.virtualmachine.host.id`*::
 +
 --
