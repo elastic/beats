@@ -297,6 +297,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Add `use_kubeadm` config option for filebeat autodiscovery in order to toggle kubeadm-config api requests {pull}40301[40301]
 
 *Auditbeat*
 
