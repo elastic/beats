@@ -1500,148 +1500,148 @@ filebeat.modules:
     #var.password:
 
 #------------------------------ Salesforce Module ------------------------------
-# Configuration file for Salesforce module in Filebeat
+  # Configuration file for Salesforce module in Filebeat
 
-# Common Configurations:
-# - enabled: Set to true to enable ingestion of Salesforce module fileset
-# - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
-# - api_version: API version for Salesforce, version should be greater than 46.0
+  # Common Configurations:
+  # - enabled: Set to true to enable ingestion of Salesforce module fileset
+  # - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
+  # - api_version: API version for Salesforce, version should be greater than 46.0
 
-# Authentication Configurations:
-# User-Password Authentication:
-# - enabled: Set to true to enable user-password authentication
-# - client.id: Client ID for user-password authentication
-# - client.secret: Client secret for user-password authentication
-# - token_url: Token URL for user-password authentication
-# - username: Username for user-password authentication
-# - password: Password for user-password authentication
+  # Authentication Configurations:
+  # User-Password Authentication:
+  # - enabled: Set to true to enable user-password authentication
+  # - client.id: Client ID for user-password authentication
+  # - client.secret: Client secret for user-password authentication
+  # - token_url: Token URL for user-password authentication
+  # - username: Username for user-password authentication
+  # - password: Password for user-password authentication
 
-# JWT Authentication:
-# - enabled: Set to true to enable JWT authentication
-# - client.id: Client ID for JWT authentication
-# - client.username: Username for JWT authentication
-# - client.key_path: Path to client key for JWT authentication
-# - url: Audience URL for JWT authentication
+  # JWT Authentication:
+  # - enabled: Set to true to enable JWT authentication
+  # - client.id: Client ID for JWT authentication
+  # - client.username: Username for JWT authentication
+  # - client.key_path: Path to client key for JWT authentication
+  # - url: Audience URL for JWT authentication
 
-# Event Monitoring:
-# - real_time: Set to true to enable real-time logging using object type data collection
-# - real_time_interval: Interval for real-time logging
+  # Event Monitoring:
+  # - real_time: Set to true to enable real-time logging using object type data collection
+  # - real_time_interval: Interval for real-time logging
 
-# Event Log File:
-# - event_log_file: Set to true to enable event log file type data collection
-# - elf_interval: Interval for event log file
-# - log_file_interval: Interval type for log file collection, either Hourly or Daily
+  # Event Log File:
+  # - event_log_file: Set to true to enable event log file type data collection
+  # - elf_interval: Interval for event log file
+  # - log_file_interval: Interval type for log file collection, either Hourly or Daily
 
-- module: salesforce
+  - module: salesforce
 
-  apex:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
+    apex:
+      enabled: false
+      var.initial_interval: 1d
+      var.api_version: 56
 
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "<YourClientSecretHere>"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
+      var.authentication:
+        user_password_flow:
+          enabled: true
+          client.id: "<YourClientIdHere>"
+          client.secret: "<YourClientSecretHere>"
+          token_url: "<YourTokenURLHere>"
+          username: "<YourUsernameHere>"
+          password: "<YourPasswordHere>"
+        jwt_bearer_flow:
+          enabled: false
+          client.id: "<YourClientIdHere>"
+          client.username: "<YourClientUsernameHere>"
+          client.key_path: "<YourClientKeyPathHere>"
+          url: "https://login.salesforce.com"
 
-    var.url: "https://instance_id.my.salesforce.com"
+      var.url: "https://instance_id.my.salesforce.com"
 
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
+      var.event_log_file: true
+      var.elf_interval: 1h
+      var.log_file_interval: "Hourly"
 
-  login:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
+    login:
+      enabled: false
+      var.initial_interval: 1d
+      var.api_version: 56
 
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
+      var.authentication:
+        user_password_flow:
+          enabled: true
+          client.id: "<YourClientIdHere>"
+          client.secret: "client-secret"
+          token_url: "<YourTokenURLHere>"
+          username: "<YourUsernameHere>"
+          password: "<YourPasswordHere>"
+        jwt_bearer_flow:
+          enabled: false
+          client.id: "<YourClientIdHere>"
+          client.username: "<YourClientUsernameHere>"
+          client.key_path: "<YourClientKeyPathHere>"
+          url: "https://login.salesforce.com"
 
-    var.url: "https://instance_id.my.salesforce.com"
+      var.url: "https://instance_id.my.salesforce.com"
 
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
+      var.event_log_file: true
+      var.elf_interval: 1h
+      var.log_file_interval: "Hourly"
 
-    var.real_time: true
-    var.real_time_interval: 5m
+      var.real_time: true
+      var.real_time_interval: 5m
 
-  logout:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
+    logout:
+      enabled: false
+      var.initial_interval: 1d
+      var.api_version: 56
 
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
+      var.authentication:
+        user_password_flow:
+          enabled: true
+          client.id: "<YourClientIdHere>"
+          client.secret: "client-secret"
+          token_url: "<YourTokenURLHere>"
+          username: "<YourUsernameHere>"
+          password: "<YourPasswordHere>"
+        jwt_bearer_flow:
+          enabled: false
+          client.id: "<YourClientIdHere>"
+          client.username: "<YourClientUsernameHere>"
+          client.key_path: "<YourClientKeyPathHere>"
+          url: "https://login.salesforce.com"
 
-    var.url: "https://instance_id.my.salesforce.com"
+      var.url: "https://instance_id.my.salesforce.com"
 
-    var.event_log_file: true
-    var.elf_interval: 1h
-    var.log_file_interval: "Hourly"
+      var.event_log_file: true
+      var.elf_interval: 1h
+      var.log_file_interval: "Hourly"
 
-    var.real_time: true
-    var.real_time_interval: 5m
+      var.real_time: true
+      var.real_time_interval: 5m
 
-  setupaudittrail:
-    enabled: false
-    var.initial_interval: 1d
-    var.api_version: 56
+    setupaudittrail:
+      enabled: false
+      var.initial_interval: 1d
+      var.api_version: 56
 
-    var.authentication:
-      user_password_flow:
-        enabled: true
-        client.id: "<YourClientIdHere>"
-        client.secret: "client-secret"
-        token_url: "<YourTokenURLHere>"
-        username: "<YourUsernameHere>"
-        password: "<YourPasswordHere>"
-      jwt_bearer_flow:
-        enabled: false
-        client.id: "<YourClientIdHere>"
-        client.username: "<YourClientUsernameHere>"
-        client.key_path: "<YourClientKeyPathHere>"
-        url: "https://login.salesforce.com"
+      var.authentication:
+        user_password_flow:
+          enabled: true
+          client.id: "<YourClientIdHere>"
+          client.secret: "client-secret"
+          token_url: "<YourTokenURLHere>"
+          username: "<YourUsernameHere>"
+          password: "<YourPasswordHere>"
+        jwt_bearer_flow:
+          enabled: false
+          client.id: "<YourClientIdHere>"
+          client.username: "<YourClientUsernameHere>"
+          client.key_path: "<YourClientKeyPathHere>"
+          url: "https://login.salesforce.com"
 
-    var.url: "https://instance_id.my.salesforce.com"
+      var.url: "https://instance_id.my.salesforce.com"
 
-    var.real_time: true
-    var.real_time_interval: 5m
+      var.real_time: true
+      var.real_time_interval: 5m
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
@@ -3166,8 +3166,8 @@ filebeat.inputs:
 #               symlinks: true
 #            file_identity.fingerprint: ~
 
-  # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  # use_kubeadm: true
+# By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+# use_kubeadm: true
 
 # ========================== Filebeat global options ===========================
 
