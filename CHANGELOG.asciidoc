@@ -3,6 +3,52 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.15.1]]
+=== Beats version 8.15.1
+https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Aborts all active connections for Elasticsearch output. {pull}40572[40572]
+- Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
+
+*Auditbeat*
+
+- Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
+- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
+
+*Filebeat*
+
+- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
+- Fix bug in Okta entity analytics rate limit logic. {issue}40106[40106] {pull}40267[40267]
+- Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
+- Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
+- The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
+- Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
+- awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
+- Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+
+*Metricbeat*
+
+- Fix first HTTP 401 error when fetching metrics from the Kubelet API caused by a token update {pull}40636[40636]
+- Fix needlessly verbose logging in cgroups setup {issue}40620[40620]
+
+==== Added
+
+*Filebeat*
+
+- Enable file ingestion to report detailed status to Elastic Agent {pull}40075[40075]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+
+*Metricbeat*
+
+- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+
 [[release-notes-8.15.0]]
 === Beats version 8.15.0
 https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
