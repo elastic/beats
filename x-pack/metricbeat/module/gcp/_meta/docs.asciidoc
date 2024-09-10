@@ -122,7 +122,7 @@ Generally, you have to create a Service Account and assign it the following role
 - `compute.instances.get`
 - `compute.instances.list`
 
-* `Resource Manager`(To get ECS Cloud Labels):
+* `Browser`:
 - `resourcemanager.projects.get`
 - `resourcemanager.organizations.get`
 

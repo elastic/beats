@@ -134,6 +134,10 @@ Generally, you have to create a Service Account and assign it the following role
 - `compute.instances.get`
 - `compute.instances.list`
 
+* `Browser`:
+- `resourcemanager.projects.get`
+- `resourcemanager.organizations.get`
+
 You can play in IAM pretty much with your service accounts and Instance level access to your resources (for example, allowing that everything running in an Instance is authorized to use the Compute API). The module uses Google Cloud Platform libraries for authentication so many possibilities are open but the Module is only supported by using the method mentioned above.
 
 [float]
@@ -142,6 +146,12 @@ You can play in IAM pretty much with your service accounts and Instance level ac
 Google Cloud Platform offers the https://cloud.google.com/monitoring/api/metrics_gcp[Stackdriver Monitoring API] to fetch metrics from its services. *Those metrics are retrieved one by one*.
 
 If you also want to *extract service labels* (by setting `exclude_labels` to false, which is the default state). You also make a new API check on the corresponding service. Service labels requires a new API call to extract those metrics. In the worst case the number of API calls will be doubled. In the best case, all metrics come from the same GCP entity and 100% of the required information is included in the first API call (which is cached for subsequent calls).
+
+We have updated our field names to align with ECS semantics. As part of this change:
+
+*  `cloud.account.id` will now contain the Google Cloud Organization ID (previously, it contained the project ID).
+*  `cloud.account.name` will now contain the Google Cloud Organization Display Name (previously, it contained the project name).
+*  New fields `cloud.project.id` and `cloud.project.name` will be added to store the actual project ID and project name, respectively.
 
 If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
 GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
