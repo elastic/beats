@@ -30,7 +30,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -83,7 +83,7 @@ func TestJournaldInput(t *testing.T) {
 	)
 
 	// render configuration
-	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.New().String())
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
 	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
 
 	go generateJournaldLogs(t, context.Background(), syslogID, 3)

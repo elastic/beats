@@ -52,7 +52,7 @@ func main() {
 			mockData["MESSAGE"] = fmt.Sprintf("Count: %010d", count)
 			mockData["__CURSOR"] = fmt.Sprintf("cursor-%010d-now-%s", count, time.Now().Format(time.RFC3339Nano))
 			mockData["__REALTIME_TIMESTAMP"] = fmt.Sprintf("%d", t.UnixMicro())
-			jsonEncoder.Encode(mockData)
+			jsonEncoder.Encode(mockData) //nolint:errcheck // it will never fail and it's a mock for testing.
 		case t := <-stderrTicker.C:
 			fmt.Fprintf(os.Stderr, "a random error at %s, count: %010d\n", t.Format(time.RFC3339), count)
 		case t := <-fatalTicker.C:
