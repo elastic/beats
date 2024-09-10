@@ -8,6 +8,7 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+* <<release-notes-7.17.24>>
 * <<release-notes-7.17.23>>
 * <<release-notes-7.17.22>>
 * <<release-notes-7.17.21>>
