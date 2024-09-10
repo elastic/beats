@@ -154,10 +154,10 @@ func reportLicenseMetrics(reporter mb.ReporterV2, organizationID string, cotermL
 
 		ReportMetricsForOrganization(reporter, organizationID, []mapstr.M{
 			{
-				"license.systems_manager.active_seats":            systemsManagerLicense.ActiveSeats,
-				"license.systems_manager.orgwideenrolled_devices": systemsManagerLicense.OrgwideEnrolledDevices,
-				"license.systems_manager.total_seats":             systemsManagerLicense.TotalSeats,
-				"license.systems_manager.unassigned_seats":        systemsManagerLicense.UnassignedSeats,
+				"license.systems_manager.active_seats":              systemsManagerLicense.ActiveSeats,
+				"license.systems_manager.org_wide_enrolled_devices": systemsManagerLicense.OrgwideEnrolledDevices,
+				"license.systems_manager.total_seats":               systemsManagerLicense.TotalSeats,
+				"license.systems_manager.unassigned_seats":          systemsManagerLicense.UnassignedSeats,
 			},
 		})
 	}

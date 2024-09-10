@@ -3,15 +3,17 @@ package device_health
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
-func reportWirelessDeviceChannelUtilization(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device, wirelessDevices WirelessDevicesChannelUtilizationByDevice) {
+func reportWirelessDeviceChannelUtilization(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device, wirelessDevices *meraki_api.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice) {
 
 	metrics := []mapstr.M{}
 
-	for _, wirelessDevice := range wirelessDevices {
+	for _, wirelessDevice := range *wirelessDevices {
 
 		if device, ok := devices[Serial(wirelessDevice.Serial)]; ok {
 
@@ -31,10 +33,10 @@ func reportWirelessDeviceChannelUtilization(reporter mb.ReporterV2, organization
 				"device.tags":         device.Tags,
 			}
 
-			for _, v := range wirelessDevice.ByBand {
-				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.wifi.percentage", v.Band)] = v.Wifi.Percentage
-				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.nonwifi.percentage", v.Band)] = v.NonWifi.Percentage
-				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.total.percentage", v.Band)] = v.Total.Percentage
+			for _, v := range *wirelessDevice.ByBand {
+				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.wifi.percentage", common.DeDot(v.Band))] = v.Wifi.Percentage
+				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.nonwifi.percentage", common.DeDot(v.Band))] = v.NonWifi.Percentage
+				metric[fmt.Sprintf("wireless.device.channel.utilization.band_%s.total.percentage", common.DeDot(v.Band))] = v.Total.Percentage
 			}
 
 			metrics = append(metrics, metric)

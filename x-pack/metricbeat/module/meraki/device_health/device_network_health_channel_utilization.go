@@ -6,7 +6,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
@@ -15,10 +14,8 @@ func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *mer
 	var networkHealthUtilizations []*meraki_api.ResponseNetworksGetNetworkNetworkHealthChannelUtilization
 
 	for _, network := range *networks {
-
 		for _, product_type := range network.ProductTypes {
-
-			if strings.Compare(product_type, "wireless") == 0 {
+			if product_type == "wireless" {
 				networkHealthUtilization, res, err := client.Networks.GetNetworkNetworkHealthChannelUtilization(network.ID, &meraki_api.GetNetworkNetworkHealthChannelUtilizationQueryParams{})
 				if err != nil {
 					//"This endpoint is only available for networks on MR 27.0 or above."
@@ -28,13 +25,13 @@ func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *mer
 						return nil, fmt.Errorf("Networks.GetNetworkNetworkHealthChannelUtilization failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 					}
 				} else {
+					//fmt.Printf("\n#Added Networks.GetNetworkNetworkHealthChannelUtilization networkInfo; [%d] %s.\n###################", res.StatusCode(), res.Body())
 					networkHealthUtilizations = append(networkHealthUtilizations, networkHealthUtilization)
 				}
 
 			}
 		}
 	}
-
 	return networkHealthUtilizations, nil
 }
 
@@ -42,7 +39,6 @@ func reportNetworkHealthChannelUtilization(reporter mb.ReporterV2, organizationI
 	metrics := []mapstr.M{}
 	for _, networkHealthUtil := range networkHealthUtilizations {
 		for _, network := range *networkHealthUtil {
-
 			metric := mapstr.M{
 				"network.health.channel.radio.serial": network.Serial,
 				"network.health.channel.radio.model":  network.Model,
@@ -50,19 +46,19 @@ func reportNetworkHealthChannelUtilization(reporter mb.ReporterV2, organizationI
 			}
 
 			for k, wifi0 := range *network.Wifi0 {
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.start_time", k)] = wifi0.StartTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.end_time", k)] = wifi0.EndTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilization80211", k)] = wifi0.Utilization80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilizationNon80211", k)] = wifi0.UtilizationNon80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.%d.utilizationTotal", k)] = wifi0.UtilizationTotal
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.start_time", k)] = wifi0.StartTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.end_time", k)] = wifi0.EndTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilization80211", k)] = wifi0.Utilization80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilizationNon80211", k)] = wifi0.UtilizationNon80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilizationTotal", k)] = wifi0.UtilizationTotal
 			}
 
 			for k, wifi1 := range *network.Wifi1 {
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.start_time", k)] = wifi1.StartTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.end_time", k)] = wifi1.EndTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilization80211", k)] = wifi1.Utilization80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilizationNon80211", k)] = wifi1.UtilizationNon80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.%d.utilizationTotal", k)] = wifi1.UtilizationTotal
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.start_time", k)] = wifi1.StartTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.end_time", k)] = wifi1.EndTime
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilization80211", k)] = wifi1.Utilization80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilizationNon80211", k)] = wifi1.UtilizationNon80211
+				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilizationTotal", k)] = wifi1.UtilizationTotal
 			}
 
 			if device, ok := devices[Serial(network.Serial)]; ok {

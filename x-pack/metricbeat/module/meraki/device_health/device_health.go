@@ -161,7 +161,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if wireless_err != nil {
 			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice failed; [%d] %s. %w", wireless_res.StatusCode(), wireless_res.Body(), wireless_err)
 		}
-		var wirelessDevices WirelessDevicesChannelUtilizationByDevice
+		var wirelessDevices *meraki_api.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
 		unmashal_err := json.Unmarshal(wireless_res.Body(), &wirelessDevices)
 		if unmashal_err != nil {
 			return fmt.Errorf("device_network_health_channel_utilization json umarshal failed; %w", unmashal_err)
