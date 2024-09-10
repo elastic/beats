@@ -41,6 +41,8 @@ var (
 		"index":   c.Str("index"),
 		"shard":   c.Int("shard"),
 	}
+
+	previousStateID = ""
 )
 
 type stateStruct struct {
@@ -64,6 +66,14 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	if err != nil {
 		return fmt.Errorf("failure parsing Elasticsearch Cluster State API response: %w", err)
 	}
+
+	// Only proceed if the cluster state has changed
+	// See https://github.com/elastic/beats/issues/39058
+	if stateData.StateID == previousStateID {
+		fmt.Printf("cluster state hasn't changed since last run, ignoring.")
+		return nil
+	}
+	previousStateID = stateData.StateID
 
 	var errs multierror.Errors
 	for _, index := range stateData.RoutingTable.Indices {
