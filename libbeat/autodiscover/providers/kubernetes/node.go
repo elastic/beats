@@ -76,7 +76,6 @@ func NewNodeEventer(uuid uuid.UUID, cfg *config.C, client k8s.Interface, publish
 	}
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
-	logger.Errorf("Initializing a new Kubernetes watcher using kubeadm: %v", config.KubeAdm)
 
 	watcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
