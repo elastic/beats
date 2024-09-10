@@ -55,7 +55,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.12.3
-	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
+	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/dgraph-io/badger/v3 v3.2103.1
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
 	github.com/docker/docker v26.1.5+incompatible
@@ -199,7 +199,7 @@ require (
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.8.1
 	github.com/elastic/elastic-agent-libs v0.9.13
-	github.com/elastic/elastic-agent-system-metrics v0.10.3
+	github.com/elastic/elastic-agent-system-metrics v0.10.4-0.20240826151019-9db0a02d3b85
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
 	github.com/elastic/mito v1.13.1
