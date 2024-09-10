@@ -386,7 +386,8 @@ metricbeat.modules:
   hosts: ["localhost:10251"]
   period: 10s
   #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
-  use_kubeadm: true----
+  use_kubeadm: true
+----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 It also supports the options described in <<module-http-config-options>>.

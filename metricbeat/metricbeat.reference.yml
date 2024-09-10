@@ -674,6 +674,7 @@ metricbeat.modules:
   period: 10s
   #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
   use_kubeadm: true
+
 #--------------------------------- KVM Module ---------------------------------
 - module: kvm
   metricsets: ["dommemstat", "status"]
