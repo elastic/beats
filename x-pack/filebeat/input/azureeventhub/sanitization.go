@@ -10,6 +10,9 @@ package azureeventhub
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"regexp"
+	"strings"
 )
 
 type sanitizationOption string
@@ -17,6 +20,7 @@ type sanitizationOption string
 const (
 	newLines     sanitizationOption = "NEW_LINES"
 	singleQuotes sanitizationOption = "SINGLE_QUOTES"
+	regExp       sanitizationOption = "REGEXP"
 )
 
 // sanitizeOptionsValidate validates for supported sanitization options
@@ -25,6 +29,8 @@ func sanitizeOptionsValidate(s string) error {
 	case "NEW_LINES":
 		return nil
 	case "SINGLE_QUOTES":
+		return nil
+	case "REGEXP":
 		return nil
 	default:
 		return errors.New("invalid sanitization option")
@@ -42,6 +48,8 @@ func sanitize(jsonByte []byte, opts ...string) []byte {
 			res = sanitizeNewLines(res)
 		case singleQuotes:
 			res = sanitizeSingleQuotes(res)
+		case regExp:
+			res = sanitizeRegex(res)
 		}
 	}
 
@@ -75,4 +83,20 @@ func sanitizeSingleQuotes(jsonByte []byte) []byte {
 	}
 
 	return result.Bytes()
+}
+
+func sanitizeRegex(jsonByte []byte) []byte {
+	// Remove any leading/trailing whitespace
+	input := strings.TrimSpace(string(jsonByte))
+
+	// Regular expression to match array contents that are not valid JSON
+	// re := regexp.MustCompile(`\[\s*([^[\]{},\s]+(?:\s+[^[\]{},\s]+)*)\s*\]`)
+	re := regexp.MustCompile(`\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`)
+
+	// Replace invalid array contents with a string placeholder
+	sanitized := re.ReplaceAllStringFunc(input, func(match string) string {
+		return fmt.Sprintf("[\"%s\"]", strings.TrimSpace(match[1:len(match)-1]))
+	})
+
+	return []byte(sanitized)
 }
