@@ -75,7 +75,7 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(fmt.Errorf("error trying to logout from vSphere: %v", err))
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 

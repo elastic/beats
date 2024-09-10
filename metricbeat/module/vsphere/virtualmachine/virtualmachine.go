@@ -104,7 +104,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("Error logging out from vsphere: %v", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -130,7 +130,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug("Error destroying view from vsphere %v", err)
+			m.Logger().Debugf("Error destroying view from vsphere %v", err)
 		}
 	}()
 

@@ -80,7 +80,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to log out from vSphere: %v", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 

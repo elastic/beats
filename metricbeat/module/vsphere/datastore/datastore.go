@@ -86,7 +86,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to log out from vSphere: %v", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
