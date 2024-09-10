@@ -158,8 +158,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
 	// set organization id
-	if err := m.setOrgAndProjectDetails(ctx); err != nil {
-		m.Logger().Warnf("error occurred while fetching organization and project name: %s", err)
+	if errs := m.setOrgAndProjectDetails(ctx); errs != nil {
+		m.Logger().Warnf("error occurred while fetching organization and project details: %s", errs)
 	}
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
@@ -362,23 +362,42 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 	return hostRootFields
 }
 
-func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) error {
+func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) []error {
+	var errs []error
 
 	// Initialize the Cloud Resource Manager service
 	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
 	if err != nil {
-		return fmt.Errorf("failed to create cloudresourcemanager service: %w", err)
+		errs = append(errs, fmt.Errorf("failed to create cloudresourcemanager service: %w", err))
+		return errs
 	}
-	// Get Project name
-	project, err := srv.Projects.Get(m.config.ProjectID).Context(ctx).Do()
+	// Set Project name
+	err = m.setProjectDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	//Set Organization Details
+	err = m.setOrganizationDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	return errs
+}
+
+func (m *MetricSet) setProjectDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
+	project, err := service.Projects.Get(m.config.ProjectID).Context(ctx).Do()
 	if err != nil {
 		return fmt.Errorf("failed to get project name: %w", err)
 	}
 	if project != nil {
 		m.config.projectName = project.Name
 	}
+	return nil
+}
+
+func (m *MetricSet) setOrganizationDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
 	// Get the project ancestor details
-	ancestryResponse, err := srv.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
+	ancestryResponse, err := service.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
 	if err != nil {
 		return fmt.Errorf("failed to get project ancestors: %w", err)
 	}
@@ -389,7 +408,7 @@ func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) error {
 
 	if ancestor.ResourceId.Type == "organization" {
 		m.config.organizationID = ancestor.ResourceId.Id
-		orgReq := srv.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
+		orgReq := service.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
 
 		orgDetails, err := orgReq.Context(ctx).Do()
 		if err != nil {
@@ -398,6 +417,5 @@ func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) error {
 
 		m.config.organizationName = orgDetails.DisplayName
 	}
-
 	return nil
 }

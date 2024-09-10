@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 
 *Osquerybeat*
 
@@ -193,7 +194,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
-- Add GCP organization ID and display name to ECS cloud fields. {issue}39203[39203] {pull}40461[40461]
 
 *Osquerybeat*
 
