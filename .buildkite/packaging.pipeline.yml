@@ -36,7 +36,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -80,7 +80,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -169,7 +169,7 @@ steps:
     key: packaging-staging
     depends_on: start-gate-staging
     ## Only for release
-    if: build.branch =~ /^\d+\.\d+$$/
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == '8.x' 
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -257,7 +257,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -296,13 +296,13 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-    if: build.branch =~ /^\d+\.\d+$$/
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == '8.x' 
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
