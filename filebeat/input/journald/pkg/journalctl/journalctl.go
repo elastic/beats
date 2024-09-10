@@ -40,6 +40,8 @@ type journalctl struct {
 }
 
 // Factory returns an instance of journalctl ready to use.
+// The caller is responsible for calling Kill to ensure the
+// journalctl process created is correctly terminated.
 //
 // The returned type is an interface to allow mocking for testing
 func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args ...string) (Jctl, error) {
