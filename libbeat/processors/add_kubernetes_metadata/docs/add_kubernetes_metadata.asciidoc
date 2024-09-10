@@ -6,7 +6,8 @@
 ++++
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
-metadata based on which Kubernetes pod the event originated from.
+metadata based on which Kubernetes pod the event originated from. This processor only adds metadata to the events that do not have it yet present.
+
 At startup, it detects an `in_cluster` environment and caches the
 Kubernetes-related metadata. Events are only annotated if a valid configuration
 is detected. If it's not able to detect a valid Kubernetes configuration,
