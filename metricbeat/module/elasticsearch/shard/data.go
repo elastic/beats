@@ -171,9 +171,9 @@ func getSourceNode(nodeID string, stateData *stateStruct) (mapstr.M, error) {
 	}, nil
 }
 
-// Note: This function may generate duplicate IDs, but those will be dropped since libbeat
-// ignores the 409 status code
-// https://github.com/elastic/beats/blob/main/libbeat/outputs/elasticsearch/client.go#L396
+// Note: This function will not generate duplicate IDs anymore since we're only proceeding
+// when the cluster state (i.e. stateID) actually changes, thus preserving bandwidth and ES resources
+// See https://github.com/elastic/beats/issues/39058
 func generateHashForEvent(stateID string, shard mapstr.M, index int) (string, error) {
 	var nodeID string
 	if shard["node"] == nil {
