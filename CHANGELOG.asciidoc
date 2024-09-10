@@ -3,6 +3,27 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.24]]
+=== Beats version 7.17.24
+https://github.com/elastic/beats/compare/v7.17.23\...v7.17.24[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Upgrade github.com/containerd/containerd version to v1.5.18. {pull}40096[40096]
+
+*Elastic Agent*
+
+- Fixes the issue where upgrading from 7.17 to a 8.x+ version only runs the 7.17 watcher for the latest 8.x release.
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.6. {pull}40529[40529]
+
+
 [[release-notes-7.17.23]]
 === Beats version 7.17.23
 https://github.com/elastic/beats/compare/v7.17.22\...v7.17.23[View commits]

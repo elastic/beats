@@ -10,8 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull}40096[40096]
-- Update github.com/containerd/containerd version to v1.5.18 {pull}40096[40096]
 
 *Auditbeat*
 
@@ -32,7 +30,6 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 
 *Elastic Agent*
 
-- Fixes the issue where upgrading from 7.17 to a 8.x+ version only runs the 7.17 watcher for the latest 8.x release.
 
 ==== Bugfixes
 
@@ -69,7 +66,6 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 
 *Affecting all Beats*
 
-- Update Go version to 1.22.6. {pull}40529[40529]
 
 *Auditbeat*
 
@@ -115,6 +111,9 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
