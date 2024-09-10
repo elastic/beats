@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/elastic-agent-autodiscover/bus"

@@ -18,3 +18,11 @@
       description: >
         Total free space on this storage pod, in bytes.
       format: bytes
+    - name: datastore.names
+      type: keyword
+      description: >
+        List of all the Datastore names associated with the Datastore Cluster.
+    - name: datastore.count
+      type: long
+      description: >
+        Number of datastores in the Datastore Cluster.
