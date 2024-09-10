@@ -49,6 +49,10 @@ func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.
 		},
 	}
 
+	if len(data.alertNames) > 0 {
+		event.Put("alert.names", data.alertNames)
+	}
+
 	if ds.Summary.Capacity > 0 {
 		usedSpacePercent := float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
 		event.Put("capacity.used.pct", usedSpacePercent)

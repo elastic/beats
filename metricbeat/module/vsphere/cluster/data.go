@@ -23,21 +23,25 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *assetNames) mapstr.M {
+func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"host": mapstr.M{
-			"count": len(data.outputHostNames),
-			"names": data.outputHostNames,
+			"count": len(data.assetNames.outputHostNames),
+			"names": data.assetNames.outputHostNames,
 		},
 		"datastore": mapstr.M{
-			"count": len(data.outputDatastoreNames),
-			"names": data.outputDatastoreNames,
+			"count": len(data.assetNames.outputDatastoreNames),
+			"names": data.assetNames.outputDatastoreNames,
 		},
 		"network": mapstr.M{
-			"count": len(data.outputNetworkNames),
-			"names": data.outputNetworkNames,
+			"count": len(data.assetNames.outputNetworkNames),
+			"names": data.assetNames.outputNetworkNames,
 		},
 		"name": cl.Name,
+	}
+
+	if len(data.alertNames) > 0 {
+		event.Put("alert.names", data.alertNames)
 	}
 
 	if cl.Configuration.DasConfig.Enabled != nil {

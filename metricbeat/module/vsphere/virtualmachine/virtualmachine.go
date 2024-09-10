@@ -58,6 +58,7 @@ type VMData struct {
 	DatastoreNames []string
 	CustomFields   mapstr.M
 	Snapshots      []VMSnapshotData
+	alertNames     []string
 }
 
 type VMSnapshotData struct {
@@ -136,7 +137,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
@@ -194,6 +195,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
 		}
 
+		alerts, err := getAlertNames(ctx, pc, vm.TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from host %s: %w", vm.Name, err)
+		}
+
 		data := VMData{
 			VM:             vm,
 			HostID:         hostID,
@@ -202,6 +208,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			DatastoreNames: datastoreNames,
 			CustomFields:   customFields,
 			Snapshots:      snapshots,
+			alertNames:     alerts,
 		}
 
 		reporter.Event(mb.Event{
@@ -304,4 +311,20 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 		}
 	}
 	return snapshots
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

@@ -191,17 +191,9 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 				m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
 			}
 
-			var alerts []string
-			for _, alarm := range hst[i].TriggeredAlarmState {
-				if alarm.OverallStatus == "red" {
-					var triggeredAlarm mo.Alarm
-					err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
-					if err != nil {
-						m.Logger().Errorf("can not retrive alarm from host %s: %v", hst[i].Name, err)
-					}
-
-					alerts = append(alerts, triggeredAlarm.Info.Name)
-				}
+			alerts, err := getAlertNames(ctx, pc, hst[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from host %s: %w", hst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
@@ -253,4 +245,20 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputDsNames:      outputDsNames,
 		outputVmNames:      outputVmNames,
 	}, nil
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

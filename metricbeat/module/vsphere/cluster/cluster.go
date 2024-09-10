@@ -29,6 +29,7 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -51,6 +52,11 @@ type assetNames struct {
 	outputNetworkNames   []string
 	outputDatastoreNames []string
 	outputHostNames      []string
+}
+
+type metricData struct {
+	assetNames assetNames
+	alertNames []string
 }
 
 // New creates a new instance of the MetricSet.
@@ -97,7 +103,7 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	// Retrieve summary property for all Clusters
 	var clt []mo.ClusterComputeResource
-	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{"name", "host", "network", "datastore", "configuration"}, &clt)
+	err = v.Retrieve(ctx, []string{"ClusterComputeResource"}, []string{"name", "host", "network", "datastore", "configuration", "triggeredAlarmState"}, &clt)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -120,8 +126,13 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				m.Logger().Warn("Metric das_config.enabled not found")
 			}
 
+			alerts, err := getAlertNames(ctx, pc, clt[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from cluster %s: %w", clt[i].Name, err)
+			}
+
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(clt[i], assetNames),
+				MetricSetFields: m.mapEvent(clt[i], &metricData{assetNames: assetNames, alertNames: alerts}),
 			})
 		}
 	}
@@ -129,7 +140,7 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterComputeResource) (*assetNames, error) {
+func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterComputeResource) (assetNames, error) {
 	referenceList := append(cl.Datastore, cl.Host...)
 
 	outputDatastoreNames := make([]string, 0, len(cl.Datastore))
@@ -137,7 +148,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	if len(referenceList) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, referenceList, []string{"name"}, &objects); err != nil {
-			return nil, fmt.Errorf("failed to retrieve managed entities: %w", err)
+			return assetNames{}, fmt.Errorf("failed to retrieve managed entities: %w", err)
 		}
 
 		for _, ob := range objects {
@@ -157,7 +168,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	if len(cl.Network) > 0 {
 		var netObjects []mo.Network
 		if err := pc.Retrieve(ctx, cl.Network, []string{"name"}, &netObjects); err != nil {
-			return nil, fmt.Errorf("failed to retrieve network objects: %w", err)
+			return assetNames{}, fmt.Errorf("failed to retrieve network objects: %w", err)
 		}
 
 		for _, ob := range netObjects {
@@ -166,9 +177,25 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 		}
 	}
 
-	return &assetNames{
+	return assetNames{
 		outputNetworkNames:   outputNetworkNames,
 		outputDatastoreNames: outputDatastoreNames,
 		outputHostNames:      outputHostNames,
 	}, nil
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

@@ -4,6 +4,10 @@
     virtualmachine
   release: ga
   fields:
+    - name: alert.names
+      type: keyword
+      description: >
+        List of all the alert names.
     - name: host
       type: group
       fields:

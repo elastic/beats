@@ -57,6 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 type metricData struct {
 	perfMetrics map[string]interface{}
 	assetNames  assetNames
+	alertNames  []string
 }
 
 type assetNames struct {
@@ -108,7 +109,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
-	err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus"}, &dst)
+	err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary", "host", "vm", "overallStatus", "triggeredAlarmState"}, &dst)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -178,10 +179,16 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 				m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
 			}
 
+			alerts, err := getAlertNames(ctx, pc, dst[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %w", dst[i].Name, err)
+			}
+
 			reporter.Event(mb.Event{
 				MetricSetFields: m.mapEvent(dst[i], &metricData{
 					perfMetrics: metricMap,
 					assetNames:  *assetNames,
+					alertNames:  alerts,
 				}),
 			})
 		}
@@ -234,4 +241,20 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		outputHostNames: outputHostNames,
 		outputVmNames:   outputVmNames,
 	}, nil
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

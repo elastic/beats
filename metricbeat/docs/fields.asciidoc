@@ -66861,6 +66861,16 @@ Cluster information.
 
 
 
+*`vsphere.cluster.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
+
 
 *`vsphere.cluster.datastore.names`*::
 +
@@ -66961,6 +66971,16 @@ type: keyword
 datastore
 
 
+
+*`vsphere.datastore.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
 
 *`vsphere.datastore.capacity.free.bytes`*::
 +
@@ -67140,6 +67160,16 @@ type: long
 Datastore Cluster
 
 
+
+*`vsphere.datastorecluster.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
 
 *`vsphere.datastorecluster.name`*::
 +
@@ -67609,6 +67639,16 @@ type: boolean
 
 --
 
+*`vsphere.network.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
+
 *`vsphere.network.config.status`*::
 +
 --
@@ -67697,6 +67737,16 @@ type: long
 Resource pool information from vSphere environment.
 
 
+
+*`vsphere.resourcepool.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
 
 
 *`vsphere.resourcepool.cpu.usage.mhz`*::
@@ -67923,6 +67973,16 @@ type: keyword
 virtualmachine
 
 
+
+*`vsphere.virtualmachine.alert.names`*::
++
+--
+List of all the alert names.
+
+
+type: keyword
+
+--
 
 
 *`vsphere.virtualmachine.host.id`*::

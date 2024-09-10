@@ -26,6 +26,7 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -58,6 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 type metricData struct {
 	assetNames assetNames
+	alertNames []string
 }
 
 type assetNames struct {
@@ -98,7 +100,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	// Retrieve property for all networks
 	var networks []mo.Network
-	err = v.Retrieve(ctx, []string{"Network"}, []string{"summary", "name", "overallStatus", "configStatus", "vm", "host"}, &networks)
+	err = v.Retrieve(ctx, []string{"Network"}, []string{"summary", "name", "overallStatus", "configStatus", "vm", "host", "triggeredAlarmState"}, &networks)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -115,8 +117,13 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				continue
 			}
 
+			alerts, err := getAlertNames(ctx, pc, networks[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from network %s: %w", networks[i].Name, err)
+			}
+
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames}),
+				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames, alertNames: alerts}),
 			})
 		}
 	}
@@ -153,4 +160,20 @@ func getAssetNames(ctx context.Context, pc *property.Collector, net *mo.Network)
 		outputVmNames:   outputVmNames,
 		outputHostNames: outputHostNames,
 	}, nil
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

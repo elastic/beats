@@ -4,6 +4,10 @@
   description: >
     Cluster information.
   fields:
+    - name: alert.names
+      type: keyword
+      description: >
+        List of all the alert names.
     - name: datastore
       type: group
       fields:

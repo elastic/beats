@@ -26,6 +26,7 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -59,6 +60,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 type metricData struct {
 	assetNames assetNames
+	alertNames []string
 }
 
 type assetNames struct {
@@ -94,7 +96,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity"}, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity", "triggeredAlarmState"}, &datastoreCluster)
 	if err != nil {
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
@@ -110,7 +112,12 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 			m.Logger().Errorf("Failed to retrieve object from host %s: %w", datastoreCluster[i].Name, err)
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames})})
+		alerts, err := getAlertNames(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %w", datastoreCluster[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, alertNames: alerts})})
 	}
 
 	return nil
@@ -135,4 +142,20 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 	return assetNames{
 		outputDsNames: outputDsNames,
 	}, nil
+}
+
+func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
+	var alerts []string
+	for _, alarm := range triggeredAlarmState {
+		if alarm.OverallStatus == "red" {
+			var triggeredAlarm mo.Alarm
+			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
+			if err != nil {
+				return nil, err
+			}
+
+			alerts = append(alerts, triggeredAlarm.Info.Name)
+		}
+	}
+	return alerts, nil
 }

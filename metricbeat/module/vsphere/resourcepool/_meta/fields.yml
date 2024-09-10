@@ -4,6 +4,10 @@
   description: >
     Resource pool information from vSphere environment.
   fields:
+    - name: alert.names
+      type: keyword
+      description: >
+        List of all the alert names.
     - name: cpu
       type: group
       fields:
