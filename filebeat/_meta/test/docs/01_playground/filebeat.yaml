@@ -10,7 +10,6 @@ data:
   filebeat.yml: |-
     filebeat.inputs:
     - type: filestream
-      #use_kubeadm: true
       id: kubernetes-container-logs
       paths:
         - /var/log/containers/*.log
@@ -23,6 +22,7 @@ data:
       file_identity.fingerprint: ~
       processors:
         - add_kubernetes_metadata:
+            #use_kubeadm: true
             host: ${NODE_NAME}
             matchers:
             - logs_path:
