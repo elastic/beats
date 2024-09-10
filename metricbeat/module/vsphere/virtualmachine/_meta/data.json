@@ -66,7 +66,21 @@
             "datastore.names": [
               "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
             ],
-            "host.id": "host-20"
+            "host.id": "host-20",
+            "snapshot.info": [
+              {
+                "Name":        "Snapshot_1",
+                "Description": "Test snapshot 1",
+                "CreateTime": "2024-09-01T12:34:56Z"
+
+              },
+              {
+                "Name":        "Snapshot_2",
+                "Description": "Test snapshot 2",
+                "CreateTime": "2024-09-03T2:34:56Z"
+              }
+            ],
+            "snapshot.count": 2
           }
         }
     }
