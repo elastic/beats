@@ -28,7 +28,7 @@ import (
 
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
-	g := remoteWriteEventGenerator{}
+	g := RemoteWriteEventGenerator{}
 
 	timestamp := model.Time(424242)
 	timestamp1 := model.Time(424243)
@@ -237,7 +237,7 @@ func TestMetricsCount(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			generator := remoteWriteEventGenerator{
+			generator := RemoteWriteEventGenerator{
 				metricsCount: true,
 			}
 

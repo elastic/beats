@@ -26,19 +26,32 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
-func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, metricsCount bool) (RemoteWriteEventsGenerator, error) {
-	return &remoteWriteEventGenerator{metricsCount: metricsCount}, nil
+type RemoteWriteEventsGeneratorOption func(r *RemoteWriteEventGenerator)
+
+func WithCountMetrics(countMetrics bool) RemoteWriteEventsGeneratorOption {
+	return func(r *RemoteWriteEventGenerator) {
+		r.metricsCount = countMetrics
+	}
 }
 
-type remoteWriteEventGenerator struct {
+// DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
+func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, opts ...RemoteWriteEventsGeneratorOption) (RemoteWriteEventsGenerator, error) {
+	generator := &RemoteWriteEventGenerator{}
+	for _, opt := range opts {
+		opt(generator)
+	}
+
+	return generator, nil
+}
+
+type RemoteWriteEventGenerator struct {
 	metricsCount bool
 }
 
-func (p *remoteWriteEventGenerator) Start() {}
-func (p *remoteWriteEventGenerator) Stop()  {}
+func (p *RemoteWriteEventGenerator) Start() {}
+func (p *RemoteWriteEventGenerator) Stop()  {}
 
-func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
+func (p *RemoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
