@@ -71,6 +71,9 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceWatcher kubernetes.Watcher
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{

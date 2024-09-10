@@ -37,6 +37,7 @@ var AllSupportedHints = []string{"enabled", "module", "metricsets", "hosts", "pe
 type Config struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	KubeAdm           bool                         `config:"use_kubeadm"`
 
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
