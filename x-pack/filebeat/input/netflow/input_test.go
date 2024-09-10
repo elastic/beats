@@ -7,10 +7,10 @@
 package netflow
 
 import (
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
