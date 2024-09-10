@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 
 *Heartbeat*
 
