@@ -3,6 +3,151 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.24]]
+=== Beats version 7.17.24
+https://github.com/elastic/beats/compare/v7.17.23\...v7.17.24[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull}40096[40096]
+- Update github.com/containerd/containerd version to v1.5.18 {pull}40096[40096]
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Agent*
+
+- Fixes the issue where upgrading from 7.17 to a 8.x+ version only runs the 7.17 watcher for the latest 8.x release.
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.6. {pull}40529[40529]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-7.17.23]]
 === Beats version 7.17.23
 https://github.com/elastic/beats/compare/v7.17.22\...v7.17.23[View commits]
