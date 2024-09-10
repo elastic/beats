@@ -73,10 +73,9 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		for {
 			line, err := reader.ReadString('\n')
 			if err != nil {
-				if errors.Is(err, io.EOF) {
-					return
+				if !errors.Is(err, io.EOF) {
+					logger.Errorf("cannot read from journalctl stderr: %s", err)
 				}
-				logger.Errorf("cannot read from journalctl stderr: %s", err)
 				return
 			}
 
@@ -95,10 +94,9 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		for {
 			data, err := reader.ReadBytes('\n')
 			if err != nil {
-				if errors.Is(err, io.EOF) {
-					return
+				if !errors.Is(err, io.EOF) {
+					logger.Errorf("cannot read from journalctl stdout: %s", err)
 				}
-				logger.Errorf("cannot read from journalctl stdout: %s", err)
 				return
 			}
 
