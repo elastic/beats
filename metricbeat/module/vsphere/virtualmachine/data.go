@@ -32,12 +32,14 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	freeMemory := max(0, totalMemory-usedMemory)
 
 	event := mapstr.M{
-		"name":          data.VM.Summary.Config.Name,
-		"os":            data.VM.Summary.Config.GuestFullName,
-		"uptime":        data.VM.Summary.QuickStats.UptimeSeconds,
-		"status":        data.VM.Summary.OverallStatus,
-		"host.id":       data.HostID,
-		"host.hostname": data.HostName,
+		"name":   data.VM.Summary.Config.Name,
+		"os":     data.VM.Summary.Config.GuestFullName,
+		"uptime": data.VM.Summary.QuickStats.UptimeSeconds,
+		"status": data.VM.Summary.OverallStatus,
+		"host": mapstr.M{
+			"id":       data.HostID,
+			"hostname": data.HostName,
+		},
 		"cpu": mapstr.M{
 			"used":  mapstr.M{"mhz": usedCPU},
 			"total": mapstr.M{"mhz": totalCPU},
@@ -55,22 +57,23 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 				"guest": mapstr.M{"bytes": freeMemory},
 			},
 		},
-		"network": mapstr.M{
-			"count": len(data.NetworkNames),
-		},
-		"datastore": mapstr.M{
-			"count": len(data.DatastoreNames),
-		},
 	}
 	if len(data.CustomFields) > 0 {
 		event["custom_fields"] = data.CustomFields
 	}
 	if len(data.NetworkNames) > 0 {
+		event.Put("network.count", len(data.NetworkNames))
+		event.Put("network.names", data.NetworkNames)
 		event["network_names"] = data.NetworkNames
-		event["network.names"] = data.NetworkNames
 	}
 	if len(data.DatastoreNames) > 0 {
-		event["datastore.names"] = data.DatastoreNames
+		event.Put("datastore.count", len(data.DatastoreNames))
+		event.Put("datastore.names", data.DatastoreNames)
 	}
+	if len(data.Snapshots) > 0 {
+		event.Put("snapshot.count", len(data.Snapshots))
+		event.Put("snapshot.info", data.Snapshots)
+	}
+
 	return event
 }

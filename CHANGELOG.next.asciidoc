@@ -55,11 +55,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
-- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+
 
 *Osquerybeat*
 
@@ -116,8 +116,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
-- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 
 *Filebeat*
@@ -165,6 +163,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 
 *Heartbeat*
 
@@ -172,7 +171,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix first HTTP 401 error when fetching metrics from the Kubelet API caused by a token update {pull}40636[40636]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
@@ -221,6 +219,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
+- The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
 
 *Auditbeat*
 
@@ -324,12 +323,17 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
+- Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config api requests {pull}40086[40086]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
 
 *Metricbeat*
 
+- Add support for new metrics for vSphere module datastorecluster metricset. {pull}40694[40694]
 
 *Osquerybeat*
 
@@ -377,3 +381,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
