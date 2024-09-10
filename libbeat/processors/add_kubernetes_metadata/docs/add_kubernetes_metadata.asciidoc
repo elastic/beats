@@ -152,7 +152,7 @@ Example:
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
-`use_kubeadm`::  (Optional) Default true. By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+`use_kubeadm`:: (Optional) Default true. By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
 `kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
 client. Currently client QPS and burst are supported, if not set Kubernetes client's
 https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.

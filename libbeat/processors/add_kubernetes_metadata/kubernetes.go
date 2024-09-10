@@ -148,9 +148,6 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
 		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-		config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
-		config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
-
 		err := config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
 		if err != nil {
 			k.log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
