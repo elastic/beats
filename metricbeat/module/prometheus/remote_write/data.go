@@ -77,7 +77,7 @@ func (p *RemoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				RootFields: make(mapstr.M),
+				RootFields: mapstr.M{},
 				ModuleFields: mapstr.M{
 					"metrics": mapstr.M{},
 				},
