@@ -21,10 +21,15 @@ type SanitizerSpec struct {
 	Type string                 `config:"type"`
 	Spec map[string]interface{} `config:"spec"`
 }
+
 type Sanitizer interface {
 	Sanitize(jsonByte []byte) []byte
 	Init() error
 }
+
+// ----------------------------------------------------------------------------
+// Convenience builder functions
+// ----------------------------------------------------------------------------
 
 func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	var s Sanitizer
@@ -35,7 +40,7 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	case "single_quotes":
 		s = &singleQuotesSanitizer{}
 	case "replace_all":
-		s = &regexpSanitizer{spec: spec.Spec}
+		s = &replaceAllSanitizer{spec: spec.Spec}
 	default:
 		return nil, fmt.Errorf("unknown sanitizer type: %s", spec.Type)
 	}
@@ -64,6 +69,7 @@ func newSanitizers(specs []SanitizerSpec, legacySanitizerOptions []string) ([]Sa
 
 	// Add legacy sanitizers
 	for _, opt := range legacySanitizerOptions {
+		// legacy sanitizer don't need to be initialized
 		switch sanitizationOption(opt) {
 		case newLines:
 			sanitizers = append(sanitizers, &newLinesSanitizer{})
@@ -122,16 +128,16 @@ func (s *singleQuotesSanitizer) Init() error {
 }
 
 // ----------------------------------------------------------------------------
-// Regular expression sanitizer
+// Replace all sanitizer
 // ----------------------------------------------------------------------------
 
-type regexpSanitizer struct {
+type replaceAllSanitizer struct {
 	re          *regexp.Regexp
 	replacement string
 	spec        map[string]interface{}
 }
 
-func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
+func (s *replaceAllSanitizer) Sanitize(jsonByte []byte) []byte {
 	if s.re == nil {
 		return jsonByte
 	}
@@ -139,7 +145,7 @@ func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
 	return s.re.ReplaceAll(jsonByte, []byte(s.replacement))
 }
 
-func (s *regexpSanitizer) Init() error {
+func (s *replaceAllSanitizer) Init() error {
 	if s.spec == nil {
 		return errors.New("missing sanitizer spec")
 	}

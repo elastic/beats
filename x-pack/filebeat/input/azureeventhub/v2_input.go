@@ -108,7 +108,7 @@ func (in *eventHubInputV2) Run(
 
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
-	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.SanitizeOptions)
+	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)
 	if err != nil {
 		return fmt.Errorf("failed to create sanitizers: %w", err)
 	}

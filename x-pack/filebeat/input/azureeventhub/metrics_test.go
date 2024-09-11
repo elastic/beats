@@ -112,12 +112,12 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 	for _, tc := range cases {
 
 		inputConfig := azureInputConfig{
-			SAKey:            "",
-			SAName:           "",
-			SAContainer:      ephContainerName,
-			ConnectionString: "",
-			ConsumerGroup:    "",
-			SanitizeOptions:  tc.sanitizationOption,
+			SAKey:                 "",
+			SAName:                "",
+			SAContainer:           ephContainerName,
+			ConnectionString:      "",
+			ConsumerGroup:         "",
+			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
 		reg := monitoring.NewRegistry()
@@ -125,7 +125,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 
 		fakeClient := fakeClient{}
 
-		sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.SanitizeOptions)
+		sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
 		require.NoError(t, err)
 
 		input := eventHubInputV1{

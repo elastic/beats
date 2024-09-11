@@ -62,9 +62,8 @@ func (u *messageDecoder) Decode(bMessage []byte) []string {
 	// Sanitization occurs if options are available and the message contains an invalid JSON.
 	//
 	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-	// if len(u.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
 	if !json.Valid(bMessage) {
-		// TODO: Add a metric for invalid messages
+		// Count messages containing invalid JSON
 		u.metrics.invalidJSONMessages.Inc()
 
 		if len(u.sanitizers) > 0 {
@@ -72,7 +71,6 @@ func (u *messageDecoder) Decode(bMessage []byte) []string {
 				bMessage = sanitizer.Sanitize(bMessage)
 			}
 
-			// bMessage = sanitize(bMessage, u.config.SanitizeOptions...)
 			u.metrics.sanitizedMessages.Inc()
 		}
 	}

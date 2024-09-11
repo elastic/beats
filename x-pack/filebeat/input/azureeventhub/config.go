@@ -37,10 +37,10 @@ type azureInputConfig struct {
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
-	SanitizeOptions []string `config:"sanitize_options"`
-
+	LegacySanitizeOptions []string `config:"sanitize_options"`
+	// Sanitizers is a list of sanitizers to apply to messages that
+	// contain invalid JSON.
 	Sanitizers []SanitizerSpec `config:"sanitizers"`
-
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
 	// migration from v1 to v2 (processor v2 only). Default is false.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`
@@ -85,7 +85,7 @@ func defaultConfig() azureInputConfig {
 		PartitionReceiveTimeout: 5 * time.Second,
 		PartitionReceiveCount:   100,
 		// Default
-		SanitizeOptions: []string{},
+		LegacySanitizeOptions: []string{},
 	}
 }
 
@@ -124,7 +124,7 @@ func (conf *azureInputConfig) Validate() error {
 	}
 
 	// log a warning for each sanitization option not supported
-	for _, opt := range conf.SanitizeOptions {
+	for _, opt := range conf.LegacySanitizeOptions {
 		err := sanitizeOptionsValidate(opt)
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)

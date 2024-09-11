@@ -26,7 +26,7 @@ func TestSanitizers(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	reSanitizer, err := newSanitizer(SanitizerSpec{
+	raSanitizer, err := newSanitizer(SanitizerSpec{
 		Type: "replace_all",
 		Spec: map[string]interface{}{
 			"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
@@ -60,8 +60,8 @@ func TestSanitizers(t *testing.T) {
 			expected:   []byte("{\"test\":\"this is 'some' message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"),
 		},
 		{
-			name:       "REGEXP option",
-			sanitizers: []Sanitizer{reSanitizer},
+			name:       "Replace all option",
+			sanitizers: []Sanitizer{raSanitizer},
 			original: []byte(`
 	{
 		"AppImage": "orcas/postgres_standalone_16_u18:38.1.240825",
