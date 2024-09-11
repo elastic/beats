@@ -149,12 +149,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			beatsConfig := m.MetricSet.AwsConfig.Copy()
 			beatsConfig.Region = regionName
 
-			svcCloudwatch, svcResourceAPI, svcRestAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+			svcCloudwatch, svcResourceAPI, _, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
 				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
 			}
 
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, svcRestAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
+			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, listMetricDetailTotal.metricsWithStats, listMetricDetailTotal.resourceTypeFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
@@ -207,8 +207,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					m.Logger().Errorf("could not get rest apis output: %v", err)
 				}
 			}
-
-			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, svcRestAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
+			m.Logger().Infof("PASSS InfoAPI response: %v", infoapi)
+			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
 			}
@@ -472,7 +472,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	return event
 }
 
-func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, svcRestAPI apigateway.GetResourcesAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, infoAPImap map[string]string, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
+func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient, svcResourceAPI resourcegroupstaggingapi.GetResourcesAPIClient, listMetricWithStatsTotal []metricsWithStatistics, resourceTypeTagFilters map[string][]aws.Tag, infoAPImap map[string]string, regionName string, startTime time.Time, endTime time.Time) (map[string]mb.Event, error) {
 	// Initialize events for each identifier.
 	events := make(map[string]mb.Event)
 
@@ -543,7 +543,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				delete(resourceTagMap, identifier)
 				continue
 			}
-			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifier)
+			m.logger.Infof("In region %s, service %s tags match tags_filter", regionName, identifier)
 		}
 
 		for _, output := range metricDataResults {
@@ -582,11 +582,15 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				// And tags are only store under s3BucketName in resourceTagMap.
 				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
 				for _, subIdentifier := range subIdentifiers {
-					for apiId, apiName := range infoAPImap {
-						if apiName == subIdentifier {
-							subIdentifier = apiId
-						}
+					m.logger.Infof("PASSSS Before %s", subIdentifier)
+
+					if valAPIName, ok := infoAPImap[subIdentifier]; ok {
+						subIdentifier = valAPIName
+						m.logger.Infof("PASSSS After %s from api %s", subIdentifier, valAPIName)
 					}
+
+					m.logger.Infof("PASSSS ola mazi %s", resourceTagMap[subIdentifier])
+
 					if _, ok := events[uniqueIdentifierValue]; !ok {
 						// when tagsFilter is not empty but no entry in
 						// resourceTagMap for this identifier, do not initialize

@@ -95,6 +95,7 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 }
 
 // GetRestAPIsOutput function gets results from apigw api.
+// GetRestApis Apigateway API is used to retrieve the specified info. This returns a map with the names and ids of RestAPis configured
 func GetRestAPIsOutput(svcRestApi *apigateway.Client) (map[string]string, error) {
 	input := &apigateway.GetRestApisInput{}
 	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
