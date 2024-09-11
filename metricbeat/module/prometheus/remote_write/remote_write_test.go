@@ -255,9 +255,9 @@ func TestMetricsCount(t *testing.T) {
 				}
 				labelsHash := labels.String()
 
-				expected, ok := tt.expected[labelsHash]
+				expectedCount, ok := tt.expected[labelsHash]
 				assert.True(t, ok, "should have an expected count for these labels")
-				assert.Equal(t, expected, count, "metrics_count should match expected value for labels %v", labels)
+				assert.Equal(t, expectedCount, count, "metrics_count should match expected value for labels %v", labels)
 
 			}
 		})
