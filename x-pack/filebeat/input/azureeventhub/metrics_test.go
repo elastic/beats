@@ -9,6 +9,7 @@ package azureeventhub
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 
@@ -124,15 +125,19 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 
 		fakeClient := fakeClient{}
 
+		sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.SanitizeOptions)
+		require.NoError(t, err)
+
 		input := eventHubInputV1{
 			config:         inputConfig,
 			metrics:        metrics,
 			pipelineClient: &fakeClient,
 			log:            log,
 			messageDecoder: messageDecoder{
-				config:  inputConfig,
-				metrics: metrics,
-				log:     log,
+				config:     inputConfig,
+				metrics:    metrics,
+				log:        log,
+				sanitizers: sanitizers,
 			},
 		}
 

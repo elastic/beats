@@ -49,9 +49,10 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	return s, nil
 }
 
-func newSanitizers(specs []SanitizerSpec) ([]Sanitizer, error) {
+func newSanitizers(specs []SanitizerSpec, legacySanitizerOptions []string) ([]Sanitizer, error) {
 	var sanitizers []Sanitizer
 
+	// Add new sanitizers
 	for _, spec := range specs {
 		sanitizer, err := newSanitizer(spec)
 		if err != nil {
@@ -59,6 +60,16 @@ func newSanitizers(specs []SanitizerSpec) ([]Sanitizer, error) {
 		}
 
 		sanitizers = append(sanitizers, sanitizer)
+	}
+
+	// Add legacy sanitizers
+	for _, opt := range legacySanitizerOptions {
+		switch sanitizationOption(opt) {
+		case newLines:
+			sanitizers = append(sanitizers, &newLinesSanitizer{})
+		case singleQuotes:
+			sanitizers = append(sanitizers, &singleQuotesSanitizer{})
+		}
 	}
 
 	return sanitizers, nil
@@ -125,25 +136,6 @@ func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
 		return jsonByte
 	}
 
-	// Remove any leading/trailing whitespace
-	//input := strings.TrimSpace(string(jsonByte))
-	//input := string(jsonByte)
-
-	////// Replace invalid array contents with a string placeholder
-	//sanitized := s.re.ReplaceAllStringFunc(input, func(match string) string {
-	//	//return fmt.Sprintf("[\"%s\"]", strings.TrimSpace(match[1:len(match)-1]))
-	//	//return fmt.Sprintf("[\"%s\"]", match)
-	//	// quote json string
-	//
-	//	match = strings.ReplaceAll(match, "\"", "\\\"")
-	//	match = strings.ReplaceAll(match, "\t", "")
-	//	match = strings.ReplaceAll(match, "\n", "")
-	//
-	//	return fmt.Sprintf(s.replacement, match)
-	//	//return match
-	//})
-
-	//return []byte(s.re.ReplaceAllString(input, s.replacement))
 	return s.re.ReplaceAll(jsonByte, []byte(s.replacement))
 }
 

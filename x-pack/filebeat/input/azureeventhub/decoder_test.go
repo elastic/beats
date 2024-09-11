@@ -8,6 +8,7 @@ package azureeventhub
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -96,10 +97,14 @@ func TestDecodeRecordsWithSanitization(t *testing.T) {
 	metrics := newInputMetrics("test", reg)
 	defer metrics.Close()
 
+	sanitizers, err := newSanitizers(config.Sanitizers, config.SanitizeOptions)
+	require.NoError(t, err)
+
 	decoder := messageDecoder{
-		config:  config,
-		log:     log,
-		metrics: metrics,
+		config:     config,
+		log:        log,
+		metrics:    metrics,
+		sanitizers: sanitizers,
 	}
 
 	msg := "{\"records\":[{'test':\"this is some message\",\n\n\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +

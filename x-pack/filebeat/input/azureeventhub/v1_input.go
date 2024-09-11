@@ -80,7 +80,7 @@ func (in *eventHubInputV1) Run(
 	defer in.metrics.Close()
 
 	// Set up sanitizers, if any.
-	sanitizers, err := newSanitizers(in.config.Sanitizers)
+	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.SanitizeOptions)
 	if err != nil {
 		return fmt.Errorf("failed to create sanitizers: %w", err)
 	}
