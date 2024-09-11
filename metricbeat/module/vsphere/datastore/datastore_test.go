@@ -19,77 +19,81 @@ package datastore
 
 import (
 	"testing"
+	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/vmware/govmomi/simulator"
 )
 
 func TestFetchEventContents(t *testing.T) {
-	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	// Creating a new simulator model with VPX server to collect broad range of data.
+	model := simulator.VPX()
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	require.Empty(t, errs, "expected no error")
 
-	assert.NotEmpty(t, events)
+	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "local", event["fstype"])
+	assert.EqualValues(t, "OTHER", event["fstype"])
 
 	// Values are based on the result 'df -k'.
-	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes"}
+	fields := []string{
+		"capacity.total.bytes",
+		"capacity.free.bytes",
+		"status",
+		"host.count",
+		"vm.count",
+		"write.bytes",
+		"capacity.used.bytes",
+	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			t.Error(err)
-		} else {
-			isNonNegativeInt64(t, field, value)
+			t.Error(field, err)
+			return
+		}
+		switch field {
+		case "status":
+			assert.NotNil(t, value)
+		case "vm.count", "host.count":
+			assert.GreaterOrEqual(t, value, 0)
+		default:
+			assert.GreaterOrEqual(t, value, int64(0))
 		}
 	}
 }
 
-func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
-	i, ok := v.(int64)
-	if !ok {
-		t.Errorf("%v: got %T, but expected int64", field, v)
-		return
-	}
-
-	if i < 0 {
-		t.Errorf("%v: value is negative (%v)", field, i)
-		return
-	}
-}
-
-func TestData(t *testing.T) {
+func TestDataStoreMetricSetData(t *testing.T) {
 	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(func() { model.Remove() })
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(func() { ts.Close() })
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err = mbtest.WriteEventsReporterV2WithContext(f, t, "")
+	assert.NoError(t, err, "failed to write events with reporter")
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
@@ -102,5 +106,6 @@ func getConfig(ts *simulator.Server) map[string]interface{} {
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,
+		"period":     time.Second * 20,
 	}
 }

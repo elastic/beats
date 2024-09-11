@@ -1,46 +1,102 @@
 {
-    "@timestamp": "2022-09-06T06:41:22.128Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "vsphere.host",
+        "duration": 115000,
+        "module": "vsphere"
+    },
     "metricset": {
-      "name": "host",
-      "period": 10000
+        "name": "host",
+        "period": 10000
     },
     "service": {
-      "address": "https://localhost:8989/sdk",
-      "type": "vsphere"
-    },
-    "event": {
-      "module": "vsphere",
-      "duration": 23519250,
-      "dataset": "vsphere.host"
+        "address": "127.0.0.1:55538",
+        "type": "vsphere"
     },
     "vsphere": {
-      "host": {
-        "cpu": {
-          "used": {
-            "mhz": 67
-          },
-          "total": {
-            "mhz": 4588
-          },
-          "free": {
-            "mhz": 4521
-          }
-        },
-        "memory": {
-          "free": {
-            "bytes": 2822230016
-          },
-          "total": {
-            "bytes": 4294430720
-          },
-          "used": {
-            "bytes": 1472200704
-          }
-        },
-        "network_names": [
-          "VM Network"
-        ],
-        "name": "DC0_H0"
-      }
+        "host": {
+            "cpu": {
+                "free": {
+                    "mhz": 4521
+                },
+                "total": {
+                    "mhz": 4588
+                },
+                "used": {
+                    "mhz": 67
+                }
+            },
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "LocalDS_0"
+                ]
+            },
+            "disk": {
+                "read": {
+                    "bytes": 159744
+                },
+                "total": {
+                    "bytes": 401408
+                },
+                "write": {
+                    "bytes": 259072
+                }
+            },
+            "memory": {
+                "free": {
+                    "bytes": 2822230016
+                },
+                "total": {
+                    "bytes": 4294430720
+                },
+                "used": {
+                    "bytes": 1472200704
+                }
+            },
+            "name": "localhost.localdomain",
+            "network": {
+                "bandwidth": {
+                    "received": {
+                        "bytes": 270336
+                    },
+                    "total": {
+                        "bytes": 532480
+                    },
+                    "transmitted": {
+                        "bytes": 249856
+                    }
+                },
+                "count": 1,
+                "names": [
+                    "VM Network"
+                ],
+                "packets": {
+                    "multicast": {
+                        "received": {
+                            "count": 61
+                        }
+                    },
+                    "received": {
+                        "count": 4569
+                    },
+                    "transmitted": {
+                        "count": 4578
+                    }
+                }
+            },
+            "network_names": [
+                "VM Network"
+            ],
+            "status": "gray",
+            "uptime": 77229,
+            "vm": {
+                "count": 2,
+                "names": [
+                    "ha-host_VM0",
+                    "ha-host_VM1"
+                ]
+            }
+        }
     }
 }

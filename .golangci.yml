@@ -65,7 +65,6 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
-    - prealloc # Finds slice declarations that could potentially be pre-allocated
     - depguard
 
 # all available settings of specific linters
@@ -121,10 +120,15 @@ linters-settings:
               - errors
               - fmt
             reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+        - github.com/google/uuid:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - github.com/gofrs/uuid/v5
+            reason: "Use one uuid library consistently across the codebase"
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.5"
+    go: "1.22.6"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -142,19 +146,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.5"
+    go: "1.22.6"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.5"
+    go: "1.22.6"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.5"
+    go: "1.22.6"
 
   gosec:
     excludes:
