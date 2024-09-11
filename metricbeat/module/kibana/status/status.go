@@ -73,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	apiKey := m.ApiKey
-	m.http.SetHeader("Authorization", "ApiKey " + apiKey)
+	m.http.SetHeader("Authorization", "ApiKey "+apiKey)
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return err

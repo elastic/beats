@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	return &MetricSet{
-		MetricSet: ms,
+		MetricSet:     ms,
 		BaseMetricSet: base,
 	}, nil
 }

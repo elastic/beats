@@ -19,7 +19,7 @@ package kibana
 
 // Config defines the structure for the Kibana module configuration options
 type Config struct {
-	XPackEnabled bool `config:"xpack.enabled"`
+	XPackEnabled bool   `config:"xpack.enabled"`
 	ApiKey       string `config:"api_key"`
 }
 
@@ -27,6 +27,6 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		XPackEnabled: false,
-		ApiKey: "",
+		ApiKey:       "",
 	}
 }

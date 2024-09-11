@@ -19,8 +19,9 @@ package kibana
 
 import (
 	"encoding/base64"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"fmt"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // MetricSet can be used to build other metricsets within the Kibana module.

@@ -159,6 +159,6 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([
 
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
-	http.SetHeader("Authorization", "ApiKey " + apiKey)
+	http.SetHeader("Authorization", "ApiKey "+apiKey)
 	return http.FetchContent()
 }
