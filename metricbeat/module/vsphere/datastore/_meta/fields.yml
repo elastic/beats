@@ -4,10 +4,6 @@
     datastore
   release: ga
   fields:
-    - name: alert.names
-      type: keyword
-      description: >
-        List of all the alert names.
     - name: capacity.free.bytes
       type: long
       description: >
@@ -61,6 +57,11 @@
       type: keyword
       description: >
         Status of the datastore.
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.
     - name: vm.count
       type: long
       description: >

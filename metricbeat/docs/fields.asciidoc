@@ -66861,16 +66861,6 @@ Cluster information.
 
 
 
-*`vsphere.cluster.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
-
 
 *`vsphere.cluster.datastore.names`*::
 +
@@ -66965,22 +66955,22 @@ type: keyword
 
 --
 
+*`vsphere.cluster.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === datastore
 
 datastore
 
 
-
-*`vsphere.datastore.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
 
 *`vsphere.datastore.capacity.free.bytes`*::
 +
@@ -67112,6 +67102,16 @@ type: keyword
 
 --
 
+*`vsphere.datastore.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 *`vsphere.datastore.vm.count`*::
 +
 --
@@ -67160,16 +67160,6 @@ type: long
 Datastore Cluster
 
 
-
-*`vsphere.datastorecluster.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
 
 *`vsphere.datastorecluster.name`*::
 +
@@ -67225,22 +67215,22 @@ type: long
 
 --
 
+*`vsphere.datastorecluster.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === host
 
 Host information from vSphere environment.
 
 
-
-*`vsphere.host.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
 
 *`vsphere.host.cpu.used.mhz`*::
 +
@@ -67592,6 +67582,16 @@ type: keyword
 
 --
 
+*`vsphere.host.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 *`vsphere.host.uptime`*::
 +
 --
@@ -67636,16 +67636,6 @@ Indicates whether at least one host is configured to provide this network.
 
 
 type: boolean
-
---
-
-*`vsphere.network.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
 
 --
 
@@ -67731,22 +67721,22 @@ type: long
 
 --
 
+*`vsphere.network.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === resourcepool
 
 Resource pool information from vSphere environment.
 
 
-
-*`vsphere.resourcepool.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
 
 
 *`vsphere.resourcepool.cpu.usage.mhz`*::
@@ -67967,22 +67957,22 @@ type: keyword
 
 --
 
+*`vsphere.resourcepool.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === virtualmachine
 
 virtualmachine
 
 
-
-*`vsphere.virtualmachine.alert.names`*::
-+
---
-List of all the alert names.
-
-
-type: keyword
-
---
 
 
 *`vsphere.virtualmachine.host.id`*::
@@ -68201,6 +68191,16 @@ type: object
 The number of snapshots of this virtualmachine.
 
 type: long
+
+--
+
+*`vsphere.virtualmachine.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
 
 --
 

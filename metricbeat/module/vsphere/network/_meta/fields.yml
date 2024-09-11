@@ -8,10 +8,6 @@
       type: boolean
       description: >
         Indicates whether at least one host is configured to provide this network.
-    - name: alert.names
-      type: keyword
-      description: >
-        List of all the alert names.
     - name: config.status
       type: keyword
       description: >
@@ -50,3 +46,8 @@
           type: long
           description: >
             Number of virtual machines connected to this network.
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.

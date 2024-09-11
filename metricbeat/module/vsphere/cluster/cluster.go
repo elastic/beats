@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -54,9 +55,17 @@ type assetNames struct {
 	outputHostNames      []string
 }
 
+type triggerdAlarm struct {
+	Name        string    `json:"name"`
+	ID          string    `json:"id"`
+	Status      string    `json:"status"`
+	Time        time.Time `json:"time"`
+	Description string    `json:"description"`
+}
+
 type metricData struct {
-	assetNames assetNames
-	alertNames []string
+	assetNames     assetNames
+	triggerdAlarms []triggerdAlarm
 }
 
 // New creates a new instance of the MetricSet.
@@ -126,13 +135,13 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				m.Logger().Warn("Metric das_config.enabled not found")
 			}
 
-			alerts, err := getAlertNames(ctx, pc, clt[i].TriggeredAlarmState)
+			triggerdAlarm, err := getTriggerdAlarm(ctx, pc, clt[i].TriggeredAlarmState)
 			if err != nil {
 				m.Logger().Errorf("Failed to retrieve alerts from cluster %s: %w", clt[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(clt[i], &metricData{assetNames: assetNames, alertNames: alerts}),
+				MetricSetFields: m.mapEvent(clt[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm}),
 			})
 		}
 	}
@@ -184,18 +193,23 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	}, nil
 }
 
-func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
-	var alerts []string
-	for _, alarm := range triggeredAlarmState {
-		if alarm.OverallStatus == "red" {
-			var triggeredAlarm mo.Alarm
-			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
-			if err != nil {
-				return nil, err
-			}
-
-			alerts = append(alerts, triggeredAlarm.Info.Name)
+func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
+	var triggeredAlarms []triggerdAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggerdAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
 		}
+		triggeredAlarm.Name = alarm.Info.Name
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.Time = alarmState.Time
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
 	}
-	return alerts, nil
+
+	return triggeredAlarms, nil
 }

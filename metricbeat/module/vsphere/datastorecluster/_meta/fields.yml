@@ -4,10 +4,6 @@
   description: >
     Datastore Cluster
   fields:
-    - name: alert.names
-      type: keyword
-      description: >
-        List of all the alert names.
     - name: name
       type: keyword
       description: >
@@ -30,3 +26,8 @@
       type: long
       description: >
         Number of datastores in the Datastore Cluster.
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.

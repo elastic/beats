@@ -4,10 +4,6 @@
     virtualmachine
   release: ga
   fields:
-    - name: alert.names
-      type: keyword
-      description: >
-        List of all the alert names.
     - name: host
       type: group
       fields:
@@ -107,5 +103,8 @@
         - name: count
           type: long
           description: The number of snapshots of this virtualmachine.
-
-
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.

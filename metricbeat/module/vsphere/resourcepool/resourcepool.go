@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -59,9 +60,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // metricData holds performance metrics values.
+type triggerdAlarm struct {
+	Name        string    `json:"name"`
+	ID          string    `json:"id"`
+	Status      string    `json:"status"`
+	Time        time.Time `json:"time"`
+	Description string    `json:"description"`
+}
+
 type metricData struct {
-	assetNames assetNames
-	alertNames []string
+	assetNames     assetNames
+	triggerdAlarms []triggerdAlarm
 }
 
 type assetNames struct {
@@ -120,13 +129,13 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 				m.Logger().Errorf("Failed to retrieve object from resource pool %s: %v", rps[i].Name, err)
 			}
 
-			alerts, err := getAlertNames(ctx, pc, rps[i].TriggeredAlarmState)
+			triggerdAlarm, err := getTriggerdAlarm(ctx, pc, rps[i].TriggeredAlarmState)
 			if err != nil {
 				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %w", rps[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(rps[i], &metricData{assetNames: assetNames, alertNames: alerts}),
+				MetricSetFields: m.mapEvent(rps[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm}),
 			})
 		}
 	}
@@ -156,18 +165,23 @@ func getAssetNames(ctx context.Context, pc *property.Collector, rp *mo.ResourceP
 	return assetNames{outputVmNames: outputVmNames}, nil
 }
 
-func getAlertNames(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]string, error) {
-	var alerts []string
-	for _, alarm := range triggeredAlarmState {
-		if alarm.OverallStatus == "red" {
-			var triggeredAlarm mo.Alarm
-			err := pc.RetrieveOne(ctx, alarm.Alarm, nil, &triggeredAlarm)
-			if err != nil {
-				return nil, err
-			}
-
-			alerts = append(alerts, triggeredAlarm.Info.Name)
+func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
+	var triggeredAlarms []triggerdAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggerdAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
 		}
+		triggeredAlarm.Name = alarm.Info.Name
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.Time = alarmState.Time
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
 	}
-	return alerts, nil
+
+	return triggeredAlarms, nil
 }

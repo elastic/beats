@@ -32,8 +32,8 @@ func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event.Put("config.status", net.ConfigStatus)
 	event.Put("type", net.Self.Type)
 
-	if len(data.alertNames) > 0 {
-		event.Put("alert.names", data.alertNames)
+	if len(data.triggerdAlarms) > 0 {
+		event.Put("triggerd_alarms", data.triggerdAlarms)
 	}
 
 	if len(data.assetNames.outputHostNames) > 0 {

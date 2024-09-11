@@ -15,13 +15,36 @@
     },
     "vsphere": {
         "host": {
-          "alert": {
-              "names": [
-                "Host hardware system board status",
-                "Host storage status",
-                "CPU Utilization"
-              ]
-            },
+            "triggerd_alarms": [
+                {
+                  "name": "Host hardware system board status",
+                  "id": "alarm-121.host-12",
+                  "status": "red",
+                  "time": "2024-09-09T13:23:00.786759Z",
+                  "description": "Default alarm to monitor system boards.  See the host's Hardware Status tab for more details."
+                },
+                {
+                  "id": "alarm-124.host-12",
+                  "status": "red",
+                  "time": "2024-09-09T13:23:00.786773Z",
+                  "description": "Default alarm to monitor storage.  See the host's Hardware Status tab for more details.",
+                  "name": "Host storage status"
+                },
+                {
+                  "name": "Host memory usage",
+                  "id": "alarm-4.host-12",
+                  "status": "yellow",
+                  "time": "2024-08-28T10:31:26.621636Z",
+                  "description": "Default alarm to monitor host memory usage"
+                },
+                {
+                  "name": "CPU Utilization",
+                  "id": "alarm-703.host-12",
+                  "status": "red",
+                  "time": "2024-08-28T10:31:26.621643Z",
+                  "description": ""
+                }
+              ],
             "cpu": {
                 "free": {
                     "mhz": 4521
