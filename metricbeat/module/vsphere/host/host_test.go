@@ -19,6 +19,7 @@ package host
 
 import (
 	"testing"
+	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -191,5 +192,6 @@ func getConfig(ts *simulator.Server) map[string]interface{} {
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,
+		"period":     time.Second * 20,
 	}
 }
