@@ -20,8 +20,10 @@ package datastorecluster
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/vmware/govmomi"
+	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 
@@ -55,6 +57,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &DatastoreClusterMetricSet{ms}, nil
 }
 
+type metricData struct {
+	assetNames assetNames
+}
+
+type assetNames struct {
+	outputDsNames []string
+}
+
 func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -66,7 +76,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to logout from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -79,23 +89,50 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, nil, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity"}, &datastoreCluster)
 	if err != nil {
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
 
+	pc := property.DefaultCollector(c)
 	for i := range datastoreCluster {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i])})
+		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from host %s: v", datastoreCluster[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames})})
 	}
 
 	return nil
+}
+
+func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StoragePod) (assetNames, error) {
+	var objects []mo.ManagedEntity
+	if len(dsc.ChildEntity) > 0 {
+		if err := pc.Retrieve(ctx, dsc.ChildEntity, []string{"name"}, &objects); err != nil {
+			return assetNames{}, err
+		}
+	}
+
+	outputDsNames := make([]string, 0)
+	for _, ob := range objects {
+		if ob.Reference().Type == "Datastore" {
+			name := strings.ReplaceAll(ob.Name, ".", "_")
+			outputDsNames = append(outputDsNames, name)
+		}
+	}
+
+	return assetNames{
+		outputDsNames: outputDsNames,
+	}, nil
 }

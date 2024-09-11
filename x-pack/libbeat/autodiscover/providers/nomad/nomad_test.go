@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
