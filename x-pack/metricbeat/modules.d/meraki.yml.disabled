@@ -5,10 +5,7 @@
   metricsets: ["device_health"]
   enabled: true
   period: 60s
-  hosts: ["https://api.meraki.com"]
-  # This can be used for token based authorization:
-  bearer_token_file: /var/run/secrets/meraki/token
-  headers:
-    Accept: application/json  
+  # The Meraki API key for your organization.
   apiKey: <token>
-  organizations: ["orgId"]  
+  # A list of organization id's to harvest meraki data.
+  organizations: ["<orgId>"]  
