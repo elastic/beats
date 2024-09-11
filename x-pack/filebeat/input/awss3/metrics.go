@@ -71,6 +71,8 @@ type inputMetrics struct {
 	s3EventsCreatedTotal    *monitoring.Uint // Number of events created from processing S3 data.
 	s3ObjectsInflight       *monitoring.Uint // Number of S3 objects inflight (gauge).
 	s3ObjectProcessingTime  metrics.Sample   // Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
+	s3ObjectSizeInBytes     metrics.Sample   // Histogram of processed S3 object size in bytes
+	s3EventsPerObject       metrics.Sample   // Histogram of events in an individual S3 object
 }
 
 // Close cancels the context and removes the metrics from the registry.
@@ -174,16 +176,23 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		s3EventsCreatedTotal:                monitoring.NewUint(reg, "s3_events_created_total"),
 		s3ObjectsInflight:                   monitoring.NewUint(reg, "s3_objects_inflight_gauge"),
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
+		s3ObjectSizeInBytes:                 metrics.NewUniformSample(1024),
+		s3EventsPerObject:                   metrics.NewUniformSample(1024),
 	}
 
 	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
 	out.sqsMessagesWaiting.Set(int64(-1))
+
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3ObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_events_per_object", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3EventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	if maxWorkers > 0 {
 		// Periodically update the sqs worker utilization metric.
