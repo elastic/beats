@@ -38,7 +38,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -265,11 +265,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 		return nil, err
 	}
 
-	eid, err := uuid.FromString(metricreport.EphemeralID().String())
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate EphemeralID from UUID string: %w", err)
-	}
-
 	b := beat.Beat{
 		Info: beat.Info{
 			Beat:            name,
@@ -281,9 +276,10 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			ID:              id,
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
-			EphemeralID:     eid,
+			EphemeralID:     metricreport.EphemeralID(),
 		},
-		Fields: fields,
+		Fields:   fields,
+		Registry: reload.NewRegistry(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -405,7 +401,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
@@ -861,7 +857,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, b.Registry)
 	if err != nil {
 		return err
 	}

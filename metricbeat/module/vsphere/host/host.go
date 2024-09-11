@@ -41,7 +41,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type MetricSet struct {
+type HostMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -51,12 +51,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &HostMetricSet{ms}, nil
 }
 
 type metricData struct {
 	perfMetrics map[string]interface{}
-	assetsName  assetNames
+	assetNames  assetNames
 }
 
 type assetNames struct {
@@ -89,7 +89,7 @@ var metricSet = map[string]struct{}{
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -154,47 +154,16 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &hst[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", hst[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
 			}
 
-			spec := types.PerfQuerySpec{
-				Entity:     hst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
-
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+			metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metricIds)
 			if err != nil {
-				m.Logger().Errorf("Failed to query performance data from host %s: %v", hst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debug("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Errorf("Failed to convert performance data to metric series for host %s: %v", hst[i].Name, err)
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
+				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.eventMapping(hst[i], &metricData{
-					perfMetrics: metricMap,
-					assetsName:  assetNames,
-				}),
+				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
 			})
 		}
 	}
@@ -242,4 +211,53 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputDsNames:      outputDsNames,
 		outputVmNames:      outputVmNames,
 	}, nil
+}
+
+func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metricIds []types.PerfMetricId) (metricMap map[string]interface{}, err error) {
+	metricMap = make(map[string]interface{})
+
+	period := m.Module().Config().Period
+	refreshRate := int32(period.Seconds())
+
+	spec := types.PerfQuerySpec{
+		Entity:     hst.Reference(),
+		MetricId:   metricIds,
+		MaxSample:  1,
+		IntervalId: refreshRate,
+	}
+
+	// Query performance data
+	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+	if err != nil {
+		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
+			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
+		}
+
+		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
+	}
+
+	if len(samples) == 0 {
+		m.Logger().Debug("No samples returned from performance manager")
+		return metricMap, nil
+	}
+
+	results, err := perfManager.ToMetricSeries(ctx, samples)
+	if err != nil {
+		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
+	}
+
+	if len(results) == 0 {
+		m.Logger().Debug("No results returned from metric series conversion")
+		return metricMap, nil
+	}
+
+	for _, result := range results[0].Value {
+		if len(result.Value) > 0 {
+			metricMap[result.Name] = result.Value[0]
+			continue
+		}
+		m.Logger().Debugf("For host %s, Metric %s: No result found", hst.Name, result.Name)
+	}
+
+	return metricMap, nil
 }

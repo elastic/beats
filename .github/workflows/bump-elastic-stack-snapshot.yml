@@ -17,7 +17,7 @@ jobs:
       matrix: ${{ steps.generator.outputs.matrix }}
     steps:
       - id: generator
-        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+        uses: elastic/oblt-actions/elastic/active-branches@v1
 
   bump-elastic-stack:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
         uses: updatecli/updatecli-action@a0c478c868a71d3e239a65714de69450aa1ee2c6 # v0.76.1
 
       - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/scm.yml
+        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
         env:
           BRANCH: ${{ matrix.branch }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

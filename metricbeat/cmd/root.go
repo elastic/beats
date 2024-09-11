@@ -53,7 +53,12 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // MetricbeatSettings contains the default settings for metricbeat
-func MetricbeatSettings() instance.Settings {
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func MetricbeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
@@ -63,7 +68,7 @@ func MetricbeatSettings() instance.Settings {
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		Initialize: []func(){
 			include.InitializeModule,
-			module.RegisterMonitoringModules,
+			func() { module.RegisterMonitoringModules(moduleNameSpace) },
 		},
 	}
 }
@@ -77,5 +82,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(MetricbeatSettings())
+	RootCmd = Initialize(MetricbeatSettings(""))
 }

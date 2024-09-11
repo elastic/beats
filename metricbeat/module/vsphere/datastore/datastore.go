@@ -41,7 +41,7 @@ func init() {
 }
 
 // MetricSet type defines all fields of the MetricSet.
-type MetricSet struct {
+type DataStoreMetricSet struct {
 	*vsphere.MetricSet
 }
 
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{ms}, nil
+	return &DataStoreMetricSet{ms}, nil
 }
 
 type metricData struct {
@@ -60,14 +60,23 @@ type metricData struct {
 }
 
 type assetNames struct {
-	outputVmNames []string
-	outputHsNames []string
+	outputVmNames   []string
+	outputHostNames []string
+}
+
+// Define metrics to be collected
+var metricSet = map[string]struct{}{
+	"datastore.read.average":              {},
+	"datastore.write.average":             {},
+	"datastore.datastoreIops.average":     {},
+	"datastore.totalReadLatency.average":  {},
+	"datastore.totalWriteLatency.average": {},
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -77,7 +86,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -93,7 +102,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debugf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Debugf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -115,20 +124,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Filter for required metrics
 	var metricIds []types.PerfMetricId
-
-	// Define metrics to be collected
-	for metricName := range map[string]struct{}{
-		"datastore.read.average":              {},
-		"datastore.write.average":             {},
-		"datastore.datastoreIops.average":     {},
-		"datastore.totalReadLatency.average":  {},
-		"datastore.totalWriteLatency.average": {},
-	} {
+	for metricName := range metricSet {
 		if metric, ok := metrics[metricName]; ok {
 			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
-			continue
+		} else {
+			m.Logger().Warnf("Metric %s not found", metricName)
 		}
-		m.Logger().Warnf("Metric %s not found", metricName)
 	}
 
 	pc := property.DefaultCollector(c)
@@ -139,48 +140,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &dst[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
-				continue
+				m.Logger().Errorf("Failed to retrieve object from datastore %s: %v", dst[i].Name, err)
 			}
 
-			spec := types.PerfQuerySpec{
-				Entity:     dst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
-
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+			metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metricIds)
 			if err != nil {
-				m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debugf("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
-				continue
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
+				m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.eventMapping(dst[i], &metricData{
+				MetricSetFields: m.mapEvent(dst[i], &metricData{
 					perfMetrics: metricMap,
-					assetNames:  *assetNames,
+					assetNames:  assetNames,
 				}),
 			})
 		}
@@ -189,13 +160,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	return nil
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
-
+func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (assetNames, error) {
 	outputVmNames := make([]string, 0, len(ds.Vm))
 	if len(ds.Vm) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, ds.Vm, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return assetNames{}, err
 		}
 		for _, ob := range objects {
 			if ob.Reference().Type == "VirtualMachine" {
@@ -204,9 +174,8 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 			}
 		}
 	}
-
-	// calling Host explicitly because of mo.Datastore.hHost has types.DatastoreHostMount instead of mo.ManagedEntity
-	outputHsNames := make([]string, 0, len(ds.Host))
+	// calling Host explicitly because of mo.Datastore.Host has types.DatastoreHostMount instead of mo.ManagedEntity
+	outputHostNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
 		hsRefs := make([]types.ManagedObjectReference, 0, len(ds.Host))
 		for _, obj := range ds.Host {
@@ -220,18 +189,67 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		if len(hsRefs) > 0 {
 			err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
 			if err != nil {
-				return nil, err
+				return assetNames{}, err
 			}
 		}
 
 		for _, host := range hosts {
 			name := strings.ReplaceAll(host.Name, ".", "_")
-			outputHsNames = append(outputHsNames, name)
+			outputHostNames = append(outputHostNames, name)
 		}
 	}
 
-	return &assetNames{
-		outputHsNames: outputHsNames,
-		outputVmNames: outputVmNames,
+	return assetNames{
+		outputHostNames: outputHostNames,
+		outputVmNames:   outputVmNames,
 	}, nil
+}
+
+func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metricIds []types.PerfMetricId) (metricMap map[string]interface{}, err error) {
+	metricMap = make(map[string]interface{})
+
+	period := m.Module().Config().Period
+	refreshRate := int32(period.Seconds())
+
+	spec := types.PerfQuerySpec{
+		Entity:     dst.Reference(),
+		MetricId:   metricIds,
+		MaxSample:  1,
+		IntervalId: refreshRate, // using refreshRate as interval
+	}
+
+	// Query performance data
+	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+	if err != nil {
+		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
+			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
+		}
+
+		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
+	}
+
+	if len(samples) == 0 {
+		m.Logger().Debug("No samples returned from performance manager")
+		return metricMap, nil
+	}
+
+	results, err := perfManager.ToMetricSeries(ctx, samples)
+	if err != nil {
+		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
+	}
+
+	if len(results) == 0 {
+		m.Logger().Debug("No results returned from metric series conversion")
+		return metricMap, nil
+	}
+
+	for _, result := range results[0].Value {
+		if len(result.Value) > 0 {
+			metricMap[result.Name] = result.Value[0]
+			continue
+		}
+		m.Logger().Debugf("For datastore %s, Metric %s: No result found", dst.Name, result.Name)
+	}
+
+	return metricMap, nil
 }
