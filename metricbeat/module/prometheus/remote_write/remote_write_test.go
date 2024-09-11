@@ -247,7 +247,7 @@ func TestMetricsCount(t *testing.T) {
 
 			for _, event := range events {
 				count, ok := event.RootFields["metrics_count"]
-				assert.True(t, ok, "metrics_count should be present")
+				assert.True(t, ok, "metrics_count should be present for test: %s", tt.name)
 
 				labels, ok := event.ModuleFields["labels"].(mapstr.M)
 				if !ok {
