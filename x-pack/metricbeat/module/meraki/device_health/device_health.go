@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -106,14 +106,25 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if err != nil {
 			return fmt.Errorf("getDeviceStatuses() failed; %w", err)
 		}
-		reportDeviceStatusMetrics(reporter, org, devices, deviceStatuses)
 
+		//Get mx device performance score
+		mx_scores, err := getDevicePerformanceScores(m.client, devices)
+		if err != nil {
+			return fmt.Errorf("getDevicePerformanceScores() failed; %w", err)
+		}
+		reportDeviceStatusMetrics(reporter, org, devices, deviceStatuses, mx_scores)
+
+		// //Get &  Report Organization Appliance Uplink
+		appliance_val, appliance_res, appliance_err := m.client.Appliance.GetOrganizationApplianceUplinkStatuses(org, &meraki_api.GetOrganizationApplianceUplinkStatusesQueryParams{})
+		if appliance_err != nil {
+			return fmt.Errorf("Appliance.GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", appliance_res.StatusCode(), appliance_res.Body(), appliance_err)
+		}
 		//Get & Report Device Uplink Status
-		uplinks, err := getDeviceUplinkMetrics(m.client, org, m.BaseMetricSet.Module().Config().Period)
+		lossLatencyuplinks, err := getDeviceUplinkLossLatencyMetrics(m.client, org, m.BaseMetricSet.Module().Config().Period)
 		if err != nil {
 			return fmt.Errorf("getDeviceUplinkMetrics() failed; %w", err)
 		}
-		reportDeviceUplinkMetrics(reporter, org, devices, uplinks)
+		reportApplianceUplinkStatuses(reporter, org, devices, appliance_val, lossLatencyuplinks)
 
 		//Get & Report Device License State
 		cotermLicenses, perDeviceLicenses, systemsManagerLicense, err := getLicenseStates(m.client, org)
@@ -122,26 +133,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 		reportLicenseMetrics(reporter, org, cotermLicenses, perDeviceLicenses, systemsManagerLicense)
 
-		//Get mx device performance score
-		mx_devices, mx_scores, err := getDevicePerformanceScores(m.meraki_url, m.meraki_apikey, devices)
-		if err != nil {
-			return fmt.Errorf("getDevicePerformanceScores() failed; %w", err)
-		}
-		reportPerformanceScoreMetrics(reporter, org, mx_devices, mx_scores)
-
 		//Get & Report Org Celluar Uplink Status
 		cullular_val, cullular_res, cullular_err := m.client.CellularGateway.GetOrganizationCellularGatewayUplinkStatuses(org, &meraki_api.GetOrganizationCellularGatewayUplinkStatusesQueryParams{})
 		if cullular_err != nil {
 			return fmt.Errorf("CellularGateway.GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", cullular_res.StatusCode(), cullular_res.Body(), cullular_err)
 		}
 		reportCellularGatewayApplianceUplinkStatuses(reporter, org, devices, cullular_val)
-
-		//Get &  Report Organization Appliance Uplink
-		appliance_val, appliance_res, appliance_err := m.client.Appliance.GetOrganizationApplianceUplinkStatuses(org, &meraki_api.GetOrganizationApplianceUplinkStatusesQueryParams{})
-		if appliance_err != nil {
-			return fmt.Errorf("Appliance.GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", appliance_res.StatusCode(), appliance_res.Body(), appliance_err)
-		}
-		reportApplianceUplinkStatuses(reporter, org, devices, appliance_val)
 
 		//Get Org Networks
 		//Get Network Health by Org Network

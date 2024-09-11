@@ -8,13 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
-func getDeviceUplinkMetrics(client *meraki_api.Client, organizationID string, period time.Duration) ([]*Uplink, error) {
+func getDeviceUplinkLossLatencyMetrics(client *meraki_api.Client, organizationID string, period time.Duration) ([]*Uplink, error) {
 	val, res, err := client.Organizations.GetOrganizationDevicesUplinksLossAndLatency(
 		organizationID,
 		&meraki_api.GetOrganizationDevicesUplinksLossAndLatencyQueryParams{
@@ -33,6 +30,7 @@ func getDeviceUplinkMetrics(client *meraki_api.Client, organizationID string, pe
 			DeviceSerial: Serial(device.Serial),
 			IP:           device.IP,
 			Interface:    device.Uplink,
+			NetworkID:    device.NetworkID,
 		}
 
 		for _, measurement := range *device.TimeSeries {
@@ -59,46 +57,4 @@ func getDeviceUplinkMetrics(client *meraki_api.Client, organizationID string, pe
 	}
 
 	return uplinks, nil
-}
-
-func reportDeviceUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device, uplinks []*Uplink) {
-	metrics := []mapstr.M{}
-
-	for _, uplink := range uplinks {
-		if device, ok := devices[uplink.DeviceSerial]; ok {
-			metric := mapstr.M{
-				"uplink.ip":        uplink.IP,
-				"uplink.interface": uplink.Interface,
-				// fixme: repeated code serializing device metadata to mapstr
-				"device.address":      device.Address,
-				"device.firmware":     device.Firmware,
-				"device.imei":         device.Imei,
-				"device.lan_ip":       device.LanIP,
-				"device.location":     device.Location,
-				"device.mac":          device.Mac,
-				"device.model":        device.Model,
-				"device.name":         device.Name,
-				"device.network_id":   device.NetworkID,
-				"device.notes":        device.Notes,
-				"device.product_type": device.ProductType,
-				"device.serial":       device.Serial,
-				"device.tags":         device.Tags,
-			}
-
-			for k, v := range device.Details {
-				metric[fmt.Sprintf("device.details.%s", k)] = v
-			}
-
-			for _, uplinkMetric := range uplink.Metrics {
-				metrics = append(metrics, mapstr.Union(metric, mapstr.M{
-					"@timestamp":          uplinkMetric.Timestamp,
-					"uplink.loss_percent": uplinkMetric.LossPercent,
-					"uplink.latency_ms":   uplinkMetric.LatencyMs,
-				}))
-			}
-		} else {
-			// missing device metadata; ignore
-		}
-	}
-	ReportMetricsForOrganization(reporter, organizationID, metrics)
 }

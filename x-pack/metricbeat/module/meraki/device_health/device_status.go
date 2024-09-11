@@ -9,7 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
 func getDeviceStatuses(client *meraki_api.Client, organizationID string) (map[Serial]*DeviceStatus, error) {
@@ -35,7 +35,7 @@ func getDeviceStatuses(client *meraki_api.Client, organizationID string) (map[Se
 	return statuses, nil
 }
 
-func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device, deviceStatuses map[Serial]*DeviceStatus) {
+func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device, deviceStatuses map[Serial]*DeviceStatus, devicePerformanceScores map[Serial]*DevicePerformanceScore) {
 	deviceStatusMetrics := []mapstr.M{}
 	for serial, device := range devices {
 		metric := mapstr.M{
@@ -67,6 +67,16 @@ func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, de
 			metric["device.status.secondary_dns"] = status.SecondaryDNS
 			metric["device.status.status"] = status.Status
 		}
+
+		if score, ok := devicePerformanceScores[serial]; ok {
+			if score.HttpStatusCode == 204 {
+				metric["device.performance.http_status_code"] = score.HttpStatusCode
+			} else {
+				metric["device.performance.score"] = score.PerformanceScore
+			}
+
+		}
+
 		deviceStatusMetrics = append(deviceStatusMetrics, metric)
 	}
 

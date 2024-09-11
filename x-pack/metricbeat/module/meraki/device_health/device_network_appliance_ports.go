@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
 func getNetworkAppliancePorts(client *meraki_api.Client, networks *meraki_api.ResponseOrganizationsGetOrganizationNetworks) (map[NetworkID]*meraki_api.ResponseApplianceGetNetworkAppliancePorts, error) {
@@ -55,17 +55,16 @@ func reportNetwrokAppliancePorts(reporter mb.ReporterV2, organizationID string, 
 					"device.tags":         device.Tags,
 				}
 
-				for i, port := range *networkPort {
-					metric[fmt.Sprintf("appliance.network.port.item_%d.number", i)] = port.Number
-					metric[fmt.Sprintf("appliance.network.port.item_%d.enabled", i)] = port.Enabled
-					metric[fmt.Sprintf("appliance.network.port.item_%d.type", i)] = port.Type
-					metric[fmt.Sprintf("appliance.network.port.item_%d.drop_untagged_traffic", i)] = port.DropUntaggedTraffic
-					metric[fmt.Sprintf("appliance.network.port.item_%d.vlan", i)] = port.VLAN
-					metric[fmt.Sprintf("appliance.network.port.item_%d.allowed_vlans", i)] = port.AllowedVLANs
-					metric[fmt.Sprintf("appliance.network.port.item_%d.access_policy", i)] = port.AccessPolicy
+				for _, port := range *networkPort {
+					metric["appliance.network.port.number"] = port.Number
+					metric["appliance.network.port.enabled"] = port.Enabled
+					metric["appliance.network.port.type"] = port.Type
+					metric["appliance.network.port.drop_untagged_traffic"] = port.DropUntaggedTraffic
+					metric["appliance.network.port.vlan"] = port.VLAN
+					metric["appliance.network.port.allowed_vlans"] = port.AllowedVLANs
+					metric["appliance.network.port.access_policy"] = port.AccessPolicy
+					metrics = append(metrics, metric)
 				}
-
-				metrics = append(metrics, metric)
 
 			}
 		}

@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
 func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *meraki_api.ResponseOrganizationsGetOrganizationNetworks) ([]*meraki_api.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, error) {
@@ -39,26 +39,14 @@ func reportNetworkHealthChannelUtilization(reporter mb.ReporterV2, organizationI
 	metrics := []mapstr.M{}
 	for _, networkHealthUtil := range networkHealthUtilizations {
 		for _, network := range *networkHealthUtil {
+
+			wifi0_encountered := false
+			wifi1_encountered := false
+
 			metric := mapstr.M{
 				"network.health.channel.radio.serial": network.Serial,
 				"network.health.channel.radio.model":  network.Model,
 				"network.health.channel.radio.tags":   network.Tags,
-			}
-
-			for k, wifi0 := range *network.Wifi0 {
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.start_time", k)] = wifi0.StartTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.end_time", k)] = wifi0.EndTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilization80211", k)] = wifi0.Utilization80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilizationNon80211", k)] = wifi0.UtilizationNon80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi0.item_%d.utilizationTotal", k)] = wifi0.UtilizationTotal
-			}
-
-			for k, wifi1 := range *network.Wifi1 {
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.start_time", k)] = wifi1.StartTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.end_time", k)] = wifi1.EndTime
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilization80211", k)] = wifi1.Utilization80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilizationNon80211", k)] = wifi1.UtilizationNon80211
-				metric[fmt.Sprintf("network.health.channel.radio.wifi1.item_%d.utilizationTotal", k)] = wifi1.UtilizationTotal
 			}
 
 			if device, ok := devices[Serial(network.Serial)]; ok {
@@ -77,7 +65,31 @@ func reportNetworkHealthChannelUtilization(reporter mb.ReporterV2, organizationI
 				metric["device.tags"] = device.Tags
 
 			}
-			metrics = append(metrics, metric)
+
+			for _, wifi0 := range *network.Wifi0 {
+				metric["network.health.channel.radio.wifi0.start_time"] = wifi0.StartTime
+				metric["network.health.channel.radio.wifi0.end_time"] = wifi0.EndTime
+				metric["network.health.channel.radio.wifi0.utilization80211"] = wifi0.Utilization80211
+				metric["network.health.channel.radio.wifi0.utilizationNon80211"] = wifi0.UtilizationNon80211
+				metric["network.health.channel.radio.wifi0.utilizationTotal"] = wifi0.UtilizationTotal
+				wifi0_encountered = true
+				metrics = append(metrics, metric)
+			}
+
+			for _, wifi1 := range *network.Wifi1 {
+				metric["network.health.channel.radio.wifi1.start_time"] = wifi1.StartTime
+				metric["network.health.channel.radio.wifi1.end_time"] = wifi1.EndTime
+				metric["network.health.channel.radio.wifi1.utilization80211"] = wifi1.Utilization80211
+				metric["network.health.channel.radio.wifi1.utilizationNon80211"] = wifi1.UtilizationNon80211
+				metric["network.health.channel.radio.wifi1.utilizationTotal"] = wifi1.UtilizationTotal
+				wifi1_encountered = true
+				metrics = append(metrics, metric)
+			}
+
+			if !wifi0_encountered && !wifi1_encountered {
+				metrics = append(metrics, metric)
+			}
+
 		}
 	}
 	ReportMetricsForOrganization(reporter, organizationID, metrics)

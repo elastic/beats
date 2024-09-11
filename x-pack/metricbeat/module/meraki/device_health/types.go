@@ -48,6 +48,7 @@ type Uplink struct {
 	DeviceSerial Serial
 	IP           string
 	Interface    string
+	NetworkID    string
 	Metrics      []*UplinkMetric
 }
 

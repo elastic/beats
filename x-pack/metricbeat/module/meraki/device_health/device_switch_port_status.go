@@ -5,7 +5,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
 )
 
 func getSwitchPortStatusBySerial(client *meraki_api.Client, org string) (map[Serial]*meraki_api.ResponseSwitchGetDeviceSwitchPortsStatuses, error) {
