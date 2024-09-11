@@ -82,7 +82,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -98,7 +98,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -117,7 +117,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &rps[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from resource pool %s: %w", rps[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve object from resource pool %s: %v", rps[i].Name, err)
 			}
 
 			alerts, err := getAlertNames(ctx, pc, rps[i].TriggeredAlarmState)

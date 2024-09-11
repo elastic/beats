@@ -1,17 +1,17 @@
 {
-    "@timestamp": "2022-09-06T06:41:22.128Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "vsphere.host",
+        "duration": 115000,
+        "module": "vsphere"
+    },
     "metricset": {
         "name": "host",
         "period": 10000
     },
     "service": {
-        "address": "https://localhost:8989/sdk",
+        "address": "127.0.0.1:55538",
         "type": "vsphere"
-    },
-    "event": {
-        "module": "vsphere",
-        "duration": 23519250,
-        "dataset": "vsphere.host"
     },
     "vsphere": {
         "host": {
@@ -23,40 +23,31 @@
               ]
             },
             "cpu": {
-                "used": {
-                    "mhz": 67
+                "free": {
+                    "mhz": 4521
                 },
                 "total": {
                     "mhz": 4588
                 },
-                "free": {
-                    "mhz": 4521
+                "used": {
+                    "mhz": 67
                 }
             },
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "LocalDS_0"
+                ]
+            },
             "disk": {
-                "capacity": {
-                    "usage": {
-                        "bytes": 0
-                    }
-                },
-                "devicelatency": {
-                    "average": {
-                        "ms": 0
-                    }
-                },
-                "latency": {
-                    "total": {
-                        "ms": 18
-                    }
+                "read": {
+                    "bytes": 159744
                 },
                 "total": {
-                    "bytes": 262000
-                },
-                "read": {
-                    "bytes": 13000
+                    "bytes": 401408
                 },
                 "write": {
-                    "bytes": 248000
+                    "bytes": 259072
                 }
             },
             "memory": {
@@ -70,80 +61,49 @@
                     "bytes": 1472200704
                 }
             },
+            "name": "localhost.localdomain",
             "network": {
                 "bandwidth": {
+                    "received": {
+                        "bytes": 270336
+                    },
                     "total": {
-                        "bytes": 372000
+                        "bytes": 532480
                     },
                     "transmitted": {
-                        "bytes": 0
-                    },
-                    "received": {
-                        "bytes": 371000
+                        "bytes": 249856
                     }
                 },
+                "count": 1,
+                "names": [
+                    "VM Network"
+                ],
                 "packets": {
-                    "received": {
-                        "count": 9463
-                    },
-                    "errors": {
-                        "transmitted": {
-                            "count": 0
-                        },
-                        "received": {
-                            "count": 0
-                        },
-                        "total": {
-                            "count": 0
-                        }
-                    },
                     "multicast": {
-                        "total": {
-                            "count": 6679
-                        },
-                        "transmitted": {
-                            "count": 0
-                        },
                         "received": {
-                            "count": 6679
+                            "count": 61
                         }
                     },
-                    "dropped": {
-                        "received": {
-                            "count": 0
-                        },
-                        "total": {
-                            "count": 0
-                        },
-                        "transmitted": {
-                            "count": 0
-                        }
+                    "received": {
+                        "count": 4569
                     },
                     "transmitted": {
-                        "count": 54
+                        "count": 4578
                     }
                 }
             },
-            "vm": {
-                "count": 2,
-                "names": [
-                    "DC0_H0_VM0", 
-                    "DC0_H0_VM1"
-                ]
-            },
-            "datastore": {
-                "count": 1,
-                "names": [
-                    "LocalDS_0"
-                ]
-            },
-            "network_count": 1,
             "network_names": [
                 "VM Network"
             ],
-            "name": "DC0_H0",
-            "status": "green",
-            "uptime": 1728865
+            "status": "gray",
+            "uptime": 77229,
+            "vm": {
+                "count": 2,
+                "names": [
+                    "ha-host_VM0",
+                    "ha-host_VM1"
+                ]
+            }
         }
     }
 }
