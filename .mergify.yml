@@ -146,12 +146,21 @@ pull_request_rules:
 
           To fixup this pull request, you need to add the backport labels for the needed
           branches, such as:
-          * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+          * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
 
-          **NOTE**: `backport-v8.x` has been added to help with the transition to the new branch 8.x.
+  - name: add backport-8.x label for main only
+    conditions:
+      - -label~=^backport-8.x
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          `backport-8.x` has been added to help with the transition to the new branch `8.x`.
       label:
         add:
-          - backport-v8.x
+          - backport-8.x
   - name: notify the backport has not been merged yet
     conditions:
       - -merged
@@ -167,7 +176,7 @@ pull_request_rules:
   - name: backport patches to 7.17 branch
     conditions:
       - merged
-      - label=backport-v7.17.0
+      - label~=^(backport-v7.17.0|backport-7.17)$
     actions:
       backport:
         assignees:
@@ -336,7 +345,7 @@ pull_request_rules:
   - name: backport patches to 8.15 branch
     conditions:
       - merged
-      - label=backport-v8.15.0
+      - label~=^(backport-v8.15.0|backport-8.15)$
     actions:
       backport:
         assignees:
@@ -349,7 +358,7 @@ pull_request_rules:
   - name: backport patches to 8.x branch
     conditions:
       - merged
-      - label=backport-v8.x
+      - label~=^(backport-v8.x|backport-8.x)$
     actions:
       backport:
         assignees:
