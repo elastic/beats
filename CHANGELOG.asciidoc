@@ -7,6 +7,12 @@
 === Beats version 8.15.1
 https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
+==== Known issues
+
+*Affecting all Beats*
+
+- Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{issue}
+
 ==== Bugfixes
 
 *Affecting all Beats*
