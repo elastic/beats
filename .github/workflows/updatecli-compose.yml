@@ -1,43 +1,40 @@
 ---
-name: bump-elastic-stack-snapshot
+name: updatecli-compose
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 15 * * 1-5'
+    - cron: '0 6 * * *'
 
 permissions:
   contents: read
 
 jobs:
-  filter:
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    outputs:
-      matrix: ${{ steps.generator.outputs.matrix }}
-    steps:
-      - id: generator
-        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
-
-  bump-elastic-stack:
+  compose:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
       pull-requests: write
-    needs: [filter]
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@9a37c7e35598d7b37d8e7568b40ed9538112be01 # v0.76.1
+      - uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose diff
         env:
-          BRANCH: ${{ matrix.branch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose apply
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - if: ${{ failure()  }}
@@ -60,3 +57,4 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+  
