@@ -7,7 +7,6 @@
 package remote_write
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -1438,14 +1437,15 @@ func TestMetricsCount(t *testing.T) {
 				assert.True(t, ok, "metrics_count should be present")
 
 				labels, ok := event.ModuleFields["labels"].(mapstr.M)
-				assert.True(t, ok, "labels should be present")
+				if !ok {
+					labels = mapstr.M{} // If no labels, create an empty map so that we can handle metrics with no labels
+				}
 
-				labelsJSON, err := json.Marshal(labels)
-				assert.NoError(t, err, "labels should be marshallable to JSON")
+				labelsHash := labels.String()
 
-				expected, ok := tt.expected[string(labelsJSON)]
+				expected, ok := tt.expected[labelsHash]
 				assert.True(t, ok, "should have an expected count for these labels")
-				assert.Equal(t, expected, count, "metrics_count should match expected value for labels %s", string(labelsJSON))
+				assert.Equal(t, expected, count, "metrics_count should match expected value for labels %v", labels)
 			}
 		})
 	}
