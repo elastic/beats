@@ -89,7 +89,7 @@ func (h *Harvester) Run() error {
 		return fmt.Errorf("error sending slowlog reset: %w", err)
 	}
 	if err := h.conn.Send("ROLE"); err != nil {
-		return fmt.Errorf("error sending slowlog reset: %w", err)
+		return fmt.Errorf("error sending role: %w", err)
 	}
 
 	// Flush the buffer to execute all commands and receive the replies
