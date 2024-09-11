@@ -28,18 +28,6 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "Pre-commit"
-    steps:
-      - label: "Pre-commit"
-        command: |
-          pre-commit run --from-ref origin/HEAD --to-ref HEAD --show-diff-on-failure
-        plugins:
-          - elastic/pre-commit#v1.0.1
-        agents:
-          image: "docker.elastic.co/ci-agent-images/ubuntu-build-essential:latest"
-          cpu: "4000m"
-          memory: "8Gi"
-
   - group: "Check/Update"
     key: "heartbeat-check-update"
 
@@ -83,6 +71,8 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        plugins:
+          - elastic/pre-commit#v1.0.1
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
