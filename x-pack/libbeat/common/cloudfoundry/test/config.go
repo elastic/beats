@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 func GetConfigFromEnv(t *testing.T) map[string]interface{} {

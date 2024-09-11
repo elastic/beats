@@ -26,7 +26,7 @@ jobs:
         uses: updatecli/updatecli-action@a0c478c868a71d3e239a65714de69450aa1ee2c6 # v0.76.1
 
       - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/scm.yml
+        run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

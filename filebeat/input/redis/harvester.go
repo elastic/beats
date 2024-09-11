@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -81,10 +81,16 @@ func (h *Harvester) Run() error {
 		return nil
 	default:
 	}
-	// Writes SLOWLOG GET, SLOWLOG RESET, and ROLE to the buffer so they are executed together
-	h.conn.Send("SLOWLOG", "GET")
-	h.conn.Send("SLOWLOG", "RESET")
-	h.conn.Send("ROLE")
+	// Writes Slowlog get, slowlog reset, and role to the buffer so they are executed together
+	if err := h.conn.Send("SLOWLOG", "GET"); err != nil {
+		return fmt.Errorf("error sending slowlog get: %w", err)
+	}
+	if err := h.conn.Send("SLOWLOG", "RESET"); err != nil {
+		return fmt.Errorf("error sending slowlog reset: %w", err)
+	}
+	if err := h.conn.Send("ROLE"); err != nil {
+		return fmt.Errorf("error sending slowlog reset: %w", err)
+	}
 
 	// Flush the buffer to execute all commands and receive the replies
 	h.conn.Flush()
@@ -92,13 +98,13 @@ func (h *Harvester) Run() error {
 	// Receives first reply from redis which is the one from SLOWLOG GET
 	logs, err := rd.Values(h.conn.Receive())
 	if err != nil {
-		return fmt.Errorf("error receiving slowlog data: %s", err)
+		return fmt.Errorf("error receiving slowlog data: %w", err)
 	}
 
 	// Read reply from SLOWLOG RESET
 	_, err = h.conn.Receive()
 	if err != nil {
-		return fmt.Errorf("error receiving reset data: %s", err)
+		return fmt.Errorf("error receiving reset data: %w", err)
 	}
 
 	// Read reply from ROLE
@@ -122,7 +128,11 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		if err != nil {
+			logp.Err("Error scanning slowlog entry: %s", err)
+			continue
+		}
 
 		// This splits up the args into cmd, key, args.
 		argsLen := len(args)
@@ -152,7 +162,7 @@ func (h *Harvester) Run() error {
 			slowlogEntry["args"] = log.args
 		}
 
-		h.forwarder.Send(beat.Event{
+		err = h.forwarder.Send(beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
 			Fields: mapstr.M{
 				"message": strings.Join(args, " "),
@@ -164,6 +174,10 @@ func (h *Harvester) Run() error {
 				},
 			},
 		})
+		if err != nil {
+			logp.Err("Error sending beat event: %s", err)
+			continue
+		}
 	}
 	return nil
 }
