@@ -67,12 +67,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	if err = m.init(); err != nil {
-		return
+		return err
 	}
 
 	content, err := m.settingsHTTP.FetchContent()
 	if err != nil {
-		return
+		return err
 	}
 
 	return eventMapping(r, content)
@@ -99,5 +99,5 @@ func (m *MetricSet) init() (err error) {
 
 	m.settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
 
-	return
+	return err
 }
