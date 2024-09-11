@@ -109,12 +109,18 @@ func (in *eventHubInputV2) Run(
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
 
+	sanitizers, err := newSanitizers(in.config.Sanitizers)
+	if err != nil {
+		return fmt.Errorf("failed to create sanitizers: %w", err)
+	}
+
 	// Decode the messages from event hub into
 	// a `[]string`.
 	in.messageDecoder = messageDecoder{
-		config:  in.config,
-		log:     in.log,
-		metrics: in.metrics,
+		config:     in.config,
+		log:        in.log,
+		metrics:    in.metrics,
+		sanitizers: sanitizers,
 	}
 
 	containerClient, err := container.NewClientFromConnectionString(

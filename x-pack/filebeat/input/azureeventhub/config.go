@@ -38,6 +38,9 @@ type azureInputConfig struct {
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
+
+	Sanitizers []SanitizerSpec `config:"sanitizers"`
+
 	// MigrateCheckpoint controls if the input should perform the checkpoint information
 	// migration from v1 to v2 (processor v2 only). Default is false.
 	MigrateCheckpoint bool `config:"migrate_checkpoint"`

@@ -79,10 +79,16 @@ func (in *eventHubInputV1) Run(
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
 
+	sanitizers, err := newSanitizers(in.config.Sanitizers)
+	if err != nil {
+		return fmt.Errorf("failed to create sanitizers: %w", err)
+	}
+
 	in.messageDecoder = messageDecoder{
-		config:  in.config,
-		log:     in.log,
-		metrics: in.metrics,
+		config:     in.config,
+		log:        in.log,
+		metrics:    in.metrics,
+		sanitizers: sanitizers,
 	}
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)

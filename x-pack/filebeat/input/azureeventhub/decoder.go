@@ -14,9 +14,10 @@ import (
 )
 
 type messageDecoder struct {
-	config  azureInputConfig
-	log     *logp.Logger
-	metrics *inputMetrics
+	config     azureInputConfig
+	log        *logp.Logger
+	metrics    *inputMetrics
+	sanitizers []Sanitizer
 }
 
 // Decode splits the message into multiple ones based on
@@ -61,8 +62,13 @@ func (u *messageDecoder) Decode(bMessage []byte) []string {
 	// Sanitization occurs if options are available and the message contains an invalid JSON.
 	//
 	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-	if len(u.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
-		bMessage = sanitize(bMessage, u.config.SanitizeOptions...)
+	// if len(u.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+	if !json.Valid(bMessage) {
+		for _, sanitizer := range u.sanitizers {
+			bMessage = sanitizer.Sanitize(bMessage)
+		}
+
+		// bMessage = sanitize(bMessage, u.config.SanitizeOptions...)
 		u.metrics.sanitizedMessages.Inc()
 	}
 
