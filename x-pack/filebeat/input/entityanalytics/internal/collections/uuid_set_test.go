@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,11 +22,11 @@ const (
 )
 
 var (
-	testUUID1 = uuid.MustParse(testUUID1Str)
-	testUUID2 = uuid.MustParse(testUUID2Str)
-	testUUID3 = uuid.MustParse(testUUID3Str)
-	testUUID4 = uuid.MustParse(testUUID4Str)
-	testUUID5 = uuid.MustParse(testUUID5Str)
+	testUUID1 = uuid.Must(uuid.FromString(testUUID1Str))
+	testUUID2 = uuid.Must(uuid.FromString(testUUID2Str))
+	testUUID3 = uuid.Must(uuid.FromString(testUUID3Str))
+	testUUID4 = uuid.Must(uuid.FromString(testUUID4Str))
+	testUUID5 = uuid.Must(uuid.FromString(testUUID5Str))
 )
 
 func TestNewUUIDSet(t *testing.T) {

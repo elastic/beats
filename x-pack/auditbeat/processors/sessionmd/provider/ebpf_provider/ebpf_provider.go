@@ -217,7 +217,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 		}
 		if waited >= maxWaitLimit {
 			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
-			s.logger.Warnf("%w", e)
+			s.logger.Warnf("%v", e)
 			combinedWait = combinedWait + waited
 			return e
 		}

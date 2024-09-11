@@ -153,7 +153,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		sp, ok := tryToUint(v)
-		if !ok || sp < 1 || sp > 65535 {
+		if !ok || sp > 65535 {
 			return nil
 		}
 		flow.SourcePort = uint16(sp)
@@ -164,7 +164,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		dp, ok := tryToUint(v)
-		if !ok || dp < 1 || dp > 65535 {
+		if !ok || dp > 65535 {
 			return nil
 		}
 		flow.DestinationPort = uint16(dp)

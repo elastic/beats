@@ -19,6 +19,7 @@ func init() {
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
 			"mremap",
 			"umask",
+			"setreuid",
 		); err != nil {
 			panic(err)
 		}
