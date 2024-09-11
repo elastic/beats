@@ -27,6 +27,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -273,9 +274,15 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	var testArgs []string
 
-	// -race is only supported on */amd64
-	if os.Getenv("DEV_ARCH") == "amd64" {
-		if params.Race {
+	if params.Race {
+		// Enable the race detector for supported platforms.
+		// This is an intersection of the supported platforms for beats and Go.
+		//
+		// See https://go.dev/doc/articles/race_detector#Requirements.
+		raceAmd64 := os.Getenv("DEV_ARCH") == "amd64"
+		raceArm64 := os.Getenv("DEV_ARCH") == "arm64" &&
+			slices.Contains([]string{"linux", "darwin"}, os.Getenv("DEV_OS"))
+		if raceAmd64 || raceArm64 {
 			testArgs = append(testArgs, "-race")
 		}
 	}
