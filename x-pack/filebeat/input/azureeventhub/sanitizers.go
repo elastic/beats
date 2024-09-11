@@ -29,7 +29,7 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 		s = &newLinesSanitizer{}
 	case "single_quotes":
 		s = &singleQuotesSanitizer{}
-	case "regex":
+	case "replace_all":
 		s = &regexpSanitizer{spec: spec.Spec}
 	default:
 		return nil, fmt.Errorf("unknown sanitizer type: %s", spec.Type)
@@ -110,8 +110,9 @@ func (s *singleQuotesSanitizer) Init() error {
 // ----------------------------------------------------------------------------
 
 type regexpSanitizer struct {
-	spec map[string]interface{}
-	re   *regexp.Regexp
+	re          *regexp.Regexp
+	replacement string
+	spec        map[string]interface{}
 }
 
 func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
@@ -121,17 +122,23 @@ func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
 
 	// Remove any leading/trailing whitespace
 	input := strings.TrimSpace(string(jsonByte))
+	//input := string(jsonByte)
 
-	// Regular expression to match array contents that are not valid JSON
-	// re := regexp.MustCompile(`\[\s*([^[\]{},\s]+(?:\s+[^[\]{},\s]+)*)\s*\]`)
-	// re := regexp.MustCompile(`\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`)
+	////// Replace invalid array contents with a string placeholder
+	//sanitized := s.re.ReplaceAllStringFunc(input, func(match string) string {
+	//	//return fmt.Sprintf("[\"%s\"]", strings.TrimSpace(match[1:len(match)-1]))
+	//	//return fmt.Sprintf("[\"%s\"]", match)
+	//	// quote json string
+	//
+	//	match = strings.ReplaceAll(match, "\"", "\\\"")
+	//	match = strings.ReplaceAll(match, "\t", "")
+	//	match = strings.ReplaceAll(match, "\n", "")
+	//
+	//	return fmt.Sprintf(s.replacement, match)
+	//	//return match
+	//})
 
-	// Replace invalid array contents with a string placeholder
-	sanitized := s.re.ReplaceAllStringFunc(input, func(match string) string {
-		return fmt.Sprintf("[\"%s\"]", strings.TrimSpace(match[1:len(match)-1]))
-	})
-
-	return []byte(sanitized)
+	return []byte(s.re.ReplaceAllString(input, s.replacement))
 }
 
 func (s *regexpSanitizer) Init() error {
@@ -153,6 +160,16 @@ func (s *regexpSanitizer) Init() error {
 	}
 
 	s.re = re
+
+	if _, ok := s.spec["replacement"]; !ok {
+		return errors.New("missing replacement format")
+	}
+
+	if _, ok := s.spec["replacement"].(string); !ok {
+		return errors.New("replacement format must be a string")
+	}
+
+	s.replacement = s.spec["replacement"].(string)
 
 	return nil
 }

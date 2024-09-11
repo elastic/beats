@@ -27,9 +27,10 @@ func TestSanitizers(t *testing.T) {
 	require.NoError(t, err)
 
 	reSanitizer, err := newSanitizer(SanitizerSpec{
-		Type: "regex",
+		Type: "replace_all",
 		Spec: map[string]interface{}{
-			"pattern": `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
+			"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
+			"replacement": "{}",
 		},
 	})
 	require.NoError(t, err)
@@ -90,7 +91,7 @@ func TestSanitizers(t *testing.T) {
 		"category": "PostgreSQLLogs",
 		"location": "westeurope",
 		"operationName": "LogEvent",
-		"properties": ["218 B blob data"],
+		"properties": {},
 		"resourceId": "/SUBSCRIPTIONS/88D1708E-CBC3-4799-9C16-C5BB5F57A0C3/RESOURCEGROUPS/CKAUF-AZURE-OBS/PROVIDERS/MICROSOFT.DBFORPOSTGRESQL/FLEXIBLESERVERS/CHRIS-PG-TEST",
 		"time": "2024-08-27T14:26:08.629Z",
 		"ServerType": "PostgreSQL",

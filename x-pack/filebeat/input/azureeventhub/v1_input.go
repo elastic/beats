@@ -79,6 +79,7 @@ func (in *eventHubInputV1) Run(
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
 
+	// Set up sanitizers, if any.
 	sanitizers, err := newSanitizers(in.config.Sanitizers)
 	if err != nil {
 		return fmt.Errorf("failed to create sanitizers: %w", err)

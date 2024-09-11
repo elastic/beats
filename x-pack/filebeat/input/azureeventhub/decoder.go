@@ -64,12 +64,17 @@ func (u *messageDecoder) Decode(bMessage []byte) []string {
 	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
 	// if len(u.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
 	if !json.Valid(bMessage) {
-		for _, sanitizer := range u.sanitizers {
-			bMessage = sanitizer.Sanitize(bMessage)
-		}
+		// TODO: Add a metric for invalid messages
+		u.metrics.invalidJSONMessages.Inc()
 
-		// bMessage = sanitize(bMessage, u.config.SanitizeOptions...)
-		u.metrics.sanitizedMessages.Inc()
+		if len(u.sanitizers) > 0 {
+			for _, sanitizer := range u.sanitizers {
+				bMessage = sanitizer.Sanitize(bMessage)
+			}
+
+			// bMessage = sanitize(bMessage, u.config.SanitizeOptions...)
+			u.metrics.sanitizedMessages.Inc()
+		}
 	}
 
 	// check if the message is a "records" object containing a list of events
