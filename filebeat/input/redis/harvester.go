@@ -110,7 +110,7 @@ func (h *Harvester) Run() error {
 	// Read reply from ROLE
 	role, err := h.conn.Receive()
 	if err != nil {
-		return fmt.Errorf("error receiving replication role: %s", err)
+		return fmt.Errorf("error receiving replication role: %w", err)
 	}
 
 	for _, item := range logs {
