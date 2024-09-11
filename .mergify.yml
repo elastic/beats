@@ -148,9 +148,9 @@ pull_request_rules:
           branches, such as:
           * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
 
-  - name: add backport-8.x label for main only
+  - name: add backport-8.x label for main only if no skipped or assigned already
     conditions:
-      - -label~=^backport-8.x
+      - -label~=^(backport-skip|backport-8.x)$
       - base=main
       - -merged
       - -closed
@@ -158,6 +158,7 @@ pull_request_rules:
       comment:
         message: |
           `backport-8.x` has been added to help with the transition to the new branch `8.x`.
+          If you don't need it please use `backport-skip` label and remove the `backport-8.x` label.
       label:
         add:
           - backport-8.x
