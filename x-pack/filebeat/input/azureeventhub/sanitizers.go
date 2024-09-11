@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 // ----------------------------------------------------------------------------
@@ -121,7 +120,7 @@ func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
 	}
 
 	// Remove any leading/trailing whitespace
-	input := strings.TrimSpace(string(jsonByte))
+	//input := strings.TrimSpace(string(jsonByte))
 	//input := string(jsonByte)
 
 	////// Replace invalid array contents with a string placeholder
@@ -138,7 +137,8 @@ func (s *regexpSanitizer) Sanitize(jsonByte []byte) []byte {
 	//	//return match
 	//})
 
-	return []byte(s.re.ReplaceAllString(input, s.replacement))
+	//return []byte(s.re.ReplaceAllString(input, s.replacement))
+	return s.re.ReplaceAll(jsonByte, []byte(s.replacement))
 }
 
 func (s *regexpSanitizer) Init() error {

@@ -83,7 +83,8 @@ func TestSanitizers(t *testing.T) {
 		"ReplicaRole": "Primary",
 		"OriginalPrimaryServerName": "chris-pg-test"
 	}`),
-			expected: []byte(`{
+			expected: []byte(`
+	{
 		"AppImage": "orcas/postgres_standalone_16_u18:38.1.240825",
 		"AppType": "PostgreSQL",
 		"AppVersion": "breadthpg16_2024-08-06-07-22-43",
