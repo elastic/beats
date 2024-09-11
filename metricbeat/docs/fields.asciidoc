@@ -67010,6 +67010,42 @@ format: percent
 
 --
 
+*`vsphere.datastore.disk.capacity.bytes`*::
++
+--
+Configured size of the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by or on the entity.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.provisioned.bytes`*::
++
+--
+Amount of storage set aside for use by a datastore or a virtual machine.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`vsphere.datastore.fstype`*::
 +
 --
@@ -67040,16 +67076,6 @@ type: keyword
 
 --
 
-*`vsphere.datastore.iops`*::
-+
---
-Storage I/O Control aggregated Input/Output Operations Per Second.
-
-
-type: long
-
---
-
 *`vsphere.datastore.name`*::
 +
 --
@@ -67069,16 +67095,6 @@ Rate of reading data from the datastore.
 type: long
 
 format: bytes
-
---
-
-*`vsphere.datastore.read.latency.total.ms`*::
-+
---
-Average amount of time for a read operation from the datastore in milliseconds.
-
-
-type: long
 
 --
 
@@ -67121,16 +67137,6 @@ Rate of writing data to the datastore.
 type: long
 
 format: bytes
-
---
-
-*`vsphere.datastore.write.latency.total.ms`*::
-+
---
-Average amount of time for a write operation from the datastore in milliseconds.
-
-
-type: long
 
 --
 
@@ -68119,7 +68125,7 @@ type: long
 *`vsphere.virtualmachine.snapshot.info`*::
 +
 --
-Deatils of the snapshots of this virtualmachine.
+Details of the snapshots of this virtualmachine.
 
 type: object
 

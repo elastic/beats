@@ -28,7 +28,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	var m *DataStoreMetricSet
 	var datastoreTest = mo.Datastore{
 		Summary: types.DatastoreSummary{
 			Name:      "datastore-test",
@@ -47,11 +46,11 @@ func TestEventMapping(t *testing.T) {
 
 	var metricDataTest = metricData{
 		perfMetrics: map[string]interface{}{
-			"datastore.read.average":              int64(100),
-			"datastore.write.average":             int64(200),
-			"datastore.datastoreIops.average":     int64(10),
-			"datastore.totalReadLatency.average":  int64(100),
-			"datastore.totalWriteLatency.average": int64(100),
+			"datastore.read.average":      int64(100),
+			"datastore.write.average":     int64(200),
+			"disk.capacity.latest":        int64(10000),
+			"disk.capacity.usage.average": int64(5000),
+			"disk.provisioned.latest":     int64(5000),
 		},
 		assetNames: assetNames{
 			outputHostNames: []string{"DC3_H0"},
@@ -59,11 +58,10 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	outputEvent := m.mapEvent(datastoreTest, &metricDataTest)
+	outputEvent := (&DataStoreMetricSet{}).mapEvent(datastoreTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"fstype": "local",
 		"status": types.ManagedEntityStatus("green"),
-		"iops":   int64(10),
 		"name":   "datastore-test",
 		"host": mapstr.M{
 			"count": 1,
@@ -75,18 +73,19 @@ func TestEventMapping(t *testing.T) {
 		},
 		"read": mapstr.M{
 			"bytes": int64(102400),
-			"latency": mapstr.M{
-				"total": mapstr.M{
-					"ms": int64(100),
-				},
-			},
 		},
 		"write": mapstr.M{
 			"bytes": int64(204800),
-			"latency": mapstr.M{
-				"total": mapstr.M{
-					"ms": int64(100),
+		},
+		"disk": mapstr.M{
+			"capacity": mapstr.M{
+				"bytes": int64(10240000),
+				"usage": mapstr.M{
+					"bytes": int64(5120000),
 				},
+			},
+			"provisioned": mapstr.M{
+				"bytes": int64(5120000),
 			},
 		},
 		"capacity": mapstr.M{
@@ -104,5 +103,4 @@ func TestEventMapping(t *testing.T) {
 	}
 
 	assert.Exactly(t, outputEvent, testEvent)
-
 }

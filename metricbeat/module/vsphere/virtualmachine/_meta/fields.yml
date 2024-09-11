@@ -99,7 +99,23 @@
       fields:
         - name: info
           type: object
-          description: Deatils of the snapshots of this virtualmachine.
+          description: Details of the snapshots of this virtualmachine.
+          fields:
+            - name: id
+              type: keyword
+              description: The unique identifier that distinguishes this snapshot from other snapshots of the virtual machine.
+            - name: name
+              type: keyword
+              description: Name of the snapshot.
+            - name: description
+              type: keyword
+              description: Description of the snapshot.
+            - name: createtime
+              type: keyword
+              description: The date and time the snapshot was taken.
+            - name: state
+              type: keyword
+              description: The power state of the virtual machine when this snapshot was taken.
         - name: count
           type: long
           description: The number of snapshots of this virtualmachine.

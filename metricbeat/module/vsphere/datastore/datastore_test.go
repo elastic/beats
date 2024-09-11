@@ -19,7 +19,6 @@ package datastore
 
 import (
 	"testing"
-	"time"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -33,19 +32,15 @@ func TestFetchEventContents(t *testing.T) {
 	model := simulator.VPX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
-	t.Cleanup(func() { model.Remove() })
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	t.Cleanup(func() { ts.Close() })
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	require.Empty(t, errs, "expected no error")
-
-	require.NotEmpty(t, events, "didn't get any event, should have gotten at least X")
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
 
 	event := events[0].MetricSetFields
 
@@ -63,6 +58,9 @@ func TestFetchEventContents(t *testing.T) {
 		"vm.count",
 		"write.bytes",
 		"capacity.used.bytes",
+		"disk.capacity.usage.bytes",
+		"disk.capacity.bytes",
+		"disk.provisioned.bytes",
 	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
@@ -85,10 +83,10 @@ func TestDataStoreMetricSetData(t *testing.T) {
 	model := simulator.ESX()
 	err := model.Create()
 	require.NoError(t, err, "failed to create model")
-	t.Cleanup(func() { model.Remove() })
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	t.Cleanup(func() { ts.Close() })
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
@@ -97,15 +95,12 @@ func TestDataStoreMetricSetData(t *testing.T) {
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
 	return map[string]interface{}{
 		"module":     "vsphere",
 		"metricsets": []string{"datastore"},
-		"hosts":      []string{urlSimulator},
+		"hosts":      []string{ts.URL.String()},
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,
-		"period":     time.Second * 20,
 	}
 }
