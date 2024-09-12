@@ -1,5 +1,6 @@
 queue_rules:
   - name: default
+    merge_method: squash
     conditions:
       - check-success=buildkite/beats
 pull_request_rules:
@@ -72,7 +73,6 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
     actions:
       queue:
-        method: squash
         name: default
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
@@ -116,7 +116,6 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
     actions:
       queue:
-        method: squash
         name: default
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
