@@ -91,7 +91,7 @@ func newSession(p *goja.Program, conf Config, test bool) (*session, error) {
 	// Measure load times
 	start := time.Now()
 	defer func() {
-		took := time.Now().Sub(start)
+		took := time.Since(start)
 		logger.Debugf("Load of javascript pipeline took %v", took)
 	}()
 	// Setup JS runtime.
@@ -217,9 +217,9 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 			}
 			err = fmt.Errorf("unexpected panic in javascript processor: %v", r)
 			if s.tagOnException != "" {
-				mapstr.AddTags(b.Fields, []string{s.tagOnException})
+				_ = mapstr.AddTags(b.Fields, []string{s.tagOnException})
 			}
-			appendString(b.Fields, "error.message", err.Error(), false)
+			_ = appendString(b.Fields, "error.message", err.Error(), false)
 		}
 	}()
 
@@ -238,9 +238,9 @@ func (s *session) runProcessFunc(b *beat.Event) (out *beat.Event, err error) {
 
 	if _, err = s.processFunc(goja.Undefined(), s.evt.JSObject()); err != nil {
 		if s.tagOnException != "" {
-			mapstr.AddTags(b.Fields, []string{s.tagOnException})
+			_ = mapstr.AddTags(b.Fields, []string{s.tagOnException})
 		}
-		appendString(b.Fields, "error.message", err.Error(), false)
+		_ = appendString(b.Fields, "error.message", err.Error(), false)
 		return b, fmt.Errorf("failed in process function: %w", err)
 	}
 
@@ -273,8 +273,9 @@ func init() {
 }
 
 type sessionPool struct {
-	New func() *session
-	C   chan *session
+	New                func() *session
+	C                  chan *session
+	NewSessionsAllowed bool
 }
 
 func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
@@ -288,14 +289,28 @@ func newSessionPool(p *goja.Program, c Config) (*sessionPool, error) {
 			s, _ := newSession(p, c, false)
 			return s
 		},
-		C: make(chan *session, c.MaxCachedSessions),
+		C:                  make(chan *session, c.MaxCachedSessions),
+		NewSessionsAllowed: !c.OnlyCachedSessions,
 	}
 	pool.Put(s)
+
+	// If we are not allowed to create new sessions, pre-cache requested sessions
+	if !pool.NewSessionsAllowed {
+		for i := 0; i < c.MaxCachedSessions-1; i++ {
+			pool.Put(pool.New())
+		}
+	}
 
 	return &pool, nil
 }
 
 func (p *sessionPool) Get() *session {
+
+	if !p.NewSessionsAllowed {
+		return <-p.C
+	}
+
+	// Try to get a session from the pool, if none is available, create a new one
 	select {
 	case s := <-p.C:
 		return s

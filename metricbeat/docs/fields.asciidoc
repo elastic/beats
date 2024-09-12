@@ -67175,6 +67175,26 @@ format: bytes
 
 --
 
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
 [float]
 === host
 
@@ -67894,6 +67914,7 @@ virtualmachine
 
 
 
+
 *`vsphere.virtualmachine.host.id`*::
 +
 --
@@ -67947,7 +67968,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -68089,6 +68110,25 @@ type: keyword
 --
 The uptime of the VM in seconds.
 
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
 
 type: long
 
