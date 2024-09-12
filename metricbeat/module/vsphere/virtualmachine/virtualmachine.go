@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -51,11 +52,12 @@ type MetricSet struct {
 }
 
 type triggerdAlarm struct {
-	Name        string    `json:"name"`
-	ID          string    `json:"id"`
-	Status      string    `json:"status"`
-	Time        time.Time `json:"time"`
-	Description string    `json:"description"`
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
 }
 
 type VMData struct {
@@ -331,10 +333,29 @@ func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlar
 			return nil, err
 		}
 		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
 		triggeredAlarm.Description = alarm.Info.Description
 		triggeredAlarm.ID = alarmState.Key
 		triggeredAlarm.Status = string(alarmState.OverallStatus)
-		triggeredAlarm.Time = alarmState.Time
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
 
 		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
 	}
