@@ -68122,7 +68122,7 @@ type: long
 --
 
 
-*`vsphere.virtualmachine.snapshot.info`*::
+*`vsphere.virtualmachine.snapshot.info.*`*::
 +
 --
 Details of the snapshots of this virtualmachine.

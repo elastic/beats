@@ -22,8 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -64,7 +64,7 @@ type VMSnapshotData struct {
 	ID          int32                          `json:"id"`
 	Name        string                         `json:"name"`
 	Description string                         `json:"description"`
-	CreateTime  time.Time                      `json:"createtime"`
+	CreateTime  common.Time                    `json:"createtime"`
 	State       types.VirtualMachinePowerState `json:"state"`
 }
 
@@ -294,7 +294,7 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 			ID:          snapshot.Id,
 			Name:        snapshot.Name,
 			Description: snapshot.Description,
-			CreateTime:  snapshot.CreateTime,
+			CreateTime:  common.Time(snapshot.CreateTime),
 			State:       snapshot.State,
 		})
 
