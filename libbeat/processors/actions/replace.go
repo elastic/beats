@@ -45,7 +45,14 @@ type replaceStringConfig struct {
 type replaceConfig struct {
 	Field       string         `config:"field" validate:"required"`
 	Pattern     *regexp.Regexp `config:"pattern" validate:"required"`
-	Replacement string         `config:"replacement" validate:"required"`
+	Replacement *string        `config:"replacement"`
+}
+
+func (c replaceConfig) Validate() error {
+	if c.Replacement == nil {
+		return errors.New("missing replacement")
+	}
+	return nil
 }
 
 func init() {
@@ -82,7 +89,7 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
+		err := f.replaceField(field.Field, field.Pattern, *field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
 			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
