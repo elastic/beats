@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 // init registers the MetricSet with the central registry as soon as the program

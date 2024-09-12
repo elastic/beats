@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 func getDeviceUplinkLossLatencyMetrics(client *meraki_api.Client, organizationID string, period time.Duration) ([]*Uplink, error) {

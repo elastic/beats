@@ -7,7 +7,7 @@ package device_health
 import (
 	"fmt"
 
-	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 func GetDevices(client *meraki_api.Client, organizationID string) (map[Serial]*Device, error) {

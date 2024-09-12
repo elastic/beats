@@ -6,7 +6,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *meraki_api.ResponseOrganizationsGetOrganizationNetworks) ([]*meraki_api.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, error) {

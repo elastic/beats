@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	meraki_api "github.com/tommyers-elastic/dashboard-api-go/v3/sdk"
+	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 func getDevicePerformanceScores(client *meraki_api.Client, devices map[Serial]*Device) (map[Serial]*DevicePerformanceScore, error) {
