@@ -8,6 +8,11 @@ backports.ssl-match-hostname==3.5.0.1
 cached-property==1.4.2
 certifi==2018.1.18
 chardet==3.0.4
+<<<<<<< HEAD
+=======
+charset-normalizer==3.3.2
+cryptography==43.0.1
+>>>>>>> 54c99614a6 (build(deps): bump cryptography in /libbeat/tests/system (#40795))
 deepdiff==4.2.0
 docker-pycreds==0.4.0
 dockerpty==0.4.1
