@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
+	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -36,10 +36,9 @@ type histogram struct {
 	metricName string
 }
 
-func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.RemoteWriteEventsGenerator, error) {
-	var err error
+func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet, opts ...rw.RemoteWriteEventsGeneratorOption) (rw.RemoteWriteEventsGenerator, error) {
 	config := defaultConfig
-	if err = base.Module().UnpackConfig(&config); err != nil {
+	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
@@ -52,8 +51,10 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 		g := remoteWriteTypedGenerator{
 			counterCache: counters,
 			rateCounters: config.RateCounters,
+			metricsCount: config.MetricsCount,
 		}
 
+		var err error
 		g.counterPatterns, err = p.CompilePatternList(config.TypesPatterns.CounterPatterns)
 		if err != nil {
 			return nil, fmt.Errorf("unable to compile counter patterns: %w", err)
@@ -66,10 +67,11 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 		return &g, nil
 	}
 
-	return remote_write.DefaultRemoteWriteEventsGeneratorFactory(base)
+	return rw.DefaultRemoteWriteEventsGeneratorFactory(base, opts...)
 }
 
 type remoteWriteTypedGenerator struct {
+	metricsCount      bool
 	counterCache      collector.CounterCache
 	rateCounters      bool
 	counterPatterns   []*regexp.Regexp
@@ -102,11 +104,11 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
-		labels := mapstr.M{}
-
 		if metric == nil {
 			continue
 		}
+
+		labels := mapstr.M{}
 		val := float64(metric.Value)
 		if math.IsNaN(val) || math.IsInf(val, 0) {
 			continue
@@ -130,6 +132,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		// join metrics with same labels in a single event
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
+				RootFields:   mapstr.M{},
 				ModuleFields: mapstr.M{},
 				Timestamp:    metric.Timestamp.Time(),
 			}
@@ -145,6 +148,7 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 		}
 
 		e := eventList[labelsHash]
+
 		switch promType {
 		case counterType:
 			data = mapstr.M{
@@ -182,12 +186,30 @@ func (g remoteWriteTypedGenerator) GenerateEvents(metrics model.Samples) map[str
 			histograms[histKey] = hist
 			continue
 		}
-		e.ModuleFields.Update(data)
 
+		e.ModuleFields.Update(data)
 	}
 
 	// process histograms together
 	g.processPromHistograms(eventList, histograms)
+
+	if g.metricsCount {
+		for _, e := range eventList {
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each e.ModuleFields["metrics"] may have more than 1 metric.
+			// As, metrics are nested under the "prometheus" key, labels is also nested under the "prometheus" key. So, we need to make sure
+			// we subtract 1 in case the e.ModuleFields["labels"] also exists.
+			//
+			// See unit tests for the same.
+			if _, hasLabels := e.ModuleFields["labels"]; hasLabels {
+				e.RootFields["metrics_count"] = len(e.ModuleFields) - 1
+			} else {
+				e.RootFields["metrics_count"] = len(e.ModuleFields)
+			}
+		}
+	}
+
 	return eventList
 }
 
