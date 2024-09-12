@@ -1325,6 +1325,9 @@ metricbeat.modules:
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
   #use_types: true
@@ -1341,6 +1344,9 @@ metricbeat.modules:
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -1393,6 +1399,9 @@ metricbeat.modules:
   #username: "user"
   #password: "secret"
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # This can be used for service account based authorization:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
@@ -1404,6 +1413,9 @@ metricbeat.modules:
 #  metricsets: ["remote_write"]
 #  host: "localhost"
 #  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
@@ -1568,15 +1580,26 @@ metricbeat.modules:
 #------------------------------- VSphere Module -------------------------------
 - module: vsphere
   enabled: true
-  metricsets: ["datastore", "host", "virtualmachine"]
-  period: 10s
+  metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
+  
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds by default.
+  # Supported Periods:
+  # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
+  # Since the performance API has usage restrictions based on data collection intervals,
+  # users should ensure that the period is configured optimally to receive real-time data.
+  # users can still collect summary metrics if performance metrics are not supported for the configured instance.
+  # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
+  # Reference Links:
+  # Data Collection Intervals: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html
+  # Data Collection Levels: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html
+  period: 20s
   hosts: ["https://localhost/sdk"]
 
   username: "user"
   password: "password"
   # If insecure is true, don't verify the server's certificate chain
   insecure: false
-  # Get custom fields when using virtualmachine metric set. Default false.
+  # Get custom fields when using virtualmachine metricset. Default false.
   # get_custom_fields: false
 
 #------------------------------- Windows Module -------------------------------

@@ -20,6 +20,7 @@ func init() {
 			"faccessat2",
 			"mremap",
 			"umask",
+			"setreuid",
 		); err != nil {
 			panic(err)
 		}

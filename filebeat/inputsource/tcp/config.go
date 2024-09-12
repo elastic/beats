@@ -18,6 +18,7 @@
 package tcp
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -35,12 +36,29 @@ type Config struct {
 	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
 	MaxConnections int                     `config:"max_connections"`
 	TLS            *tlscommon.ServerConfig `config:"ssl"`
+	Network        string                  `config:"network"`
 }
+
+const (
+	networkTCP  = "tcp"
+	networkTCP4 = "tcp4"
+	networkTCP6 = "tcp6"
+)
+
+var (
+	ErrInvalidNetwork  = errors.New("invalid network value")
+	ErrMissingHostPort = errors.New("need to specify the host using the `host:port` syntax")
+)
 
 // Validate validates the Config option for the tcp input.
 func (c *Config) Validate() error {
 	if len(c.Host) == 0 {
-		return fmt.Errorf("need to specify the host using the `host:port` syntax")
+		return ErrMissingHostPort
+	}
+	switch c.Network {
+	case "", networkTCP, networkTCP4, networkTCP6:
+	default:
+		return fmt.Errorf("%w: %s, expected: %v or %v or %v ", ErrInvalidNetwork, c.Network, networkTCP, networkTCP4, networkTCP6)
 	}
 	return nil
 }

@@ -18,25 +18,31 @@
 package redis
 
 import (
+	"crypto/tls"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-var defaultConfig = config{
-	ForwarderConfig: harvester.ForwarderConfig{
-		Type: "redis",
-	},
-	Network:  "tcp",
-	MaxConn:  10,
-	Password: "",
+func defaultConfig() config {
+	return config{
+		ForwarderConfig: harvester.ForwarderConfig{
+			Type: "redis",
+		},
+		Network: "tcp",
+		MaxConn: 10,
+	}
 }
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
-	Hosts                     []string      `config:"hosts" validate:"required"`
-	IdleTimeout               time.Duration `config:"idle_timeout"`
-	Network                   string        `config:"network"`
-	MaxConn                   int           `config:"maxconn" validate:"min=1"`
-	Password                  string        `config:"password"`
+	Hosts                     []string          `config:"hosts" validate:"required"`
+	IdleTimeout               time.Duration     `config:"idle_timeout"`
+	Network                   string            `config:"network"`
+	MaxConn                   int               `config:"maxconn" validate:"min=1"`
+	Username                  string            `config:"username"`
+	Password                  string            `config:"password"`
+	TLS                       *tlscommon.Config `config:"ssl"`
+	tlsConfig                 *tls.Config
 }

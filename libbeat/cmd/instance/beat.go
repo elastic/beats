@@ -35,9 +35,10 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -68,7 +69,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/filewatcher"
@@ -278,7 +278,8 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			StartTime:       time.Now(),
 			EphemeralID:     metricreport.EphemeralID(),
 		},
-		Fields: fields,
+		Fields:   fields,
+		Registry: reload.NewRegistry(),
 	}
 
 	return &Beat{Beat: b}, nil
@@ -337,8 +338,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-	logSystemInfo(b.Info)
-	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	log := logp.NewLogger("beat")
+	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
 	if err != nil {
@@ -387,6 +389,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
+		// Since now publisher is closed on Stop, we want to give some
+		// time to ack any pending events by default to avoid
+		// changing on stop behavior too much.
+		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -395,11 +401,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
-
-	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
-	//       but refine publisher to disconnect clients on stop automatically
-	// defer pipeline.Close()
+	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
@@ -513,11 +515,24 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
+	// Since publisher.Close is not safe to be called more than once this is necessary.
+	var once sync.Once
 	stopBeat := func() {
-		b.Instrumentation.Tracer().Close()
-		beater.Stop()
+		once.Do(func() {
+			b.Instrumentation.Tracer().Close()
+			// If the publisher has a Close() method, call it before stopping the beater.
+			if c, ok := b.Publisher.(io.Closer); ok {
+				c.Close()
+			}
+			beater.Stop()
+		})
 	}
 	svc.HandleSignals(stopBeat, cancel)
+
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(stopBeat)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -525,9 +540,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
@@ -845,7 +857,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, b.Registry)
 	if err != nil {
 		return err
 	}
@@ -865,17 +877,8 @@ func (b *Beat) configure(settings Settings) error {
 		version.SetPackageVersion(b.Info.Version)
 	}
 
-	// if we're in fleet mode, construct a custom user-agent
-	if fleetmode.Enabled() {
-		userAgent := ""
-		info := b.Manager.AgentInfo()
-		if info.ManagedMode == proto.AgentManagedMode_MANAGED {
-			userAgent = "Agent-Managed"
-		} else if info.ManagedMode == proto.AgentManagedMode_STANDALONE {
-			userAgent = "Agent-Standalone"
-		}
-		b.Info.UserAgentPostfix = userAgent
-	}
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
@@ -1365,15 +1368,19 @@ func handleError(err error) error {
 // in debugging. This information includes data about the beat, build, go
 // runtime, host, and process. If any of the data is not available it will be
 // omitted.
-func logSystemInfo(info beat.Info) {
+func (b *Beat) logSystemInfo(log *logp.Logger) {
 	defer logp.Recover("An unexpected error occurred while collecting " +
 		"information about the system.")
-	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
+	log = log.With(logp.Namespace("system_info"))
+
+	if b.Manager.Enabled() {
+		return
+	}
 
 	// Beat
 	beat := mapstr.M{
-		"type": info.Beat,
-		"uuid": info.ID,
+		"type": b.Info.Beat,
+		"uuid": b.Info.ID,
 		"path": mapstr.M{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),
@@ -1387,7 +1394,7 @@ func logSystemInfo(info beat.Info) {
 	build := mapstr.M{
 		"commit":  version.Commit(),
 		"time":    version.BuildTime(),
-		"version": info.Version,
+		"version": b.Info.Version,
 		"libbeat": version.GetDefaultVersion(),
 	}
 	log.Infow("Build info", "build", build)

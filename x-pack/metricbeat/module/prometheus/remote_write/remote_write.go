@@ -7,12 +7,12 @@ package remote_write
 import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
+	rw "github.com/elastic/beats/v7/metricbeat/module/prometheus/remote_write"
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("prometheus", "remote_write",
-		remote_write.MetricSetBuilder(remoteWriteEventsGeneratorFactory),
+		rw.MetricSetBuilder(remoteWriteEventsGeneratorFactory),
 		mb.WithHostParser(parse.EmptyHostParser),
 
 		// must replace ensures that we are replacing the oss implementation with this one

@@ -18,17 +18,17 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/dockerlogbeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-dockerlogbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "x-pack/dockerlogbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/dockerlogbeat check update
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
           cpu: "4000m"
@@ -37,7 +37,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -45,17 +45,18 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "x-pack-dockerlogbeat-check-update"
 
-  - group: "x-pack/dockerlogbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "xpack-dockerlogbeat-mandatory-tests"
+
     steps:
-      - label: ":ubuntu: x-pack/dockerlogbeat Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/dockerlogbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -65,9 +66,9 @@ steps:
           - "x-pack/dockerlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
+              context: "x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/dockerlogbeat Go (Module) Integration Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -79,7 +80,7 @@ steps:
           mage goIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -89,7 +90,7 @@ steps:
           - "x-pack/dockerlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Go (Module) Integration Tests"
+              context: "x-pack/dockerlogbeat: Go Integration Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -99,21 +100,20 @@ steps:
     depends_on:
       - "xpack-dockerlogbeat-mandatory-tests"
 
-  - group: "x-pack/dockerlogbeat Packaging"
+  - group: "Packaging"
     key: "xpack-dockerlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux"
+      - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
         command: |
           cd x-pack/dockerlogbeat
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: gcp
@@ -123,18 +123,17 @@ steps:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Packaging Linux"
 
-      - label: ":linux: x-pack/dockerlogbeat Packaging Linux arm64"
+      - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd x-pack/dockerlogbeat
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

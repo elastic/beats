@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,6 +42,7 @@ var _ provider.Provider = &azure{}
 type azure struct {
 	*kvstore.Manager
 
+	cfg  *config.C
 	conf conf
 
 	metrics *inputMetrics
@@ -74,8 +75,20 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
 	p.ctx = inputCtx
+
+	var err error
+	p.auth, err = oauth2.New(p.cfg, p.Manager.Logger)
+	if err != nil {
+		return fmt.Errorf("unable to create authenticator: %w", err)
+	}
 	p.auth.SetLogger(p.logger)
+
+	p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, p.cfg, p.Manager.Logger, p.auth)
+	if err != nil {
+		return fmt.Errorf("unable to create fetcher: %w", err)
+	}
 	p.fetcher.SetLogger(p.logger)
+
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
 
@@ -569,19 +582,10 @@ func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID stri
 
 // configure configures this provider using the given configuration.
 func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
-	var err error
-
-	if err = cfg.Unpack(&p.conf); err != nil {
+	if err := cfg.Unpack(&p.conf); err != nil {
 		return nil, fmt.Errorf("unable to unpack %s input config: %w", Name, err)
 	}
-
-	if p.auth, err = oauth2.New(cfg, p.Manager.Logger); err != nil {
-		return nil, fmt.Errorf("unable to create authenticator: %w", err)
-	}
-	if p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, cfg, p.Manager.Logger, p.auth); err != nil {
-		return nil, fmt.Errorf("unable to create fetcher: %w", err)
-	}
-
+	p.cfg = cfg
 	return p, nil
 }
 

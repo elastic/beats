@@ -67,14 +67,15 @@ func New(
 func (s *Server) createServer() (net.Listener, error) {
 	var l net.Listener
 	var err error
+	network := s.network()
 	if s.tlsConfig != nil {
 		t := s.tlsConfig.BuildServerConfig(s.config.Host)
-		l, err = tls.Listen("tcp", s.config.Host, t)
+		l, err = tls.Listen(network, s.config.Host, t)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		l, err = net.Listen("tcp", s.config.Host)
+		l, err = net.Listen(network, s.config.Host)
 		if err != nil {
 			return nil, err
 		}
@@ -84,4 +85,11 @@ func (s *Server) createServer() (net.Listener, error) {
 		return netutil.LimitListener(l, s.config.MaxConnections), nil
 	}
 	return l, nil
+}
+
+func (s *Server) network() string {
+	if s.config.Network != "" {
+		return s.config.Network
+	}
+	return networkTCP
 }

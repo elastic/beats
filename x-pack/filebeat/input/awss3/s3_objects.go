@@ -201,7 +201,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // Content-Type and reader to get the object's contents. The caller must
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
-	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -441,14 +441,14 @@ func (p *s3ObjectProcessor) FinalizeS3Object() error {
 		return nil
 	}
 	backupKey := p.backupConfig.BackupToBucketPrefix + p.s3Obj.S3.Object.Key
-	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
 	if err != nil {
 		return fmt.Errorf("failed to copy object to backup bucket: %w", err)
 	}
 	if !p.backupConfig.Delete {
 		return nil
 	}
-	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
 		return fmt.Errorf("failed to delete object from bucket: %w", err)
 	}

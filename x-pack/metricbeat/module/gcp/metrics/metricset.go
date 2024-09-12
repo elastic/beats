@@ -144,7 +144,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
-		return nil, err
+		m.Logger().Warnf("Period has been set to default value of 60s: %s", err)
+		m.config.period = &durationpb.Duration{
+			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
+		}
 	}
 
 	// Get ingest delay and sample period for each metric type
@@ -212,7 +215,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
 	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService gcp.MetadataService
 	var err error
 
 	if !m.config.ExcludeLabels {

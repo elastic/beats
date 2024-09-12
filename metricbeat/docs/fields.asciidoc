@@ -4853,7 +4853,7 @@ type: long
 *`aws.sqs.oldest_message_age.sec`*::
 +
 --
-The approximate age of the oldest non-deleted message in the queue.
+The maximum approximate age of the oldest non-deleted message in the queue.
 
 
 type: long
@@ -4895,7 +4895,7 @@ type: long
 *`aws.sqs.messages.deleted`*::
 +
 --
-The number of messages deleted from the queue.
+The total number of messages deleted from the queue.
 
 
 type: long
@@ -4905,7 +4905,7 @@ type: long
 *`aws.sqs.messages.received`*::
 +
 --
-The number of messages returned by calls to the ReceiveMessage action.
+The total number of messages returned by calls to the ReceiveMessage action.
 
 
 type: long
@@ -4915,7 +4915,7 @@ type: long
 *`aws.sqs.messages.sent`*::
 +
 --
-The number of messages added to a queue.
+The total number of messages added to a queue.
 
 
 type: long
@@ -4925,7 +4925,7 @@ type: long
 *`aws.sqs.empty_receives`*::
 +
 --
-The number of ReceiveMessage API calls that did not return a message.
+The total number of ReceiveMessage API calls that did not return a message.
 
 
 type: long
@@ -6503,516 +6503,6 @@ Beat module
 
 
 
-*`beats_stats.apm-server.processor.span.transformations`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.span.transformations
-
---
-
-
-*`beats_stats.apm-server.processor.error.spans`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.spans
-
---
-
-*`beats_stats.apm-server.processor.error.stacktraces`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.stacktraces
-
---
-
-*`beats_stats.apm-server.processor.error.frames`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.frames
-
---
-
-*`beats_stats.apm-server.processor.error.transformations`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.transformations
-
---
-
-*`beats_stats.apm-server.processor.error.decoding.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.decoding.errors
-
---
-
-*`beats_stats.apm-server.processor.error.decoding.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.decoding.count
-
---
-
-*`beats_stats.apm-server.processor.error.validation.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.validation.errors
-
---
-
-*`beats_stats.apm-server.processor.error.validation.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.error.validation.count
-
---
-
-
-*`beats_stats.apm-server.processor.transaction.spans`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.spans
-
---
-
-*`beats_stats.apm-server.processor.transaction.stacktraces`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.stacktraces
-
---
-
-*`beats_stats.apm-server.processor.transaction.frames`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.frames
-
---
-
-*`beats_stats.apm-server.processor.transaction.transactions`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.transactions
-
---
-
-*`beats_stats.apm-server.processor.transaction.transformations`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.transformations
-
---
-
-*`beats_stats.apm-server.processor.transaction.decoding.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.decoding.errors
-
---
-
-*`beats_stats.apm-server.processor.transaction.decoding.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.decoding.count
-
---
-
-*`beats_stats.apm-server.processor.transaction.validation.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.validation.errors
-
---
-
-*`beats_stats.apm-server.processor.transaction.validation.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.transaction.validation.count
-
---
-
-
-*`beats_stats.apm-server.processor.sourcemap.counter`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.sourcemap.counter
-
---
-
-*`beats_stats.apm-server.processor.sourcemap.decoding.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.sourcemap.decoding.errors
-
---
-
-*`beats_stats.apm-server.processor.sourcemap.decoding.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.sourcemap.decoding.count
-
---
-
-*`beats_stats.apm-server.processor.sourcemap.validation.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.sourcemap.validation.errors
-
---
-
-*`beats_stats.apm-server.processor.sourcemap.validation.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.sourcemap.validation.count
-
---
-
-
-*`beats_stats.apm-server.processor.metric.transformations`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.metric.transformations
-
---
-
-
-*`beats_stats.apm-server.processor.metric.decoding.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.metric.decoding.errors
-
---
-
-*`beats_stats.apm-server.processor.metric.decoding.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.metric.decoding.count
-
---
-
-
-*`beats_stats.apm-server.processor.metric.validation.errors`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.metric.validation.errors
-
---
-
-*`beats_stats.apm-server.processor.metric.validation.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.processor.metric.validation.count
-
---
-
-
-
-*`beats_stats.apm-server.decoder.deflate.content-length`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.deflate.content-length
-
---
-
-*`beats_stats.apm-server.decoder.deflate.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.deflate.count
-
---
-
-
-*`beats_stats.apm-server.decoder.gzip.content-length`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.gzip.content-length
-
---
-
-*`beats_stats.apm-server.decoder.gzip.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.gzip.count
-
---
-
-
-*`beats_stats.apm-server.decoder.uncompressed.content-length`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.uncompressed.content-length
-
---
-
-*`beats_stats.apm-server.decoder.uncompressed.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.uncompressed.count
-
---
-
-
-*`beats_stats.apm-server.decoder.reader.size`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.reader.size
-
---
-
-*`beats_stats.apm-server.decoder.reader.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.reader.count
-
---
-
-*`beats_stats.apm-server.decoder.missing-content-length.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.decoder.missing-content-length.count
-
---
-
-
-*`beats_stats.apm-server.server.request.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.request.count
-
---
-
-*`beats_stats.apm-server.server.concurrent.wait.ms`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.concurrent.wait.ms
-
---
-
-
-*`beats_stats.apm-server.server.response.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.count
-
---
-
-
-*`beats_stats.apm-server.server.response.valid.ok`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.valid.ok
-
---
-
-*`beats_stats.apm-server.server.response.valid.accepted`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.valid.accepted
-
---
-
-*`beats_stats.apm-server.server.response.valid.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.valid.count
-
---
-
-
-*`beats_stats.apm-server.server.response.errors.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.count
-
---
-
-*`beats_stats.apm-server.server.response.errors.toolarge`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.toolarge
-
---
-
-*`beats_stats.apm-server.server.response.errors.validate`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.validate
-
---
-
-*`beats_stats.apm-server.server.response.errors.ratelimit`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.ratelimit
-
---
-
-*`beats_stats.apm-server.server.response.errors.queue`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.queue
-
---
-
-*`beats_stats.apm-server.server.response.errors.closed`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.closed
-
---
-
-*`beats_stats.apm-server.server.response.errors.forbidden`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.forbidden
-
---
-
-*`beats_stats.apm-server.server.response.errors.concurrency`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.concurrency
-
---
-
-*`beats_stats.apm-server.server.response.errors.unauthorized`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.unauthorized
-
---
-
-*`beats_stats.apm-server.server.response.errors.internal`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.internal
-
---
-
-*`beats_stats.apm-server.server.response.errors.decode`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.decode
-
---
-
-*`beats_stats.apm-server.server.response.errors.method`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.server.response.errors.method
-
---
-
 *`beats_stats.apm-server.acm.request.count`*::
 +
 --
@@ -7022,24 +6512,6 @@ alias to: beat.stats.apm_server.acm.request.count
 
 --
 
-
-*`beats_stats.apm-server.acm.response.request.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.request.count
-
---
-
-*`beats_stats.apm-server.acm.response.unset`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.unset
-
---
 
 *`beats_stats.apm-server.acm.response.count`*::
 +
@@ -7051,67 +6523,12 @@ alias to: beat.stats.apm_server.acm.response.count
 --
 
 
-*`beats_stats.apm-server.acm.response.valid.notmodified`*::
+*`beats_stats.apm-server.acm.response.errors.closed`*::
 +
 --
 type: alias
 
-alias to: beat.stats.apm_server.acm.response.valid.notmodified
-
---
-
-*`beats_stats.apm-server.acm.response.valid.count`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.valid.count
-
---
-
-*`beats_stats.apm-server.acm.response.valid.ok`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.valid.ok
-
---
-
-*`beats_stats.apm-server.acm.response.valid.accepted`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.valid.accepted
-
---
-
-
-*`beats_stats.apm-server.acm.response.errors.validate`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.errors.validate
-
---
-
-*`beats_stats.apm-server.acm.response.errors.internal`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.errors.internal
-
---
-
-*`beats_stats.apm-server.acm.response.errors.queue`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.errors.queue
+alias to: beat.stats.apm_server.acm.response.errors.closed
 
 --
 
@@ -7133,30 +6550,30 @@ alias to: beat.stats.apm_server.acm.response.errors.decode
 
 --
 
-*`beats_stats.apm-server.acm.response.errors.toolarge`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.errors.toolarge
-
---
-
-*`beats_stats.apm-server.acm.response.errors.unavailable`*::
-+
---
-type: alias
-
-alias to: beat.stats.apm_server.acm.response.errors.unavailable
-
---
-
 *`beats_stats.apm-server.acm.response.errors.forbidden`*::
 +
 --
 type: alias
 
 alias to: beat.stats.apm_server.acm.response.errors.forbidden
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.internal
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.invalidquery`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.invalidquery
 
 --
 
@@ -7178,12 +6595,12 @@ alias to: beat.stats.apm_server.acm.response.errors.notfound
 
 --
 
-*`beats_stats.apm-server.acm.response.errors.invalidquery`*::
+*`beats_stats.apm-server.acm.response.errors.queue`*::
 +
 --
 type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.invalidquery
+alias to: beat.stats.apm_server.acm.response.errors.queue
 
 --
 
@@ -7196,12 +6613,21 @@ alias to: beat.stats.apm_server.acm.response.errors.ratelimit
 
 --
 
-*`beats_stats.apm-server.acm.response.errors.closed`*::
+*`beats_stats.apm-server.acm.response.errors.timeout`*::
 +
 --
 type: alias
 
-alias to: beat.stats.apm_server.acm.response.errors.closed
+alias to: beat.stats.apm_server.acm.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.toolarge
 
 --
 
@@ -7211,6 +6637,1146 @@ alias to: beat.stats.apm_server.acm.response.errors.closed
 type: alias
 
 alias to: beat.stats.apm_server.acm.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.unavailable
+
+--
+
+*`beats_stats.apm-server.acm.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.errors.validate
+
+--
+
+
+*`beats_stats.apm-server.acm.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.accepted
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.count
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.notmodified`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.notmodified
+
+--
+
+*`beats_stats.apm-server.acm.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.response.valid.ok
+
+--
+
+*`beats_stats.apm-server.acm.unset`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.acm.unset
+
+--
+
+
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.cache.entries.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.cache.refresh.failures`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.failures
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.cache.refresh.successes`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.successes
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.fetch.es`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.es
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.fetch.fallback`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.fallback
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.fetch.invalid`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid
+
+--
+
+*`beats_stats.apm-server.agentcfg.elasticsearch.fetch.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable
+
+--
+
+
+
+
+*`beats_stats.apm-server.jaeger.grpc.collect.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.request.count
+
+--
+
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.count
+
+--
+
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.count
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.collect.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.collect.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.jaeger.grpc.sampling.event.received.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.sampling.event.received.count
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.sampling.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.sampling.request.count
+
+--
+
+
+*`beats_stats.apm-server.jaeger.grpc.sampling.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.count
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.sampling.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count
+
+--
+
+*`beats_stats.apm-server.jaeger.grpc.sampling.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count
+
+--
+
+
+
+
+*`beats_stats.apm-server.otlp.grpc.logs.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.logs.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.logs.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.metrics.consumer.unsupported_dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.metrics.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.metrics.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.metrics.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.traces.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.grpc.traces.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.grpc.traces.response.valid.count
+
+--
+
+
+
+*`beats_stats.apm-server.otlp.http.logs.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.logs.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.logs.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.http.logs.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.http.logs.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.http.logs.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.http.logs.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.logs.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.metrics.consumer.unsupported_dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped
+
+--
+
+*`beats_stats.apm-server.otlp.http.metrics.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.metrics.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.metrics.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.http.metrics.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.http.metrics.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.http.metrics.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.http.metrics.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.metrics.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.traces.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.request.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.traces.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.count
+
+--
+
+
+*`beats_stats.apm-server.otlp.http.traces.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.errors.count
+
+--
+
+*`beats_stats.apm-server.otlp.http.traces.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.otlp.http.traces.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.otlp.http.traces.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.otlp.http.traces.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.otlp.http.traces.response.valid.count
+
+--
+
+
+*`beats_stats.apm-server.processor.error.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.error.transformations
+
+--
+
+*`beats_stats.apm-server.processor.metric.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.metric.transformations
+
+--
+
+*`beats_stats.apm-server.processor.span.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.span.transformations
+
+--
+
+
+*`beats_stats.apm-server.processor.stream.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.stream.accepted
+
+--
+
+
+*`beats_stats.apm-server.processor.stream.errors.invalid`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.stream.errors.invalid
+
+--
+
+*`beats_stats.apm-server.processor.stream.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.stream.errors.toolarge
+
+--
+
+*`beats_stats.apm-server.processor.transaction.transformations`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.processor.transaction.transformations
+
+--
+
+
+*`beats_stats.apm-server.root.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.request.count
+
+--
+
+
+*`beats_stats.apm-server.root.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.count
+
+--
+
+
+*`beats_stats.apm-server.root.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.closed
+
+--
+
+*`beats_stats.apm-server.root.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.count
+
+--
+
+*`beats_stats.apm-server.root.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.decode
+
+--
+
+*`beats_stats.apm-server.root.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.forbidden
+
+--
+
+*`beats_stats.apm-server.root.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.internal
+
+--
+
+*`beats_stats.apm-server.root.response.errors.invalidquery`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.invalidquery
+
+--
+
+*`beats_stats.apm-server.root.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.method
+
+--
+
+*`beats_stats.apm-server.root.response.errors.notfound`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.notfound
+
+--
+
+*`beats_stats.apm-server.root.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.queue
+
+--
+
+*`beats_stats.apm-server.root.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.root.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.root.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.toolarge
+
+--
+
+*`beats_stats.apm-server.root.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.root.response.errors.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.unavailable
+
+--
+
+*`beats_stats.apm-server.root.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.errors.validate
+
+--
+
+
+*`beats_stats.apm-server.root.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.valid.accepted
+
+--
+
+*`beats_stats.apm-server.root.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.valid.count
+
+--
+
+*`beats_stats.apm-server.root.response.valid.notmodified`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.valid.notmodified
+
+--
+
+*`beats_stats.apm-server.root.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.response.valid.ok
+
+--
+
+*`beats_stats.apm-server.root.unset`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.root.unset
+
+--
+
+*`beats_stats.apm-server.sampling.transactions_dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.transactions_dropped
+
+--
+
+
+*`beats_stats.apm-server.server.request.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.request.count
+
+--
+
+
+*`beats_stats.apm-server.server.response.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.count
+
+--
+
+
+*`beats_stats.apm-server.server.response.errors.closed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.closed
+
+--
+
+*`beats_stats.apm-server.server.response.errors.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.count
+
+--
+
+*`beats_stats.apm-server.server.response.errors.decode`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.decode
+
+--
+
+*`beats_stats.apm-server.server.response.errors.forbidden`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.forbidden
+
+--
+
+*`beats_stats.apm-server.server.response.errors.internal`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.internal
+
+--
+
+*`beats_stats.apm-server.server.response.errors.invalidquery`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.invalidquery
+
+--
+
+*`beats_stats.apm-server.server.response.errors.method`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.method
+
+--
+
+*`beats_stats.apm-server.server.response.errors.notfound`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.notfound
+
+--
+
+*`beats_stats.apm-server.server.response.errors.queue`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.queue
+
+--
+
+*`beats_stats.apm-server.server.response.errors.ratelimit`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.ratelimit
+
+--
+
+*`beats_stats.apm-server.server.response.errors.timeout`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.timeout
+
+--
+
+*`beats_stats.apm-server.server.response.errors.toolarge`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.toolarge
+
+--
+
+*`beats_stats.apm-server.server.response.errors.unauthorized`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.unauthorized
+
+--
+
+*`beats_stats.apm-server.server.response.errors.unavailable`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.unavailable
+
+--
+
+*`beats_stats.apm-server.server.response.errors.validate`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.errors.validate
+
+--
+
+
+*`beats_stats.apm-server.server.response.valid.accepted`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.accepted
+
+--
+
+*`beats_stats.apm-server.server.response.valid.count`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.count
+
+--
+
+*`beats_stats.apm-server.server.response.valid.notmodified`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.notmodified
+
+--
+
+*`beats_stats.apm-server.server.response.valid.ok`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.response.valid.ok
+
+--
+
+*`beats_stats.apm-server.server.unset`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.server.unset
 
 --
 
@@ -7809,6 +8375,55 @@ alias to: beat.stats.cpu.user.time.ms
 
 
 
+
+*`beats_stats.output.elasticsearch.bulk_requests.available`*::
++
+--
+type: alias
+
+alias to: beat.stats.output.elasticsearch.bulk_requests.available
+
+--
+
+*`beats_stats.output.elasticsearch.bulk_requests.completed`*::
++
+--
+type: alias
+
+alias to: beat.stats.output.elasticsearch.bulk_requests.completed
+
+--
+
+
+*`beats_stats.output.elasticsearch.indexers.active`*::
++
+--
+type: alias
+
+alias to: beat.stats.output.elasticsearch.indexers.active
+
+--
+
+*`beats_stats.output.elasticsearch.indexers.created`*::
++
+--
+type: alias
+
+alias to: beat.stats.output.elasticsearch.indexers.created
+
+--
+
+*`beats_stats.output.elasticsearch.indexers.destroyed`*::
++
+--
+type: alias
+
+alias to: beat.stats.output.elasticsearch.indexers.destroyed
+
+--
+
+
+
 *`beats_state.beat.host`*::
 +
 --
@@ -8206,406 +8821,6 @@ Beat stats
 
 
 
-*`beat.stats.apm_server.processor.span.transformations`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.error.spans`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.stacktraces`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.frames`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.transformations`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.decoding.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.decoding.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.validation.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.error.validation.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.transaction.spans`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.stacktraces`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.frames`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.transactions`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.transformations`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.decoding.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.decoding.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.validation.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.transaction.validation.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.sourcemap.counter`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.sourcemap.decoding.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.sourcemap.decoding.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.sourcemap.validation.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.sourcemap.validation.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.metric.transformations`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.metric.decoding.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.metric.decoding.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.processor.metric.validation.errors`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.processor.metric.validation.count`*::
-+
---
-type: long
-
---
-
-
-
-*`beat.stats.apm_server.decoder.deflate.content-length`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.decoder.deflate.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.decoder.gzip.content-length`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.decoder.gzip.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.decoder.uncompressed.content-length`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.decoder.uncompressed.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.decoder.reader.size`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.decoder.reader.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.decoder.missing-content-length.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.server.request.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.concurrent.wait.ms`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.server.response.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.server.response.valid.ok`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.valid.accepted`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.valid.count`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.server.response.errors.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.toolarge`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.validate`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.ratelimit`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.queue`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.closed`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.forbidden`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.concurrency`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.unauthorized`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.internal`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.decode`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.server.response.errors.method`*::
-+
---
-type: long
-
---
-
 *`beat.stats.apm_server.acm.request.count`*::
 +
 --
@@ -8614,13 +8829,6 @@ type: long
 --
 
 
-*`beat.stats.apm_server.acm.response.request.count`*::
-+
---
-type: long
-
---
-
 *`beat.stats.apm_server.acm.response.count`*::
 +
 --
@@ -8628,58 +8836,8 @@ type: long
 
 --
 
-*`beat.stats.apm_server.acm.response.unset`*::
-+
---
-type: long
 
---
-
-
-*`beat.stats.apm_server.acm.response.valid.notmodified`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.valid.count`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.valid.ok`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.valid.accepted`*::
-+
---
-type: long
-
---
-
-
-*`beat.stats.apm_server.acm.response.errors.validate`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.errors.internal`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.errors.queue`*::
+*`beat.stats.apm_server.acm.response.errors.closed`*::
 +
 --
 type: long
@@ -8700,21 +8858,21 @@ type: long
 
 --
 
-*`beat.stats.apm_server.acm.response.errors.toolarge`*::
-+
---
-type: long
-
---
-
-*`beat.stats.apm_server.acm.response.errors.unavailable`*::
-+
---
-type: long
-
---
-
 *`beat.stats.apm_server.acm.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.invalidquery`*::
 +
 --
 type: long
@@ -8735,7 +8893,7 @@ type: long
 
 --
 
-*`beat.stats.apm_server.acm.response.errors.invalidquery`*::
+*`beat.stats.apm_server.acm.response.errors.queue`*::
 +
 --
 type: long
@@ -8749,7 +8907,14 @@ type: long
 
 --
 
-*`beat.stats.apm_server.acm.response.errors.closed`*::
+*`beat.stats.apm_server.acm.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.toolarge`*::
 +
 --
 type: long
@@ -8757,6 +8922,902 @@ type: long
 --
 
 *`beat.stats.apm_server.acm.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.unavailable`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.acm.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.notmodified`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.acm.unset`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.failures`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.successes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.fetch.es`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.fetch.fallback`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable`*::
++
+--
+type: long
+
+--
+
+
+
+
+*`beat.stats.apm_server.jaeger.grpc.collect.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.collect.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.jaeger.grpc.sampling.event.received.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.sampling.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.jaeger.grpc.sampling.response.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+
+
+*`beat.stats.apm_server.otlp.grpc.logs.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.logs.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.metrics.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.metrics.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.traces.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.grpc.traces.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.apm_server.otlp.http.logs.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.logs.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.logs.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.logs.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.logs.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.logs.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.metrics.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.metrics.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.metrics.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.metrics.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.metrics.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.metrics.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.traces.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.traces.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.otlp.http.traces.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.traces.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.traces.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.otlp.http.traces.response.valid.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.error.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.metric.transformations`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.span.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.stream.accepted`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.processor.stream.errors.invalid`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.stream.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.processor.transaction.transformations`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.root.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.root.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.root.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.invalidquery`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.notfound`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.unavailable`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.root.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.valid.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.valid.notmodified`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.root.unset`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.transactions_dropped`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.request.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.count`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.errors.closed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.decode`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.forbidden`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.internal`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.invalidquery`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.method`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.notfound`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.queue`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.ratelimit`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.timeout`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.toolarge`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.unauthorized`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.unavailable`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.errors.validate`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.server.response.valid.accepted`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.notmodified`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.response.valid.ok`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.server.unset`*::
 +
 --
 type: long
@@ -9366,6 +10427,45 @@ type: long
 Number of write errors
 
 
+type: long
+
+--
+
+
+
+
+*`beat.stats.output.elasticsearch.bulk_requests.available`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.output.elasticsearch.bulk_requests.completed`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.output.elasticsearch.indexers.active`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.output.elasticsearch.indexers.created`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.output.elasticsearch.indexers.destroyed`*::
++
+--
 type: long
 
 --
@@ -43350,10 +44450,70 @@ alias to: service.version
 *`kibana.status.status.overall.state`*::
 +
 --
-Kibana overall state.
+Kibana overall state (v7 format).
 
 
 type: keyword
+
+--
+
+*`kibana.status.status.overall.level`*::
++
+--
+Kibana overall level (v8 format).
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.overall.summary`*::
++
+--
+Kibana overall state in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.elasticsearch.level`*::
++
+--
+Kibana Elasticsearch client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.elasticsearch.summary`*::
++
+--
+Kibana Elasticsearch client's status in a human-readable format.
+
+
+type: text
+
+--
+
+*`kibana.status.status.core.savedObjects.level`*::
++
+--
+Kibana Saved Objects client's status
+
+
+type: keyword
+
+--
+
+*`kibana.status.status.core.savedObjects.summary`*::
++
+--
+Kibana Saved Objects client's status in a human-readable format.
+
+
+type: text
 
 --
 
@@ -45158,7 +46318,7 @@ format: percent
 *`kubernetes.pod.cpu.usage.limit.pct`*::
 +
 --
-CPU usage as a percentage of the defined limit for the pod containers (or total node CPU if one or more containers of the pod are unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
+CPU usage as a percentage of the defined cpu limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
 
 type: scaled_float
@@ -45196,7 +46356,7 @@ format: percent
 *`kubernetes.pod.memory.usage.limit.pct`*::
 +
 --
-Memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited). If one or more containers of the pod is unlimited and the `node` and `state_node` metricsets are both disabled on that node, this metric will be missing entirely.
+Memory usage as a percentage of the defined memory limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
 
 type: scaled_float
@@ -45234,7 +46394,7 @@ format: bytes
 *`kubernetes.pod.memory.working_set.limit.pct`*::
 +
 --
-Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+Working set memory usage as a percentage of the defined limits sum of the pod containers. If any container is missing a limit the metric is not emitted.
 
 
 type: scaled_float
@@ -57098,6 +58258,16 @@ Stats scraped from a Prometheus endpoint.
 
 
 
+*`metrics_count`*::
++
+--
+Number of metrics per Elasticsearch document.
+
+
+type: long
+
+--
+
 
 *`prometheus.labels.*`*::
 +
@@ -65695,36 +66865,117 @@ vSphere module
 
 
 [float]
+=== cluster
+
+Cluster information.
+
+
+
+
+*`vsphere.cluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.datastore.count`*::
++
+--
+Number of Datastores associated with the cluster.
+
+
+type: long
+
+--
+
+
+*`vsphere.cluster.das_config.admission.control.enabled`*::
++
+--
+Indicates whether strict admission control is enabled.
+
+
+type: boolean
+
+--
+
+*`vsphere.cluster.das_config.enabled`*::
++
+--
+Indicates whether vSphere HA feature is enabled.
+
+
+type: boolean
+
+--
+
+
+*`vsphere.cluster.host.count`*::
++
+--
+Number of Hosts associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.host.names`*::
++
+--
+List of all the Host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.cluster.network.count`*::
++
+--
+Number of Networks associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.network.names`*::
++
+--
+List of all the Network names associated with the cluster.
+
+
+type: keyword
+
+--
+
+[float]
 === datastore
 
 datastore
 
 
 
-*`vsphere.datastore.name`*::
+*`vsphere.datastore.capacity.free.bytes`*::
 +
 --
-Datastore name
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.fstype`*::
-+
---
-Filesystem type
-
-
-type: keyword
-
---
-
-*`vsphere.datastore.capacity.total.bytes`*::
-+
---
-Total bytes of the datastore
+Free bytes of the datastore.
 
 
 type: long
@@ -65733,10 +66984,10 @@ format: bytes
 
 --
 
-*`vsphere.datastore.capacity.free.bytes`*::
+*`vsphere.datastore.capacity.total.bytes`*::
 +
 --
-Free bytes of the datastore
+Total bytes of the datastore.
 
 
 type: long
@@ -65748,7 +66999,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.bytes`*::
 +
 --
-Used bytes of the datastore
+Used bytes of the datastore.
 
 
 type: long
@@ -65760,7 +67011,7 @@ format: bytes
 *`vsphere.datastore.capacity.used.pct`*::
 +
 --
-Used percent of the datastore
+Percentage of datastore capacity used.
 
 
 type: scaled_float
@@ -65769,27 +67020,202 @@ format: percent
 
 --
 
-[float]
-=== host
-
-host
-
-
-
-*`vsphere.host.name`*::
+*`vsphere.datastore.fstype`*::
 +
 --
-Host name
+Filesystem type.
 
 
 type: keyword
 
 --
 
+*`vsphere.datastore.host.count`*::
++
+--
+Number of hosts.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.host.names`*::
++
+--
+List of all the host names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.iops`*::
++
+--
+Storage I/O Control aggregated Input/Output Operations Per Second.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.name`*::
++
+--
+Datastore name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.read.bytes`*::
++
+--
+Rate of reading data from the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.read.latency.total.ms`*::
++
+--
+Average amount of time for a read operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.status`*::
++
+--
+Status of the datastore.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.vm.count`*::
++
+--
+Number of VMs.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.write.bytes`*::
++
+--
+Rate of writing data to the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.write.latency.total.ms`*::
++
+--
+Average amount of time for a write operation from the datastore in milliseconds.
+
+
+type: long
+
+--
+
+[float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
+[float]
+=== host
+
+Host information from vSphere environment.
+
+
+
 *`vsphere.host.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in MHz.
 
 
 type: long
@@ -65799,7 +67225,7 @@ type: long
 *`vsphere.host.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total CPU in MHz.
 
 
 type: long
@@ -65809,17 +67235,37 @@ type: long
 *`vsphere.host.cpu.free.mhz`*::
 +
 --
-Free CPU in Mhz
+Free CPU in MHz.
 
 
 type: long
 
 --
 
-*`vsphere.host.memory.used.bytes`*::
+*`vsphere.host.datastore.names`*::
 +
 --
-Used Memory in bytes
+List of all the datastore names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.datastore.count`*::
++
+--
+Number of datastores on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by or on the entity.
 
 
 type: long
@@ -65828,10 +67274,54 @@ format: bytes
 
 --
 
-*`vsphere.host.memory.total.bytes`*::
+*`vsphere.host.disk.devicelatency.average.ms`*::
 +
 --
-Total Memory in bytes
+Average amount of time it takes to complete an SCSI command from physical device in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.latency.total.ms`*::
++
+--
+Highest latency value across all disks used by the host in milliseconds.
+
+
+type: long
+
+--
+
+*`vsphere.host.disk.read.bytes`*::
++
+--
+Average number of bytes read from the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.write.bytes`*::
++
+--
+Average number of bytes written to the disk each second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.disk.total.bytes`*::
++
+--
+Sum of disk read and write rates each second in bytes.
 
 
 type: long
@@ -65843,7 +67333,7 @@ format: bytes
 *`vsphere.host.memory.free.bytes`*::
 +
 --
-Free Memory in bytes
+Free Memory in bytes.
 
 
 type: long
@@ -65852,10 +67342,575 @@ format: bytes
 
 --
 
+*`vsphere.host.memory.total.bytes`*::
++
+--
+Total Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.memory.used.bytes`*::
++
+--
+Used Memory in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.name`*::
++
+--
+Host name.
+
+
+type: keyword
+
+--
+
 *`vsphere.host.network_names`*::
 +
 --
-Network names
+Network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.names`*::
++
+--
+List of all the network names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.network.count`*::
++
+--
+Number of networks on the host.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.bandwidth.transmitted.bytes`*::
++
+--
+Average rate at which data was transmitted during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.received.bytes`*::
++
+--
+Average rate at which data was received during the interval. This represents the bandwidth of the network.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.bandwidth.total.bytes`*::
++
+--
+Sum of network transmitted and received rates in bytes during the interval.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.host.network.packets.transmitted.count`*::
++
+--
+Number of packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.received.count`*::
++
+--
+Number of packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.transmitted.count`*::
++
+--
+Number of packets with errors transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.received.count`*::
++
+--
+Number of packets with errors received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.errors.total.count`*::
++
+--
+Total number of packets with errors.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.transmitted.count`*::
++
+--
+Number of multicast packets transmitted.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.received.count`*::
++
+--
+Number of multicast packets received.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.multicast.total.count`*::
++
+--
+Total number of multicast packets.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.transmitted.count`*::
++
+--
+Number of transmitted packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.received.count`*::
++
+--
+Number of received packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.network.packets.dropped.total.count`*::
++
+--
+Total number of packets dropped.
+
+
+type: long
+
+--
+
+*`vsphere.host.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.uptime`*::
++
+--
+The total uptime of a host in seconds within the vSphere environment.
+
+
+type: long
+
+--
+
+*`vsphere.host.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.host.vm.count`*::
++
+--
+Number of virtual machines on the host.
+
+
+type: long
+
+--
+
+[float]
+=== network
+
+Network-related information.
+
+
+
+*`vsphere.network.accessible`*::
++
+--
+Indicates whether at least one host is configured to provide this network.
+
+
+type: boolean
+
+--
+
+*`vsphere.network.config.status`*::
++
+--
+Indicates whether the system has detected a configuration issue.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.host.names`*::
++
+--
+Names of the hosts connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.host.count`*::
++
+--
+Number of hosts connected to this network.
+
+
+type: long
+
+--
+
+*`vsphere.network.name`*::
++
+--
+Name of the network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.status`*::
++
+--
+General health of the Network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.type`*::
++
+--
+Type of the network (e.g., Network(Standard), DistributedVirtualport).
+
+
+type: keyword
+
+--
+
+
+*`vsphere.network.vm.names`*::
++
+--
+Names of the virtual machines connected to this network.
+
+
+type: keyword
+
+--
+
+*`vsphere.network.vm.count`*::
++
+--
+Number of virtual machines connected to this network.
+
+
+type: long
+
+--
+
+[float]
+=== resourcepool
+
+Resource pool information from vSphere environment.
+
+
+
+
+*`vsphere.resourcepool.cpu.usage.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.demand.mhz`*::
++
+--
+Basic CPU performance statistics, in MHz.
+
+
+type: long
+
+--
+
+
+*`vsphere.resourcepool.cpu.entitlement.mhz`*::
++
+--
+The amount of CPU resource, in MHz, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.cpu.entitlement.static.mhz`*::
++
+--
+The static CPU resource entitlement for a virtual machine.
+
+
+type: long
+
+--
+
+
+
+*`vsphere.resourcepool.memory.usage.guest.bytes`*::
++
+--
+Guest memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.usage.host.bytes`*::
++
+--
+Host memory utilization statistics, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.entitlement.bytes`*::
++
+--
+The amount of memory, in bytes, that this VM is entitled to, as calculated by DRS.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.entitlement.static.bytes`*::
++
+--
+The static memory resource entitlement for a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.private.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from non-shared host memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.shared.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from host memory that is shared between VMs.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.swapped.bytes`*::
++
+--
+The portion of memory, in bytes, that is granted to a virtual machine from the host's swap space.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.ballooned.bytes`*::
++
+--
+The size of the balloon driver in a virtual machine, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+
+*`vsphere.resourcepool.memory.overhead.bytes`*::
++
+--
+The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.overhead.consumed.bytes`*::
++
+--
+The amount of overhead memory, in bytes, currently being consumed to run a VM.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.memory.compressed.bytes`*::
++
+--
+The amount of compressed memory currently consumed by VM, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.resourcepool.name`*::
++
+--
+The name of the resource pool.
+
+
+type: keyword
+
+--
+
+*`vsphere.resourcepool.status`*::
++
+--
+The overall health status of a host in the vSphere environment.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.resourcepool.vm.count`*::
++
+--
+Number of virtual machines on the resource pool.
+
+
+type: long
+
+--
+
+*`vsphere.resourcepool.vm.names`*::
++
+--
+Names of virtual machines on the resource pool.
 
 
 type: keyword
@@ -65869,10 +67924,11 @@ virtualmachine
 
 
 
+
 *`vsphere.virtualmachine.host.id`*::
 +
 --
-Host id
+Host id.
 
 
 type: keyword
@@ -65882,7 +67938,7 @@ type: keyword
 *`vsphere.virtualmachine.host.hostname`*::
 +
 --
-Host name of the host
+Hostname of the host.
 
 
 type: keyword
@@ -65892,7 +67948,7 @@ type: keyword
 *`vsphere.virtualmachine.name`*::
 +
 --
-Virtual Machine name
+Virtual Machine name.
 
 
 type: keyword
@@ -65902,7 +67958,7 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-Virtual Machine Operating System name
+Virtual Machine Operating System name.
 
 
 type: keyword
@@ -65912,7 +67968,7 @@ type: keyword
 *`vsphere.virtualmachine.cpu.used.mhz`*::
 +
 --
-Used CPU in Mhz
+Used CPU in Mhz.
 
 
 type: long
@@ -65922,7 +67978,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -65932,7 +67988,7 @@ type: long
 *`vsphere.virtualmachine.cpu.free.mhz`*::
 +
 --
-Available CPU in Mhz
+Available CPU in Mhz.
 
 
 type: long
@@ -65942,7 +67998,7 @@ type: long
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
-Used Memory of Guest in bytes
+Used Memory of Guest in bytes.
 
 
 type: long
@@ -65954,7 +68010,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.used.host.bytes`*::
 +
 --
-Used Memory of Host in bytes
+Used Memory of Host in bytes.
 
 
 type: long
@@ -65966,7 +68022,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Total Memory of Guest in bytes
+Total Memory of Guest in bytes.
 
 
 type: long
@@ -65978,7 +68034,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.free.guest.bytes`*::
 +
 --
-Free Memory of Guest in bytes
+Free Memory of Guest in bytes.
 
 
 type: long
@@ -65990,7 +68046,7 @@ format: bytes
 *`vsphere.virtualmachine.custom_fields`*::
 +
 --
-Custom fields
+Custom fields.
 
 
 type: object
@@ -66000,10 +68056,91 @@ type: object
 *`vsphere.virtualmachine.network_names`*::
 +
 --
-Network names
+Network names.
 
 
 type: keyword
+
+--
+
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
+
+type: long
 
 --
 

@@ -17,6 +17,7 @@
                     "notfound": 0,
                     "queue": 0,
                     "ratelimit": 0,
+                    "timeout": 0,
                     "toolarge": 0,
                     "unauthorized": 0,
                     "unavailable": 0,
@@ -31,44 +32,30 @@
             },
             "unset": 0
         },
-        "decoder": {
-            "deflate": {
-                "content-length": 0,
-                "count": 0
-            },
-            "gzip": {
-                "content-length": 0,
-                "count": 0
-            },
-            "missing-content-length": {
-                "count": 0
-            },
-            "reader": {
-                "count": 0
-            },
-            "uncompressed": {
-                "content-length": 0,
-                "count": 0
+        "agentcfg": {
+            "elasticsearch": {
+                "cache.entries.count": 0,
+                "cache.refresh.failures": 0,
+                "cache.refresh.successes": 220,
+                "fetch.es": 0,
+                "fetch.fallback": 0,
+                "fetch.invalid": 0,
+                "fetch.unavailable": 0
             }
         },
         "jaeger": {
             "grpc": {
                 "collect": {
-                    "event": {
-                        "dropped": {
-                            "count": 0
-                        },
-                        "received": {
-                            "count": 0
-                        }
-                    },
                     "request": {
                         "count": 0
                     },
                     "response": {
                         "count": 0,
                         "errors": {
-                            "count": 0
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
                         },
                         "valid": {
                             "count": 0
@@ -77,9 +64,6 @@
                 },
                 "sampling": {
                     "event": {
-                        "dropped": {
-                            "count": 0
-                        },
                         "received": {
                             "count": 0
                         }
@@ -97,32 +81,27 @@
                         }
                     }
                 }
-            },
-            "http": {
-                "event": {
-                    "dropped": {
-                        "count": 0
-                    },
-                    "received": {
-                        "count": 0
-                    }
-                },
-                "request": {
-                    "count": 0
-                },
-                "response": {
-                    "count": 0,
-                    "errors": {
-                        "count": 0
-                    },
-                    "valid": {
-                        "count": 0
-                    }
-                }
             }
         },
         "otlp": {
             "grpc": {
+                "logs": {
+                    "request": {
+                        "count": 0
+                    },
+                    "response": {
+                        "count": 0,
+                        "errors": {
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
+                        },
+                        "valid": {
+                            "count": 0
+                        }
+                    }
+                },
                 "metrics": {
                     "consumer": {
                         "unsupported_dropped": 0
@@ -133,7 +112,10 @@
                     "response": {
                         "count": 0,
                         "errors": {
-                            "count": 0
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
                         },
                         "valid": {
                             "count": 0
@@ -147,7 +129,66 @@
                     "response": {
                         "count": 0,
                         "errors": {
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
+                        },
+                        "valid": {
                             "count": 0
+                        }
+                    }
+                }
+            },
+            "http": {
+                "logs": {
+                    "request": {
+                        "count": 0
+                    },
+                    "response": {
+                        "count": 0,
+                        "errors": {
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
+                        },
+                        "valid": {
+                            "count": 0
+                        }
+                    }
+                },
+                "metrics": {
+                    "consumer": {
+                        "unsupported_dropped": 0
+                    },
+                    "request": {
+                        "count": 0
+                    },
+                    "response": {
+                        "count": 0,
+                        "errors": {
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
+                        },
+                        "valid": {
+                            "count": 0
+                        }
+                    }
+                },
+                "traces": {
+                    "request": {
+                        "count": 0
+                    },
+                    "response": {
+                        "count": 0,
+                        "errors": {
+                            "count": 0,
+                            "ratelimit": 0,
+                            "timeout": 0,
+                            "unauthorized": 0
                         },
                         "valid": {
                             "count": 0
@@ -158,72 +199,31 @@
         },
         "processor": {
             "error": {
-                "frames": 0,
-                "stacktraces": 0,
-                "transformations": 0
+                "transformations": 2563
             },
             "metric": {
-                "transformations": 0
-            },
-            "sourcemap": {
-                "counter": 0
+                "transformations": 13792
             },
             "span": {
-                "frames": 0,
-                "stacktraces": 0,
-                "transformations": 0
+                "transformations": 66999
             },
             "stream": {
-                "accepted": 0,
+                "accepted": 111954,
                 "errors": {
-                    "closed": 0,
                     "invalid": 0,
-                    "queue": 0,
-                    "server": 0,
                     "toolarge": 0
                 }
             },
             "transaction": {
-                "transformations": 0
+                "transformations": 29994
             }
-        },
-        "profile": {
-            "request": {
-                "count": 0
-            },
-            "response": {
-                "count": 0,
-                "errors": {
-                    "closed": 0,
-                    "count": 0,
-                    "decode": 0,
-                    "forbidden": 0,
-                    "internal": 0,
-                    "invalidquery": 0,
-                    "method": 0,
-                    "notfound": 0,
-                    "queue": 0,
-                    "ratelimit": 0,
-                    "toolarge": 0,
-                    "unauthorized": 0,
-                    "unavailable": 0,
-                    "validate": 0
-                },
-                "valid": {
-                    "accepted": 0,
-                    "count": 0,
-                    "notmodified": 0,
-                    "ok": 0
-                }
-            },
-            "unset": 0
         },
         "root": {
             "request": {
-                "count": 0
+                "count": 1
             },
             "response": {
-                "count": 0,
+                "count": 1,
                 "errors": {
                     "closed": 0,
                     "count": 0,
@@ -235,6 +235,7 @@
                     "notfound": 0,
                     "queue": 0,
                     "ratelimit": 0,
+                    "timeout": 0,
                     "toolarge": 0,
                     "unauthorized": 0,
                     "unavailable": 0,
@@ -242,9 +243,9 @@
                 },
                 "valid": {
                     "accepted": 0,
-                    "count": 0,
+                    "count": 1,
                     "notmodified": 0,
-                    "ok": 0
+                    "ok": 1
                 }
             },
             "unset": 0
@@ -254,87 +255,41 @@
         },
         "server": {
             "request": {
-                "count": 0
+                "count": 1492
             },
             "response": {
-                "count": 0,
+                "count": 1492,
                 "errors": {
                     "closed": 0,
-                    "count": 0,
+                    "count": 1,
                     "decode": 0,
                     "forbidden": 0,
-                    "internal": 0,
+                    "internal": 1,
                     "invalidquery": 0,
                     "method": 0,
                     "notfound": 0,
                     "queue": 0,
                     "ratelimit": 0,
+                    "timeout": 0,
                     "toolarge": 0,
                     "unauthorized": 0,
                     "unavailable": 0,
                     "validate": 0
                 },
                 "valid": {
-                    "accepted": 0,
-                    "count": 0,
+                    "accepted": 1491,
+                    "count": 1491,
                     "notmodified": 0,
                     "ok": 0
                 }
             },
             "unset": 0
-        },
-        "sourcemap": {
-            "decoding": {
-                "count": 0,
-                "errors": 0
-            },
-            "request": {
-                "count": 0
-            },
-            "response": {
-                "count": 0,
-                "errors": {
-                    "closed": 0,
-                    "count": 0,
-                    "decode": 0,
-                    "forbidden": 0,
-                    "internal": 0,
-                    "invalidquery": 0,
-                    "method": 0,
-                    "notfound": 0,
-                    "queue": 0,
-                    "ratelimit": 0,
-                    "toolarge": 0,
-                    "unauthorized": 0,
-                    "unavailable": 0,
-                    "validate": 0
-                },
-                "valid": {
-                    "accepted": 0,
-                    "count": 0,
-                    "notmodified": 0,
-                    "ok": 0
-                }
-            },
-            "unset": 0,
-            "validation": {
-                "count": 0,
-                "errors": 0
-            }
         }
     },
     "beat": {
         "cgroup": {
             "cpu": {
-                "cfs": {
-                    "period": {
-                        "us": 100000
-                    },
-                    "quota": {
-                        "us": 0
-                    }
-                },
-                "id": "user.slice",
+                "id": "session-c2.scope",
                 "stats": {
                     "periods": 0,
                     "throttled": {
@@ -343,128 +298,108 @@
                     }
                 }
             },
-            "cpuacct": {
-                "id": "user.slice",
-                "total": {
-                    "ns": 6920953988630
-                }
-            },
             "memory": {
-                "id": "user@1000.service",
+                "id": "session-c2.scope",
                 "mem": {
-                    "limit": {
-                        "bytes": 9223372036854772000
-                    },
                     "usage": {
-                        "bytes": 11504508928
+                        "bytes": 37939621888
                     }
                 }
             }
         },
         "cpu": {
             "system": {
-                "ticks": 10,
+                "ticks": 1720,
                 "time": {
-                    "ms": 19
+                    "ms": 1720
                 }
             },
             "total": {
-                "ticks": 60,
+                "ticks": 16100,
                 "time": {
-                    "ms": 75
+                    "ms": 16100
                 },
-                "value": 60
+                "value": 16100
             },
             "user": {
-                "ticks": 50,
+                "ticks": 14380,
                 "time": {
-                    "ms": 56
+                    "ms": 14380
                 }
             }
         },
         "handles": {
             "limit": {
-                "hard": 524288,
-                "soft": 1024
+                "hard": 1048576,
+                "soft": 1048576
             },
-            "open": 13
+            "open": 18
         },
         "info": {
-            "ephemeral_id": "dda08800-0daa-45b6-82dc-f8793d7b0a26",
+            "ephemeral_id": "87279482-5cbc-4232-b90e-a08d2d2f0ec9",
+            "name": "apm-server",
             "uptime": {
-                "ms": 8095
-            }
+                "ms": 6589405
+            },
+            "version": "8.14.3"
         },
         "memstats": {
-            "gc_next": 9753008,
-            "memory_alloc": 8665704,
-            "memory_sys": 76104704,
-            "memory_total": 17596200,
-            "rss": 61169664
+            "gc_next": 204429288,
+            "memory_alloc": 102433408,
+            "memory_sys": 267778360,
+            "memory_total": 1392024448,
+            "rss": 164769792
         },
         "runtime": {
-            "goroutines": 38
+            "goroutines": 52
         }
     },
     "libbeat": {
-        "config": {
-            "module": {
-                "running": 0,
-                "starts": 0,
-                "stops": 0
-            },
-            "reloads": 0,
-            "scans": 0
-        },
         "output": {
             "events": {
-                "acked": 1,
+                "acked": 70666,
                 "active": 0,
-                "batches": 1,
-                "dropped": 0,
-                "duplicates": 0,
-                "failed": 0,
-                "toomany": 0,
-                "total": 1
-            },
-            "read": {
-                "bytes": 8533,
-                "errors": 0
+                "batches": 26,
+                "failed": 42682,
+                "toomany": 42682,
+                "total": 113348
             },
             "type": "elasticsearch",
             "write": {
-                "bytes": 4309,
-                "errors": 0
+                "bytes": 24728235
             }
         },
         "pipeline": {
-            "clients": 1,
             "events": {
-                "active": 0,
-                "dropped": 0,
-                "failed": 0,
-                "filtered": 0,
-                "published": 1,
-                "retry": 1,
-                "total": 1
+                "total": 113348
+            }
+        }
+    },
+    "output": {
+        "elasticsearch": {
+            "bulk_requests": {
+                "available": 60,
+                "completed": 26
             },
-            "queue": {
-                "acked": 1
+            "indexers": {
+                "active": 1,
+                "created": 0,
+                "destroyed": 0
             }
         }
     },
     "system": {
         "cpu": {
-            "cores": 12
+            "cores": 16
         },
         "load": {
-            "1": 1.25,
-            "15": 1.09,
-            "5": 1.22,
+            "1": 2.88,
+            "15": 1.86,
+            "5": 1.87,
             "norm": {
-                "1": 0.1042,
-                "15": 0.0908,
-                "5": 0.1017
+                "1": 0.18,
+                "15": 0.1163,
+                "5": 0.1169
             }
         }
     }

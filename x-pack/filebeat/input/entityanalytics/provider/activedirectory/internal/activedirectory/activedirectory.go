@@ -23,8 +23,6 @@ var (
 	ErrUsers                    = errors.New("failed to get user details")
 )
 
-var cnUsers = &ldap.RelativeDN{Attributes: []*ldap.AttributeTypeAndValue{{Type: "CN", Value: "Users"}}}
-
 // Entry is an Active Directory user entry with associated group membership.
 type Entry struct {
 	ID          string         `json:"id"`
@@ -41,13 +39,9 @@ type Entry struct {
 // only records with whenChanged since that time will be returned. since is
 // expected to be configured in a time zone the Active Directory server will
 // understand, most likely UTC.
-func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
+func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttrs, grpAttrs []string, pagingSize uint32, dialer *net.Dialer, tlsconfig *tls.Config) ([]Entry, error) {
 	if base == nil || len(base.RDNs) == 0 {
 		return nil, fmt.Errorf("%w: no path", ErrInvalidDistinguishedName)
-	}
-	baseDN := base.String()
-	if !base.RDNs[0].Equal(cnUsers) {
-		return nil, fmt.Errorf("%w: %s does not have %s", ErrInvalidDistinguishedName, baseDN, cnUsers)
 	}
 
 	var opts []ldap.DialOpt
@@ -77,10 +71,12 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSi
 		sinceFmtd = since.Format(denseTimeLayout)
 	}
 
+	baseDN := base.String()
+
 	// Get groups in the directory. Get all groups independent of the
 	// since parameter as they may not have changed for changed users.
 	var groups directory
-	grps, err := search(conn, baseDN, "(objectClass=group)", pagingSize)
+	grps, err := search(conn, baseDN, "(objectClass=group)", grpAttrs, pagingSize)
 	if err != nil {
 		// Allow continuation if groups query fails, but warn.
 		errs = []error{fmt.Errorf("%w: %w", ErrGroups, err)}
@@ -94,7 +90,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSi
 	if sinceFmtd != "" {
 		userFilter = "(&(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
 	}
-	usrs, err := search(conn, baseDN, userFilter, pagingSize)
+	usrs, err := search(conn, baseDN, userFilter, userAttrs, pagingSize)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("%w: %w", ErrUsers, err))
 		return nil, errors.Join(errs...)
@@ -104,7 +100,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSi
 
 	// Also collect users that are members of groups that have changed.
 	if sinceFmtd != "" {
-		grps, err := search(conn, baseDN, "(&(objectClass=groups)(whenChanged>="+sinceFmtd+"))", pagingSize)
+		grps, err := search(conn, baseDN, "(&(objectClass=groups)(whenChanged>="+sinceFmtd+"))", grpAttrs, pagingSize)
 		if err != nil {
 			// Allow continuation if groups query fails, but warn.
 			errs = append(errs, fmt.Errorf("failed to collect changed groups: %w: %w", ErrGroups, err))
@@ -125,7 +121,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, pagingSi
 					modGrps[i] = "(memberOf=" + u + ")"
 				}
 				query := "(&(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
-				usrs, err := search(conn, baseDN, query, pagingSize)
+				usrs, err := search(conn, baseDN, query, userAttrs, pagingSize)
 				if err != nil {
 					errs = append(errs, fmt.Errorf("failed to collect users of changed groups%w: %w", ErrUsers, err))
 				} else {
@@ -180,7 +176,7 @@ func whenChanged(user map[string]any, groups []any) time.Time {
 // search performs an LDAP filter search on conn at the LDAP base. If paging
 // is non-zero, page sizing will be used. See [ldap.Conn.SearchWithPaging] for
 // details.
-func search(conn *ldap.Conn, base, filter string, pagingSize uint32) (*ldap.SearchResult, error) {
+func search(conn *ldap.Conn, base, filter string, attrs []string, pagingSize uint32) (*ldap.SearchResult, error) {
 	srch := &ldap.SearchRequest{
 		BaseDN:       base,
 		Scope:        ldap.ScopeWholeSubtree,
@@ -189,7 +185,7 @@ func search(conn *ldap.Conn, base, filter string, pagingSize uint32) (*ldap.Sear
 		TimeLimit:    0,
 		TypesOnly:    false,
 		Filter:       filter,
-		Attributes:   nil,
+		Attributes:   attrs,
 		Controls:     nil,
 	}
 	if pagingSize != 0 {

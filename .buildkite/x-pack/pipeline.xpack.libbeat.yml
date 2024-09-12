@@ -24,17 +24,17 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/libbeat Check/Update"
+  - group: "Check/Update"
     key: "x-pack-libbeat-check-update"
     steps:
-      - label: "Run check/update"
+      - label: "x-pack/libbeat: Run check/update"
         command: |
           set -eo pipefail
           make -C x-pack/libbeat check update
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
           cpu: "4000m"
@@ -43,7 +43,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -51,18 +51,18 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "x-pack-libbeat-check-update"
 
-  - group: "x-pack/libbeat Mandatory Tests"
+  - group: "Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/libbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -72,16 +72,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Unit Tests"
+              context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
           mage goIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -93,14 +93,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
 
-      - label: ":ubuntu: x-pack/libbeat Python Integration Tests"
+      - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -112,14 +112,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -131,16 +131,16 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2016 Unit Tests"
+              context: "x-pack/libbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -152,21 +152,21 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2022 Unit Tests"
+              context: "x-pack/libbeat: Win 2022 Unit Tests"
 
-  - group: "x-pack/libbeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "x-pack-libbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/libbeat Win 10 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -180,14 +180,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win 11 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -201,14 +201,14 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/libbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/libbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -220,21 +220,21 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Win-2019 Unit Tests"
+              context: "x-pack/libbeat: Win 2019 Unit Tests"
 
-  - group: "x-pack/libbeat Extended Tests"
+  - group: "Extended Tests"
     key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
-      - label: ":ubuntu: x-pack/libbeat arm64 Unit Tests"
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           cd x-pack/libbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -244,4 +244,4 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Linux arm64 Unit Tests"
+              context: "x-pack/libbeat: Ubuntu arm64 Unit Tests"

@@ -1,5 +1,6 @@
 queue_rules:
   - name: default
+    merge_method: squash
     conditions:
       - check-success=buildkite/beats
 pull_request_rules:
@@ -72,7 +73,6 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
     actions:
       queue:
-        method: squash
         name: default
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
@@ -116,7 +116,6 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
     actions:
       queue:
-        method: squash
         name: default
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
@@ -146,7 +145,22 @@ pull_request_rules:
 
           To fixup this pull request, you need to add the backport labels for the needed
           branches, such as:
-          * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+          * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+
+  - name: add backport-8.x label for main only if no skipped or assigned already
+    conditions:
+      - -label~=^(backport-skip|backport-8.x)$
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          `backport-8.x` has been added to help with the transition to the new branch `8.x`.
+          If you don't need it please use `backport-skip` label and remove the `backport-8.x` label.
+      label:
+        add:
+          - backport-8.x
   - name: notify the backport has not been merged yet
     conditions:
       - -merged
@@ -162,7 +176,7 @@ pull_request_rules:
   - name: backport patches to 7.17 branch
     conditions:
       - merged
-      - label=backport-v7.17.0
+      - label~=^(backport-v7.17.0|backport-7.17)$
     actions:
       backport:
         assignees:
@@ -325,6 +339,32 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "8.14"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.15 branch
+    conditions:
+      - merged
+      - label~=^(backport-v8.15.0|backport-8.15)$
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.15"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.x branch
+    conditions:
+      - merged
+      - label~=^(backport-v8.x|backport-8.x)$
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.x"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
