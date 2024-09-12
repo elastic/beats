@@ -17,12 +17,16 @@
         "datastore": {
             "host": {
                 "count": 1,
-                "names": ["DC3_H0"]
+                "names": [
+                    "DC3_H0"
+                ]
             },
             "status": "green",
             "vm": {
                 "count": 6,
-                "names": ["DC3_H0_VM0"]
+                "names": [
+                    "DC3_H0_VM0"
+                ]
             },
             "read": {
                 "bytes": 0
