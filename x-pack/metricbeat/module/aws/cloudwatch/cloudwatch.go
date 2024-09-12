@@ -204,21 +204,28 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
 				// inforestapi inlcudes only Rest APIs
-				infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
-				if err != nil {
-					m.Logger().Errorf("could not get rest apis output: %v", err)
-				}
-
-				for key := range resourceTypeTagFilters {
-					if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) != 0 {
-						// infoapi inlcudes only WebSocket and HTTP APIs
-						infotherapi, err = aws.GetAPIsOutput(svcHttpAPI)
-						if err != nil {
-							m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+				if len(resourceTypeTagFilters) == 1 {
+					for key := range resourceTypeTagFilters {
+						if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) == 0 {
+							infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+							if err != nil {
+								m.Logger().Errorf("could not get rest apis output: %v", err)
+							}
 						}
 					}
+				} else {
+					infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
+					}
+					// infoapi inlcudes only WebSocket and HTTP APIs
+					infotherapi, err = aws.GetAPIsOutput(svcHttpAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+					}
+					maps.Copy(infoapi, infotherapi)
 				}
-				maps.Copy(infoapi, infotherapi)
+
 				m.Logger().Infof("infoapi response: %v", infoapi)
 
 			}
