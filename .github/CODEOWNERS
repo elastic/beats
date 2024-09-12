@@ -194,7 +194,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
+/x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application
 /x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations @elastic/security-service-integrations
 /x-pack/metricbeat/module/gcp/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudrun_metrics @elastic/obs-infraobs-integrations
