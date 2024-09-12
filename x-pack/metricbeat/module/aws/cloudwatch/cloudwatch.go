@@ -203,7 +203,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			checkresource_type := "apigateway:restapis"
 			useonlyrest := false
 			if len(resourceTypeTagFilters) == 1 {
-
 				for key := range resourceTypeTagFilters {
 					if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) == 0 {
 						useonlyrest = true
@@ -230,7 +229,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					maps.Copy(infoapi, infotherapi)
 				}
 
-				m.Logger().Infof("infoapi response: %v", infoapi)
+				m.Logger().Debugf("infoapi response: %v", infoapi)
 
 			}
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
@@ -612,10 +611,9 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
 				for _, subIdentifier := range subIdentifiers {
 
-					if len(infoAPImap) > 0 { // If infoAPImap
+					if len(infoAPImap) > 0 { // If infoAPImap includes data
 						if valAPIName, ok := infoAPImap[subIdentifier]; ok {
 							subIdentifier = valAPIName
-							m.logger.Infof("PASSSS We changed %s", subIdentifier)
 						}
 					}
 
