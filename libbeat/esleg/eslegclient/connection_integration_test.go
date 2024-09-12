@@ -45,6 +45,13 @@ func TestConnect(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestConnectionCanBeClosedAndReused(t *testing.T) {
+	conn := getTestingElasticsearch(t)
+	assert.NoError(t, conn.Connect(), "first connect must succeed")
+	assert.NoError(t, conn.Close(), "close must succeed")
+	assert.NoError(t, conn.Connect(), "calling connect after close must succeed")
+}
+
 func TestConnectWithProxy(t *testing.T) {
 	wrongPort, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)
