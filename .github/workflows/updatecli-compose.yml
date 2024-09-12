@@ -1,32 +1,39 @@
 ---
-name: bump-golang
+name: updatecli-compose
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 20 * * 1-6"
+    - cron: '0 6 * * *'
 
 permissions:
   contents: read
 
 jobs:
-  bump:
+  compose:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
       pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@6b8881a17fc8038e884ec94ff72a49e8e8a4069f # v0.76.1
+      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose diff
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose apply
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -50,3 +57,4 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+  
