@@ -202,7 +202,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			//Check whether namespace is APIGW
 			checkns := "AWS/ApiGateway"
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
-				infoapi, err = aws.GetRestAPIsOutput(svcRestAPI)
+				infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
 				if err != nil {
 					m.Logger().Errorf("could not get rest apis output: %v", err)
 				}

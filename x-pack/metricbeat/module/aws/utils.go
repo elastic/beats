@@ -95,20 +95,25 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 }
 
 // GetRestAPIsOutput function gets results from apigw api.
-// GetRestApis Apigateway API is used to retrieve the specified info. This returns a map with the names and ids of RestAPis configured
-func GetRestAPIsOutput(svcRestApi *apigateway.Client) (map[string]string, error) {
+// GetRestApis Apigateway API is used to retrieve the specified info. This returns a map with the names and ids of RestAPIs configured
+// Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+func GetRestAPIsOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
 	input := &apigateway.GetRestApisInput{}
+	if limit != nil {
+		input = &apigateway.GetRestApisInput{
+			Limit: limit,
+		}
+	}
 	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
 	defer cancel()
 	result, err := svcRestApi.GetRestApis(ctx, input)
 	if err != nil {
-		return nil, fmt.Errorf("error GetRestApis %w", err)
+		return nil, fmt.Errorf("error retrieving GetRestApis %w", err)
 	}
 
 	// Iterate and display the APIs
 	infoAPImap := make(map[string]string, len(result.Items))
 	for _, api := range result.Items {
-
 		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.Id)
 	}
 	return infoAPImap, nil
@@ -116,40 +121,6 @@ func GetRestAPIsOutput(svcRestApi *apigateway.Client) (map[string]string, error)
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
-	maxNumberOfMetricsRetrieved := 500
-	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-
-	// Split metricDataQueries into smaller slices that length no longer than 500.
-	// 500 is defined in maxNumberOfMetricsRetrieved.
-	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 500.
-	for i := 0; i < len(metricDataQueries); i += maxNumberOfMetricsRetrieved {
-		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxNumberOfMetricsRetrieved), float64(len(metricDataQueries))))]
-		if len(metricDataQueriesPartial) == 0 {
-			return getMetricDataOutput.MetricDataResults, nil
-		}
-
-		getMetricDataInput := &cloudwatch.GetMetricDataInput{
-			StartTime:         &startTime,
-			EndTime:           &endTime,
-			MetricDataQueries: metricDataQueriesPartial,
-		}
-
-		paginator := cloudwatch.NewGetMetricDataPaginator(svc, getMetricDataInput)
-		var err error
-		var page *cloudwatch.GetMetricDataOutput
-		for paginator.HasMorePages() {
-			if page, err = paginator.NextPage(context.TODO()); err != nil {
-				return getMetricDataOutput.MetricDataResults, fmt.Errorf("error GetMetricData with Paginator: %w", err)
-			}
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
-		}
-	}
-
-	return getMetricDataOutput.MetricDataResults, nil
-}
-
-// Get function uses apigateway get-rest-api to get data output.
-func GetRestApiResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
 	maxNumberOfMetricsRetrieved := 500
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 
