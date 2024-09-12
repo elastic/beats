@@ -6,6 +6,7 @@ package cloudwatch
 
 import (
 	"fmt"
+	"maps"
 	"reflect"
 	"strconv"
 	"strings"
@@ -196,6 +197,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
+			m.logger.Infof("Collected metrics for filter %v", resourceTypeTagFilters)
 
 			//Check whether namespace is APIGW
 			checkns := "AWS/ApiGateway"
@@ -210,10 +212,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if err != nil {
 					m.Logger().Errorf("could not get http and websocket apis output: %v", err)
 				}
-				m.Logger().Debugf("inforestapi response: %v", inforestapi)
-				m.Logger().Debugf("infoapi response: %v", infoapi)
-			}
+				maps.Copy(infoapi, inforestapi)
+				m.Logger().Infof("infoapi response: %v", infoapi)
 
+			}
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
@@ -592,14 +594,12 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				// And tags are only store under s3BucketName in resourceTagMap.
 				subIdentifiers := strings.Split(identifierValue, dimensionSeparator)
 				for _, subIdentifier := range subIdentifiers {
-					m.logger.Infof("PASSSS Before %s", subIdentifier)
 
-					if valAPIName, ok := infoAPImap[subIdentifier]; ok {
-						subIdentifier = valAPIName
-						m.logger.Infof("PASSSS After %s from api %s", subIdentifier, valAPIName)
+					if len(infoAPImap) > 0 { // If infoAPImap
+						if valAPIName, ok := infoAPImap[subIdentifier]; ok {
+							subIdentifier = valAPIName
+						}
 					}
-
-					m.logger.Infof("PASSSS ola mazi %s", resourceTagMap[subIdentifier])
 
 					if _, ok := events[uniqueIdentifierValue]; !ok {
 						// when tagsFilter is not empty but no entry in
