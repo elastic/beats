@@ -16,6 +16,9 @@
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
   #use_types: true
@@ -32,6 +35,9 @@
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name

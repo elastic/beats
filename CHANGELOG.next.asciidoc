@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
 
 *Auditbeat*
 
@@ -332,6 +333,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 
 *Metricbeat*
 
