@@ -34,9 +34,13 @@ var inputList = monitoring.NewUniqueList()
 var inputListMetricsOnce sync.Once
 
 // RegisterMonitoringInputs registers the inputs list with the monitoring system.
-func RegisterMonitoringInputs() {
+// namespace is namespace to put the inputs under.  default is "state"
+func RegisterMonitoringInputs(namespace string) {
+	if namespace == "" {
+		namespace = "state"
+	}
 	inputListMetricsOnce.Do(func() {
-		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
+		monitoring.NewFunc(monitoring.GetNamespace(namespace).GetRegistry(), "input", inputList.Report, monitoring.Report)
 	})
 }
 
