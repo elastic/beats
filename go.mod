@@ -185,6 +185,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5
 	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.29.5

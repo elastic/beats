@@ -13,6 +13,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -95,7 +97,7 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 }
 
 // GetRestAPIsOutput function gets results from apigw api.
-// GetRestApis Apigateway API is used to retrieve the specified info. This returns a map with the names and ids of RestAPIs configured
+// GetRestApis Apigateway API is used to retrieve only the REST API specified info. This returns a map with the names and ids of RestAPIs configured
 // Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
 func GetRestAPIsOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
 	input := &apigateway.GetRestApisInput{}
@@ -112,9 +114,30 @@ func GetRestAPIsOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]
 	}
 
 	// Iterate and display the APIs
+	infoRestAPImap := make(map[string]string, len(result.Items))
+	for _, api := range result.Items {
+		infoRestAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.Id)
+	}
+	return infoRestAPImap, nil
+}
+
+// GetAPIsOutput function gets results from apigatewayv2 api.
+// GetApis Apigateway API is used to retrieve the HTTP and WEBSOCKET specified info. This returns a map with the names and ids of relevant APIs configured
+func GetAPIsOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
+	input := &apigatewayv2.GetApisInput{}
+
+	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+	defer cancel()
+	result, err := svcHttpApi.GetApis(ctx, input)
+
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving GetApis %w", err)
+	}
+
+	// Iterate and display the APIs
 	infoAPImap := make(map[string]string, len(result.Items))
 	for _, api := range result.Items {
-		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.Id)
+		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.ApiId)
 	}
 	return infoAPImap, nil
 }

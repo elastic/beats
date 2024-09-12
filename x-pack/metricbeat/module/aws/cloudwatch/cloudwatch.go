@@ -13,11 +13,11 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
+	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
@@ -123,8 +123,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 	// Initialise the map that will be used in case APiGW api is configured
+	inforestapi := make(map[string]string)
 	infoapi := make(map[string]string)
-
 	// Check statistic method in config
 	err := m.checkStatistics()
 	if err != nil {
@@ -148,8 +148,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 			beatsConfig := m.MetricSet.AwsConfig.Copy()
 			beatsConfig.Region = regionName
-
-			svcCloudwatch, svcResourceAPI, _, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+			svcCloudwatch, svcResourceAPI, _, _, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 			if err != nil {
 				m.Logger().Warn("skipping metrics list from region '%s'", regionName)
 			}
@@ -174,7 +173,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		beatsConfig := m.MetricSet.AwsConfig.Copy()
 		beatsConfig.Region = regionName
 
-		svcCloudwatch, svcResourceAPI, svcRestAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
+		svcCloudwatch, svcResourceAPI, svcRestAPI, svcHttpAPI, err := m.createAwsRequiredClients(beatsConfig, regionName, config)
 		if err != nil {
 			m.Logger().Warn("skipping metrics list from region '%s'", regionName, err)
 			continue
@@ -192,7 +191,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		for namespace, namespaceDetails := range namespaceDetailTotal {
 			m.logger.Debugf("Collected metrics from namespace %s", namespace)
-
 			// filter listMetricsOutput by detailed configuration per each namespace
 			filteredMetricWithStatsTotal := filterListMetricsOutput(listMetricsOutput, namespace, namespaceDetails)
 
@@ -202,12 +200,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			//Check whether namespace is APIGW
 			checkns := "AWS/ApiGateway"
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
-				infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+				// inforestapi inlcudes only Rest APIs
+				inforestapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
 				if err != nil {
 					m.Logger().Errorf("could not get rest apis output: %v", err)
 				}
+				// infoapi inlcudes only WebSocket and HTTP APIs
+				infoapi, err = aws.GetAPIsOutput(svcHttpAPI)
+				if err != nil {
+					m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+				}
+				m.Logger().Debugf("inforestapi response: %v", inforestapi)
+				m.Logger().Debugf("infoapi response: %v", infoapi)
 			}
-			m.Logger().Infof("PASSS InfoAPI response: %v", infoapi)
+
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)
 			if err != nil {
 				return fmt.Errorf("createEvents failed for region %s: %w", regionName, err)
@@ -231,7 +237,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 // createAwsRequiredClients will return the two necessary client instances to do Metric requests to the AWS API
-func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (*cloudwatch.Client, *resourcegroupstaggingapi.Client, *apigateway.Client, error) {
+func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionName string, config aws.Config) (*cloudwatch.Client, *resourcegroupstaggingapi.Client, *apigateway.Client, *apigatewayv2.Client, error) {
 	m.logger.Debugf("Collecting metrics from AWS region %s", regionName)
 
 	svcCloudwatchClient := cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
@@ -251,7 +257,11 @@ func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionNa
 
 	})
 
-	return svcCloudwatchClient, svcResourceAPIClient, svcGetRestAPIClient, nil
+	svcGetHttpAPIClient := apigatewayv2.NewFromConfig(beatsConfig, func(o *apigatewayv2.Options) {
+
+	})
+
+	return svcCloudwatchClient, svcResourceAPIClient, svcGetRestAPIClient, svcGetHttpAPIClient, nil
 }
 
 // filterListMetricsOutput compares config details with listMetricsOutput and filter out the ones don't match
@@ -543,7 +553,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 				delete(resourceTagMap, identifier)
 				continue
 			}
-			m.logger.Infof("In region %s, service %s tags match tags_filter", regionName, identifier)
+			m.logger.Debugf("In region %s, service %s tags match tags_filter", regionName, identifier)
 		}
 
 		for _, output := range metricDataResults {

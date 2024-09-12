@@ -329,6 +329,8 @@ github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.16 h1:mimdLQkIX1zr8GIPY1ZtALdBQGx
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.3.16/go.mod h1:YHk6owoSwrIsok+cAH9PENCOGoH5PU2EllX4vLtSrsY=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8 h1:CgEyY7gfTf7lHYcCi7+w6jJ1XQBugjpadtsuN3TGxdQ=
 github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8/go.mod h1:z99ur4Ha5540t8hb5XtqV/UMOnEoEZK22lhr5ZBS0zw=
+github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8 h1:SWBNBbVbThg5Hdi3hWbVaDFjV/OyPbuqZLu4N+mj/Es=
+github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8/go.mod h1:lz2IT8gzzSwao0Pa6uMSdCIPsprmgCkW83q6sHGZFDw=
 github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5 h1:YeTVIy7cJLeahs7K0jQGDGAd1YYND/to/z8N3kqZBhY=
 github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5/go.mod h1:y45SdA9v+dLlweaqwAQMoFeXqdRvgwevafa2X8iTqZQ=
 github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.5 h1:/YvqO1j75i4leoV+Z3a5s/dAlEszf2wTKBW8jc3Gd4s=
