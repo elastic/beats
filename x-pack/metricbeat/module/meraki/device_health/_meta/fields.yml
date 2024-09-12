@@ -2,9 +2,14 @@
   type: group
   release: beta
   description: >
-    device_health
+    meraki device_health metricset to collect device metrics
   fields:
-    - name: example
-      type: keyword
+    - name: device
+      type: group
       description: >
-        Example field
+        meraki devices metrics
+      fields:      
+        - name: serial
+          type: number
+          description: >
+            unique device serial

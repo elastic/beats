@@ -39,6 +39,7 @@ func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, de
 	deviceStatusMetrics := []mapstr.M{}
 	for serial, device := range devices {
 		metric := mapstr.M{
+			"device.serial":       device.Serial,
 			"device.address":      device.Address,
 			"device.firmware":     device.Firmware,
 			"device.imei":         device.Imei,
@@ -50,7 +51,6 @@ func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, de
 			"device.network_id":   device.NetworkID,
 			"device.notes":        device.Notes,
 			"device.product_type": device.ProductType,
-			"device.serial":       device.Serial,
 			"device.tags":         device.Tags,
 		}
 

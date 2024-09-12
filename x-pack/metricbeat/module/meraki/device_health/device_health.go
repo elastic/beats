@@ -7,9 +7,6 @@ package device_health
 import (
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -220,41 +217,10 @@ func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string,
 				event.Timestamp = ts
 				delete(metric, "@timestamp")
 			}
+
 			event.ModuleFields.Update(metric)
+
 			reporter.Event(event)
 		}
 	}
-}
-
-func HttpGetRequestWithMerakiRetry(url string, token string, retry int) (*http.Response, error) {
-	//https://developer.cisco.com/meraki/api-v1/get-device-appliance-performance/
-
-	// Create a Bearer string by appending string access token
-	var bearer = "Bearer " + token
-
-	// Create a new request using http
-	req, _ := http.NewRequest("GET", url, nil)
-
-	// add authorization header to the req
-	req.Header.Add("Authorization", bearer)
-	req.Header.Add("Accept", "application/json")
-
-	client := &http.Client{}
-	response, err := client.Do(req)
-
-	// Rate Limt Retry After Needed due to only 10 requests per second allowed by API
-	//https://developer.cisco.com/meraki/api-v1/rate-limit/#rate-limit
-	for i := 0; i < retry && response.StatusCode == 429; i++ {
-
-		retryHeader := response.Header.Get("Retry-After")
-		if _, err := strconv.Atoi(retryHeader); err == nil {
-			log.Printf("Retry Limit Paused for %s second", retryHeader)
-			time.ParseDuration(retryHeader + "s")
-		}
-		response, err = client.Do(req)
-
-	}
-
-	return response, err
-
 }

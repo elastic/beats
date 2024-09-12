@@ -2,9 +2,11 @@
   title: "meraki"
   release: beta
   description: >
-    meraki module
+    Meraki module collects metrics from the meraki api
   fields:
     - name: meraki
       type: group
-      description: >
+      description: > 
+        Various Meraki metrics
       fields:
+

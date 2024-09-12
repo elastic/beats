@@ -38,6 +38,8 @@ func reportNetwrokApplianceVPNSiteToSite(reporter mb.ReporterV2, organizationID 
 
 	for network_id, networkVPNSiteToSite := range networkVPNSiteToSites {
 		for _, device := range devices {
+			networkSiteToSiteMode_encountered := false
+			networkSiteToSiteSubnet_encountered := false
 			if device.NetworkID == string(network_id) {
 				metric := mapstr.M{
 					"device.address":      device.Address,
@@ -59,20 +61,27 @@ func reportNetwrokApplianceVPNSiteToSite(reporter mb.ReporterV2, organizationID 
 
 				if networkVPNSiteToSite.Mode != "none" {
 					if networkVPNSiteToSite.Hubs != nil {
-						for k, hub := range *networkVPNSiteToSite.Hubs {
-							metric[fmt.Sprintf("network.appliance.vpn.site_to_site.hub.%d.hub_id", k)] = hub.HubID
-							metric[fmt.Sprintf("network.appliance.vpn.site_to_site.hub.%d.use_default_route", k)] = *hub.UseDefaultRoute
+						for _, hub := range *networkVPNSiteToSite.Hubs {
+							metric["network.appliance.vpn.site_to_site.hub.%d.hub_id"] = hub.HubID
+							metric["network.appliance.vpn.site_to_site.hub.%d.use_default_route"] = *hub.UseDefaultRoute
 						}
+						networkSiteToSiteMode_encountered = true
+						metrics = append(metrics, metric)
 					}
 
 					if networkVPNSiteToSite.Subnets != nil {
-						for k, subnet := range *networkVPNSiteToSite.Subnets {
-							metric[fmt.Sprintf("network.appliance.vpn.site_to_site.subnet.%d.local_subnet", k)] = subnet.LocalSubnet
-							metric[fmt.Sprintf("network.appliance.vpn.site_to_site.subnet.%d.use_vpn", k)] = *subnet.UseVpn
+						for _, subnet := range *networkVPNSiteToSite.Subnets {
+							metric["network.appliance.vpn.site_to_site.subnet.%d.local_subnet"] = subnet.LocalSubnet
+							metric["network.appliance.vpn.site_to_site.subnet.%d.use_vpn"] = *subnet.UseVpn
 						}
+						networkSiteToSiteSubnet_encountered = true
+						metrics = append(metrics, metric)
 					}
 				}
-				metrics = append(metrics, metric)
+				if !networkSiteToSiteMode_encountered && !networkSiteToSiteSubnet_encountered {
+					metrics = append(metrics, metric)
+				}
+
 			}
 		}
 
