@@ -48,7 +48,11 @@ var (
 
 // Client is an elasticsearch client.
 type Client struct {
-	conn eslegclient.Connection
+	// We use a pointer here because the connection holds a context
+	// that needs to be recreated in case of error and the connection
+	// that is passed to this client is also used in a closure, we need
+	// to ensure both hold a reference to the same instance of the connection.
+	conn *eslegclient.Connection
 
 	indexSelector    outputs.IndexSelector
 	pipelineSelector *outil.Selector
@@ -186,7 +190,7 @@ func NewClient(
 	pLogIndex.Start()
 	pLogIndexTryDeadLetter.Start()
 	client := &Client{
-		conn:             *conn,
+		conn:             conn,
 		indexSelector:    s.indexSelector,
 		pipelineSelector: pipeline,
 		observer:         observer,
