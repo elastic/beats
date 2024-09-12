@@ -165,7 +165,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
-- Fix replace processor handling of zero string replacement validation. {pull}[]
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 
 *Heartbeat*
 
