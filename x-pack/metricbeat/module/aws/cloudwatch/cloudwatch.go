@@ -201,17 +201,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			//Check whether namespace is APIGW
 			checkns := "AWS/ApiGateway"
 			checkresource_type := "apigateway:restapis"
+			useonlyrest := false
+			if len(resourceTypeTagFilters) == 1 {
 
+				for key := range resourceTypeTagFilters {
+					if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) == 0 {
+						useonlyrest = true
+					}
+				}
+			}
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
 				// inforestapi inlcudes only Rest APIs
-				if len(resourceTypeTagFilters) == 1 {
-					for key := range resourceTypeTagFilters {
-						if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) == 0 {
-							infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
-							if err != nil {
-								m.Logger().Errorf("could not get rest apis output: %v", err)
-							}
-						}
+				if useonlyrest {
+					infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
 				} else {
 					infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
