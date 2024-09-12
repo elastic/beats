@@ -124,7 +124,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 	// Initialise the map that will be used in case APiGW api is configured
-	inforestapi := make(map[string]string)
+	infotherapi := make(map[string]string)
 	infoapi := make(map[string]string)
 	// Check statistic method in config
 	err := m.checkStatistics()
@@ -197,22 +197,28 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			// get resource type filters and tags filters for each namespace
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
-			m.logger.Infof("Collected metrics for filter %v", resourceTypeTagFilters)
 
 			//Check whether namespace is APIGW
 			checkns := "AWS/ApiGateway"
+			checkresource_type := "apigateway:restapis"
+
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
 				// inforestapi inlcudes only Rest APIs
-				inforestapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+				infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
 				if err != nil {
 					m.Logger().Errorf("could not get rest apis output: %v", err)
 				}
-				// infoapi inlcudes only WebSocket and HTTP APIs
-				infoapi, err = aws.GetAPIsOutput(svcHttpAPI)
-				if err != nil {
-					m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+
+				for key := range resourceTypeTagFilters {
+					if strings.Compare(strings.ToLower(key), strings.ToLower(checkresource_type)) != 0 {
+						// infoapi inlcudes only WebSocket and HTTP APIs
+						infotherapi, err = aws.GetAPIsOutput(svcHttpAPI)
+						if err != nil {
+							m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+						}
+					}
 				}
-				maps.Copy(infoapi, inforestapi)
+				maps.Copy(infoapi, infotherapi)
 				m.Logger().Infof("infoapi response: %v", infoapi)
 
 			}
@@ -598,6 +604,7 @@ func (m *MetricSet) createEvents(svcCloudwatch cloudwatch.GetMetricDataAPIClient
 					if len(infoAPImap) > 0 { // If infoAPImap
 						if valAPIName, ok := infoAPImap[subIdentifier]; ok {
 							subIdentifier = valAPIName
+							m.logger.Infof("PASSSS We changed %s", subIdentifier)
 						}
 					}
 
