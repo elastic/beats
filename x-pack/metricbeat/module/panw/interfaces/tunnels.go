@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package vpn
+package interfaces
 
 import (
 	"encoding/xml"
@@ -66,7 +66,7 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 				"ipsec_tunnel.dh":         entry.DH,
 				"ipsec_tunnel.enc":        entry.Enc,
 				"ipsec_tunnel.hash":       entry.Hash,
-				"ipsec_tunnel.life":       entry.Life,
+				"ipsec_tunnel.life.sec":   entry.Life,
 				"ipsec_tunnel.kb":         entry.KB,
 			},
 			RootFields: mapstr.M{

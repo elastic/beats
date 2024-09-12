@@ -82,7 +82,7 @@
     - name: logical.addr
       type: keyword
       description: >
-       Used to store aditional static IP addresses
+       Used to store additional static IP addresses
     - name: logical.dyn_addr
       type: keyword
       description: >
@@ -116,10 +116,10 @@
       type: keyword
       description: >
         HA state of the local device, e.g., "active" or "passive"
-    - name: ha.local_info.state_duration
+    - name: ha.local_info.state_duration.sec
       type: long
       description: >
-        Duration in milliseconds of the current state
+        Duration in seconds of the current state
     - name: ha.local_info.mgmt_ip
       type: ip
       description: >
@@ -224,10 +224,10 @@
       type: keyword
       description: >
         Current operational state of the peer firewall (passive means it is in standby mode and not handling traffic)
-    - name: ha.peer_info.state_duration
+    - name: ha.peer_info.state_duration.sec
       type: long
       description: >
-        How long the peer has been in the current state
+        How long the peer has been in the current state in seconds
     - name: ha.peer_info.mgmt_ip
       type: ip
       description: >
@@ -332,3 +332,75 @@
       type: keyword
       description: >
         Status of the interface in the link monitoring group
+    - name: ipsec_tunnel.id
+      type: keyword
+      description: >
+        ID of the IPsec tunnel
+    - name: ipsec_tunnel.name
+      type: keyword
+      description: >
+        Name of the IPsec tunnel
+    - name: ipsec_tunnel.gw
+      type: keyword
+      description: >
+        Gateway of the IPsec tunnel
+    - name: ipsec_tunnel.TSi_ip
+      type: ip
+      description: >
+        Traffic Selector Initiator IP. This is the local IP (0.0.0.0 means any IP address)
+    - name: ipsec_tunnel.TSi_prefix
+      type: keyword
+      description: >
+        Network prefix for the TSi IP, 0 means no specific network is defined.
+    - name: ipsec_tunnel.TSi_proto
+      type: keyword
+      description: >
+        Protocol associated with the TSi (0 means any protocol)
+    - name: ipsec_tunnel.TSi_port
+      type: long
+      description: >
+        Port number associated with TSi (0 means any port)
+    - name: ipsec_tunnel.TSr_ip
+      type: ip
+      description: >
+        Traffic Selector Responder IP.
+    - name: ipsec_tunnel.TSr_prefix
+      type: keyword
+      description: >
+        Network prefix for the TSr IP. Similar to TSi_prefix
+    - name: ipsec_tunnel.TSr_proto
+      type: keyword
+      description: >
+        TSr protocol of the IPsec tunnel
+    - name: ipsec_tunnel.TSr_port
+      type: long
+      description: >
+        TSr port of the IPsec tunnel
+    - name: ipsec_tunnel.proto
+      type: keyword
+      description: >
+        Protocol of the IPsec tunnel
+    - name: ipsec_tunnel.mode
+      type: keyword
+      description: >
+        This specifies the IPsec mode. e.g., 'tunl'
+    - name: ipsec_tunnel.dh
+      type: keyword
+      description: >
+        Diffie-Hellman group of the IPsec tunnel
+    - name: ipsec_tunnel.enc
+      type: keyword
+      description: >
+        Encryption algorithm of the IPsec tunnel
+    - name: ipsec_tunnel.hash
+      type: keyword
+      description: >
+        Hash algorithm of the IPsec tunnel
+    - name: ipsec_tunnel.life.sec
+      type: long
+      description: >
+        The lifetime of the IPsec Security Association (SA) in seconds
+    - name: ipsec_tunnel.kb
+      type: long
+      description: >
+        Traffic volume limit for SA rekeying        

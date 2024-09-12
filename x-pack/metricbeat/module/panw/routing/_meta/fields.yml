@@ -28,7 +28,7 @@
       type: keyword
       description: >
         The BGP session status, e.g., "Established" means the session is up and running
-    - name: bgp.status_duration
+    - name: bgp.status_duration.sec
       type: long
       description: >
         Time in seconds since the current status was set
@@ -43,15 +43,23 @@
     - name: bgp.multi_hop_ttl
       type: long
       description: >
-        Time to Live (TTL) value for multi-hop BGP sessions.
-    - name: bgp.peer_address
-      type: keyword
+        Time to Live (TTL) value for multi-hop BGP sessions. Units are the number of hops.
+    - name: bgp.peer_ip
+      type: ip
       description: >
-        IP address and port of the peer
-    - name: bgp.local_address
-      type: keyword
+        IP address of the peer
+    - name: bgp.peer_port
+      type: long
       description: >
-        Local address and port used for BGP connection
+        Port number of the peer
+    - name: bgp.local_ip
+      type: ip
+      description: >
+        Local ip address used for BGP connection
+    - name: bgp.local_port
+      type: long
+      description: >
+        Local port number used for BGP connection 
     - name: bgp.reflector_client
       type: keyword
       description: >
@@ -68,15 +76,15 @@
       type: keyword
       description: >
         Defines the type of relationship between peers, e.g., "External BGP", "Internal BGP", or "Unspecified"
-    - name: bgp.connect_retry_interval
+    - name: bgp.connect_retry_interval.sec
       type: long
       description: >
         The interval (in seconds) between connection retries
-    - name: bgp.open_delay
+    - name: bgp.open_delay.sec
       type: long
       description: >
         Delay before sending an Open message (in seconds)
-    - name: bgp.idle_hold
+    - name: bgp.idle_hold.sec
       type: long
       description: >
         The idle hold time (in seconds) before retrying a connection after failure
@@ -84,39 +92,39 @@
       type: long
       description: >
         The maximum number of prefixes that can be received from the peer (0 = no limit)
-    - name: bgp.holdtime
+    - name: bgp.holdtime.sec
       type: long
       description: >
         Time in seconds that the BGP peer will wait for a keepalive message, negotiated between peers
-    - name: bgp.holdtime_config
+    - name: bgp.holdtime_config.sec
       type: long
       description: >
-        Represents the locally configured hold time on this peer
-    - name: bgp.keepalive
+        Represents the locally configured hold time on this peer (in seconds)
+    - name: bgp.keepalive.sec
       type: long
       description: >
         The interval (in seconds) at which BGP keepalive messages are sent, negotiated between peers
-    - name: bgp.keepalive_config
+    - name: bgp.keepalive_config.sec
       type: long
       description: >
         The keepalive configured on this peer
-    - name: bgp.msg_update_in
+    - name: bgp.msg_update_in.count
       type: long
       description: >
         The number of BGP UPDATE messages received by the router from this peer
-    - name: bgp.msg_update_out
+    - name: bgp.msg_update_out.count
       type: long
       description: >
         the number of BGP UPDATE messages sent from the local router to the peer
-    - name: bgp.msg_total_in
+    - name: bgp.msg_total_in.count
       type: long
       description: >
         Total of all messages received from the peer
-    - name: bgp.msg_total_out
+    - name: bgp.msg_total_out.count
       type: long
       description: >
         Total of all messages sent to the peer
-    - name: bgp.last_update_age
+    - name: bgp.last_update_age.sec
       type: long
       description: >
         Time in seconds since the last update message was received from the peer

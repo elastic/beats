@@ -7,6 +7,7 @@ package system
 import (
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -54,23 +55,33 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 
 		//
 		// <issued>March 20, 2024</issued>
-		// <expires>May 27, 2025</expires>
+		// <expires>May 27, 2025</expires> or <expires>Never</expires>
 		//
 		issued, err := time.Parse("January 2, 2006", license.Issued)
 		if err != nil {
 			m.logger.Warn("Failed to parse issued date %s: %s", license.Issued, err)
 		}
+		never_expires := false
+		expires, err := time.Parse("January 2, 2006", license.Expires)
+		// The value of license.Expires is "never" when the license never expires
+		if err != nil {
+			if strings.ToLower(license.Expires) == "never" {
+				never_expires = true
+			} else {
+				m.logger.Warn("Failed to parse expires date %s: %s", license.Expires, err)
+			}
+		}
 
 		event := mb.Event{
 			Timestamp: timestamp,
 			MetricSetFields: mapstr.M{
-				"license.feature":     license.Feature,
-				"license.description": license.Description,
-				"license.serial":      license.Serial,
-				"license.issued":      issued.Format(time.RFC3339),
-				"license.expires":     license.Expires,
-				"license.expired":     expired,
-				"license.auth_code":   license.AuthCode,
+				"license.feature":       license.Feature,
+				"license.description":   license.Description,
+				"license.serial":        license.Serial,
+				"license.issued":        issued.Format(time.RFC3339),
+				"license.never_expires": never_expires,
+				"license.expired":       expired,
+				"license.auth_code":     license.AuthCode,
 			},
 			RootFields: mapstr.M{
 				"observer.ip":     m.config.HostIp,
@@ -78,6 +89,10 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 				"observer.vendor": "Palo Alto",
 				"observer.type":   "firewall",
 			},
+		}
+		// only set the expires field if the license expires
+		if !never_expires {
+			event.MetricSetFields["license.expires"] = expires.Format(time.RFC3339)
 		}
 
 		events = append(events, event)

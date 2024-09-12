@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("error while fetching vpn metrics: %w", errors.Join(errs...))
+		return fmt.Errorf("error while fetching routing metrics: %w", errors.Join(errs...))
 	}
 
 	return nil

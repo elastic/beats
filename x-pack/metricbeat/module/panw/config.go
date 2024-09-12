@@ -5,8 +5,6 @@
 package panw
 
 import (
-	"errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -15,20 +13,16 @@ const (
 )
 
 type Config struct {
-	HostIp    string `config:"host_ip"`
+	HostIp    string `config:"host_ip" validate:"required"`
+	ApiKey    string `config:"api_key" validate:"required"`
 	Port      uint   `config:"port"`
-	ApiKey    string `config:"apiKey"`
-	DebugMode string `config:"apiDebugMode"`
+	DebugMode string `config:"api_debug_mode"`
 }
 
 func NewConfig(base mb.BaseMetricSet) (*Config, error) {
 	config := Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-
-	if (config.HostIp == "") || (config.ApiKey == "") {
-		return nil, errors.New("host_ip and apiKey must be set	")
 	}
 
 	return &config, nil

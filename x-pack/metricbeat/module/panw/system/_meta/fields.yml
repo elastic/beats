@@ -133,9 +133,13 @@
       description: >
         Date the license was issued
     - name: license.expires
-      type: keyword
+      type: date
       description: >
-        Date the license expires, but this is a keyword because value might be "never" 
+        Date the license expires - not set if license never expires
+    - nake: never_expires
+      type: boolean
+      description: >
+        Indicates if the license never expires
     - name: license.expired
       type: boolean
       description: >

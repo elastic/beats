@@ -6,6 +6,7 @@ package routing
 
 import (
 	"encoding/xml"
+	"net"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -22,12 +23,6 @@ func getBGPEvents(m *MetricSet) ([]mb.Event, error) {
 	// Set logger so all the sub functions have access
 	bgpLogger = m.logger
 	var response BGPResponse
-
-	// Initialize the client
-	// if err := m.client.Initialize(); err != nil {
-	// 	log.Error("Failed to initialize client: %s", err)
-	// 	return err
-	// }
 
 	output, err := m.client.Op(bgpPeersQuery, panw.Vsys, nil, nil)
 	if err != nil {
@@ -81,6 +76,16 @@ func formatBGPEvents(m *MetricSet, entries []BGPEntry) []mb.Event {
 
 	for _, entry := range entries {
 		booleanFields := convertEntryBooleanFields(entry)
+		peer_ip, peer_port, err := net.SplitHostPort(entry.PeerAddress)
+		if err != nil {
+			bgpLogger.Warnf("Error splitting peer address (%s): %v", entry.PeerAddress, err)
+			peer_ip = entry.PeerAddress
+		}
+		local_ip, local_port, err := net.SplitHostPort(entry.LocalAddress)
+		if err != nil {
+			bgpLogger.Warnf("Error splitting local address (%s): %v", entry.LocalAddress, err)
+			local_ip = entry.LocalAddress
+		}
 
 		event := mb.Event{
 			Timestamp: timestamp,
@@ -95,8 +100,10 @@ func formatBGPEvents(m *MetricSet, entries []BGPEntry) []mb.Event {
 				"bgp.password_set":           booleanFields["bgp.password_set"],
 				"bgp.passive":                booleanFields["bgp.passive"],
 				"bgp.multi_hop_ttl":          entry.MultiHopTTL,
-				"bgp.peer_address":           entry.PeerAddress,
-				"bgp.local_address":          entry.LocalAddress,
+				"bgp.peer_ip":                peer_ip,
+				"bgp.peer_port":              peer_port,
+				"bgp.local_ip":               local_ip,
+				"bgp.local_port":             local_port,
 				"bgp.reflector_client":       entry.ReflectorClient,
 				"bgp.same_confederation":     booleanFields["bgp.same_confederation"],
 				"bgp.aggregate_confed_as":    booleanFields["bgp.aggregate_confed_as"],

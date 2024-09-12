@@ -77,6 +77,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}{
 		{"ifnet interfaces", getIFNetInterfaceEvents},
 		{"HA interfaces", getHAInterfaceEvents},
+		{"ipsec tunnel", getIPSecTunnelEvents},
 	}
 
 	for _, fetcher := range eventFetchers {
