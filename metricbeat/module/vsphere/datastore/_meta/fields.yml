@@ -32,12 +32,12 @@
     - name: disk.capacity.usage.bytes
       type: long
       description: >
-        The amount of storage capacity currently being consumed by or on the entity.
+        The amount of storage capacity currently being consumed by datastore.
       format: bytes
     - name: disk.provisioned.bytes
       type: long
       description: >
-        Amount of storage set aside for use by a datastore or a virtual machine.
+        Amount of storage set aside for use by a datastore.
       format: bytes
     - name: fstype
       type: keyword

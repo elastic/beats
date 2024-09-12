@@ -67025,7 +67025,7 @@ format: bytes
 *`vsphere.datastore.disk.capacity.usage.bytes`*::
 +
 --
-The amount of storage capacity currently being consumed by or on the entity.
+The amount of storage capacity currently being consumed by datastore.
 
 
 type: long
@@ -67037,7 +67037,7 @@ format: bytes
 *`vsphere.datastore.disk.provisioned.bytes`*::
 +
 --
-Amount of storage set aside for use by a datastore or a virtual machine.
+Amount of storage set aside for use by a datastore.
 
 
 type: long
