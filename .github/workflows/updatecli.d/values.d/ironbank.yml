@@ -4,4 +4,3 @@ config:
   - path: dev-tools/packaging/templates/ironbank/heartbeat
   - path: dev-tools/packaging/templates/ironbank/metricbeat
   - path: dev-tools/packaging/templates/ironbank/packetbeat
-  - beats_packages: dev-tools/packaging/packages.yml
