@@ -62,8 +62,8 @@ func reportNetwrokApplianceVPNSiteToSite(reporter mb.ReporterV2, organizationID 
 				if networkVPNSiteToSite.Mode != "none" {
 					if networkVPNSiteToSite.Hubs != nil {
 						for _, hub := range *networkVPNSiteToSite.Hubs {
-							metric["network.appliance.vpn.site_to_site.hub.%d.hub_id"] = hub.HubID
-							metric["network.appliance.vpn.site_to_site.hub.%d.use_default_route"] = *hub.UseDefaultRoute
+							metric["network.appliance.vpn.site_to_site.hub.hub_id"] = hub.HubID
+							metric["network.appliance.vpn.site_to_site.hub.use_default_route"] = *hub.UseDefaultRoute
 						}
 						networkSiteToSiteMode_encountered = true
 						metrics = append(metrics, metric)
@@ -71,8 +71,8 @@ func reportNetwrokApplianceVPNSiteToSite(reporter mb.ReporterV2, organizationID 
 
 					if networkVPNSiteToSite.Subnets != nil {
 						for _, subnet := range *networkVPNSiteToSite.Subnets {
-							metric["network.appliance.vpn.site_to_site.subnet.%d.local_subnet"] = subnet.LocalSubnet
-							metric["network.appliance.vpn.site_to_site.subnet.%d.use_vpn"] = *subnet.UseVpn
+							metric["network.appliance.vpn.site_to_site.subnet.local_subnet"] = subnet.LocalSubnet
+							metric["network.appliance.vpn.site_to_site.subnet.use_vpn"] = *subnet.UseVpn
 						}
 						networkSiteToSiteSubnet_encountered = true
 						metrics = append(metrics, metric)
