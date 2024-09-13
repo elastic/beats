@@ -170,11 +170,15 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func newTestConnection(url string) *Connection {
+func newTestConnection(t *testing.T, url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
 		URL: url,
 	})
 	conn.Encoder = NewJSONEncoder(nil, false)
+	if err := conn.Connect(); err != nil {
+		t.Fatalf("cannot connect to Elasticsearch: %s", err)
+	}
+
 	return conn
 }
 

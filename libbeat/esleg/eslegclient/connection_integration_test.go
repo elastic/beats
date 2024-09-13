@@ -21,8 +21,7 @@ package eslegclient
 
 import (
 	"context"
-	"io/ioutil"
-	"math/rand"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +33,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
-	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -146,16 +144,6 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 	return conn
 }
 
-func randomClient(grp outputs.Group) outputs.NetworkClient {
-	L := len(grp.Clients)
-	if L == 0 {
-		panic("no elasticsearch client")
-	}
-
-	client := grp.Clients[rand.Intn(L)]
-	return client.(outputs.NetworkClient)
-}
-
 // startTestProxy starts a proxy that redirects all connections to the specified URL
 func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
 	t.Helper()
@@ -173,14 +161,14 @@ func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)
 
 		for _, header := range []string{"Content-Encoding", "Content-Type"} {
 			w.Header().Set(header, resp.Header.Get(header))
 		}
 		w.WriteHeader(resp.StatusCode)
-		w.Write(body)
+		w.Write(body) //nolint: errcheck // It's a test, we can ignore this error
 	}))
 	return proxy
 }
