@@ -99,7 +99,7 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 // GetRestAPIsOutput function gets results from apigw api.
 // GetRestApis Apigateway API is used to retrieve only the REST API specified info. This returns a map with the names and ids of RestAPIs configured
 // Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
-func GetRestAPIsOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
+func GetAPIGatewayAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
 	input := &apigateway.GetRestApisInput{}
 	if limit != nil {
 		input = &apigateway.GetRestApisInput{
