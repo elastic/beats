@@ -22,8 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -61,11 +61,19 @@ type VMData struct {
 }
 
 type VMSnapshotData struct {
+<<<<<<< HEAD
 	ID          int32
 	Name        string
 	Description string
 	CreateTime  time.Time
 	State       types.VirtualMachinePowerState
+=======
+	ID          int32                          `json:"id"`
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	CreateTime  common.Time                    `json:"createtime"`
+	State       types.VirtualMachinePowerState `json:"state"`
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 }
 
 // New creates a new instance of the MetricSet.
@@ -136,7 +144,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "snapshot"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
@@ -294,7 +302,7 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 			ID:          snapshot.Id,
 			Name:        snapshot.Name,
 			Description: snapshot.Description,
-			CreateTime:  snapshot.CreateTime,
+			CreateTime:  common.Time(snapshot.CreateTime),
 			State:       snapshot.State,
 		})
 

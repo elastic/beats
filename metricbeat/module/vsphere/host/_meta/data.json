@@ -120,7 +120,11 @@
             "vm": {
                 "count": 2,
                 "names": [
+<<<<<<< HEAD
                     "DC0_H0_VM0", 
+=======
+                    "DC0_H0_VM0",
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
                     "DC0_H0_VM1"
                 ]
             },
@@ -130,7 +134,10 @@
                     "LocalDS_0"
                 ]
             },
+<<<<<<< HEAD
             "network_count": 1,
+=======
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
             "network_names": [
                 "VM Network"
             ],

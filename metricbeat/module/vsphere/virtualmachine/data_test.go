@@ -19,12 +19,12 @@ package virtualmachine
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -64,14 +64,14 @@ func TestEventMapping(t *testing.T) {
 				ID:          123,
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
-				CreateTime:  time.Time{},
+				CreateTime:  common.Time{},
 				State:       types.VirtualMachinePowerStatePoweredOff,
 			},
 			{
 				ID:          745,
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
-				CreateTime:  time.Time{},
+				CreateTime:  common.Time{},
 				State:       types.VirtualMachinePowerStatePoweredOn,
 			},
 		},
@@ -122,6 +122,7 @@ func TestEventMapping(t *testing.T) {
 			"customField1": "value1",
 			"customField2": "value2",
 		},
+<<<<<<< HEAD
 		"network.names":   []string{"network-1", "network-2"},
 		"network_names":   []string{"network-1", "network-2"},
 		"datastore.names": []string{"ds1", "ds2"},
@@ -139,6 +140,25 @@ func TestEventMapping(t *testing.T) {
 				Description: "Test snapshot 2",
 				CreateTime:  time.Time{},
 				State:       types.VirtualMachinePowerStatePoweredOn,
+=======
+		"network_names": []string{"network-1", "network-2"},
+		"snapshot": mapstr.M{
+			"info": []VMSnapshotData{
+				{
+					ID:          123,
+					Name:        "Snapshot_1",
+					Description: "Test snapshot 1",
+					CreateTime:  common.Time{},
+					State:       types.VirtualMachinePowerStatePoweredOff,
+				},
+				{
+					ID:          745,
+					Name:        "Snapshot_2",
+					Description: "Test snapshot 2",
+					CreateTime:  common.Time{},
+					State:       types.VirtualMachinePowerStatePoweredOn,
+				},
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 			},
 		},
 		"snapshot.count": 2,

@@ -94,9 +94,10 @@
     - name: snapshot
       type: group
       fields:
-        - name: info
+        - name: info.*
           type: object
-          description: Deatils of the snapshots of this virtualmachine.
+          object_type: keyword
+          description: Details of the snapshots of this virtualmachine.
         - name: count
           type: long
           description: The number of snapshots of this virtualmachine.
