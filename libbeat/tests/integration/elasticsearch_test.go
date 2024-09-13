@@ -99,7 +99,7 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 	mr := metrics.NewRegistry()
 	es := api.NewAPIHandler(uid, "foo2", mr, time.Now().Add(24*time.Hour), 0, 0, 0, 0, 0)
 
-	s := http.Server{Addr: addr, Handler: es}
+	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
 	go func() {
 		if err := s.ListenAndServe(); !errors.Is(http.ErrServerClosed, err) {
 			t.Errorf("could not start mock-es server: %s", err)
@@ -107,8 +107,9 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 	}()
 
 	require.Eventually(t, func() bool {
-		resp, err := http.Get("http://" + addr)
+		resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
 		if err != nil {
+			//nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return false
