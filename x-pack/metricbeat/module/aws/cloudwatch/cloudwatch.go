@@ -123,8 +123,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
 	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
-	// Initialise the map that will be used in case APiGW api is configured
-	infotherapi := make(map[string]string)
+	// Initialise the map that will be used in case APIGateway api is configured. Infoapi includes Name_of_API:ID_of_API entries
 	infoapi := make(map[string]string)
 	// Check statistic method in config
 	err := m.checkStatistics()
@@ -210,26 +209,26 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				}
 			}
 			if strings.Contains(strings.ToLower(namespace), strings.ToLower(checkns)) {
-				// inforestapi inlcudes only Rest APIs
+				// inforestapi includes only Rest APIs
 				if useonlyrest {
-					infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+					infoapi, err = aws.GetAPIGatewayRestAPIOutput(svcRestAPI, config.LimitRestAPI)
 					if err != nil {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
 				} else {
-					infoapi, err = aws.GetRestAPIsOutput(svcRestAPI, config.LimitRestAPI)
+					infoapi, err = aws.GetAPIGatewayRestAPIOutput(svcRestAPI, config.LimitRestAPI)
 					if err != nil {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
-					// infoapi inlcudes only WebSocket and HTTP APIs
-					infotherapi, err = aws.GetAPIsOutput(svcHttpAPI)
+					// infoapi includes only WebSocket and HTTP APIs
+					infotherapi, err := aws.GetAPIGatewayAPIOutput(svcHttpAPI)
 					if err != nil {
 						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
 					}
 					maps.Copy(infoapi, infotherapi)
 				}
 
-				m.Logger().Debugf("infoapi response: %v", infoapi)
+				m.Logger().Infof("infoapi response: %v", infoapi)
 
 			}
 			eventsWithIdentifier, err := m.createEvents(svcCloudwatch, svcResourceAPI, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)

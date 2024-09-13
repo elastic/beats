@@ -96,10 +96,10 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 	return metricWithAccountID, nil
 }
 
-// GetRestAPIsOutput function gets results from apigw api.
+// GetAPIGatewayRestAPIOutput function gets results from apigw api.
 // GetRestApis Apigateway API is used to retrieve only the REST API specified info. This returns a map with the names and ids of RestAPIs configured
 // Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
-func GetAPIGatewayAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
+func GetAPIGatewayRestAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[string]string, error) {
 	input := &apigateway.GetRestApisInput{}
 	if limit != nil {
 		input = &apigateway.GetRestApisInput{
@@ -121,9 +121,9 @@ func GetAPIGatewayAPIOutput(svcRestApi *apigateway.Client, limit *int32) (map[st
 	return infoRestAPImap, nil
 }
 
-// GetAPIsOutput function gets results from apigatewayv2 api.
+// GetAPIGatewayAPIOutput function gets results from apigatewayv2 api.
 // GetApis Apigateway API is used to retrieve the HTTP and WEBSOCKET specified info. This returns a map with the names and ids of relevant APIs configured
-func GetAPIsOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
+func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
 	input := &apigatewayv2.GetApisInput{}
 
 	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
