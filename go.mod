@@ -137,7 +137,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
+	github.com/vmware/govmomi v0.39.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.6.1
 	go.etcd.io/bbolt v1.3.10
