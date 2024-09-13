@@ -82,8 +82,8 @@ LABEL \
   org.opencontainers.image.licenses="{{ .License }}" \
   org.opencontainers.image.title="{{ .BeatName | title }}" \
   org.opencontainers.image.vendor="{{ .BeatVendor }}" \
+  org.opencontainers.image.authors="infra@elastic.co" \
   name="{{ .BeatName }}" \
-  maintainer="infra@elastic.co" \
   vendor="{{ .BeatVendor }}" \
   version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
   release="1" \
@@ -160,6 +160,7 @@ RUN echo \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
 
+USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
@@ -204,11 +205,12 @@ RUN cd /usr/share/heartbeat/.node \
 
 # Install synthetics as a regular user, installing npm deps as root odesn't work
 RUN chown -R {{ .user }} $NODE_PATH
-
+USER {{ .user }}
 # If this fails dump the NPM logs
 RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
 RUN chmod ug+rwX -R $NODE_PATH
 
+USER root
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
 # We don't use npx playwright install-deps because that could pull a newer version
 # Install additional fonts as well

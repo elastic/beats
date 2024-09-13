@@ -79,7 +79,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to logout from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -92,7 +92,7 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 

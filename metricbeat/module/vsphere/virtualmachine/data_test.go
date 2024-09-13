@@ -19,12 +19,12 @@ package virtualmachine
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -64,14 +64,14 @@ func TestEventMapping(t *testing.T) {
 				ID:          123,
 				Name:        "Snapshot_1",
 				Description: "Test snapshot 1",
-				CreateTime:  time.Time{},
+				CreateTime:  common.Time{},
 				State:       types.VirtualMachinePowerStatePoweredOff,
 			},
 			{
 				ID:          745,
 				Name:        "Snapshot_2",
 				Description: "Test snapshot 2",
-				CreateTime:  time.Time{},
+				CreateTime:  common.Time{},
 				State:       types.VirtualMachinePowerStatePoweredOn,
 			},
 		},
@@ -133,14 +133,14 @@ func TestEventMapping(t *testing.T) {
 					ID:          123,
 					Name:        "Snapshot_1",
 					Description: "Test snapshot 1",
-					CreateTime:  time.Time{},
+					CreateTime:  common.Time{},
 					State:       types.VirtualMachinePowerStatePoweredOff,
 				},
 				{
 					ID:          745,
 					Name:        "Snapshot_2",
 					Description: "Test snapshot 2",
-					CreateTime:  time.Time{},
+					CreateTime:  common.Time{},
 					State:       types.VirtualMachinePowerStatePoweredOn,
 				},
 			},
