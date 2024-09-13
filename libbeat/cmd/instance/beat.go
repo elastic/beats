@@ -454,7 +454,11 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
+
 	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error creating processors: %w", err)
+	}
 
 	reg := monitoring.Default.GetRegistry(b.Info.Name)
 	if reg == nil {
