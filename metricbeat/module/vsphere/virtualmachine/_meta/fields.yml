@@ -104,5 +104,8 @@
         - name: count
           type: long
           description: The number of snapshots of this virtualmachine.
-
-
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.
