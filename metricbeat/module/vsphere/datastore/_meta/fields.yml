@@ -24,6 +24,21 @@
       description: >
         Percentage of datastore capacity used.
       format: percent
+    - name: disk.capacity.bytes
+      type: long
+      description: >
+        Configured size of the datastore.
+      format: bytes
+    - name: disk.capacity.usage.bytes
+      type: long
+      description: >
+        The amount of storage capacity currently being consumed by datastore.
+      format: bytes
+    - name: disk.provisioned.bytes
+      type: long
+      description: >
+        Amount of storage set aside for use by a datastore.
+      format: bytes
     - name: fstype
       type: keyword
       description: >
@@ -36,10 +51,6 @@
       type: keyword
       description: >
         List of all the host names.
-    - name: iops
-      type: long
-      description: >
-        Storage I/O Control aggregated Input/Output Operations Per Second.
     - name: name
       type: keyword
       description: >
@@ -49,10 +60,6 @@
       description: >
         Rate of reading data from the datastore.
       format: bytes
-    - name: read.latency.total.ms
-      type: long
-      description: >
-        Average amount of time for a read operation from the datastore in milliseconds.
     - name: status
       type: keyword
       description: >
@@ -70,8 +77,4 @@
       description: >
         Rate of writing data to the datastore.
       format: bytes
-    - name: write.latency.total.ms
-      type: long
-      description: >
-        Average amount of time for a write operation from the datastore in milliseconds.
 
