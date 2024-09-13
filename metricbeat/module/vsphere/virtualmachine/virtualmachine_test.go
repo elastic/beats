@@ -50,7 +50,12 @@ func TestFetchEventContents(t *testing.T) {
 
 	assert.EqualValues(t, "ha-host", event["host.id"])
 	assert.EqualValues(t, "localhost.localdomain", event["host.hostname"])
+	assert.EqualValues(t, "green", event["status"])
+	assert.EqualValues(t, 0, event["uptime"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
+	expectedDatastoreNames := []string{"LocalDS_0"}
+	actualDatastoreNames := event["datastore.names"].([]string)
+	assert.EqualValues(t, expectedDatastoreNames, actualDatastoreNames)
 
 	cpu := event["cpu"].(mapstr.M)
 

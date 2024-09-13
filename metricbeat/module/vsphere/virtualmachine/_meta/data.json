@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2024-08-12T04:51:25.851Z",
     "event": {
         "dataset": "vsphere.virtualmachine",
         "duration": 115000,
@@ -15,35 +15,58 @@
     },
     "vsphere": {
         "virtualmachine": {
-            "cpu": {
-                "used": {
-                    "mhz": 0
-                }
+            "network.names": [
+              "PROD_VCF"
+            ],
+            "os": "Microsoft Windows 10 (64-bit)",
+            "datastore": {
+              "count": 1
             },
-            "host.hostname": "localhost.localdomain",
-            "host.id": "ha-host",
             "memory": {
-                "free": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
+              "used": {
+                "guest": {
+                  "bytes": 0
                 },
-                "total": {
-                    "guest": {
-                        "bytes": 33554432
-                    }
-                },
-                "used": {
-                    "guest": {
-                        "bytes": 0
-                    },
-                    "host": {
-                        "bytes": 0
-                    }
+                "host": {
+                  "bytes": 0
                 }
+              },
+              "total": {
+                "guest": {
+                  "bytes": 4294967296
+                }
+              },
+              "free": {
+                "guest": {
+                  "bytes": 4294967296
+                }
+              }
             },
-            "name": "ha-host_VM0",
-            "os": "otherGuest"
+            "network": {
+              "count": 1
+            },
+            "host.hostname": "phx-w1c1",
+            "name": "phx-14",
+            "cpu": {
+              "free": {
+                "mhz": 0
+              },
+              "used": {
+                "mhz": 0
+              },
+              "total": {
+                "mhz": 0
+              }
+            },
+            "uptime": 0,
+            "status": "green",
+            "network_names": [
+              "PROD_VCF"
+            ],
+            "datastore.names": [
+              "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
+            ],
+            "host.id": "host-20"
+          }
         }
     }
-}
