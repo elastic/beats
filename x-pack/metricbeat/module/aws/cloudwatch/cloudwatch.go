@@ -225,7 +225,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					if err != nil {
 						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
 					}
-					maps.Copy(infoapi, infotherapi)
+					if len(infotherapi) > 0 {
+						maps.Copy(infoapi, infotherapi)
+					}
 				}
 
 				m.Logger().Infof("infoapi response: %v", infoapi)
