@@ -33,6 +33,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Update metrics for the vSphere Host metricset. {pull}40429[40429]
 
 *Osquerybeat*
 

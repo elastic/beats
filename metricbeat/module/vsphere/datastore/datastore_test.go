@@ -27,10 +27,12 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	model := simulator.ESX()
+	// Creating a new simulator model with VPX server to collect broad range of data.
+	model := simulator.VPX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
+	defer model.Remove()
 
 	ts := model.Service.NewServer()
 	defer ts.Close()
@@ -40,7 +42,6 @@ func TestFetchEventContents(t *testing.T) {
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-
 	assert.NotEmpty(t, events)
 
 	event := events[0].MetricSetFields
@@ -48,31 +49,32 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
-	assert.EqualValues(t, "local", event["fstype"])
+	assert.EqualValues(t, "OTHER", event["fstype"])
 
 	// Values are based on the result 'df -k'.
-	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
-		"capacity.used.bytes"}
+	fields := []string{
+		"capacity.total.bytes",
+		"capacity.free.bytes",
+		"status",
+		"host.count",
+		"vm.count",
+		"write.bytes",
+		"capacity.used.bytes",
+	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			t.Error(err)
-		} else {
-			isNonNegativeInt64(t, field, value)
+			t.Error(field, err)
+			return
 		}
-	}
-}
-
-func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
-	i, ok := v.(int64)
-	if !ok {
-		t.Errorf("%v: got %T, but expected int64", field, v)
-		return
-	}
-
-	if i < 0 {
-		t.Errorf("%v: value is negative (%v)", field, i)
-		return
+		switch field {
+		case "status":
+			assert.NotNil(t, value)
+		case "vm.count", "host.count":
+			assert.GreaterOrEqual(t, value, 0)
+		default:
+			assert.GreaterOrEqual(t, value, int64(0))
+		}
 	}
 }
 
