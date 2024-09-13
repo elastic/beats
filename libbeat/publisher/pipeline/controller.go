@@ -113,11 +113,7 @@ func (c *outputController) WaitClose(timeout time.Duration) error {
 	c.consumer.close()
 	close(c.workerChan)
 
-	// Signal the output workers to close. This step is a hint, and carries
-	// no guarantees. For example, on close the Elasticsearch output workers
-	// will close idle connections, but will not change any behavior for
-	// active connections, giving any remaining events a chance to ingest
-	// before we terminate.
+	// Signal the output workers to close.
 	for _, out := range c.workers {
 		out.Close()
 	}
@@ -209,11 +205,6 @@ func (c *outputController) closeQueue(timeout time.Duration) {
 		// pipeline but it was shut down before any output was set.
 		// In this case, return nil and Pipeline.ConnectWith will pass on a
 		// real error to the caller.
-		// NOTE: under the current shutdown process, Pipeline.Close (and hence
-		// outputController.Close) is ~never called. So even if we did have
-		// blocked callers here, in a real shutdown they will never be woken
-		// up. But in hopes of a day when the shutdown process is more robust,
-		// I've decided to do the right thing here anyway.
 		req.responseChan <- nil
 	}
 }

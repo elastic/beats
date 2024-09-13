@@ -68,6 +68,7 @@ func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	input := &netflowInput{
 		cfg:              inputCfg,
+		customFields:     customFields,
 		internalNetworks: inputCfg.InternalNetworks,
 		logger:           im.log,
 		queueSize:        inputCfg.PacketQueueSize,
@@ -155,7 +156,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 		client, err := connector.ConnectWith(beat.ClientConfig{
 			PublishMode: beat.DefaultGuarantees,
 			Processing: beat.ProcessingConfig{
-				EventNormalization: boolPtr(true),
+				EventNormalization: boolPtr(false),
 			},
 			EventListener: nil,
 		})

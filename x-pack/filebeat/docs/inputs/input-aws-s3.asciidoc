@@ -573,10 +573,126 @@ sqs:GetQueueAttributes
 [float]
 === S3 and SQS setup
 
-Enable bucket notification: any new object creation in S3 bucket will also
-create a notification through SQS. Please see
-https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
-for more details.
+To configure SQS notifications for an existing S3 bucket, you can follow
+https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification] guide.
+
+Alternatively, you can follow steps given which utilize a CloudFormation template to create a S3 bucket connected to a SQS with object creation notifications already enabled.
+
+. First copy the CloudFormation template given below to a desired location. For example, to file `awsCloudFormation.yaml`
+
++
+[%collapsible]
+.CloudFormation template
+====
+[source,yaml]
+----
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Create a S3 bucket connected to a SQS for filebeat validations
+Resources:
+  S3BucketWithSQS:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-s3bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+      PublicAccessBlockConfiguration:
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: s3:ObjectCreated:*
+            Queue: !GetAtt SQSWithS3BucketConnected.Arn
+    DependsOn:
+      - S3BucketWithSQSToSQSWithS3BucketConnectedPermission
+  S3BucketWithSQSBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3BucketWithSQS
+      PolicyDocument:
+        Id: RequireEncryptionInTransit
+        Version: '2012-10-17'
+        Statement:
+          - Principal: '*'
+            Action: '*'
+            Effect: Deny
+            Resource:
+              - !GetAtt S3BucketWithSQS.Arn
+              - !Sub ${S3BucketWithSQS.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+  SQSWithS3BucketConnected:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 345600
+  S3BucketWithSQSToSQSWithS3BucketConnectedPermission:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt SQSWithS3BucketConnected.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::${AWS::StackName}-s3bucket
+      Queues:
+        - !Ref SQSWithS3BucketConnected
+Outputs:
+  S3BucketArn:
+    Description: The ARN of the S3 bucket to insert logs
+    Value: !GetAtt S3BucketWithSQS.Arn
+  SQSUrl:
+    Description: The SQS URL to use for filebeat
+    Value: !GetAtt SQSWithS3BucketConnected.QueueUrl
+----
+====
++
+
+. Next, create a CloudFormation stack sourcing the copied.
+
++
+[source,sh]
+----
+aws cloudformation create-stack --stack-name <STACK_NAME> --template-body file://awsCloudFormation.yaml
+----
++
+
+. Then, obtain the S3 bucket ARN and SQS queue url using stack's output
+
++
+For this, you can describe the stack created above. The S3 ARN is set to `S3BucketArn` output and SQS url is set to `SQSUrl` output.
+The output will be populated once the `StackStatus` is set to `CREATE_COMPLETE`.
++
+
++
+[source,sh]
+----
+aws cloudformation describe-stacks --stack-name <STACK_NAME>
+----
++
+
+. Finally, you can configure filebeat to use SQS notifications
+
++
+[source,yaml]
+----
+filebeat.inputs:
+- type: aws-s3
+  queue_url: <URL_FROM_STACK>
+  expand_event_list_from_field: Records
+  credential_profile_name: elastic-beats
+----
++
+
+With this configuration, filebeat avoids polling and utilizes SQS notifications to extract logs from the S3 bucket.
 
 [float]
 === S3 -> SNS -> SQS setup

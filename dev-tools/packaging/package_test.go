@@ -466,6 +466,10 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
+// {BeatName}-{OptionalVariantSuffix}-oss-{version}-{os}-{arch}.docker.tar.gz
+// For example, `heartbeat-oss-8.16.0-linux-arm64.docker.tar.gz`
+var ossSuffixRegexp = regexp.MustCompile(`^(\w+)(-\w+)?-oss-.+$`)
+
 func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
 	vendor := info.Config.Labels["org.label-schema.vendor"]
 	if vendor != "Elastic" {
@@ -474,12 +478,7 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 
 	t.Run(fmt.Sprintf("%s license labels", p.Name), func(t *testing.T) {
 		expectedLicense := "Elastic License"
-		ossPrefix := strings.Join([]string{
-			info.Config.Labels["org.label-schema.name"],
-			"oss",
-			info.Config.Labels["org.label-schema.version"],
-		}, "-")
-		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+		if ossSuffixRegexp.MatchString(filepath.Base(file)) {
 			expectedLicense = "ASL 2.0"
 		}
 		licenseLabels := []string{
