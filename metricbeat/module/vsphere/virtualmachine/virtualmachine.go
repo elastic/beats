@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -75,7 +74,7 @@ type VMSnapshotData struct {
 	ID          int32                          `json:"id"`
 	Name        string                         `json:"name"`
 	Description string                         `json:"description"`
-	CreateTime  time.Time                      `json:"createtime"`
+	CreateTime  common.Time                    `json:"createtime"`
 	State       types.VirtualMachinePowerState `json:"state"`
 }
 
@@ -147,7 +146,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState", "snapshot"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
@@ -311,7 +310,7 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 			ID:          snapshot.Id,
 			Name:        snapshot.Name,
 			Description: snapshot.Description,
-			CreateTime:  snapshot.CreateTime,
+			CreateTime:  common.Time(snapshot.CreateTime),
 			State:       snapshot.State,
 		})
 
