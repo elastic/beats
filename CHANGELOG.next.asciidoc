@@ -214,6 +214,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Add new metricset datastorecluster for vSphere module. {pull}40694[40694]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
+- Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add new metrics for datastore and minor changes to overall vSphere metrics {pull}40766[40766]
 
