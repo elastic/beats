@@ -170,7 +170,9 @@ func TestReadSearchResult_invalid(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// nolint: unused // it's used by files with the !integration constraint
+// newTestConnection creates a new connection for testing
+//
+//nolint:unused // it's used by files with the !integration constraint
 func newTestConnection(t *testing.T, url string) *Connection {
 	conn, _ := NewConnection(ConnectionSettings{
 		URL: url,
