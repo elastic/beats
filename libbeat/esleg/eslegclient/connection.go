@@ -109,7 +109,8 @@ type ESVersionData struct {
 	BuildFlavor string `json:"build_flavor"`
 }
 
-// NewConnection returns a new Elasticsearch client
+// NewConnection returns a new Elasticsearch client.
+// Connect must be called before using this Connection.
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
 
@@ -184,15 +185,12 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
-	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
-		reqsContext:        ctx,
-		cancelReqs:         cancelFunc,
 	}
 
 	if s.APIKey != "" {
@@ -284,6 +282,9 @@ func (conn *Connection) Connect() error {
 	if conn.log == nil {
 		conn.log = logp.NewLogger("esclientleg")
 	}
+
+	conn.reqsContext, conn.cancelReqs = context.WithCancel(context.Background())
+
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
@@ -327,8 +328,6 @@ func (conn *Connection) Ping() (ESPingData, error) {
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
 	conn.cancelReqs()
-	// Creates a new context to be use in new requests
-	conn.reqsContext, conn.cancelReqs = context.WithCancel(context.Background())
 	return nil
 }
 
