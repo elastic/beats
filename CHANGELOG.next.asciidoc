@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
 
 *Auditbeat*
 
@@ -162,6 +163,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 
 *Heartbeat*
 
@@ -331,7 +333,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
+- Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 
 *Metricbeat*
 

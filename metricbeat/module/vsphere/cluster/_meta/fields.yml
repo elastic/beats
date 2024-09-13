@@ -52,3 +52,8 @@
           type: keyword
           description: >
             List of all the Network names associated with the cluster.
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.
