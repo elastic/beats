@@ -127,15 +127,15 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 
 	go func(qq *quark.Queue, logger *logp.Logger) {
 		for {
-			qevs, err := qq.GetEvents()
+			procs, err := qq.GetEvents()
 			if err != nil {
 				logger.Errorf("get events from quark: %v", err)
 				continue
 			}
-			for _, qev := range qevs {
-				logger.Infof("qev: %v", qev)
+			for _, proc := range procs {
+				logger.Infof("proc: %v", proc)
 			}
-			if len(qevs) == 0 {
+			if len(procs) == 0 {
 				err = qq.Block()
 				if err != nil {
 					logger.Errorf("quark block: %v", err)
@@ -167,7 +167,7 @@ var (
 )
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
-	if qev := p.qq.Lookup(int(pid)); qev != nil {
+	if _, found := p.qq.Lookup(int(pid)); found {
 		return nil
 	}
 
@@ -200,7 +200,7 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if qev := p.qq.Lookup(int(pid)); qev != nil {
+		if _, found := p.qq.Lookup(int(pid)); found {
 			p.logger.Debugf("got process that was missing after %v", waited)
 			combinedWait = combinedWait + waited
 			return nil
@@ -221,30 +221,30 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 }
 
 func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
-	qev := p.qq.Lookup(int(pid))
-	if qev == nil {
+	proc, found := p.qq.Lookup(int(pid))
+	if !found {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
 	}
 
 	interactive := interactiveFromTTY(types.TTYDev{
-		Major: qev.Proc.TtyMajor,
-		Minor: qev.Proc.TtyMinor,
+		Major: proc.Proc.TtyMajor,
+		Minor: proc.Proc.TtyMinor,
 	})
 
-	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
 	ret := types.Process{
-		PID:              qev.Pid,
+		PID:              proc.Pid,
 		Start:            &start,
-		Name:             basename(qev.Filename),
-		Executable:       qev.Filename,
-		Args:             []string{qev.Filename}, // TODO: Fix
-		WorkingDirectory: qev.Cwd,
+		Name:             basename(proc.Filename),
+		Executable:       proc.Filename,
+		Args:             []string{proc.Filename}, // TODO: Fix
+		WorkingDirectory: proc.Cwd,
 		Interactive:      &interactive,
 	}
 
-	euid := qev.Proc.Euid
-	egid := qev.Proc.Egid
+	euid := proc.Proc.Euid
+	egid := proc.Proc.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(ret.User.ID)
 	if ok {
@@ -255,43 +255,43 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	if ok {
 		ret.Group.Name = groupname
 	}
-	ret.TTY.CharDevice.Major = uint16(qev.Proc.TtyMajor)
-	ret.TTY.CharDevice.Minor = uint16(qev.Proc.TtyMinor)
-	if qev.ExitEvent != nil {
-		end := time.Unix(0, int64(qev.ExitEvent.ExitTimeEvent))
-		ret.ExitCode = qev.ExitEvent.ExitCode
+	ret.TTY.CharDevice.Major = uint16(proc.Proc.TtyMajor)
+	ret.TTY.CharDevice.Minor = uint16(proc.Proc.TtyMinor)
+	if proc.Exit.Valid {
+		end := time.Unix(0, int64(proc.Exit.ExitTimeProcess))
+		ret.ExitCode = proc.Exit.ExitCode
 		ret.End = &end
 	}
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
-	p.fillParent(&ret, qev.Proc.Ppid)
-	p.fillGroupLeader(&ret, qev.Pid) //  qev.Proc.Pgid)
-	p.fillSessionLeader(&ret, qev.Proc.Sid)
-	p.fillEntryLeader(&ret, qev.Proc.EntryLeader)
+	p.fillParent(&ret, proc.Proc.Ppid)
+	p.fillGroupLeader(&ret, proc.Pid) //  proc.Proc.Pgid)
+	p.fillSessionLeader(&ret, proc.Proc.Sid)
+	p.fillEntryLeader(&ret, proc.Proc.EntryLeader)
 	setEntityID(&ret)
 	setSameAsProcess(&ret)
 	return &ret, nil
 }
 
 func (p prvdr) fillParent(process *types.Process, ppid uint32) {
-	qev := p.qq.Lookup(int(ppid))
-	if qev == nil {
+	proc, found := p.qq.Lookup(int(ppid))
+	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 	interactive := interactiveFromTTY(types.TTYDev{
-		Major: qev.Proc.TtyMajor,
-		Minor: qev.Proc.TtyMinor,
+		Major: proc.Proc.TtyMajor,
+		Minor: proc.Proc.TtyMinor,
 	})
-	euid := qev.Proc.Euid
-	egid := qev.Proc.Egid
-	process.Parent.PID = qev.Proc.Ppid
+	euid := proc.Proc.Euid
+	egid := proc.Proc.Egid
+	process.Parent.PID = proc.Proc.Ppid
 	process.Parent.Start = &start
-	process.Parent.Name = basename(qev.Filename)
-	process.Parent.Executable = qev.Filename
-	process.Parent.Args = []string{qev.Filename} //TODO: FIx
-	process.Parent.WorkingDirectory = qev.Cwd
+	process.Parent.Name = basename(proc.Filename)
+	process.Parent.Executable = proc.Filename
+	process.Parent.Args = []string{proc.Filename} //TODO: FIx
+	process.Parent.WorkingDirectory = proc.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.Parent.User.ID)
@@ -307,25 +307,25 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 }
 
 func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
-	qev := p.qq.Lookup(int(pgid))
-	if qev == nil {
+	proc, found := p.qq.Lookup(int(pgid))
+	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
 	interactive := interactiveFromTTY(types.TTYDev{
-		Major: qev.Proc.TtyMajor,
-		Minor: qev.Proc.TtyMinor,
+		Major: proc.Proc.TtyMajor,
+		Minor: proc.Proc.TtyMinor,
 	})
-	euid := qev.Proc.Euid
-	egid := qev.Proc.Egid
-	process.GroupLeader.PID = qev.Pid
+	euid := proc.Proc.Euid
+	egid := proc.Proc.Egid
+	process.GroupLeader.PID = proc.Pid
 	process.GroupLeader.Start = &start
-	process.GroupLeader.Name = basename(qev.Filename)
-	process.GroupLeader.Executable = qev.Filename
-	process.GroupLeader.Args = []string{qev.Filename} //TODO: fix
-	process.GroupLeader.WorkingDirectory = qev.Cwd
+	process.GroupLeader.Name = basename(proc.Filename)
+	process.GroupLeader.Executable = proc.Filename
+	process.GroupLeader.Args = []string{proc.Filename} //TODO: fix
+	process.GroupLeader.WorkingDirectory = proc.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.GroupLeader.User.ID)
@@ -341,25 +341,25 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
-	qev := p.qq.Lookup(int(sid))
-	if qev == nil {
+	proc, found := p.qq.Lookup(int(sid))
+	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
 	interactive := interactiveFromTTY(types.TTYDev{
-		Major: qev.Proc.TtyMajor,
-		Minor: qev.Proc.TtyMinor,
+		Major: proc.Proc.TtyMajor,
+		Minor: proc.Proc.TtyMinor,
 	})
-	euid := qev.Proc.Euid
-	egid := qev.Proc.Egid
-	process.SessionLeader.PID = qev.Pid
+	euid := proc.Proc.Euid
+	egid := proc.Proc.Egid
+	process.SessionLeader.PID = proc.Pid
 	process.SessionLeader.Start = &start
-	process.SessionLeader.Name = basename(qev.Filename)
-	process.SessionLeader.Executable = qev.Filename
-	process.SessionLeader.Args = []string{qev.Filename} //TODO: fix
-	process.SessionLeader.WorkingDirectory = qev.Cwd
+	process.SessionLeader.Name = basename(proc.Filename)
+	process.SessionLeader.Executable = proc.Filename
+	process.SessionLeader.Args = []string{proc.Filename} //TODO: fix
+	process.SessionLeader.WorkingDirectory = proc.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.SessionLeader.User.ID)
@@ -375,24 +375,24 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
-	qev := p.qq.Lookup(int(elid))
-	if qev == nil {
+	proc, found := p.qq.Lookup(int(elid))
+	if !found {
 		return
 	}
 
-	start := time.Unix(0, int64(qev.Proc.TimeBoot))
+	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
 
 	interactive := interactiveFromTTY(types.TTYDev{
-		Major: qev.Proc.TtyMajor,
-		Minor: qev.Proc.TtyMinor,
+		Major: proc.Proc.TtyMajor,
+		Minor: proc.Proc.TtyMinor,
 	})
 
-	euid := qev.Proc.Euid
-	egid := qev.Proc.Egid
-	process.EntryLeader.PID = qev.Pid
+	euid := proc.Proc.Euid
+	egid := proc.Proc.Egid
+	process.EntryLeader.PID = proc.Pid
 	process.EntryLeader.Start = &start
-	process.EntryLeader.WorkingDirectory = qev.Cwd
+	process.EntryLeader.WorkingDirectory = proc.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
 	username, ok := getUserName(process.EntryLeader.User.ID)
@@ -406,7 +406,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	}
 
 	process.EntryLeader.EntityID = calculateEntityIDv1(elid, *process.EntryLeader.Start)
-	process.EntryLeader.EntryMeta.Type = getEntryTypeName(qev.Proc.EntryLeaderType)
+	process.EntryLeader.EntryMeta.Type = getEntryTypeName(proc.Proc.EntryLeaderType)
 }
 
 func setEntityID(process *types.Process) {
