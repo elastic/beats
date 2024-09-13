@@ -326,7 +326,6 @@ func (conn *Connection) Ping() (ESPingData, error) {
 // Close closes a connection.
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
-	conn.cancelReqs()
 	return nil
 }
 
