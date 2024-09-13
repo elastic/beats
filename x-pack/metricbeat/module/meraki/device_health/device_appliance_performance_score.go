@@ -22,7 +22,6 @@ func getDevicePerformanceScores(client *meraki_api.Client, devices map[Serial]*D
 		if score_res.StatusCode() != 204 {
 			scores[Serial(device.Serial)] = &DevicePerformanceScore{
 				PerformanceScore: *score_val.PerfScore,
-				HttpStatusCode:   200,
 			}
 		}
 	}

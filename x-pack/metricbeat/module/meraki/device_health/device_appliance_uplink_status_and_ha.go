@@ -41,31 +41,38 @@ func reportApplianceUplinkStatuses(reporter mb.ReporterV2, organizationID string
 
 			for _, item := range *uplink.Uplinks {
 
+				uplink_encountered := false
+
+				metric["uplink.interface"] = item.Interface
+				metric["uplink.status"] = item.Status
+				metric["uplink.ip"] = item.IP
+				metric["uplink.gateway"] = item.Gateway
+				metric["uplink.public_ip"] = item.PublicIP
+				metric["uplink.primary_dns"] = item.PrimaryDNS
+				metric["uplink.secondary_dns"] = item.SecondaryDNS
+				metric["uplink.ip_assigned_by"] = item.IPAssignedBy
+
 				for _, lossLatencyMetric := range lossLatencyUplinks {
 					if lossLatencyMetric.Interface == item.Interface && string(lossLatencyMetric.DeviceSerial) == device.Serial && lossLatencyMetric.NetworkID == device.NetworkID {
 						for _, lossLatency := range lossLatencyMetric.Metrics {
+
+							uplink_encountered = true
 							//It seems there is bug in the client.Organizations.GetOrganizationDevicesUplinksLossAndLatency code returning differnt IP
 							//To mitigate, I am additionally printing the ip as seperate value, IMO it is odd these do not match.
 							// client.Appliance.GetOrganizationApplianceUplinkStatuses
-							metric["uplink.loss_latancy.ip"] = lossLatencyMetric.IP
-							metric["uplink.loss_latancy.@timestamp"] = lossLatency.Timestamp
-							metric["uplink.loss_latancy.loss_percent"] = lossLatency.LossPercent
-							metric["uplink.loss_latancy.latency_ms"] = lossLatency.LatencyMs
-
+							metrics = append(metrics, mapstr.Union(metric, mapstr.M{
+								"uplink.loss_latancy.ip":           lossLatencyMetric.IP,
+								"@timestamp":                       lossLatency.Timestamp,
+								"uplink.loss_latancy.loss_percent": lossLatency.LossPercent,
+								"uplink.loss_latancy.latency_ms":   lossLatency.LatencyMs,
+							}))
 						}
 					}
 
 				}
-				metrics = append(metrics, mapstr.Union(metric, mapstr.M{
-					"uplink.interface":      item.Interface,
-					"uplink.status":         item.Status,
-					"uplink.ip":             item.IP,
-					"uplink.gateway":        item.Gateway,
-					"uplink.public_ip":      item.PublicIP,
-					"uplink.primary_dns":    item.PrimaryDNS,
-					"uplink.secondary_dns":  item.SecondaryDNS,
-					"uplink.ip_assigned_by": item.IPAssignedBy,
-				}))
+				if !uplink_encountered {
+					metrics = append(metrics, metric)
+				}
 
 			}
 		}

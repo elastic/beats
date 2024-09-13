@@ -95,5 +95,4 @@ type PerfScore struct {
 // DeviceStatus contains dynamic device attributes
 type DevicePerformanceScore struct {
 	PerformanceScore float64
-	HttpStatusCode   int
 }

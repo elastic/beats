@@ -25,7 +25,6 @@ func getNetworkHealthChannelUtilization(client *meraki_api.Client, networks *mer
 						return nil, fmt.Errorf("Networks.GetNetworkNetworkHealthChannelUtilization failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 					}
 				} else {
-					//fmt.Printf("\n#Added Networks.GetNetworkNetworkHealthChannelUtilization networkInfo; [%d] %s.\n###################", res.StatusCode(), res.Body())
 					networkHealthUtilizations = append(networkHealthUtilizations, networkHealthUtilization)
 				}
 

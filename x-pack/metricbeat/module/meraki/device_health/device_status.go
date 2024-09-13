@@ -65,16 +65,11 @@ func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, de
 			metric["device.status.primary_dns"] = status.PrimaryDNS
 			metric["device.status.public_ip"] = status.PublicIP
 			metric["device.status.secondary_dns"] = status.SecondaryDNS
-			metric["device.status.status"] = status.Status
+			metric["device.status.value"] = status.Status
 		}
 
 		if score, ok := devicePerformanceScores[serial]; ok {
-			if score.HttpStatusCode == 204 {
-				metric["device.performance.http_status_code"] = score.HttpStatusCode
-			} else {
-				metric["device.performance.score"] = score.PerformanceScore
-			}
-
+			metric["device.performance.score"] = score.PerformanceScore
 		}
 
 		deviceStatusMetrics = append(deviceStatusMetrics, metric)

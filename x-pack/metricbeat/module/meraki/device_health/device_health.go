@@ -123,6 +123,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 		reportApplianceUplinkStatuses(reporter, org, devices, appliance_val, lossLatencyuplinks)
 
+		//Get & Report Device Uplink Status
+		uplinks, err := getDeviceUplinkMetrics(m.client, org, m.BaseMetricSet.Module().Config().Period)
+		if err != nil {
+			return fmt.Errorf("getDeviceUplinkMetrics() failed; %w", err)
+		}
+		reportDeviceUplinkMetrics(reporter, org, devices, uplinks)
+
 		//Get & Report Device License State
 		cotermLicenses, perDeviceLicenses, systemsManagerLicense, err := getLicenseStates(m.client, org)
 		if err != nil {
