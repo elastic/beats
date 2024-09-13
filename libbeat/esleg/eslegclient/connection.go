@@ -110,7 +110,6 @@ type ESVersionData struct {
 }
 
 // NewConnection returns a new Elasticsearch client.
-// Connect must be called before using this Connection.
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
 
@@ -185,12 +184,18 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
+	// There are some cases where the connection is created but Connect
+	// is not called before it's used, so we populate reqsContext and cancelReqs
+	// here.
+	reqsContext, cancelReqs := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
+		reqsContext:        reqsContext,
+		cancelReqs:         cancelReqs,
 	}
 
 	if s.APIKey != "" {
