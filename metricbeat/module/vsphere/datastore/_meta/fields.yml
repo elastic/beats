@@ -32,4 +32,60 @@
       description: >
         Used percent of the datastore
       format: percent
+<<<<<<< HEAD
+=======
+    - name: disk.capacity.bytes
+      type: long
+      description: >
+        Configured size of the datastore.
+      format: bytes
+    - name: disk.capacity.usage.bytes
+      type: long
+      description: >
+        The amount of storage capacity currently being consumed by datastore.
+      format: bytes
+    - name: disk.provisioned.bytes
+      type: long
+      description: >
+        Amount of storage set aside for use by a datastore.
+      format: bytes
+    - name: fstype
+      type: keyword
+      description: >
+        Filesystem type.
+    - name: host.count
+      type: long
+      description: >
+        Number of hosts.
+    - name: host.names
+      type: keyword
+      description: >
+        List of all the host names.
+    - name: name
+      type: keyword
+      description: >
+        Datastore name.
+    - name: read.bytes
+      type: long
+      description: >
+        Rate of reading data from the datastore.
+      format: bytes
+    - name: status
+      type: keyword
+      description: >
+        Status of the datastore.
+    - name: vm.count
+      type: long
+      description: >
+        Number of VMs.
+    - name: vm.names
+      type: keyword
+      description: >
+        List of all the VM names.
+    - name: write.bytes
+      type: long
+      description: >
+        Rate of writing data to the datastore.
+      format: bytes
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 

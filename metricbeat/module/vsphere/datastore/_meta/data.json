@@ -15,6 +15,39 @@
     },
     "vsphere": {
         "datastore": {
+<<<<<<< HEAD
+=======
+            "host": {
+                "count": 1,
+                "names": [
+                    "DC3_H0"
+                ]
+            },
+            "status": "green",
+            "vm": {
+                "count": 6,
+                "names": [
+                    "DC3_H0_VM0"
+                ]
+            },
+            "read": {
+                "bytes": 0
+            },
+            "write": {
+                "bytes": 337000
+            },
+            "disk": {
+                "capacity": {
+                    "usage": {
+                        "bytes": 520505786368
+                    },
+                    "bytes": 1610344300544
+                },
+                "provisioned": {
+                    "bytes": 520505786368
+                }
+            },
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
             "capacity": {
                 "free": {
                     "bytes": 37120094208

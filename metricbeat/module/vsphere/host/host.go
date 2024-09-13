@@ -101,6 +101,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 		event := mapstr.M{}
 
+<<<<<<< HEAD
 		event["name"] = hs.Summary.Config.Name
 		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
 		event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
@@ -127,6 +128,28 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
+=======
+	pc := property.DefaultCollector(c)
+	for i := range hst {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		assetNames, err := getAssetNames(ctx, pc, &hst[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
+		}
+
+		metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metrics)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{
+			MetricSetFields: m.mapEvent(hst[i], &metricData{
+				perfMetrics: metricMap,
+				assetNames:  assetNames,
+			}),
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 		})
 	}
 
@@ -138,8 +161,78 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 
 	pc := property.DefaultCollector(c)
 
+<<<<<<< HEAD
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &hs)
+=======
+	outputDsNames := make([]string, 0, len(hs.Datastore))
+	outputVmNames := make([]string, 0, len(hs.Vm))
+	for _, ob := range objects {
+		name := strings.ReplaceAll(ob.Name, ".", "_")
+		switch ob.Reference().Type {
+		case "Datastore":
+			outputDsNames = append(outputDsNames, name)
+		case "VirtualMachine":
+			outputVmNames = append(outputVmNames, name)
+		}
+	}
+
+	// calling network explicitly because of mo.Network's ManagedEntityObject.Name does not store Network name
+	// instead mo.Network.Name contains correct value of Network name
+	outputNetworkNames := make([]string, 0, len(hs.Network))
+	if len(hs.Network) > 0 {
+		var netObjects []mo.Network
+		if err := pc.Retrieve(ctx, hs.Network, []string{"name"}, &netObjects); err != nil {
+			return assetNames{}, err
+		}
+		for _, ob := range netObjects {
+			outputNetworkNames = append(outputNetworkNames, strings.ReplaceAll(ob.Name, ".", "_"))
+		}
+	}
+
+	return assetNames{
+		outputNetworkNames: outputNetworkNames,
+		outputDsNames:      outputDsNames,
+		outputVmNames:      outputVmNames,
+	}, nil
+}
+
+func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
+	metricMap = make(map[string]interface{})
+
+	period := int32(m.Module().Config().Period.Seconds())
+	availableMetric, err := perfManager.AvailableMetric(ctx, hst.Reference(), period)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get available metrics: %w", err)
+	}
+
+	availableMetricByKey := availableMetric.ByKey()
+
+	// Filter for required metrics
+	var metricIDs []types.PerfMetricId
+	for key, metric := range metricSet {
+		if counter, ok := metrics[key]; ok {
+			if _, exists := availableMetricByKey[counter.Key]; exists {
+				metricIDs = append(metricIDs, types.PerfMetricId{
+					CounterId: counter.Key,
+					Instance:  "*",
+				})
+			}
+		} else {
+			m.Logger().Warnf("Metric %s not found", metric)
+		}
+	}
+
+	spec := types.PerfQuerySpec{
+		Entity:     hst.Reference(),
+		MetricId:   metricIDs,
+		MaxSample:  1,
+		IntervalId: period,
+	}
+
+	// Query performance data
+	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving host information: %v", err)
 	}

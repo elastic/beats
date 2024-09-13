@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -49,6 +50,27 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+<<<<<<< HEAD
+=======
+type VMData struct {
+	VM             mo.VirtualMachine
+	HostID         string
+	HostName       string
+	NetworkNames   []string
+	DatastoreNames []string
+	CustomFields   mapstr.M
+	Snapshots      []VMSnapshotData
+}
+
+type VMSnapshotData struct {
+	ID          int32                          `json:"id"`
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	CreateTime  common.Time                    `json:"createtime"`
+	State       types.VirtualMachinePowerState `json:"state"`
+}
+
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := vsphere.NewMetricSet(base)
@@ -117,7 +139,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
+<<<<<<< HEAD
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary"}, &vmt)
+=======
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "snapshot"}, &vmt)
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -302,3 +328,25 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 	}
 	return &hs, nil
 }
+<<<<<<< HEAD
+=======
+
+func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapshotData {
+	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
+	for _, snapshot := range snapshotTree {
+		snapshots = append(snapshots, VMSnapshotData{
+			ID:          snapshot.Id,
+			Name:        snapshot.Name,
+			Description: snapshot.Description,
+			CreateTime:  common.Time(snapshot.CreateTime),
+			State:       snapshot.State,
+		})
+
+		// Recursively add child snapshots
+		if len(snapshot.ChildSnapshotList) > 0 {
+			snapshots = append(snapshots, fetchSnapshots(snapshot.ChildSnapshotList)...)
+		}
+	}
+	return snapshots
+}
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))

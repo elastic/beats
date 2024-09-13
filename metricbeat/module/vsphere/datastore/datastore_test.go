@@ -27,6 +27,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
+<<<<<<< HEAD
 	model := simulator.ESX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
@@ -42,6 +43,21 @@ func TestFetchEventContents(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
+=======
+	// Creating a new simulator model with VPX server to collect broad range of data.
+	model := simulator.VPX()
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(model.Remove)
+
+	ts := model.Service.NewServer()
+	t.Cleanup(ts.Close)
+
+	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
+	events, errs := mbtest.ReportingFetchV2WithContext(f)
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 
 	event := events[0].MetricSetFields
 
@@ -51,8 +67,23 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "local", event["fstype"])
 
 	// Values are based on the result 'df -k'.
+<<<<<<< HEAD
 	fields := []string{"capacity.total.bytes", "capacity.free.bytes",
 		"capacity.used.bytes"}
+=======
+	fields := []string{
+		"capacity.total.bytes",
+		"capacity.free.bytes",
+		"status",
+		"host.count",
+		"vm.count",
+		"write.bytes",
+		"capacity.used.bytes",
+		"disk.capacity.usage.bytes",
+		"disk.capacity.bytes",
+		"disk.provisioned.bytes",
+	}
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 	for _, field := range fields {
 		value, err := event.GetValue(field)
 		if err != nil {
@@ -78,12 +109,21 @@ func isNonNegativeInt64(t testing.TB, field string, v interface{}) {
 
 func TestData(t *testing.T) {
 	model := simulator.ESX()
+<<<<<<< HEAD
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
 
 	ts := model.Service.NewServer()
 	defer ts.Close()
+=======
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(model.Remove)
+
+	ts := model.Service.NewServer()
+	t.Cleanup(ts.Close)
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
@@ -93,12 +133,10 @@ func TestData(t *testing.T) {
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
 	return map[string]interface{}{
 		"module":     "vsphere",
 		"metricsets": []string{"datastore"},
-		"hosts":      []string{urlSimulator},
+		"hosts":      []string{ts.URL.String()},
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,

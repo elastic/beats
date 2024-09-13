@@ -60,4 +60,50 @@
     - name: network_names
       type: keyword
       description: >
+<<<<<<< HEAD
         Network names
+=======
+        Network names.
+    - name: datastore
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the datastore associated to this virtualmachine.
+        - name: count
+          type: long
+          description: >
+            Number of datastores associated to this virtualmachine.
+    - name: network
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            Names of the networks associated to this virtualmachine.
+        - name: count
+          type: long
+          description: >
+            Number of networks associated to this virtualmachine.
+    - name: status
+      type: keyword
+      description: >
+        Overall health and status of a virtual machine.
+    - name: uptime
+      type: long
+      description: >
+        The uptime of the VM in seconds.
+    - name: snapshot
+      type: group
+      fields:
+        - name: info.*
+          type: object
+          object_type: keyword
+          description: Details of the snapshots of this virtualmachine.
+        - name: count
+          type: long
+          description: The number of snapshots of this virtualmachine.
+
+
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))

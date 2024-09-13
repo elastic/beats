@@ -66929,6 +66929,200 @@ format: percent
 
 --
 
+<<<<<<< HEAD
+=======
+*`vsphere.datastore.disk.capacity.bytes`*::
++
+--
+Configured size of the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.provisioned.bytes`*::
++
+--
+Amount of storage set aside for use by a datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.fstype`*::
++
+--
+Filesystem type.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.host.count`*::
++
+--
+Number of hosts.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.host.names`*::
++
+--
+List of all the host names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.name`*::
++
+--
+Datastore name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.read.bytes`*::
++
+--
+Rate of reading data from the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.status`*::
++
+--
+Status of the datastore.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.vm.count`*::
++
+--
+Number of VMs.
+
+
+type: long
+
+--
+
+*`vsphere.datastore.vm.names`*::
++
+--
+List of all the VM names.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastore.write.bytes`*::
++
+--
+Rate of writing data to the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 [float]
 === host
 
@@ -67167,6 +67361,90 @@ type: keyword
 
 --
 
+<<<<<<< HEAD
+=======
+
+*`vsphere.virtualmachine.datastore.names`*::
++
+--
+Names of the datastore associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.datastore.count`*::
++
+--
+Number of datastores associated to this virtualmachine.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.network.names`*::
++
+--
+Names of the networks associated to this virtualmachine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.network.count`*::
++
+--
+Number of networks associated to this virtualmachine.
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.status`*::
++
+--
+Overall health and status of a virtual machine.
+
+
+type: keyword
+
+--
+
+*`vsphere.virtualmachine.uptime`*::
++
+--
+The uptime of the VM in seconds.
+
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info.*`*::
++
+--
+Details of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
+
+type: long
+
+--
+
+>>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 [[exported-fields-windows]]
 == Windows fields
 
