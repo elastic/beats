@@ -183,6 +183,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
 - added benchmark input {pull}37437[37437]
 - added benchmark input and discard output {pull}37437[37437]
+
 *Auditbeat*
 
 
