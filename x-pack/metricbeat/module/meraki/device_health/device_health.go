@@ -23,9 +23,7 @@ import (
 // the MetricSet for each host is defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-
 	mb.Registry.MustAddMetricSet("meraki", "device_health", New)
-
 }
 
 type config struct {
@@ -52,8 +50,6 @@ type MetricSet struct {
 	logger        *logp.Logger
 	client        *meraki_api.Client
 	organizations []string
-	meraki_url    string
-	meraki_apikey string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -80,8 +76,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		logger:        logger,
 		client:        client,
 		organizations: config.Organizations,
-		meraki_url:    config.BaseURL,
-		meraki_apikey: config.ApiKey,
 	}, nil
 }
 
