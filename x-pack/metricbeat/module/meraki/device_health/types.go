@@ -17,7 +17,6 @@ type NetworkID string
 // Device contains static device attributes (i.e. dimensions)
 type Device struct {
 	Address     string
-	Details     map[string]string
 	Firmware    string
 	Imei        *float64
 	LanIP       string

@@ -1,8 +1,6 @@
 package device_health
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -33,10 +31,6 @@ func reportApplianceUplinkStatuses(reporter mb.ReporterV2, organizationID string
 				"device.product_type":             device.ProductType,
 				"device.serial":                   device.Serial,
 				"device.tags":                     device.Tags,
-			}
-
-			for k, v := range device.Details {
-				metric[fmt.Sprintf("device.details.%s", k)] = v
 			}
 
 			for _, item := range *uplink.Uplinks {

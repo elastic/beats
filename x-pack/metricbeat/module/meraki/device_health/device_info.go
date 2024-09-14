@@ -33,11 +33,7 @@ func GetDevices(client *meraki_api.Client, organizationID string) (map[Serial]*D
 			Serial:      d.Serial,
 			Tags:        d.Tags,
 		}
-		if d.Details != nil {
-			for _, detail := range *d.Details {
-				device.Details[detail.Name] = detail.Value
-			}
-		}
+
 		devices[Serial(device.Serial)] = &device
 	}
 

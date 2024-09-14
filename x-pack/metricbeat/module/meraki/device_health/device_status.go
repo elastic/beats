@@ -54,10 +54,6 @@ func reportDeviceStatusMetrics(reporter mb.ReporterV2, organizationID string, de
 			"device.tags":         device.Tags,
 		}
 
-		for k, v := range device.Details {
-			metric[fmt.Sprintf("device.details.%s", k)] = v
-		}
-
 		if status, ok := deviceStatuses[serial]; ok {
 			metric["device.status.gateway"] = status.Gateway
 			metric["device.status.ip_type"] = status.IPType

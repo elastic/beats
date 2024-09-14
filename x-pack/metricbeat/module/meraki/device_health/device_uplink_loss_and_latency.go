@@ -132,10 +132,6 @@ func reportDeviceUplinkMetrics(reporter mb.ReporterV2, organizationID string, de
 				"device.tags":         device.Tags,
 			}
 
-			for k, v := range device.Details {
-				metric[fmt.Sprintf("device.details.%s", k)] = v
-			}
-
 			for _, uplinkMetric := range uplink.Metrics {
 				metrics = append(metrics, mapstr.Union(metric, mapstr.M{
 					"@timestamp":          uplinkMetric.Timestamp,
