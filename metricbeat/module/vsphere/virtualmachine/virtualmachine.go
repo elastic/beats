@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
@@ -56,6 +57,15 @@ type VMData struct {
 	NetworkNames   []string
 	DatastoreNames []string
 	CustomFields   mapstr.M
+	Snapshots      []VMSnapshotData
+}
+
+type VMSnapshotData struct {
+	ID          int32
+	Name        string
+	Description string
+	CreateTime  time.Time
+	State       types.VirtualMachinePowerState
 }
 
 // New creates a new instance of the MetricSet.
@@ -136,6 +146,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var hostID, hostName string
 		var networkNames, datastoreNames []string
 		var customFields mapstr.M
+		var snapshots []VMSnapshotData
 
 		if host := vm.Summary.Runtime.Host; host != nil {
 			hostID = host.Value
@@ -179,6 +190,10 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 		}
 
+		if vm.Snapshot != nil {
+			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
+		}
+
 		data := VMData{
 			VM:             vm,
 			HostID:         hostID,
@@ -186,6 +201,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			NetworkNames:   networkNames,
 			DatastoreNames: datastoreNames,
 			CustomFields:   customFields,
+			Snapshots:      snapshots,
 		}
 
 		reporter.Event(mb.Event{
@@ -269,4 +285,23 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 		return nil, fmt.Errorf("error retrieving host information: %w", err)
 	}
 	return &hs, nil
+}
+
+func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapshotData {
+	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
+	for _, snapshot := range snapshotTree {
+		snapshots = append(snapshots, VMSnapshotData{
+			ID:          snapshot.Id,
+			Name:        snapshot.Name,
+			Description: snapshot.Description,
+			CreateTime:  snapshot.CreateTime,
+			State:       snapshot.State,
+		})
+
+		// Recursively add child snapshots
+		if len(snapshot.ChildSnapshotList) > 0 {
+			snapshots = append(snapshots, fetchSnapshots(snapshot.ChildSnapshotList)...)
+		}
+	}
+	return snapshots
 }
