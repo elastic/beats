@@ -183,8 +183,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
 - added benchmark input {pull}37437[37437]
 - added benchmark input and discard output {pull}37437[37437]
-- Add new metricset cluster for the vSphere module. {pull}40536[40536]
-
 *Auditbeat*
 
 
@@ -210,6 +208,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
 
 *Metricbeat*
 
