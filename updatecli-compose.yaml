@@ -7,7 +7,7 @@ policies:
       - .github/workflows/updatecli.d/values.d/scm.yml
       - .github/workflows/updatecli.d/values.d/ironbank.yml
   - name: Update Updatecli policies
-    policy: ghcr.io/updatecli/policies/autodiscovery/updatecli:0.6.0@sha256:6bd6999620674b2fbb1d374f7a1a5e9740d042667f0592900b44259f3e1ae98f
+    policy: ghcr.io/updatecli/policies/autodiscovery/updatecli:0.7.0@sha256:c1d8f94f108aca8a906ffeb7ec32a001d10497609ce073a1d956a38a563ceb38
     values:
       - .github/workflows/updatecli.d/values.d/scm.yml
       - .github/workflows/updatecli.d/values.d/updatecli-compose.yml
