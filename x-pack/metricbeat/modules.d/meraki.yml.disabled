@@ -4,8 +4,6 @@
 - module: meraki
   metricsets: ["device_health"]
   enabled: true
-  period: 60s
-  # The Meraki API key for your organization.
-  apiKey: <token>
-  # A list of organization id's to harvest meraki data.
-  organizations: ["<orgId>"]  
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  

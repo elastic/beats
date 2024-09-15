@@ -1,12 +1,7 @@
 - key: meraki
-  title: "meraki"
+  title: Cisco Meraki
   release: beta
-  description: >
-    Meraki module collects metrics from the meraki api
   fields:
-    - name: meraki
-      type: group
-      description: > 
-        Various Meraki metrics
-      fields:
-
+   - name: meraki
+     type: group
+     fields:

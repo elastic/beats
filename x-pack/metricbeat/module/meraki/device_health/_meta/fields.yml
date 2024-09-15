@@ -1,15 +1,306 @@
-- name: device_health
+- name: device
   type: group
-  release: beta
-  description: >
-    meraki device_health metricset to collect device metrics
   fields:
-    - name: device
+    - name: serial
+      type: keyword
+      dimension: true
+    - name: imei
+      type: keyword
+    - name: lan_ip
+      type: ip
+    - name: location
+      type: geo_point
+    - name: mac
+      type: keyword
+    - name: model
+      type: keyword
+    - name: name
+      type: keyword
+    - name: network_id
+      type: keyword
+    - name: notes
+      type: text
+    - name: product_type
+      type: keyword
+    - name: tags
+      type: keyword
+    - name: performance_score
+      type: double
+      metric_type: gauge
+    - name: license
       type: group
-      description: >
-        meraki devices metrics
-      fields:      
-        - name: serial
-          type: number
-          description: >
-            unique device serial
+      fields:
+        - name: activation_date
+          type: keyword
+        - name: claim_date
+          type: date
+        - name: duration_in_days
+          type: long
+        - name: expiration_date
+          type: date
+        - name: head_license_id
+          type: keyword
+        - name: id
+          type: keyword
+        - name: license_type
+          type: keyword
+        - name: order_number
+          type: keyword
+        - name: seat_count
+          type: long
+        - name: state
+          type: keyword
+        - name: total_duration_in_day
+          type: long
+    - name: high_availability
+      type: group
+      fields:
+       - name: enabled
+         type: boolean
+       - name: role
+         type: keyword
+    - name: status
+      type: group
+      fields:
+        - name: gateway
+          type: ip
+        - name: ip_status
+          type: keyword
+        - name: last_reported_at
+          type: date
+        - name: primary_dns
+          type: keyword
+        - name: secondary_dns
+          type: keyword
+        - name: public_ip
+          type: ip
+        - name: value
+          type: keyword
+    - name: channel_utilization
+      type: group
+      fields:
+        - name: wifi0
+          type: group
+          fields:
+           - name: utilization_80211
+             type: double
+             metric_type: gauge
+             unit: percent
+           - name: utilization_non_80211
+             type: double
+             metric_type: gauge
+             unit: percent
+           - name: utilization_total
+             type: double
+             metric_type: gauge
+             unit: percent
+        - name: wifi1
+          type: group
+          fields:
+           - name: utilization_80211
+             type: double
+             metric_type: gauge
+             unit: percent
+           - name: utilization_non_80211
+             type: double
+             metric_type: gauge
+             unit: percent
+           - name: utilization_total
+             type: double
+             metric_type: gauge
+             unit: percent
+- name: switch.port
+  type: group
+  fields:
+    - name: id
+      type: keyword
+      dimension: true
+    - name: access_policy_type
+      type: keyword
+    - name: allowed_vlans
+      type: keyword
+    - name: enabled
+      type: boolean
+    - name: link_negotiation
+      type: keyword
+    - name: name
+      type: keyword
+    - name: poe_enabled
+      type: boolean
+    - name: rstp_enabled
+      type: boolean
+    - name: sticky_mac_allow_list
+      type: keyword
+    - name: sticky_mac_allow_list_limit
+      type: long
+    - name: stp_guard
+      type: keyword
+    - name: tags
+      type: keyword
+    - name: type
+      type: keyword
+    - name: vlan
+      type: long
+    - name: voice_vlan
+      type: long
+    - name: status
+      type: group
+      fields:
+      - name: client_count
+        type: long
+      - name: duplex
+        type: keyword
+      - name: enabled
+        type: boolean
+      - name: errors
+        type: keyword
+      - name: is_uplink
+        type: boolean
+      - name: power_usage_in_wh
+        type: double
+        metric_type: gauge
+      - name: speed
+        type: keyword
+      - name: status
+        type: keyword
+      - name: warnings
+        type: keyword
+      - name: stp_statuses
+        type: keyword
+      - name: cdp
+        type: group
+        fields:
+          - name: address
+            type: keyword
+          - name: capabilities
+            type: keyword
+          - name: device_id
+            type: keyword
+          - name: management_address
+            type: keyword
+          - name: native_vlan
+            type: long
+          - name: platform
+            type: keyword
+          - name: port_id
+            type: keyword
+          - name: system_name
+            type: keyword
+          - name: version
+            type: keyword
+          - name: vtp_management_domain
+            type: keyword
+      - name: lldp
+        type: group
+        fields:
+          - name: chassis_id
+            type: keyword
+          - name: management_address
+            type: keyword
+          - name: management_vlan
+            type: long
+          - name: port_description
+            type: keyword
+          - name: port_id
+            type: keyword
+          - name: port_vlan
+            type: long
+          - name: system_capabilities
+            type: keyword
+          - name: system_description
+            type: keyword
+          - name: system_name
+            type: keyword
+      - name: secure_port
+        type: group
+        fields:
+          - name: active
+            type: boolean
+          - name: authentication_status
+            type: keyword
+          - name: enabled
+            type: boolean
+          - name: config_overrides.allowed_vlans
+            type: keyword
+          - name: config_overrides.type
+            type: keyword
+          - name: config_overrides.vlan
+            type: long
+          - name: config_overrides.voice_vlan
+            type: long
+      - name: throughput
+        type: group
+        field:
+          - name: recv
+            type: double
+            metric_type: gauge
+          - name: sent
+            type: double
+            metric_type: gauge
+          - name: total
+            type: double
+            metric_type: gauge
+      - name: usage
+        type: group
+        fields:
+        - name: recv
+          type: long
+          metric_type: gauge
+        - name: sent
+          type: long
+          metric_type: gauge
+        - name: total
+          type: long
+          metric_type: gauge
+- name: uplink
+  type: group
+  fields:
+    - name: last_reported_at
+      type: date
+    - name: gateway
+      type: keyword
+    - name: interface
+      type: keyword
+      dimension: true
+    - name: ip
+      type: ip
+    - name: primary_dns
+      type: ip
+    - name: secondary_dns
+      type: ip
+    - name: public_ip
+      type: ip
+    - name: status
+      type: keyword
+    - name: ip_assigned_by
+      type: keyword
+    - name: apn
+      type: keyword
+    - name: connection_type
+      type: keyword
+    - name: iccid
+      type: keyword
+    - name: model
+      type: keyword
+    - name: provider
+      type: keyword
+    - name: signal_type
+      type: keyword
+    - name: rsrp
+      type: keyword
+    - name: rsrq
+      type: keyword
+    - name: loss
+      type: group
+      fields:
+        - name: pct
+          type: double
+          metric_type: gauge
+          unit: percent
+    - name: latency
+      type: group
+      fields:
+        - name: ms
+          type: double
+          metric_type: gauge
+          unit: ms

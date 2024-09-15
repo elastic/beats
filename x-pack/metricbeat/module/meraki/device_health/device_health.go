@@ -5,17 +5,16 @@
 package device_health
 
 import (
-	"encoding/json"
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	meraki_api "github.com/meraki/dashboard-api-go/v3/sdk"
+	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -48,7 +47,7 @@ func defaultConfig() *config {
 type MetricSet struct {
 	mb.BaseMetricSet
 	logger        *logp.Logger
-	client        *meraki_api.Client
+	client        *meraki.Client
 	organizations []string
 }
 
@@ -65,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	logger.Debugf("loaded config: %v", config)
-	client, err := meraki_api.NewClientWithOptions(config.BaseURL, config.ApiKey, config.DebugMode, "Metricbeat Elastic")
+	client, err := meraki.NewClientWithOptions(config.BaseURL, config.ApiKey, config.DebugMode, "Metricbeat Elastic")
 	if err != nil {
 		logger.Error("creating Meraki dashboard API client failed: %w", err)
 		return nil, err
@@ -83,145 +82,107 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-
 	for _, org := range m.organizations {
+		// some metrics require a 'timespan' parameter; we match this to our
+		// collection interval to only collect new metric values
+		collectionPeriod := m.BaseMetricSet.Module().Config().Period
 
-		//Get Devices
-		devices, err := GetDevices(m.client, org)
+		// First we get the list of all devices for this org (and their metadata).
+		// Devices are uniquely identified by their serial number, which are used to
+		// associate the metrics we collect later with the devices returned here.
+		devices, err := getDevices(m.client, org)
 		if err != nil {
-			return fmt.Errorf("getDevices() failed; %w", err)
+			return fmt.Errorf("getDevices failed; %w", err)
 		}
 
-		//Get & Report Device Status
-		deviceStatuses, err := getDeviceStatuses(m.client, org)
+		// Now we continue to populate the device data structure with health
+		// attributes/statuses/metrics etc in the following functions...
+		err = getDeviceStatuses(m.client, org, devices)
 		if err != nil {
-			return fmt.Errorf("getDeviceStatuses() failed; %w", err)
+			return fmt.Errorf("getDeviceStatuses failed; %w", err)
 		}
 
-		//Get mx device performance score
-		mx_scores, err := getDevicePerformanceScores(m.client, devices)
+		err = getDevicePerformanceScores(m.client, devices)
 		if err != nil {
-			return fmt.Errorf("getDevicePerformanceScores() failed; %w", err)
+			return fmt.Errorf("getDevicePerformanceScores failed; %w", err)
 		}
-		reportDeviceStatusMetrics(reporter, org, devices, deviceStatuses, mx_scores)
 
-		// //Get &  Report Organization Appliance Uplink
-		appliance_val, appliance_res, appliance_err := m.client.Appliance.GetOrganizationApplianceUplinkStatuses(org, &meraki_api.GetOrganizationApplianceUplinkStatusesQueryParams{})
-		if appliance_err != nil {
-			return fmt.Errorf("Appliance.GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", appliance_res.StatusCode(), appliance_res.Body(), appliance_err)
-		}
-		//Get & Report Device Uplink Status
-		lossLatencyuplinks, err := getDeviceUplinkLossLatencyMetrics(m.client, org, m.BaseMetricSet.Module().Config().Period)
+		err = getDeviceChannelUtilization(m.client, devices, collectionPeriod)
 		if err != nil {
-			return fmt.Errorf("getDeviceUplinkMetrics() failed; %w", err)
+			return fmt.Errorf("getDeviceChannelUtilization failed; %w", err)
 		}
-		reportApplianceUplinkStatuses(reporter, org, devices, appliance_val, lossLatencyuplinks)
 
-		//Get & Report Device Uplink Status
-		uplinks, err := getDeviceUplinkMetrics(m.client, org, m.BaseMetricSet.Module().Config().Period)
+		err = getDeviceLicenses(m.client, org, devices)
 		if err != nil {
-			return fmt.Errorf("getDeviceUplinkMetrics() failed; %w", err)
+			return fmt.Errorf("getDeviceLicenses failed; %w", err)
 		}
-		reportDeviceUplinkMetrics(reporter, org, devices, uplinks)
 
-		//Get & Report Device License State
-		cotermLicenses, perDeviceLicenses, systemsManagerLicense, err := getLicenseStates(m.client, org)
+		err = getDeviceUplinks(m.client, org, devices, collectionPeriod)
 		if err != nil {
-			return fmt.Errorf("getLicenseStates() failed; %w", err)
+			return fmt.Errorf("getDeviceUplinks failed; %w", err)
 		}
-		reportLicenseMetrics(reporter, org, cotermLicenses, perDeviceLicenses, systemsManagerLicense)
 
-		//Get & Report Org Celluar Uplink Status
-		cullular_val, cullular_res, cullular_err := m.client.CellularGateway.GetOrganizationCellularGatewayUplinkStatuses(org, &meraki_api.GetOrganizationCellularGatewayUplinkStatusesQueryParams{})
-		if cullular_err != nil {
-			return fmt.Errorf("CellularGateway.GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", cullular_res.StatusCode(), cullular_res.Body(), cullular_err)
-		}
-		reportCellularGatewayApplianceUplinkStatuses(reporter, org, devices, cullular_val)
-
-		//Get Org Networks
-		//Get Network Health by Org Network
-		//Report NetworkHalthChannelUtilization
-		orgNetworks, orgNetwork_res, orgNetwork_err := m.client.Organizations.GetOrganizationNetworks(org, &meraki_api.GetOrganizationNetworksQueryParams{})
-		if orgNetwork_err != nil {
-			return fmt.Errorf("Organizations.GetOrganizationNetworks failed; [%d] %s. %w", orgNetwork_res.StatusCode(), orgNetwork_res.Body(), orgNetwork_err)
-		}
-		networkHealthUtilizations, err := getNetworkHealthChannelUtilization(m.client, orgNetworks)
+		err = getDeviceSwitchports(m.client, org, devices, collectionPeriod)
 		if err != nil {
-			return err
+			return fmt.Errorf("getDeviceSwitchports failed; %w", err)
 		}
-		reportNetworkHealthChannelUtilization(reporter, org, devices, networkHealthUtilizations)
 
-		// Get and Report Organization Wireless Devices Channel Utilization
-		wireless_res, wireless_err := m.client.Devices.GetOrganizationWirelessDevicesChannelUtilizationByDevice(org, &meraki_api.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams{})
-		if wireless_err != nil {
-			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice failed; [%d] %s. %w", wireless_res.StatusCode(), wireless_res.Body(), wireless_err)
-		}
-		var wirelessDevices *meraki_api.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
-		unmashal_err := json.Unmarshal(wireless_res.Body(), &wirelessDevices)
-		if unmashal_err != nil {
-			return fmt.Errorf("device_network_health_channel_utilization json umarshal failed; %w", unmashal_err)
-		}
-		reportWirelessDeviceChannelUtilization(reporter, org, devices, wirelessDevices)
-
-		//Use Org Networks Retrieved above
-		//Get VPN site_to_site
-		//Report VPN site_to_site
-		networkVPNSiteToSites, err := getNetworkApplianceVPNSiteToSite(m.client, orgNetworks)
-		if err != nil {
-			return err
-		}
-		reportNetwrokApplianceVPNSiteToSite(reporter, org, devices, networkVPNSiteToSites)
-
-		//Get &  Report Organization License by Device
-		license_val, license_res, license_err := m.client.Organizations.GetOrganizationLicenses(org, &meraki_api.GetOrganizationLicensesQueryParams{})
-		if license_err != nil {
-			return fmt.Errorf("Organizations.GetOrganizationLicenses failed; [%d] %s. %w", license_res.StatusCode(), license_res.Body(), license_err)
-		}
-		reportOrganizationDeviceLicenses(reporter, org, devices, license_val)
-
-		//Use Org Networks Retrieved above
-		//Get Network Ports
-		//Report Network Ports By Device
-		networkPorts, err := getNetworkAppliancePorts(m.client, orgNetworks)
-		if err != nil {
-			return err
-		}
-		reportNetwrokAppliancePorts(reporter, org, devices, networkPorts)
-
-		//Get &  Report Organization License by Device
-		switchPorts_val, switchPorts_res, switchPorts_err := m.client.Switch.GetOrganizationSwitchPortsBySwitch(org, &meraki_api.GetOrganizationSwitchPortsBySwitchQueryParams{})
-		if switchPorts_err != nil {
-			return fmt.Errorf("Switch.GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", switchPorts_res.StatusCode(), switchPorts_res.Body(), switchPorts_err)
-		}
-		reportOrganizationDeviceSwitchPortBySwitch(reporter, org, devices, switchPorts_val)
-
-		//Use Org Networks Retrieved above
-		//Get Network Ports
-		//Report Network Ports By Device
-		switchPortStatusBySerials, err := getSwitchPortStatusBySerial(m.client, org)
-		if err != nil {
-			return err
-		}
-		reportSwitchPortStatusBySerial(reporter, org, devices, switchPortStatusBySerials)
-
+		// Once we have collected _all_ the data and associated it with the correct device
+		// we can report the various device health metrics. These functions are split up
+		// in this way primarily to allow better seperation of the code, but also because
+		// each function here corresponds to a distinct set of reported metric events
+		// i.e. there is one event per device, one event per uplink (but multiple uplinks per device),
+		// one event per switchport (but multiple switchports per device), etc.
+		reportDeviceMetrics(reporter, org, devices)
+		reportUplinkMetrics(reporter, org, devices)
+		reportSwitchportMetrics(reporter, org, devices)
 	}
 
 	return nil
 }
 
-func ReportMetricsForOrganization(reporter mb.ReporterV2, organizationID string, metrics ...[]mapstr.M) {
-
+func reportMetricsForOrganization(reporter mb.ReporterV2, organizationID string, metrics ...[]mapstr.M) {
 	for _, metricSlice := range metrics {
 		for _, metric := range metricSlice {
 			event := mb.Event{ModuleFields: mapstr.M{"organization_id": organizationID}}
-			if ts, ok := metric["@timestamp"].(time.Time); ok {
-				event.Timestamp = ts
-				delete(metric, "@timestamp")
+			if ts, ok := metric["@timestamp"]; ok {
+				t, err := time.Parse(time.RFC3339, ts.(string))
+				if err == nil {
+					// if the timestamp parsing fails, we just fall back to the event time
+					// (and leave the additional timestamp in the event for posterity)
+					event.Timestamp = t
+					delete(metric, "@timestamp")
+				}
 			}
 
-			event.ModuleFields.Update(metric)
+			for k, v := range metric {
+				if !isEmpty(v) {
+					event.ModuleFields.Put(k, v)
+				}
+			}
 
 			reporter.Event(event)
 		}
 	}
+}
+
+func isEmpty(value interface{}) bool {
+	// we make use of the fact that all the dashboard API responses utilize
+	// pointers for non-string types to filter out empty values from metric events.
+
+	if value == nil {
+		return true
+	}
+
+	t := reflect.TypeOf(value)
+
+	if t.Kind() == reflect.Ptr {
+		return reflect.ValueOf(value).IsNil()
+	}
+
+	if t.Kind() == reflect.Slice || t.Kind() == reflect.String {
+		return reflect.ValueOf(value).Len() == 0
+	}
+
+	return false
 }
