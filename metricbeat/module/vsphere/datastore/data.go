@@ -65,16 +65,16 @@ func mapPerfMetricToEvent(event mapstr.M, perfMetricMap map[string]interface{}) 
 	if val, exist := perfMetricMap["datastore.read.average"]; exist {
 		event.Put("read.bytes", val.(int64)*bytesMultiplier)
 	}
-	if val, exist := perfMetricMap["datastore.totalReadLatency.average"]; exist {
-		event.Put("read.latency.total.ms", val)
-	}
 	if val, exist := perfMetricMap["datastore.write.average"]; exist {
 		event.Put("write.bytes", val.(int64)*bytesMultiplier)
 	}
-	if val, exist := perfMetricMap["datastore.totalWriteLatency.average"]; exist {
-		event.Put("write.latency.total.ms", val)
+	if val, exist := perfMetricMap["disk.capacity.latest"]; exist {
+		event.Put("disk.capacity.bytes", val.(int64)*bytesMultiplier)
 	}
-	if val, exist := perfMetricMap["datastore.datastoreIops.average"]; exist {
-		event.Put("iops", val)
+	if val, exist := perfMetricMap["disk.capacity.usage.average"]; exist {
+		event.Put("disk.capacity.usage.bytes", val.(int64)*bytesMultiplier)
+	}
+	if val, exist := perfMetricMap["disk.provisioned.latest"]; exist {
+		event.Put("disk.provisioned.bytes", val.(int64)*bytesMultiplier)
 	}
 }
