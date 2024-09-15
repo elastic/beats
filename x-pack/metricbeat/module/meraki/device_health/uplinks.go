@@ -17,14 +17,14 @@ type uplink struct {
 	lastReportedAt        string
 	status                *meraki.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesUplinks
 	cellularGatewayStatus *meraki.ResponseItemCellularGatewayGetOrganizationCellularGatewayUplinkStatusesUplinks
-	lossAndLatency        *meraki.ResponseItemOrganizationsGetOrganizationDevicesUplinksLossAndLatencyTimeSeries
+	lossAndLatency        *meraki.ResponseItemOrganizationsGetOrganizationDevicesUplinksLossAndLatency
 }
 
 func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
 	// there are two separate APIs for uplink statuses depending on the type of device (MG or MX/Z).
 	// there is a single API for getting the loss and latency metrics regardless of the type of device.
 	// in this function we combine loss and latency metrics with device-specific status information,
-	// and attach it to the relevant device in the supplied `devices`` data structure.
+	// and attach it to the relevant device in the supplied `devices` data structure.
 	applicanceUplinks, res, err := client.Appliance.GetOrganizationApplianceUplinkStatuses(organizationID, &meraki.GetOrganizationApplianceUplinkStatusesQueryParams{})
 	if err != nil {
 		return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
@@ -60,8 +60,7 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 				for _, metrics := range *lossAndLatency {
 					if metrics.TimeSeries != nil && metrics.Serial == device.Serial && metrics.Uplink == uplinkStatus.Interface {
-						// only one bucket per collection is supported
-						uplink.lossAndLatency = &(*metrics.TimeSeries)[0]
+						uplink.lossAndLatency = &metrics
 						break
 					}
 				}
@@ -87,7 +86,7 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 			for _, metrics := range *lossAndLatency {
 				if metrics.TimeSeries != nil && metrics.Serial == device.Serial && metrics.Uplink == uplinkStatus.Interface {
-					uplink.lossAndLatency = &(*metrics.TimeSeries)[0]
+					uplink.lossAndLatency = &metrics
 					break
 				}
 			}
@@ -109,48 +108,63 @@ func reportUplinkMetrics(reporter mb.ReporterV2, organizationID string, devices 
 		}
 
 		for _, uplink := range device.uplinks {
-			metric := deviceDetailsToMapstr(device.details)
-			metric["uplink.last_reported_at"] = uplink.lastReportedAt
-
 			if uplink.lossAndLatency != nil {
-				metric["@timestamp"] = uplink.lossAndLatency.Ts
-				metric["uplink.loss.pct"] = uplink.lossAndLatency.LossPercent
-				metric["uplink.latency.ms"] = uplink.lossAndLatency.LatencyMs
-			}
+				// each loss and latency metric can have multiple values per collection.
+				// we report each value as it's own (smaller) metric event, containing
+				// the identifying device/uplink fields.
+				for _, dataPoint := range *uplink.lossAndLatency.TimeSeries {
+					// for some reason there are sometimes empty buckets
+					if dataPoint.LatencyMs != nil || dataPoint.LossPercent != nil {
+						metrics = append(metrics, mapstr.M{
+							"@timestamp":        dataPoint.Ts,
+							"uplink.latency.ms": dataPoint.LatencyMs,
+							"uplink.loss.pct":   dataPoint.LossPercent,
 
-			if uplink.status != nil {
-				metric["uplink.gateway"] = uplink.status.Gateway
-				metric["uplink.interface"] = uplink.status.Interface
-				metric["uplink.ip"] = uplink.status.IP
-				metric["uplink.primary_dns"] = uplink.status.PrimaryDNS
-				metric["uplink.secondary_dns"] = uplink.status.SecondaryDNS
-				metric["uplink.public_ip"] = uplink.status.PublicIP
-				metric["uplink.status"] = uplink.status.Status
-				metric["uplink.ip_assigned_by"] = uplink.status.IPAssignedBy
-			}
-
-			if uplink.cellularGatewayStatus != nil {
-				metric["uplink.gateway"] = uplink.cellularGatewayStatus.Gateway
-				metric["uplink.interface"] = uplink.cellularGatewayStatus.Interface
-				metric["uplink.ip"] = uplink.cellularGatewayStatus.IP
-				metric["uplink.primary_dns"] = uplink.cellularGatewayStatus.DNS1
-				metric["uplink.secondary_dns"] = uplink.cellularGatewayStatus.DNS2
-				metric["uplink.public_ip"] = uplink.cellularGatewayStatus.PublicIP
-				metric["uplink.status"] = uplink.cellularGatewayStatus.Status
-				metric["uplink.apn"] = uplink.cellularGatewayStatus.Apn
-				metric["uplink.connection_type"] = uplink.cellularGatewayStatus.ConnectionType
-				metric["uplink.iccid"] = uplink.cellularGatewayStatus.Iccid
-				metric["uplink.model"] = uplink.cellularGatewayStatus.Model
-				metric["uplink.provider"] = uplink.cellularGatewayStatus.Provider
-				metric["uplink.signal_type"] = uplink.cellularGatewayStatus.SignalType
-
-				if uplink.cellularGatewayStatus.SignalStat != nil {
-					metric["uplink.rsrp"] = uplink.cellularGatewayStatus.SignalStat.Rsrp
-					metric["uplink.rsrq"] = uplink.cellularGatewayStatus.SignalStat.Rsrq
+							"device.serial":     uplink.lossAndLatency.Serial,    // _should_ be the same as `device.Serial`
+							"device.network_id": uplink.lossAndLatency.NetworkID, // _should_ be the same as `device.NetworkID`
+							"uplink.interface":  uplink.lossAndLatency.Uplink,
+							"uplink.ip":         uplink.lossAndLatency.IP,
+						})
+					}
 				}
 			}
 
-			metrics = append(metrics, metric)
+			statusMetric := deviceDetailsToMapstr(device.details)
+			statusMetric["uplink.last_reported_at"] = uplink.lastReportedAt
+
+			if uplink.status != nil {
+				statusMetric["uplink.gateway"] = uplink.status.Gateway
+				statusMetric["uplink.interface"] = uplink.status.Interface
+				statusMetric["uplink.ip"] = uplink.status.IP
+				statusMetric["uplink.primary_dns"] = uplink.status.PrimaryDNS
+				statusMetric["uplink.secondary_dns"] = uplink.status.SecondaryDNS
+				statusMetric["uplink.public_ip"] = uplink.status.PublicIP
+				statusMetric["uplink.status"] = uplink.status.Status
+				statusMetric["uplink.ip_assigned_by"] = uplink.status.IPAssignedBy
+			}
+
+			if uplink.cellularGatewayStatus != nil {
+				statusMetric["uplink.gateway"] = uplink.cellularGatewayStatus.Gateway
+				statusMetric["uplink.interface"] = uplink.cellularGatewayStatus.Interface
+				statusMetric["uplink.ip"] = uplink.cellularGatewayStatus.IP
+				statusMetric["uplink.primary_dns"] = uplink.cellularGatewayStatus.DNS1
+				statusMetric["uplink.secondary_dns"] = uplink.cellularGatewayStatus.DNS2
+				statusMetric["uplink.public_ip"] = uplink.cellularGatewayStatus.PublicIP
+				statusMetric["uplink.status"] = uplink.cellularGatewayStatus.Status
+				statusMetric["uplink.apn"] = uplink.cellularGatewayStatus.Apn
+				statusMetric["uplink.connection_type"] = uplink.cellularGatewayStatus.ConnectionType
+				statusMetric["uplink.iccid"] = uplink.cellularGatewayStatus.Iccid
+				statusMetric["uplink.model"] = uplink.cellularGatewayStatus.Model
+				statusMetric["uplink.provider"] = uplink.cellularGatewayStatus.Provider
+				statusMetric["uplink.signal_type"] = uplink.cellularGatewayStatus.SignalType
+
+				if uplink.cellularGatewayStatus.SignalStat != nil {
+					statusMetric["uplink.rsrp"] = uplink.cellularGatewayStatus.SignalStat.Rsrp
+					statusMetric["uplink.rsrq"] = uplink.cellularGatewayStatus.SignalStat.Rsrq
+				}
+			}
+
+			metrics = append(metrics, statusMetric)
 		}
 	}
 

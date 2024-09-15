@@ -85,30 +85,24 @@
            - name: utilization_80211
              type: double
              metric_type: gauge
-             unit: percent
            - name: utilization_non_80211
              type: double
              metric_type: gauge
-             unit: percent
            - name: utilization_total
              type: double
              metric_type: gauge
-             unit: percent
         - name: wifi1
           type: group
           fields:
            - name: utilization_80211
              type: double
              metric_type: gauge
-             unit: percent
            - name: utilization_non_80211
              type: double
              metric_type: gauge
-             unit: percent
            - name: utilization_total
              type: double
              metric_type: gauge
-             unit: percent
 - name: switch.port
   type: group
   fields:
@@ -296,7 +290,6 @@
         - name: pct
           type: double
           metric_type: gauge
-          unit: percent
     - name: latency
       type: group
       fields:

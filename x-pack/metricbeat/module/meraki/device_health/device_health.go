@@ -26,10 +26,11 @@ func init() {
 }
 
 type config struct {
-	BaseURL       string   `config:"apiBaseURL"`
-	ApiKey        string   `config:"apiKey"`
-	DebugMode     string   `config:"apiDebugMode"`
-	Organizations []string `config:"organizations"`
+	BaseURL       string        `config:"apiBaseURL"`
+	ApiKey        string        `config:"apiKey"`
+	DebugMode     string        `config:"apiDebugMode"`
+	Organizations []string      `config:"organizations"`
+	Period        time.Duration `config:"period"`
 	// todo: device filtering?
 }
 
@@ -37,6 +38,7 @@ func defaultConfig() *config {
 	return &config{
 		BaseURL:   "https://api.meraki.com",
 		DebugMode: "false",
+		Period:    time.Second * 300,
 	}
 }
 
@@ -61,6 +63,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(config); err != nil {
 		return nil, err
+	}
+
+	// the reason for this is due to restrictions imposed by some dashboard API endpoints.
+	// for example, "/api/v1/organizations/{organizationId}/devices/uplinksLossAndLatency"
+	// has a maximum 'timespan' of 5 minutes.
+	if config.Period.Seconds() > 300 {
+		return nil, fmt.Errorf("the maximum allowed collection period is 5 minutes (300s)")
 	}
 
 	logger.Debugf("loaded config: %v", config)
