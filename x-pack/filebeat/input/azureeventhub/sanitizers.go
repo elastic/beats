@@ -13,6 +13,12 @@ import (
 	"regexp"
 )
 
+const (
+	SanitizerNewLines     = "new_lines"
+	SanitizerSingleQuotes = "single_quotes"
+	SanitizerReplaceAll   = "replace_all"
+)
+
 // ----------------------------------------------------------------------------
 // Sanitizer API
 // ----------------------------------------------------------------------------
@@ -44,11 +50,11 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	var s Sanitizer
 
 	switch spec.Type {
-	case "new_lines":
+	case SanitizerNewLines:
 		s = &newLinesSanitizer{}
-	case "single_quotes":
+	case SanitizerSingleQuotes:
 		s = &singleQuotesSanitizer{}
-	case "replace_all":
+	case SanitizerReplaceAll:
 		s = &replaceAllSanitizer{spec: spec.Spec}
 	default:
 		return nil, fmt.Errorf("unknown sanitizer type: %s", spec.Type)
@@ -57,7 +63,7 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	// Initialize the sanitizer with the provided spec.
 	err := s.Init()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize sanitizer '%s': %w", spec.Type, err)
 	}
 
 	return s, nil
@@ -168,40 +174,43 @@ func (s *replaceAllSanitizer) Sanitize(jsonByte []byte) []byte {
 }
 
 func (s *replaceAllSanitizer) Init() error {
-    if s.spec == nil {
-        return errors.New("missing sanitizer spec")
-    }
+	if s.spec == nil {
+		return errors.New("missing required sanitizer spec")
+	}
 
-    pattern, err := getStringFromSpec(s.spec, "pattern")
-    if err != nil {
-        return fmt.Errorf("invalid pattern: %w", err)
-    }
+	pattern, err := getStringFromSpec(s.spec, "pattern")
+	if err != nil {
+		return fmt.Errorf("invalid pattern: %w", err)
+	}
 
-    re, err := regexp.Compile(pattern)
-    if err != nil {
-        return fmt.Errorf("invalid regex pattern: %w", err)
-    }
-    s.re = re
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return fmt.Errorf("can't compile regex pattern: %w", err)
+	}
+	s.re = re
 
-    replacement, err := getStringFromSpec(s.spec, "replacement")
-    if err != nil {
-        return fmt.Errorf("invalid replacement: %w", err)
-    }
-    s.replacement = replacement
+	replacement, err := getStringFromSpec(s.spec, "replacement")
+	if err != nil {
+		return fmt.Errorf("invalid replacement: %w", err)
+	}
+	s.replacement = replacement
 
-    return nil
+	return nil
 }
 
-func getStringFromSpec(spec map[string]interface{}, key string) (string, error) {
-    value, ok := spec[key]
-    if !ok {
-        return "", fmt.Errorf("missing %s", key)
-    }
+// getStringFromSpec returns a string from the spec map.
+//
+// It returns an error if the spec entry key is missing or the value is not a string.
+func getStringFromSpec(spec map[string]interface{}, entryKey string) (string, error) {
+	value, ok := spec[entryKey]
+	if !ok {
+		return "", fmt.Errorf("missing sanitizer spec entry: %s", entryKey)
+	}
 
-    strValue, ok := value.(string)
-    if !ok {
-        return "", fmt.Errorf("%s must be a string", key)
-    }
+	strValue, ok := value.(string)
+	if !ok {
+		return "", fmt.Errorf("sanitizer spec entry %s must be a string", entryKey)
+	}
 
-    return strValue, nil
+	return strValue, nil
 }

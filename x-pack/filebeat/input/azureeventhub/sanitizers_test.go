@@ -17,17 +17,17 @@ func TestSanitizers(t *testing.T) {
 
 	// Set up some sanitizers
 	nlSanitizer, err := newSanitizer(SanitizerSpec{
-		Type: "new_lines",
+		Type: SanitizerNewLines,
 	})
 	require.NoError(t, err)
 
 	sqSanitizer, err := newSanitizer(SanitizerSpec{
-		Type: "single_quotes",
+		Type: SanitizerSingleQuotes,
 	})
 	require.NoError(t, err)
 
 	raSanitizer, err := newSanitizer(SanitizerSpec{
-		Type: "replace_all",
+		Type: SanitizerReplaceAll,
 		Spec: map[string]interface{}{
 			"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
 			"replacement": "{}",
