@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -118,7 +119,10 @@ func getFromCommit() string {
 
 		return previousCommit
 	} else {
-		commit := os.Getenv("BUILDKITE_COMMIT")
+		commit, err := getBuildkiteCommit()
+		if err != nil {
+			log.Fatal(err)
+		}
 		printWhenVerbose("Git from commit: %s\n", commit)
 
 		return commit
@@ -133,7 +137,10 @@ func getPreviousCommit() string {
 }
 
 func getCommitRange() string {
-	commit := os.Getenv("BUILDKITE_COMMIT")
+	commit, err := getBuildkiteCommit()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return fmt.Sprintf("%s...%s", getFromCommit(), commit)
 }
@@ -146,4 +153,14 @@ func printWhenVerbose(template string, parameter string) {
 	if mg.Verbose() {
 		fmt.Printf(template, parameter)
 	}
+}
+
+func getBuildkiteCommit() (string, error) {
+	commit := os.Getenv("BUILDKITE_COMMIT")
+
+	if commit == "" {
+		return "", errors.New("BUILDKITE_COMMIT is not defined")
+	}
+
+	return commit, nil
 }
