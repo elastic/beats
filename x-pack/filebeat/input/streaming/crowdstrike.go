@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -203,11 +202,11 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		if offset > 0 {
 			feedURL, err := url.Parse(r.FeedURL)
 			if err != nil {
-				log.Fatalf("failed to parse feed url: %v", err)
+				return state, Warning{fmt.Errorf("failed to parse feed url: %w", err)}
 			}
 			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
 			if err != nil {
-				log.Fatalf("failed to parse feed query: %v", err)
+				return state, Warning{fmt.Errorf("failed to parse feed query: %v", err)}
 			}
 			feedQuery.Set("offset", strconv.Itoa(offset))
 			feedURL.RawQuery = feedQuery.Encode()
