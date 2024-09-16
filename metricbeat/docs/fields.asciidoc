@@ -50560,7 +50560,7 @@ type: double
 *`meraki.device.license.activation_date`*::
 +
 --
-type: keyword
+type: date
 
 --
 

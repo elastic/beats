@@ -36,7 +36,7 @@
       type: group
       fields:
         - name: activation_date
-          type: keyword
+          type: date
         - name: claim_date
           type: date
         - name: duration_in_days
