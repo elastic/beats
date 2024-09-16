@@ -116,11 +116,16 @@ func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
 		}
 		return true
 	},
-		time.Second, time.Millisecond, "first server must be up")
+		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
 
 	return &s, mr
 }
 
+// waitForEventToBePublished waits for at least one event published
+// by inspecting the count for `bulk.create.total` in `mr`. Once
+// the counter is > 1, waitForEventToBePublished returns. If that
+// does not happen within 10min, then the test fails with a call to
+// t.Fatal.
 func waitForEventToBePublished(t *testing.T, mr metrics.Registry) {
 	t.Helper()
 	require.Eventually(t, func() bool {
