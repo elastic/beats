@@ -36,7 +36,32 @@ type azureInputConfig struct {
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
-	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
+	// LegacySanitizeOptions is a list of sanitization options to apply to messages.
+	//
+	// The supported options are:
+	//
+	// * NEW_LINES: replaces new lines with spaces
+	// * SINGLE_QUOTES: replaces single quotes with double quotes
+	//
+	// IMPORTANT: Users should use the `sanitizers` configuration option
+	// instead.
+	//
+	// Instead of using the `sanitize_options` configuration option:
+	//
+	//     sanitize_options:
+	//       - NEW_LINES
+	//       - SINGLE_QUOTES
+	//
+	// use the `sanitizers` configuration option:
+	//
+	//     sanitizers:
+	//       - type: new_lines
+	//       - type: single_quotes
+	//
+	// The `sanitize_options` option is deprecated and will be
+	// removed in future releases.
+	//
+	// Default is an empty list (no sanitization).
 	LegacySanitizeOptions []string `config:"sanitize_options"`
 	// Sanitizers is a list of sanitizers to apply to messages that
 	// contain invalid JSON.

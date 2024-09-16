@@ -152,6 +152,7 @@ func (s *singleQuotesSanitizer) Init() error {
 // Replace all sanitizer
 // ----------------------------------------------------------------------------
 
+// replaceAllSanitizer replaces all occurrences of a regex pattern with a replacement string.
 type replaceAllSanitizer struct {
 	re          *regexp.Regexp
 	replacement string
