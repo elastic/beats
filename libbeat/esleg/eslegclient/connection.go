@@ -288,6 +288,10 @@ func (conn *Connection) Connect() error {
 		conn.log = logp.NewLogger("esclientleg")
 	}
 
+	// Cancel the old context before replacing it. Because this Connection
+	// is not goroutine safe, there should be no in-flight request using
+	// this context, hence it's safe to cancel it.
+	conn.cancelReqs()
 	conn.reqsContext, conn.cancelReqs = context.WithCancel(context.Background())
 
 	if err := conn.getVersion(); err != nil {
