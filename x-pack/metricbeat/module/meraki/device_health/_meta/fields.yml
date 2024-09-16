@@ -4,6 +4,10 @@
     - name: serial
       type: keyword
       dimension: true
+    - name: firmware
+      type: keyword
+    - name: address
+      type: text
     - name: imei
       type: keyword
     - name: lan_ip
@@ -50,7 +54,7 @@
           type: long
         - name: state
           type: keyword
-        - name: total_duration_in_day
+        - name: total_duration_in_days
           type: long
     - name: high_availability
       type: group
@@ -64,7 +68,7 @@
       fields:
         - name: gateway
           type: ip
-        - name: ip_status
+        - name: ip_type
           type: keyword
         - name: last_reported_at
           type: date
@@ -142,6 +146,7 @@
       fields:
       - name: client_count
         type: long
+        metric_type: gauge
       - name: duplex
         type: keyword
       - name: enabled
@@ -214,14 +219,17 @@
             type: keyword
           - name: enabled
             type: boolean
-          - name: config_overrides.allowed_vlans
-            type: keyword
-          - name: config_overrides.type
-            type: keyword
-          - name: config_overrides.vlan
-            type: long
-          - name: config_overrides.voice_vlan
-            type: long
+          - name: config_overrides
+            type: group
+            fields:
+            - name: allowed_vlans
+              type: keyword
+            - name: type
+              type: keyword
+            - name: vlan
+              type: long
+            - name: voice_vlan
+              type: long
       - name: throughput
         type: group
         field:
