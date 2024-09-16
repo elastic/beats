@@ -168,34 +168,40 @@ func (s *replaceAllSanitizer) Sanitize(jsonByte []byte) []byte {
 }
 
 func (s *replaceAllSanitizer) Init() error {
-	if s.spec == nil {
-		return errors.New("missing sanitizer spec")
-	}
+    if s.spec == nil {
+        return errors.New("missing sanitizer spec")
+    }
 
-	if _, ok := s.spec["pattern"]; !ok {
-		return errors.New("missing regex pattern")
-	}
+    pattern, err := getStringFromSpec(s.spec, "pattern")
+    if err != nil {
+        return fmt.Errorf("invalid pattern: %w", err)
+    }
 
-	if _, ok := s.spec["pattern"].(string); !ok {
-		return errors.New("regex pattern must be a string")
-	}
+    re, err := regexp.Compile(pattern)
+    if err != nil {
+        return fmt.Errorf("invalid regex pattern: %w", err)
+    }
+    s.re = re
 
-	re, err := regexp.Compile(s.spec["pattern"].(string))
-	if err != nil {
-		return err
-	}
+    replacement, err := getStringFromSpec(s.spec, "replacement")
+    if err != nil {
+        return fmt.Errorf("invalid replacement: %w", err)
+    }
+    s.replacement = replacement
 
-	s.re = re
+    return nil
+}
 
-	if _, ok := s.spec["replacement"]; !ok {
-		return errors.New("missing replacement format")
-	}
+func getStringFromSpec(spec map[string]interface{}, key string) (string, error) {
+    value, ok := spec[key]
+    if !ok {
+        return "", fmt.Errorf("missing %s", key)
+    }
 
-	if _, ok := s.spec["replacement"].(string); !ok {
-		return errors.New("replacement format must be a string")
-	}
+    strValue, ok := value.(string)
+    if !ok {
+        return "", fmt.Errorf("%s must be a string", key)
+    }
 
-	s.replacement = s.spec["replacement"].(string)
-
-	return nil
+    return strValue, nil
 }
