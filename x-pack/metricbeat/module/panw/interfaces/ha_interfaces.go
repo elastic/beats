@@ -25,13 +25,13 @@ func getHAInterfaceEvents(m *MetricSet) ([]mb.Event, error) {
 
 	output, err := m.client.Op(haInterfaceQuery, panw.Vsys, nil, nil)
 	if err != nil {
-		m.logger.Error("Error: %s", err)
+		haLogger.Error("Error: %s", err)
 		return nil, err
 	}
 
 	err = xml.Unmarshal(output, &response)
 	if err != nil {
-		m.logger.Error("Error: %s", err)
+		haLogger.Errorw("Failed to unmarshal interface response", "error", err, "query", haInterfaceQuery)
 		return nil, err
 	}
 
@@ -56,7 +56,9 @@ func formatHAInterfaceEvents(m *MetricSet, input HAResult) []mb.Event {
 func makeGroupEvent(m *MetricSet, input HAResult) *mb.Event {
 
 	group := input.Group
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
+
 	linkMonitoringEnabled, err := panw.StringToBool(group.LinkMonitoring.Enabled)
 	if err != nil {
 		haLogger.Warn("Error converting LinkMonitoring.Enabled to boolean: %s", err)
@@ -128,12 +130,7 @@ func makeGroupEvent(m *MetricSet, input HAResult) *mb.Event {
 			"ha.peer_info.conn_ha1_backup.description": group.PeerInfo.ConnHA1Backup.Desc,
 			"ha.link_monitoring.enabled":               linkMonitoringEnabled,
 		},
-		RootFields: mapstr.M{
-			"observer.ip":     m.config.HostIp,
-			"host.ip":         m.config.HostIp,
-			"observer.vendor": "Palo Alto",
-			"observer.type":   "firewall",
-		},
+		RootFields: rootFields,
 	}
 
 	return &event
@@ -145,9 +142,15 @@ func makeLinkMonitoringEvents(m *MetricSet, links HALinkMonitoring) []mb.Event {
 	}
 
 	events := make([]mb.Event, 0, len(links.Groups))
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
+
 	var event mb.Event
 	for _, group := range links.Groups {
+		if group.Interface == nil {
+			haLogger.Warn("No interface entries found in link monitoring group: %s", group.Name)
+			continue
+		}
 		for _, interface_entry := range group.Interface {
 			linkEnabled, err := panw.StringToBool(links.Enabled)
 			if err != nil {
@@ -169,12 +172,7 @@ func makeLinkMonitoringEvents(m *MetricSet, links HALinkMonitoring) []mb.Event {
 					"ha.link_monitoring.group.interface.name":    interface_entry.Name,
 					"ha.link_monitoring.group.interface.status":  interface_entry.Status,
 				},
-				RootFields: mapstr.M{
-					"observer.ip":     m.config.HostIp,
-					"host.ip":         m.config.HostIp,
-					"observer.vendor": "Palo Alto",
-					"observer.type":   "firewall",
-				},
+				RootFields: rootFields,
 			}
 		}
 

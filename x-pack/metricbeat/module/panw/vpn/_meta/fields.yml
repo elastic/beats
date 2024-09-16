@@ -115,8 +115,8 @@
     - name: globalprotect.total_current_users
       type: long
       description: >
-       Total current number of users connected to GlobalProtect
+       Total current number of users connected to GlobalProtect gateway
     - name: globalprotect.total_previous_users
       type: long
       description: >
-        Total previous number of users connected to GlobalProtect
+        Total previous number of users connected to GlobalProtect gateway

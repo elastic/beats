@@ -12,7 +12,7 @@
   period: 10s
   host_ip: "127.0.0.1"
   port: 
-  apiKey: "<API Key>"
-  apiDebugMode: false
+  api_key: "<API Key>"
+  api_debug_mode: false
 
 

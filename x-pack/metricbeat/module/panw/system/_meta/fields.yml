@@ -15,7 +15,7 @@
     - name: uptime.minutes
       type: integer
       description: >
-        Minutes component of uptime       
+        Minutes component of uptime
     - name: user_count
       type: long
       description: >
@@ -136,7 +136,7 @@
       type: date
       description: >
         Date the license expires - not set if license never expires
-    - nake: never_expires
+    - name: license.never_expires
       type: boolean
       description: >
         Indicates if the license never expires
@@ -156,12 +156,12 @@
       type: float
       format: bytes
       description: >
-        Total size of the filesystem        
+        Total size of the filesystem
     - name: filesystem.used
       type: float
       format: bytes
       description: >
-        Amount used on the filesystem  
+        Amount used on the filesystem
     - name: filesystem.available
       type: float
       format: bytes
@@ -221,7 +221,7 @@
       description: >
         Maximum temperature field
     - name: power.slot_number
-      type: keyword
+      type: integer
       description: >
         Slot number field
     - name: power.description
@@ -235,7 +235,7 @@
     - name: power.volts
       type: float
       description: >
-        Current Volts 
+        Current Volts
     - name: power.minimum_volts
       type: float
       description: >
@@ -243,7 +243,7 @@
     - name: power.maximum_volts
       type: float
       description: >
-        Maximum volts recorded      
+        Maximum volts recorded
     - name: certificate.issuer
       type: keyword
       description: >
@@ -293,6 +293,5 @@
       type: keyword
       description: >
         db_status field
-
 
     

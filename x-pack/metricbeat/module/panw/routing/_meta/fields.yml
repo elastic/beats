@@ -63,7 +63,7 @@
     - name: bgp.reflector_client
       type: keyword
       description: >
-        Indicates if the BGP peer is a route reflector client
+        Specifies the BGP peer relationship to route reflectors, e.g. "client", "not-client", "meshed-client"
     - name: bgp.same_confederation
       type: boolean
       description: >

@@ -38,12 +38,13 @@ func getGlobalProtectSessionEvents(m *MetricSet) ([]mb.Event, error) {
 }
 
 func formatGPSessionEvents(m *MetricSet, sessions []GPSession) []mb.Event {
-	if sessions == nil {
+	if len(sessions) == 0 {
 		return nil
 	}
 
 	events := make([]mb.Event, 0, len(sessions))
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, session := range sessions {
 		isLocal, err := panw.StringToBool(session.IsLocal)
@@ -78,12 +79,8 @@ func formatGPSessionEvents(m *MetricSet, sessions []GPSession) []mb.Event {
 				"globalprotect.session.request_get_config":     session.RequestGetConfig,
 				"globalprotect.session.request_sslvpn_connect": session.RequestSSLVPNConnect,
 			},
-			RootFields: mapstr.M{
-				"observer.ip":     m.config.HostIp,
-				"host.ip":         m.config.HostIp,
-				"observer.vendor": "Palo Alto",
-				"observer.type":   "firewall",
-			}}
+			RootFields: rootFields,
+		}
 
 		events = append(events, event)
 	}

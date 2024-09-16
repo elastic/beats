@@ -50,15 +50,21 @@ func getIFNetInterfaceEvents(m *MetricSet) ([]mb.Event, error) {
 
 func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 	events := make([]mb.Event, 0, len(input.HW.Entries)+len(input.Ifnet.Entries))
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	// First process the phyiscal interfaces
 	for _, entry := range input.HW.Entries {
-		iftype := interfaceTypes[entry.Type]
+		iftype, ok := interfaceTypes[entry.Type]
+
+		if !ok {
+			m.logger.Warnw("Unknown interface type", "type", entry.Type)
+			iftype = "Unknown"
+		}
 
 		var members []string
 		// If this is an aggregate interface, populate the members
-		if entry.Type == 1 {
+		if entry.Type == 1 && len(entry.AEMember.Members) != 0 {
 			members = entry.AEMember.Members
 		}
 
@@ -76,12 +82,7 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"physical.full_state": entry.ST,
 				"physical.ae_member":  members,
 			},
-			RootFields: mapstr.M{
-				"observer.ip":     m.config.HostIp,
-				"host.ip":         m.config.HostIp,
-				"observer.vendor": "Palo Alto",
-				"observer.type":   "firewall",
-			},
+			RootFields: rootFields,
 		}
 
 		events = append(events, event)
@@ -103,12 +104,8 @@ func formatIFInterfaceEvents(m *MetricSet, input InterfaceResult) []mb.Event {
 				"logical.dyn_addr": entry.DynAddr,
 				"logical.addr6":    entry.Addr6,
 			},
-			RootFields: mapstr.M{
-				"observer.ip":     m.config.HostIp,
-				"host.ip":         m.config.HostIp,
-				"observer.vendor": "Palo Alto",
-				"observer.type":   "firewall",
-			}}
+			RootFields: rootFields,
+		}
 
 		events = append(events, event)
 

@@ -39,7 +39,8 @@ func formatFanEvents(m *MetricSet, response *FanResponse) []mb.Event {
 	}
 
 	events := make([]mb.Event, 0)
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, slot := range response.Result.Fan.Slots {
 		for _, entry := range slot.Entries {
@@ -57,12 +58,7 @@ func formatFanEvents(m *MetricSet, response *FanResponse) []mb.Event {
 					"fan.rpm":         entry.RPMs,
 					"fan.min_rpm":     entry.Min,
 				},
-				RootFields: mapstr.M{
-					"observer.ip":     m.config.HostIp,
-					"host.ip":         m.config.HostIp,
-					"observer.vendor": "Palo Alto",
-					"observer.type":   "firewall",
-				},
+				RootFields: rootFields,
 			}
 			events = append(events, event)
 		}

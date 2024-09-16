@@ -15,7 +15,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const licenseQuery = "<request><license><info></info></license></request>"
+const (
+	licenseQuery   = "<request><license><info></info></license></request>"
+	panwDateFormat = "January 2, 2006"
+)
 
 func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 
@@ -27,7 +30,7 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 	}
 
 	if len(output) == 0 {
-		return nil, fmt.Errorf("empty response from PanOS")
+		return nil, fmt.Errorf("empty response from PanOS for license query")
 	}
 
 	err = xml.Unmarshal(output, &response)
@@ -37,7 +40,7 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 
 	if len(response.Result.Licenses) == 0 {
 		m.logger.Warn("No licenses found in the response")
-		return nil, nil
+		return []mb.Event{}, nil
 	}
 
 	return formatLicenseEvents(m, response.Result.Licenses), nil
@@ -45,7 +48,8 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 
 func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 	events := make([]mb.Event, 0, len(licenses))
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, license := range licenses {
 		expired, err := panw.StringToBool(license.Expired)
@@ -57,18 +61,18 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 		// <issued>March 20, 2024</issued>
 		// <expires>May 27, 2025</expires> or <expires>Never</expires>
 		//
-		issued, err := time.Parse("January 2, 2006", license.Issued)
+		issued, err := time.Parse(panwDateFormat, license.Issued)
 		if err != nil {
-			m.logger.Warn("Failed to parse issued date %s: %s", license.Issued, err)
+			m.logger.Warn("Failed to parse license issued date %s: %s", license.Issued, err)
 		}
-		never_expires := false
-		expires, err := time.Parse("January 2, 2006", license.Expires)
+		neverExpires := false
+		expires, err := time.Parse(panwDateFormat, license.Expires)
 		// The value of license.Expires is "never" when the license never expires
 		if err != nil {
 			if strings.ToLower(license.Expires) == "never" {
-				never_expires = true
+				neverExpires = true
 			} else {
-				m.logger.Warn("Failed to parse expires date %s: %s", license.Expires, err)
+				m.logger.Warn("Failed to parse license expire date %s: %s", license.Expires, err)
 			}
 		}
 
@@ -79,19 +83,14 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 				"license.description":   license.Description,
 				"license.serial":        license.Serial,
 				"license.issued":        issued.Format(time.RFC3339),
-				"license.never_expires": never_expires,
+				"license.never_expires": neverExpires,
 				"license.expired":       expired,
 				"license.auth_code":     license.AuthCode,
 			},
-			RootFields: mapstr.M{
-				"observer.ip":     m.config.HostIp,
-				"host.ip":         m.config.HostIp,
-				"observer.vendor": "Palo Alto",
-				"observer.type":   "firewall",
-			},
+			RootFields: rootFields,
 		}
 		// only set the expires field if the license expires
-		if !never_expires {
+		if !neverExpires {
 			event.MetricSetFields["license.expires"] = expires.Format(time.RFC3339)
 		}
 

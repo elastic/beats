@@ -68,7 +68,8 @@ MiB Swap:   5961.0 total,   4403.5 free,   1557.6 used.   1530.0 avail Mem
 	2       20   0       0      0      0 S   0.0   0.0   0:00.83 kthreadd
 */
 func formatResourceEvents(m *MetricSet, input string) []mb.Event {
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 	events := make([]mb.Event, 0)
 
 	// We only need the top 5 lines
@@ -125,12 +126,7 @@ func formatResourceEvents(m *MetricSet, input string) []mb.Event {
 				"available": swapInfo.Available,
 			},
 		},
-		RootFields: mapstr.M{
-			"observer.ip":     m.config.HostIp,
-			"host.ip":         m.config.HostIp,
-			"observer.vendor": "Palo Alto",
-			"observer.type":   "firewall",
-		},
+		RootFields: rootFields,
 	}
 
 	events = append(events, event)
@@ -270,6 +266,10 @@ func parseMemoryInfo(line string) MemoryInfo {
 	//MiB Mem :   5026.9 total,    414.2 free,   2541.5 used,   2071.1 buff/cache
 	re := regexp.MustCompile(`(\d+\.\d+)\s+total,\s+(\d+\.\d+)\s+free,\s+(\d+\.\d+)\s+used,\s+(\d+\.\d+)\s+buff/cache`)
 	matches := re.FindStringSubmatch(line)
+	if matches == nil {
+		resourcesLogger.Errorf("Failed to parse memory info: %s", line)
+		return MemoryInfo{}
+	}
 
 	total := parseFloat("total", matches[1])
 	free := parseFloat("free", matches[2])
@@ -289,6 +289,11 @@ func parseSwapInfo(line string) SwapInfo {
 	// Note: the punctuation after the "used" is a ".", not a ","
 	re := regexp.MustCompile(`(\d+\.\d+)\s+total,\s+(\d+\.\d+)\s+free,\s+(\d+\.\d+)\s+used[,\.].\s+(\d+\.\d+)\s+avail Mem`)
 	matches := re.FindStringSubmatch(line)
+
+	if matches == nil {
+		resourcesLogger.Errorf("Failed to parse swap info: %s", line)
+		return SwapInfo{}
+	}
 
 	total := parseFloat("total", matches[1])
 	free := parseFloat("free", matches[2])

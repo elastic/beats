@@ -43,7 +43,8 @@ func getPowerEvents(m *MetricSet) ([]mb.Event, error) {
 
 func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
 	events := make([]mb.Event, 0)
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, slot := range response.Result.Power.Slots {
 		for _, entry := range slot.Entries {
@@ -58,12 +59,7 @@ func formatPowerEvents(m *MetricSet, response *PowerResponse) []mb.Event {
 					"power.minimum_volts": entry.MinimumVolts,
 					"power.maximum_volts": entry.MaximumVolts,
 				},
-				RootFields: mapstr.M{
-					"observer.ip":     m.config.HostIp,
-					"host.ip":         m.config.HostIp,
-					"observer.vendor": "Palo Alto",
-					"observer.type":   "firewall",
-				},
+				RootFields: rootFields,
 			}
 			events = append(events, event)
 		}

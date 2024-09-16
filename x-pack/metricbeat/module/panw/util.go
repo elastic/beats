@@ -3,6 +3,8 @@ package panw
 import (
 	"fmt"
 	"strings"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func StringToBool(s string) (bool, error) {
@@ -20,4 +22,13 @@ func StringToBool(s string) (bool, error) {
 
 	// Default to false
 	return false, fmt.Errorf("invalid value: %s", s)
+}
+
+func MakeRootFields(HostIp string) mapstr.M {
+	return mapstr.M{
+		"observer.ip":     HostIp,
+		"host.ip":         HostIp,
+		"observer.vendor": "Palo Alto",
+		"observer.type":   "firewall",
+	}
 }

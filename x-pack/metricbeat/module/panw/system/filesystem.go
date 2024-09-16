@@ -56,7 +56,7 @@ func getFilesystems(input string) []Filesystem {
 
 	filesystemLogger.Debugf("getFilesystems input:\n %s", input)
 	lines := strings.Split(input, "\n")
-	filesystems := make([]Filesystem, 0)
+	filesystems := make([]Filesystem, 0, len(lines)-1)
 
 	// Skip the first line which is the header:
 	//
@@ -112,14 +112,11 @@ func convertToBytes(field string, value string) float64 {
 		return result * MBytes
 	case "g":
 		return result * GBytes
+	case "":
+		return result
 	default:
-		// Handle values without units
-		if units == "" {
-			return result
-		} else {
-			filesystemLogger.Warnf("Unhandled units for field %s, value %s: %s", field, value, units)
-			return result
-		}
+		filesystemLogger.Warnf("Unhandled units for field %s, value %s: %s", field, value, units)
+		return result
 	}
 
 }
@@ -130,7 +127,9 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 	}
 
 	events := make([]mb.Event, 0, len(filesystems))
-	timestamp := time.Now()
+	timestamp := time.Now().UTC()
+	rootFields := panw.MakeRootFields(m.config.HostIp)
+
 	for _, filesystem := range filesystems {
 		used, err := strconv.ParseInt(filesystem.UsePerc[:len(filesystem.UsePerc)-1], 10, 64)
 		if err != nil {
@@ -147,12 +146,7 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 				"filesystem.use_percent": used,
 				"filesystem.mounted":     filesystem.Mounted,
 			},
-			RootFields: mapstr.M{
-				"observer.ip":     m.config.HostIp,
-				"host.ip":         m.config.HostIp,
-				"observer.vendor": "Palo Alto",
-				"observer.type":   "firewall",
-			},
+			RootFields: rootFields,
 		}
 
 		events = append(events, event)
