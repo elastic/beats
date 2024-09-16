@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.22.0
+go 1.22
 
 toolchain go1.22.6
 
@@ -221,7 +221,7 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
-	go.opentelemetry.io/collector/consumer v0.109.0
+	go.opentelemetry.io/collector/consumer v0.107.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -366,7 +366,7 @@ require (
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/collector/pdata v1.15.0 // indirect
+	go.opentelemetry.io/collector/pdata v1.13.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
 	go.opentelemetry.io/otel v1.28.0 // indirect

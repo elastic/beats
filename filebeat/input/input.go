@@ -33,8 +33,9 @@ import (
 var inputList = monitoring.NewUniqueList()
 var inputListMetricsOnce sync.Once
 
-// RegisterMonitoringInputs registers the inputs list with the monitoring system.
-// namespace is namespace to put the inputs under.  default is "state"
+// RegisterMonitoringInputs registers a list of inputs with the
+// monitoring system under the provided namespace.  If namespace is
+// empty, it default to "state". Registration only occurs once.
 func RegisterMonitoringInputs(namespace string) {
 	if namespace == "" {
 		namespace = "state"

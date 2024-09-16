@@ -314,7 +314,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 
 	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
 	if err != nil {
-		return nil, fmt.Errorf("error converting to ucfg: %w", err)
+		return nil, fmt.Errorf("error converting receiver config to ucfg: %w", err)
 	}
 
 	cfg := (*config.C)(tmp)
@@ -472,9 +472,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
-			msg := "no outputs are defined, please define one under the output section"
-			logp.Info(msg)
-			return nil, fmt.Errorf(msg)
+			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
 		}
 	}
 
