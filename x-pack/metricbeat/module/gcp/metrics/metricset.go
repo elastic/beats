@@ -207,7 +207,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 		}
 	}
 
-	tsGrouped, err := m.timeSeriesGrouped(ctx, gcpService, tss, e)
+	tsGrouped, err := m.timeSeriesGrouped(ctx, metadataService, tss, e)
 	if err != nil {
 		return nil, errors.Wrap(err, "error trying to group time series data")
 	}
