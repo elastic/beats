@@ -78,9 +78,9 @@ func DefineModules() {
 			return
 		}
 
-		_, _ = fmt.Fprintf(os.Stdout, "Detected changes in module(s): %s\n", moduleVar)
+		log.Printf("Detected changes in module(s): %s\n", moduleVar)
 	} else {
-		fmt.Print("No changed modules found")
+		log.Printf("No changed modules found")
 	}
 }
 
