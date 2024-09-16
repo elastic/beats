@@ -26,7 +26,9 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 )
@@ -58,7 +60,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 type metricData struct {
-	assetNames assetNames
+	assetNames     assetNames
+	triggerdAlarms []triggerdAlarm
+}
+
+type triggerdAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
 }
 
 type assetNames struct {
@@ -94,7 +106,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity"}, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity", "triggeredAlarmState"}, &datastoreCluster)
 	if err != nil {
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
@@ -107,10 +119,15 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from host %s: v", datastoreCluster[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: v", datastoreCluster[i].Name, err)
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames})})
+		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %w", datastoreCluster[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm})})
 	}
 
 	return nil
@@ -135,4 +152,44 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 	return assetNames{
 		outputDsNames: outputDsNames,
 	}, nil
+}
+
+func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
+	var triggeredAlarms []triggerdAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggerdAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
 }
