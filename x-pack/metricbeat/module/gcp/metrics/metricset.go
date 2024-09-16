@@ -202,7 +202,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
