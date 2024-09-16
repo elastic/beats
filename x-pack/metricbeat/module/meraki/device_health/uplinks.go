@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"time"
 
+	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
 )
 
 type uplink struct {
