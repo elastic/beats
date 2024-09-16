@@ -26,12 +26,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
-- Update Salesforce module to use new Salesforce input. {pull}37509[37509]
-- Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
-- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
-- Enable file ingestion to report detailed status to Elastic Agent {pull}40075[40075]
-- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
-- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
 
 *Heartbeat*
 
@@ -39,7 +33,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
-- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 
 *Osquerybeat*
 
@@ -75,12 +68,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Update Go version to 1.22.6. {pull}40528[40528]
 
 *Auditbeat*
 
-- Fix segfaults that may happen if user runs multiple instances of the package metricset {pull}40525[40525]
-- Fix incorrect definition of struct utmp for arm64 {pull}40541[40541]
 
 *Filebeat*
 
@@ -106,11 +96,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
-- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
-- Fix bug in Okta entity analytics rate limit logic. {issue}40106[40106] {pull}40267[40267]
-- Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
-- Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
-- The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 
 *Heartbeat*
 
@@ -167,6 +154,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
+- When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
+- The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
 
 *Auditbeat*
 
@@ -233,7 +222,18 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-
+- Add new metrics for the vSphere Host metricset. {pull}40429[40429]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Add new metricset datastorecluster for vSphere module. {pull}40694[40694]
+- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
+- Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Add new metrics for datastore and minor changes to overall vSphere metrics {pull}40766[40766]
 
 *Metricbeat*
 
@@ -284,3 +284,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+

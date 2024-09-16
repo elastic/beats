@@ -39,7 +39,7 @@ steps:
         make -C deploy/kubernetes test
       retry:
         automatic:
-          - limit: 3
+          - limit: 1
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -61,7 +61,7 @@ steps:
         make -C deploy/kubernetes test
       retry:
         automatic:
-          - limit: 3
+          - limit: 1
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -83,7 +83,7 @@ steps:
         make -C deploy/kubernetes test
       retry:
         automatic:
-          - limit: 3
+          - limit: 1
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -105,7 +105,7 @@ steps:
         make -C deploy/kubernetes test
       retry:
         automatic:
-          - limit: 3
+          - limit: 1
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"

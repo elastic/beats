@@ -1,0 +1,77 @@
+{
+    "@timestamp": "2024-08-06T10:38:51.952Z",
+    "metricset": {
+        "name": "resourcepool",
+        "period": 10000
+    },
+    "service": {
+        "type": "vsphere",
+        "address": "https://localhost:8989/sdk"
+    },
+    "event": {
+        "dataset": "vsphere.resourcepool",
+        "module": "vsphere",
+        "duration": 57462824
+    },
+    "vsphere": {
+        "resourcepool": {
+            "name": "Resources",
+            "status": "green",
+            "vm": {
+                "names": ["DC0_H0_VM0", "DC0_H0_VM1"],
+                "count": 2
+            },
+            "cpu": {
+                "usage": {
+                    "mhz": 3323
+                },
+                "demand": {
+                    "mhz": 3344
+                },
+                "entitlement": {
+                    "mhz": 3197,
+                    "static": {
+                        "mhz": 21294
+                    }
+                }
+            },
+            "memory": {
+                "compressed": {
+                    "bytes": 0
+                },
+                "usage": {
+                    "guest": {
+                        "bytes": 6515851264
+                    },
+                    "host": {
+                        "bytes": 122227261440
+                    }
+                },
+                "entitlement": {
+                    "bytes": 38726008832,
+                    "static": {
+                        "bytes": 14680064
+                    }
+                },
+                "private": {
+                    "bytes": 121226919936
+                },
+                "shared": {
+                    "bytes": 45088768
+                },
+                "swapped": {
+                    "bytes": 0
+                },
+                "ballooned": {
+                    "bytes": 0
+                },
+                "overhead": {
+                    "bytes": 1695547392,
+                    "consumed": {
+                        "bytes": 1001390080
+                    }
+                }
+            }
+        }
+    }
+}

@@ -305,7 +305,7 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	// Conditionally replace the client if the region of
 	// the request does not match the pre-prepared client.
 	opts := a.client.Options()
-	if opts.Region == region {
+	if region == "" || opts.Region == region {
 		return a.client
 	}
 	// Use a cached client if we have already seen this region.
