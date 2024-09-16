@@ -184,9 +184,9 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
-	// There are some cases where the connection is created but Connect
-	// is not called before it's used, so we populate reqsContext and cancelReqs
-	// here.
+	// There are some cases where the connection is created and closed
+	// without being used, so we populate reqsContext and cancelReqs
+	// here to make the returned Connection always safe to use.
 	reqsContext, cancelReqs := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
