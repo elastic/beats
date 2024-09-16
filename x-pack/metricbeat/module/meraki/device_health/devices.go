@@ -40,9 +40,9 @@ func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Devic
 	}
 
 	devices := make(map[Serial]*Device)
-	for _, d := range *val {
+	for i, d := range *val {
 		devices[Serial(d.Serial)] = &Device{
-			details: &d,
+			details: &(*val)[i],
 		}
 	}
 
@@ -56,9 +56,9 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 		return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
-	for _, status := range *val {
+	for i, status := range *val {
 		if device, ok := devices[Serial(status.Serial)]; ok {
-			device.status = &status
+			device.status = &(*val)[i]
 		}
 	}
 
@@ -147,9 +147,9 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
-	for _, license := range *val {
+	for i, license := range *val {
 		if device, ok := devices[Serial(license.DeviceSerial)]; ok {
-			device.license = &license
+			device.license = &(*val)[i]
 		}
 	}
 

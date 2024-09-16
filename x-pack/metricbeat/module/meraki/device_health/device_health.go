@@ -125,7 +125,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		// Once we have collected _all_ the data and associated it with the correct device
 		// we can report the various device health metrics. These functions are split up
-		// in this way primarily to allow better seperation of the code, but also because
+		// in this way primarily to allow better separation of the code, but also because
 		// each function here corresponds to a distinct set of reported metric events
 		// i.e. there is one event per device, one event per uplink (but multiple uplinks per device),
 		// one event per switchport (but multiple switchports per device), etc.
