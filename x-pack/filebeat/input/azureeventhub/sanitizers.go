@@ -17,11 +17,19 @@ import (
 // Sanitizer API
 // ----------------------------------------------------------------------------
 
+// SanitizerSpec defines a sanitizer configuration.
+//
+// Sanitizers can use the spec field to provide additional
+// configuration.
 type SanitizerSpec struct {
 	Type string                 `config:"type"`
 	Spec map[string]interface{} `config:"spec"`
 }
 
+// Sanitizer defines the interface for sanitizing JSON data.
+//
+// Implementing `Init` is optional. If implemented, it should
+// be used to initialize the sanitizer with the provided spec.
 type Sanitizer interface {
 	Sanitize(jsonByte []byte) []byte
 	Init() error
@@ -31,6 +39,7 @@ type Sanitizer interface {
 // Convenience builder functions
 // ----------------------------------------------------------------------------
 
+// newSanitizer creates a new sanitizer based on the provided spec.
 func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	var s Sanitizer
 
@@ -54,6 +63,12 @@ func newSanitizer(spec SanitizerSpec) (Sanitizer, error) {
 	return s, nil
 }
 
+// newSanitizers creates a list of sanitizers based on the provided specs.
+//
+// The legacySanitizerOptions are used to add legacy sanitizers to the list.
+// `legacySanitizerOptions` should be a list of strings representing the
+// legacy sanitization options (it only support the two original legacy
+// options: "NEW_LINES", "SINGLE_QUOTES").
 func newSanitizers(specs []SanitizerSpec, legacySanitizerOptions []string) ([]Sanitizer, error) {
 	var sanitizers []Sanitizer
 
@@ -85,12 +100,16 @@ func newSanitizers(specs []SanitizerSpec, legacySanitizerOptions []string) ([]Sa
 // New line sanitizer
 // ----------------------------------------------------------------------------
 
+// newLinesSanitizer replaces new lines with spaces.
+//
+// This sanitizer is used to remove new lines inside JSON strings.
 type newLinesSanitizer struct{}
 
 func (s *newLinesSanitizer) Sanitize(jsonByte []byte) []byte {
 	return bytes.ReplaceAll(jsonByte, []byte("\n"), []byte{})
 }
 
+// Init is a no-op for the newLinesSanitizer.
 func (s *newLinesSanitizer) Init() error {
 	return nil
 }
@@ -99,6 +118,7 @@ func (s *newLinesSanitizer) Init() error {
 // Single quote sanitizer
 // ----------------------------------------------------------------------------
 
+// singleQuotesSanitizer replaces single quotes with double quotes.
 type singleQuotesSanitizer struct{}
 
 func (s *singleQuotesSanitizer) Sanitize(jsonByte []byte) []byte {
@@ -123,6 +143,7 @@ func (s *singleQuotesSanitizer) Sanitize(jsonByte []byte) []byte {
 	return result.Bytes()
 }
 
+// Init is a no-op for the singleQuotesSanitizer.
 func (s *singleQuotesSanitizer) Init() error {
 	return nil
 }

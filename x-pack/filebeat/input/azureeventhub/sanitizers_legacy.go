@@ -8,6 +8,20 @@ package azureeventhub
 
 import "errors"
 
+// This file supports the legacy sanitization options for the Azure Event Hub input.
+//
+// The legacy offered two sanitization options using the `sanitize_options`
+// configuration option:
+//
+// - NEW_LINES: replaces new lines with spaces
+// - SINGLE_QUOTES: replaces single quotes with double quotes
+//
+// The legacy `sanitize_options` is deprecated and will be removed in the future.
+// Users should use the `sanitizers` configuration option instead.
+//
+// However, the current sanitization implementation honors the legacy sanitization
+// options and applies them to the sanitizers configuration.
+
 type sanitizationOption string
 
 const (
