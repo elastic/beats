@@ -150,6 +150,7 @@ func (conf *azureInputConfig) Validate() error {
 
 	// log a warning for each sanitization option not supported
 	for _, opt := range conf.LegacySanitizeOptions {
+		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in future releases; use the `sanitizers` option instead", "option", opt)
 		err := sanitizeOptionsValidate(opt)
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)
