@@ -16,7 +16,8 @@ import "errors"
 // - NEW_LINES: replaces new lines with spaces
 // - SINGLE_QUOTES: replaces single quotes with double quotes
 //
-// The legacy `sanitize_options` is deprecated and will be removed in the future.
+// The legacy `sanitize_options` is deprecated and will be removed in the 
+// 9.0 release.
 // Users should use the `sanitizers` configuration option instead.
 //
 // However, the current sanitization implementation honors the legacy sanitization

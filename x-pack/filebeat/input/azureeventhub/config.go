@@ -59,7 +59,7 @@ type azureInputConfig struct {
 	//       - type: single_quotes
 	//
 	// The `sanitize_options` option is deprecated and will be
-	// removed in future releases.
+	// removed in 9.0 release.
 	//
 	// Default is an empty list (no sanitization).
 	LegacySanitizeOptions []string `config:"sanitize_options"`
@@ -150,7 +150,7 @@ func (conf *azureInputConfig) Validate() error {
 
 	// log a warning for each sanitization option not supported
 	for _, opt := range conf.LegacySanitizeOptions {
-		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in future releases; use the `sanitizers` option instead", "option", opt)
+		logger.Warnw("legacy sanitization `sanitize_options` options are deprecated and will be removed in the 9.0 release; use the `sanitizers` option instead", "option", opt)
 		err := sanitizeOptionsValidate(opt)
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)

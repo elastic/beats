@@ -16,6 +16,7 @@ Users can use the `sanitizers` configuration option to set up the input sanitiza
 input detects invalid JSON, the input will try to fix or remove it from the log.
 
 Existing sanitizers:
+
 - `new_lines`: removes new lines inside JSON strings.
 - `single_quotes`: replaces single quotes with double quotes in JSON strings.
 - `replace_all`: replaces all occurrences of a substring matching a regex pattern with a fixed literal string.
@@ -68,7 +69,6 @@ GitHub issue:
 
 - https://github.com/elastic/beats/issues/34092
 
-
 #### double_quotes
 
 Here is an example of the `sanitizers` configuration option with the `double_quotes` sanitizer:
@@ -114,8 +114,6 @@ Users first reported logs using single quotes to delimit JSON strings in the Azu
 the following GitHub issue:
 
 - https://github.com/elastic/azuremarketplacedev/issues/190
-
-
 
 #### replace_all
 
