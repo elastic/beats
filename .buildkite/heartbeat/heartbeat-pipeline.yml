@@ -62,6 +62,7 @@ steps:
     steps:
       - label: ":ubuntu: Heartbeat: Ubuntu x86_64 Unit Tests"
         command: |
+          pre-commit --version
           cd heartbeat
           mage build unitTest
         retry:
@@ -71,8 +72,8 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        plugins:
-          - elastic/pre-commit#v1.0.1
+#        plugins:
+#          - elastic/pre-commit#v1.0.1
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
