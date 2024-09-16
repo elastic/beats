@@ -5,6 +5,7 @@
 package azureblobstorage
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -44,19 +45,38 @@ type fileSelectorConfig struct {
 }
 
 type authConfig struct {
-	SharedCredentials *sharedKeyConfig        `config:"shared_credentials,omitempty"`
-	ConnectionString  *connectionStringConfig `config:"connection_string,omitempty"`
+	SharedCredentials *sharedKeyConfig        `config:"shared_credentials"`
+	ConnectionString  *connectionStringConfig `config:"connection_string"`
+	OAuth2            *OAuth2Config           `config:"oauth2"`
 }
 
 type connectionStringConfig struct {
-	URI string `config:"uri,omitempty"`
+	URI string `config:"uri"`
 }
 type sharedKeyConfig struct {
 	AccountKey string `config:"account_key"`
+}
+
+type OAuth2Config struct {
+	ClientID     string `config:"client_id"`
+	ClientSecret string `config:"client_secret"`
+	TenantID     string `config:"tenant_id"`
 }
 
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
 	}
+}
+
+func (c config) Validate() error {
+	switch {
+	case c.Auth.SharedCredentials != nil && c.Auth.SharedCredentials.AccountKey == "":
+		return fmt.Errorf("account key is required for shared credentials")
+	case c.Auth.ConnectionString != nil && c.Auth.ConnectionString.URI == "":
+		return fmt.Errorf("connection string is required for connection string auth")
+	case c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == ""):
+		return fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth")
+	}
+	return nil
 }
