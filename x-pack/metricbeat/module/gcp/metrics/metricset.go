@@ -142,12 +142,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ctx := context.Background()
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating Stackdriver client")
+		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
 	}
 
 	m.metricsMeta, err = m.metricDescriptor(ctx, client)
 	if err != nil {
-		return nil, errors.Wrap(err, "error calling metricDescriptor function")
+		return nil, fmt.Errorf("error calling metricDescriptor function: %w", err)
 	}
 
 	m.requester = &metricsRequester{
@@ -175,14 +175,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		}
 		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
-			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
+			err = fmt.Errorf("error trying to get metrics for project '%w' and zone '%w' or region '%w': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
 		events, err := m.eventMapping(ctx, responses, sdc)
 		if err != nil {
-			err = errors.Wrap(err, "eventMapping failed")
+			err = fmt.Errorf("eventMapping failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
@@ -198,18 +198,18 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
 	e := newIncomingFieldExtractor(m.Logger(), sdc)
 
-	var metadataService gcp.MetadataService
+	var gcpService gcp.MetadataService
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
-			return nil, errors.Wrap(err, "error trying to create metadata service")
+		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
-	tsGrouped, err := m.timeSeriesGrouped(ctx, metadataService, tss, e)
+	tsGrouped, err := m.timeSeriesGrouped(ctx, gcpService, tss, e)
 	if err != nil {
-		return nil, errors.Wrap(err, "error trying to group time series data")
+		return nil, fmt.Errorf("error trying to group time series data: %w", err)
 	}
 
 	// Create single events for each group of data that matches some common patterns like labels and timestamp
