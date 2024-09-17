@@ -32,6 +32,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
 
 	"gopkg.in/yaml.v2"
@@ -322,25 +324,34 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
 func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error) {
-	host, err := os.Hostname()
-	if err != nil || len(host) == 0 {
+	osHost, err := os.Hostname()
+	if err != nil || len(osHost) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %w", err)
 	}
-	split := strings.SplitN(host, ".", 2)
+	split := strings.SplitN(osHost, ".", 2)
 	hostname := split[0]
 	domain := ""
 	if len(split) > 1 {
 		domain = split[1]
 	}
 
-	return map[string]interface{}{
+	hostInfo, err := sysinfo.Host()
+	if err != nil && !errors.Is(err, types.ErrNotImplemented) {
+		return nil, fmt.Errorf("cannot get host information: %w", err)
+	}
+
+	vars := map[string]interface{}{
 		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
 		"domain":      domain,
 		"module":      fs.mname,
 		"fileset":     fs.name,
 		"beatVersion": info.Version,
-	}, nil
+		"osVersion":   hostInfo.Info().OS.Version,
+		"osFamily":    hostInfo.Info().OS.Family,
+	}
+
+	return vars, nil
 }
 
 func (fs *Fileset) getInputConfig() (*conf.C, error) {

@@ -1,3 +1,11 @@
+{{ define "journald" }}
+type: journald
+tags:
+  - journald
+{{ end }}
+
+{{define "log-files" }}
+
 type: log
 paths:
 {{ range $i, $path := .paths }}
@@ -13,3 +21,13 @@ processors:
       target: ''
       fields:
         ecs.version: 1.12.0
+
+{{ end }}
+
+{{if eq .builtin.osFamily "debian" }}
+  {{if eq .builtin.osVersion "12 (bookworm)" }}
+     {{ template "journald" }}
+  {{end}}
+{{ else }}
+{{ template "log-files" }}
+{{end}}
