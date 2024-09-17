@@ -12,6 +12,8 @@
   period: 5m
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       #name: ["CPUUtilization", "DiskWriteOps"]
