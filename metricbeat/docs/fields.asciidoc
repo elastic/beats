@@ -68,6 +68,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -57139,6 +57140,18 @@ type: long
 format: bytes
 
 --
+
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
 
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
