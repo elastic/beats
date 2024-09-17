@@ -1,1 +1,3 @@
-- release: beta
+- name: routing
+  type: group
+  release: beta

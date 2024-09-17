@@ -1,1 +1,3 @@
-- release: beta
+- name: system
+  type: group
+  release: beta

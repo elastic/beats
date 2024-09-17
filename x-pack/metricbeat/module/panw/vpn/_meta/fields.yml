@@ -1,1 +1,3 @@
-- release: beta
+- name: vpn
+  type: group
+  release: beta

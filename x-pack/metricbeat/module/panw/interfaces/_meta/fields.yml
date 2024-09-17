@@ -1,1 +1,3 @@
-- release: beta
+- name: interfaces
+  type: group
+  release: beta
