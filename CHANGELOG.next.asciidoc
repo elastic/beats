@@ -217,6 +217,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add new metrics for datastore and minor changes to overall vSphere metrics {pull}40766[40766]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 
 *Metricbeat*
 
