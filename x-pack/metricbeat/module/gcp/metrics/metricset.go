@@ -242,7 +242,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
 	if d.Seconds() < gcp.MonitoringMetricsSamplingRate {
-		return errors.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
+		return fmt.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
 	}
 
 	return nil
@@ -257,7 +257,7 @@ func (mc *metricsConfig) Validate() error {
 
 	if mc.Aligner != "" {
 		if _, ok := gcp.AlignersMapToGCP[mc.Aligner]; !ok {
-			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
+			return fmt.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
 		}
 	}
 	return nil
@@ -280,7 +280,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 			for {
 				out, err := it.Next()
 				if err != nil && errors.Is(err, iterator.Done) {
-					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+					err = fmt.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
