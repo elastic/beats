@@ -189,6 +189,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
+	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.1
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.16.15
@@ -396,12 +397,7 @@ require (
 )
 
 require (
-<<<<<<< HEAD
 	cloud.google.com/go/storage v1.38.0
-=======
-	cloud.google.com/go/storage v1.43.0
-	github.com/PaloAltoNetworks/pango v0.10.2
->>>>>>> cc2c92571f (x-pack/metricbeat/module/panw: Add a new module (#40686))
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
