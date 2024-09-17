@@ -53,8 +53,7 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 		if device.Uplinks != nil {
 			var uplinks []*uplink
-			for i := range *device.Uplinks {
-				uplinkStatus := (*device.Uplinks)[i]
+			for _, uplinkStatus := range *device.Uplinks {
 				uplink := &uplink{
 					lastReportedAt: device.LastReportedAt,
 					status:         &uplinkStatus,
