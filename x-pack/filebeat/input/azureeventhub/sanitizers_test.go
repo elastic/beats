@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSanitizers(t *testing.T) {
+func TestSanitizersSanitize(t *testing.T) {
 
 	// Set up some sanitizers
 	nlSanitizer, err := newSanitizer(SanitizerSpec{
@@ -118,4 +118,60 @@ func TestSanitizers(t *testing.T) {
 			assert.Equal(t, string(tc.expected), string(res))
 		})
 	}
+}
+
+func TestSanitizersInit(t *testing.T) {
+
+	t.Run("Support legacy sanitizers", func(t *testing.T) {
+		legacySanitizers := []string{"NEW_LINES", "SINGLE_QUOTES"}
+
+		sanitizers, err := newSanitizers([]SanitizerSpec{}, legacySanitizers)
+		require.NoError(t, err)
+
+		require.Len(t, sanitizers, 2)
+
+		// Check the struct types
+		assert.IsType(t, &newLinesSanitizer{}, sanitizers[0])
+		assert.IsType(t, &singleQuotesSanitizer{}, sanitizers[1])
+	})
+
+	t.Run("Support new sanitizers", func(t *testing.T) {
+		raSanitizerSpec := SanitizerSpec{
+			Type: SanitizerReplaceAll,
+			Spec: map[string]any{
+				"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
+				"replacement": "{}",
+			},
+		}
+
+		sanitizers, err := newSanitizers([]SanitizerSpec{raSanitizerSpec}, nil)
+		require.NoError(t, err)
+
+		require.Len(t, sanitizers, 1)
+
+		// Check the struct types
+		assert.IsType(t, &replaceAllSanitizer{}, sanitizers[0])
+	})
+
+	t.Run("Support legacy and new sanitizer together", func(t *testing.T) {
+		raSanitizerSpec := SanitizerSpec{
+			Type: SanitizerReplaceAll,
+			Spec: map[string]any{
+				"pattern":     `\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]`,
+				"replacement": "{}",
+			},
+		}
+
+		legacySanitizers := []string{"NEW_LINES", "SINGLE_QUOTES"}
+
+		sanitizers, err := newSanitizers([]SanitizerSpec{raSanitizerSpec}, legacySanitizers)
+		require.NoError(t, err)
+
+		require.Len(t, sanitizers, 3)
+
+		// Check the struct types
+		assert.IsType(t, &replaceAllSanitizer{}, sanitizers[0])
+		assert.IsType(t, &newLinesSanitizer{}, sanitizers[1])
+		assert.IsType(t, &singleQuotesSanitizer{}, sanitizers[2])
+	})
 }
