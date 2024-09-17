@@ -1,0 +1,9 @@
+# Module: panw
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.15/metricbeat-module-panw.html
+
+- module: panw
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
