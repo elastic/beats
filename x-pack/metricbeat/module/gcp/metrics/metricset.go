@@ -10,9 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"errors"
+
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
@@ -280,7 +281,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 			for {
 				out, err := it.Next()
 				if err != nil && errors.Is(err, iterator.Done) {
-					err = fmt.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+					err = fmt.Errorf("Could not make ListMetricDescriptors request for metric type %s: %w", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
