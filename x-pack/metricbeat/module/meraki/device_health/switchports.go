@@ -31,8 +31,8 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 		}
 
 		var switchports []*switchport
-		for _, port := range *device.Ports {
-			switchports = append(switchports, &switchport{port: &port})
+		for i := range *device.Ports {
+			switchports = append(switchports, &switchport{port: &(*device.Ports)[i]})
 		}
 
 		statuses, res, err := client.Switch.GetDeviceSwitchPortsStatuses(device.Serial, &meraki.GetDeviceSwitchPortsStatusesQueryParams{
@@ -43,7 +43,8 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 		}
 
 		// match status to the port attributes found earlier using the shared port ID
-		for _, status := range *statuses {
+		for i := range *statuses {
+			status := (*statuses)[i]
 			for _, switchport := range switchports {
 				if switchport.port.PortID == status.PortID {
 					switchport.portStatus = &status

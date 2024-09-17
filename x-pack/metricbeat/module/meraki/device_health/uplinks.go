@@ -53,13 +53,15 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 		if device.Uplinks != nil {
 			var uplinks []*uplink
-			for _, uplinkStatus := range *device.Uplinks {
+			for i := range *device.Uplinks {
+				uplinkStatus := (*device.Uplinks)[i]
 				uplink := &uplink{
 					lastReportedAt: device.LastReportedAt,
 					status:         &uplinkStatus,
 				}
 
-				for _, metrics := range *lossAndLatency {
+				for j := range *lossAndLatency {
+					metrics := (*lossAndLatency)[j]
 					if metrics.TimeSeries != nil && metrics.Serial == device.Serial && metrics.Uplink == uplinkStatus.Interface {
 						uplink.lossAndLatency = &metrics
 						break
@@ -79,13 +81,15 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 		}
 
 		var uplinks []*uplink
-		for _, uplinkStatus := range *device.Uplinks {
+		for i := range *device.Uplinks {
+			uplinkStatus := (*device.Uplinks)[i]
 			uplink := &uplink{
 				lastReportedAt:        device.LastReportedAt,
 				cellularGatewayStatus: &uplinkStatus,
 			}
 
-			for _, metrics := range *lossAndLatency {
+			for j := range *lossAndLatency {
+				metrics := (*lossAndLatency)[j]
 				if metrics.TimeSeries != nil && metrics.Serial == device.Serial && metrics.Uplink == uplinkStatus.Interface {
 					uplink.lossAndLatency = &metrics
 					break
