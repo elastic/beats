@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-meraki>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -50451,6 +50452,17 @@ Number of bytes this server is allowed to use for storage.
 
 
 type: long
+
+--
+
+[[exported-fields-meraki]]
+
+
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
 
 --
 
