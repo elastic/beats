@@ -19,5 +19,5 @@ func init() {
 // AssetPanw returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/panw.
 func AssetPanw() string {
-	return "eJykzkEKgzAQheF9TvFw7wWy6wVaoSdI9SmhcRKSseLti1DEllIo/ssZ+Hg17lwskpPZAOo10KJqnMyVATqWNvukPopFczrXlyvG2E2BBsgMdIUWN6ozQO8ZumINANQQN3Jz13RJtBhynNLr8lNf24t71Ysy965l2V7f/LXPke9QjpN6GQ4qZSnK8SDySPKn8AwAAP//aSl4eA=="
+	return "eJzUz0FOBCEQheE9p3iZfV+AnRfQSTwBDm8mZKAgUNhye9NGO21rXNtvSSVffibcOSyKk9kAGjTS4nR2Mp8M4NkuNRQNWSzOD4/T0zNS9j3SAJWRrtHiheoMcA2MvlkDABPEJa7uMh2FFreae/l8+VNfthW3ahBlvboL23r6zV+2j/zant7yfHOprBHf/TvHnKvf3XxIlPbxD62dP4Jr7hrkdpDaNpoyHST2tcg/LX0PAAD//4Q63bA="
 }
