@@ -55,11 +55,11 @@ func BinaryToString(bin []byte) string {
 	size := len(bin) * 2
 	buffer := make([]byte, size)
 
-	for i := 0; i < len(bin); i++ {
-		for j := 0; j < 2; j++ {
-			idx := (bin[i] >> (j * 4) & 0x0F)
-			buffer[2*i+(1-j)] = hexTable[idx]
-		}
+	j := 0
+	for _, v := range bin {
+		buffer[j] = hexTable[v>>4]
+		buffer[j+1] = hexTable[v&0x0f]
+		j += 2
 	}
 
 	return string(buffer)
