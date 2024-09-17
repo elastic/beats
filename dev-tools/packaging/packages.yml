@@ -1,25 +1,24 @@
 ---
-
 # This file contains the package specifications for both Community Beats and
 # Official Beats. The shared section contains YAML anchors that are used to
 # define common parts of the package in order to not repeat ourselves.
 
 shared:
   - &common
-    name: '{{.BeatName}}'
-    service_name: '{{.BeatServiceName}}'
-    os: '{{.GOOS}}'
-    arch: '{{.PackageArch}}'
-    vendor: '{{.BeatVendor}}'
-    version: '{{ beat_version }}'
-    license: '{{.BeatLicense}}'
-    url: '{{.BeatURL}}'
-    description: '{{.BeatDescription}}'
+    name: "{{.BeatName}}"
+    service_name: "{{.BeatServiceName}}"
+    os: "{{.GOOS}}"
+    arch: "{{.PackageArch}}"
+    vendor: "{{.BeatVendor}}"
+    version: "{{ beat_version }}"
+    license: "{{.BeatLicense}}"
+    url: "{{.BeatURL}}"
+    description: "{{.BeatDescription}}"
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
-    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/files/linux/systemd-daemon-reload.sh'
+    post_install_script: "{{ elastic_beats_dir }}/dev-tools/packaging/files/linux/systemd-daemon-reload.sh"
     files:
       /usr/share/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -28,23 +27,23 @@ shared:
         source: fields.yml
         mode: 0644
       /usr/share/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/LICENSE.txt'
+        source: "{{ repo.RootDir }}/LICENSE.txt"
         mode: 0644
       /usr/share/{{.BeatName}}/NOTICE.txt:
-        source: '{{ repo.RootDir }}/NOTICE.txt'
+        source: "{{ repo.RootDir }}/NOTICE.txt"
         mode: 0644
       /usr/share/{{.BeatName}}/README.md:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl"
         mode: 0644
       /usr/share/{{.BeatName}}/.build_hash.txt:
         content: >
           {{ commit }}
         mode: 0644
       /etc/{{.BeatName}}/{{.BeatName}}.reference.yml:
-        source: '{{.BeatName}}.reference.yml'
+        source: "{{.BeatName}}.reference.yml"
         mode: 0644
       /etc/{{.BeatName}}/{{.BeatName}}.yml:
-        source: '{{.BeatName}}.yml'
+        source: "{{.BeatName}}.yml"
         mode: 0600
         config: true
       /usr/share/{{.BeatName}}/kibana:
@@ -54,13 +53,13 @@ shared:
         source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
         mode: 0755
       /usr/bin/{{.BeatName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl"
         mode: 0755
       /lib/systemd/system/{{.BeatServiceName}}.service:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl"
         mode: 0644
       /etc/init.d/{{.BeatServiceName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl"
         mode: 0755
 
   # MacOS pkg spec for community beats.
@@ -70,29 +69,29 @@ shared:
       # OS X 10.8 Mountain Lion is the oldest supported by Go 1.10.
       # https://golang.org/doc/go1.10#ports
       min_supported_osx_version: 10.8
-      identifier: 'co.{{.BeatVendor | tolower}}.beats.{{.BeatName}}'
+      identifier: "co.{{.BeatVendor | tolower}}.beats.{{.BeatName}}"
       install_path: /Library/Application Support
-    pre_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/preinstall.tmpl'
-    post_install_script: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/postinstall.tmpl'
+    pre_install_script: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/preinstall.tmpl"
+    post_install_script: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/scripts/postinstall.tmpl"
     files:
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
         source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
         mode: 0755
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/LICENSE.txt'
+        source: "{{ repo.RootDir }}/LICENSE.txt"
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/NOTICE.txt:
-        source: '{{ repo.RootDir }}/NOTICE.txt'
+        source: "{{ repo.RootDir }}/NOTICE.txt"
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/README.md:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl"
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/.build_hash.txt:
         content: >
           {{ commit }}
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/{{.identifier}}.plist:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/launchd-daemon.plist.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/darwin/launchd-daemon.plist.tmpl"
         mode: 0644
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/kibana:
         source: _meta/kibana.generated
@@ -101,38 +100,38 @@ shared:
         source: fields.yml
         mode: 0644
       /etc/{{.BeatName}}/{{.BeatName}}.reference.yml:
-        source: '{{.BeatName}}.reference.yml'
+        source: "{{.BeatName}}.reference.yml"
         mode: 0644
       /etc/{{.BeatName}}/{{.BeatName}}.yml:
-        source: '{{.BeatName}}.yml'
+        source: "{{.BeatName}}.yml"
         mode: 0600
         config: true
 
   - &binary_files
-    '{{.BeatName}}{{.BinaryExt}}':
+    "{{.BeatName}}{{.BinaryExt}}":
       source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
       mode: 0755
     fields.yml:
       source: fields.yml
       mode: 0644
     LICENSE.txt:
-      source: '{{ repo.RootDir }}/LICENSE.txt'
+      source: "{{ repo.RootDir }}/LICENSE.txt"
       mode: 0644
     NOTICE.txt:
-      source: '{{ repo.RootDir }}/NOTICE.txt'
+      source: "{{ repo.RootDir }}/NOTICE.txt"
       mode: 0644
     README.md:
-      template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+      template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl"
       mode: 0644
     .build_hash.txt:
       content: >
         {{ commit }}
       mode: 0644
-    '{{.BeatName}}.reference.yml':
-      source: '{{.BeatName}}.reference.yml'
+    "{{.BeatName}}.reference.yml":
+      source: "{{.BeatName}}.reference.yml"
       mode: 0644
-    '{{.BeatName}}.yml':
-      source: '{{.BeatName}}.yml'
+    "{{.BeatName}}.yml":
+      source: "{{.BeatName}}.yml"
       mode: 0600
       config: true
     kibana:
@@ -151,44 +150,54 @@ shared:
     files:
       <<: *binary_files
       install-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service.ps1.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/install-service.ps1.tmpl"
         mode: 0755
       uninstall-service-{{.BeatName}}.ps1:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl'
+        template: "{{ elastic_beats_dir }}/dev-tools/packaging/templates/windows/uninstall-service.ps1.tmpl"
         mode: 0755
 
   - &docker_spec
     <<: *binary_spec
     extra_vars:
-      from: 'ubuntu:20.04'
-      buildFrom: 'ubuntu:20.04'
-      user: '{{ .BeatName }}'
-      linux_capabilities: ''
+      from: "--platform=linux/amd64 ubuntu:20.04"
+      buildFrom: "--platform=linux/amd64 cgr.dev/chainguard/wolfi-base"
+      user: "{{ .BeatName }}"
+      linux_capabilities: ""
     files:
-      '{{.BeatName}}.yml':
-        source: '{{.BeatName}}.docker.yml'
+      "{{.BeatName}}.yml":
+        source: "{{.BeatName}}.docker.yml"
         mode: 0600
         config: true
 
   - &docker_arm_spec
     <<: *docker_spec
     extra_vars:
-      from: 'arm64v8/ubuntu:20.04'
-      buildFrom: 'arm64v8/ubuntu:20.04'
+      from: "--platform=linux/arm64 ubuntu:20.04"
+      buildFrom: "--platform=linux/arm64 cgr.dev/chainguard/wolfi-base"
 
   - &docker_ubi_spec
     extra_vars:
-      image_name: '{{.BeatName}}-ubi'
-      from: 'docker.elastic.co/ubi9/ubi-minimal'
+      image_name: "{{.BeatName}}-ubi"
+      from: "--platform=linux/amd64 docker.elastic.co/ubi9/ubi-minimal"
 
   - &docker_arm_ubi_spec
     extra_vars:
-      image_name: '{{.BeatName}}-ubi'
-      from: 'registry.access.redhat.com/ubi9/ubi-minimal:9.4'
+      image_name: "{{.BeatName}}-ubi"
+      from: "--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal"
+
+  - &docker_wolfi_spec
+    extra_vars:
+      image_name: "{{.BeatName}}-wolfi"
+      from: "--platform=linux/amd64 cgr.dev/chainguard/wolfi-base"
+
+  - &docker_arm_wolfi_spec
+    extra_vars:
+      image_name: "{{.BeatName}}-wolfi"
+      from: "--platform=linux/arm64 cgr.dev/chainguard/wolfi-base"
 
   - &elastic_docker_spec
     extra_vars:
-      repository: 'docker.elastic.co/beats'
+      repository: "docker.elastic.co/beats"
 
   #
   # License modifiers for Apache 2.0
@@ -197,21 +206,21 @@ shared:
     license: "ASL 2.0"
     files:
       LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt'
+        source: "{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt"
         mode: 0644
 
   - &apache_license_for_deb_rpm
     license: "ASL 2.0"
     files:
       /usr/share/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt'
+        source: "{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt"
         mode: 0644
 
   - &apache_license_for_macos_pkg
     license: "ASL 2.0"
     files:
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt'
+        source: "{{ repo.RootDir }}/licenses/APACHE-LICENSE-2.0.txt"
         mode: 0644
 
   #
@@ -221,21 +230,21 @@ shared:
     license: "Elastic License"
     files:
       LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+        source: "{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt"
         mode: 0644
 
   - &elastic_license_for_deb_rpm
     license: "Elastic License"
     files:
       /usr/share/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+        source: "{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt"
         mode: 0644
 
   - &elastic_license_for_macos_pkg
     license: "Elastic License"
     files:
       /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/LICENSE.txt:
-        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+        source: "{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt"
         mode: 0644
 
 # specs is a list of named packaging "flavors".
@@ -263,9 +272,16 @@ specs:
         <<: *deb_rpm_spec
 
     - os: linux
+      arch: amd64
       types: [docker]
       spec:
         <<: *docker_spec
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
 
     - os: aix
       types: [tgz]
@@ -280,43 +296,77 @@ specs:
       spec:
         <<: *windows_binary_spec
         <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
 
     - os: darwin
       types: [tgz]
       spec:
         <<: *binary_spec
         <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
 
     - os: linux
       types: [tgz]
       spec:
         <<: *binary_spec
         <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
 
     - os: linux
       types: [deb, rpm]
       spec:
         <<: *deb_rpm_spec
         <<: *apache_license_for_deb_rpm
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
 
     - os: linux
       types: [docker]
+      arch: amd64
       spec:
         <<: *docker_spec
         <<: *elastic_docker_spec
         <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
+
+    - os: linux
+      types: [docker]
+      arch: amd64
+      spec:
+        <<: *docker_spec
+        <<: *docker_wolfi_spec
+        <<: *elastic_docker_spec
+        <<: *apache_license_for_binaries
+        name: "{{.BeatName}}-wolfi-oss"
+        extra_vars:
+          image_name: "{{.BeatName}}-wolfi-oss"
+
+    - os: linux
+      types: [docker]
+      arch: arm64
+      spec:
+        <<: *docker_arm_spec
+        <<: *elastic_docker_spec
+        <<: *apache_license_for_binaries
+        name: "{{.BeatName}}-oss"
+
+    - os: linux
+      types: [docker]
+      arch: arm64
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_wolfi_spec
+        <<: *elastic_docker_spec
+        <<: *apache_license_for_binaries
+        name: "{{.BeatName}}-wolfi-oss"
+        extra_vars:
+          image_name: "{{.BeatName}}-wolfi-oss"
 
     - os: aix
       types: [tgz]
       spec:
         <<: *binary_spec
         <<: *apache_license_for_binaries
-        name: '{{.BeatName}}-oss'
+        name: "{{.BeatName}}-oss"
 
   # Elastic Beat with Elastic License and binary taken the current directory.
   elastic_beat_xpack:
@@ -365,6 +415,15 @@ specs:
         <<: *elastic_license_for_binaries
 
     - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_wolfi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
       arch: arm64
       types: [docker]
       spec:
@@ -378,6 +437,15 @@ specs:
       spec:
         <<: *docker_arm_spec
         <<: *docker_arm_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_wolfi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
@@ -427,7 +495,7 @@ specs:
         <<: *windows_binary_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
@@ -436,7 +504,7 @@ specs:
         <<: *binary_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -445,7 +513,7 @@ specs:
         <<: *binary_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -465,7 +533,7 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -477,7 +545,19 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
+        <<: *docker_wolfi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -488,7 +568,7 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -500,7 +580,19 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_wolfi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: aix
@@ -509,7 +601,7 @@ specs:
         <<: *binary_spec
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
@@ -522,100 +614,12 @@ specs:
             symlink: true
             mode: 0755
 
-    - os: linux
-      arch: amd64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    # Complete image gets a 'complete' variant for synthetics and other large
-    # packages too big to fit in the main image
-    - os: linux
-      arch: amd64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    # Cloud specific docker image
-    - os: linux
-      arch: amd64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
-      arch: amd64
-      types: [docker]
-      spec:
-        <<: *docker_ubi_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
-      arch: arm64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    # Complete image gets a 'complete' variant for synthetics and other large
-    # packages too big to fit in the main image
-    - os: linux
-      arch: arm64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    # Cloud specific docker image
-    - os: linux
-      arch: arm64
-      types: [docker]
-      spec:
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
-    - os: linux
-      arch: arm64
-      types: [docker]
-      spec:
-        <<: *docker_arm_ubi_spec
-        <<: *elastic_docker_spec
-        <<: *elastic_license_for_binaries
-        files:
-          '{{.BeatName}}{{.BinaryExt}}':
-            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
-
     - os: aix
       types: [tgz]
       spec:
         <<: *elastic_license_for_binaries
         files:
-          '{{.BeatName}}{{.BinaryExt}}':
+          "{{.BeatName}}{{.BinaryExt}}":
             source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
             symlink: true
             mode: 0755

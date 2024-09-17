@@ -40,8 +40,13 @@ const Name = "filebeat"
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-// FilebeatSettings contains the default settings for filebeat
-func FilebeatSettings() instance.Settings {
+// FilebeatSettings contains the default settings for filebeat.
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func FilebeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
@@ -51,7 +56,7 @@ func FilebeatSettings() instance.Settings {
 		HasDashboards: true,
 		Initialize: []func(){
 			include.InitializeModule,
-			fileset.RegisterMonitoringModules,
+			func() { fileset.RegisterMonitoringModules(moduleNameSpace) },
 			input.RegisterMonitoringInputs,
 		},
 	}

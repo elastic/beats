@@ -158,7 +158,9 @@ func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
-	l.metrics = newInputMetrics(l.channelName, l.id)
+	if l.metrics == nil {
+		l.metrics = newInputMetrics(l.channelName, l.id)
+	}
 
 	var err error
 	l.iterator, err = win.NewEventIterator(

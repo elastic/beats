@@ -18,6 +18,70 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func BenchmarkGenerateEvents(b *testing.B) {
+	// Create a sample set of metrics
+	metrics := createSampleMetrics()
+
+	// Create an instance of remoteWriteTypedGenerator
+	generator := remoteWriteTypedGenerator{
+		// Initialize with appropriate values
+		metricsCount: true,
+		// Add other necessary fields
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		generator.GenerateEvents(metrics)
+	}
+}
+
+func createSampleMetrics() model.Samples {
+	now := model.TimeFromUnix(time.Now().Unix())
+	return model.Samples{
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "http_requests_total",
+				"method":   "GET",
+				"status":   "200",
+			},
+			Value:     1234,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "http_request_duration_seconds",
+				"method":   "POST",
+				"path":     "/api/v1/users",
+			},
+			Value:     0.543,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "node_cpu_seconds_total",
+				"cpu":      "0",
+				"mode":     "idle",
+			},
+			Value:     3600.5,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "go_goroutines",
+			},
+			Value:     42,
+			Timestamp: now,
+		},
+		&model.Sample{
+			Metric: model.Metric{
+				"__name__": "process_resident_memory_bytes",
+			},
+			Value:     2.5e+7,
+			Timestamp: now,
+		},
+	}
+}
+
 // TestGenerateEventsCounter tests counter simple cases
 func TestGenerateEventsCounter(t *testing.T) {
 
@@ -1206,4 +1270,183 @@ func TestGenerateEventsHistogramWithDefinedPattern(t *testing.T) {
 	e = events[labels.String()+timestamp.Time().String()]
 	assert.EqualValues(t, e.ModuleFields, expected)
 
+}
+
+func TestMetricsCount(t *testing.T) {
+	tests := []struct {
+		name     string
+		samples  model.Samples
+		expected map[string]int
+	}{
+		{
+			name: "HTTP requests counter with multiple dimensions",
+			samples: model.Samples{
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_requests_total", "method": "GET", "status": "200", "path": "/api/v1/users"},
+					Value:  100,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_requests_total", "method": "POST", "status": "201", "path": "/api/v1/users"},
+					Value:  50,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_requests_total", "method": "GET", "status": "404", "path": "/api/v1/products"},
+					Value:  10,
+				},
+			},
+			expected: map[string]int{
+				`{"method":"GET","path":"/api/v1/users","status":"200"}`:    1,
+				`{"method":"POST","path":"/api/v1/users","status":"201"}`:   1,
+				`{"method":"GET","path":"/api/v1/products","status":"404"}`: 1,
+			},
+		},
+		{
+			name: "CPU and memory usage gauges",
+			samples: model.Samples{
+				&model.Sample{
+					Metric: model.Metric{"__name__": "node_cpu_usage_percent", "cpu": "0", "mode": "user"},
+					Value:  25.5,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "node_cpu_usage_percent", "cpu": "0", "mode": "system"},
+					Value:  10.2,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "node_memory_usage_bytes", "type": "used"},
+					Value:  4294967296, // 4GB
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "node_memory_usage_bytes", "type": "free"},
+					Value:  8589934592, // 8GB
+				},
+			},
+			expected: map[string]int{
+				`{"cpu":"0","mode":"user"}`:   1,
+				`{"cpu":"0","mode":"system"}`: 1,
+				`{"type":"used"}`:             1,
+				`{"type":"free"}`:             1,
+			},
+		},
+		{
+			name: "Request duration histogram",
+			samples: model.Samples{
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_request_duration_seconds_bucket", "le": "0.1", "handler": "/home"},
+					Value:  200,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_request_duration_seconds_bucket", "le": "0.5", "handler": "/home"},
+					Value:  400,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_request_duration_seconds_bucket", "le": "+Inf", "handler": "/home"},
+					Value:  500,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_request_duration_seconds_sum", "handler": "/home"},
+					Value:  120.5,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_request_duration_seconds_count", "handler": "/home"},
+					Value:  500,
+				},
+			},
+			expected: map[string]int{
+				`{"handler":"/home"}`: 3,
+			},
+		},
+		{
+			name: "Mix of counter, gauge, and histogram",
+			samples: model.Samples{
+				&model.Sample{
+					Metric: model.Metric{"__name__": "http_requests_total", "method": "GET", "status": "200"},
+					Value:  100,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "cpu_usage", "core": "0"},
+					Value:  45.5,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "request_duration_seconds_bucket", "le": "0.1"},
+					Value:  30,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "request_duration_seconds_bucket", "le": "0.5"},
+					Value:  50,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "request_duration_seconds_sum"},
+					Value:  75.5,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "request_duration_seconds_count"},
+					Value:  60,
+				},
+			},
+			expected: map[string]int{
+				`{"method":"GET","status":"200"}`: 1,
+				`{"core":"0"}`:                    1,
+				`{}`:                              3,
+			},
+		},
+		{
+			name: "Duplicate labels and distinct labels",
+			samples: model.Samples{
+				&model.Sample{
+					Metric: model.Metric{"__name__": "api_calls", "endpoint": "/users", "method": "GET"},
+					Value:  50,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "api_calls", "endpoint": "/users", "method": "POST"},
+					Value:  30,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "api_calls", "endpoint": "/products", "method": "GET"},
+					Value:  40,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "system_load", "host": "server1"},
+					Value:  1.5,
+				},
+				&model.Sample{
+					Metric: model.Metric{"__name__": "system_load", "host": "server2"},
+					Value:  2.0,
+				},
+			},
+			expected: map[string]int{
+				`{"endpoint":"/users","method":"GET"}`:    1,
+				`{"endpoint":"/users","method":"POST"}`:   1,
+				`{"endpoint":"/products","method":"GET"}`: 1,
+				`{"host":"server1"}`:                      1,
+				`{"host":"server2"}`:                      1,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			generator := remoteWriteTypedGenerator{
+				metricsCount: true,
+				counterCache: xcollector.NewCounterCache(time.Minute),
+			}
+
+			events := generator.GenerateEvents(tt.samples)
+
+			for _, event := range events {
+				count, ok := event.RootFields["metrics_count"]
+				assert.True(t, ok, "metrics_count should be present")
+
+				labels, ok := event.ModuleFields["labels"].(mapstr.M)
+				if !ok {
+					labels = mapstr.M{} // If no labels, create an empty map so that we can handle metrics with no labels
+				}
+
+				labelsHash := labels.String()
+
+				expectedCount, ok := tt.expected[labelsHash]
+				assert.True(t, ok, "should have an expected count for these labels")
+				assert.Equal(t, expectedCount, count, "metrics_count should match expected value for labels %v", labels)
+			}
+		})
+	}
 }
