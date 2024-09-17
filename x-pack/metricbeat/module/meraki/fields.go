@@ -19,5 +19,5 @@ func init() {
 // AssetMeraki returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/meraki.
 func AssetMeraki() string {
-	return "eJxsjUEOgkAQBO/7ivoAH5irZx+xQmsmLEJ2RxN+b4LBYEIdK1PTHaNWY1LNoycIjyLj4q2fue62qig3GTdFTnB3laFZAjqeedLhAxDrIuNR59fyFYf7jT0a9PZeP31SbvzPfwIAAP//mZwyrw=="
+	return "eJxsjVEOwiAQRP85xVygF9hfvz0EltFsSkuzUA23N6nBIHE+3+y8nbCwClaaX9QBRUuk4KJ5Trg2aoz0mYIbi3fAXRlDFgdgwuZXdgYApe4UPCwd+wd092faKPCpM7/4z/LM+L5l1PbqTFMff6qmX1hfycLQBV25ZU2boNhB9w4AAP//oZRLkQ=="
 }

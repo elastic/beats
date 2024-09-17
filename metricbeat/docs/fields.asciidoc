@@ -50457,6 +50457,14 @@ type: long
 [[exported-fields-meraki]]
 
 
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
