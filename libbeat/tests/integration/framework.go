@@ -21,6 +21,7 @@ package integration
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -252,6 +253,14 @@ func (b *BeatProc) startBeat() {
 	require.NoError(b.t, err, "error starting beat process")
 
 	b.Process = cmd.Process
+
+	b.t.Cleanup(func() {
+		// If the test failed, print the whole cmd line to help debugging
+		if b.t.Failed() {
+			args := strings.Join(cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+		}
+	})
 }
 
 // waitBeatToExit blocks until the Beat exits.
@@ -383,7 +392,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	defer logFile.Close()
 
 	var found bool
-	found, b.logFileOffset = b.searchStrInLogs(logFile, s, b.logFileOffset)
+	found, b.logFileOffset, _ = b.searchStrInLogs(logFile, s, b.logFileOffset)
 	if found {
 		return found
 	}
@@ -393,16 +402,39 @@ func (b *BeatProc) LogContains(s string) bool {
 		return false
 	}
 	defer eventLogFile.Close()
-	found, b.eventLogFileOffset = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
+	found, b.eventLogFileOffset, _ = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
 
 	return found
+}
+
+// GetLogLine search for the string s starting at the beginning
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLogLine does not keep track of
+// any offset
+func (b *BeatProc) GetLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, _, line := b.searchStrInLogs(logFile, s, 0)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, _, line = b.searchStrInLogs(eventLogFile, s, 0)
+
+	return line
 }
 
 // searchStrInLogs search for s as a substring of any line in logFile starting
 // from offset.
 //
 // It will close logFile and return the current offset.
-func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64) {
+func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64, string) {
 	t := b.t
 
 	_, err := logFile.Seek(offset, io.SeekStart)
@@ -432,11 +464,11 @@ func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bo
 		}
 
 		if strings.Contains(line, s) {
-			return true, offset
+			return true, offset, line
 		}
 	}
 
-	return false, offset
+	return false, offset, ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -890,4 +922,15 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
 	}
+}
+
+func (b *BeatProc) CountFileLines(glob string) int {
+	file := b.openGlobFile(glob, true)
+	defer file.Close()
+	data, err := io.ReadAll(file)
+	if err != nil {
+		b.t.Fatalf("could not read file '%s': %s", file.Name(), err)
+	}
+
+	return bytes.Count(data, []byte{'\n'})
 }

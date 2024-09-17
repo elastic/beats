@@ -132,6 +132,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		"",
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return err
@@ -161,6 +162,7 @@ func (inp *journald) Run(
 		pos,
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return fmt.Errorf("could not start journal reader: %w", err)
@@ -179,12 +181,17 @@ func (inp *journald) Run(
 	for {
 		entry, err := parser.Next()
 		if err != nil {
+			switch {
 			// The input has been cancelled, gracefully return
-			if errors.Is(err, journalctl.ErrCancelled) {
+			case errors.Is(err, journalctl.ErrCancelled):
 				return nil
+				// Journalctl is restarting, do ignore the empty event
+			case errors.Is(err, journalctl.ErrRestarting):
+				continue
+			default:
+				logger.Errorf("could not read event: %s", err)
+				return err
 			}
-			logger.Errorf("could not read event: %s", err)
-			return err
 		}
 
 		event := entry.ToEvent()
