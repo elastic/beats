@@ -29,6 +29,7 @@ type prvdr struct {
 	ctx    context.Context
 	logger *logp.Logger
 	qq     *quark.Queue
+	qqMtx  *sync.Mutex
 }
 
 type TTYType int
@@ -119,15 +120,19 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		return nil, fmt.Errorf("open queue: %v", err)
 	}
 
+	var qqMtx sync.Mutex
 	p := prvdr{
 		ctx:    ctx,
 		logger: logger,
 		qq:     qq,
+		qqMtx: &qqMtx,
 	}
 
-	go func(qq *quark.Queue, logger *logp.Logger) {
+	go func(qq *quark.Queue, logger *logp.Logger, p *prvdr) {
 		for {
+			p.qqMtx.Lock()
 			procs, err := qq.GetEvents()
+			p.qqMtx.Unlock()
 			if err != nil {
 				logger.Errorf("get events from quark: %v", err)
 				continue
@@ -143,7 +148,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				}
 			}
 		}
-	}(qq, logger)
+	}(qq, logger, &p)
 
 	bootID, _ = readBootID()
 	pidNsInode, _ = readPIDNsInode()
@@ -167,7 +172,7 @@ var (
 )
 
 func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
-	if _, found := p.qq.Lookup(int(pid)); found {
+	if _, found := p.lookupLocked(pid); found {
 		return nil
 	}
 
@@ -200,7 +205,7 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if _, found := p.qq.Lookup(int(pid)); found {
+		if _, found := p.lookupLocked(pid); found {
 			p.logger.Debugf("got process that was missing after %v", waited)
 			combinedWait = combinedWait + waited
 			return nil
@@ -221,7 +226,7 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 }
 
 func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
-	proc, found := p.qq.Lookup(int(pid))
+	proc, found := p.lookupLocked(pid)
 	if !found {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
 	}
@@ -238,7 +243,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		Start:            &start,
 		Name:             basename(proc.Filename),
 		Executable:       proc.Filename,
-		Args:             []string{proc.Filename}, // TODO: Fix
+		Args:             proc.Cmdline,
 		WorkingDirectory: proc.Cwd,
 		Interactive:      &interactive,
 	}
@@ -265,7 +270,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	ret.EntityID = calculateEntityIDv1(pid, *ret.Start)
 
 	p.fillParent(&ret, proc.Proc.Ppid)
-	p.fillGroupLeader(&ret, proc.Pid) //  proc.Proc.Pgid)
+	p.fillGroupLeader(&ret, proc.Proc.Pgid)
 	p.fillSessionLeader(&ret, proc.Proc.Sid)
 	p.fillEntryLeader(&ret, proc.Proc.EntryLeader)
 	setEntityID(&ret)
@@ -273,8 +278,15 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	return &ret, nil
 }
 
+func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
+	p.qqMtx.Lock()
+	p.qqMtx.Unlock()
+
+	return p.qq.Lookup(int(pid))
+}
+
 func (p prvdr) fillParent(process *types.Process, ppid uint32) {
-	proc, found := p.qq.Lookup(int(ppid))
+	proc, found := p.lookupLocked(ppid)
 	if !found {
 		return
 	}
@@ -307,7 +319,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 }
 
 func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
-	proc, found := p.qq.Lookup(int(pgid))
+	proc, found := p.lookupLocked(pgid)
 	if !found {
 		return
 	}
@@ -341,7 +353,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 }
 
 func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
-	proc, found := p.qq.Lookup(int(sid))
+	proc, found := p.lookupLocked(sid)
 	if !found {
 		return
 	}
@@ -375,13 +387,12 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 }
 
 func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
-	proc, found := p.qq.Lookup(int(elid))
+	proc, found := p.lookupLocked(elid)
 	if !found {
 		return
 	}
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
-
 
 	interactive := interactiveFromTTY(types.TTYDev{
 		Major: proc.Proc.TtyMajor,

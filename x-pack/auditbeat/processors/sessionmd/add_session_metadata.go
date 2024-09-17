@@ -94,7 +94,6 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create quark provider: %w", err)
 		}
-		db.Close() // db not used with quark
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
