@@ -17,7 +17,7 @@ const Vsys = ""
 
 // PanwClient interface with an Op function
 type PanwClient interface {
-	Op(req interface{}, vsys string, extras interface{}, ans interface{}) ([]byte, error)
+	Op(req interface{}, vsys string, extras, ans interface{}) ([]byte, error)
 }
 
 type PanwFirewallClient struct {
