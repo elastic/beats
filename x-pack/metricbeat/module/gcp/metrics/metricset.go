@@ -175,7 +175,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		}
 		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
-			err = fmt.Errorf("error trying to get metrics for project '%w' and zone '%w' or region '%w': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
+			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
