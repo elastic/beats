@@ -55,9 +55,6 @@ Fix CVE-2023-25173 by updating github.com/containerd/containerd to v1.5.18 {pull
 
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 
-*Osquerybeat*
-
-
 *Packetbeat*
 
 
