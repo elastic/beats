@@ -1,0 +1,47 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: meraki
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/meraki/_meta/docs.asciidoc
+
+
+[[metricbeat-module-meraki]]
+[role="xpack"]
+== Cisco Meraki module
+
+beta[]
+
+This is the meraki module.
+
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Cisco Meraki module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: meraki
+  metricsets: ["device_health"]
+  enabled: true
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-meraki-device_health,device_health>>
+
+include::meraki/device_health.asciidoc[]
+
+:edit_url!:
