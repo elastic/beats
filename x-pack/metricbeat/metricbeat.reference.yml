@@ -1449,7 +1449,6 @@ metricbeat.modules:
 #    params:
 #      query: "some_value"
 
-<<<<<<< HEAD
 #------------------------------ Prometheus Module ------------------------------
 # Metrics collected from a Prometheus endpoint
 - module: prometheus
@@ -1505,8 +1504,6 @@ metricbeat.modules:
 #    params:
 #      query: "some_value"
 
-=======
->>>>>>> ae71c676d8 ([metricbeat] meraki module with device_health metricset    (#40836))
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection", "exchange", "shovel"]
