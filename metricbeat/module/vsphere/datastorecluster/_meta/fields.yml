@@ -25,4 +25,13 @@
     - name: datastore.count
       type: long
       description: >
+<<<<<<< HEAD
         Number of datastores in the Datastore Cluster.
+=======
+        Number of datastores in the Datastore Cluster.
+    - name: triggered_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggered alarms.
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

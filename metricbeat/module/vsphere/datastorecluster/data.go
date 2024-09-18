@@ -37,4 +37,13 @@ func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, dat
 			"count": len(data.assetNames.outputDsNames),
 		},
 	}
+<<<<<<< HEAD
+=======
+
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
+
+	return event
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 }

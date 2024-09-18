@@ -54,9 +54,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &DataStoreMetricSet{ms}, nil
 }
 
+<<<<<<< HEAD
 type metricData struct {
 	perfMetrics map[string]interface{}
 	assetNames  assetNames
+=======
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
+type metricData struct {
+	perfMetrics     map[string]interface{}
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 }
 
 type assetNames struct {
@@ -158,6 +174,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 				continue
 			}
 
+<<<<<<< HEAD
 			if len(samples) == 0 {
 				m.Logger().Debugf("No samples returned from performance manager")
 				continue
@@ -185,6 +202,20 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 				}),
 			})
 		}
+=======
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, dst[i].TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %w", dst[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{
+			MetricSetFields: m.mapEvent(dst[i], &metricData{
+				perfMetrics:     metricMap,
+				triggeredAlarms: triggeredAlarm,
+				assetNames:      assetNames,
+			}),
+		})
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	}
 
 	return nil
@@ -235,3 +266,115 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		outputVmNames:   outputVmNames,
 	}, nil
 }
+<<<<<<< HEAD
+=======
+
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggeredAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
+}
+
+func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
+	metricMap = make(map[string]interface{})
+
+	period := int32(m.Module().Config().Period.Seconds())
+	availableMetric, err := perfManager.AvailableMetric(ctx, dst.Reference(), period)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get available metrics: %w", err)
+	}
+
+	availableMetricByKey := availableMetric.ByKey()
+
+	// Filter for required metrics
+	var metricIDs []types.PerfMetricId
+	for key, metric := range metricSet {
+		if counter, ok := metrics[key]; ok {
+			if _, exists := availableMetricByKey[counter.Key]; exists {
+				metricIDs = append(metricIDs, types.PerfMetricId{
+					CounterId: counter.Key,
+					Instance:  "*",
+				})
+			}
+		} else {
+			m.Logger().Warnf("Metric %s not found", metric)
+		}
+	}
+
+	spec := types.PerfQuerySpec{
+		Entity:     dst.Reference(),
+		MetricId:   metricIDs,
+		MaxSample:  1,
+		IntervalId: period, // using refreshRate as interval
+	}
+
+	// Query performance data
+	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
+	if err != nil {
+		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
+			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
+		}
+
+		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
+	}
+
+	if len(samples) == 0 {
+		m.Logger().Debug("No samples returned from performance manager")
+		return metricMap, nil
+	}
+
+	results, err := perfManager.ToMetricSeries(ctx, samples)
+	if err != nil {
+		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
+	}
+
+	if len(results) == 0 {
+		m.Logger().Debug("No results returned from metric series conversion")
+		return metricMap, nil
+	}
+
+	for _, result := range results[0].Value {
+		if len(result.Value) > 0 {
+			metricMap[result.Name] = result.Value[0]
+			continue
+		}
+		m.Logger().Debugf("For datastore %s, Metric %s: No result found", dst.Name, result.Name)
+	}
+
+	return metricMap, nil
+}
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

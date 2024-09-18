@@ -40,6 +40,13 @@ func (m *ClusterMetricSet) mapEvent(cl mo.ClusterComputeResource, data *assetNam
 		"name": cl.Name,
 	}
 
+<<<<<<< HEAD
+=======
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
+
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	if cl.Configuration.DasConfig.Enabled != nil {
 		event.Put("das_config.enabled", *cl.Configuration.DasConfig.Enabled)
 	}

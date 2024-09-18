@@ -56,8 +56,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &NetworkMetricSet{ms}, nil
 }
 
+<<<<<<< HEAD
 type metricData struct {
 	assetNames assetNames
+=======
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
+type metricData struct {
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 }
 
 type assetNames struct {
@@ -115,8 +130,18 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				continue
 			}
 
+<<<<<<< HEAD
 			reporter.Event(mb.Event{
 				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames}),
+=======
+			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, networks[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from network %s: %w", networks[i].Name, err)
+			}
+
+			reporter.Event(mb.Event{
+				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm}),
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 			})
 		}
 	}
@@ -154,3 +179,46 @@ func getAssetNames(ctx context.Context, pc *property.Collector, net *mo.Network)
 		outputHostNames: outputHostNames,
 	}, nil
 }
+<<<<<<< HEAD
+=======
+
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggeredAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
+}
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

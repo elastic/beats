@@ -49,6 +49,13 @@ func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.
 		},
 	}
 
+<<<<<<< HEAD
+=======
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
+
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	if ds.Summary.Capacity > 0 {
 		usedSpacePercent := float64(ds.Summary.Capacity-ds.Summary.FreeSpace) / float64(ds.Summary.Capacity)
 		event.Put("capacity.used.pct", usedSpacePercent)
