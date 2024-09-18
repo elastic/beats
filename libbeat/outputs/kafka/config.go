@@ -106,6 +106,7 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"gzip":   sarama.CompressionGZIP,
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
+	"zstd":   sarama.CompressionZSTD,
 }
 
 func defaultConfig() kafkaConfig {
