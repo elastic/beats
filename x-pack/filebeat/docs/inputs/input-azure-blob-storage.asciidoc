@@ -128,17 +128,18 @@ Now let's explore the configuration attributes a bit more elaborately.
 *Supported Attributes :-*
 
     1. <<attrib-account-name,account_name>>
-    2. <<attrib-auth-shared-account-key,auth.shared_credentials.account_key>>
-    3. <<attrib-auth-connection-string,auth.connection_string.uri>>
-    4. <<attrib-storage-url,storage_url>>
-    5. <<attrib-containers,containers>>
-    6. <<attrib-container-name,name>>
-    7. <<attrib-max_workers,max_workers>>
-    8. <<attrib-poll,poll>>
-    9. <<attrib-poll_interval,poll_interval>>
-   10. <<attrib-file_selectors,file_selectors>>
-   11. <<attrib-expand_event_list_from_field,expand_event_list_from_field>>
-   12. <<attrib-timestamp_epoch,timestamp_epoch>>
+    2. <<attrib-auth-oauth2,auth.oauth2>>
+    3. <<attrib-auth-shared-account-key,auth.shared_credentials.account_key>>
+    4. <<attrib-auth-connection-string,auth.connection_string.uri>>
+    5. <<attrib-storage-url,storage_url>>
+    6. <<attrib-containers,containers>>
+    7. <<attrib-container-name,name>>
+    8. <<attrib-max_workers,max_workers>>
+    9. <<attrib-poll,poll>>
+   10. <<attrib-poll_interval,poll_interval>>
+   11. <<attrib-file_selectors,file_selectors>>
+   12. <<attrib-expand_event_list_from_field,expand_event_list_from_field>>
+   13. <<attrib-timestamp_epoch,timestamp_epoch>>
 
 
 [id="attrib-account-name"]
@@ -147,6 +148,37 @@ Now let's explore the configuration attributes a bit more elaborately.
 
 This attribute is required for various internal operations with respect to authentication, creating service clients and blob clients which are used internally
 for various processing purposes.
+
+[id="attrib-auth-oauth2"]
+[float]
+==== `auth.oauth2`
+
+This attribute contains the Microsoft Entra ID RBAC authentication credentials for a secure connection to the Azure Blob Storage. The `auth.oauth2` attribute contains the following sub-attributes:
+
+    1. `client_id` : The client ID of the Azure Entra ID application.
+    2. `client_secret` : The client secret of the Azure Entra ID application.
+    3. `tenant_id` : The tenant ID of the Azure Entra ID application.
+
+A sample configuration with `auth.oauth2` is given below:
+
+["source","yaml"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  account_name: some_account
+  auth.oauth2:
+    client_id: "some_client_id"
+    client_secret: "some_client_secret"
+    tenant_id: "some_tenant_id"
+  containers:
+  - name: container_1
+    max_workers: 3
+    poll: true
+    poll_interval: 10s
+----
+How to setup the `auth.oauth2` credentials can be found in the Azure documentation https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app[here]
+
+NOTE: According to our internal testing it seems that we require at least an access level of **blobOwner** for the service principle to be able to read the blobs. If you are facing any issues with the access level, please ensure that the access level is set to **blobOwner**.
 
 [id="attrib-auth-shared-account-key"]
 [float]
