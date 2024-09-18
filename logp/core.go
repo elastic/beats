@@ -151,6 +151,48 @@ func ConfigureWithOutputs(defaultLoggerCfg Config, outputs ...zapcore.Core) erro
 	return nil
 }
 
+// ConfigureWithCore configures the global logger to use the passed in
+// core.  It is assumed that an output has already been defined with
+// the core and a new one should not be created.  The loggerCfg is
+// only used to set selectors and level.  This is useful if a part of
+// your code uses logp but the log output is already handled.  Normal
+// use cases should use Configure or ConfigureWithOutput.
+func ConfigureWithCore(loggerCfg Config, core zapcore.Core) error {
+	var (
+		sink  zapcore.Core
+		level zap.AtomicLevel
+	)
+
+	level = zap.NewAtomicLevelAt(loggerCfg.Level.ZapLevel())
+	sink = wrappedCore(core)
+
+	// Enabled selectors when debug is enabled.
+	selectors := make(map[string]struct{}, len(loggerCfg.Selectors))
+	if loggerCfg.Level.Enabled(DebugLevel) && len(loggerCfg.Selectors) > 0 {
+		for _, sel := range loggerCfg.Selectors {
+			selectors[strings.TrimSpace(sel)] = struct{}{}
+		}
+
+		// Default to all enabled if no selectors are specified.
+		if len(selectors) == 0 {
+			selectors["*"] = struct{}{}
+		}
+
+		sink = selectiveWrapper(sink, selectors)
+	}
+
+	root := zap.New(sink, makeOptions(loggerCfg)...)
+	storeLogger(&coreLogger{
+		selectors:    selectors,
+		rootLogger:   root,
+		globalLogger: root.WithOptions(zap.AddCallerSkip(1)),
+		logger:       newLogger(root, ""),
+		level:        level,
+		observedLogs: nil,
+	})
+	return nil
+}
+
 // ConfigureWithTypedOutput configures the global logger to use typed outputs.
 //
 // If a log entry matches the defined key/value, this entry is logged using the

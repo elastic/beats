@@ -19,6 +19,7 @@ package logp
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
@@ -696,6 +697,42 @@ func TestCloserLoggerCoreWith(t *testing.T) {
 			t.Error("Expecting:\n", l, "\nGot:\n", expectedLines[count])
 		}
 		count++
+	}
+}
+
+func TestConfigureWithCore(t *testing.T) {
+	testMsg := "The quick brown fox jumped over the lazy dog."
+	var b bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.AddSync(&b),
+		zapcore.InfoLevel)
+	err := ConfigureWithCore(Config{}, core)
+	if err != nil {
+		t.Fatalf("Unexpected err: %s", err)
+	}
+	Info(testMsg)
+	var r map[string]interface{}
+
+	err = json.Unmarshal(b.Bytes(), &r)
+	if err != nil {
+		t.Fatalf("unable to json unmarshal '%s': %s", b.String(), err)
+	}
+
+	val, prs := r["msg"]
+	if !prs {
+		t.Fatalf("expected 'msg' field not present in '%s'", b.String())
+	}
+	if val != testMsg {
+		t.Fatalf("expected msg of '%s', got '%s'", testMsg, val)
+	}
+
+	val, prs = r["level"]
+	if !prs {
+		t.Fatalf("expected 'level' field not present in '%s'", b.String())
+	}
+	if val != "info" {
+		t.Fatalf("expected log.level of 'info', got '%s'", val)
 	}
 }
 
