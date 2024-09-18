@@ -60,11 +60,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 type metricData struct {
-	assetNames     assetNames
-	triggerdAlarms []triggerdAlarm
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -122,12 +122,12 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: v", datastoreCluster[i].Name, err)
 		}
 
-		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %w", datastoreCluster[i].Name, err)
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm})})
+		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm})})
 	}
 
 	return nil
@@ -154,10 +154,15 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 	}, nil
 }
 
+<<<<<<< HEAD
 func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
 	triggeredAlarms := make([]triggerdAlarm, 0, len(triggeredAlarmState))
+=======
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
+>>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {
