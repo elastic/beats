@@ -50,6 +50,15 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+type triggerdAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
 type VMData struct {
 	VM             mo.VirtualMachine
 	HostID         string
@@ -58,6 +67,7 @@ type VMData struct {
 	DatastoreNames []string
 	CustomFields   mapstr.M
 	Snapshots      []VMSnapshotData
+	triggerdAlarms []triggerdAlarm
 }
 
 type VMSnapshotData struct {
@@ -136,7 +146,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "snapshot"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState", "snapshot"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
@@ -194,6 +204,11 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
 		}
 
+		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, vm.TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from VM %s: %w", vm.Name, err)
+		}
+
 		data := VMData{
 			VM:             vm,
 			HostID:         hostID,
@@ -202,6 +217,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			DatastoreNames: datastoreNames,
 			CustomFields:   customFields,
 			Snapshots:      snapshots,
+			triggerdAlarms: triggerdAlarm,
 		}
 
 		reporter.Event(mb.Event{
@@ -304,4 +320,44 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 		}
 	}
 	return snapshots
+}
+
+func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
+	var triggeredAlarms []triggerdAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggerdAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
 }

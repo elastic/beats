@@ -55,13 +55,20 @@ type MetricWithID struct {
 // API call per metric name and set of dimensions. This will increase API cost.
 // IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
 // monitoring account.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+// OwningAccount works alongside IncludeLinkedAccounts as a filter mechanism to extract metrics specific to a linked account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool,
+	owningAccount string, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+
 	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken:             nextToken,
 		IncludeLinkedAccounts: &includeLinkedAccounts,
+	}
+
+	if owningAccount != "" {
+		listMetricsInput.OwningAccount = &owningAccount
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -84,13 +91,14 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
-		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
 		for i, metric := range page.Metrics {
-			owningAccount := monitoringAccountID
-			if page.OwningAccounts != nil {
-				owningAccount = page.OwningAccounts[i]
+			if page.OwningAccounts == nil {
+				// When IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts.
+				// Hence, account ID is set to the monitoring account ID
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			} else {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
 			}
-			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, owningAccount})
 		}
 	}
 	return metricWithAccountID, nil

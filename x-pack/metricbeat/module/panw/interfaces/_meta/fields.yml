@@ -1,0 +1,7 @@
+- name: interfaces
+  type: group
+  release: beta
+  fields:
+    - name: example
+      type: keyword
+      dimension: true

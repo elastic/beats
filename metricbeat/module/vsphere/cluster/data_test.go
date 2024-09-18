@@ -49,7 +49,11 @@ func TestEventMapping(t *testing.T) {
 		outputNetworkNames:   []string{"Network_0"},
 	}
 
-	outputEvent := m.mapEvent(ClusterTest, &assetNames)
+	var metricDataTest = metricData{
+		assetNames: assetNames,
+	}
+
+	outputEvent := m.mapEvent(ClusterTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"das_config": mapstr.M{
 			"enabled": false,

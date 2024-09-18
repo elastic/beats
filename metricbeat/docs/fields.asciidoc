@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-meraki>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -68,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -50453,6 +50455,17 @@ type: long
 
 --
 
+[[exported-fields-meraki]]
+
+
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -57137,6 +57150,50 @@ Tablespace total size, in bytes.
 type: long
 
 format: bytes
+
+--
+
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
 
 --
 
@@ -66965,6 +67022,16 @@ type: keyword
 
 --
 
+*`vsphere.cluster.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === datastore
 
@@ -67118,6 +67185,16 @@ type: keyword
 
 --
 
+*`vsphere.datastore.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 *`vsphere.datastore.vm.count`*::
 +
 --
@@ -67208,6 +67285,16 @@ Number of datastores in the Datastore Cluster.
 
 
 type: long
+
+--
+
+*`vsphere.datastorecluster.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
 
 --
 
@@ -67568,6 +67655,16 @@ type: keyword
 
 --
 
+*`vsphere.host.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 *`vsphere.host.uptime`*::
 +
 --
@@ -67694,6 +67791,16 @@ Number of virtual machines connected to this network.
 
 
 type: long
+
+--
+
+*`vsphere.network.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
 
 --
 
@@ -67923,6 +68030,16 @@ type: keyword
 
 --
 
+*`vsphere.resourcepool.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
+
+--
+
 [float]
 === virtualmachine
 
@@ -68147,6 +68264,16 @@ type: object
 The number of snapshots of this virtualmachine.
 
 type: long
+
+--
+
+*`vsphere.virtualmachine.triggerd_alarms.*`*::
++
+--
+List of all the triggerd alarms.
+
+
+type: object
 
 --
 

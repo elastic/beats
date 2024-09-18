@@ -191,7 +191,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 
 		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, APIClients.CloudWatchClient)
+		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
 		if err != nil {
 			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
 		}
