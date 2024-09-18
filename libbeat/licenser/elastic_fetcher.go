@@ -18,6 +18,7 @@
 package licenser
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -115,7 +116,9 @@ func (mux *esClientMux) Request(
 ) (int, []byte, error) {
 	c := mux.clients[mux.idx]
 
-	if err := c.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if err := c.Connect(ctx); err != nil {
 		return 0, nil, err
 	}
 	defer c.Close()
