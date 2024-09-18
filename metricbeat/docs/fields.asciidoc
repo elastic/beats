@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -57149,6 +57150,50 @@ Tablespace total size, in bytes.
 type: long
 
 format: bytes
+
+--
+
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
 
 --
 
