@@ -52,8 +52,9 @@ steps:
       - label: "Heartbeat: Run pre-commit"
         command: "echo Run pre-commit"
         agents:
+          provider: "gcp"
           imageProject: "elastic-images-qa"
-          image: "dplatform-ingest-beats-ubuntu-2204-1726662472"
+          image: "platform-ingest-beats-ubuntu-2204-1726662472"
         plugins:
           - elastic/pre-commit#v1.0.1
         notify:
