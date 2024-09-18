@@ -298,11 +298,11 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	})
 	euid := proc.Proc.Euid
 	egid := proc.Proc.Egid
-	process.Parent.PID = proc.Proc.Ppid
+	process.Parent.PID = proc.Pid
 	process.Parent.Start = &start
 	process.Parent.Name = basename(proc.Filename)
 	process.Parent.Executable = proc.Filename
-	process.Parent.Args = []string{proc.Filename} //TODO: FIx
+	process.Parent.Args = proc.Cmdline
 	process.Parent.WorkingDirectory = proc.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -336,7 +336,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	process.GroupLeader.Start = &start
 	process.GroupLeader.Name = basename(proc.Filename)
 	process.GroupLeader.Executable = proc.Filename
-	process.GroupLeader.Args = []string{proc.Filename} //TODO: fix
+	process.GroupLeader.Args = proc.Cmdline
 	process.GroupLeader.WorkingDirectory = proc.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
@@ -370,7 +370,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	process.SessionLeader.Start = &start
 	process.SessionLeader.Name = basename(proc.Filename)
 	process.SessionLeader.Executable = proc.Filename
-	process.SessionLeader.Args = []string{proc.Filename} //TODO: fix
+	process.SessionLeader.Args = proc.Cmdline
 	process.SessionLeader.WorkingDirectory = proc.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
