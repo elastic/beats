@@ -125,7 +125,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		ctx:    ctx,
 		logger: logger,
 		qq:     qq,
-		qqMtx: &qqMtx,
+		qqMtx:  &qqMtx,
 	}
 
 	go func(qq *quark.Queue, logger *logp.Logger, p *prvdr) {
