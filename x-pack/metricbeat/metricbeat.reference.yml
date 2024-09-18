@@ -227,6 +227,8 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       name: ["CPUUtilization"]
@@ -1115,6 +1117,14 @@ metricbeat.modules:
   hosts: ["localhost:11211"]
   enabled: true
 
+#----------------------------- Cisco Meraki Module -----------------------------
+- module: meraki
+  metricsets: ["device_health"]
+  enabled: true
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  
+
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
@@ -1281,6 +1291,14 @@ metricbeat.modules:
 
   # username: ""
   # password: ""
+
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
 
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm

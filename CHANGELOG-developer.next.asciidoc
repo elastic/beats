@@ -203,6 +203,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Refactor x-pack/filebeat/input/websocket for generalisation. {pull}40308[40308]
 - Add a configuration option for TCP/UDP network type. {issue}40407[40407] {pull}40623[40623]
 - Added debug logging to parquet reader in x-pack/libbeat/reader. {pull}40651[40651]
+- Added filebeat debug histograms for s3 object size and events per processed s3 object. {pull}40775[40775]
 
 ==== Deprecated
 
