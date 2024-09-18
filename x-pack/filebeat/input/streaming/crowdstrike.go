@@ -206,7 +206,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			}
 			feedQuery, err := url.ParseQuery(feedURL.RawQuery)
 			if err != nil {
-				return state, Warning{fmt.Errorf("failed to parse feed query: %v", err)}
+				return state, Warning{fmt.Errorf("failed to parse feed query: %w", err)}
 			}
 			feedQuery.Set("offset", strconv.Itoa(offset))
 			feedURL.RawQuery = feedQuery.Encode()
