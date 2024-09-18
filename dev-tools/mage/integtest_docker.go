@@ -141,8 +141,8 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
-		args...,
+		"docker",
+		append([]string{"compose"}, args...)...,
 	)
 
 	err = saveDockerComposeLogs(dir, mageTarget)
@@ -313,8 +313,8 @@ func BuildIntegTestContainers() error {
 		composeEnv,
 		out,
 		os.Stderr,
-		"docker-compose", args...,
-	)
+		"docker",
+		append([]string{"compose"}, args...)...)
 
 	// This sleep is to avoid hitting the docker build issues when resources are not available.
 	if err != nil {
@@ -324,8 +324,8 @@ func BuildIntegTestContainers() error {
 			composeEnv,
 			out,
 			os.Stderr,
-			"docker-compose", args...,
-		)
+			"docker",
+			append([]string{"compose"}, args...)...)
 	}
 	return err
 }
@@ -348,8 +348,8 @@ func StartIntegTestContainers() error {
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
-		args...,
+		"docker",
+		append([]string{"compose"}, args...)...,
 	)
 	return err
 }
@@ -370,7 +370,7 @@ func StopIntegTestContainers() error {
 		composeEnv,
 		ioutil.Discard,
 		out,
-		"docker-compose",
+		"docker", "compose",
 		"-p", DockerComposeProjectName(),
 		"rm", "--stop", "--force",
 	)
@@ -428,7 +428,7 @@ func saveDockerComposeLogs(rootDir string, mageTarget string) error {
 		composeEnv,
 		composeLogFile, // stdout
 		composeLogFile, // stderr
-		"docker-compose",
+		"docker", "compose",
 		"-p", DockerComposeProjectName(),
 		"logs",
 		"--no-color",
