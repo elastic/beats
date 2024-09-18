@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-meraki>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -68,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -50453,6 +50455,17 @@ type: long
 
 --
 
+[[exported-fields-meraki]]
+
+
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -57140,6 +57153,50 @@ format: bytes
 
 --
 
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
@@ -58257,6 +58314,16 @@ type: text
 Stats scraped from a Prometheus endpoint.
 
 
+
+*`metrics_count`*::
++
+--
+Number of metrics per Elasticsearch document.
+
+
+type: long
+
+--
 
 
 *`prometheus.labels.*`*::
@@ -66855,6 +66922,117 @@ vSphere module
 
 
 [float]
+=== cluster
+
+Cluster information.
+
+
+
+
+*`vsphere.cluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.datastore.count`*::
++
+--
+Number of Datastores associated with the cluster.
+
+
+type: long
+
+--
+
+
+*`vsphere.cluster.das_config.admission.control.enabled`*::
++
+--
+Indicates whether strict admission control is enabled.
+
+
+type: boolean
+
+--
+
+*`vsphere.cluster.das_config.enabled`*::
++
+--
+Indicates whether vSphere HA feature is enabled.
+
+
+type: boolean
+
+--
+
+
+*`vsphere.cluster.host.count`*::
++
+--
+Number of Hosts associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.host.names`*::
++
+--
+List of all the Host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.name`*::
++
+--
+Cluster name.
+
+
+type: keyword
+
+--
+
+
+*`vsphere.cluster.network.count`*::
++
+--
+Number of Networks associated with the cluster.
+
+
+type: long
+
+--
+
+*`vsphere.cluster.network.names`*::
++
+--
+List of all the Network names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
+
+--
+
+[float]
 === datastore
 
 datastore
@@ -66909,6 +67087,42 @@ format: percent
 
 --
 
+*`vsphere.datastore.disk.capacity.bytes`*::
++
+--
+Configured size of the datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.capacity.usage.bytes`*::
++
+--
+The amount of storage capacity currently being consumed by datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastore.disk.provisioned.bytes`*::
++
+--
+Amount of storage set aside for use by a datastore.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`vsphere.datastore.fstype`*::
 +
 --
@@ -66939,16 +67153,6 @@ type: keyword
 
 --
 
-*`vsphere.datastore.iops`*::
-+
---
-Storage I/O Control aggregated Input/Output Operations Per Second.
-
-
-type: long
-
---
-
 *`vsphere.datastore.name`*::
 +
 --
@@ -66971,16 +67175,6 @@ format: bytes
 
 --
 
-*`vsphere.datastore.read.latency.total.ms`*::
-+
---
-Average amount of time for a read operation from the datastore in milliseconds.
-
-
-type: long
-
---
-
 *`vsphere.datastore.status`*::
 +
 --
@@ -66988,6 +67182,16 @@ Status of the datastore.
 
 
 type: keyword
+
+--
+
+*`vsphere.datastore.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
 
 --
 
@@ -67023,13 +67227,74 @@ format: bytes
 
 --
 
-*`vsphere.datastore.write.latency.total.ms`*::
+[float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
 +
 --
-Average amount of time for a write operation from the datastore in milliseconds.
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
 
 
 type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
+*`vsphere.datastorecluster.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
 
 --
 
@@ -67390,6 +67655,16 @@ type: keyword
 
 --
 
+*`vsphere.host.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
+
+--
+
 *`vsphere.host.uptime`*::
 +
 --
@@ -67516,6 +67791,16 @@ Number of virtual machines connected to this network.
 
 
 type: long
+
+--
+
+*`vsphere.network.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
 
 --
 
@@ -67745,10 +68030,21 @@ type: keyword
 
 --
 
+*`vsphere.resourcepool.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
+
+--
+
 [float]
 === virtualmachine
 
 virtualmachine
+
 
 
 
@@ -67805,7 +68101,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -67949,6 +68245,35 @@ The uptime of the VM in seconds.
 
 
 type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info.*`*::
++
+--
+Details of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.triggered_alarms.*`*::
++
+--
+List of all the triggered alarms.
+
+
+type: object
 
 --
 
