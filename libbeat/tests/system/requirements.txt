@@ -58,7 +58,7 @@ pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 python-dotenv==0.21.1
-PyYAML==6.0.1
+PyYAML<6
 redis==4.4.4
 semver==2.8.1
 six==1.15.0
