@@ -48,11 +48,9 @@ var (
 
 // Client is an elasticsearch client.
 type Client struct {
-	// We use a pointer here because the connection holds a context
-	// that needs to be recreated in case of error and the connection
-	// that is passed to this client is also used in a closure, we need
-	// to ensure both hold a reference to the same instance of the connection.
-	conn *eslegclient.Connection
+	conn          eslegclient.Connection
+	connCtx       context.Context
+	connCancelCtx context.CancelFunc
 
 	indexSelector    outputs.IndexSelector
 	pipelineSelector *outil.Selector
@@ -137,12 +135,12 @@ func NewClient(
 		return nil, err
 	}
 
-	conn.OnConnectCallback = func() error {
+	conn.OnConnectCallback = func(conn eslegclient.Connection) error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(conn)
+			err := callback(&conn)
 			if err != nil {
 				return err
 			}
@@ -153,7 +151,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(conn)
+				err := callback(&conn)
 				if err != nil {
 					return err
 				}
@@ -190,7 +188,7 @@ func NewClient(
 	pLogIndex.Start()
 	pLogIndexTryDeadLetter.Start()
 	client := &Client{
-		conn:             conn,
+		conn:             *conn,
 		indexSelector:    s.indexSelector,
 		pipelineSelector: pipeline,
 		observer:         observer,
@@ -537,10 +535,14 @@ func (client *Client) applyItemStatus(
 }
 
 func (client *Client) Connect() error {
-	return client.conn.Connect()
+	client.connCtx, client.connCancelCtx = context.WithCancel(context.Background())
+	return client.conn.Connect(client.connCtx)
 }
 
 func (client *Client) Close() error {
+	if client.connCancelCtx != nil {
+		client.connCancelCtx()
+	}
 	return client.conn.Close()
 }
 

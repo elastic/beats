@@ -67,7 +67,6 @@ type Connection struct {
 	// requests will share the same cancellable context
 	// so they can be aborted on Close()
 	reqsContext context.Context
-	cancelReqs  func()
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -82,7 +81,7 @@ type ConnectionSettings struct {
 
 	Kerberos *kerberos.Config
 
-	OnConnectCallback func() error
+	OnConnectCallback func(Connection) error
 	Observer          transport.IOStatser
 
 	Parameters       map[string]string
@@ -184,18 +183,12 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
-	// There are some cases where the connection is created and closed
-	// without being used, so we populate reqsContext and cancelReqs
-	// here to make the returned Connection always safe to use.
-	reqsContext, cancelReqs := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
-		reqsContext:        reqsContext,
-		cancelReqs:         cancelReqs,
 	}
 
 	if s.APIKey != "" {
@@ -267,14 +260,20 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	errors := []string{}
 
 	for _, client := range clients {
-		err = client.Connect()
+		// client.Connect makes a call to get the ES version, so we create
+		// a context for those calls. Users of this Connection will have
+		// to call Connect again.
+		ctx, cancel := context.WithCancel(context.Background())
+		err = client.Connect(ctx)
 		if err != nil {
 			const errMsg = "error connecting to Elasticsearch at %v: %v"
 			client.log.Errorf(errMsg, client.URL, err)
 			err = fmt.Errorf(errMsg, client.URL, err)
 			errors = append(errors, err.Error())
+			cancel()
 			continue
 		}
+		cancel()
 		return &client, nil
 	}
 	return nil, fmt.Errorf("couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)
@@ -282,24 +281,22 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 
 // Connect connects the client. It runs a GET request against the root URL of
 // the configured host, updates the known Elasticsearch version and calls
-// globally configured handlers.
-func (conn *Connection) Connect() error {
+// globally configured handlers. The context is used to control the lifecycle
+// of the HTTP requests/connections, the caller is responsible for cancelling
+// the context to stop any in-flight requests.
+func (conn *Connection) Connect(ctx context.Context) error {
 	if conn.log == nil {
 		conn.log = logp.NewLogger("esclientleg")
 	}
 
-	// Cancel the old context before replacing it. Because this Connection
-	// is not goroutine safe, there should be no in-flight request using
-	// this context, hence it's safe to cancel it.
-	conn.cancelReqs()
-	conn.reqsContext, conn.cancelReqs = context.WithCancel(context.Background())
+	conn.reqsContext = ctx
 
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
 	if conn.OnConnectCallback != nil {
-		if err := conn.OnConnectCallback(); err != nil {
+		if err := conn.OnConnectCallback(*conn); err != nil {
 			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}
@@ -333,10 +330,9 @@ func (conn *Connection) Ping() (ESPingData, error) {
 	return response, nil
 }
 
-// Close closes a connection.
+// Close closes any idle connections from the HTTP client.
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
-	conn.cancelReqs()
 	return nil
 }
 
@@ -369,7 +365,9 @@ func (conn *Connection) Test(d testing.Driver) {
 			})
 		}
 
-		err = conn.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		err = conn.Connect(ctx)
 		d.Fatal("talk to server", err)
 		version := conn.GetVersion()
 		d.Info("version", version.String())
