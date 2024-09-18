@@ -195,7 +195,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 }
 
 func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
-	var triggeredAlarms []triggeredAlarm
+	triggeredAlarms := make([]triggeredAlarm, 0, len(triggeredAlarmState))
 	for _, alarmState := range triggeredAlarmState {
 		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
