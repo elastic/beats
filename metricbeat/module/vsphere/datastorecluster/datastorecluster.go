@@ -154,13 +154,8 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 	}, nil
 }
 
-<<<<<<< HEAD
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	triggeredAlarms := make([]triggerdAlarm, 0, len(triggeredAlarmState))
-=======
 func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
 	var triggeredAlarms []triggeredAlarm
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	for _, alarmState := range triggeredAlarmState {
 		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
