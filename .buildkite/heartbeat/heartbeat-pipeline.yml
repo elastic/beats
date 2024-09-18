@@ -51,16 +51,14 @@ steps:
 
       - label: "Heartbeat: Run pre-commit"
         command: "echo Run pre-commit"
-        retry:
-          automatic:
-            - limit: 1
         agents:
           imageProject: "elastic-images-qa"
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/platform-ingest-beats-ubuntu-2204:latest"
+          image: "dplatform-ingest-beats-ubuntu-2204-1726662472"
+        plugins:
+          - elastic/pre-commit#v1.0.1
         notify:
           - github_commit_status:
-              context: "hearbeat: check/update"
-
+              context: "hearbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -84,8 +82,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        plugins:
-          - elastic/pre-commit#v1.0.1
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
