@@ -57,8 +57,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
-- Added Cisco Meraki module {pull}40836[40836]
-- Added Palo Alto Networks module {pull}40686[40686]
 
 *Osquerybeat*
 
@@ -333,7 +331,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset cluster for the vSphere module. {pull}40536[40536]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
-- Add new metricset datastorecluster for vSphere module. {pull}40634[40634] 
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
@@ -342,6 +340,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
+- Added Cisco Meraki module {pull}40836[40836]
+- Added Palo Alto Networks module {pull}40686[40686]
 
 *Metricbeat*
 
