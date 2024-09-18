@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package quarkprovider
+package modernprovider
 
 import (
 	"context"

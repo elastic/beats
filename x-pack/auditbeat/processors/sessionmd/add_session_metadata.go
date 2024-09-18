@@ -17,9 +17,8 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpfprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quarkprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/modernprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -59,7 +58,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	if c.Backend != "quark" {
+	if c.Backend != "modern" {
 		backfilledPIDs := db.ScrapeProcfs()
 		logger.Infof("backfilled %d processes", len(backfilledPIDs))
 	}
@@ -68,31 +67,26 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		p, err = ebpfprovider.NewProvider(ctx, logger, db)
+		p, err = modernprovider.NewProvider(ctx, logger)
 		if err != nil {
-			// Most likely cause of error is not supporting ebpf on system, try procfs
+			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
 			p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
 			logger.Info("backend=auto using procfs")
 		} else {
-			logger.Info("backend=auto using ebpf")
-		}
-	case "ebpf":
-		p, err = ebpfprovider.NewProvider(ctx, logger, db)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
+			logger.Info("backend=auto using modern")
 		}
 	case "procfs":
 		p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}
-	case "quark":
-		p, err = quarkprovider.NewProvider(ctx, logger)
+	case "modern":
+		p, err = modernprovider.NewProvider(ctx, logger)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create quark provider: %w", err)
+			return nil, fmt.Errorf("failed to create modern provider: %w", err)
 		}
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
@@ -157,8 +151,8 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	}
 
 	var fullProcess types.Process
-	if p.backend == "quark" {
-		// Quark doesn't enrich with the processor DB;  process info is taken directly from quark cache
+	if p.backend == "modern" {
+		// modern doesn't enrich with the processor DB;  process info is taken directly from modern cache
 		proc, err := p.provider.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
