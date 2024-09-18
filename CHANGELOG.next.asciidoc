@@ -61,8 +61,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
-- Added Cisco Meraki module {pull}40836[40836]
-- Added Palo Alto Networks module {pull}40686[40686]
 
 *Osquerybeat*
 
@@ -333,6 +331,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
+- Added Cisco Meraki module {pull}40836[40836]
+- Added Palo Alto Networks module {pull}40686[40686]
 
 *Metricbeat*
 
