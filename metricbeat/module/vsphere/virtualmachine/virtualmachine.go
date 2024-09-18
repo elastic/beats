@@ -50,7 +50,7 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -60,14 +60,14 @@ type triggerdAlarm struct {
 }
 
 type VMData struct {
-	VM             mo.VirtualMachine
-	HostID         string
-	HostName       string
-	NetworkNames   []string
-	DatastoreNames []string
-	CustomFields   mapstr.M
-	Snapshots      []VMSnapshotData
-	triggerdAlarms []triggerdAlarm
+	VM              mo.VirtualMachine
+	HostID          string
+	HostName        string
+	NetworkNames    []string
+	DatastoreNames  []string
+	CustomFields    mapstr.M
+	Snapshots       []VMSnapshotData
+	triggeredAlarms []triggeredAlarm
 }
 
 type VMSnapshotData struct {
@@ -204,20 +204,20 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
 		}
 
-		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, vm.TriggeredAlarmState)
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, vm.TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve alerts from VM %s: %w", vm.Name, err)
 		}
 
 		data := VMData{
-			VM:             vm,
-			HostID:         hostID,
-			HostName:       hostName,
-			NetworkNames:   networkNames,
-			DatastoreNames: datastoreNames,
-			CustomFields:   customFields,
-			Snapshots:      snapshots,
-			triggerdAlarms: triggerdAlarm,
+			VM:              vm,
+			HostID:          hostID,
+			HostName:        hostName,
+			NetworkNames:    networkNames,
+			DatastoreNames:  datastoreNames,
+			CustomFields:    customFields,
+			Snapshots:       snapshots,
+			triggeredAlarms: triggeredAlarm,
 		}
 
 		reporter.Event(mb.Event{
@@ -322,10 +322,10 @@ func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapsho
 	return snapshots
 }
 
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	var triggeredAlarms []triggerdAlarm
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {
