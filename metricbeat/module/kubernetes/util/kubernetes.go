@@ -593,9 +593,14 @@ func NewResourceMetadataEnricher(
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
 	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-	config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
-	config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
-
+	err = config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
@@ -760,8 +765,14 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
-	config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
-	config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	err = config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 
 	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	if err != nil {
