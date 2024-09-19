@@ -60,5 +60,9 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
+
 	return event
 }
