@@ -24,10 +24,22 @@ processors:
 
 {{ end }}
 
+{{ $journaldDetected := false }}
+
 {{if eq .builtin.osFamily "debian" }}
   {{if eq .builtin.osVersion "12 (bookworm)" }}
-     {{ template "journald" }}
-  {{end}}
+    {{ $journaldDetected = true }}
+  {{  end  }}
+{{  end  }}
+
+{{ if .use_journald }}
+  {{ template "journald" . }}
+{{ else if .use_logs }}
+  {{ template "log-files" . }}
 {{ else }}
-{{ template "log-files" }}
-{{end}}
+  {{ if $journaldDetected }}
+    {{ template "journald" . }}
+  {{ else }}
+    {{ template "log-files" . }}
+  {{ end }}
+{{ end }}

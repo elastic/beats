@@ -8,6 +8,10 @@ var:
     os.darwin:
       - /var/log/system.log*
     os.windows: []
+  - name: use_journald
+    default: false
+  - name: use_logs
+    default: false
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/syslog.yml
