@@ -1,46 +1,89 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "event": {
-        "dataset": "vsphere.host",
-        "duration": 115000,
-        "module": "vsphere"
-    },
+    "@timestamp": "2022-09-06T06:41:22.128Z",
     "metricset": {
         "name": "host",
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:55538",
+        "address": "https://localhost:8989/sdk",
         "type": "vsphere"
+    },
+    "event": {
+        "module": "vsphere",
+        "duration": 23519250,
+        "dataset": "vsphere.host"
     },
     "vsphere": {
         "host": {
+            "triggered_alarms": [
+                {
+                    "status": "red",
+                    "triggered_time": "2024-09-09T13:23:00.786Z",
+                    "description": "Default alarm to monitor system boards.  See the host's Hardware Status tab for more details.",
+                    "entity_name": "121.0.0.0",
+                    "name": "Host hardware system board status",
+                    "id": "alarm-121.host-12"
+                },
+                {
+                    "triggered_time": "2024-09-09T13:23:00.786Z",
+                    "description": "Default alarm to monitor storage.  See the host's Hardware Status tab for more details.",
+                    "entity_name": "121.0.0.0",
+                    "name": "Host storage status",
+                    "id": "alarm-124.host-12",
+                    "status": "red"
+                },
+                {
+                    "entity_name": "121.0.0.0",
+                    "name": "Host memory usage",
+                    "id": "alarm-4.host-12",
+                    "status": "yellow",
+                    "triggered_time": "2024-08-28T10:31:26.621Z",
+                    "description": "Default alarm to monitor host memory usage"
+                },
+                {
+                    "name": "CPU Utilization",
+                    "id": "alarm-703.host-12",
+                    "status": "red",
+                    "triggered_time": "2024-08-28T10:31:26.621Z",
+                    "description": "",
+                    "entity_name": "121.0.0.0"
+                }
+            ],
             "cpu": {
-                "free": {
-                    "mhz": 4521
+                "used": {
+                    "mhz": 67
                 },
                 "total": {
                     "mhz": 4588
                 },
-                "used": {
-                    "mhz": 67
+                "free": {
+                    "mhz": 4521
                 }
             },
-            "datastore": {
-                "count": 1,
-                "names": [
-                    "LocalDS_0"
-                ]
-            },
             "disk": {
-                "read": {
-                    "bytes": 159744
+                "capacity": {
+                    "usage": {
+                        "bytes": 0
+                    }
+                },
+                "devicelatency": {
+                    "average": {
+                        "ms": 0
+                    }
+                },
+                "latency": {
+                    "total": {
+                        "ms": 18
+                    }
                 },
                 "total": {
-                    "bytes": 401408
+                    "bytes": 262000
+                },
+                "read": {
+                    "bytes": 13000
                 },
                 "write": {
-                    "bytes": 259072
+                    "bytes": 248000
                 }
             },
             "memory": {
@@ -54,49 +97,79 @@
                     "bytes": 1472200704
                 }
             },
-            "name": "localhost.localdomain",
             "network": {
                 "bandwidth": {
-                    "received": {
-                        "bytes": 270336
-                    },
                     "total": {
-                        "bytes": 532480
+                        "bytes": 372000
                     },
                     "transmitted": {
-                        "bytes": 249856
+                        "bytes": 0
+                    },
+                    "received": {
+                        "bytes": 371000
                     }
                 },
-                "count": 1,
-                "names": [
-                    "VM Network"
-                ],
                 "packets": {
-                    "multicast": {
+                    "received": {
+                        "count": 9463
+                    },
+                    "errors": {
+                        "transmitted": {
+                            "count": 0
+                        },
                         "received": {
-                            "count": 61
+                            "count": 0
+                        },
+                        "total": {
+                            "count": 0
                         }
                     },
-                    "received": {
-                        "count": 4569
+                    "multicast": {
+                        "total": {
+                            "count": 6679
+                        },
+                        "transmitted": {
+                            "count": 0
+                        },
+                        "received": {
+                            "count": 6679
+                        }
+                    },
+                    "dropped": {
+                        "received": {
+                            "count": 0
+                        },
+                        "total": {
+                            "count": 0
+                        },
+                        "transmitted": {
+                            "count": 0
+                        }
                     },
                     "transmitted": {
-                        "count": 4578
+                        "count": 54
                     }
                 }
+            },
+            "vm": {
+                "count": 2,
+                "names": [
+                    "DC0_H0_VM0",
+                    "DC0_H0_VM1"
+                ]
+            },
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "LocalDS_0"
+                ]
             },
             "network_names": [
                 "VM Network"
             ],
-            "status": "gray",
-            "uptime": 77229,
-            "vm": {
-                "count": 2,
-                "names": [
-                    "ha-host_VM0",
-                    "ha-host_VM1"
-                ]
-            }
+            "name": "DC0_H0",
+            "status": "green",
+            "uptime": 1728865
         }
     }
 }
