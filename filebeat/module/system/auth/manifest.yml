@@ -12,6 +12,10 @@ var:
     os.windows: []
   - name: tags
     default: []
+  - name: use_journald
+    default: false
+  - name: use_logs
+    default: false
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/auth.yml
