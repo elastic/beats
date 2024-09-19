@@ -898,7 +898,9 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if !isElasticsearchOutput(outCfg.Name()) {
 				return fmt.Errorf("index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}

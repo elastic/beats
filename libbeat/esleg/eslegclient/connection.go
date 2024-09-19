@@ -251,7 +251,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err
@@ -260,20 +260,14 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	errors := []string{}
 
 	for _, client := range clients {
-		// client.Connect makes a call to get the ES version, so we create
-		// a context for those calls. Users of this Connection will have
-		// to call Connect again.
-		ctx, cancel := context.WithCancel(context.Background())
 		err = client.Connect(ctx)
 		if err != nil {
 			const errMsg = "error connecting to Elasticsearch at %v: %v"
 			client.log.Errorf(errMsg, client.URL, err)
 			err = fmt.Errorf(errMsg, client.URL, err)
 			errors = append(errors, err.Error())
-			cancel()
 			continue
 		}
-		cancel()
 		return &client, nil
 	}
 	return nil, fmt.Errorf("couldn't connect to any of the configured Elasticsearch hosts. Errors: %v", errors)

@@ -88,7 +88,11 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		esClient, err := makeESClient(b.Config.Output.Config(), 3, 2*time.Second)
+		// TODO(Tiago): I believe this cannot be cancelled here, but all tests are passing
+		// so I need to fund out the correct life cycle for this connection/context
+		ctx, cancel := context.WithCancel(context.TODO())
+		defer cancel()
+		esClient, err := makeESClient(ctx, b.Config.Output.Config(), 3, 2*time.Second)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
@@ -275,7 +279,10 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
+		// TODO(Tiago): find out the correct lifecycle for this context/connection
+		ctx, cancel := context.WithCancel(context.TODO())
+		defer cancel()
+		esClient, err := makeESClient(ctx, outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
 			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
 		} else {
@@ -324,7 +331,7 @@ func (bt *Heartbeat) Stop() {
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
-func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
 	var (
 		esClient *eslegclient.Connection
 		err      error
@@ -353,7 +360,7 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 	}
 
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(newCfg, "Heartbeat")
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat")
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil
