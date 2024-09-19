@@ -20,6 +20,7 @@
 package eslegclient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -90,7 +91,9 @@ func TestOneHost500Resp(t *testing.T) {
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
 	client := newTestConnection(t, server.URL)
-	err := client.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err := client.Connect(ctx)
 	if err != nil {
 		t.Fatalf("Failed to connect: %v", err)
 	}
