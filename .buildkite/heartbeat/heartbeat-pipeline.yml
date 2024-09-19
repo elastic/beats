@@ -50,16 +50,15 @@ steps:
               context: "hearbeat: check/update"
 
       - label: "Heartbeat: Run pre-commit"
-        command: "echo Run pre-commit"
+        command: "pre-commit run --all-files"
         agents:
-          provider: "gcp"
-          imageProject: "elastic-images-qa"
-          image: "platform-ingest-beats-ubuntu-2204-1726662472"
-        plugins:
-          - elastic/pre-commit#v1.0.1
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:b3e009b6615409c2f3687f227b268f6512fd785d"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "hearbeat: pre-commit"
+              context: "heartbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
