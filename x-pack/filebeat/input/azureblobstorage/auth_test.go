@@ -76,7 +76,7 @@ func Test_OAuth2(t *testing.T) {
 		},
 	}
 
-	//logp.TestingSetup()
+	logp.TestingSetup()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())
