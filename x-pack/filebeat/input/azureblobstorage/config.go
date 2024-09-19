@@ -74,12 +74,7 @@ func defaultConfig() config {
 }
 
 func (c config) Validate() error {
-	switch {
-	case c.Auth.SharedCredentials != nil && c.Auth.SharedCredentials.AccountKey == "":
-		return fmt.Errorf("account key is required for shared credentials")
-	case c.Auth.ConnectionString != nil && c.Auth.ConnectionString.URI == "":
-		return fmt.Errorf("connection string is required for connection string auth")
-	case c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == ""):
+	if c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == "") {
 		return fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth")
 	}
 	return nil

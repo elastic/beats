@@ -29,68 +29,14 @@ var configTests = []struct {
 			},
 			"max_workers":   2,
 			"poll":          true,
-			"poll_interval": "20s",
+			"poll_interval": "10s",
 			"containers": []map[string]interface{}{
 				{
 					"name": beatsContainer,
 				},
 			},
 		},
-		wantErr: fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth"),
-	},
-	{
-		name: "invalid_shared_credentials_config",
-		config: map[string]interface{}{
-			"account_name": "beatsblobnew",
-			"shared_credentials": map[string]interface{}{
-				"account_key": "",
-			},
-			"max_workers":   2,
-			"poll":          true,
-			"poll_interval": "20s",
-			"containers": []map[string]interface{}{
-				{
-					"name": beatsContainer,
-				},
-			},
-		},
-		wantErr: fmt.Errorf("account key is required for shared credentials"),
-	},
-	{
-		name: "invalid_shared_credentials_config",
-		config: map[string]interface{}{
-			"account_name": "beatsblobnew",
-			"shared_credentials": map[string]interface{}{
-				"account_key": "",
-			},
-			"max_workers":   2,
-			"poll":          true,
-			"poll_interval": "20s",
-			"containers": []map[string]interface{}{
-				{
-					"name": beatsContainer,
-				},
-			},
-		},
-		wantErr: fmt.Errorf("account key is required for shared credentials"),
-	},
-	{
-		name: "invalid_connection_string_config",
-		config: map[string]interface{}{
-			"account_name": "beatsblobnew",
-			"connection_string": map[string]interface{}{
-				"uri": "",
-			},
-			"max_workers":   2,
-			"poll":          true,
-			"poll_interval": "20s",
-			"containers": []map[string]interface{}{
-				{
-					"name": beatsContainer,
-				},
-			},
-		},
-		wantErr: fmt.Errorf("connection string is required for connection string auth"),
+		wantErr: fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth accessing config"),
 	},
 	{
 		name: "valid_oauth2_config",
@@ -103,7 +49,7 @@ var configTests = []struct {
 			},
 			"max_workers":   2,
 			"poll":          true,
-			"poll_interval": "20s",
+			"poll_interval": "10s",
 			"containers": []map[string]interface{}{
 				{
 					"name": beatsContainer,

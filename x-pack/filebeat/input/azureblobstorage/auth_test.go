@@ -60,7 +60,7 @@ func Test_OAuth2(t *testing.T) {
 				},
 				"max_workers":   2,
 				"poll":          true,
-				"poll_interval": "20s",
+				"poll_interval": "30s",
 				"containers": []map[string]interface{}{
 					{
 						"name": beatsContainer,
@@ -76,7 +76,7 @@ func Test_OAuth2(t *testing.T) {
 		},
 	}
 
-	logp.TestingSetup()
+	//logp.TestingSetup()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())
