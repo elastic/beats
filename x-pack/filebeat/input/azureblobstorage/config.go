@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
 
@@ -61,6 +63,8 @@ type OAuth2Config struct {
 	ClientID     string `config:"client_id"`
 	ClientSecret string `config:"client_secret"`
 	TenantID     string `config:"tenant_id"`
+	// clientOptions is used internally for testing purposes only
+	clientOptions azcore.ClientOptions
 }
 
 func defaultConfig() config {
