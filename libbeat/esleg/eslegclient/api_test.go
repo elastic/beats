@@ -19,6 +19,7 @@
 package eslegclient
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -178,7 +179,9 @@ func newTestConnection(t *testing.T, url string) *Connection {
 		URL: url,
 	})
 	conn.Encoder = NewJSONEncoder(nil, false)
-	if err := conn.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := conn.Connect(ctx); err != nil {
 		t.Fatalf("cannot connect to Elasticsearch: %s", err)
 	}
 
