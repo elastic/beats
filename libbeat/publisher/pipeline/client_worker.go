@@ -115,6 +115,9 @@ func (w *netClientWorker) run() {
 		reconnectAttempts = 0
 	)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	for {
 		// We wait for either the worker to be closed or for there to be a batch of
 		// events to publish.
@@ -139,7 +142,7 @@ func (w *netClientWorker) run() {
 					w.logger.Infof("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
 				}
 
-				err := w.client.Connect()
+				err := w.client.Connect(ctx)
 				connected = err == nil
 				if connected {
 					w.logger.Infof("Connection to %v established", w.client)
@@ -152,15 +155,14 @@ func (w *netClientWorker) run() {
 				continue
 			}
 
-			if err := w.publishBatch(batch); err != nil {
+			if err := w.publishBatch(ctx, batch); err != nil {
 				connected = false
 			}
 		}
 	}
 }
 
-func (w *netClientWorker) publishBatch(batch publisher.Batch) error {
-	ctx := context.Background()
+func (w *netClientWorker) publishBatch(ctx context.Context, batch publisher.Batch) error {
 	if w.tracer != nil && w.tracer.Recording() {
 		tx := w.tracer.StartTransaction("publish", "output")
 		defer tx.End()
