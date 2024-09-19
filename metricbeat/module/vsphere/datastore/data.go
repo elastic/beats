@@ -49,8 +49,8 @@ func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.
 		},
 	}
 
-	if len(data.triggerdAlarms) > 0 {
-		event.Put("triggerd_alarms", data.triggerdAlarms)
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
 	if ds.Summary.Capacity > 0 {

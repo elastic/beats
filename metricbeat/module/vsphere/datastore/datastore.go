@@ -55,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &DataStoreMetricSet{ms}, nil
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -65,9 +65,9 @@ type triggerdAlarm struct {
 }
 
 type metricData struct {
-	perfMetrics    map[string]interface{}
-	assetNames     assetNames
-	triggerdAlarms []triggerdAlarm
+	perfMetrics     map[string]interface{}
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
 type assetNames struct {
@@ -149,16 +149,16 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 			m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
 		}
 
-		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, dst[i].TriggeredAlarmState)
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, dst[i].TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %w", dst[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{
 			MetricSetFields: m.mapEvent(dst[i], &metricData{
-				perfMetrics:    metricMap,
-				triggerdAlarms: triggerdAlarm,
-				assetNames:     assetNames,
+				perfMetrics:     metricMap,
+				triggeredAlarms: triggeredAlarm,
+				assetNames:      assetNames,
 			}),
 		})
 	}
@@ -213,10 +213,10 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 	}, nil
 }
 
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	var triggeredAlarms []triggerdAlarm
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {

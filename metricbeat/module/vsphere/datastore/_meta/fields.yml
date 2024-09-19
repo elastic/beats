@@ -64,11 +64,11 @@
       type: keyword
       description: >
         Status of the datastore.
-    - name: triggerd_alarms.*
+    - name: triggered_alarms.*
       type: object
       object_type: keyword
       description: >
-        List of all the triggerd alarms.
+        List of all the triggered alarms.
     - name: vm.count
       type: long
       description: >

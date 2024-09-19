@@ -112,8 +112,8 @@
           type: keyword
           description: >
             Names of virtual machines on the resource pool.
-    - name: triggerd_alarms.*
+    - name: triggered_alarms.*
       type: object
       object_type: keyword
       description: >
-        List of all the triggerd alarms.
+        List of all the triggered alarms.

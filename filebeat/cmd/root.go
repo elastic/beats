@@ -57,7 +57,7 @@ func FilebeatSettings(moduleNameSpace string) instance.Settings {
 		Initialize: []func(){
 			include.InitializeModule,
 			func() { fileset.RegisterMonitoringModules(moduleNameSpace) },
-			input.RegisterMonitoringInputs,
+			func() { input.RegisterMonitoringInputs("") },
 		},
 	}
 }

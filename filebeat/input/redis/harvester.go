@@ -81,27 +81,36 @@ func (h *Harvester) Run() error {
 		return nil
 	default:
 	}
-	// Writes Slowlog get and slowlog reset both to the buffer so they are executed together
+	// Writes Slowlog get, slowlog reset, and role to the buffer so they are executed together
 	if err := h.conn.Send("SLOWLOG", "GET"); err != nil {
 		return fmt.Errorf("error sending slowlog get: %w", err)
 	}
 	if err := h.conn.Send("SLOWLOG", "RESET"); err != nil {
 		return fmt.Errorf("error sending slowlog reset: %w", err)
 	}
+	if err := h.conn.Send("ROLE"); err != nil {
+		return fmt.Errorf("error sending role: %w", err)
+	}
 
-	// Flush the buffer to execute both commands and receive the reply from SLOWLOG GET
+	// Flush the buffer to execute all commands and receive the replies
 	h.conn.Flush()
 
-	// Receives first reply from redis which is the one from GET
+	// Receives first reply from redis which is the one from SLOWLOG GET
 	logs, err := rd.Values(h.conn.Receive())
 	if err != nil {
 		return fmt.Errorf("error receiving slowlog data: %w", err)
 	}
 
-	// Read reply from RESET
+	// Read reply from SLOWLOG RESET
 	_, err = h.conn.Receive()
 	if err != nil {
 		return fmt.Errorf("error receiving reset data: %w", err)
+	}
+
+	// Read reply from ROLE
+	role, err := h.conn.Receive()
+	if err != nil {
+		return fmt.Errorf("error receiving replication role: %w", err)
 	}
 
 	for _, item := range logs {
@@ -146,6 +155,7 @@ func (h *Harvester) Run() error {
 			"duration": mapstr.M{
 				"us": log.duration,
 			},
+			"role": role,
 		}
 
 		if log.args != nil {

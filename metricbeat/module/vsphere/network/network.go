@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &NetworkMetricSet{ms}, nil
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -68,8 +68,8 @@ type triggerdAlarm struct {
 }
 
 type metricData struct {
-	assetNames     assetNames
-	triggerdAlarms []triggerdAlarm
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
 type assetNames struct {
@@ -127,13 +127,13 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				continue
 			}
 
-			triggerdAlarm, err := getTriggerdAlarm(ctx, pc, networks[i].TriggeredAlarmState)
+			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, networks[i].TriggeredAlarmState)
 			if err != nil {
 				m.Logger().Errorf("Failed to retrieve alerts from network %s: %w", networks[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm}),
+				MetricSetFields: m.mapEvent(networks[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm}),
 			})
 		}
 	}
@@ -172,10 +172,10 @@ func getAssetNames(ctx context.Context, pc *property.Collector, net *mo.Network)
 	}, nil
 }
 
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	var triggeredAlarms []triggerdAlarm
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {

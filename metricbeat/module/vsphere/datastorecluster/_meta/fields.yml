@@ -26,8 +26,8 @@
       type: long
       description: >
         Number of datastores in the Datastore Cluster.
-    - name: triggerd_alarms.*
+    - name: triggered_alarms.*
       type: object
       object_type: keyword
       description: >
-        List of all the triggerd alarms.
+        List of all the triggered alarms.

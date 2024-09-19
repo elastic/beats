@@ -55,7 +55,7 @@ type assetNames struct {
 	outputHostNames      []string
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -65,8 +65,8 @@ type triggerdAlarm struct {
 }
 
 type metricData struct {
-	assetNames     assetNames
-	triggerdAlarms []triggerdAlarm
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
 // New creates a new instance of the MetricSet.
@@ -136,13 +136,13 @@ func (m *ClusterMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 				m.Logger().Warn("Metric das_config.enabled not found")
 			}
 
-			triggerdAlarm, err := getTriggerdAlarm(ctx, pc, clt[i].TriggeredAlarmState)
+			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, clt[i].TriggeredAlarmState)
 			if err != nil {
 				m.Logger().Errorf("Failed to retrieve alerts from cluster %s: %w", clt[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(clt[i], &metricData{assetNames: assetNames, triggerdAlarms: triggerdAlarm}),
+				MetricSetFields: m.mapEvent(clt[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm}),
 			})
 		}
 	}
@@ -194,10 +194,10 @@ func getAssetNames(ctx context.Context, pc *property.Collector, cl *mo.ClusterCo
 	}, nil
 }
 
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	var triggeredAlarms []triggerdAlarm
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {

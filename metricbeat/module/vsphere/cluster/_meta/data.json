@@ -15,7 +15,7 @@
   },
   "vsphere": {
       "cluster": {
-          "triggerd_alarms": [
+          "triggered_alarms": [
               {
                   "status": "red",
                   "triggered_time": "2024-09-09T13:23:00.786Z",

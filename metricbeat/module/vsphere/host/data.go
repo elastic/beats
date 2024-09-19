@@ -46,8 +46,8 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 		m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 	}
 
-	if len(data.triggerdAlarms) > 0 {
-		event.Put("triggerd_alarms", data.triggerdAlarms)
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
 	if len(data.assetNames.outputVmNames) > 0 {

@@ -38,8 +38,8 @@ func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, dat
 		},
 	}
 
-	if len(data.triggerdAlarms) > 0 {
-		event.Put("triggerd_alarms", data.triggerdAlarms)
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
 	return event
