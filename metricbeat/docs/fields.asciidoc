@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-meraki>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -68,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -50453,6 +50455,17 @@ type: long
 
 --
 
+[[exported-fields-meraki]]
+
+
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -57137,6 +57150,50 @@ Tablespace total size, in bytes.
 type: long
 
 format: bytes
+
+--
+
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
 
 --
 
@@ -66965,10 +67022,10 @@ type: keyword
 
 --
 
-*`vsphere.cluster.triggerd_alarms.*`*::
+*`vsphere.cluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67128,10 +67185,10 @@ type: keyword
 
 --
 
-*`vsphere.datastore.triggerd_alarms.*`*::
+*`vsphere.datastore.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67231,10 +67288,10 @@ type: long
 
 --
 
-*`vsphere.datastorecluster.triggerd_alarms.*`*::
+*`vsphere.datastorecluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67598,10 +67655,10 @@ type: keyword
 
 --
 
-*`vsphere.host.triggerd_alarms.*`*::
+*`vsphere.host.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67737,10 +67794,10 @@ type: long
 
 --
 
-*`vsphere.network.triggerd_alarms.*`*::
+*`vsphere.network.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67973,10 +68030,10 @@ type: keyword
 
 --
 
-*`vsphere.resourcepool.triggerd_alarms.*`*::
+*`vsphere.resourcepool.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68210,10 +68267,10 @@ type: long
 
 --
 
-*`vsphere.virtualmachine.triggerd_alarms.*`*::
+*`vsphere.virtualmachine.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
