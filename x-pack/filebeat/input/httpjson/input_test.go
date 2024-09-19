@@ -1357,9 +1357,9 @@ var testCases = []struct {
   </item>
 </order>
 `
-				_, _ = io.ReadAll(r.Body)
+				io.ReadAll(r.Body)
 				r.Body.Close()
-				_, _ = w.Write([]byte(text))
+				w.Write([]byte(text))
 			})
 			server := httptest.NewServer(r)
 			config["request.url"] = server.URL
@@ -1695,7 +1695,7 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 			}
 		}
 
-		_, _ = w.Write([]byte(msg))
+		w.Write([]byte(msg))
 	}
 }
 
