@@ -1695,7 +1695,7 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 			}
 		}
 
-		w.Write([]byte(msg))
+		_, _ = w.Write([]byte(msg))
 	}
 }
 
