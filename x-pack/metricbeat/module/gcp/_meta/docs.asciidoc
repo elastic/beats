@@ -141,6 +141,39 @@ We have updated our field names to align with ECS semantics. As part of this cha
 *  `cloud.account.name` will now contain the Google Cloud Organization Display Name (previously, it contained the project name).
 *  New fields `cloud.project.id` and `cloud.project.name` will be added to store the actual project ID and project name, respectively.
 
+To restore the previous version, you can add a custom ingest pipeline to the Elastic Integration:
+[source,json]
+----
+{
+  "processors": [
+    {
+      "set": {
+        "field": "cloud.account.id",
+        "value": "{{cloud.project.id}}",
+        "if": "ctx?.cloud?.project?.id != null"
+      }
+    },
+    {
+      "set": {
+        "field": "cloud.account.name",
+        "value": "{{cloud.project.name}}",
+        "if": "ctx?.cloud?.project?.name != null"
+      }
+    },
+    {
+      "remove": {
+        "field": [
+          "cloud.project.id",
+          "cloud.project.name"
+        ],
+        "ignore_missing": true
+      }
+    }
+  ]
+}
+----
+For more information on creating custom ingest pipelines and processors, please see the https://www.elastic.co/guide/en/fleet/current/data-streams-pipeline-tutorial.html#data-streams-pipeline-two[Custom Ingest Pipelines] guide.
+
 If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation.
 GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see https://cloud.google.com/monitoring/api/v3/latency-n-retention[Latency of GCP Monitoring Metric Data] for more details.
 In `gcp` module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
