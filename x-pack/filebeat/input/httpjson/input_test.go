@@ -1357,9 +1357,9 @@ var testCases = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				r.Body.Close()
-				w.Write([]byte(text))
+				_, _ = w.Write([]byte(text))
 			})
 			server := httptest.NewServer(r)
 			config["request.url"] = server.URL

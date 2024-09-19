@@ -448,9 +448,9 @@ var inputTests = []struct {
   </item>
 </order>
 `
-				io.ReadAll(r.Body)
+				_, _ = io.ReadAll(r.Body)
 				r.Body.Close()
-				w.Write([]byte(text))
+				_, _ = w.Write([]byte(text))
 			})
 			server := httptest.NewServer(r)
 			config["resource.url"] = server.URL
@@ -582,7 +582,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			_, _ = w.Write([]byte(msg))
 		},
 		want: []map[string]interface{}{
 			{
@@ -630,7 +630,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			_, _ = w.Write([]byte(msg))
 		},
 		want: []map[string]interface{}{
 			{
@@ -676,7 +676,7 @@ var inputTests = []struct {
 				msg = fmt.Sprintf(`{"error":"expected method was %#q"}`, http.MethodGet)
 			}
 
-			w.Write([]byte(msg))
+			_, _ = w.Write([]byte(msg))
 		},
 		want: []map[string]interface{}{
 			{
