@@ -49,7 +49,6 @@ func getLicenseEvents(m *MetricSet) ([]mb.Event, error) {
 func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 	events := make([]mb.Event, 0, len(licenses))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, license := range licenses {
 		expired, err := panw.StringToBool(license.Expired)
@@ -87,7 +86,7 @@ func formatLicenseEvents(m *MetricSet, licenses []License) []mb.Event {
 				"license.expired":       expired,
 				"license.auth_code":     license.AuthCode,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 		// only set the expires field if the license expires
 		if !neverExpires {
