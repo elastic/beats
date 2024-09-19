@@ -48,9 +48,7 @@ var (
 
 // Client is an elasticsearch client.
 type Client struct {
-	conn          eslegclient.Connection
-	connCtx       context.Context
-	connCancelCtx context.CancelFunc
+	conn eslegclient.Connection
 
 	indexSelector    outputs.IndexSelector
 	pipelineSelector *outil.Selector
@@ -534,15 +532,11 @@ func (client *Client) applyItemStatus(
 	return true
 }
 
-func (client *Client) Connect() error {
-	client.connCtx, client.connCancelCtx = context.WithCancel(context.Background())
-	return client.conn.Connect(client.connCtx)
+func (client *Client) Connect(ctx context.Context) error {
+	return client.conn.Connect(ctx)
 }
 
 func (client *Client) Close() error {
-	if client.connCancelCtx != nil {
-		client.connCancelCtx()
-	}
 	return client.conn.Close()
 }
 
