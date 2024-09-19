@@ -13,6 +13,17 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
+    - label: "Deploy/K8S: Run pre-commit"
+      command: "pre-commit run --all-files"
+      agents:
+        image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+        cpu: "4000m"
+        memory: "8Gi"
+        useCustomGlobalHooks: true
+      notify:
+        - github_commit_status:
+            context: "deploy/k8s: pre-commit"
+
     - label: "Checks"
       command: |
         set -euo pipefail

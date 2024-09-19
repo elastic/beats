@@ -45,7 +45,18 @@ steps:
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
-              context: "x-pack-filebeat: check/update"
+              context: "x-pack/filebeat: check/update"
+
+      - label: "x-pack/filebeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
