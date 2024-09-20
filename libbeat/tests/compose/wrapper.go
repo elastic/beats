@@ -174,6 +174,10 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	if len(d.Environment) > 0 {
 		cmd.Env = append(os.Environ(), d.Environment...)
 	}
+
+	// Debug message
+	fmt.Println(">>>>", "docker", strings.Join(append([]string{"compose"}, args...), " "))
+
 	return cmd
 }
 
