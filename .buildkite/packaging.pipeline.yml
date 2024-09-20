@@ -17,11 +17,7 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
-=======
     if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -40,11 +36,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-<<<<<<< HEAD
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
-=======
         if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -88,11 +80,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
-=======
     if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -181,11 +169,7 @@ steps:
     key: packaging-staging
     depends_on: start-gate-staging
     ## Only for release
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == '8.x' 
-=======
     if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -273,11 +257,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-<<<<<<< HEAD
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
-=======
         if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -316,21 +296,13 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.branch == '8.x' || build.env('RUN_SNAPSHOT') == "true"
-=======
     if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == '8.x' 
-=======
     if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
->>>>>>> e8f41bbb0f (Chore: update packaging pipeline to run automatically on 8.x branch (#40915))
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
