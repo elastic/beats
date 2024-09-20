@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup Git
-        uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        uses: elastic/oblt-actions/git/setup@v1
 
       - name: Install Updatecli in the runner
         uses: updatecli/updatecli-action@22fc20fc94d2482874876b66b797e2a4a7178445
