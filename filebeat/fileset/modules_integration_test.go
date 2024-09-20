@@ -20,6 +20,7 @@
 package fileset
 
 import (
+	"context"
 	"encoding/json"
 	"path/filepath"
 	"testing"
@@ -268,7 +269,9 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

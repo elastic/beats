@@ -32,6 +32,7 @@ const (
 // TestLogger is used to report fatal errors to the testing framework.
 type TestLogger interface {
 	Fatal(args ...interface{})
+	Cleanup(f func())
 }
 
 // Connectable defines the minimum interface required to initialize a connected
