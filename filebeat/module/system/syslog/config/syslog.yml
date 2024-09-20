@@ -1,7 +1,18 @@
 {{ define "journald" }}
 type: journald
+id: system-syslog
+facilities:
+  - 1
+  - 2
+  - 3
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
 tags:
   - journald
+  - syslog
 {{ end }}
 
 {{define "log-files" }}

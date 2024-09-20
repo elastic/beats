@@ -1,3 +1,16 @@
+{{ define "journald" }}
+type: journald
+id: system-auth
+facilities:
+  - 4
+  - 10
+tags:
+  - journald
+  - auth
+{{ end }}
+
+{{define "log-files" }}
+
 type: log
 paths:
 {{ range $i, $path := .paths }}
@@ -15,3 +28,25 @@ processors:
 tags: {{ .tags | tojson }}
 
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+{{ end }}
+
+{{ $journaldDetected := false }}
+
+{{if eq .builtin.osFamily "debian" }}
+  {{if eq .builtin.osVersion "12 (bookworm)" }}
+    {{ $journaldDetected = true }}
+  {{  end  }}
+{{  end  }}
+
+{{ if .use_journald }}
+  {{ template "journald" . }}
+{{ else if .use_logs }}
+  {{ template "log-files" . }}
+{{ else }}
+  {{ if $journaldDetected }}
+    {{ template "journald" . }}
+  {{ else }}
+    {{ template "log-files" . }}
+  {{ end }}
+{{ end }}
