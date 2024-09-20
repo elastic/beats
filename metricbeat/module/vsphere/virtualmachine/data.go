@@ -74,6 +74,9 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		event.Put("snapshot.count", len(data.Snapshots))
 		event.Put("snapshot.info", data.Snapshots)
 	}
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
 
 	return event
 }
