@@ -65,10 +65,14 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+include::../include/use-journald.asciidoc[]
+
 [float]
 ==== `auth` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+include::../include/use-journald.asciidoc[]
 
 *`var.tags`*::
 

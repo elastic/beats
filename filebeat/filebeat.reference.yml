@@ -21,6 +21,17 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Force using journald to collect system logs
+    #var.use_journald: true|false
+
+    # Force using log files to collect system logs
+    #var.use_logs: true|false
+
+    # If use_journald and use_logs are false, then
+    # Filebeat will autodetect whether use journald
+    # to collect system logs. If both are true,
+    # then journald is used.
+
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -32,6 +43,17 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Force using journald to collect system logs
+    #var.use_journald: true|false
+
+    # Force using log files to collect system logs
+    #var.use_logs: true|false
+
+    # If use_journald and use_logs are false, then
+    # Filebeat will autodetect whether use journald
+    # to collect system logs. If both are true,
+    # then journald is used.
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
