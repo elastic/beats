@@ -109,11 +109,11 @@ type config struct {
 	CredentialsJSON     string   `config:"credentials_json"`
 	Endpoint            string   `config:"endpoint"`
 
-	opt                 []option.ClientOption
-	period              *durationpb.Duration
-	organizationID      string
-	organizationName    string
-	projectName         string
+	opt              []option.ClientOption
+	period           *durationpb.Duration
+	organizationID   string
+	organizationName string
+	projectName      string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -144,7 +144,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	} else {
 		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
 	}
-	
+
 	if m.config.Endpoint != "" {
 		m.Logger().Warnf("You are using a custom endpoint '%s' for the GCP API calls.", m.config.Endpoint)
 		m.config.opt = append(m.config.opt, option.WithEndpoint(m.config.Endpoint))
