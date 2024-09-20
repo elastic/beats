@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
 - Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Redis: Added replication role as a field to submitted slowlogs
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 
 
@@ -57,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 
 *Osquerybeat*
 
@@ -164,6 +166,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+
 
 *Heartbeat*
 
@@ -298,6 +302,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
 
 *Auditbeat*
 
@@ -336,7 +341,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
-- Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
+- Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
@@ -353,6 +358,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
+
+- Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}40684[40684]
 
 
 *Functionbeat*

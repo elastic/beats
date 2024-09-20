@@ -15,32 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastorecluster
+package sys
 
 import (
-	"github.com/vmware/govmomi/vim25/mo"
+	"fmt"
+	"syscall"
+	"unsafe"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"golang.org/x/sys/windows"
 )
 
-func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, data *metricData) mapstr.M {
-	event := mapstr.M{
-		"name": datastoreCluster.Name,
-		"capacity": mapstr.M{
-			"bytes": datastoreCluster.Summary.Capacity,
-		},
-		"free_space": mapstr.M{
-			"bytes": datastoreCluster.Summary.FreeSpace,
-		},
-		"datastore": mapstr.M{
-			"names": data.assetNames.outputDsNames,
-			"count": len(data.assetNames.outputDsNames),
-		},
-	}
+var _ unsafe.Pointer
 
-	if len(data.triggeredAlarms) > 0 {
-		event.Put("triggered_alarms", data.triggeredAlarms)
-	}
+var (
+	modkernel = windows.NewLazySystemDLL("Kernel32.dll")
 
-	return event
+	procSystemTimeToFileTime = modkernel.NewProc("SystemTimeToFileTime")
+)
+
+func SystemTimeToFileTime(systemTime *windows.Systemtime, fileTime *windows.Filetime) error {
+	r1, _, err := syscall.SyscallN(procSystemTimeToFileTime.Addr(), uintptr(unsafe.Pointer(systemTime)), uintptr(unsafe.Pointer(fileTime)))
+	if r1 == 0 {
+		return fmt.Errorf("error converting system time to file time: %w", err)
+	}
+	return nil
 }

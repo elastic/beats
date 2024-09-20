@@ -15,32 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastorecluster
+package sys
 
 import (
-	"github.com/vmware/govmomi/vim25/mo"
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"golang.org/x/sys/windows"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
 )
 
-func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, data *metricData) mapstr.M {
-	event := mapstr.M{
-		"name": datastoreCluster.Name,
-		"capacity": mapstr.M{
-			"bytes": datastoreCluster.Summary.Capacity,
-		},
-		"free_space": mapstr.M{
-			"bytes": datastoreCluster.Summary.FreeSpace,
-		},
-		"datastore": mapstr.M{
-			"names": data.assetNames.outputDsNames,
-			"count": len(data.assetNames.outputDsNames),
-		},
-	}
+var ansiDecoder *encoding.Decoder
 
-	if len(data.triggeredAlarms) > 0 {
-		event.Put("triggered_alarms", data.triggeredAlarms)
+func init() {
+	ansiCP := windows.GetACP()
+	for _, enc := range charmap.All {
+		cm, ok := enc.(*charmap.Charmap)
+		cmID, _ := cm.ID()
+		if !ok || uint32(cmID) != ansiCP {
+			continue
+		}
+		ansiDecoder = cm.NewDecoder()
+		return
 	}
+	ansiDecoder = charmap.Windows1250.NewDecoder()
+}
 
-	return event
+func ANSIBytesToString(enc []byte) (string, error) {
+	out, err := ansiDecoder.Bytes(enc)
+	return string(out), err
 }

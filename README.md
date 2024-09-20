@@ -89,7 +89,7 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
 (This service is only available for users affiliated with Elastic and not for open-source contributors.)
 
 * [beats][]
-  * `jenkins run the tests please` or `jenkins run tests` or `/test` will kick off a default build.
+  * `buildkite test it` or `/test` will kick off a default build.
   * `/test macos` will kick off a default build with also the `macos` stages.
   * `/test <beat-name>` will kick off the default build for the given PR in addition to the `<beat-name>` build itself.
   * `/test <beat-name> for macos` will kick off a default build with also the `macos` stage for the `<beat-name>`.

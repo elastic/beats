@@ -15,32 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package datastorecluster
+package sys
 
 import (
-	"github.com/vmware/govmomi/vim25/mo"
+	"testing"
+	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 )
 
-func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, data *metricData) mapstr.M {
-	event := mapstr.M{
-		"name": datastoreCluster.Name,
-		"capacity": mapstr.M{
-			"bytes": datastoreCluster.Summary.Capacity,
-		},
-		"free_space": mapstr.M{
-			"bytes": datastoreCluster.Summary.FreeSpace,
-		},
-		"datastore": mapstr.M{
-			"names": data.assetNames.outputDsNames,
-			"count": len(data.assetNames.outputDsNames),
-		},
+func TestSystemTimeToFileTime(t *testing.T) {
+	ts := time.Date(
+		2024, time.Month(9), 3,
+		0, 0, 0, 0, time.UTC).UnixNano()
+	st := windows.Systemtime{
+		Year:  2024,
+		Month: 9,
+		Day:   3,
 	}
-
-	if len(data.triggeredAlarms) > 0 {
-		event.Put("triggered_alarms", data.triggeredAlarms)
+	var ft windows.Filetime
+	if err := SystemTimeToFileTime(&st, &ft); err != nil {
+		t.Fatal(err)
 	}
-
-	return event
+	assert.Equal(t, ts, ft.Nanoseconds())
 }
