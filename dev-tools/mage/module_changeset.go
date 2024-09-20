@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -157,9 +156,8 @@ func printWhenVerbose(template string, parameter string) {
 
 func getBuildkiteCommit() (string, error) {
 	commit := os.Getenv("BUILDKITE_COMMIT")
-
 	if commit == "" {
-		return "", errors.New("BUILDKITE_COMMIT is not defined")
+		log.Fatal("BUILDKITE_COMMIT is not defined")
 	}
 
 	return commit, nil
