@@ -72,3 +72,13 @@
   credentials_file_path: "your JSON credentials file path"
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+ - module: gcp
+  metricsets:
+    - compute
+  region: "us-"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
+  exclude_labels: false
+  period: 1m 
