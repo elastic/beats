@@ -15,18 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package sys
 
-// Config defines the structure for the Kibana module configuration options
-type Config struct {
-	XPackEnabled bool   `config:"xpack.enabled"`
-	ApiKey       string `config:"api_key"`
-}
+import (
+	"fmt"
+	"syscall"
+	"unsafe"
 
-// DefaultConfig returns the default configuration for the Kibana module
-func DefaultConfig() Config {
-	return Config{
-		XPackEnabled: false,
-		ApiKey:       "",
+	"golang.org/x/sys/windows"
+)
+
+var _ unsafe.Pointer
+
+var (
+	modkernel = windows.NewLazySystemDLL("Kernel32.dll")
+
+	procSystemTimeToFileTime = modkernel.NewProc("SystemTimeToFileTime")
+)
+
+func SystemTimeToFileTime(systemTime *windows.Systemtime, fileTime *windows.Filetime) error {
+	r1, _, err := syscall.SyscallN(procSystemTimeToFileTime.Addr(), uintptr(unsafe.Pointer(systemTime)), uintptr(unsafe.Pointer(fileTime)))
+	if r1 == 0 {
+		return fmt.Errorf("error converting system time to file time: %w", err)
 	}
+	return nil
 }
