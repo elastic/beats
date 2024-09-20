@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-	quark "github.com/elastic/quark/go"
+	quark "github.com/mjwolf/quark"
 )
 
 type prvdr struct {
