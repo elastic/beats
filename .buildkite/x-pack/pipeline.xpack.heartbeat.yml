@@ -177,7 +177,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 10 Unit Tests"
 
-      # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
