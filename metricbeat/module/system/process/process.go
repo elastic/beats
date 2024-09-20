@@ -131,8 +131,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	} else {
 		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
-		if err != nil {
+		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
+			// return only if the error is fatal in nature
 			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
+		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			err = mb.PartialMetricsError{Err: err}
 		}
 		r.Event(mb.Event{
 			MetricSetFields: proc,
