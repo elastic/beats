@@ -130,7 +130,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2016 Unit Tests"
 
-      # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat: Win 2022 Unit Tests"
         key: "mandatory-win-2022-unit-tests"
         command: |
