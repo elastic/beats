@@ -137,6 +137,7 @@ func New(
 	syslogIdentifiers []string,
 	transports []string,
 	matchers journalfield.IncludeMatches,
+	facilities []int,
 	mode SeekMode,
 	cursor string,
 	since time.Duration,
@@ -164,6 +165,10 @@ func New(
 
 	for _, m := range transports {
 		args = append(args, fmt.Sprintf("_TRANSPORT=%s", m))
+	}
+
+	for _, facility := range facilities {
+		args = append(args, "--facility", fmt.Sprintf("%d", facility))
 	}
 
 	otherArgs := handleSeekAndCursor(mode, since, cursor)
