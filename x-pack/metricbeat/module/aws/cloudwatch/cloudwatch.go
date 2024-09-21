@@ -234,7 +234,26 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
 					// infoapi includes only WebSocket and HTTP APIs
-					infotherapi, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
+					// apiGatewayRestAPI includes only Rest APIs
+				if useonlyrest {
+					apiGatewayRestAPI, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
+					}
+				} else {
+					apiGatewayRestAPI, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
+					if err != nil {
+						m.Logger().Errorf("could not get rest apis output: %v", err)
+					}
+					// apiGatewayAPI includes only WebSocket and HTTP APIs
+					apiGatewayAPI, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
+					if err != nil {
+						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+					}
+					if len(apiGatewayAPI) > 0 {
+						maps.Copy(apiGatewayRestAPI, apiGatewayAPI)
+					}
+				}
 					if err != nil {
 						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
 					}
