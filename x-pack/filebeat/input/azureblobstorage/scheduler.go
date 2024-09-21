@@ -192,35 +192,20 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.List
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 	var latestJobs []*job
 	jobsToReturn := make([]*job, 0)
-	counter := 0
-	flag := false
-	ignore := false
 
 	for _, job := range jobs {
 		switch {
 		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
 			latestJobs = append(latestJobs, job)
-		case job.name() == s.state.checkpoint().BlobName:
-			flag = true
 		case job.name() > s.state.checkpoint().BlobName:
-			flag = true
-			counter--
-		case job.name() <= s.state.checkpoint().BlobName && (!ignore):
-			ignore = true
+			jobsToReturn = append(jobsToReturn, job)
 		}
-		counter++
-	}
-
-	if flag && (counter < len(jobs)-1) {
-		jobsToReturn = jobs[counter+1:]
-	} else if !flag && !ignore {
-		jobsToReturn = jobs
 	}
 
 	// in a senario where there are some jobs which have a greater timestamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
 	// than the current checkpoint blob name, then we append the latest jobs
-	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
+	if len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
 
