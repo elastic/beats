@@ -1261,7 +1261,9 @@ func (m *MockResourceGroupsTaggingClient) GetResources(context.Context, *resourc
 type MockResourceGroupsTaggingClient2 struct{}
 
 // GetResources implements resourcegroupstaggingapi.GetResourcesAPIClient.
-func (m *MockResourceGroupsTaggingClient2) GetResources(context.Context, *apigateway.GetResourcesInput, ...func(*apigateway.Options)) (*restapi.GetResourcesOutput, error) {
+func (m *MockResourceGroupsTaggingClient2) GetResources(context.Context, *apigateway.GetResourcesInput, ...func(*apigateway.Options)) (*apigateway.GetResourcesOutput, error) {
+	return &apigateway.GetResourcesOutput{}, nil
+}
 	return &restapi.GetResourcesOutput{}, nil
 }
 
