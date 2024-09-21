@@ -205,10 +205,9 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add a configuration option for TCP/UDP network type. {issue}40407[40407] {pull}40623[40623]
 - Added debug logging to parquet reader in x-pack/libbeat/reader. {pull}40651[40651]
 - Added filebeat debug histograms for s3 object size and events per processed s3 object. {pull}40775[40775]
-- Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}35705[35705] {pull}35724[35724]
-
+- Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}40674[40674] {pull}40936[40936]
 ==== Deprecated
 
 - Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]
 - Deprecate Beat generators. {pull}28814[28814]
-- Remove garbled PE executable test from auditbeat FIM module testing. {issue}40674[40674] {pull}40936[40936]
+- Remove garbled PE executable test from auditbeat FIM module testing. {issue}35705[35705] {pull}35724[35724]
