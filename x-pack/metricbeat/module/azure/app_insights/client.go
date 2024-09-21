@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 
@@ -40,6 +40,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	var bodyMetrics []insights.MetricsPostBodySchema
 	var result insights.ListMetricsResultsItem
 	for _, metrics := range client.Config.Metrics {
+		metrics := metrics
 		var aggregations []insights.MetricsAggregation
 		var segments []insights.MetricsSegment
 		for _, agg := range metrics.Aggregation {
