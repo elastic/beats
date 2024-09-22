@@ -18,14 +18,18 @@
 package beater
 
 import (
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/eslog"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/go-elasticsearch/v8"
 )
 
 type filebeatStore struct {
@@ -35,6 +39,7 @@ type filebeatStore struct {
 }
 
 func openStateStore(info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
+	var backend backend.Registry
 	memlog, err := memlog.New(logger, memlog.Settings{
 		Root:     paths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
@@ -42,9 +47,29 @@ func openStateStore(info beat.Info, logger *logp.Logger, cfg config.Registry) (*
 	if err != nil {
 		return nil, err
 	}
+	backend = memlog
+	if os.Getenv("ELASTIC_STATESTORE_ENABLED") == "true" {
+		esClient, err := elasticsearch.NewClient(elasticsearch.Config{
+			APIKey: os.Getenv("ELASTIC_STATESTORE_API_KEY"),
+			Addresses: []string{
+				os.Getenv("ELASTIC_STATESTORE_HOST"),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+		eslog, err := eslog.New(logger, eslog.Settings{
+			IndexPrefix: "filebeat-state",
+			ESClient:    esClient,
+		})
+		if err != nil {
+			return nil, err
+		}
+		backend = eslog
+	}
 
 	return &filebeatStore{
-		registry:      statestore.NewRegistry(memlog),
+		registry:      statestore.NewRegistry(backend),
 		storeName:     info.Beat,
 		cleanInterval: cfg.CleanInterval,
 	}, nil
