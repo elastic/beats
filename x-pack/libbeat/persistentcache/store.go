@@ -66,7 +66,7 @@ func (s *Store) Close() error {
 // Set sets a value with a ttl in the store. If ttl is zero, it is ignored.
 func (s *Store) Set(k, v []byte, ttl time.Duration) error {
 	entry := badger.Entry{
-		Key:   []byte(k),
+		Key:   k,
 		Value: v,
 	}
 	if ttl > 0 {
