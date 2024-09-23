@@ -138,7 +138,7 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 
 	// Filter out not owned processes
 	k := 0
-	euid := uint32(os.Geteuid())
+	euid := uint64(os.Geteuid())
 	for i := 0; i < len(procs); i++ {
 		p, err := t.fs.Proc(procs[i].PID)
 		if err != nil {
@@ -148,11 +148,8 @@ func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
 		if err != nil {
 			continue
 		}
-		currentEUID, err := strconv.Atoi(status.UIDs[1])
-		if err != nil {
-			continue
-		}
-		if uint32(currentEUID) != euid {
+		currentEUID := status.UIDs[1]
+		if currentEUID != euid {
 			continue
 		}
 		procs[k] = procs[i]
