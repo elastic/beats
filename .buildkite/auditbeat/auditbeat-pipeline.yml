@@ -101,10 +101,6 @@ steps:
         env:
           STACK_ENVIRONMENT: "next-major"
         command: |
-          set -euo pipefail
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet auditbeat
-          echo "~~~ Running tests"
           cd auditbeat
           mage pythonIntegTest
         retry:
