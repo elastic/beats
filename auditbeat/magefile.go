@@ -21,6 +21,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -166,5 +167,5 @@ func PythinIntegTest() {
 		mg.Deps(devtools.DefineModules)
 	}
 
-	integtest.PythonIntegTest()
+	integtest.PythonIntegTest(context.TODO())
 }
