@@ -66,7 +66,7 @@ func NewProcTable(mountpoint string) (*ProcTable, error) {
 	}
 
 	p := &ProcTable{fs: fs, privileged: privileged}
-	p.Refresh()
+	_ = p.Refresh()
 	return p, nil
 }
 
@@ -89,7 +89,8 @@ func (t *ProcTable) Refresh() error {
 	var errs multierror.Errors
 	inodes := map[uint32]*Proc{}
 	cachedProcs := make(map[int]*Proc, len(procs))
-	for _, p := range procs {
+	for _, pi := range procs {
+		p := pi
 		proc := t.procs[p.PID]
 
 		// Cache miss.
