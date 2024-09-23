@@ -35,10 +35,17 @@ const DefaultApiTimeout = 5 * time.Second
 // If durations are configured in non-whole minute periods, they are rounded up to the next minute e.g. 90s becomes 120s.
 //
 // If `latency` is configured, the period is shifted back in time by specified duration (before period alignment).
-func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration) (time.Time, time.Time) {
+// If endTime of the previous collection period is recorded, then use this endTime as the new startTime. This will guarantee no gap between collection timestamps.
+func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration, previousEndTime time.Time) (time.Time, time.Time) {
 	periodInMinutes := (period + time.Second*29).Round(time.Second * 60)
-	endTime := now.Add(latency * -1).Truncate(periodInMinutes)
-	startTime := endTime.Add(periodInMinutes * -1)
+	var startTime, endTime time.Time
+	if !previousEndTime.IsZero() {
+		startTime = previousEndTime
+		endTime = startTime.Add(periodInMinutes)
+	} else {
+		endTime = now.Add(latency * -1).Truncate(periodInMinutes)
+		startTime = endTime.Add(periodInMinutes * -1)
+	}
 	return startTime, endTime
 }
 

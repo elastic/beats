@@ -26,15 +26,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-var (
-	metricsetName          = "cloudwatch"
-	defaultStatistics      = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
-	dimensionSeparator     = ","
-	dimensionValueWildcard = "*"
-)
-
 const checkns = "AWS/ApiGateway"
 const checkresource_type = "apigateway:restapis"
+
+var (
+	metricsetName            = "cloudwatch"
+	defaultStatistics        = []string{"Average", "Maximum", "Minimum", "Sum", "SampleCount"}
+	dimensionSeparator       = ","
+	dimensionValueWildcard   = "*"
+	checkns_lower            = strings.ToLower(checkns)
+	checkresource_type_lower = strings.ToLower(checkresource_type)
+)
 
 type APIClients struct {
 	CloudWatchClient         *cloudwatch.Client
@@ -61,6 +63,7 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger            *logp.Logger
 	CloudwatchConfigs []Config `config:"metrics" validate:"nonzero,required"`
+	PreviousEndTime   time.Time
 }
 
 // Dimension holds name and value for cloudwatch metricset dimension config.
@@ -100,7 +103,7 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := logp.NewLogger(aws.ModuleName + "." + metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
@@ -132,7 +135,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 	// Initialise the map that will be used in case APIGateway api is configured. Infoapi includes Name_of_API:ID_of_API entries
 	infoapi := make(map[string]string)
@@ -209,10 +213,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
 			//Check whether namespace is APIGW
-			var (
-				checkns_lower            = strings.ToLower(checkns)
-				checkresource_type_lower = strings.ToLower(checkresource_type)
-			)
 			useonlyrest := false
 			if len(resourceTypeTagFilters) == 1 {
 				for key := range resourceTypeTagFilters {
@@ -229,40 +229,24 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
 				} else {
+					// infoapi  includes only Rest APIs
+					// apiGatewayAPI includes only WebSocket and HTTP APIs
 					infoapi, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
 					if err != nil {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
-					// infoapi includes only WebSocket and HTTP APIs
-					// apiGatewayRestAPI includes only Rest APIs
-				if useonlyrest {
-					apiGatewayRestAPI, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
-					if err != nil {
-						m.Logger().Errorf("could not get rest apis output: %v", err)
-					}
-				} else {
-					apiGatewayRestAPI, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
-					if err != nil {
-						m.Logger().Errorf("could not get rest apis output: %v", err)
-					}
-					// apiGatewayAPI includes only WebSocket and HTTP APIs
+
 					apiGatewayAPI, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
 					if err != nil {
 						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
 					}
 					if len(apiGatewayAPI) > 0 {
-						maps.Copy(apiGatewayRestAPI, apiGatewayAPI)
+						maps.Copy(infoapi, apiGatewayAPI)
 					}
-				}
-					if err != nil {
-						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
-					}
-					if len(infotherapi) > 0 {
-						maps.Copy(infoapi, infotherapi)
-					}
+
 				}
 
-				m.Logger().Infof("infoapi response: %v", infoapi)
+				m.Logger().Debugf("infoapi response: %v", infoapi)
 
 			}
 			eventsWithIdentifier, err := m.createEvents(APIClients.CloudWatchClient, APIClients.Resourcegroupstaggingapi, filteredMetricWithStatsTotal, resourceTypeTagFilters, infoapi, regionName, startTime, endTime)

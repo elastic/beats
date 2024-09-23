@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
-	restapi "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
 	"github.com/aws/smithy-go/middleware"
@@ -1264,8 +1263,6 @@ type MockResourceGroupsTaggingClient2 struct{}
 func (m *MockResourceGroupsTaggingClient2) GetResources(context.Context, *apigateway.GetResourcesInput, ...func(*apigateway.Options)) (*apigateway.GetResourcesOutput, error) {
 	return &apigateway.GetResourcesOutput{}, nil
 }
-	return &restapi.GetResourcesOutput{}, nil
-}
 
 func TestCreateEventsWithIdentifier(t *testing.T) {
 	m := MetricSet{}
@@ -1283,7 +1280,9 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 	}}
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
+
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
@@ -1328,7 +1327,8 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1364,7 +1364,8 @@ func TestCreateEventsWithDataGranularity(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1409,7 +1410,8 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	resourceTypeTagFilters["ec2:instance"] = nameTestEC2Tag
 
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, infoAPImap, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(events))
@@ -1573,7 +1575,8 @@ func TestCreateEventsTimestamp(t *testing.T) {
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
 	infoAPImap := make(map[string]string)
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 
 	cloudwatchMock := &MockCloudWatchClientWithoutDim{}
 	resGroupTaggingClientMock := &MockResourceGroupsTaggingClient{}
@@ -1587,6 +1590,7 @@ func TestGetStartTimeEndTime(t *testing.T) {
 	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
 	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
 	m.logger = logp.NewLogger("test")
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency)
+	var previousEndTime time.Time
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.MetricSet.Period, m.MetricSet.Latency, previousEndTime)
 	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }
