@@ -66,8 +66,6 @@ const (
 var (
 	bootID     string
 	pidNsInode uint64
-	initError  error
-	once       sync.Once
 )
 
 func readBootID() (string, error) {
