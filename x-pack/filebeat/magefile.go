@@ -10,6 +10,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"

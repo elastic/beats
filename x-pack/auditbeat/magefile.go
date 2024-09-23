@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
