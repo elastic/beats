@@ -490,6 +490,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: meraki/metrics
+    description: "Cisco Meraki metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: nats/metrics
     description: "NATS metrics"
     platforms: *platforms
@@ -497,6 +502,11 @@ inputs:
     command: *metricbeat_command
   - name: nginx/metrics
     description: "NGINX metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: panw/metrics
+    description: "Palo Alto Networks metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
