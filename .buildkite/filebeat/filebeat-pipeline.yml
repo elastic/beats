@@ -23,6 +23,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module Tests
+  BEAT_PATH: "filebeat"
+
 steps:
   - group: "Check/Update"
     key: "filebeat-check-update"
