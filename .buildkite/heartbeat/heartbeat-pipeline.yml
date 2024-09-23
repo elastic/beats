@@ -113,17 +113,33 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win 2019 Unit Tests"
 
+<<<<<<< HEAD
       - label: ":ubuntu: Heartbeat: Go (Module) Integration Tests"
+=======
+      - label: ":windows: Heartbeat: Win 2022 Unit Test"
+        key: "windows-2022"
         command: |
-          set -euo pipefail
-          echo "~~~ Installing @elastic/synthetics"
-          npm install -g @elastic/synthetics
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "heartbeat: Win 2022 Unit Tests"
 
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet heartbeat
-
-          echo "~~~ Running tests"
+      # Heartbeat has no modules
+      - label: ":ubuntu: Heartbeat: Go Integration Tests"
+>>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
+        command: |
           cd heartbeat
           mage -v goIntegTest
         retry:
@@ -140,14 +156,13 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
+<<<<<<< HEAD
       - label: ":ubuntu: Heartbeat: Python (Module) Integration Tests"
+=======
+      # Heartbeat has no modules yet
+      - label: ":ubuntu: Heartbeat: Python Integration Tests"
+>>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet heartbeat
-
-          echo "~~~ Running tests"
           cd heartbeat
           mage pythonIntegTest
         retry:
