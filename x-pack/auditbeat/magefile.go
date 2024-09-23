@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -24,8 +25,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
