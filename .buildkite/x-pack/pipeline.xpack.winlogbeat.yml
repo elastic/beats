@@ -61,12 +61,9 @@ steps:
     key: "x-pack-winlogbeat-mandatory-tests"
 
     steps:
-      - label: ":windows: x-pack/winlogbeat Win 2019 Unit (MODULE) Tests"
-        key: "mandatory-win-2019-module-unit-tests"
+      - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests"
+        key: "mandatory-win-2019-unit-tests"
         command: |
-          Import-Module ./.buildkite/scripts/changesets.psm1
-          defineModuleFromTheChangeSet 'x-pack/winlogbeat'
-          Write-Output "~~~ Running tests"
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         retry:
@@ -83,7 +80,7 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat Win 2019 Unit (MODULE) Tests"
+              context: "x-pack/winlogbeat Win 2019 Unit Tests"
 
       - label: ":windows: x-pack/winlogbeat: Win 2016 Unit Tests"
         command: |
