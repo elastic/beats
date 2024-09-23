@@ -203,6 +203,10 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" && (os.Getenv("STACK_ENVIRONMENT") == "prev-minor" || os.Getenv("STACK_ENVIRONMENT") == "next-major") {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields, Dashboards)
 	}
