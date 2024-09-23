@@ -163,7 +163,7 @@ func Docs() {
 }
 
 // PythonIntegTest executes the python system tests in the integration
-func PythinIntegTest() {
+func PythonIntegTest() {
 	if os.Getenv("CI") == "true" && os.Getenv("STACK_ENVIRONMENT") == "next-major" {
 		mg.Deps(devtools.DefineModules)
 	}
