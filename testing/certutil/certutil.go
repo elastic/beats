@@ -51,16 +51,16 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, Pair, error) {
 		return nil, nil, Pair{}, fmt.Errorf("could not create private key: %w", err)
 	}
 
-	notBefore := time.Now()
-	notAfter := notBefore.Add(3 * time.Hour)
+	notBefore, notAfter := makeNotBeforeAndAfter()
 
 	rootTemplate := x509.Certificate{
-		DNSNames:     []string{"localhost"},
-		IPAddresses:  []net.IP{net.ParseIP("127.0.0.1")},
 		SerialNumber: big.NewInt(1653),
 		Subject: pkix.Name{
-			Organization: []string{"Gallifrey"},
-			CommonName:   "localhost",
+			Country:            []string{"Gallifrey"},
+			Locality:           []string{"The Capitol"},
+			OrganizationalUnit: []string{"Time Lords"},
+			Organization:       []string{"High Council of the Time Lords"},
+			CommonName:         "High Council",
 		},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
@@ -125,16 +125,16 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, Pair, error) {
 // If any error occurs during the generation process, a non-nil error is returned.
 func GenerateChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, caCert *x509.Certificate) (*tls.Certificate, Pair, error) {
 
-	notBefore := time.Now()
-	notAfter := notBefore.Add(3 * time.Hour)
+	notBefore, notAfter := makeNotBeforeAndAfter()
 
 	certTemplate := &x509.Certificate{
 		DNSNames:     []string{name},
 		IPAddresses:  ips,
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
-			Organization: []string{"Gallifrey"},
-			CommonName:   name,
+			Locality:     []string{"anywhere in time and space"},
+			Organization: []string{"TARDIS"},
+			CommonName:   "Police Public Call Box",
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
@@ -211,4 +211,11 @@ func NewRootAndChildCerts() (Pair, Pair, error) {
 	}
 
 	return rootPair, childPair, nil
+}
+
+func makeNotBeforeAndAfter() (time.Time, time.Time) {
+	now := time.Now()
+	notBefore := now.Add(-1 * time.Minute)
+	notAfter := now.Add(7 * 24 * time.Hour)
+	return notBefore, notAfter
 }
