@@ -208,6 +208,18 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	})
 	metricSet.MonitoringAccountName = getAccountName(svcIam, base, metricSet)
 
+	//Validate LimitRestAPI value.
+	//The Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+	if config.LimitRestAPI != nil {
+		if *config.LimitRestAPI > 500 {
+			base.Logger().Debug("Metricset LimitRestAPI config value can not exceed value 500. Setting LimitRestAPI=25")
+			*config.LimitRestAPI = 25
+		} else if *config.LimitRestAPI <= 0 {
+			base.Logger().Debug("Metricset LimitRestAPI config value can not be <=0. Setting LimitRestAPI=25")
+			*config.LimitRestAPI = 25
+		}
+	}
+
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
 		svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
