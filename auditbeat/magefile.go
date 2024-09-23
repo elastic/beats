@@ -26,8 +26,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	"github.com/magefile/mage/mg"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
