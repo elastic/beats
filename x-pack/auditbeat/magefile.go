@@ -9,10 +9,7 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
-
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -27,13 +24,8 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-<<<<<<< HEAD
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
-=======
-	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
 )
 
 func init() {
@@ -143,7 +135,6 @@ func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
 }
 
-<<<<<<< HEAD
 // -----------------------------------------------------------------------------
 // - Install the librpm-dev package
 var (
@@ -239,7 +230,8 @@ func installDependencies(arch string, pkgs ...string) error {
 		"--no-install-recommends",
 	}, pkgs...)
 	return sh.Run("apt-get", args...)
-=======
+}
+
 // Test runs all available tests (unitTest + integTest)
 func Test() {
 	if os.Getenv("CI") == "true" {
@@ -247,5 +239,4 @@ func Test() {
 	}
 
 	test.Test()
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
 }

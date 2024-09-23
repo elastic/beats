@@ -61,7 +61,6 @@ steps:
     key: "x-pack-auditbeat-mandatory-tests"
 
     steps:
-<<<<<<< HEAD
       - label: ":ubuntu: x-pack/auditbeat: Ubuntu arm64 Unit Tests"
         command: |
           cd x-pack/auditbeat
@@ -80,12 +79,8 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/auditbeat: Build (MODULE) Tests"
-        key: "mandatory-build-test"
-=======
       - label: ":ubuntu: x-pack/auditbeat: Build Tests (Module)"
-        key: "mandatory-linux-unit-test"
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
+        key: "mandatory-build-test"
         command: |
           cd x-pack/auditbeat
           mage update build test
@@ -101,11 +96,7 @@ steps:
           - "x-pack/auditbeat/build/*.json"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "x-pack/auditbeat: Build (MODULE) Tests"
-=======
               context: "x-pack/auditbeat: Build Tests (Module)"
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
 
       - label: ":windows: x-pack/auditbeat: Win 2019 Unit Tests"
         command: |
