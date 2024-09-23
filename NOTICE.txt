@@ -21200,6 +21200,18 @@ THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/mjwolf/quark
+Version: v0.6.0
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/mjwolf/quark@v0.6.0/LICENSE.txt:
+
+Source code in this repository is licensed under the Apache License Version 2.0,
+an Apache compatible license.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/olekukonko/tablewriter
 Version: v0.0.5
 Licence type (autodetected): MIT

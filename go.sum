@@ -1333,10 +1333,6 @@ github.com/mitchellh/mapstructure v1.4.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RR
 github.com/mitchellh/mapstructure v1.4.1/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/mjwolf/quark v0.4.0 h1:adKQdurcNLUMp/jdql5jp89S9TYwitOo+YKd1QAKvC4=
-github.com/mjwolf/quark v0.4.0/go.mod h1:o3qk32z0U4JrIUUik5b6+LZXjuh2zkeoP9mvZYLDiW0=
-github.com/mjwolf/quark v0.5.0 h1:+7A9t1u0Yz/EuEd6srZnZRA+LCwIaBkFjN5iN8289dc=
-github.com/mjwolf/quark v0.5.0/go.mod h1:o3qk32z0U4JrIUUik5b6+LZXjuh2zkeoP9mvZYLDiW0=
 github.com/mjwolf/quark v0.6.0 h1:D7FIBbSMDjQ/bt/NLIGf5s95aJWS/PH73ejgEGKE2v8=
 github.com/mjwolf/quark v0.6.0/go.mod h1:o3qk32z0U4JrIUUik5b6+LZXjuh2zkeoP9mvZYLDiW0=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
