@@ -13,6 +13,8 @@ import (
 
 	"github.com/magefile/mage/mg"
 
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
 	// mage:import
@@ -25,8 +27,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
 )
