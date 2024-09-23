@@ -45,7 +45,6 @@ func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 300, "logstash")
 
 	for _, metricSet := range metricSets {
-		t.Log("DELETEME")
 		t.Run(metricSet, func(t *testing.T) {
 			config := getConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
