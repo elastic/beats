@@ -13,8 +13,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	"github.com/magefile/mage/mg"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
