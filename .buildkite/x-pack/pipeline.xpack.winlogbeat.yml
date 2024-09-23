@@ -49,13 +49,8 @@ steps:
   - group: "Mandatory Tests"
     key: "x-pack-winlogbeat-mandatory-tests"
     steps:
-<<<<<<< HEAD
-      - label: ":windows: x-pack/winlogbeat Win-2019 Unit (MODULE) Tests"
-        key: "mandatory-win-2019-module-unit-tests"
-=======
-      - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests (Module)"
         key: "mandatory-win-2019-unit-tests"
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -73,11 +68,7 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "x-pack/winlogbeat Win-2019 Unit (MODULE) Tests"
-=======
-              context: "x-pack/winlogbeat Win 2019 Unit Tests"
->>>>>>> cc0bda7688 (Go-based changeset definition for MODULE (#40238))
+              context: "x-pack/winlogbeat Win 2019 Unit Tests (Module)"
 
       - label: ":windows: x-pack/winlogbeat Win-2022 Unit Tests"
         command: |

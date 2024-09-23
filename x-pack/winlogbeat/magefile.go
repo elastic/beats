@@ -48,3 +48,12 @@ func Ironbank() error {
 	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
 	return nil
 }
+
+// Test runs all available tests (unitTest + integTest)
+func UnitTest() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	unittest.UnitTest()
+}
