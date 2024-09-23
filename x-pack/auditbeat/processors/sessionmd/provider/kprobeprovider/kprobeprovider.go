@@ -42,15 +42,18 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	// Load kprobe
 	eventsFile, err := os.OpenFile(tracingEvents, os.O_APPEND|os.O_RDWR, 0777)
 	if err != nil {
-		return nil, fmt.Errorf("opening %v: %v", tracingEvents, err)
+		return nil, fmt.Errorf("opening %v: %w", tracingEvents, err)
 	}
 	defer eventsFile.Close()
 
 	if _, err := eventsFile.WriteString(loadExecve); err != nil {
-		return nil, fmt.Errorf("loading execve kprobe: %v", err)
+		return nil, fmt.Errorf("loading execve kprobe: %w", err)
 	}
 
 	pipeFile, err := os.OpenFile(tracingPipe, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("opening trace pipe: %w", err)
+	}
 	//Read from trace pipe, and insert events into DB.
 	go func(f *os.File, logger *logp.Logger) {
 		reader := bufio.NewReader(f)

@@ -18,11 +18,12 @@ import (
 	"sync"
 	"time"
 
+	quark "github.com/mjwolf/quark"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-	quark "github.com/mjwolf/quark"
 )
 
 type prvdr struct {
@@ -52,24 +53,6 @@ const (
 	EntryConsole EntryType = "console"
 	EntryUnknown EntryType = "unknown"
 )
-
-var containerRuntimes = [...]string{
-	"containerd-shim",
-	"runc",
-	"conmon",
-}
-
-// "filtered" executables are executables that relate to internal
-// implementation details of entry mechanisms. The set of circumstances under
-// which they can become an entry leader are reduced compared to other binaries
-// (see implementation and unit tests).
-var filteredExecutables = [...]string{
-	"runc",
-	"containerd-shim",
-	"calico-node",
-	"check-status",
-	"conmon",
-}
 
 const (
 	ptsMinMajor     = 136
@@ -117,7 +100,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 	attr.Flags = quark.QQ_KPROBE | quark.QQ_MIN_AGG | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
-		return nil, fmt.Errorf("open queue: %v", err)
+		return nil, fmt.Errorf("open queue: %w", err)
 	}
 
 	var qqMtx sync.Mutex
@@ -134,7 +117,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 			procs, err := qq.GetEvents()
 			p.qqMtx.Unlock()
 			if err != nil {
-				logger.Errorf("get events from quark: %v", err)
+				logger.Errorf("get events from quark: %w", err)
 				continue
 			}
 			for _, proc := range procs {
@@ -143,7 +126,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 			if len(procs) == 0 {
 				err = qq.Block()
 				if err != nil {
-					logger.Errorf("quark block: %v", err)
+					logger.Errorf("quark block: %w", err)
 					continue
 				}
 			}
@@ -280,7 +263,7 @@ func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 
 func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	p.qqMtx.Lock()
-	p.qqMtx.Unlock()
+	defer p.qqMtx.Unlock()
 
 	return p.qq.Lookup(int(pid))
 }
