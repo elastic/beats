@@ -15,18 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package sys
 
-// Config defines the structure for the Kibana module configuration options
-type Config struct {
-	XPackEnabled bool   `config:"xpack.enabled"`
-	ApiKey       string `config:"api_key"`
-}
+import (
+	"testing"
+	"time"
 
-// DefaultConfig returns the default configuration for the Kibana module
-func DefaultConfig() Config {
-	return Config{
-		XPackEnabled: false,
-		ApiKey:       "",
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
+)
+
+func TestSystemTimeToFileTime(t *testing.T) {
+	ts := time.Date(
+		2024, time.Month(9), 3,
+		0, 0, 0, 0, time.UTC).UnixNano()
+	st := windows.Systemtime{
+		Year:  2024,
+		Month: 9,
+		Day:   3,
 	}
+	var ft windows.Filetime
+	if err := SystemTimeToFileTime(&st, &ft); err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, ts, ft.Nanoseconds())
 }
