@@ -54,10 +54,15 @@ func TestNewReceiver(t *testing.T) {
 		countLogs = countLogs + ld.LogRecordCount()
 		return nil
 	})
+	assert.NoError(t, err, "Error creating log consumer")
 
 	r, err := createReceiver(context.Background(), receiverSettings, &config, logConsumer)
 	assert.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", zapLogs.String())
-	r.Start(context.Background(), nil)
+	err = r.Start(context.Background(), nil)
+	assert.NoError(t, err, "Error starting filebeatreceiver")
+
 	assert.Eventuallyf(t, func() bool { return countLogs > 0 }, 60*time.Second, 1*time.Second, "consumed logs didn't increase\nCount: %d\nLogs: %s\n", countLogs, zapLogs.String())
-	r.Shutdown(context.Background())
+
+	err = r.Shutdown(context.Background())
+	assert.NoError(t, err, "Error shutting down filebeatreceiver")
 }
