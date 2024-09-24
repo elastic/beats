@@ -19,7 +19,7 @@ type filebeatReceiver struct {
 
 func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
 	go func() {
-		fb.beater.Run(fb.beat)
+		_ = fb.beater.Run(fb.beat)
 	}()
 	return nil
 }
