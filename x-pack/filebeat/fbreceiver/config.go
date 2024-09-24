@@ -15,7 +15,7 @@ type Config struct {
 // Validate checks if the configuration in valid
 func (cfg *Config) Validate() error {
 	if len(cfg.Beatconfig) == 0 {
-		return fmt.Errorf("NO config sent")
+		return fmt.Errorf("Configuration is required")
 	}
 	_, prs := cfg.Beatconfig["filebeat"]
 	if !prs {
