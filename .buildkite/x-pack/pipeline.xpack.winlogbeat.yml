@@ -73,8 +73,6 @@ steps:
               context: "x-pack/winlogbeat Win 2019 Unit Tests (Module)"
 
       - label: ":windows: x-pack/winlogbeat Win 2022 Unit Tests (Module)"
-        env:
-          MAGEFILE_VERBOSE: "1"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -140,8 +138,6 @@ steps:
               context: "x-pack/winlogbeat Win 10 Unit Tests (Module)"
 
       - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests (Module)"
-        env:
-          MAGEFILE_VERBOSE: "1"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
