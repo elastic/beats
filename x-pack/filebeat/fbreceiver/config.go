@@ -19,7 +19,7 @@ func (cfg *Config) Validate() error {
 	}
 	_, prs := cfg.Beatconfig["filebeat"]
 	if !prs {
-		return fmt.Errorf("'filebeat' key is required")
+		return fmt.Errorf("Configuration key 'filebeat' is required")
 	}
 	return nil
 }
