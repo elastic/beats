@@ -136,7 +136,6 @@ steps:
           STACK_ENVIRONMENT: "prev-minor"
           TESTING_FILEBEAT_SKIP_DIFF: 1
           PYTEST_ADDOPTS: "-k test_modules"
-          MAGEFILE_VERBOSE: "1"
         command: |
           cd filebeat
           mage pythonIntegTest
@@ -159,7 +158,6 @@ steps:
         env:
           STACK_ENVIRONMENT: "next-major"
           TESTING_FILEBEAT_SKIP_DIFF: 1
-          MAGEFILE_VERBOSE: "1"
         command: |
           cd filebeat
           mage pythonIntegTest
