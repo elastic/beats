@@ -244,7 +244,7 @@ func TestKafkaPublish(t *testing.T) {
 			"publish message with zstd compression to test topic",
 			map[string]interface{}{
 				"compression": "zstd",
-				"version":     "2.6.0",
+				"version":     "2.2.2",
 			},
 			testTopic,
 			single(mapstr.M{
