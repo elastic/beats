@@ -190,8 +190,8 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.List
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	var latestJobs []*job
-	jobsToReturn := make([]*job, 0)
+	latestJobs := make([]*job, 0, len(jobs))
+	jobsToReturn := make([]*job, 0, len(jobs))
 
 	for _, job := range jobs {
 		switch {
@@ -204,7 +204,7 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 	// in a senario where there are some jobs which have a greater timestamp
 	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint blob name, then we append the latest jobs
+	// than the current checkpoint blob name, we then append to the latest jobs
 	if len(latestJobs) > 0 {
 		jobsToReturn = append(latestJobs, jobsToReturn...)
 	}
