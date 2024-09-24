@@ -18,6 +18,8 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  BEAT_PATH: "x-pack/winlogbeat"
+
 steps:
   - group: "Check/Update"
     key: "x-pack-winlogbeat-check-update"
