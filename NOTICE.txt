@@ -21201,11 +21201,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mjwolf/quark
-Version: v0.7.0
+Version: v0.8.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mjwolf/quark@v0.7.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/mjwolf/quark@v0.8.0/LICENSE.txt:
 
 
                                  Apache License
