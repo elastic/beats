@@ -247,9 +247,9 @@ func TestKafkaPublish(t *testing.T) {
 				"version":     "2.6.0",
 			},
 			testTopic,
-			randMulti(5, 100, mapstr.M{
-				"host": "test-host",
-				"type": "log",
+			single(mapstr.M{
+				"host":    "test-host",
+				"message": id,
 			}),
 		},
 	}
