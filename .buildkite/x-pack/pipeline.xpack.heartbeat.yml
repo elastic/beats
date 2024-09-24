@@ -58,8 +58,7 @@ steps:
         command: "pre-commit run --all-files"
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          cpu: "2000m"
-          memory: "4Gi"
+          memory: "2Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
