@@ -9,6 +9,8 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -30,7 +32,7 @@ steps:
           automatic:
             - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
@@ -41,9 +43,9 @@ steps:
       - label: "Libbeat: Run pre-commit"
         command: "pre-commit run --all-files"
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
-          cpu: "4000m"
-          memory: "8Gi"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "2000m"
+          memory: "4Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
