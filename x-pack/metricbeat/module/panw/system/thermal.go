@@ -43,7 +43,6 @@ func formatThermalEvents(m *MetricSet, response *ThermalResponse) []mb.Event {
 
 	events := make([]mb.Event, 0, len(response.Result.Thermal.Slots))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	var event mb.Event
 
@@ -64,7 +63,7 @@ func formatThermalEvents(m *MetricSet, response *ThermalResponse) []mb.Event {
 					"thermal.minimum_temp":    entry.MinimumTemp,
 					"thermal.maximum_temp":    entry.MaximumTemp,
 				},
-				RootFields: rootFields,
+				RootFields: panw.MakeRootFields(m.config.HostIp),
 			}
 
 			events = append(events, event)

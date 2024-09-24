@@ -73,7 +73,6 @@ func convertEntryBooleanFields(entry BGPEntry) map[string]bool {
 func formatBGPEvents(m *MetricSet, entries []BGPEntry) []mb.Event {
 	events := make([]mb.Event, 0, len(entries))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, entry := range entries {
 		booleanFields := convertEntryBooleanFields(entry)
@@ -130,7 +129,7 @@ func formatBGPEvents(m *MetricSet, entries []BGPEntry) []mb.Event {
 				"bgp.nexthop_thirdparty":     booleanFields["bgp.nexthop_thirdparty"],
 				"bgp.nexthop_peer":           booleanFields["bgp.nexthop_peer"],
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)

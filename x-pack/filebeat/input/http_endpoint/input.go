@@ -108,7 +108,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	defer metrics.Close()
 
 	if e.config.Tracer != nil {
-		id := sanitizeFileName(ctx.ID)
+		id := sanitizeFileName(ctx.IDWithoutName)
 		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
 	}
 

@@ -67,7 +67,7 @@ steps:
           - "libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "libbeat: Ununtu x86_64 Unit Tests"
+              context: "libbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"

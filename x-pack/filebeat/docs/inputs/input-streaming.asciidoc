@@ -12,9 +12,9 @@ experimental[]
 <titleabbrev>Streaming</titleabbrev>
 ++++
 
-The `streaming` input reads messages from a streaming data source, for example a websocket server. This input uses the `CEL engine` and the `mito` library interally to parse and process the messages. Having support for `CEL` allows you to parse and process the messages in a more flexible way. It has many similarities with the `cel` input as to how the `CEL` programs are written but deviates in the way the messages are read and processed. Currently only websocket server or API endpoints are supported.
+The `streaming` input reads messages from a streaming data source, for example a websocket server. This input uses the `CEL engine` and the `mito` library internally to parse and process the messages. Having support for `CEL` allows you to parse and process the messages in a more flexible way. It has many similarities with the `cel` input as to how the `CEL` programs are written but differs in the way the messages are read and processed. Currently websocket server or API endpoints, and the Crowdstrike Falcon streaming API are supported.
 
-This input supports:
+The websocket streaming input supports:
 
 * Auth
 ** Basic
@@ -22,6 +22,10 @@ This input supports:
 ** Custom
 
 NOTE: The `streaming` input websocket handler does not currently support XML messages. Auto-reconnects are also not supported at the moment so reconnection will occur on input restart.
+
+The Crowdstrike streaming input requires OAuth2.0 as described in the Crowdstrike documentation for the API. When using the Crowdstrike streaming type, the `crowdstrike_app_id` configuration field must be set. This field specifies the `appId` parameter sent to the Crowdstrike API. See the Crowdstrike documentation for details.
+
+The `stream_type` configuration field specifies which type of streaming input to use, "websocket" or "crowdstrike". If it is not set, the input defaults to websocket streaming  .
 
 ==== Execution
 
@@ -64,7 +68,7 @@ The field could be an array or a single object that will be treated as an array 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 
 
-Example configuration:
+Example configurations:
 
 ["source","yaml",subs="attributes"]
 ----
@@ -80,13 +84,36 @@ filebeat.inputs:
     })
 ----
 
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Read and process events from the Crowdstrike Falcon Hose API
+- type: streaming
+  stream_type: crowdstrike
+  url: https://api.crowdstrike.com/sensors/entities/datafeed/v2
+  auth:
+    client_id: a23fcea2643868ef1a41565a1a8a1c7c
+    client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
+    token_url: https://api.crowdstrike.com/oauth2/token
+  crowdstrike_app_id: my_app_id
+  program: |
+    state.response.decode_json().as(body,{
+      "events": [body],
+      ?"cursor": has(body.?metadata.offset) ?
+        optional.of({"offset": body.metadata.offset})
+      :
+        optional.none(),
+    })
+----
+
 ==== Debug state logging
 
 The Websocket input will log the complete state when logging at the DEBUG level before and after CEL evaluation.
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See <<streaming-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 ==== Authentication
-The Websocket input supports authentication via Basic token authentication, Bearer token authentication and authentication via a custom auth config. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and custom auth contains any combination of custom header and value. These token/key values are are added to the request headers and are not exposed to the `state` object. The custom auth configuration is useful for constructing requests that require custom headers and values for authentication. The basic and bearer token configurations will always use the `Authorization` header and prepend the token with `Basic` or `Bearer` respectively.
+
+The websocket streaming input supports authentication via Basic token authentication, Bearer token authentication and authentication via a custom auth config. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and custom auth contains any combination of custom header and value. These token/key values are are added to the request headers and are not exposed to the `state` object. The custom auth configuration is useful for constructing requests that require custom headers and values for authentication. The basic and bearer token configurations will always use the `Authorization` header and prepend the token with `Basic` or `Bearer` respectively.
 
 Example configurations with authentication:
 
@@ -126,6 +153,19 @@ filebeat.inputs:
   url: wss://localhost:443/_stream
 ----
 
+The crowdstrike streaming input requires OAuth2.0 authentication using a client ID, client secret and a token URL. These values are not exposed to the `state` object. OAuth2.0 scopes and endpoint parameters are available via the `auth.scopes` and `auth.endpoint_params` config parameters.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: streaming
+  stream_type: crowdstrike
+  auth:
+    client_id: a23fcea2643868ef1a41565a1a8a1c7c
+    client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
+    token_url: https://api.crowdstrike.com/oauth2/token
+----
+
 [[input-state-streaming]]
 ==== Input state
 
@@ -136,6 +176,12 @@ The state must contain a `response` map and may contain any object the user wish
 
 The `streaming` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
+
+[[stream_type-streaming]]
+[float]
+==== `stream_type`
+
+The flavor of streaming to use. This may be either "websocket", "crowdstrike", or unset. If the field is unset, websocket streaming is used.
 
 [[program-streaming]]
 [float]

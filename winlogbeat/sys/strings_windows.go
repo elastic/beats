@@ -15,18 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kibana
+package sys
 
-// Config defines the structure for the Kibana module configuration options
-type Config struct {
-	XPackEnabled bool   `config:"xpack.enabled"`
-	ApiKey       string `config:"api_key"`
+import (
+	"golang.org/x/sys/windows"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/charmap"
+)
+
+var ansiDecoder *encoding.Decoder
+
+func init() {
+	ansiCP := windows.GetACP()
+	for _, enc := range charmap.All {
+		cm, ok := enc.(*charmap.Charmap)
+		cmID, _ := cm.ID()
+		if !ok || uint32(cmID) != ansiCP {
+			continue
+		}
+		ansiDecoder = cm.NewDecoder()
+		return
+	}
+	ansiDecoder = charmap.Windows1250.NewDecoder()
 }
 
-// DefaultConfig returns the default configuration for the Kibana module
-func DefaultConfig() Config {
-	return Config{
-		XPackEnabled: false,
-		ApiKey:       "",
-	}
+func ANSIBytesToString(enc []byte) (string, error) {
+	out, err := ansiDecoder.Bytes(enc)
+	return string(out), err
 }

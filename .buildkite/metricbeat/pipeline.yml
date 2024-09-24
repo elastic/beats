@@ -22,6 +22,9 @@ env:
   K8S_VERSION: "v1.29.0"
   ASDF_KIND_VERSION: "0.20.0"
 
+  # Module Tests
+  BEAT_PATH: "metricbeat"
+
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -80,14 +83,10 @@ steps:
           - github_commit_status:
               context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Metricbeat: Go Integration Tests"
+      - label: ":ubuntu: Metricbeat: Go Integration Tests (Module)"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet metricbeat
-
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
@@ -104,16 +103,12 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Go Integration Tests"
+              context: "metricbeat: Go Integration Tests (Module)"
 
-      - label: ":ubuntu: Metricbeat: Python Integration Tests"
+      - label: ":ubuntu: Metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet metricbeat
-
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat

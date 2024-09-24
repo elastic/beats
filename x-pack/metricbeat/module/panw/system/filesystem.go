@@ -128,7 +128,6 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 
 	events := make([]mb.Event, 0, len(filesystems))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, filesystem := range filesystems {
 		used, err := strconv.ParseInt(filesystem.UsePerc[:len(filesystem.UsePerc)-1], 10, 64)
@@ -146,7 +145,7 @@ func formatFilesystemEvents(m *MetricSet, filesystems []Filesystem) []mb.Event {
 				"filesystem.use_percent": used,
 				"filesystem.mounted":     filesystem.Mounted,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)

@@ -93,7 +93,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 }
 
 func (m *MetricSet) init() (err error, versionSupported bool) {
-	kibanaVersion, err := kibana.GetVersion(m.statsHTTP, kibana.StatsPath)
+	kibanaVersion, err := kibana.GetVersion(m.statsHTTP, kibana.StatsPath, m.ApiKey)
 	if err != nil {
 		return err, false
 	}

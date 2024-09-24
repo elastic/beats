@@ -77,25 +77,5 @@ resources. These tests are disabled by default in CI.
 Terraform states are archived as artifacrs of builds, this allows to manually
 destroy resources created by builds that were not able to do a proper cleanup.
 
-Here is a checklist to add support for a cloud feature in Jenkins:
-* In the feature code:
-  * Tests have a build tag so they are disabled by default. When run from mage,
-    its execution can be selected using the `TEST_TAGS` environment variable, e.g:
-    `TEST_TAGS=aws` for AWS tests.
-  * There is some Terraform configuration that defines a cloud scenario where
-    tests pass. This configuration should be in the directory of the feature.
-* In the Jenkinsfile:
-  * Add a boolean parameter to run the tests on this environment, e.g.
-    `awsCloudTests`. This parameter should be set to false by default.
-  * Add a conditional block in `withCloudTestEnv` that:
-     * Will be executed if the previously added boolean parameter, or `allCloudTests`
-       are set to true.
-     * Adds the tag to `TEST_TAGS` (as comma separated values), so tests are
-       selected.
-     * Defines how to obtain the credentials and provide them to the tests.
-  * In the stage of the specific beat:
-    * Add a stage that calls to `startCloudTestEnv`, if there isn't anyone.
-    * Add a post cleanup step that calls to `terraformCleanup`, if there isn't anyone.
-    * Add a environment to the list of environments started by `startCloudEnv`,
-      with the condition to start the scenario, and the path to the directory
-      with its definition, e.g. `[cond: params.awsCloudTests, dir: 'x-pack/metricbeat/module/aws']`
+
+

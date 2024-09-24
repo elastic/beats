@@ -641,6 +641,7 @@ metricbeat.modules:
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
 
@@ -892,6 +893,9 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+  #username: "user"
+  #password: "secret"
+  #api_key: "foo:bar"
 
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.

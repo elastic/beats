@@ -47,7 +47,6 @@ func getCertificateEvents(m *MetricSet) ([]mb.Event, error) {
 
 func formatCertificateEvents(m *MetricSet, input string) ([]mb.Event, error) {
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	certificates, err := parseCertificates(input)
 	if err != nil {
@@ -72,7 +71,7 @@ func formatCertificateEvents(m *MetricSet, input string) ([]mb.Event, error) {
 				"certificate.db_name":             certificate.DBName,
 				"certificate.db_status":           certificate.DBStatus,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)

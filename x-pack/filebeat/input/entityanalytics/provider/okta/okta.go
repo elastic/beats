@@ -113,7 +113,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	p.lim = rate.NewLimiter(1, 1)
 
 	if p.cfg.Tracer != nil {
-		id := sanitizeFileName(inputCtx.ID)
+		id := sanitizeFileName(inputCtx.IDWithoutName)
 		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 	}
 

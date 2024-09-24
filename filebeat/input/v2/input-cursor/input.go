@@ -115,6 +115,8 @@ func (inp *managedInput) Run(
 		grp.Go(func() (err error) {
 			// refine per worker context
 			inpCtx := ctx
+			// Preserve IDWithoutName, in case the context was constructed who knows how
+			inpCtx.IDWithoutName = ctx.ID
 			inpCtx.ID = ctx.ID + "::" + source.Name()
 			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
 

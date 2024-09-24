@@ -45,7 +45,6 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 
 	events := make([]mb.Event, 0, len(entries))
 	timestamp := time.Now().UTC()
-	rootFields := panw.MakeRootFields(m.config.HostIp)
 
 	for _, entry := range entries {
 		event := mb.Event{
@@ -70,7 +69,7 @@ func formatIPSecTunnelEvents(m *MetricSet, entries []TunnelsEntry) []mb.Event {
 				"ipsec_tunnel.life.sec":   entry.Life,
 				"ipsec_tunnel.kb":         entry.KB,
 			},
-			RootFields: rootFields,
+			RootFields: panw.MakeRootFields(m.config.HostIp),
 		}
 
 		events = append(events, event)
