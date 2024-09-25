@@ -18,19 +18,16 @@
 package elasticsearch
 
 import (
-	"crypto/tls"
 	"fmt"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configopaque"
-	"go.opentelemetry.io/collector/config/configtls"
 	"go.opentelemetry.io/collector/exporter/exporterbatcher"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // ToOtelConfig converts a Beat config into an OTel elasticsearch exporter config
@@ -75,67 +72,9 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 		headers[k] = configopaque.String(v)
 	}
 
-	insecureSkipVerify := false
-	if escfg.Transport.TLS.VerificationMode == tlscommon.VerifyNone {
-		insecureSkipVerify = true
-	}
-
-	// The OTel exporter accepts either single CA file or CA string. However
-	// Beats support any combination and number of files and certificates
-	// as string.
-	// TODO (Tiago): Merge all certificates into a single one.
-	caFiles := []string{}
-	caCerts := []string{}
-	for _, ca := range escfg.Transport.TLS.CAs {
-		if tlscommon.IsPEMString(ca) {
-			caCerts = append(caCerts, ca)
-			continue
-		}
-		caFiles = append(caFiles, ca)
-	}
-
-	if len(caFiles) > 1 {
-		return nil, fmt.Errorf("currently a single CA file is supported, got %d", len(caFiles))
-	}
-
-	if len(caCerts) > 1 {
-		return nil, fmt.Errorf("currently a single CA certificate is supported, got %d", len(caCerts))
-	}
-
-	caFile := ""
-	caPem := ""
-	if len(caFiles) == 1 {
-		caFile = caFiles[0]
-	}
-	if len(caCerts) == 1 {
-		caPem = caCerts[0]
-	}
-
-	certFile := escfg.Transport.TLS.Certificate.Certificate
-	certPem := ""
-	if tlscommon.IsPEMString(escfg.Transport.TLS.Certificate.Certificate) {
-		certPem = escfg.Transport.TLS.Certificate.Certificate
-		certFile = ""
-	}
-
-	certKeyFile := escfg.Transport.TLS.Certificate.Key
-	certKeyPem := ""
-	if tlscommon.IsPEMString(escfg.Transport.TLS.Certificate.Key) {
-		certKeyPem = escfg.Transport.TLS.Certificate.Key
-		certKeyFile = ""
-	}
-
-	// If custom certificates are set we do not include the system certificates
-	includeSystemCACertsPool := (caFile == "") && (caPem == "")
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(escfg.Transport.TLS)
+	otelTLSConfg, err := outputs.TLSCommonToOtel(escfg.Transport.TLS)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
-	}
-	goTLSConfig := tlsConfig.ToConfig()
-	ciphersuites := []string{}
-	for _, cs := range goTLSConfig.CipherSuites {
-		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))
+		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
 	otelcfg := elasticsearchexporter.Config{
@@ -156,20 +95,7 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 			Headers:         headers,                          // headers
 			Timeout:         escfg.Transport.Timeout,          // timeout
 			IdleConnTimeout: &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
-			TLSSetting: configtls.ClientConfig{
-				Insecure:           insecureSkipVerify, // ssl.verirication_mode, used for gRPC
-				InsecureSkipVerify: insecureSkipVerify, // ssl.verirication_mode, used for HTTPS
-				Config: configtls.Config{
-					IncludeSystemCACertsPool: includeSystemCACertsPool,
-					CAFile:                   caFile,                          // ssl.certificate_authorities
-					CAPem:                    configopaque.String(caPem),      // ssl.certificate_authorities
-					CertFile:                 certFile,                        // ssl.certificate
-					CertPem:                  configopaque.String(certPem),    // ssl.certificate
-					KeyFile:                  certKeyFile,                     // ssl.key
-					KeyPem:                   configopaque.String(certKeyPem), // ssl.key
-					CipherSuites:             ciphersuites,                    // ssl.cipher_suites
-				},
-			},
+			TLSSetting:      otelTLSConfg,
 		},
 
 		// Backoff settings
