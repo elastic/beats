@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+echo $BUILDKITE_MESSAGE
+
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
