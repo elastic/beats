@@ -7,6 +7,8 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
+	"slices"
+	"sort"
 	"sync"
 
 	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
@@ -190,26 +192,18 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.List
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	latestJobs := make([]*job, 0, len(jobs))
-	jobsToReturn := make([]*job, 0, len(jobs))
-
-	for _, job := range jobs {
-		switch {
-		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
-			latestJobs = append(latestJobs, job)
-		case job.name() > s.state.checkpoint().BlobName:
-			jobsToReturn = append(jobsToReturn, job)
-		}
-	}
+	cp := s.state.checkpoint()
+	jobs = slices.DeleteFunc(jobs, func(j *job) bool {
+		return !(j.timestamp().After(cp.LatestEntryTime) || j.name() > cp.BlobName)
+	})
 
 	// in a senario where there are some jobs which have a greater timestamp
-	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint blob name, we then append to the latest jobs
-	if len(latestJobs) > 0 {
-		jobsToReturn = append(latestJobs, jobsToReturn...)
-	}
-
-	return jobsToReturn
+	// but lesser lexicographic order and some jobs have greater lexicographic order
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint timestamp
+	sort.Slice(jobs, func(i, _ int) bool {
+		return jobs[i].timestamp().After(cp.LatestEntryTime)
+	})
+	return jobs
 }
 
 func (s *scheduler) isFileSelected(name string) bool {
