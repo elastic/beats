@@ -36,6 +36,9 @@ func TestNewReceiver(t *testing.T) {
 			},
 			"logging": map[string]interface{}{
 				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
 			},
 			"path.home": t.TempDir(),
 		},
@@ -45,7 +48,7 @@ func TestNewReceiver(t *testing.T) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.AddSync(&zapLogs),
-		zapcore.InfoLevel)
+		zapcore.DebugLevel)
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
