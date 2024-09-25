@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    paths:
+      - /tmp/flog.log
+
+output:
+  elasticsearch:
+    allow_older_versions: true
+    hosts:
+      - http://localhost:9200
+    protocol: http
+    username: elastic
+    password: changeme
+
+# elastic.co$es-hostname$kibana-hostname
+cloud.id: ZWxhc3RpYy5jbyRlcy1ob3N0bmFtZSRraWJhbmEtaG9zdG5hbWU=
+cloud.auth: elastic-cloud:password
+
+
