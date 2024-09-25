@@ -225,6 +225,7 @@ require (
 	go.mongodb.org/mongo-driver v1.5.1
 	go.opentelemetry.io/collector/config/confighttp v0.110.0
 	go.opentelemetry.io/collector/config/configopaque v1.16.0
+	go.opentelemetry.io/collector/config/configtls v1.16.0
 	go.opentelemetry.io/collector/consumer v0.110.0
 	go.opentelemetry.io/collector/exporter v0.110.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
@@ -388,7 +389,6 @@ require (
 	go.opentelemetry.io/collector/config/configcompression v1.16.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.16.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.110.0 // indirect
-	go.opentelemetry.io/collector/config/configtls v1.16.0 // indirect
 	go.opentelemetry.io/collector/config/internal v0.110.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumerprofiles v0.110.0 // indirect
 	go.opentelemetry.io/collector/extension v0.110.0 // indirect
