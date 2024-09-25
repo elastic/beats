@@ -27,8 +27,6 @@ import (
 	"strconv"
 	"testing"
 
-	"golang.org/x/sys/windows/svc/eventlog"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,7 +55,7 @@ func TestBenchmarkRead(t *testing.T) {
 
 	// Publish test messages:
 	for i := 0; i < *injectAmount; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(rand.Int63()%1000), []string{strconv.Itoa(i) + " " + randomSentence(256)})
+		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i) + " " + randomSentence(256))
 	}
 
 	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {
