@@ -81,6 +81,9 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 		panic(fmt.Errorf("failed to set default config file path: %v", err))
 	}
 
+	// Initialize the configuration flags.
+	cfgfile.InitFlags(nil)
+
 	// must be updated prior to CLI flag handling.
 
 	rootCmd.RunCmd = genRunCmd(settings, beatCreator)
