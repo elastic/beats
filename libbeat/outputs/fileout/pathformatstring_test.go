@@ -21,8 +21,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestCheckNilDoesntPanic(t *testing.T) {
+	newCfg := config.NewConfig()
+	handler, err := readConfig(newCfg)
+	require.NoError(t, err)
+	_, err = handler.Path.Run(time.Now())
+	require.Error(t, err)
+
+}
 
 func TestPathFormatString(t *testing.T) {
 	tests := []struct {
