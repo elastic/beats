@@ -7,6 +7,8 @@ package gcs
 import (
 	"context"
 	"fmt"
+	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -181,26 +183,18 @@ func (s *scheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterato
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	latestJobs := make([]*job, 0, len(jobs))
-	jobsToReturn := make([]*job, 0, len(jobs))
+	cp := s.state.checkpoint()
+	jobs = slices.DeleteFunc(jobs, func(j *job) bool {
+		return !(j.Timestamp().After(cp.LatestEntryTime) || j.Name() > cp.ObjectName)
+	})
 
-	for _, job := range jobs {
-		switch {
-		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
-			latestJobs = append(latestJobs, job)
-		case job.Name() > s.state.checkpoint().ObjectName:
-			jobsToReturn = append(jobsToReturn, job)
-		}
-	}
-
-	// in a senario where there are some jobs which have a later time stamp
+	// in a scenario where there are some jobs which have a greater timestamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint object name, we then append to the latest jobs
-	if len(latestJobs) > 0 {
-		jobsToReturn = append(latestJobs, jobsToReturn...)
-	}
-
-	return jobsToReturn
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint timestamp
+	sort.Slice(jobs, func(i, _ int) bool {
+		return jobs[i].Timestamp().After(cp.LatestEntryTime)
+	})
+	return jobs
 }
 
 func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
