@@ -13,8 +13,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -119,6 +121,7 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 // and based on the configuration, it will run the different methods -- EventLogFile
 // or Object to collect events at defined intervals.
 func (s *salesforceInput) run() error {
+	s.log.Info("Starting Salesforce input run")
 	if s.srcConfig.EventMonitoringMethod.EventLogFile.isEnabled() {
 		err := s.RunEventLogFile()
 		if err != nil {
@@ -160,17 +163,22 @@ func (s *salesforceInput) run() error {
 		case <-s.ctx.Done():
 			return s.isError(s.ctx.Err())
 		case <-eventLogFileTicker.C:
+			s.log.Info("Running EventLogFile collection")
 			if err := s.RunEventLogFile(); err != nil {
 				s.log.Errorf("Problem running EventLogFile collection: %s", err)
+			} else {
+				s.log.Info("EventLogFile collection completed successfully")
 			}
 		case <-objectMethodTicker.C:
+			s.log.Info("Running Object collection")
 			if err := s.RunObject(); err != nil {
 				s.log.Errorf("Problem running Object collection: %s", err)
+			} else {
+				s.log.Info("Object collection completed successfully")
 			}
 		}
 	}
 }
-
 func (s *salesforceInput) isError(err error) error {
 	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		s.log.Infof("input stopped because context was cancelled with: %v", err)
@@ -181,6 +189,7 @@ func (s *salesforceInput) isError(err error) error {
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
+	s.log.Info("Setting up Salesforce client connection")
 	if s.sfdcConfig == nil {
 		return nil, errors.New("internal error: salesforce configuration is not set properly")
 	}
@@ -188,8 +197,10 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
+		s.log.Errorf("Failed to open Salesforce session: %v", err)
 		return nil, err
 	}
+	s.log.Info("Salesforce session opened successfully")
 
 	// Set clientSession for re-use.
 	s.clientSession = session
@@ -209,8 +220,6 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 		return nil, err
 	}
 
-	s.log.Infof("Salesforce query: %s", qr)
-
 	return &querier{Query: qr}, err
 }
 
@@ -222,7 +231,7 @@ func isZero[T comparable](v T) bool {
 
 // RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
-	s.log.Debugf("scrape object(s) every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+	s.log.Infof("Running Object collection with interval: %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
 	var cursor mapstr.M
 	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
@@ -240,6 +249,8 @@ func (s *salesforceInput) RunObject() error {
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
+
+	s.log.Infof("Query formed: %s", query.Query)
 
 	res, err := s.soqlr.Query(query, false)
 	if err != nil {
@@ -282,7 +293,7 @@ func (s *salesforceInput) RunObject() error {
 			return err
 		}
 	}
-	s.log.Debugf("Total events: %d", totalEvents)
+	s.log.Infof("Total events: %d", totalEvents)
 
 	return nil
 }
@@ -290,7 +301,7 @@ func (s *salesforceInput) RunObject() error {
 // RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
 // collect events.
 func (s *salesforceInput) RunEventLogFile() error {
-	s.log.Debugf("scrape eventLogFile(s) every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+	s.log.Infof("Running EventLogFile collection with interval: %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
 	if !(isZero(s.cursor.EventLogFile.FirstEventTime) && isZero(s.cursor.EventLogFile.LastEventTime)) {
@@ -309,6 +320,8 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
+	s.log.Infof("Query formed: %s", query.Query)
+
 	res, err := s.soqlr.Query(query, false)
 	if err != nil {
 		return err
@@ -324,12 +337,27 @@ func (s *salesforceInput) RunEventLogFile() error {
 	totalEvents, firstEvent := 0, true
 	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
-			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
+			logfile, ok := rec.Record().Fields()["LogFile"].(string)
+			if !ok {
+				s.log.Error("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
+				continue
+			}
+
+			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+logfile, nil)
 			if err != nil {
-				return err
+				s.log.Errorf("Error creating request for log file: %v", err)
+				continue
 			}
 
 			s.clientSession.AuthorizationHeader(req)
+
+			reqDump, err := httputil.DumpRequestOut(req, true)
+			if err != nil {
+				s.log.Errorf("Error dumping request: %v", err)
+			} else {
+				s.log.Infof("Curl command: curl -X %s '%s' %s", req.Method, req.URL.String(), strings.Join(formatHeaders(req.Header), " "))
+				s.log.Infof("Full request dump:\n%s", string(reqDump))
+			}
 
 			// NOTE: If we ever see a production issue relaated to this, then only
 			// we should consider adding the header: "X-PrettyPrint:1"
@@ -341,19 +369,27 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			resp, err := s.sfdcConfig.Client.Do(req)
 			if err != nil {
-				return err
+				s.log.Errorf("Error fetching log file: %v", err)
+				continue
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				s.log.Errorf("Unexpected status code %d for log file", resp.StatusCode)
+				resp.Body.Close()
+				continue
 			}
 
 			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				resp.Body.Close()
-				return err
-			}
 			resp.Body.Close()
-
-			recs, err := decodeAsCSV(body)
 			if err != nil {
-				return err
+				s.log.Errorf("Error reading log file body: %v", err)
+				continue
+			}
+
+			recs, err := s.decodeAsCSV(body)
+			if err != nil {
+				s.log.Errorf("Error decoding CSV: %v", err)
+				continue
 			}
 
 			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
@@ -366,12 +402,11 @@ func (s *salesforceInput) RunEventLogFile() error {
 			for _, val := range recs {
 				jsonStrEvent, err := json.Marshal(val)
 				if err != nil {
-					return err
+					return fmt.Errorf("error json marshaling event: %w", err)
 				}
 
-				err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile")
-				if err != nil {
-					return err
+				if err := publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile"); err != nil {
+					return fmt.Errorf("error publishing event: %w", err)
 				}
 				totalEvents++
 			}
@@ -384,10 +419,10 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 		res, err = res.Next()
 		if err != nil {
-			return err
+			return fmt.Errorf("error getting next page: %w", err)
 		}
 	}
-	s.log.Debugf("Total events: %d", totalEvents)
+	s.log.Infof("Total events processed: %d", totalEvents)
 
 	return nil
 }
@@ -405,6 +440,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 	switch {
 	case cfg.Auth.OAuth2.JWTBearerFlow != nil && cfg.Auth.OAuth2.JWTBearerFlow.isEnabled():
+		s.log.Info("Using JWT Bearer Flow for authentication")
 		pemBytes, err := os.ReadFile(cfg.Auth.OAuth2.JWTBearerFlow.ClientKeyPath)
 		if err != nil {
 			return nil, fmt.Errorf("problem with client key path for JWT auth: %w", err)
@@ -428,6 +464,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 		}
 
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
+		s.log.Info("Using User Password Flow for authentication")
 		passCreds := credentials.PasswordCredentials{
 			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
 			Username:     cfg.Auth.OAuth2.UserPasswordFlow.Username,
@@ -533,21 +570,27 @@ type textContextError struct {
 	body []byte
 }
 
-// decodeAsCSV decodes p as a headed CSV document into dst.
-func decodeAsCSV(p []byte) ([]map[string]string, error) {
+// decodeAsCSV decodes the provided byte slice as a CSV and returns a slice of
+// maps, where each map represents a row in the CSV with the header fields as
+// keys and the row values as values.
+func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
 	r := csv.NewReader(bytes.NewReader(p))
 
 	// To share the backing array for performance.
 	r.ReuseRecord = true
 
+	// // Lazy quotes are enabled to allow for quoted fields with commas. More flexible
+	// // in handling CSVs.
+	// r.LazyQuotes = true
+
 	// Header row is always expected, otherwise we can't map values to keys in
 	// the event.
 	header, err := r.Read()
 	if err != nil {
-		if err == io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
+		if errors.Is(err, io.EOF) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to read CSV header: %w", err)
 	}
 
 	// As buffer reuse is enabled, copying header is important.
@@ -561,23 +604,32 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// so that future records must have the same field count.
 	// So, if len(header) != len(event), the Read will return an error and hence
 	// we need not put an explicit check.
-	event, err := r.Read()
-	for ; err == nil; event, err = r.Read() {
+	for {
+		record, err := r.Read()
 		if err != nil {
-			continue
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			s.log.Errorf("failed to read CSV record: %v\n%s", err, p)
+			return nil, textContextError{error: fmt.Errorf("failed to read CSV record: %w for: %v", err, record), body: p}
 		}
-		o := make(map[string]string, len(header))
-		for i, h := range header {
-			o[h] = event[i]
-		}
-		results = append(results, o)
-	}
 
-	if err != nil {
-		if err != io.EOF { //nolint:errorlint // csv.Reader never wraps io.EOF.
-			return nil, textContextError{error: err, body: p}
+		event := make(map[string]string, len(header))
+		for i, h := range header {
+			event[h] = record[i]
 		}
+		results = append(results, event)
 	}
 
 	return results, nil
+}
+
+func formatHeaders(headers http.Header) []string {
+	var result []string
+	for key, values := range headers {
+		for _, value := range values {
+			result = append(result, fmt.Sprintf("-H '%s: %s'", key, value))
+		}
+	}
+	return result
 }
