@@ -1,0 +1,21 @@
+enabled: true
+
+hosts: ["localhost:9092"]
+
+username: 'beats'
+password: 'changeme'
+
+topic: beats
+client_id: beats
+
+codec.json:
+
+backoff.init: 1s
+backoff.max: 60s
+
+timeout: 30s
+channel_buffer_size: 256
+
+compression: none
+max_message_bytes: 1000000
+required_acks: 1

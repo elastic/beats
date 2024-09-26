@@ -1,0 +1,22 @@
+auth:
+  sasl:
+    mechanism: PLAIN
+    password: changeme
+    username: beats
+    version: "1"
+brokers:
+- localhost:9092
+client_id: beats
+encoding: json
+producer:
+  compression: none
+  max_message_bytes: 1000000
+  required_acks: 1
+protocol_version: 1.0.0
+retry_on_failure:
+  enabled: true
+  initial_interval: 1s
+  max_elapsed_time: 2505600h0m0s
+  max_interval: 1m0s
+timeout: 30s
+topic: beats
