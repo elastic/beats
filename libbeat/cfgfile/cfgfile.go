@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
@@ -34,9 +35,10 @@ var (
 	// The default config cannot include the beat name as it is not initialized
 	// when this variable is created. See ChangeDefaultCfgfileFlag which should
 	// be called prior to flags.Parse().
-	commandLine flag.FlagSet
-	configfiles = config.StringArrFlag(&commandLine, "c", "beat.yml", "Configuration file, relative to path.config")
-	overwrites  = config.SettingFlag(&commandLine, "E", "Configuration overwrite")
+	commandLine     flag.FlagSet
+	commandLineOnce sync.Once
+	configfiles     = config.StringArrFlag(&commandLine, "c", "beat.yml", "Configuration file, relative to path.config")
+	overwrites      = config.SettingFlag(&commandLine, "E", "Configuration overwrite")
 
 	// Additional default settings, that must be available for variable expansion
 	defaults = config.MustNewConfigFrom(map[string]interface{}{
@@ -68,13 +70,11 @@ func init() {
 // InitFlags is for explicitly initializing the flags.
 // It may get called repeatedly for different flagsets, but not
 // twice for the same one.
-func InitFlags(flagset *flag.FlagSet) {
-	if flagset == nil {
-		flagset = flag.CommandLine
-	}
-
-	commandLine.VisitAll(func(f *flag.Flag) {
-		flagset.Var(f.Value, f.Name, f.Usage)
+func InitFlags() {
+	commandLineOnce.Do(func() {
+		commandLine.VisitAll(func(f *flag.Flag) {
+			flag.CommandLine.Var(f.Value, f.Name, f.Usage)
+		})
 	})
 }
 
