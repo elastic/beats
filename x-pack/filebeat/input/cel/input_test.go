@@ -1690,12 +1690,10 @@ func TestInput(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
-			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:        logp.NewLogger("cel_test"),
-				ID:            id,
-				IDWithoutName: id,
-				Cancelation:   ctx,
+				Logger:      logp.NewLogger("cel_test"),
+				ID:          "test_id:" + test.name,
+				Cancelation: ctx,
 			}
 			var client publisher
 			client.done = func() {
