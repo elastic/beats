@@ -21,11 +21,11 @@ import (
 	"math"
 	"strconv"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/prometheus/common/model"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
