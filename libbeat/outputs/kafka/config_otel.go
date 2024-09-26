@@ -7,6 +7,8 @@ import (
 
 	"github.com/go-viper/mapstructure/v2"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -16,7 +18,6 @@ import (
 // It returns the config ready to be placed inside `exporters.kafka`
 func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 	// assuming enabled: true
-
 	kCfg, err := readConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not read kafka config: %s", err)
@@ -25,7 +26,13 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
-	config := map[string]interface{}{
+	if kCfg.Codec.Namespace.Name() != "json" {
+		return nil, fmt.Errorf(
+			"only 'json' codec is supported in OTel mode, found %s",
+			kCfg.Codec.Namespace.Name())
+	}
+
+	otelCfg := map[string]interface{}{
 		"brokers": map[string]interface{}{
 			"protocol_version": string(kCfg.Version),
 		},
@@ -63,7 +70,7 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 			return nil, fmt.Errorf("invalid kerberos configuration: %s", err)
 		}
 
-		config["kerberos"] = map[string]interface{}{
+		otelCfg["kerberos"] = map[string]interface{}{
 			"config_file":              kCfg.Kerberos.ConfigPath,
 			"realm":                    kCfg.Kerberos.Realm,
 			"disable_fast_negotiation": !kCfg.Kerberos.EnableFAST,
@@ -76,12 +83,12 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 
 		switch authType {
 		case "keytab":
-			config["use_keytab"] = true
-			config["keytab_file"] = kCfg.Kerberos.KeyTabPath
+			otelCfg["use_keytab"] = true
+			otelCfg["keytab_file"] = kCfg.Kerberos.KeyTabPath
 
 		case "password":
-			config["username"] = kCfg.Kerberos.Username
-			config["password"] = kCfg.Kerberos.Password
+			otelCfg["username"] = kCfg.Kerberos.Username
+			otelCfg["password"] = kCfg.Kerberos.Password
 
 		// kCfg.Kerberos.Validate() should have covered it already,
 		// but better safe than sorry
@@ -91,7 +98,6 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 
 	}
 
-	// TODO: TLS:
 	otelTLS, err := outputs.TLSCommonToOTel(kCfg.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse TLS/SSL config: %s", err)
@@ -102,15 +108,47 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not decode TLS/SSL config: %s", err)
 	}
-	config["tls"] = configMapTLS
+	otelCfg["tls"] = configMapTLS
 
-	// assume topic does not use templating and reject topics.
-	// TODO: check if topic/topics match a single event attribute, if so, set
-	// OTel 'topic_from_attribute'
+	// we do not support more than one topic
 	if len(kCfg.Topics) != 0 {
 		return nil, errors.New("topics isn't supported in OTel mode")
 	}
-	config["topic"] = kCfg.Topic
 
-	return config, nil
+	topic, err := extractSingleTopic(kCfg.Topic)
+	if err != nil {
+		return nil, fmt.Errorf("could not extract topic: %s", err)
+	}
+	otelCfg["topic"] = topic
+
+	return otelCfg, nil
+}
+
+func extractSingleTopic(tmpl string) (string, error) {
+	st, err := fmtstr.CompileEvent(tmpl)
+	if err != nil {
+		return "", fmt.Errorf("failed to compile topic template")
+	}
+	if st.IsConst() {
+		return st.Run(&beat.Event{})
+	}
+
+	if len(st.Fields()) > 1 {
+		return "", errors.New("only one attribute supported")
+	}
+
+	attr := st.Fields()[0]
+
+	ev := beat.Event{
+		Fields: map[string]any{
+			attr: "value",
+		},
+	}
+
+	topic, err := st.Run(&ev)
+	if topic != "value" {
+		return "", fmt.Errorf("topic template is more than just a event attribute")
+	}
+
+	return attr, nil
 }
