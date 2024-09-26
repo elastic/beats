@@ -1,0 +1,45 @@
+receivers:
+  filebeatreceiver:
+    filebeat:
+      autodiscover:
+        providers:
+          - type: docker
+            templates:
+              - condition:
+                  contains:
+                    docker.container.name: mycontainername
+                config: 
+                  - type: filestream
+                    id: my-filestream-id-2
+                    paths:
+                      - /var/lib/docker/containers/*/*.log
+      inputs:
+        - type: filestream
+          enabled: true
+          paths: /home/ubuntu/hello.log
+          take_over: false
+    output:
+      otelconsumer:
+    logging:
+      level: debug
+      selectors:
+        - '*'
+    processors:
+      - add_fields:
+          target: project
+          fields:
+            name: myproject
+    
+
+exporters:
+  debug:
+  elasticsearch:
+    user: elastic
+    password: ZA1kgoQPpp3bW5jzXi5CC0eT
+    endpoint: https://my-deployment-3c73da.es.us-central1.gcp.cloud.es.io
+service:
+  pipelines:
+    logs:
+      receivers: [filebeatreceiver]
+      processors: []
+      exporters: [debug, elasticsearch]
