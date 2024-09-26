@@ -9,6 +9,10 @@ https://github.com/elastic/beats/compare/v8.15.1\...v8.15.2[View commits]
 
 ==== Bugfixes
 
+*Affecting all Beats*
+
+- Fix bug that prevented the Elasticsearch output from recovering from an interrupted connection. {issue}40705[40705] {pull}40769[40796]
+
 *Filebeat*
 
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
