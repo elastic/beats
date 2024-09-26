@@ -1,10 +1,12 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package cmd
 
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/x-pack/filebeat/cmd/customProvider"
-	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
 	"github.com/spf13/cobra"
@@ -21,6 +23,9 @@ import (
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver"
+
+	"github.com/elastic/beats/v7/x-pack/filebeat/cmd/customProvider"
+	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 )
 
 func components() (otelcol.Factories, error) {
@@ -72,7 +77,7 @@ func OtelCmd() *cobra.Command {
 				Factories: components,
 				ConfigProviderSettings: otelcol.ConfigProviderSettings{
 					ResolverSettings: confmap.ResolverSettings{
-						URIs: []string{"filebeat:/Users/vihasmakwana/Desktop/Vihas/elastic/elastic-agent/otel.yml"},
+						URIs: []string{"filebeat:otel.yml"},
 						ProviderFactories: []confmap.ProviderFactory{
 							fileprovider.NewFactory(),
 							httpprovider.NewFactory(),

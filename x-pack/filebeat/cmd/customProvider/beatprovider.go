@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package customProvider
 
 import (
@@ -7,11 +11,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"go.opentelemetry.io/collector/confmap"
+
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/go-viper/mapstructure/v2"
-	"go.opentelemetry.io/collector/confmap"
 )
 
 const schemeName = "filebeat"
@@ -37,13 +41,12 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	}
 
-	esCfg, err := elasticsearch.ToOtelConfig(cfg)
+	beatConfig, err := cfg.Child("receivers.filebeatreceiver", -1)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot extract Filebeat config from OTel config: %w", err)
 	}
 
-	var tempMap map[string]any
-	err = mapstructure.Decode(esCfg, &tempMap)
+	esCfg, err := elasticsearch.ToOTelConfig(beatConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +61,7 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	cfgMap := map[string]any{
 		"exporters": map[string]any{
-			"elasticsearch": tempMap,
+			"elasticsearch": esCfg,
 			"debug":         map[string]any{},
 		},
 		"receivers": map[string]any{
