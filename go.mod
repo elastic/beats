@@ -194,7 +194,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.8.2
-	github.com/elastic/elastic-agent-libs v0.10.0
+	github.com/elastic/elastic-agent-libs v0.11.0
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
@@ -222,7 +222,10 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
-	go.opentelemetry.io/collector/consumer v0.107.0
+	go.opentelemetry.io/collector/component v0.109.0
+	go.opentelemetry.io/collector/consumer v0.109.0
+	go.opentelemetry.io/collector/pdata v1.15.0
+	go.opentelemetry.io/collector/receiver v0.109.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
@@ -355,7 +358,7 @@ require (
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/prometheus/client_golang v1.20.0 // indirect
+	github.com/prometheus/client_golang v1.20.2 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -369,19 +372,21 @@ require (
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/collector/pdata v1.13.0 // indirect
+	go.opentelemetry.io/collector/config/configtelemetry v0.109.0 // indirect
+	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
+	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
-	go.opentelemetry.io/otel v1.28.0 // indirect
+	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
-	go.opentelemetry.io/otel/metric v1.28.0 // indirect
-	go.opentelemetry.io/otel/trace v1.28.0 // indirect
+	go.opentelemetry.io/otel/metric v1.29.0 // indirect
+	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/term v0.24.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240730163845-b1a4ccb954bf // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
