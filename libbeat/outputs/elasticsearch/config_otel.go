@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-// ToOtelConfig converts a Beat config into an OTel elasticsearch exporter config
-func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
+// ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
+func ToOTelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 	// Handle cloud.id the same way Beats does, this will also handle
 	// extracting the Kibana URL (which is required to handle ILM on
 	// Beats side (currently not supported by ES OTel exporter).
@@ -81,7 +81,7 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 		headers[k] = configopaque.String(v)
 	}
 
-	otelTLSConfg, err := outputs.TLSCommonToOtel(escfg.Transport.TLS)
+	otelTLSConfg, err := outputs.TLSCommonToOTel(escfg.Transport.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
@@ -95,7 +95,7 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 		Authentication: elasticsearchexporter.AuthenticationSettings{
 			User:     escfg.Username,                      // username
 			Password: configopaque.String(escfg.Password), // password
-			APIKey:   configopaque.String(escfg.APIKey),   //api_key
+			APIKey:   configopaque.String(escfg.APIKey),   // api_key
 		},
 
 		// HTTP Client configuration

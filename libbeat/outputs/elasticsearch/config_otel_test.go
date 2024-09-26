@@ -42,7 +42,7 @@ var wantCAPem string
 func TestToOtelConfig(t *testing.T) {
 	beatCfg := config.MustNewConfigFrom(beatYAMLCfg)
 
-	otelCfg, err := ToOtelConfig(beatCfg)
+	otelCfg, err := ToOTelConfig(beatCfg)
 	if err != nil {
 		t.Fatalf("could not convert Beat config to OTel elasicsearch exporter: %s", err)
 	}

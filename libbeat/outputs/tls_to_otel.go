@@ -29,19 +29,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// TLSCommonToOtel converts a tlscommon.Config into the OTel configtls.ClientConfig
-func TLSCommonToOtel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
+// TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
+func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
 		insecureSkipVerify = true
 	}
 
-	// The OTel exporter accepts either single CA file or CA string. However
+	// The OTel exporter accepts either single CA file or CA string. However,
 	// Beats support any combination and number of files and certificates
 	// as string, so we read them all and assemble one PEM string with
 	// all CA certificates
-	caCerts := []string{}
+	var caCerts []string
 	for _, ca := range tlscfg.CAs {
 		d, err := tlscommon.ReadPEMFile(logger, ca, "")
 		if err != nil {
