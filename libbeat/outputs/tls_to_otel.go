@@ -22,20 +22,17 @@ import (
 	"fmt"
 	"strings"
 
-	"go.opentelemetry.io/collector/config/configopaque"
-	"go.opentelemetry.io/collector/config/configtls"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
-func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
+func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
 
 	if tlscfg == nil {
-		return configtls.ClientConfig{}, nil
+		return nil, nil
 	}
 
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
@@ -50,7 +47,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 	for _, ca := range tlscfg.CAs {
 		d, err := tlscommon.ReadPEMFile(logger, ca, "")
 		if err != nil {
-			return configtls.ClientConfig{}, err
+			return nil, err
 		}
 		caCerts = append(caCerts, string(d))
 	}
@@ -66,7 +63,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
 	if err != nil {
-		return configtls.ClientConfig{}, fmt.Errorf("cannot load SSL configuration: %w", err)
+		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
 	}
 	goTLSConfig := tlsConfig.ToConfig()
 	ciphersuites := []string{}
@@ -74,16 +71,16 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))
 	}
 
-	otelTLSConfig := configtls.ClientConfig{
-		Insecure:           insecureSkipVerify, // ssl.verirication_mode, used for gRPC
-		InsecureSkipVerify: insecureSkipVerify, // ssl.verirication_mode, used for HTTPS
-		Config: configtls.Config{
-			IncludeSystemCACertsPool: includeSystemCACertsPool,
-			CAPem:                    configopaque.String(strings.Join(caCerts, "")), // ssl.certificate_authorities
-			CertPem:                  configopaque.String(certPem),                   // ssl.certificate
-			KeyPem:                   configopaque.String(certKeyPem),                // ssl.key
-			CipherSuites:             ciphersuites,                                   // ssl.cipher_suites
-		},
+	otelTLSConfig := map[string]any{
+		"insecure":             insecureSkipVerify, // ssl.verirication_mode, used for gRPC
+		"insecure_skip_verify": insecureSkipVerify, // ssl.verirication_mode, used for HTTPS
+
+		// Config
+		"include_system_ca_certs_pool": includeSystemCACertsPool,
+		"ca_pem":                       strings.Join(caCerts, ""), // ssl.certificate_authorities
+		"cert_pem":                     certPem,                   // ssl.certificate
+		"key_pem":                      certKeyPem,                // ssl.key
+		"cipher_suites":                ciphersuites,              // ssl.cipher_suites
 	}
 
 	return otelTLSConfig, nil

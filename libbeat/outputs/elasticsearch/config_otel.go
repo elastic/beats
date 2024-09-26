@@ -20,10 +20,7 @@ package elasticsearch
 import (
 	"fmt"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
-	"go.opentelemetry.io/collector/config/confighttp"
 	"go.opentelemetry.io/collector/config/configopaque"
-	"go.opentelemetry.io/collector/exporter/exporterbatcher"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -31,34 +28,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-// ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
-// returned as a map[string]any
-func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
-	otelCfg, err := toOTelConfig(beatCfg)
-	if err != nil {
-		// toOTelConfig adds all the context necessary to the error,
-		// so we just return it.
-		return nil, err
-	}
-
-	// Ugly hack to convert the config to a map[string]any, our config package
-	// goes deep into the types, which bypasses the redaction provided by
-	// go.opentelemetry.io/collector/config/configopaque.
-	otelC, err := config.NewConfigFrom(otelCfg)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert ES exporter config to config.C: %w", err)
-	}
-
-	otelConfigMap := map[string]any{}
-	if err := otelC.Unpack(otelConfigMap); err != nil {
-		return nil, fmt.Errorf("could not convert ES exporter config to map[string]any: %w", err)
-	}
-
-	return otelConfigMap, nil
-}
-
 // toOTelConfig converts a Beat config into an OTel elasticsearch exporter config
-func toOTelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
+func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	// Handle cloud.id the same way Beats does, this will also handle
 	// extracting the Kibana URL (which is required to handle ILM on
 	// Beats side (currently not supported by ES OTel exporter).
@@ -112,48 +83,37 @@ func toOTelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
-	otelcfg := elasticsearchexporter.Config{
-		LogsIndex:  esToOTelOptions.Index,    // index
-		Pipeline:   esToOTelOptions.Pipeline, // pipeline
-		Endpoints:  hosts,                    // hosts, protocol, path, port
-		NumWorkers: workersCfg.NumWorkers(),  // worker/workers
+	otelYAMLCfg := map[string]any{
+		"logs_index":  esToOTelOptions.Index,    // index
+		"pipeline":    esToOTelOptions.Pipeline, // pipeline
+		"endpoints":   hosts,                    // hosts, protocol, path, port
+		"num_workers": workersCfg.NumWorkers(),  // worker/workers
 
-		Authentication: elasticsearchexporter.AuthenticationSettings{
-			User:     escfg.Username,                      // username
-			Password: configopaque.String(escfg.Password), // password
-			APIKey:   configopaque.String(escfg.APIKey),   // api_key
+		// Authentication
+		"user":     escfg.Username, // username
+		"password": escfg.Password, // password
+		"api_key":  escfg.APIKey,   // api_key
+
+		// ClientConfig
+		"proxy_url":         esToOTelOptions.ProxyURL,         // proxy_url
+		"headers":           headers,                          // headers
+		"timeout":           escfg.Transport.Timeout,          // timeout
+		"idle_conn_timeout": &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
+		"tls":               otelTLSConfg,                     //TODO: convert it to map[string]any
+
+		// Retry
+		"retry": map[string]any{
+			"enabled":          true,
+			"initial_interval": escfg.Backoff.Init, // backoff.init
+			"max_interval":     escfg.Backoff.Max,  // backoff.max
 		},
 
-		// HTTP Client configuration
-		ClientConfig: confighttp.ClientConfig{
-			ProxyURL:        esToOTelOptions.ProxyURL,         // proxy_url
-			Headers:         headers,                          // headers
-			Timeout:         escfg.Transport.Timeout,          // timeout
-			IdleConnTimeout: &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
-			TLSSetting:      otelTLSConfg,
-		},
-
-		// Backoff settings
-		Retry: elasticsearchexporter.RetrySettings{
-			Enabled:         true,
-			InitialInterval: escfg.Backoff.Init, // backoff.init
-			MaxInterval:     escfg.Backoff.Max,  // backoff.max
-		},
-
-		// Batching configuration
-		Batcher: elasticsearchexporter.BatcherConfig{
-			Enabled: ptr(true),
-			MaxSizeConfig: exporterbatcher.MaxSizeConfig{
-				MaxSizeItems: escfg.BulkMaxSize, // bulk_max_size
-			},
+		// Batcher
+		"batcher": map[string]any{
+			"enabled":        true,
+			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
 		},
 	}
 
-	return &otelcfg, nil
-}
-
-func ptr[T any](v T) *T {
-	var p T
-	p = v
-	return &p
+	return otelYAMLCfg, nil
 }
