@@ -41,6 +41,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -287,7 +288,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 }
 
 // NewBeatReceiver creates a Beat that will be used in the context of an otel receiver
-func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, consumer consumer.Logs) (*Beat, error) {
+func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, consumer consumer.Logs, core zapcore.Core) (*Beat, error) {
 	b, err := NewBeat(settings.Name,
 		settings.IndexPrefix,
 		settings.Version,
@@ -355,6 +356,18 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	logpConfig := logp.Config{}
+	logpConfig.Beat = b.Info.Name
+	logpConfig.Files.MaxSize = 1
+
+	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
+		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
+	}
+
+	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
+		return nil, fmt.Errorf("error configuring beats logp: %w", err)
+	}
+
 	if err := promoteOutputQueueSettings(&b.Config); err != nil {
 		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
 	}
@@ -372,10 +385,6 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 
 	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
 		return nil, fmt.Errorf("error setting timestamp precision: %w", err)
-	}
-
-	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
-		return nil, fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	// log paths values to help with troubleshooting
