@@ -49,45 +49,48 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 			kCfg.Codec.Namespace.Name())
 	}
 
-	otelCfg := map[string]interface{}{
-		"brokers": map[string]interface{}{
-			"protocol_version": string(kCfg.Version),
-		},
-		"auth": map[string]interface{}{
-			"plain_text": map[string]interface{}{
-				"username": kCfg.Username,
-				"password": kCfg.Password,
-			},
-
-			"sasl": map[string]interface{}{ // TODO: only set if needed
-				"mechanism": kCfg.Sasl.SaslMechanism,
-				"username":  kCfg.Username,
-				"password":  kCfg.Password,
-				"version":   "1", // TODO: set to 0 for Azure EventHub, see https://github.com/elastic/sarama/blob/beats-fork/config.go#L68-L70
-			},
-		},
-		"client_id": kCfg.ClientID,
-		"retry_on_failure": map[string]interface{}{
+	otelCfg := map[string]any{
+		"brokers":          kCfg.Hosts,
+		"protocol_version": string(kCfg.Version),
+		"auth":             map[string]any{},
+		"client_id":        kCfg.ClientID,
+		"encoding":         kCfg.Codec.Namespace.Name(),
+		"retry_on_failure": map[string]any{
 			"enabled":          true,
 			"initial_interval": kCfg.Backoff.Init,
 			"max_interval":     kCfg.Backoff.Max,
 			"max_elapsed_time": 290 * 360 * 24 * time.Hour, // 290 years, approximately the largest representable duration
 		},
 		"timeout": kCfg.Timeout,
-		"producer": map[string]interface{}{
+		"producer": map[string]any{
 			"compression":       kCfg.Compression,
 			"max_message_bytes": *kCfg.MaxMessageBytes, // there is validation, therefore, it should be safe
 			"required_acks":     *kCfg.RequiredACKs,    // there is validation, therefore, it should be safe
 		},
 	}
 
-	if kCfg.Kerberos != nil {
+	// handle auth
+	auth := otelCfg["auth"]
+	authM, ok := auth.(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("could not convert 'auth' node to map to add kerberos auth: %T", auth)
+	}
+
+	switch {
+	case kCfg.Sasl.SaslMechanism != "":
+		authM["sasl"] = map[string]any{ // TODO: only set if needed
+			"mechanism": kCfg.Sasl.SaslMechanism,
+			"username":  kCfg.Username,
+			"password":  kCfg.Password,
+			"version":   "1", // TODO: set to 0 for Azure EventHub, see https://github.com/elastic/sarama/blob/beats-fork/config.go#L68-L70
+		}
+	case kCfg.Kerberos.IsEnabled():
 		err = kCfg.Kerberos.Validate()
 		if err != nil {
 			return nil, fmt.Errorf("invalid kerberos configuration: %s", err)
 		}
 
-		otelCfg["kerberos"] = map[string]interface{}{
+		krb := map[string]any{
 			"config_file":              kCfg.Kerberos.ConfigPath,
 			"realm":                    kCfg.Kerberos.Realm,
 			"disable_fast_negotiation": !kCfg.Kerberos.EnableFAST,
@@ -100,12 +103,12 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 
 		switch authType {
 		case "keytab":
-			otelCfg["use_keytab"] = true
-			otelCfg["keytab_file"] = kCfg.Kerberos.KeyTabPath
+			krb["use_keytab"] = true
+			krb["keytab_file"] = kCfg.Kerberos.KeyTabPath
 
 		case "password":
-			otelCfg["username"] = kCfg.Kerberos.Username
-			otelCfg["password"] = kCfg.Kerberos.Password
+			krb["username"] = kCfg.Kerberos.Username
+			krb["password"] = kCfg.Kerberos.Password
 
 		// kCfg.Kerberos.Validate() should have covered it already,
 		// but better safe than sorry
@@ -113,45 +116,68 @@ func ToOTelConfig(cfg *config.C) (map[string]any, error) {
 			return nil, fmt.Errorf("invalid kerberos auth type: %s", authType)
 		}
 
+		authM["kerberos"] = krb
+	default:
+		authM["plain_text"] = map[string]any{
+			"username": kCfg.Username,
+			"password": kCfg.Password,
+		}
 	}
 
-	otelTLS, err := outputs.TLSCommonToOTel(kCfg.TLS)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse TLS/SSL config: %s", err)
-	}
+	if kCfg.TLS.IsEnabled() {
+		otelTLS, err := outputs.TLSCommonToOTel(kCfg.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse TLS/SSL config: %s", err)
+		}
 
-	var configMapTLS map[string]any
-	err = mapstructure.Decode(otelTLS, &configMapTLS)
-	if err != nil {
-		return nil, fmt.Errorf("could not decode TLS/SSL config: %s", err)
+		var configMapTLS map[string]any
+		err = mapstructure.Decode(otelTLS, &configMapTLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not decode TLS/SSL config: %s", err)
+		}
+		otelCfg["tls"] = configMapTLS
 	}
-	otelCfg["tls"] = configMapTLS
 
 	// we do not support more than one topic
 	if len(kCfg.Topics) != 0 {
 		return nil, errors.New("topics isn't supported in OTel mode")
 	}
 
-	topic, err := extractSingleTopic(kCfg.Topic)
+	topic, fromAttr, err := extractSingleTopic(kCfg.Topic)
 	if err != nil {
 		return nil, fmt.Errorf("could not extract topic: %s", err)
 	}
+	// topic is to be extracted from an attribute value on the event
+	if fromAttr {
+		otelCfg["topic_from_attribute"] = topic
+		topic = ""
+	}
 	otelCfg["topic"] = topic
 
+	// TODO: partially supported and unsupported fields. See https://docs.google.com/spreadsheets/d/1FlVVVzQsH5iRGAlPrMbpqNw23kQOn20WhtONSmM3UUI/edit?usp=sharing
+	// for details
 	return otelCfg, nil
 }
 
-func extractSingleTopic(tmpl string) (string, error) {
+// extractSingleTopic extracts the topic name or the attribute which value
+// should be used as the topic name.
+// It receives the Beats' topic template and returns a topic name and false or
+// the event attribute name and true.
+func extractSingleTopic(tmpl string) (string, bool, error) {
 	st, err := fmtstr.CompileEvent(tmpl)
 	if err != nil {
-		return "", fmt.Errorf("failed to compile topic template")
+		return "", false, fmt.Errorf("failed to compile topic template")
 	}
 	if st.IsConst() {
-		return st.Run(&beat.Event{})
+		topic, err := st.Run(&beat.Event{})
+		if err != nil {
+			return "", false, fmt.Errorf("failed to topic template is a constant but failed to compile")
+		}
+		return topic, false, nil
 	}
 
 	if len(st.Fields()) > 1 {
-		return "", errors.New("only one attribute supported")
+		return "", false, errors.New("only one attribute supported")
 	}
 
 	attr := st.Fields()[0]
@@ -164,8 +190,8 @@ func extractSingleTopic(tmpl string) (string, error) {
 
 	topic, err := st.Run(&ev)
 	if topic != "value" {
-		return "", fmt.Errorf("topic template is more than just a event attribute")
+		return "", false, fmt.Errorf("topic template is more than just a event attribute")
 	}
 
-	return attr, nil
+	return attr, true, nil
 }
