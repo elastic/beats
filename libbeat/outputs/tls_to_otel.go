@@ -20,15 +20,18 @@ package outputs
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	"go.opentelemetry.io/collector/config/configopaque"
 	"go.opentelemetry.io/collector/config/configtls"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // TLSCommonToOtel converts a tlscommon.Config into the OTel configtls.ClientConfig
 func TLSCommonToOtel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
+	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
 		insecureSkipVerify = true
@@ -36,51 +39,25 @@ func TLSCommonToOtel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 
 	// The OTel exporter accepts either single CA file or CA string. However
 	// Beats support any combination and number of files and certificates
-	// as string.
-	// TODO (Tiago): Merge all certificates into a single one.
-	caFiles := []string{}
+	// as string, so we read them all and assemble one PEM string with
+	// all CA certificates
 	caCerts := []string{}
 	for _, ca := range tlscfg.CAs {
-		if tlscommon.IsPEMString(ca) {
-			caCerts = append(caCerts, ca)
-			continue
+		d, err := tlscommon.ReadPEMFile(logger, ca, "")
+		if err != nil {
+			return configtls.ClientConfig{}, err
 		}
-		caFiles = append(caFiles, ca)
+		caCerts = append(caCerts, string(d))
 	}
 
-	if len(caFiles) > 1 {
-		return configtls.ClientConfig{}, fmt.Errorf("currently a single CA file is supported, got %d", len(caFiles))
-	}
+	certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
+	certKeyPem := string(certKeyBytes)
 
-	if len(caCerts) > 1 {
-		return configtls.ClientConfig{}, fmt.Errorf("currently a single CA certificate is supported, got %d", len(caCerts))
-	}
+	certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
+	certPem := string(certBytes)
 
-	caFile := ""
-	caPem := ""
-	if len(caFiles) == 1 {
-		caFile = caFiles[0]
-	}
-	if len(caCerts) == 1 {
-		caPem = caCerts[0]
-	}
-
-	certFile := tlscfg.Certificate.Certificate
-	certPem := ""
-	if tlscommon.IsPEMString(tlscfg.Certificate.Certificate) {
-		certPem = tlscfg.Certificate.Certificate
-		certFile = ""
-	}
-
-	certKeyFile := tlscfg.Certificate.Key
-	certKeyPem := ""
-	if tlscommon.IsPEMString(tlscfg.Certificate.Key) {
-		certKeyPem = tlscfg.Certificate.Key
-		certKeyFile = ""
-	}
-
-	// If custom certificates are set we do not include the system certificates
-	includeSystemCACertsPool := (caFile == "") && (caPem == "")
+	// We only include the system certificates if no CA is defined
+	includeSystemCACertsPool := len(caCerts) == 0
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
 	if err != nil {
@@ -97,13 +74,10 @@ func TLSCommonToOtel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 		InsecureSkipVerify: insecureSkipVerify, // ssl.verirication_mode, used for HTTPS
 		Config: configtls.Config{
 			IncludeSystemCACertsPool: includeSystemCACertsPool,
-			CAFile:                   caFile,                          // ssl.certificate_authorities
-			CAPem:                    configopaque.String(caPem),      // ssl.certificate_authorities
-			CertFile:                 certFile,                        // ssl.certificate
-			CertPem:                  configopaque.String(certPem),    // ssl.certificate
-			KeyFile:                  certKeyFile,                     // ssl.key
-			KeyPem:                   configopaque.String(certKeyPem), // ssl.key
-			CipherSuites:             ciphersuites,                    // ssl.cipher_suites
+			CAPem:                    configopaque.String(strings.Join(caCerts, "")), // ssl.certificate_authorities
+			CertPem:                  configopaque.String(certPem),                   // ssl.certificate
+			KeyPem:                   configopaque.String(certKeyPem),                // ssl.key
+			CipherSuites:             ciphersuites,                                   // ssl.cipher_suites
 		},
 	}
 

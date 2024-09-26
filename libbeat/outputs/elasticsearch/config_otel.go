@@ -26,6 +26,7 @@ import (
 	"go.opentelemetry.io/collector/exporter/exporterbatcher"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -41,7 +42,7 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 
 	esRawCfg, err := beatCfg.Child("output.elasticsearch", -1)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("could not parse Elasticsearch output configuration: %w", err)
 	}
 	escfg := defaultConfig
 	if err := esRawCfg.Unpack(&escfg); err != nil {
@@ -57,7 +58,15 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 
 	if err := esRawCfg.Unpack(&esToOTelOptions); err != nil {
 		return nil, fmt.Errorf("cannot parse Elasticsearch config: %w", err)
+	}
 
+	hosts := []string{}
+	for _, h := range esToOTelOptions.Hosts {
+		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
+		if err != nil {
+			return nil, fmt.Errorf("cannot generate ES URL from host %q", err)
+		}
+		hosts = append(hosts, esURL)
 	}
 
 	// The workers config is can be configured using two keys, so we leverage
@@ -78,9 +87,9 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 	}
 
 	otelcfg := elasticsearchexporter.Config{
-		Index:      esToOTelOptions.Index,    // index
+		LogsIndex:  esToOTelOptions.Index,    // index
 		Pipeline:   esToOTelOptions.Pipeline, // pipeline
-		Endpoints:  esToOTelOptions.Hosts,    // hosts, protocol, path, port
+		Endpoints:  hosts,                    // hosts, protocol, path, port
 		NumWorkers: workersCfg.NumWorkers(),  // worker/workers
 
 		Authentication: elasticsearchexporter.AuthenticationSettings{
@@ -107,6 +116,7 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 
 		// Batching configuration
 		Batcher: elasticsearchexporter.BatcherConfig{
+			Enabled: ptr(true),
 			MaxSizeConfig: exporterbatcher.MaxSizeConfig{
 				MaxSizeItems: escfg.BulkMaxSize, // bulk_max_size
 			},
@@ -114,4 +124,10 @@ func ToOtelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 	}
 
 	return &otelcfg, nil
+}
+
+func ptr[T any](v T) *T {
+	var p T
+	p = v
+	return &p
 }
