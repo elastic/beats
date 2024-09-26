@@ -5,6 +5,7 @@
 
 [[release-notes-8.15.2]]
 === Beats version 8.15.2
+<<<<<<< HEAD
 https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 
 ==== Breaking changes
@@ -12,6 +13,48 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 *Metricbeat*
 
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+=======
+https://github.com/elastic/beats/compare/v8.15.1\...v8.15.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
+
+*Metricbeat*
+
+- Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true`. {issue}40437[40437] {pull}40467[40467]
+
+==== Added
+
+*Affecting all Beats*
+
+- When running under Elastic Agent, Kafka output allows dynamic topic in `topic` field. {pull}40415[40415]
+- The script processor has a new configuration option that only uses the cached JavaScript sessions and prevents the creation of new javascript sessions.
+
+*Metricbeat*
+
+- Add new metrics for the vSphere Host metricset. {pull}40429[40429]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
+- Add support for snapshot in vSphere virtualmachine metricset. {pull}40683[40683]
+- Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
+- Update fields to use mapstr in vSphere virtualmachine metricset. {pull}40707[40707]
+- Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
+- Add support for period based intervalID in vSphere host and datastore metricsets. {pull}40678[40678]
+- Add new metrics for datastore and minor changes to overall vSphere metrics. {pull}40766[40766]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests. {pull}40661[40661]
+- Added Cisco Meraki module. {pull}40836[40836]
+- Added Palo Alto Networks module. {pull}40686[40686]
+
+>>>>>>> 83effecb68 (docs: Prepare Changelog for 8.15.2 (#40982))
 
 [[release-notes-8.15.1]]
 === Beats version 8.15.1
