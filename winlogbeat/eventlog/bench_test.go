@@ -55,7 +55,7 @@ func TestBenchmarkRead(t *testing.T) {
 
 	// Publish test messages:
 	for i := 0; i < *injectAmount; i++ {
-		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i) + " " + randomSentence(256))
+		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i)+" "+randomSentence(256))
 	}
 
 	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {
