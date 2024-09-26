@@ -10,7 +10,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/go-viper/mapstructure/v2"
 	"go.opentelemetry.io/collector/confmap"
 )
 
@@ -37,13 +36,7 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	}
 
-	esCfg, err := elasticsearch.ToOtelConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	var tempMap map[string]any
-	err = mapstructure.Decode(esCfg, &tempMap)
+	esCfg, err := elasticsearch.ToOTelConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +51,7 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	cfgMap := map[string]any{
 		"exporters": map[string]any{
-			"elasticsearch": tempMap,
+			"elasticsearch": esCfg,
 			"debug":         map[string]any{},
 		},
 		"receivers": map[string]any{

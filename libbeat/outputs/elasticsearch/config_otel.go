@@ -32,7 +32,33 @@ import (
 )
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
-func ToOTelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
+// returned as a map[string]any
+func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
+	otelCfg, err := toOTelConfig(beatCfg)
+	if err != nil {
+		// toOTelConfig adds all the context necessary to the error,
+		// so we just return it.
+		return nil, err
+	}
+
+	// Ugly hack to convert the config to a map[string]any, our config package
+	// goes deep into the types, which bypasses the redaction provided by
+	// go.opentelemetry.io/collector/config/configopaque.
+	otelC, err := config.NewConfigFrom(otelCfg)
+	if err != nil {
+		return nil, fmt.Errorf("cannot convert ES exporter config to config.C: %w", err)
+	}
+
+	otelConfigMap := map[string]any{}
+	if err := otelC.Unpack(otelConfigMap); err != nil {
+		return nil, fmt.Errorf("could not convert ES exporter config to map[string]any: %w", err)
+	}
+
+	return otelConfigMap, nil
+}
+
+// toOTelConfig converts a Beat config into an OTel elasticsearch exporter config
+func toOTelConfig(beatCfg *config.C) (*elasticsearchexporter.Config, error) {
 	// Handle cloud.id the same way Beats does, this will also handle
 	// extracting the Kibana URL (which is required to handle ILM on
 	// Beats side (currently not supported by ES OTel exporter).

@@ -72,7 +72,7 @@ func OtelCmd() *cobra.Command {
 				Factories: components,
 				ConfigProviderSettings: otelcol.ConfigProviderSettings{
 					ResolverSettings: confmap.ResolverSettings{
-						URIs: []string{"filebeat:/Users/vihasmakwana/Desktop/Vihas/elastic/elastic-agent/otel.yml"},
+						URIs: []string{"filebeat:otel.yml"},
 						ProviderFactories: []confmap.ProviderFactory{
 							fileprovider.NewFactory(),
 							httpprovider.NewFactory(),
