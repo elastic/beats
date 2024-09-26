@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/cmd/customProvider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver"
@@ -71,12 +72,13 @@ func OtelCmd() *cobra.Command {
 				Factories: components,
 				ConfigProviderSettings: otelcol.ConfigProviderSettings{
 					ResolverSettings: confmap.ResolverSettings{
-						URIs: []string{"file:/Users/vihasmakwana/Desktop/Vihas/elastic/elastic-agent/otel.yml"},
+						URIs: []string{"filebeat:/Users/vihasmakwana/Desktop/Vihas/elastic/elastic-agent/otel.yml"},
 						ProviderFactories: []confmap.ProviderFactory{
 							fileprovider.NewFactory(),
 							httpprovider.NewFactory(),
 							httpsprovider.NewFactory(),
 							yamlprovider.NewFactory(),
+							customProvider.NewFactory(),
 						},
 					},
 				},

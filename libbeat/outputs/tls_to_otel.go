@@ -33,6 +33,11 @@ import (
 func TLSCommonToOTel(tlscfg *tlscommon.Config) (configtls.ClientConfig, error) {
 	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
+
+	if tlscfg == nil {
+		return configtls.ClientConfig{}, nil
+	}
+
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
 		insecureSkipVerify = true
 	}
