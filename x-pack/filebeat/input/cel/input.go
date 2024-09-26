@@ -142,7 +142,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	if cfg.Resource.Tracer != nil {
-		id := sanitizeFileName(env.IDWithoutName)
+		id := sanitizeFileName(env.ID)
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
