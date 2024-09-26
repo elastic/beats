@@ -109,7 +109,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	updateTimer := time.NewTimer(updateWaitTime)
 
 	if p.cfg.Tracer != nil {
-		id := sanitizeFileName(inputCtx.IDWithoutName)
+		id := sanitizeFileName(inputCtx.ID)
 		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 	}
 
