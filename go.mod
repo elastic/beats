@@ -226,9 +226,7 @@ require (
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
 	go.opentelemetry.io/collector/component v0.110.0
-	go.opentelemetry.io/collector/config/confighttp v0.110.0
 	go.opentelemetry.io/collector/config/configopaque v1.16.0
-	go.opentelemetry.io/collector/config/configtls v1.16.0
 	go.opentelemetry.io/collector/confmap v1.16.0
 	go.opentelemetry.io/collector/confmap/provider/fileprovider v1.16.0
 	go.opentelemetry.io/collector/confmap/provider/httpprovider v0.110.0
@@ -294,6 +292,7 @@ require (
 	github.com/containerd/containerd v1.7.20 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
+	github.com/creack/pty v1.1.20 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
@@ -371,7 +370,7 @@ require (
 	github.com/markbates/pkger v0.17.1 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -395,6 +394,7 @@ require (
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/power-devops/perfstat v0.0.0-20220216144756-c35f1ee13d7c // indirect
 	github.com/prometheus/client_golang v1.20.4 // indirect
+	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
@@ -419,8 +419,10 @@ require (
 	go.opentelemetry.io/collector/component/componentstatus v0.110.0 // indirect
 	go.opentelemetry.io/collector/config/configauth v0.110.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.16.0 // indirect
+	go.opentelemetry.io/collector/config/confighttp v0.110.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.16.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.110.0 // indirect
+	go.opentelemetry.io/collector/config/configtls v1.16.0 // indirect
 	go.opentelemetry.io/collector/config/internal v0.110.0 // indirect
 	go.opentelemetry.io/collector/connector v0.110.0 // indirect
 	go.opentelemetry.io/collector/connector/connectorprofiles v0.110.0 // indirect
@@ -506,9 +508,3 @@ replace (
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 )
-
-// replace go.opentelemetry.io/collector/otelcol => /Users/vihasmakwana/Desktop/Vihas/OTeL/opentelemetry-collector/otelcol
-
-// replace go.opentelemetry.io/collector/confmap => /Users/vihasmakwana/Desktop/Vihas/OTeL/opentelemetry-collector/confmap
-
-// replace go.opentelemetry.io/collector/confmap/provider/fileprovider => /Users/vihasmakwana/Desktop/Vihas/OTeL/opentelemetry-collector/confmap/provider/fileprovider

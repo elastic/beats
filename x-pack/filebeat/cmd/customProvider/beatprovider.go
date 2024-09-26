@@ -38,7 +38,6 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 	cfg, err := cfgfile.Load(filepath.Clean(uri[len(schemeName)+1:]), nil)
 	if err != nil {
 		return nil, err
-
 	}
 
 	esCfg, err := elasticsearch.ToOTelConfig(cfg)
@@ -51,8 +50,12 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	cfg.SetChild("output", -1, newCfg)
 
+	fbCfg, err := cfg.Child("receivers.filebeatreceiver", -1)
+	if err != nil {
+		return nil, fmt.Errorf("cannot extract Filebeat config from  receivers: %w", err)
+	}
 	var receiverMap map[string]any
-	cfg.Unpack(&receiverMap)
+	fbCfg.Unpack(&receiverMap)
 
 	cfgMap := map[string]any{
 		"exporters": map[string]any{
@@ -63,10 +66,11 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 			"filebeatreceiver": receiverMap,
 		},
 		"service": map[string]any{
-			"pipeline": map[string]any{
+			"pipelines": map[string]any{
 				"logs": map[string]any{
 					"exporters": []string{
 						"debug",
+						"elasticsearch",
 					},
 					"receivers": []string{"filebeatreceiver"},
 				},
