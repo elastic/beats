@@ -41,14 +41,9 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 
 	}
 
-	beatConfig, err := cfg.Child("receivers.filebeatreceiver", -1)
+	esCfg, err := elasticsearch.ToOTelConfig(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("cannot extract Filebeat config from OTel config: %w", err)
-	}
-
-	esCfg, err := elasticsearch.ToOTelConfig(beatConfig)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot convert Filebeat config: %w", err)
 	}
 
 	newCfg := config.NewConfig()

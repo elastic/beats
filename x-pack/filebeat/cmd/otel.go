@@ -71,13 +71,16 @@ func OtelCmd() *cobra.Command {
 				Description: "Beats OTeL",
 				Version:     "9.0.0",
 			}
-
+			flag, err := cmd.Flags().GetStringArray("config")
+			if err != nil {
+				return err
+			}
 			set := otelcol.CollectorSettings{
 				BuildInfo: info,
 				Factories: components,
 				ConfigProviderSettings: otelcol.ConfigProviderSettings{
 					ResolverSettings: confmap.ResolverSettings{
-						URIs: []string{"filebeat:otel.yml"},
+						URIs: flag,
 						ProviderFactories: []confmap.ProviderFactory{
 							fileprovider.NewFactory(),
 							httpprovider.NewFactory(),
@@ -96,5 +99,6 @@ func OtelCmd() *cobra.Command {
 			return col.Run(context.Background())
 		},
 	}
+	command.Flags().StringArray("config", []string{"file:otel.yml"}, "pass otel config")
 	return command
 }
