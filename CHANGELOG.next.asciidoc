@@ -97,8 +97,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
-- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
-- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 
 *Heartbeat*
@@ -112,8 +110,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
-- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
-- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 
 *Osquerybeat*
 
@@ -140,8 +136,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
-- When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
-- The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
 
 *Auditbeat*
 
@@ -208,22 +202,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-- Add new metrics for the vSphere Host metricset. {pull}40429[40429]
-- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
-- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
-- Add new metricset network for the vSphere module. {pull}40559[40559]
-- Add new metricset cluster for the vSphere module. {pull}40536[40536]
-- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
-- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
-- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
-- Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
-- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
-- Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
-- Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
-- Add new metrics for datastore and minor changes to overall vSphere metrics {pull}40766[40766]
-- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
-- Added Cisco Meraki module {pull}40836[40836]
-- Added Palo Alto Networks module {pull}40686[40686]
 
 *Metricbeat*
 
@@ -274,6 +252,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
