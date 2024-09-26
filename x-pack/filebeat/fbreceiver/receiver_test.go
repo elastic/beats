@@ -43,6 +43,7 @@ func TestNewReceiver(t *testing.T) {
 			"path.home": t.TempDir(),
 		},
 	}
+
 	var zapLogs bytes.Buffer
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
