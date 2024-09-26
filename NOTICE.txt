@@ -12493,11 +12493,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/eapache/go-resiliency
-Version: v1.2.0
+Version: v1.7.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/eapache/go-resiliency@v1.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/eapache/go-resiliency@v1.7.0/LICENSE:
 
 The MIT License (MIT)
 
@@ -17087,6 +17087,37 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/go-viper/mapstructure/v2
+Version: v2.1.0
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/go-viper/mapstructure/v2@v2.1.0/LICENSE:
+
+The MIT License (MIT)
+
+Copyright (c) 2013 Mitchell Hashimoto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/gocarina/gocsv
 Version: v0.0.0-20170324095351-ffef3ffc77be
 Licence type (autodetected): MIT
@@ -18829,45 +18860,50 @@ Contents of probable licence file $GOMODCACHE/github.com/gorhill/cronexpr@v0.0.0
 
 --------------------------------------------------------------------------------
 Dependency : github.com/gorilla/handlers
-Version: v1.5.1
-Licence type (autodetected): BSD-2-Clause
+Version: v1.5.2
+Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/gorilla/handlers@v1.5.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/gorilla/handlers@v1.5.2/LICENSE:
 
-Copyright (c) 2013 The Gorilla Handlers Authors. All rights reserved.
+Copyright (c) 2023 The Gorilla Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+modification, are permitted provided that the following conditions are
+met:
 
-  Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
+	 * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+	 * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+	 * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
 
-  Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
 Dependency : github.com/gorilla/mux
-Version: v1.8.0
+Version: v1.8.1
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/gorilla/mux@v1.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/gorilla/mux@v1.8.1/LICENSE:
 
-Copyright (c) 2012-2018 The Gorilla Authors. All rights reserved.
+Copyright (c) 2023 The Gorilla Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -19339,11 +19375,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/golang-lru
-Version: v0.5.4
+Version: v1.0.2
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru@v0.5.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru@v1.0.2/LICENSE:
+
+Copyright (c) 2014 HashiCorp, Inc.
 
 Mozilla Public License, version 2.0
 
@@ -21170,11 +21208,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mitchellh/mapstructure
-Version: v1.5.0
+Version: v1.5.1-0.20231216201459-8508981c8b6c
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mitchellh/mapstructure@v1.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mitchellh/mapstructure@v1.5.1-0.20231216201459-8508981c8b6c/LICENSE:
 
 The MIT License (MIT)
 
@@ -21701,11 +21739,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/pierrec/lz4/v4
-Version: v4.1.18
+Version: v4.1.21
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.18/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.21/LICENSE:
 
 Copyright (c) 2015, Pierre Curto
 All rights reserved.
@@ -37720,11 +37758,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/apache/thrift
-Version: v0.19.0
+Version: v0.20.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.19.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.20.0/LICENSE:
 
 
                                  Apache License
@@ -38097,11 +38135,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go
-Version: v1.38.60
+Version: v1.55.5
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go@v1.38.60/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go@v1.55.5/LICENSE.txt:
 
 
                                  Apache License
@@ -41564,11 +41602,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/davecgh/go-spew
-Version: v1.1.1
+Version: v1.1.2-0.20180830191138-d8f796af33cc
 Licence type (autodetected): ISC
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/davecgh/go-spew@v1.1.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/davecgh/go-spew@v1.1.2-0.20180830191138-d8f796af33cc/LICENSE:
 
 ISC License
 
@@ -42501,11 +42539,11 @@ Contents of probable licence file $GOMODCACHE/github.com/docker/go-metrics@v0.0.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/eapache/go-xerial-snappy
-Version: v0.0.0-20180814174437-776d5712da21
+Version: v0.0.0-20230731223053-c322873962e3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/eapache/go-xerial-snappy@v0.0.0-20180814174437-776d5712da21/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/eapache/go-xerial-snappy@v0.0.0-20230731223053-c322873962e3/LICENSE:
 
 The MIT License (MIT)
 
@@ -45439,37 +45477,6 @@ Licence type (autodetected): MIT
 Contents of probable licence file $GOMODCACHE/github.com/go-task/slim-sprig@v0.0.0-20230315185526-52ccab3ef572/LICENSE.txt:
 
 Copyright (C) 2013-2020 Masterminds
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
---------------------------------------------------------------------------------
-Dependency : github.com/go-viper/mapstructure/v2
-Version: v2.1.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/go-viper/mapstructure/v2@v2.1.0/LICENSE:
-
-The MIT License (MIT)
-
-Copyright (c) 2013 Mitchell Hashimoto
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49344,11 +49351,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/go-uuid
-Version: v1.0.2
+Version: v1.0.3
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-uuid@v1.0.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-uuid@v1.0.3/LICENSE:
+
+Copyright © 2015-2022 HashiCorp, Inc.
 
 Mozilla Public License, version 2.0
 
@@ -50082,37 +50091,6 @@ Exhibit B - “Incompatible With Secondary Licenses” Notice
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/hpcloud/tail
-Version: v1.0.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/hpcloud/tail@v1.0.0/LICENSE.txt:
-
-# The MIT License (MIT)
-
-# © Copyright 2015 Hewlett Packard Enterprise Development LP
-Copyright (c) 2014 ActiveState
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-
---------------------------------------------------------------------------------
 Dependency : github.com/imdario/mergo
 Version: v0.3.12
 Licence type (autodetected): BSD-3-Clause
@@ -50785,11 +50763,11 @@ Contents of probable licence file $GOMODCACHE/github.com/jcmturner/dnsutils/v2@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/jcmturner/gofork
-Version: v1.0.0
+Version: v1.7.6
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gofork@v1.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gofork@v1.7.6/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -51033,11 +51011,11 @@ Contents of probable licence file $GOMODCACHE/github.com/jcmturner/goidentity/v6
 
 --------------------------------------------------------------------------------
 Dependency : github.com/jcmturner/gokrb5/v8
-Version: v8.4.2
+Version: v8.4.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gokrb5/v8@v8.4.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/jcmturner/gokrb5/v8@v8.4.4/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -52615,11 +52593,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/lufia/plan9stats
-Version: v0.0.0-20211012122336-39d0f177ccd0
+Version: v0.0.0-20220913051719-115f729f3c8c
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/lufia/plan9stats@v0.0.0-20211012122336-39d0f177ccd0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/lufia/plan9stats@v0.0.0-20220913051719-115f729f3c8c/LICENSE:
 
 BSD 3-Clause License
 
@@ -54550,6 +54528,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/nxadm/tail
+Version: v1.4.8
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/nxadm/tail@v1.4.8/LICENSE:
+
+# The MIT License (MIT)
+
+# © Copyright 2015 Hewlett Packard Enterprise Development LP
+Copyright (c) 2014 ActiveState
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/oklog/ulid
 Version: v1.3.1
 Licence type (autodetected): Apache-2.0
@@ -54973,11 +54982,11 @@ Contents of probable licence file $GOMODCACHE/github.com/oklog/ulid/v2@v2.0.2/LI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/ginkgo
-Version: v1.11.0
+Version: v1.16.5
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo@v1.11.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo@v1.16.5/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -56539,11 +56548,11 @@ Contents of probable licence file $GOMODCACHE/github.com/oxtoacart/bpool@v0.0.0-
 
 --------------------------------------------------------------------------------
 Dependency : github.com/pierrec/lz4
-Version: v2.6.0+incompatible
+Version: v2.6.1+incompatible
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4@v2.6.0+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4@v2.6.1+incompatible/LICENSE:
 
 Copyright (c) 2015, Pierre Curto
 All rights reserved.
@@ -56610,11 +56619,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/pmezard/go-difflib
-Version: v1.0.0
+Version: v1.0.1-0.20181226105442-5d4384ee4fb2
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/pmezard/go-difflib@v1.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/pmezard/go-difflib@v1.0.1-0.20181226105442-5d4384ee4fb2/LICENSE:
 
 Copyright (c) 2013, Patrick Mezard
 All rights reserved.
@@ -56647,11 +56656,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/power-devops/perfstat
-Version: v0.0.0-20210106213030-5aafc221ea8c
+Version: v0.0.0-20220216144756-c35f1ee13d7c
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/power-devops/perfstat@v0.0.0-20210106213030-5aafc221ea8c/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/power-devops/perfstat@v0.0.0-20220216144756-c35f1ee13d7c/LICENSE:
 
 MIT License
 
@@ -66268,11 +66277,11 @@ Contents of probable licence file $GOMODCACHE/go.opentelemetry.io/contrib/config
 
 --------------------------------------------------------------------------------
 Dependency : go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
-Version: v0.49.0
+Version: v0.53.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.49.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc@v0.53.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -71598,44 +71607,6 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------------------
-Dependency : gopkg.in/fsnotify.v1
-Version: v1.4.7
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/gopkg.in/fsnotify.v1@v1.4.7/LICENSE:
-
-Copyright (c) 2012 The Go Authors. All rights reserved.
-Copyright (c) 2012 fsnotify Authors. All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-   * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-   * Redistributions in binary form must reproduce the above
-copyright notice, this list of conditions and the following disclaimer
-in the documentation and/or other materials provided with the
-distribution.
-   * Neither the name of Google Inc. nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------

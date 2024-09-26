@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package customProvider
 
 import (
@@ -7,10 +11,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"go.opentelemetry.io/collector/confmap"
+
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
-	"go.opentelemetry.io/collector/confmap"
 )
 
 const schemeName = "filebeat"
