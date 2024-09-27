@@ -14522,7 +14522,7 @@ format: bytes
 *`docker.network.in.dropped`*::
 +
 --
-Dropped incoming packets per second..
+Dropped incoming packets per second.
 
 
 type: scaled_float
@@ -14532,7 +14532,7 @@ type: scaled_float
 *`docker.network.in.errors`*::
 +
 --
-Errors on incoming packets per second..
+Errors on incoming packets per second.
 
 
 type: long
@@ -14542,7 +14542,7 @@ type: long
 *`docker.network.in.packets`*::
 +
 --
-Incoming packets per second..
+Incoming packets per second.
 
 
 type: long
@@ -14571,7 +14571,7 @@ format: bytes
 *`docker.network.out.dropped`*::
 +
 --
-Dropped outgoing packets per second..
+Dropped outgoing packets per second.
 
 
 type: scaled_float
@@ -14581,7 +14581,7 @@ type: scaled_float
 *`docker.network.out.errors`*::
 +
 --
-Errors on outgoing packets per second..
+Errors on outgoing packets per second.
 
 
 type: long
@@ -14591,7 +14591,7 @@ type: long
 *`docker.network.out.packets`*::
 +
 --
-Outgoing packets per second..
+Outgoing packets per second.
 
 
 type: long

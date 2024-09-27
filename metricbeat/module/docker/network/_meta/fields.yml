@@ -22,15 +22,15 @@
         - name: dropped
           type: scaled_float
           description: >
-            Dropped incoming packets per second..
+            Dropped incoming packets per second.
         - name: errors
           type: long
           description: >
-            Errors on incoming packets per second..
+            Errors on incoming packets per second.
         - name: packets
           type: long
           description: >
-            Incoming packets per second..
+            Incoming packets per second.
     - name: out
       type: group
       description: >
@@ -44,15 +44,15 @@
         - name: dropped
           type: scaled_float
           description: >
-            Dropped outgoing packets per second..
+            Dropped outgoing packets per second.
         - name: errors
           type: long
           description: >
-            Errors on outgoing packets per second..
+            Errors on outgoing packets per second.
         - name: packets
           type: long
           description: >
-            Outgoing packets per second..
+            Outgoing packets per second.
     - name: inbound
       type: group
       description: >
