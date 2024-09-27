@@ -18,6 +18,7 @@
 package licenser
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -42,6 +43,10 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 	if err != nil {
 		t.Fatalf("could not create the elasticsearch client, error: %s", err)
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	client.Connect(ctx)
 
 	return server, client
 }

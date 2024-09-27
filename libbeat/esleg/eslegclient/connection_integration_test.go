@@ -39,15 +39,17 @@ import (
 
 func TestConnect(t *testing.T) {
 	conn := getTestingElasticsearch(t)
-	err := conn.Connect()
+	err := conn.Connect(context.Background())
 	assert.NoError(t, err)
 }
 
 func TestConnectionCanBeClosedAndReused(t *testing.T) {
 	conn := getTestingElasticsearch(t)
-	assert.NoError(t, conn.Connect(), "first connect must succeed")
+	ctx, cancel := context.WithCancel(context.Background())
+	assert.NoError(t, conn.Connect(ctx), "first connect must succeed")
 	assert.NoError(t, conn.Close(), "close must succeed")
-	assert.NoError(t, conn.Connect(), "calling connect after close must succeed")
+	cancel()
+	assert.NoError(t, conn.Connect(context.Background()), "calling connect after close must succeed")
 }
 
 func TestConnectWithProxy(t *testing.T) {
@@ -71,7 +73,9 @@ func TestConnectWithProxy(t *testing.T) {
 		"timeout": 5, // seconds
 	})
 	require.NoError(t, err)
-	assert.Error(t, client.Connect(), "it should fail without proxy")
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	assert.Error(t, client.Connect(ctx), "it should fail without proxy")
 
 	client, err = connectTestEs(t, map[string]interface{}{
 		"hosts":     "http://" + wrongPort.Addr().String(),
@@ -79,7 +83,7 @@ func TestConnectWithProxy(t *testing.T) {
 		"timeout":   5, // seconds
 	})
 	require.NoError(t, err)
-	assert.NoError(t, client.Connect())
+	assert.NoError(t, client.Connect(ctx))
 }
 
 func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
