@@ -167,6 +167,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+
 
 *Heartbeat*
 
@@ -350,6 +352,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 
 *Metricbeat*
 
@@ -361,8 +364,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
-
-- Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}40684[40684]
 
 
 *Functionbeat*
