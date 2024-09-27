@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -59,7 +58,7 @@ func Check() error {
 
 	if len(changes) > 0 {
 		if mg.Verbose() {
-			GitDiff()
+			_ = GitDiff()
 		}
 
 		return fmt.Errorf("some files are not up-to-date. "+
@@ -229,7 +228,7 @@ func CheckDashboardsFormat() error {
 
 	hasErrors := false
 	for _, file := range dashboardFiles {
-		d, err := ioutil.ReadFile(file)
+		d, err := os.ReadFile(file)
 		if err != nil {
 			return fmt.Errorf("failed to read dashboard file %s: %w", file, err)
 		}
@@ -321,11 +320,11 @@ func (d *DashboardObject) CheckFormat(module string) error {
 			return fmt.Errorf("empty description on dashboard '%s'", d.Attributes.Title)
 		}
 		if err := checkTitle(dashboardTitleRegexp, d.Attributes.Title, module); err != nil {
-			return fmt.Errorf("expected title with format '[%s Module] Some title', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err)
+			return fmt.Errorf("expected title with format '[%s Module] Some title', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err) // nolint:staticcheck // strings.Title is deprecated but we need it.
 		}
 	case "visualization":
 		if err := checkTitle(visualizationTitleRegexp, d.Attributes.Title, module); err != nil {
-			return fmt.Errorf("expected title with format 'Some title [%s Module]', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err)
+			return fmt.Errorf("expected title with format 'Some title [%s Module]', found '%s': %w", strings.Title(BeatName), d.Attributes.Title, err) // nolint:staticcheck // strings.Title is deprecated but we need it.
 		}
 	}
 
