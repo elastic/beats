@@ -99,7 +99,9 @@ func (n *NetService) getNetworkStats(nameInterface string, rawNetStats types.Net
 		netStats.TxErrors = n.getTxErrorsPerSecond(&newNetworkStats, &oldNetworkStat)
 		netStats.TxPackets = n.getTxPacketsPerSecond(&newNetworkStats, &oldNetworkStat)
 	} else {
-		n.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NetRaw)
+		if _, conExists := n.NetworkStatPerContainer[myRawstats.Container.ID]; !conExists {
+			n.NetworkStatPerContainer[myRawstats.Container.ID] = make(map[string]NetRaw)
+		}
 	}
 
 	n.NetworkStatPerContainer[myRawstats.Container.ID][nameInterface] = newNetworkStats
@@ -119,13 +121,6 @@ func createNetRaw(time time.Time, stats *types.NetworkStats) NetRaw {
 		TxErrors:  stats.TxErrors,
 		TxPackets: stats.TxPackets,
 	}
-}
-
-func (n *NetService) checkStats(containerID string, nameInterface string) bool {
-	if _, exist := n.NetworkStatPerContainer[containerID][nameInterface]; exist {
-		return true
-	}
-	return false
 }
 
 func (n *NetService) getRxBytesPerSecond(newStats *NetRaw, oldStats *NetRaw) float64 {
