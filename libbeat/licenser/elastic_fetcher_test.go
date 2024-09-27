@@ -19,7 +19,6 @@ package licenser
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,7 +32,7 @@ import (
 
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *eslegclient.Connection) {
 	mux := http.NewServeMux()
-	mux.Handle("/_license/", http.HandlerFunc(handler))
+	mux.Handle("/_license/", handler)
 
 	server := httptest.NewServer(mux)
 
@@ -46,7 +45,9 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
-	client.Connect(ctx)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
 
 	return server, client
 }
@@ -54,7 +55,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 func TestParseJSON(t *testing.T) {
 	t.Run("OSS release of Elasticsearch (Code: 405)", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Method Not Allowed", 405)
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		}
 		s, c := newServerClientPair(t, h)
 		defer s.Close()
@@ -80,7 +81,7 @@ func TestParseJSON(t *testing.T) {
 
 	t.Run("malformed JSON", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("hello bad JSON"))
+			_, _ = w.Write([]byte("hello bad JSON"))
 		}
 		s, c := newServerClientPair(t, h)
 		defer s.Close()
@@ -93,7 +94,7 @@ func TestParseJSON(t *testing.T) {
 
 	t.Run("401 response", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
-			http.Error(w, "Unauthorized", 401)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		}
 		s, c := newServerClientPair(t, h)
 		defer s.Close()
@@ -118,14 +119,14 @@ func TestParseJSON(t *testing.T) {
 	})
 
 	t.Run("200 response", func(t *testing.T) {
-		filepath.Walk("testdata/", func(path string, i os.FileInfo, err error) error {
+		_ = filepath.Walk("testdata/", func(path string, i os.FileInfo, err error) error {
 			if i.IsDir() {
 				return nil
 			}
 
 			t.Run(path, func(t *testing.T) {
 				h := func(w http.ResponseWriter, r *http.Request) {
-					json, err := ioutil.ReadFile(path)
+					json, err := os.ReadFile(path)
 					if err != nil {
 						t.Fatal("could not read JSON")
 					}
