@@ -24,7 +24,6 @@ require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
-	github.com/andrewkroh/sys v0.0.0-20151128191922-287798fe3e43
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.44.0
