@@ -41,7 +41,6 @@ const (
 	hdrContentType               = "Content-Type"
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
-	FmtUnknown            string = `<unknown>`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
 )
 
@@ -755,7 +754,7 @@ func GetContentType(h http.Header) string {
 
 	mediatype, params, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return FmtUnknown
+		return ""
 	}
 
 	const textType = "text/plain"
@@ -763,16 +762,16 @@ func GetContentType(h http.Header) string {
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return FmtUnknown
+			return ""
 		}
 		return OpenMetricsType
 
 	case textType:
 		if v, ok := params["version"]; ok && v != TextVersion {
-			return FmtUnknown
+			return ""
 		}
 		return ContentTypeTextFormat
 	}
 
-	return FmtUnknown
+	return ""
 }
