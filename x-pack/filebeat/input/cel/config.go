@@ -47,6 +47,10 @@ type config struct {
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
+	// AllowedEnvironment is the set of env vars made
+	// visible to an executing CEL evaluation.
+	AllowedEnvironment []string `config:"allowed_environment"`
+
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
 	Auth authConfig `config:"auth"`
@@ -85,7 +89,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

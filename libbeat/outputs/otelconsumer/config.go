@@ -15,28 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sys
+package otelconsumer
 
 import (
-	"fmt"
-	"syscall"
-	"unsafe"
-
-	"golang.org/x/sys/windows"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
-var _ unsafe.Pointer
+type otelConsumerConfig struct {
+	Queue config.Namespace `config:"queue"`
+}
 
-var (
-	modkernel = windows.NewLazySystemDLL("Kernel32.dll")
-
-	procSystemTimeToFileTime = modkernel.NewProc("SystemTimeToFileTime")
-)
-
-func SystemTimeToFileTime(systemTime *windows.Systemtime, fileTime *windows.Filetime) error {
-	r1, _, err := syscall.SyscallN(procSystemTimeToFileTime.Addr(), uintptr(unsafe.Pointer(systemTime)), uintptr(unsafe.Pointer(fileTime)))
-	if r1 == 0 {
-		return fmt.Errorf("error converting system time to file time: %w", err)
-	}
-	return nil
+func defaultConfig() otelConsumerConfig {
+	return otelConsumerConfig{}
 }
