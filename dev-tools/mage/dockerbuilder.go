@@ -43,7 +43,7 @@ type dockerBuilder struct {
 func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
 	imageName, err := spec.ImageName()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get image name: %w", err)
 	}
 
 	buildDir := filepath.Join(spec.packageDir, "docker-build")
@@ -63,7 +63,7 @@ func (b *dockerBuilder) Build() error {
 	}
 
 	if err := b.copyFiles(); err != nil {
-		return err
+		return fmt.Errorf("failed to copy files: %w", err)
 	}
 
 	if err := b.prepareBuild(); err != nil {
@@ -71,13 +71,14 @@ func (b *dockerBuilder) Build() error {
 	}
 
 	tag, err := b.dockerBuild()
-	tries := 3
-	for err != nil && tries != 0 {
+
+	const maxRetries = 3
+	const retryInterval = 10 * time.Second
+
+	for retries := 0; err != nil && retries < maxRetries; retries++ {
 		fmt.Println(">> Building docker images again (after 10 s)")
-		// This sleep is to avoid hitting the docker build issues when resources are not available.
-		time.Sleep(time.Second * 10)
+		time.Sleep(retryInterval)
 		tag, err = b.dockerBuild()
-		tries -= 1
 	}
 	if err != nil {
 		return fmt.Errorf("failed to build docker: %w", err)
@@ -123,7 +124,7 @@ func (b *dockerBuilder) copyFiles() error {
 func (b *dockerBuilder) prepareBuild() error {
 	elasticBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get ElasticBeatsDir: %w", err)
 	}
 	templatesDir := filepath.Join(elasticBeatsDir, "dev-tools/packaging/templates/docker")
 
@@ -139,8 +140,7 @@ func (b *dockerBuilder) prepareBuild() error {
 				".tmpl",
 			)
 
-			err = b.ExpandFile(path, target, data)
-			if err != nil {
+			if err := b.ExpandFile(path, target, data); err != nil {
 				return fmt.Errorf("expanding template '%s' to '%s': %w", path, target, err)
 			}
 		}
@@ -148,15 +148,15 @@ func (b *dockerBuilder) prepareBuild() error {
 	})
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to walk templates directory: %w", err)
 	}
 
 	return b.expandDockerfile(templatesDir, data)
 }
 
 func isDockerFile(path string) bool {
-	path = filepath.Base(path)
-	return strings.HasPrefix(path, "Dockerfile") || strings.HasPrefix(path, "docker-entrypoint")
+	base := filepath.Base(path)
+	return strings.HasPrefix(base, "Dockerfile") || strings.HasPrefix(base, "docker-entrypoint")
 }
 
 func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]interface{}) error {
@@ -170,18 +170,21 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 		entrypoint = e
 	}
 
-	type fileExpansion struct {
+	files := []struct {
 		source string
 		target string
+	}{
+		{dockerfile, "Dockerfile.tmpl"},
+		{entrypoint, "docker-entrypoint.tmpl"},
 	}
-	for _, file := range []fileExpansion{{dockerfile, "Dockerfile.tmpl"}, {entrypoint, "docker-entrypoint.tmpl"}} {
+
+	for _, file := range files {
 		target := strings.TrimSuffix(
 			filepath.Join(b.buildDir, file.target),
 			".tmpl",
 		)
 		path := filepath.Join(templatesDir, file.source)
-		err := b.ExpandFile(path, target, data)
-		if err != nil {
+		if err := b.ExpandFile(path, target, data); err != nil {
 			return fmt.Errorf("expanding template '%s' to '%s': %w", path, target, err)
 		}
 	}
@@ -192,7 +195,7 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 func (b *dockerBuilder) dockerBuild() (string, error) {
 	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
 	if b.Snapshot {
-		tag = tag + "-SNAPSHOT"
+		tag += "-SNAPSHOT"
 	}
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
@@ -201,12 +204,10 @@ func (b *dockerBuilder) dockerBuild() (string, error) {
 }
 
 func (b *dockerBuilder) dockerSave(tag string) error {
-	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
-		err := os.MkdirAll(distributionsDir, 0750)
-		if err != nil {
-			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
-		}
+	if err := os.MkdirAll(distributionsDir, 0750); err != nil {
+		return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 	}
+
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
@@ -214,46 +215,46 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 			"Name": b.imageName,
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to expand output file name: %w", err)
 		}
 		outputFile = filepath.Join(distributionsDir, outputTar)
 	}
+
 	var stderr bytes.Buffer
 	cmd := exec.Command("docker", "save", tag)
 	cmd.Stderr = &stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
-	}
-	if err = cmd.Start(); err != nil {
-		return err
+		return fmt.Errorf("failed to get stdout pipe: %w", err)
 	}
 
-	err = func() error {
+	if err = cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start docker save command: %w", err)
+	}
+
+	if err := func() error {
 		f, err := os.Create(outputFile)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create output file: %w", err)
 		}
 		defer f.Close()
 
 		w := gzip.NewWriter(f)
 		defer w.Close()
 
-		_, err = io.Copy(w, stdout)
-		if err != nil {
-			return err
+		if _, err = io.Copy(w, stdout); err != nil {
+			return fmt.Errorf("failed to copy docker save output: %w", err)
 		}
 		return nil
-	}()
-	if err != nil {
+	}(); err != nil {
 		return err
 	}
 
 	if err = cmd.Wait(); err != nil {
 		if errmsg := strings.TrimSpace(stderr.String()); errmsg != "" {
-			err = fmt.Errorf(err.Error()+": %w", errors.New(errmsg))
+			err = fmt.Errorf("%w: %s", err, errmsg)
 		}
-		return err
+		return fmt.Errorf("docker save command failed: %w", err)
 	}
 
 	if err = CreateSHA512File(outputFile); err != nil {

@@ -459,7 +459,7 @@ func Tar(src string, targetFile string) error {
 func untar(sourceFile, destinationDir string) error {
 	file, err := os.Open(sourceFile)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open source file: %w", err)
 	}
 	defer file.Close()
 
@@ -467,7 +467,7 @@ func untar(sourceFile, destinationDir string) error {
 
 	if strings.HasSuffix(sourceFile, ".gz") {
 		if fileReader, err = gzip.NewReader(file); err != nil {
-			return err
+			return fmt.Errorf("failed to create gzip reader: %w", err)
 		}
 		defer fileReader.Close()
 	}
@@ -480,38 +480,31 @@ func untar(sourceFile, destinationDir string) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			return fmt.Errorf("error reading tar: %w", err)
 		}
 
 		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)+string(os.PathSeparator)) {
 			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
 			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
-				return err
+				return fmt.Errorf("failed to create directory: %w", err)
 			}
 		case tar.TypeReg:
-			writer, err := os.Create(path)
+			writer, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(header.Mode))
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to create file: %w", err)
 			}
-
-			if _, err = io.Copy(writer, tarReader); err != nil {
-				return err
-			}
-
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
-				return err
-			}
-
-			if err = writer.Close(); err != nil {
-				return err
+			_, err = io.Copy(writer, tarReader)
+			writer.Close()
+			if err != nil {
+				return fmt.Errorf("failed to write file contents: %w", err)
 			}
 		default:
-			return fmt.Errorf("unable to untar type=%c in file=%s", header.Typeflag, path)
+			return fmt.Errorf("unsupported tar entry type: %c for file: %s", header.Typeflag, path)
 		}
 	}
 
@@ -585,7 +578,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 	}
 
 	var mu sync.Mutex
-	var errs []string
+	var errs []error
 	var wg sync.WaitGroup
 
 	for _, fw := range fnWrappers {
@@ -594,7 +587,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 			defer func() {
 				if v := recover(); v != nil {
 					mu.Lock()
-					errs = append(errs, fmt.Sprint(v))
+					errs = append(errs, fmt.Errorf("%s", v))
 					mu.Unlock()
 				}
 				wg.Done()
@@ -602,10 +595,10 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 			}()
 			waitStart := time.Now()
 			parallelJobs() <- 1
-			log.Println("Parallel job waited", time.Since(waitStart), "before starting.")
+			fmt.Printf("Parallel job waited %v before starting.\n", time.Since(waitStart))
 			if err := fw(ctx); err != nil {
 				mu.Lock()
-				errs = append(errs, fmt.Sprint(err))
+				errs = append(errs, err)
 				mu.Unlock()
 			}
 		}(fw)
@@ -613,7 +606,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 	wg.Wait()
 	if len(errs) > 0 {
-		panic(fmt.Errorf(strings.Join(errs, "\n")))
+		panic(errors.Join(errs...))
 	}
 }
 
@@ -675,7 +668,6 @@ func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]strin
 		}
 
 		if !info.Mode().IsRegular() {
-			// continue
 			return nil
 		}
 
@@ -696,31 +688,25 @@ func FileConcat(out string, perm os.FileMode, files ...string) error {
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
+	defer w.Flush()
 
-	append := func(file string) error {
+	for _, file := range files {
 		in, err := os.Open(file)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open input file %s: %w", file, err)
 		}
 		defer in.Close()
 
 		if _, err := io.Copy(w, in); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	for _, in := range files {
-		if err := append(in); err != nil {
-			return err
+			return fmt.Errorf("failed to copy from %s: %w", file, err)
 		}
 	}
 
-	if err = w.Flush(); err != nil {
-		return err
+	if err := w.Flush(); err != nil {
+		return fmt.Errorf("failed to flush writer: %w", err)
 	}
-	return f.Close()
+
+	return nil
 }
 
 // MustFileConcat invokes FileConcat and panics if an error occurs.
@@ -748,11 +734,10 @@ func VerifySHA256(file string, hash string) error {
 	expectedHash := strings.TrimSpace(hash)
 
 	if computedHash != expectedHash {
-		return fmt.Errorf("SHA256 verification of %v failed. Expected=%v, "+
-			"but computed=%v", f.Name(), expectedHash, computedHash)
+		return fmt.Errorf("SHA256 verification of %v failed. Expected=%v, computed=%v", f.Name(), expectedHash, computedHash)
 	}
-	log.Println("SHA256 OK:", f.Name())
 
+	fmt.Printf("SHA256 OK: %s\n", f.Name())
 	return nil
 }
 
@@ -773,7 +758,7 @@ func CreateSHA512File(file string) error {
 	computedHash := hex.EncodeToString(sum.Sum(nil))
 	out := fmt.Sprintf("%v  %v", computedHash, filepath.Base(file))
 
-	return ioutil.WriteFile(file+".sha512", []byte(out), 0644)
+	return os.WriteFile(file+".sha512", []byte(out), 0644)
 }
 
 // Mage executes mage targets in the specified directory.

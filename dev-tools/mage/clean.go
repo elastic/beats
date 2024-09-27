@@ -53,8 +53,7 @@ func Clean(pathLists ...[]string) error {
 			if err := sh.Rm(f); err != nil {
 				if errors.Is(err, os.ErrPermission) ||
 					strings.Contains(err.Error(), "permission denied") {
-					fmt.Printf("warn: cannot delete %q: %v, proceeding anyway\n",
-						f, err)
+					fmt.Printf("warn: cannot delete %q: %v, proceeding anyway\n", f, err)
 					continue
 				}
 				return err

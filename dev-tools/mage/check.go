@@ -253,7 +253,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 	var dashboard DashboardObject
 	err := json.Unmarshal(d, &dashboard)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("failed to parse dashboard from %s: %s", file, err))
+		fmt.Printf("failed to parse dashboard from %s: %s\n", file, err)
 		return true
 	}
 
