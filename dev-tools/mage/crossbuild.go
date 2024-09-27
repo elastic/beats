@@ -353,12 +353,13 @@ func (b GolangCrossBuilder) Build() error {
 	// So, we need to create the directory before mounting it.
 	//
 	// Also, in the container, the cache directory is mounted to /root/.cache/go-build.
-	buildCacheHostDir := filepath.Join(repoInfo.RootDir, "build", ".go-build", b.Platform)
+	// buildCacheHostDir := filepath.Join(repoInfo.RootDir, "build", ".go-build", b.Platform)
+	buildCacheHostDir := filepath.Join(os.TempDir(), "build", ".go-build", b.Platform)
 	buildCacheContainerDir := "/root/.cache/go-build"
 
 	_, err = os.Stat(buildCacheHostDir)
 	if err != nil {
-		return fmt.Errorf("failed to stat directory %s: %w", buildCacheHostDir, err)
+		fmt.Printf("Failed to stat cache directory %s: %v", buildCacheHostDir, err)
 	}
 	if err = os.MkdirAll(buildCacheHostDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", buildCacheHostDir, err)
@@ -366,7 +367,9 @@ func (b GolangCrossBuilder) Build() error {
 
 	// Print the directory tree to ensure that the directory is mounted correctly.
 	fmt.Println("Displaying .go-build directory structure:")
-	sh.Run("tree", filepath.Join(repoInfo.RootDir, "build", ".go-build"))
+	if err = sh.Run("tree", filepath.Join(repoInfo.RootDir, "build", ".go-build")); err != nil {
+		fmt.Printf("Failed to execute tree command: %v", err)
+	}
 
 	// Common arguments
 	args = append(args,
