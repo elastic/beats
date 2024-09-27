@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -142,7 +143,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	if cfg.Resource.Tracer != nil {
-		id := sanitizeFileName(env.ID)
+		id := sanitizeFileName(env.IDWithoutName)
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
@@ -165,7 +166,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, ast, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
+	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -991,7 +992,19 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
+func getEnv(allowed []string) map[string]string {
+	env := make(map[string]string)
+	for _, kv := range os.Environ() {
+		k, v, ok := strings.Cut(kv, "=")
+		if !ok || !slices.Contains(allowed, k) {
+			continue
+		}
+		env[k] = v
+	}
+	return env
+}
+
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1013,6 +1026,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,
+			"env":       vars,
 		}),
 	}
 	if len(patterns) != 0 {
