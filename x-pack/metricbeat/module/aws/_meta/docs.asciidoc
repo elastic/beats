@@ -150,7 +150,7 @@ See https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/apigateway@v1.25.8#G
       metrics:
         - namespace: "AWS/ApiGateway"
           resource_type: "apigateway:restapis"
-          limit_rest_api: 40
+          max_apigateway_results: 40
 ----
 
 The aws module comes with a predefined dashboard. For example:

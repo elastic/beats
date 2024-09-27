@@ -36,7 +36,7 @@ type Config struct {
 	AWSConfig             awscommon.ConfigAWS `config:",inline"`
 	TagsFilter            []Tag               `config:"tags_filter"`
 	IncludeLinkedAccounts *bool               `config:"include_linked_accounts"`
-	LimitRestAPI          *int32              `config:"limit_rest_api"`
+	LimitRestAPI          *int32              `config:"max_apigateway_results"`
 	OwningAccount         string              `config:"owning_account"`
 }
 
