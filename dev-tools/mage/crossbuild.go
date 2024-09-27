@@ -355,9 +355,18 @@ func (b GolangCrossBuilder) Build() error {
 	// Also, in the container, the cache directory is mounted to /root/.cache/go-build.
 	buildCacheHostDir := filepath.Join(repoInfo.RootDir, "build", ".go-build", b.Platform)
 	buildCacheContainerDir := "/root/.cache/go-build"
+
+	_, err = os.Stat(buildCacheHostDir)
+	if err != nil {
+		return fmt.Errorf("failed to stat directory %s: %w", buildCacheHostDir, err)
+	}
 	if err = os.MkdirAll(buildCacheHostDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", buildCacheHostDir, err)
 	}
+
+	// Print the directory tree to ensure that the directory is mounted correctly.
+	fmt.Println("Displaying .go-build directory structure:")
+	sh.Run("tree", filepath.Join(repoInfo.RootDir, "build", ".go-build"))
 
 	// Common arguments
 	args = append(args,
@@ -366,6 +375,7 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", "SNAPSHOT="+strconv.FormatBool(Snapshot),
+		"--env", "GOGC=off", // Disable GC during build.
 
 		// To persist the build cache, we need to mount the cache directory to the Docker host.
 		// With docker run, mount types are: bind, volume and tmpfs. For our use case, we have
