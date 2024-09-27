@@ -186,9 +186,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
 			}
 		} else {
-			for namespace, _ := range namespaceDetailTotal {
-				var listMetricsOutputPerNamespace []aws.MetricWithID
-				listMetricsOutputPerNamespace, err = aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
+			for namespace := range namespaceDetailTotal {
+				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
 				if err != nil {
 					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, namespace, err)
 				}
