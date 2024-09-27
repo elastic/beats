@@ -338,6 +338,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 
 *Metricbeat*
 
