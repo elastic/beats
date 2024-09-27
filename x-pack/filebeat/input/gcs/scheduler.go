@@ -188,9 +188,10 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 		return !(j.Timestamp().After(cp.LatestEntryTime) || j.Name() > cp.ObjectName)
 	})
 
-	// in a scenario where there are some jobs which have a greater timestamp
+	// In a scenario where there are some jobs which have a greater timestamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint blob name, we then sort around the pivot checkpoint timestamp
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint
+	// timestamp.
 	sort.Slice(jobs, func(i, _ int) bool {
 		return jobs[i].Timestamp().After(cp.LatestEntryTime)
 	})
