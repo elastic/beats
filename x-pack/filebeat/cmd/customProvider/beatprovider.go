@@ -45,17 +45,19 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 		return nil, fmt.Errorf("cannot convert Filebeat config: %w", err)
 	}
 
-	newCfg := config.NewConfig()
-	newCfg.SetString("otelconsumer", -1, "")
+	// We need to edit the output settings from Filebeat:
+	// first we create a new config with a single key `otelconsumer`
+	// which is an empty map, then we replace the `output` by this
+	// new config.
+	//
+	// Effectively we're replacing `output.elasticsearch` by
+	// `output.otelconsumer`.
+	otelConsumerCfg := config.NewConfig()
+	otelConsumerCfg.SetChild("otelconsumer", -1, config.MustNewConfigFrom(map[string]any{}))
+	cfg.SetChild("output", -1, otelConsumerCfg)
 
-	cfg.SetChild("output", -1, newCfg)
-
-	fbCfg, err := cfg.Child("receivers.filebeatreceiver", -1)
-	if err != nil {
-		return nil, fmt.Errorf("cannot extract Filebeat config from  receivers: %w", err)
-	}
 	var receiverMap map[string]any
-	fbCfg.Unpack(&receiverMap)
+	cfg.Unpack(&receiverMap)
 
 	cfgMap := map[string]any{
 		"exporters": map[string]any{
@@ -78,9 +80,10 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 		},
 	}
 
+	// TODO: Remove this debug statement
 	s, _ := json.MarshalIndent(cfgMap, "", " ")
-
 	fmt.Println(string(s))
+
 	return confmap.NewRetrieved(cfgMap)
 }
 

@@ -84,8 +84,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index":  esToOTelOptions.Index, // index
-		"index":       esToOTelOptions.Index,
+		"logs_index":  esToOTelOptions.Index,    // index
 		"pipeline":    esToOTelOptions.Pipeline, // pipeline
 		"endpoints":   hosts,                    // hosts, protocol, path, port
 		"num_workers": workersCfg.NumWorkers(),  // worker/workers
@@ -113,11 +112,6 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		"batcher": map[string]any{
 			"enabled":        true,
 			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-		},
-
-		// TODO (Tiago): Trying to make things work, remove later
-		"mapping": map[string]any{
-			"mode": "ecs",
 		},
 	}
 
