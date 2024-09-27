@@ -1,0 +1,53 @@
+receivers:
+  filebeatreceiver:
+    filebeat:
+      autodiscover:
+        providers:
+          - type: docker
+            templates:
+              - condition:
+                  contains:
+                    docker.container.name: mycontainername
+                config: 
+                  - type: filestream
+                    id: my-filestream-id-2
+                    paths:
+                      - /var/lib/docker/containers/*/*.log
+      inputs:
+        - type: filestream
+          id: my-filestream
+          enabled: true
+          paths: /tmp/flog.log
+    output:
+      otelconsumer:
+    logging:
+      level: debug
+      selectors:
+        - '*'
+    processors:
+      - add_fields:
+          target: project
+          fields:
+            name: myproject
+exporters:
+  debug:
+  elasticsearch:
+    user: elastic
+    password: changeme
+    endpoint: https://not-used:9200
+    tls.insecure_skip_verify: true
+service:
+  pipelines:
+    logs:
+      receivers: [filebeatreceiver]
+      processors: []
+      exporters: [debug, elasticsearch]
+
+# the output parsed/used when running with -config filebeat:/path/to/file
+output:
+  elasticsearch:
+    hosts:
+      - https://localhost:9200
+    username: elastic
+    password: changeme
+    ssl.verification_mode: none

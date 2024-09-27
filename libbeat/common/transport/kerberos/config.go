@@ -70,6 +70,23 @@ func (t *AuthType) Unpack(value string) error {
 	return nil
 }
 
+func (t *AuthType) String() (string, error) {
+	if t == nil {
+		return "", InvalidAuthType
+	}
+
+	switch *t {
+	case authPassword:
+		return authPasswordStr, nil
+	case authKeytab:
+		return authPasswordStr, nil
+	default:
+
+		return "", fmt.Errorf("invalid authentication type '%d': %w",
+			*t, InvalidAuthType)
+	}
+}
+
 func (c *Config) Validate() error {
 	switch c.AuthType {
 	case authPassword:
