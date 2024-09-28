@@ -2,7 +2,6 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
 steps:
@@ -41,10 +40,6 @@ steps:
           cd x-pack/agentbeat
           go env GOMODCACHE
           go env GOCACHE
-          echo "GOMODCACHE=$(go env GOMODCACHE)" >> $BUILDKITE_ENV_FILE
-          echo "GOCACHE=$(go env GOCACHE)" >> $BUILDKITE_ENV_FILE
-          echo $GOMODCACHE
-          echo $GOCACHE
           cat $BUILDKITE_ENV_FILE
           # mage package
         artifact_paths:
@@ -72,6 +67,10 @@ steps:
           PLATFORMS: "linux/amd64"
           SNAPSHOT: true
         command: |
+          go env GOMODCACHE
+          go env GOCACHE
+          ls -ltr $(go env GOMODCACHE)
+          ls -ltr $(go env GOCACHE)
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
