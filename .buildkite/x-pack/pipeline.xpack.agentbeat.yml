@@ -38,11 +38,15 @@ steps:
         command: |
           set -euo pipefail
           cd x-pack/agentbeat
+
+          go mod tidy
+
           go env GOMODCACHE
           go env GOCACHE
-          ls -ltr $(go env GOMODCACHE)
+          ls -Rltr $(go env GOMODCACHE)
           ls -ltr $(go env GOCACHE)
           # mage package
+
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
@@ -70,7 +74,7 @@ steps:
         command: |
           go env GOMODCACHE
           go env GOCACHE
-          ls -ltr $(go env GOMODCACHE)
+          ls -Rltr $(go env GOMODCACHE)
           ls -ltr $(go env GOCACHE)
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics with npm"
