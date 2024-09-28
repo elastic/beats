@@ -1,0 +1,31 @@
+module_version: "1.0"
+
+var:
+  - name: input
+    default: winlog
+  - name: batch_read_size
+  - name: name
+  - name: id
+  - name: ignore_older
+  - name: forwarded
+  - name: event_id
+  - name: language
+  - name: level
+  - name: provider
+  - name: xml_query
+  - name: include_xml
+  - name: fields
+  - name: fields_under_root
+  - name: processors
+  - name: index
+  - name: keep_null
+  - name: no_more_events
+  - name: api
+  - name: tags
+    default: [windows]
+
+ingest_pipeline:
+  - ../ingest/routing.yml
+  - ./ingest/powershell_operational.yml
+input: config/input.yml
+

@@ -1,0 +1,53 @@
+{{ if eq .input "winlog" }}
+type: winlog
+{{if .batch_read_size}}
+batch_read_size: {{.batch_read_size}}{{end}}
+{{if .name}}
+name: {{.name}}{{end}}
+{{if .id}}
+id: {{.id}}{{end}}
+{{if .ignore_older}}
+ignore_older: {{.ignore_older}}{{end}}
+{{if .forwarded}}
+forwarded: {{.forwarded}}{{end}}
+{{if .event_id}}
+event_id: {{.event_id}}{{end}}
+{{if .language}}
+language: {{.language}}{{end}}
+{{if .level}}
+level: {{.level}}{{end}}
+{{if .provider}}
+provider: {{.provider}}{{end}}
+{{if .xml_query}}
+xml_query: {{.xml_query}}{{end}}
+{{if .include_xml}}
+include_xml: {{.include_xml}}{{end}}
+{{if .fields}}
+fields: {{.fields | tojson }}{{end}}
+{{if .fields_under_root}}
+fields_under_root: {{.fields_under_root}}{{end}}
+{{if .processors}}
+processors: {{.processors | tojson }}{{end}}
+{{if .index}}
+index: {{.index}}{{end}}
+{{if .keep_null}}
+keep_null: {{.keep_null}}{{end}}
+{{if .no_more_events}}
+no_more_events: {{.no_more_events}}{{end}}
+{{if .api}}
+api: {{.api}}{{end}}
+{{ else if eq .input "file" }}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+processors:
+  - decode_json_fields:
+      fields:
+        - message
+      overwrite_keys: true
+      target: ""
+{{ end }}
+{{- if .tags }}tags: {{ .tags | tojson }}{{ end }}

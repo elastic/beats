@@ -173,6 +173,7 @@ CHANGELOG*
 /x-pack/filebeat/module/suricata @elastic/sec-deployment-and-devices
 /x-pack/filebeat/module/threatintel @elastic/security-service-integrations
 /x-pack/filebeat/module/tomcat @elastic/obs-infraobs-integrations
+/x-pack/filebeat/module/windows @elastic/sec-windows-platform
 /x-pack/filebeat/module/zeek @elastic/sec-deployment-and-devices
 /x-pack/filebeat/module/zookeeper @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/zoom @elastic/security-service-integrations

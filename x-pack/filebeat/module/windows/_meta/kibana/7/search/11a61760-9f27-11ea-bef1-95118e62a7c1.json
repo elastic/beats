@@ -1,0 +1,49 @@
+{
+    "attributes": {
+        "columns": [
+            "event.code",
+            "powershell.engine.version",
+            "powershell.runspace_id",
+            "process.args",
+            "powershell.command.invocation_details",
+            "powershell.file.script_block_text"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "(winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" )"
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Details (PowerShell) [Filebeat Windows]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:10.446Z",
+    "id": "11a61760-9f27-11ea-bef1-95118e62a7c1",
+    "managed": false,
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "typeMigrationVersion": "7.9.3",
+    "updated_at": "2023-11-10T17:08:10.446Z",
+    "version": "WzMxMCwxXQ=="
+}
