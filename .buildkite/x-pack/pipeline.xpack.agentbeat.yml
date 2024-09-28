@@ -34,7 +34,7 @@ steps:
       - label: ":linux: Agentbeat packaging Linux"
         key: "agentbeat-package-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "linux/amd64"
           SNAPSHOT: true
         command: |
           set -euo pipefail
@@ -64,22 +64,15 @@ steps:
           - agentbeat-package-linux
         env:
           ASDF_NODEJS_VERSION: 18.17.1
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "linux/amd64"
           SNAPSHOT: true
         command: |
           set -euo pipefail
-          echo "~~~ Downloading artifacts"
-          buildkite-agent artifact download x-pack/agentbeat/build/distributions/** . --step 'agentbeat-package-linux'
-          ls -lah x-pack/agentbeat/build/distributions/
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
           echo "~~~ Running tests"
           cd x-pack/agentbeat
           mage goIntegTest
-        artifact_paths:
-          - x-pack/agentbeat/build/distributions/**/*
-          - "x-pack/agentbeat/build/*.xml"
-          - "x-pack/agentbeat/build/*.json"
         retry:
           automatic:
             - limit: 1
