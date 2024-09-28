@@ -15,6 +15,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": [ ]
-        }        
+        }
     ]
 }
