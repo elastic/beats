@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -524,40 +525,36 @@ func RunCmds(cmds ...[]string) error {
 	return nil
 }
 
-var (
-	parallelJobsLock      sync.Mutex
-	parallelJobsSemaphore chan int
-)
+var parallelJobsSemaphore chan struct{}
 
-func parallelJobs() chan int {
-	parallelJobsLock.Lock()
-	defer parallelJobsLock.Unlock()
-
+// parallelJobs returns a semaphore channel to limit the number of parallel jobs.
+func parallelJobs() chan struct{} {
 	if parallelJobsSemaphore == nil {
 		max := numParallel()
-		parallelJobsSemaphore = make(chan int, max)
-		log.Println("Max parallel jobs =", max)
+		parallelJobsSemaphore = make(chan struct{}, max)
+		fmt.Printf("Max parallel jobs: %d\n", max)
 	}
 
 	return parallelJobsSemaphore
 }
 
+// numParallel determines the maximum number of parallel jobs to run.
+// It considers the MAX_PARALLEL environment variable, the number of CPUs on the host,
+// and the number of CPUs reported by Docker.
 func numParallel() int {
-	if maxParallel := os.Getenv("MAX_PARALLEL"); maxParallel != "" {
-		if num, err := strconv.Atoi(maxParallel); err == nil && num > 0 {
-			return num
-		}
+	if maxParallel, err := strconv.Atoi(os.Getenv("MAX_PARALLEL")); err == nil && maxParallel > 0 {
+		return maxParallel
 	}
 
-	// To be conservative use the minimum of the number of CPUs between the host
-	// and the Docker host.
-	maxParallel := runtime.NumCPU()
+	// Calculate based on available CPUs
+	maxParallel := runtime.NumCPU() / 2
 
+	// Adjust based on Docker-reported CPUs if available
 	info, err := GetDockerInfo()
 	// Check that info.NCPU != 0 since docker info doesn't return with an
-	// error status if communcation with the daemon failed.
-	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
-		maxParallel = info.NCPU
+	// error status if communication with the daemon fails.
+	if err == nil && info.NCPU != 0 {
+		maxParallel = int(math.Min(float64(maxParallel), float64(info.NCPU)))
 	}
 
 	return maxParallel
@@ -571,39 +568,49 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 	for _, f := range fns {
 		fnWrapper := funcTypeWrap(f)
 		if fnWrapper == nil {
-			panic("attempted to add a dep that did not match required function type")
+			panic(fmt.Sprintf("unsupported function type: %T", f))
 		}
 		fnWrappers = append(fnWrappers, fnWrapper)
 	}
 
-	var mu sync.Mutex
-	var errs []error
+	errChan := make(chan error, len(fnWrappers))
 	var wg sync.WaitGroup
 
 	for _, fw := range fnWrappers {
 		wg.Add(1)
 		go func(fw func(context.Context) error) {
+			defer wg.Done()
 			defer func() {
-				if v := recover(); v != nil {
-					mu.Lock()
-					errs = append(errs, fmt.Errorf("%s", v))
-					mu.Unlock()
+				if r := recover(); r != nil {
+					errChan <- fmt.Errorf("panic: %v", r)
 				}
-				wg.Done()
 				<-parallelJobs()
 			}()
+
+			select {
+			case parallelJobs() <- struct{}{}:
+			case <-ctx.Done():
+				errChan <- ctx.Err()
+				return
+			}
+
 			waitStart := time.Now()
-			parallelJobs() <- 1
 			fmt.Printf("Parallel job waited %v before starting.\n", time.Since(waitStart))
+
 			if err := fw(ctx); err != nil {
-				mu.Lock()
-				errs = append(errs, err)
-				mu.Unlock()
+				errChan <- err
 			}
 		}(fw)
 	}
 
 	wg.Wait()
+	close(errChan)
+
+	var errs []error
+	for err := range errChan {
+		errs = append(errs, err)
+	}
+
 	if len(errs) > 0 {
 		panic(errors.Join(errs...))
 	}
@@ -619,23 +626,16 @@ func Parallel(fns ...interface{}) {
 func funcTypeWrap(fn interface{}) func(context.Context) error {
 	switch f := fn.(type) {
 	case func():
-		return func(context.Context) error {
-			f()
-			return nil
-		}
+		return func(context.Context) error { f(); return nil }
 	case func() error:
-		return func(context.Context) error {
-			return f()
-		}
+		return func(context.Context) error { return f() }
 	case func(context.Context):
-		return func(ctx context.Context) error {
-			f(ctx)
-			return nil
-		}
+		return func(ctx context.Context) error { f(ctx); return nil }
 	case func(context.Context) error:
 		return f
+	default:
+		return nil
 	}
-	return nil
 }
 
 // FindFiles return a list of file matching the given glob patterns.
