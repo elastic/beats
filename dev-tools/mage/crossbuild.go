@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
+	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -367,8 +369,14 @@ func (b GolangCrossBuilder) Build() error {
 
 	// Print the directory tree to ensure that the directory is mounted correctly.
 	fmt.Println("Displaying .go-build directory structure:")
-	if err = sh.Run("tree", filepath.Join(repoInfo.RootDir, "build", ".go-build")); err != nil {
-		fmt.Printf("Failed to execute tree command: %v", err)
+	err = filepath.WalkDir(buildCacheHostDir, func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			fmt.Println(path, d.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		log.Fatalf("impossible to walk directories: %s", err)
 	}
 
 	// Common arguments
