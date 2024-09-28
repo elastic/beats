@@ -74,6 +74,9 @@ steps:
         command: |
           go env GOMODCACHE
           go env GOCACHE
+
+          go mod tidy
+
           ls -Rltr $(go env GOMODCACHE)
           ls -ltr $(go env GOCACHE)
           set -euo pipefail
