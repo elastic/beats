@@ -40,7 +40,11 @@ steps:
           cd x-pack/agentbeat
           go mod tidy
 
-          buildkite-agent env set GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE)
+          echo export GOMODCACHE=$(go env GOMODCACHE) > shared_vars.sh
+          echo export GOCACHE=$(go env GOCACHE) >> shared_vars.sh
+
+          cat shared_vars.sh
+          source shared_vars.sh
 
           echo $GOMODCACHE
           echo $GOCACHE
