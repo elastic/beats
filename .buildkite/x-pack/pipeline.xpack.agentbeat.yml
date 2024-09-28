@@ -40,7 +40,8 @@ steps:
           cd x-pack/agentbeat
           go env GOMODCACHE
           go env GOCACHE
-          cat $BUILDKITE_ENV_FILE
+          ls -ltr $(go env GOMODCACHE)
+          ls -ltr $(go env GOCACHE)
           # mage package
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
