@@ -526,8 +526,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 
 		// Update input metrics.
 		in.metrics.processedMessages.Inc()
-		in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 	}
+
+	// Update input metrics.
+	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 
 	return nil
 }
