@@ -21,8 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -359,24 +357,8 @@ func (b GolangCrossBuilder) Build() error {
 	buildCacheHostDir := filepath.Join(os.TempDir(), "build", ".go-build", b.Platform)
 	buildCacheContainerDir := "/root/.cache/go-build"
 
-	_, err = os.Stat(buildCacheHostDir)
-	if err != nil {
-		fmt.Printf("Failed to stat cache directory %s: %v", buildCacheHostDir, err)
-	}
 	if err = os.MkdirAll(buildCacheHostDir, 0755); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", buildCacheHostDir, err)
-	}
-
-	// Print the directory tree to ensure that the directory is mounted correctly.
-	fmt.Println("Displaying .go-build directory structure:")
-	err = filepath.WalkDir(buildCacheHostDir, func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() {
-			fmt.Println(path, d.Name())
-		}
-		return nil
-	})
-	if err != nil {
-		log.Fatalf("impossible to walk directories: %s", err)
 	}
 
 	// Common arguments
