@@ -1,5 +1,6 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
+  GO_VERSION: 1.22.7
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
@@ -39,22 +40,14 @@ steps:
           set -euo pipefail
           cd x-pack/agentbeat
           go mod tidy
-
-          echo export GOMODCACHE=$(go env GOMODCACHE) > shared_vars.sh
-          echo export GOCACHE=$(go env GOCACHE) >> shared_vars.sh
-
-          cat shared_vars.sh
-          source shared_vars.sh
-
-          echo $GOMODCACHE
-          echo $GOCACHE
           # mage package
 
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
           - "x-pack/agentbeat/build/*.json"
-          - "$GOMODCACHE/**/*"
+          - /opt/buildkite-agent/.asdf/installs/golang/$GO_VERSION/packages/pkg/mod/**/*
+          - /opt/buildkite-agent/.cache/go-build/**/*
         retry:
           automatic:
             - limit: 2
@@ -71,12 +64,23 @@ steps:
 
       - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-it-linux"
+        depends_on:
+          - agentbeat-package-linux
         env:
           ASDF_NODEJS_VERSION: 18.17.1
           PLATFORMS: "linux/amd64"
           SNAPSHOT: true
         command: |
           set -euo pipefail
+          echo "~~~ Downloading cache artifacts"
+          buildkite-agent artifact download /opt/buildkite-agent/.asdf/installs/golang/$GO_VERSION/packages/pkg/mod/* /opt/buildkite-agent/.asdf/installs/golang/$GO_VERSION/packages/pkg/mod/ --step 'agentbeat-package-linux'
+          buildkite-agent artifact download /opt/buildkite-agent/.cache/go-build/* /opt/buildkite-agent/.cache/go-build/ --step 'agentbeat-package-linux'
+
+          ls -Rltr /opt/buildkite-agent/.asdf/installs/golang/$GO_VERSION/packages/pkg/mod/
+          ls -Rltr /opt/buildkite-agent/.cache/go-build/
+
+          go mod tidy
+
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
           echo "~~~ Running tests"
