@@ -38,19 +38,19 @@ steps:
         command: |
           set -euo pipefail
           cd x-pack/agentbeat
-
           go mod tidy
 
-          go env GOMODCACHE
-          go env GOCACHE
-          ls -Rltr $(go env GOMODCACHE)
-          ls -ltr $(go env GOCACHE)
+          buildkite-agent env set GOMODCACHE=$(go env GOMODCACHE) GOCACHE=$(go env GOCACHE)
+
+          echo $GOMODCACHE
+          echo $GOCACHE
           # mage package
 
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
           - "x-pack/agentbeat/build/*.json"
+          - "$GOMODCACHE/**/*"
         retry:
           automatic:
             - limit: 2
@@ -72,13 +72,6 @@ steps:
           PLATFORMS: "linux/amd64"
           SNAPSHOT: true
         command: |
-          go env GOMODCACHE
-          go env GOCACHE
-
-          go mod tidy
-
-          ls -Rltr $(go env GOMODCACHE)
-          ls -ltr $(go env GOCACHE)
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
