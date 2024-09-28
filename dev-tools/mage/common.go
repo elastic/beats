@@ -546,8 +546,7 @@ func numParallel() int {
 		return maxParallel
 	}
 
-	// Calculate based on available CPUs
-	maxParallel := runtime.NumCPU() / 2
+	maxParallel := runtime.NumCPU()
 
 	// Adjust based on Docker-reported CPUs if available
 	info, err := GetDockerInfo()
@@ -557,6 +556,10 @@ func numParallel() int {
 		maxParallel = int(math.Min(float64(maxParallel), float64(info.NCPU)))
 	}
 
+	// Parallelize conservatively to avoid overloading the host.
+	if maxParallel >= 2 {
+		return maxParallel / 2
+	}
 	return maxParallel
 }
 

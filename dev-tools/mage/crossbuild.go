@@ -345,15 +345,19 @@ func (b GolangCrossBuilder) Build() error {
 	// This is done by mounting the host directory to the container.
 	//
 	// Path of the cache directory on the host:
-	// 	<repoInfo.RootDir>/build/.go-build/<b.Platform>
-	// Example: <rootdir>/build/.go-build/linux/amd64
+	// 		<os.TempDir>/build/.go-build/<b.Platform>
+	// Example: /tmp/build/.go-build/linux/amd64
+	// Reason for using <os.TempDir> and not <repoInfo.RootDir> as base because for
+	// builds happening on CI, the paths looks similar to:
+	// /opt/buildkite-agent/builds/bk-agent-prod-gcp-1727515099712207954/elastic/beats-xpack-agentbeat/
+	// where bk-agent-prod-gcp-1727515099712207954 is the agent so it keeps changing. So even if we do cache the
+	// build, it will be useless as the cache directory will be different for every build.
 	//
 	// As per: https://docs.docker.com/engine/storage/bind-mounts/#differences-between--v-and---mount-behavior
 	// If the directory doesn't exist, Docker does not automatically create it for you, but generates an error.
 	// So, we need to create the directory before mounting it.
 	//
 	// Also, in the container, the cache directory is mounted to /root/.cache/go-build.
-	// buildCacheHostDir := filepath.Join(repoInfo.RootDir, "build", ".go-build", b.Platform)
 	buildCacheHostDir := filepath.Join(os.TempDir(), "build", ".go-build", b.Platform)
 	buildCacheContainerDir := "/root/.cache/go-build"
 
@@ -368,7 +372,6 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", "SNAPSHOT="+strconv.FormatBool(Snapshot),
-		"--env", "GOGC=off", // Disable GC during build.
 
 		// To persist the build cache, we need to mount the cache directory to the Docker host.
 		// With docker run, mount types are: bind, volume and tmpfs. For our use case, we have
