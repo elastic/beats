@@ -31,19 +31,6 @@ steps:
     key: "agentbeat-mandatory-tests"
 
     steps:
-      - label: "Warm Go cache"
-        key: "warm-go-cache"
-        command: |
-          go mod download
-          go build ./...
-          echo "GOMODCACHE=$(go env GOMODCACHE)" >> $BUILDKITE_ENV_FILE
-          echo "GOCACHE=$(go env GOCACHE)" >> $BUILDKITE_ENV_FILE
-        artifact_paths:
-          - "${GOMODCACHE}/**/*"
-          - "${GOCACHE}/**/*"
-
-      - wait
-
       - label: ":linux: Agentbeat packaging Linux"
         key: "agentbeat-package-linux"
         env:
@@ -52,11 +39,17 @@ steps:
         command: |
           set -euo pipefail
           cd x-pack/agentbeat
-          # mage package
+          echo "GOMODCACHE=$(go env GOMODCACHE)" >> $BUILDKITE_ENV_FILE
+          echo "GOCACHE=$(go env GOCACHE)" >> $BUILDKITE_ENV_FILE
+          ls -ltr $GOMODCACHE
+          echo $BUILDKITE_ENV_FILE
+          mage package
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
           - "x-pack/agentbeat/build/*.json"
+          - "${GOMODCACHE}/**/*"
+          - "${GOCACHE}/**/*"
         retry:
           automatic:
             - limit: 2
@@ -79,8 +72,6 @@ steps:
           SNAPSHOT: true
         command: |
           set -euo pipefail
-          buildkite-agent artifact download "${GOMODCACHE}/**/*" .
-          buildkite-agent artifact download "${GOCACHE}/**/*" .
           echo "~~~ Installing @elastic/synthetics with npm"
           npm install -g @elastic/synthetics
           echo "~~~ Running tests"
