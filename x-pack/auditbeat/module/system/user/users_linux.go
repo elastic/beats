@@ -79,7 +79,7 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 		if passwd == nil {
 			// getpwent() can return ENOENT even when there is no error,
 			// see https://github.com/systemd/systemd/issues/9585.
-			if err != nil && err != syscall.ENOENT {
+			if err != nil && errors.Is(err, syscall.ENOENT) {
 				return users, fmt.Errorf("error getting user: %w", err)
 			}
 

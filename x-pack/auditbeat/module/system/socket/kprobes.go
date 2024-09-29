@@ -57,7 +57,7 @@ func (p *probeInstaller) Install(pdef helper.ProbeDef) (format tracing.ProbeForm
 	if decoder, err = pdef.Decoder(format); err != nil {
 		return format, decoder, fmt.Errorf("failed to create decoder: %w", err)
 	}
-	return
+	return format, decoder, nil
 }
 
 // UninstallInstalled uninstalls the probes installed by Install.

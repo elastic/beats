@@ -7,9 +7,9 @@
 package helper
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net"
 	"time"
 	"unsafe"

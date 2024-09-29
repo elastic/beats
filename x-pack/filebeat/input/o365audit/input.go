@@ -117,7 +117,8 @@ func (inp *o365input) Run(
 		if err == nil {
 			break
 		}
-		if ctx.Cancelation.Err() != err && errors.Is(err, context.Canceled) {
+		//nolint:errorlint // ignore
+		if ctx.Cancelation.Err() != err && !errors.Is(err, context.Canceled) {
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")

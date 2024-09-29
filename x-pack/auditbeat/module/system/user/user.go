@@ -402,6 +402,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			// Check for changes to users
 			missingUserMap := make(map[string](*User))
 			for _, missingUser := range missingFromCache {
+				//nolint:errcheck // ignore
 				missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
 			}
 

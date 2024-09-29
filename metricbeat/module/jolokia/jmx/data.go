@@ -138,8 +138,10 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
 			}
 		case []interface{}:
-			entryValues := v.Value.(map[string]interface{})
-			errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			entryValues, ok := v.Value.(map[string]interface{})
+			if ok {
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			}
 		}
 	}
 

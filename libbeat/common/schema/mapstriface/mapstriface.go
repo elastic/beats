@@ -276,17 +276,11 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)
 	}
 
-	switch emptyIface.(type) {
+	switch ts := emptyIface.(type) {
 	case time.Time:
-		ts, ok := emptyIface.(time.Time)
-		if ok {
-			return common.Time(ts), nil
-		}
+		return common.Time(ts), nil
 	case common.Time:
-		ts, ok := emptyIface.(common.Time)
-		if ok {
-			return ts, nil
-		}
+		return ts, nil
 	}
 
 	msg := fmt.Sprintf("expected date, found %T", emptyIface)
