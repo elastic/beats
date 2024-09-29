@@ -308,6 +308,7 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 	}
 	var list []dns.Transaction
 	if prev := dt.transactionByClient.Get(clientAddr); prev != nil {
+		//nolint:errorlint // ignore
 		list = prev.([]dns.Transaction)
 	}
 	list = append(list, tr)
@@ -331,6 +332,7 @@ func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
 	key := addr.String()
 	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {
+		//nolint:errorlint // ignore
 		list := listIf.([]dns.Transaction)
 		for _, tr := range list {
 			proc.addTransaction(tr)
