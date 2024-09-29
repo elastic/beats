@@ -17,6 +17,7 @@ import (
 	// For provider registration.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta"
 )
 
@@ -43,7 +44,7 @@ type manager struct {
 
 // Init is not used for this input. It is called before Create and no provider
 // has been configured yet.
-func (m *manager) Init(grp unison.Group, mode v2.Mode) error {
+func (m *manager) Init(grp unison.Group) error {
 	return nil
 }
 

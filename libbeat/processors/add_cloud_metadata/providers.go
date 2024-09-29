@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -73,6 +75,21 @@ func selectProviders(configList providerList, providers map[string]provider) map
 }
 
 func providersFilter(configList providerList, allProviders map[string]provider) func(string) bool {
+	if v, ok := os.LookupEnv("BEATS_ADD_CLOUD_METADATA_PROVIDERS"); ok {
+		// We allow users to override the config and defaults with
+		// this environment variable as a workaround in case the
+		// configured/default providers misbehave.
+		configList = nil
+		for _, name := range strings.Split(v, ",") {
+			configList = append(configList, strings.TrimSpace(name))
+		}
+		if len(configList) == 0 {
+			// User explicitly disabled all providers.
+			return func(string) bool {
+				return false
+			}
+		}
+	}
 	if len(configList) == 0 {
 		return func(name string) bool {
 			ff, ok := allProviders[name]

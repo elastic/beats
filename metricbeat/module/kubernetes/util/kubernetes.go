@@ -29,21 +29,22 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
+	KubeAdm           bool                         `config:"use_kubeadm"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
-
-	Node       string        `config:"node"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	Node              string                       `config:"node"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
@@ -166,7 +167,14 @@ func getResource(resourceName string) kubernetes.Resource {
 func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddResourceMetadataConfig) []string {
 	switch resourceName {
 	case PodResource:
-		extra := []string{NamespaceResource, NodeResource}
+		extra := []string{}
+		if addResourceMetadata.Node.Enabled() {
+			extra = append(extra, NodeResource)
+		}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+
 		// We need to create watchers for ReplicaSets and Jobs that it might belong to,
 		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 		// Deployment -> Replicaset -> Pod
@@ -179,23 +187,55 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		}
 		return extra
 	case ServiceResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case DeploymentResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case ReplicaSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case StatefulSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case DaemonSetResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case JobResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case CronJobResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case PersistentVolumeResource:
 		return []string{}
 	case PersistentVolumeClaimResource:
-		return []string{NamespaceResource}
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	case StorageClassResource:
 		return []string{}
 	case NodeResource:
@@ -242,8 +282,7 @@ func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.
 }
 
 func isNamespaced(resourceName string) bool {
-	if resourceName == NodeResource || resourceName == PersistentVolumeResource || resourceName == StorageClassResource ||
-		resourceName == NamespaceResource {
+	if resourceName == NodeResource || resourceName == PersistentVolumeResource || resourceName == StorageClassResource {
 		return false
 	}
 	return true
@@ -553,6 +592,15 @@ func NewResourceMetadataEnricher(
 
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 	// Create the metadata generator to be used in the watcher's event handler.
 	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
@@ -565,11 +613,11 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	// updateFunc to be used as the resource watcher's add and update handler.
+	// updateFunc to be used as the resource watchers add and update handler.
 	// The handler function is executed when a watcher is triggered(i.e. new/updated resource).
-	// It is responsible for generating the metadata for a detected resource by executing the metadata generator's Generate method.
+	// It is responsible for generating the metadata for a detected resource by executing the metadata generators Generate method.
 	// It is a common handler for all resource watchers. The kind of resource(e.g. pod or deployment) is checked inside the function.
-	// It returns a map of a resourse identifier(i.e namespace-resource_name) as key and the metadata as value.
+	// It returns a map of a resource identifier(i.e. namespace-resource_name) as key and the metadata as value.
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
@@ -652,7 +700,7 @@ func NewResourceMetadataEnricher(
 	indexFunc := func(e mapstr.M) string {
 		name := getString(e, "name")
 		namespace := getString(e, mb.ModuleDataKey+".namespace")
-		id := ""
+		var id string
 		if name != "" && namespace != "" {
 			id = join(namespace, name)
 		} else if namespace != "" {
@@ -715,6 +763,15 @@ func NewContainerMetadataEnricher(
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
+	}
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, commonMetaConfig.KubeAdm)
+	if err != nil {
+		log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
 	}
 
 	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)

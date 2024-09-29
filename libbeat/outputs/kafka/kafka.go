@@ -23,7 +23,6 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -84,28 +83,18 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when
 // running under Elastic-Agent based on cfg.
 //
 // When running standalone the topic selector works as expected and documented.
-// When running under Elastic-Agent, dynamic topic selection is not supported,
-// so a constant selector using the `topic` value is returned.
+// When running under Elastic-Agent, dynamic topic selection is also supported
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
-	topicCfg := struct {
-		Topic string `config:"topic" yaml:"topic"`
-	}{}
 
-	if err := cfg.Unpack(&topicCfg); err != nil {
-		return outil.Selector{}, fmt.Errorf("cannot unpack Kafka config to read the topic: %w", err)
-	}
-
-	if management.UnderAgent() {
-		exprSelector := outil.ConstSelectorExpr(topicCfg.Topic, outil.SelectorKeepCase)
-		selector := outil.MakeSelector(exprSelector)
-		return selector, nil
+	if cfg == nil {
+		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil")
 	}
 
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{

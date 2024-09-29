@@ -8,7 +8,7 @@
     "kubernetes": {
         "namespace": "local-path-storage",
         "replicaset": {
-            "name": "local-path-provisioner-6bc4bddd6b",
+            "name": "local-path-provisioner-7577fdbbfb",
             "replicas": {
                 "available": 1,
                 "desired": 1,

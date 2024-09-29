@@ -30,7 +30,8 @@ import (
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// Here we set a bunch of linux specific security stuff.
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
@@ -50,6 +51,9 @@ func init() {
 
 	// Make heartbeat dumpable so elastic-agent can access process metrics.
 	_ = setDumpable()
+
+	// Customize the seccomp policy that will be loaded when the Heartbeat is initialized.
+	mustConfigureSeccompPolicy()
 }
 
 func setNodeProcAttr(localUserName string) error {

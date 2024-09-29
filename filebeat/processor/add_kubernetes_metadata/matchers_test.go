@@ -34,6 +34,10 @@ const cid = "0069869de9adf97f574c62029aeba65d1ecd85a2a112e87fbc28afe4dec2b843"
 // A random pod UID that we use for our tests
 const puid = "005f3b90-4b9d-12f8-acf0-31020a840133"
 
+func TestMain(m *testing.M) {
+	InitializeModule()
+}
+
 func TestLogsPathMatcher_InvalidSource1(t *testing.T) {
 	cfgLogsPath := "" // use the default matcher configuration
 	source := "/var/log/messages"

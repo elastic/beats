@@ -18,8 +18,6 @@
 package redis
 
 import (
-	"time"
-
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -29,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func init() {
@@ -51,11 +50,20 @@ type Input struct {
 func NewInput(cfg *conf.C, connector channel.Connector, context input.Context) (input.Input, error) {
 	cfgwarn.Experimental("Redis slowlog input is enabled.")
 
-	config := defaultConfig
+	config := defaultConfig()
 
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err
+	}
+
+	if config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, err
+		}
+
+		config.tlsConfig = tlsConfig.ToConfig()
 	}
 
 	out, err := connector.Connect(cfg)
@@ -94,8 +102,7 @@ func (p *Input) Run() {
 
 	forwarder := harvester.NewForwarder(p.outlet)
 	for _, host := range p.config.Hosts {
-		pool := CreatePool(host, p.config.Password, p.config.Network,
-			p.config.MaxConn, p.config.IdleTimeout, p.config.IdleTimeout)
+		pool := CreatePool(host, p.config)
 
 		h, err := NewHarvester(pool.Get())
 		if err != nil {
@@ -121,28 +128,37 @@ func (p *Input) Wait() {}
 
 // CreatePool creates a redis connection pool
 // NOTE: This code is copied from the redis pool handling in metricbeat
-func CreatePool(
-	host, password, network string,
-	maxConn int,
-	idleTimeout, connTimeout time.Duration,
-) *rd.Pool {
+func CreatePool(host string, cfg config) *rd.Pool {
 	return &rd.Pool{
-		MaxIdle:     maxConn,
-		IdleTimeout: idleTimeout,
+		MaxIdle:     cfg.MaxConn,
+		IdleTimeout: cfg.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
-			c, err := rd.Dial(network, host,
-				rd.DialConnectTimeout(connTimeout),
-				rd.DialReadTimeout(connTimeout),
-				rd.DialWriteTimeout(connTimeout))
+			dialOptions := []rd.DialOption{
+				rd.DialUsername(cfg.Username),
+				rd.DialConnectTimeout(cfg.IdleTimeout),
+				rd.DialReadTimeout(cfg.IdleTimeout),
+				rd.DialWriteTimeout(cfg.IdleTimeout),
+			}
+
+			if cfg.TLS.IsEnabled() && cfg.tlsConfig != nil {
+				dialOptions = append(dialOptions,
+					rd.DialUseTLS(true),
+					rd.DialTLSConfig(cfg.tlsConfig),
+				)
+			}
+
+			c, err := rd.Dial(cfg.Network, host, dialOptions...)
 			if err != nil {
 				return nil, err
 			}
-			if password != "" {
-				if _, err := c.Do("AUTH", password); err != nil {
+
+			if cfg.Password != "" {
+				if _, err := c.Do("AUTH", cfg.Password); err != nil {
 					c.Close()
 					return nil, err
 				}
 			}
+
 			return c, err
 		},
 	}

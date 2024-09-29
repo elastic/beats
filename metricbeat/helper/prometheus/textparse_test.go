@@ -144,6 +144,166 @@ process_cpu 20
 	require.ElementsMatch(t, expected, result)
 }
 
+func TestGroupWithHeaderBlockPrometheus(t *testing.T) {
+	input := `
+# HELP nginx_sts_server_bytes_total The request/response bytes
+# TYPE nginx_sts_server_bytes_total counter
+# HELP nginx_sts_server_connects_total The connects counter
+# TYPE nginx_sts_server_connects_total counter
+# HELP nginx_sts_server_session_seconds_total The session duration time
+# TYPE nginx_sts_server_session_seconds_total counter
+# HELP nginx_sts_server_session_seconds The average of session duration time in seconds
+# TYPE nginx_sts_server_session_seconds gauge
+# HELP nginx_sts_server_session_duration_seconds The histogram of session duration in seconds
+# TYPE nginx_sts_server_session_duration_seconds histogram
+nginx_sts_server_bytes_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",direction="in"} 0
+nginx_sts_server_bytes_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",direction="out"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="1xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="2xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="3xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="4xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="5xx"} 171
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="total"} 171
+nginx_sts_server_session_seconds_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP"} 0.016
+nginx_sts_server_session_seconds{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP"} 0.000
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("nginx_sts_server_bytes_total"),
+			Help: stringp("The request/response bytes"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_bytes_total"),
+					Label: []*labels.Label{
+						{Name: "direction", Value: "in"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_bytes_total"),
+					Label: []*labels.Label{
+						{Name: "direction", Value: "out"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_connects_total"),
+			Help: stringp("The connects counter"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "1xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "2xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "3xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "4xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "5xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(171)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "total"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(171)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_session_seconds_total"),
+			Help: stringp("The session duration time"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_session_seconds_total"),
+					Label: []*labels.Label{
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0.016)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_session_seconds"),
+			Help: stringp("The average of session duration time in seconds"),
+			Type: "gauge",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_session_seconds"),
+					Label: []*labels.Label{
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Gauge: &Gauge{Value: float64p(0.000)},
+				},
+			},
+		},
+	}
+
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	if err != nil {
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error: %v", ContentTypeTextFormat, err)
+	}
+	require.ElementsMatch(t, expected, result)
+}
+
 func TestGaugeOpenMetrics(t *testing.T) {
 	input := `
 # TYPE first_metric gauge

@@ -333,6 +333,9 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
+	)
+
+	args = append(args,
 		image,
 
 		// Arguments for docker crossbuild entrypoint. For details see

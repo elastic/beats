@@ -46,6 +46,11 @@ var (
 						"pct":   c.Int("heap_used_percent"),
 					},
 				},
+				"pools": c.Dict("pools", s.Schema{
+					"young":    c.Dict("young", poolSchema),
+					"survivor": c.Dict("survivor", poolSchema),
+					"old":      c.Dict("old", poolSchema),
+				}),
 			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
@@ -112,6 +117,9 @@ var (
 					"count": c.Int("query_total"),
 				},
 			}),
+			"shard_stats": c.Dict("shard_stats", s.Schema{
+				"total_count": c.Int("total_count"),
+			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
 				"size": s.Object{
 					"bytes": c.Int("size_in_bytes"),
@@ -302,6 +310,21 @@ var (
 		},
 		"combined_coordinating_and_primary": s.Object{
 			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
+	}
+
+	poolSchema = s.Schema{
+		"used": s.Object{
+			"bytes": c.Int("used_in_bytes"),
+		},
+		"max": s.Object{
+			"bytes": c.Int("max_in_bytes"),
+		},
+		"peak": s.Object{
+			"bytes": c.Int("peak_used_in_bytes"),
+		},
+		"peak_max": s.Object{
+			"bytes": c.Int("peak_max_in_bytes"),
 		},
 	}
 

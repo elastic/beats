@@ -118,35 +118,6 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	return inputs, nil
 }
 
-// CreateShipperInput is a modified version of CreateInputsFromStreams made for forwarding input units to the shipper beat
-// this does not create separate inputs for each stream, and instead passes it along as a single input, with just the processors added
-func CreateShipperInput(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
-	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
-	for iter, stream := range raw.GetStreams() {
-		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
-		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
-		// 1. global processors
-		streamSource = injectGlobalProcesssors(raw, streamSource)
-
-		// 2. agentInfo
-		streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
-		}
-
-		// 3. stream processors
-		streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
-		}
-		inputs[iter] = streamSource
-	}
-	rawMap := raw.Source.AsMap()
-	rawMap["streams"] = inputs
-
-	return []map[string]interface{}{rawMap}, nil
-}
-
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
 func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.ConfigWithMeta, error) {
 	// format for the reloadable list needed bythe cm.Reload() method
@@ -384,7 +355,7 @@ func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, e
 	// We still need to emulate the InjectHeadersRule AST code,
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
-	outputType := outCfg.GetType() //nolint:typecheck // this is used, linter just doesn't seem to see it
+	outputType := outCfg.GetType()
 	if outputType == "" {
 		return nil, fmt.Errorf("output config does not have a configured type field")
 	}

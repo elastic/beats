@@ -280,7 +280,7 @@ func TestServerPool(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub, metrics)
+					err := servers.serve(ctx, cfg, pub.Publish, metrics)
 					if err != http.ErrServerClosed {
 						select {
 						case fails <- err:
@@ -331,7 +331,7 @@ func TestServerPool(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub, metrics)
+					err := servers.serve(ctx, cfg, pub.Publish, metrics)
 					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
 						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
 					}

@@ -858,6 +858,6 @@ class Test(BaseTest):
 
         # 13 on unix, 14 on windows.
         self.wait_until(lambda: self.log_contains(re.compile(
-            'Matching null byte found at offset (13|14)')), max_timeout=5)
+            'Matching null byte found at offset (13|14)')), max_timeout=10)
 
         filebeat.check_kill_and_wait()

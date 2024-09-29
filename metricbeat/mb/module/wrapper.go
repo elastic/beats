@@ -19,6 +19,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -146,6 +148,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
+			msw.module.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
 			msw.run(done, out)
 		}(msw)
 	}
@@ -199,13 +202,13 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	}
 
 	switch ms := msw.MetricSet.(type) {
-	case mb.PushMetricSet:
+	case mb.PushMetricSet: //nolint:staticcheck // PushMetricSet is deprecated but not removed
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -242,7 +245,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.ReportingMetricSet:
+	case mb.ReportingMetricSet: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
@@ -253,14 +256,32 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			if errors.As(err, &mb.PartialMetricsError{}) {
+				// mark module as running if metrics are partially available and display the error message
+				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			} else {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			if errors.As(err, &mb.PartialMetricsError{}) {
+				// mark module as running if metrics are partially available and display the error message
+				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			} else {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
@@ -292,7 +313,7 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 
 type reporter interface {
 	StartFetchTimer()
-	V1() mb.PushReporter
+	V1() mb.PushReporter //nolint:staticcheck // PushReporter is deprecated but not removed
 	V2() mb.PushReporterV2
 }
 
@@ -309,7 +330,7 @@ type eventReporter struct {
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
 func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter {
+func (r *eventReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }

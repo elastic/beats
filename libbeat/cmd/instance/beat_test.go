@@ -20,24 +20,28 @@
 package instance
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewInstance(t *testing.T) {
-	b, err := NewBeat("testbeat", "testidx", "0.9", false)
+	b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +55,7 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, 36, len(b.Info.ID.String()))
 
 	// indexPrefix set to name if empty
-	b, err = NewBeat("testbeat", "", "0.9", false)
+	b, err = NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +65,7 @@ func TestNewInstance(t *testing.T) {
 }
 
 func TestNewInstanceUUID(t *testing.T) {
-	b, err := NewBeat("testbeat", "", "0.9", false)
+	b, err := NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +79,7 @@ func TestNewInstanceUUID(t *testing.T) {
 }
 
 func TestInitKibanaConfig(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +122,7 @@ func TestInitKibanaConfig(t *testing.T) {
 }
 
 func TestEmptyMetaJson(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +143,7 @@ func TestEmptyMetaJson(t *testing.T) {
 }
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
-	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -155,7 +159,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	err = firstBeat.loadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
-	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -231,7 +235,7 @@ func TestSanitizeIPs(t *testing.T) {
 
 func TestReloader(t *testing.T) {
 	t.Run("updates the output configuration on the beat", func(t *testing.T) {
-		b, err := NewBeat("testbeat", "testidx", "0.9", false)
+		b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
 		require.NoError(t, err)
 
 		cfg := `
@@ -433,3 +437,59 @@ output:
 		})
 	}
 }
+
+func TestLogSystemInfo(t *testing.T) {
+	tcs := []struct {
+		name     string
+		managed  bool
+		assertFn func(*testing.T, *bytes.Buffer)
+	}{
+		{
+			name: "managed mode", managed: true,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				assert.Empty(t, b, "logSystemInfo should not have produced any log")
+			},
+		},
+		{
+			name: "stand alone", managed: false,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				logs := b.String()
+				assert.Contains(t, logs, "Beat info")
+				assert.Contains(t, logs, "Build info")
+				assert.Contains(t, logs, "Go runtime info")
+			},
+		},
+	}
+	log, buff := logp.NewInMemory("beat", logp.ConsoleEncoderConfig())
+	log.WithOptions()
+
+	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	require.NoError(t, err, "could not create beat")
+
+	for _, tc := range tcs {
+		buff.Reset()
+
+		b.Manager = mockManager{enabled: tc.managed}
+		b.logSystemInfo(log)
+
+		tc.assertFn(t, buff)
+	}
+}
+
+type mockManager struct {
+	enabled bool
+}
+
+func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
+func (m mockManager) Enabled() bool                       { return m.enabled }
+func (m mockManager) RegisterAction(action client.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+}
+func (m mockManager) SetPayload(payload map[string]interface{})     {}
+func (m mockManager) SetStopCallback(f func())                      {}
+func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) Status() status.Status                         { return status.Status(-42) }
+func (m mockManager) Stop()                                         {}
+func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UpdateStatus(status status.Status, msg string) {}

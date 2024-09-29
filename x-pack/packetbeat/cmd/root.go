@@ -7,6 +7,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -55,9 +57,6 @@ func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo)
 }
 
 func init() {
-	// Register packetbeat with central management to perform any needed config
-	// transformations before agent configs are sent to the beat during reload.
-	management.ConfigTransform.SetTransform(packetbeatCfg)
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
@@ -65,6 +64,11 @@ func init() {
 	settings := packetbeatCmd.PacketbeatSettings(globalProcs)
 	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
+	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		// Register packetbeat with central management to perform any needed config
+		// transformations before agent configs are sent to the beat during reload.
+		management.ConfigTransform.SetTransform(packetbeatCfg)
+	}
 }
 
 func defaultProcessors() []mapstr.M {

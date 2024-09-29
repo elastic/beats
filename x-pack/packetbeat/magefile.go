@@ -165,7 +165,12 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+	// Buildkite (CI) images have preinstalled npcap
+	if os.Getenv("CI") == "true" {
+		mg.SerialDeps(devtools.BuildSystemTestBinary)
+	} else {
+		mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+	}
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
@@ -173,10 +178,7 @@ func SystemTest(ctx context.Context) error {
 }
 
 func getBucketName() string {
-	if os.Getenv("BUILDKITE") == "true" {
-		return "ingest-buildkite-ci"
-	}
-	return "obs-ci-cache"
+	return "ingest-buildkite-ci"
 }
 
 // getNpcapInstaller gets the installer from the Google Cloud Storage service.

@@ -18,9 +18,11 @@
 package cfgfile
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
@@ -33,8 +35,10 @@ var (
 	// The default config cannot include the beat name as it is not initialized
 	// when this variable is created. See ChangeDefaultCfgfileFlag which should
 	// be called prior to flags.Parse().
-	configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
-	overwrites  = config.SettingFlag(nil, "E", "Configuration overwrite")
+	commandLine     flag.FlagSet
+	commandLineOnce sync.Once
+	configfiles     = config.StringArrFlag(&commandLine, "c", "beat.yml", "Configuration file, relative to path.config")
+	overwrites      = config.SettingFlag(&commandLine, "E", "Configuration overwrite")
 
 	// Additional default settings, that must be available for variable expansion
 	defaults = config.MustNewConfigFrom(map[string]interface{}{
@@ -54,13 +58,24 @@ var (
 func init() {
 	// add '-path.x' options overwriting paths in 'overwrites' config
 	makePathFlag := func(name, usage string) *string {
-		return config.ConfigOverwriteFlag(nil, overwrites, name, name, "", usage)
+		return config.ConfigOverwriteFlag(&commandLine, overwrites, name, name, "", usage)
 	}
 
 	homePath = makePathFlag("path.home", "Home path")
 	configPath = makePathFlag("path.config", "Configuration path")
 	makePathFlag("path.data", "Data path")
 	makePathFlag("path.logs", "Logs path")
+}
+
+// InitFlags is for explicitly initializing the flags.
+// It may get called repeatedly for different flagsets, but not
+// twice for the same one.
+func InitFlags() {
+	commandLineOnce.Do(func() {
+		commandLine.VisitAll(func(f *flag.Flag) {
+			flag.CommandLine.Var(f.Value, f.Name, f.Usage)
+		})
+	})
 }
 
 // OverrideChecker checks if a config should be overwritten.
@@ -97,6 +112,8 @@ func GetDefaultCfgfile() string {
 }
 
 // HandleFlags adapts default config settings based on command line flags.
+// This also stores if -E management.enabled=true was set on command line
+// to determine if running the Beat under agent.
 func HandleFlags() error {
 	// default for the home path is the binary location
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -114,6 +131,27 @@ func HandleFlags() error {
 		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
 	}
 
+	// Enable check to see if beat is running under Agent
+	// This is stored in a package so the modules which don't have
+	// access to the config can check this value.
+	type management struct {
+		Enabled bool `config:"management.enabled"`
+	}
+	var managementSettings management
+	cfgFlag := flag.Lookup("E")
+	if cfgFlag == nil {
+		fleetmode.SetAgentMode(false)
+		return nil
+	}
+	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
+	cliCfg := cfgObject.Config()
+
+	err = cliCfg.Unpack(&managementSettings)
+	if err != nil {
+		fleetmode.SetAgentMode(false)
+		return nil //nolint:nilerr // unpacking failing isn't an error for this case
+	}
+	fleetmode.SetAgentMode(managementSettings.Enabled)
 	return nil
 }
 

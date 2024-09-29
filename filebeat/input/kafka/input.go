@@ -120,12 +120,12 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 				}
 			}),
 		),
-		CloseRef:  ctx.Cancelation,
 		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	log.Info("Starting Kafka input")
 	defer log.Info("Kafka input stopped")

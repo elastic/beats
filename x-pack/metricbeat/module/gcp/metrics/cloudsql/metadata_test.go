@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gotest.tools/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -218,7 +218,7 @@ func TestGetDatabaseNameAndVersion(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			db := getDatabaseNameAndVersion(c.db)
-			assert.DeepEqual(t, db, c.expected)
+			assert.Equal(t, db, c.expected)
 		})
 	}
 }

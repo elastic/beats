@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -84,9 +83,8 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 		err := f.renameField(field.From, field.To, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to rename fields in processor: %w", err)
-			if management.TraceLevelEnabled() {
-				f.logger.Debug(errMsg.Error())
-			}
+			f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 			if f.config.FailOnError {
 				event = backup
 				_, _ = event.PutValue("error.message", errMsg.Error())

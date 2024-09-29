@@ -8,7 +8,7 @@
       type: long
       format: duration
       description: >
-        The approximate age of the oldest non-deleted message in the queue.
+        The maximum approximate age of the oldest non-deleted message in the queue.
     - name: messages.delayed
       type: long
       description: >
@@ -24,19 +24,19 @@
     - name: messages.deleted
       type: long
       description: >
-        The number of messages deleted from the queue.
+        The total number of messages deleted from the queue.
     - name: messages.received
       type: long
       description: >
-        The number of messages returned by calls to the ReceiveMessage action.
+        The total number of messages returned by calls to the ReceiveMessage action.
     - name: messages.sent
       type: long
       description: >
-        The number of messages added to a queue.
+        The total number of messages added to a queue.
     - name: empty_receives
       type: long
       description: >
-        The number of ReceiveMessage API calls that did not return a message.
+        The total number of ReceiveMessage API calls that did not return a message.
     - name: sent_message_size.bytes
       type: long
       format: bytes

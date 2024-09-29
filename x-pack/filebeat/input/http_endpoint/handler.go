@@ -6,26 +6,29 @@ package http_endpoint
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"reflect"
+	"sort"
 	"strconv"
+	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
@@ -44,12 +47,14 @@ var (
 )
 
 type handler struct {
+	ctx context.Context
+
 	metrics     *inputMetrics
-	publisher   stateless.Publisher
+	publish     func(beat.Event)
 	log         *logp.Logger
 	validator   apiValidator
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
 	reqLogger    *zap.Logger
 	host, scheme string
@@ -64,18 +69,40 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	txID := h.nextTxID()
+	h.log.Debugw("request", "url", r.URL, "tx_id", txID)
 	status, err := h.validator.validateRequest(r)
 	if err != nil {
-		h.sendAPIErrorResponse(w, r, h.log, status, err)
+		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
 		return
 	}
 
+	wait, err := getTimeoutWait(r.URL, h.log)
+	if err != nil {
+		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
+		return
+	}
+	var (
+		acked   chan struct{}
+		timeout *time.Timer
+	)
+	if wait != 0 {
+		acked = make(chan struct{})
+		timeout = time.NewTimer(wait)
+	}
 	start := time.Now()
+	acker := newBatchACKTracker(func() {
+		h.metrics.batchACKTime.Update(time.Since(start).Nanoseconds())
+		h.metrics.batchesACKedTotal.Inc()
+		if acked != nil {
+			close(acked)
+		}
+	})
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
 	body, status, err := getBodyReader(r)
 	if err != nil {
-		h.sendAPIErrorResponse(w, r, h.log, status, err)
+		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -94,7 +121,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	objs, _, status, err := httpReadJSON(body, h.program)
 	if err != nil {
-		h.sendAPIErrorResponse(w, r, h.log, status, err)
+		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
 		h.metrics.apiErrors.Add(1)
 		return
 	}
@@ -119,29 +146,92 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			} else if !errors.Is(err, errNotCRC) {
 				h.metrics.apiErrors.Add(1)
-				h.sendAPIErrorResponse(w, r, h.log, http.StatusBadRequest, err)
+				h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
 				return
 			}
 		}
 
-		if err = h.publishEvent(obj, headers); err != nil {
+		acker.Add()
+		if err = h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
-			h.sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusInternalServerError, err)
 			return
 		}
 		h.metrics.eventsPublished.Add(1)
 		respCode, respBody = h.responseCode, h.responseBody
 	}
 
-	h.sendResponse(w, respCode, respBody)
-	if h.reqLogger != nil {
-		h.logRequest(r, respCode, nil)
+	acker.Ready()
+	if acked == nil {
+		h.sendResponse(w, respCode, respBody)
+	} else {
+		select {
+		case <-acked:
+			h.log.Debugw("request acked", "tx_id", txID)
+			if !timeout.Stop() {
+				<-timeout.C
+			}
+			h.sendResponse(w, respCode, respBody)
+		case <-timeout.C:
+			h.log.Debugw("request timed out", "tx_id", txID)
+			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusGatewayTimeout, errTookTooLong)
+		case <-h.ctx.Done():
+			h.log.Debugw("request context cancelled", "tx_id", txID)
+			h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusGatewayTimeout, h.ctx.Err())
+		}
+		if h.reqLogger != nil {
+			h.logRequest(txID, r, respCode, nil)
+		}
 	}
 	h.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 	h.metrics.batchesPublished.Add(1)
 }
 
-func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+var errTookTooLong = errors.New("could not publish event within timeout")
+
+func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
+	q := u.Query()
+	switch len(q) {
+	case 0:
+		return 0, nil
+	case 1:
+		if _, ok := q["wait_for_completion_timeout"]; !ok {
+			// Get the only key in q. We don't know what it is, so iterate
+			// over the first one of one.
+			var k string
+			for k = range q {
+				break
+			}
+			return 0, fmt.Errorf("unexpected URL query: %s", k)
+		}
+	default:
+		delete(q, "wait_for_completion_timeout")
+		keys := make([]string, 0, len(q))
+		for k := range q {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		return 0, fmt.Errorf("unexpected URL query: %s", strings.Join(keys, ", "))
+	}
+	p := q.Get("wait_for_completion_timeout")
+	if p == "" {
+		// This will never happen; it is already handled in the check switch above.
+		return 0, nil
+	}
+	log.Debugw("wait_for_completion_timeout parameter", "value", p)
+	t, err := time.ParseDuration(p)
+	if err != nil {
+		return 0, fmt.Errorf("could not parse wait_for_completion_timeout parameter: %w", err)
+	}
+	if t < 0 {
+		return 0, fmt.Errorf("negative wait_for_completion_timeout parameter: %w", err)
+	}
+	return t, nil
+}
+
+func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
+	log.Errorw("request error", "tx_id", txID, "status_code", status, "error", apiError)
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 
@@ -159,11 +249,11 @@ func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, l
 		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
 	}
 	if h.reqLogger != nil {
-		h.logRequest(r, status, buf.Bytes())
+		h.logRequest(txID, r, status, buf.Bytes())
 	}
 }
 
-func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
+func (h *handler) logRequest(txID string, r *http.Request, status int, respBody []byte) {
 	// Populate and preserve scheme and host if they are missing;
 	// they are required for httputil.DumpRequestOut.
 	var scheme, host string
@@ -189,7 +279,6 @@ func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 			zap.ByteString("http.response.body.content", respBody),
 		)
 	}
-	txID := h.nextTxID()
 	h.log.Debugw("new request trace transaction", "id", txID)
 	// Limit request logging body size to 10kiB.
 	const maxBodyLen = 10 * (1 << 10)
@@ -203,7 +292,7 @@ func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 }
 
 func (h *handler) nextTxID() string {
-	count := h.txIDCounter.Inc()
+	count := h.txIDCounter.Add(1)
 	return h.formatTxID(count)
 }
 
@@ -219,10 +308,17 @@ func (h *handler) sendResponse(w http.ResponseWriter, status int, message string
 	}
 }
 
-func (h *handler) publishEvent(obj, headers mapstr.M) error {
+func (h *handler) publishEvent(obj, headers mapstr.M, acker *batchACKTracker) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields:    mapstr.M{},
+		Private:   acker,
+	}
+	if h.messageField == "." {
+		event.Fields = obj
+	} else {
+		if _, err := event.PutValue(h.messageField, obj); err != nil {
+			return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
+		}
 	}
 	if h.preserveOriginalEvent {
 		event.Fields["event"] = mapstr.M{
@@ -233,11 +329,7 @@ func (h *handler) publishEvent(obj, headers mapstr.M) error {
 		event.Fields["headers"] = headers
 	}
 
-	if _, err := event.PutValue(h.messageField, obj); err != nil {
-		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
-	}
-
-	h.publisher.Publish(event)
+	h.publish(event)
 	return nil
 }
 
@@ -292,7 +384,7 @@ func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []js
 			objs = append(objs, nobjs...)
 			rawMessages = append(rawMessages, nrawMessages...)
 		default:
-			return nil, nil, errUnsupportedType
+			return nil, nil, fmt.Errorf("%w: %T", errUnsupportedType, v)
 		}
 	}
 	for i := range objs {
@@ -306,7 +398,7 @@ type program struct {
 	ast *cel.Ast
 }
 
-func newProgram(src string) (*program, error) {
+func newProgram(src string, log *logp.Logger) (*program, error) {
 	if src == "" {
 		return nil, nil
 	}
@@ -320,6 +412,7 @@ func newProgram(src string) (*program, error) {
 		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		cel.CustomTypeAdapter(&numberAdapter{registry}),
 		cel.CustomTypeProvider(registry),
+		lib.Debug(debug(log)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create env: %w", err)
@@ -337,6 +430,17 @@ func newProgram(src string) (*program, error) {
 	return &program{prg: prg, ast: ast}, nil
 }
 
+func debug(log *logp.Logger) func(string, any) {
+	log = log.Named("http_endpoint_cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		log.Debugw(level, "tag", tag, "value", value)
+	}
+}
+
 var _ types.Adapter = (*numberAdapter)(nil)
 
 type numberAdapter struct {
@@ -344,15 +448,36 @@ type numberAdapter struct {
 }
 
 func (a *numberAdapter) NativeToValue(value any) ref.Val {
-	if n, ok := value.(json.Number); ok {
+	switch value := value.(type) {
+	case []any:
+		for i, v := range value {
+			value[i] = a.NativeToValue(v)
+		}
+	case map[string]any:
+		for k, v := range value {
+			value[k] = a.NativeToValue(v)
+		}
+	case json.Number:
 		var errs []error
-		i, err := n.Int64()
+		i, err := value.Int64()
 		if err == nil {
 			return types.Int(i)
 		}
 		errs = append(errs, err)
-		f, err := n.Float64()
+		f, err := value.Float64()
 		if err == nil {
+			// Literalise floats that could have been an integer greater than
+			// can be stored without loss of precision in a double.
+			// This is any integer wider than the IEEE-754 double mantissa.
+			// As a heuristic, allow anything that includes a decimal point
+			// or uses scientific notation. We could be more careful, but
+			// it is likely not important, and other languages use the same
+			// rule.
+			if f >= 0x1p53 && !strings.ContainsFunc(string(value), func(r rune) bool {
+				return r == '.' || r == 'e' || r == 'E'
+			}) {
+				return types.String(value)
+			}
 			return types.Double(f)
 		}
 		errs = append(errs, err)

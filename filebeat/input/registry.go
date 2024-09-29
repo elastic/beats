@@ -22,15 +22,19 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type GetStatusReporter func() status.StatusReporter
+
 type Context struct {
-	States   []file.State
-	Done     chan struct{}
-	BeatDone chan struct{}
-	Meta     map[string]string
+	States            []file.State
+	Done              chan struct{}
+	BeatDone          chan struct{}
+	Meta              map[string]string
+	GetStatusReporter GetStatusReporter
 }
 
 // Factory is used to register functions creating new Input instances.

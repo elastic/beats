@@ -60,8 +60,8 @@ This output works with all compatible versions of Elasticsearch. See the
 https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
 Matrix].
 
-For optimal experience, {beatname_uc} only connects to instances that are at least on the
-same version as the Beat. The check can be disabled by setting `output.elasticsearch.allow_older_versions`.
+Optionally, you can set {beatname_uc} to only connect to instances that are at least on the
+same version as the Beat. The check can be enabled by setting `output.elasticsearch.allow_older_versions` to `false`. Leaving the setting at it's default value of `true` avoids an issue where {beatname_uc} cannot connect to {es} after having been upgraded to a version higher than the {stack}.
 
 ==== Configuration options
 
@@ -223,7 +223,9 @@ Additional headers to send to proxies during CONNECT requests.
 
 // Begin exclude for APM Server docs
 ifndef::apm-server[]
-The index name to write events to when you're using daily indices. The default is
+The indexing target to write events to. 
+Can point to an {ref}/index-mgmt.html[index], {ref}/aliases.html[alias], or {ref}/data-streams.html[data stream]. 
+When using daily indices, this will be the index name. The default is
 +"{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"+, for example,
 +"{beatname_lc}-{version}-{localdate}"+. If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options

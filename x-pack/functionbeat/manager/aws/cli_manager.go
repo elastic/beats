@@ -7,15 +7,14 @@ package aws
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/awslabs/goformation/v4/cloudformation"
-	"github.com/awslabs/goformation/v4/cloudformation/iam"
-	"github.com/awslabs/goformation/v4/cloudformation/lambda"
+	"github.com/awslabs/goformation/v7/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation/iam"
+	"github.com/awslabs/goformation/v7/cloudformation/lambda"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
@@ -113,7 +112,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr, err)
+			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr.Error(), err)
 		}
 		return err
 	}
@@ -163,7 +162,7 @@ func (c *CLIManager) Remove(name string) error {
 	ctx := newStackContext()
 	if err := executer.Execute(ctx); err != nil {
 		if rollbackErr := executer.Rollback(ctx); rollbackErr != nil {
-			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr, err)
+			return fmt.Errorf("could not rollback, error: %s, %w", rollbackErr.Error(), err)
 		}
 		return err
 	}
@@ -191,7 +190,7 @@ func (c *CLIManager) Package(outputPattern string) error {
 	}
 
 	output := strings.ReplaceAll(outputPattern, "{{.Provider}}", "aws")
-	err = ioutil.WriteFile(output, content, 0644)
+	err = os.WriteFile(output, content, 0644)
 	if err != nil {
 		return err
 	}

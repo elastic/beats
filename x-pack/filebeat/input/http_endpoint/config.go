@@ -48,7 +48,16 @@ type config struct {
 	CRCSecret             string                  `config:"crc.secret"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
-	Tracer                *lumberjack.Logger      `config:"tracer"`
+	Tracer                *tracerConfig           `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 func defaultConfig() config {

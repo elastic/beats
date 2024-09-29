@@ -11,9 +11,9 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	lambdarunner "github.com/aws/aws-lambda-go/lambda"
-	"github.com/awslabs/goformation/v4/cloudformation"
-	"github.com/awslabs/goformation/v4/cloudformation/iam"
-	"github.com/awslabs/goformation/v4/cloudformation/lambda"
+	"github.com/awslabs/goformation/v7/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation/iam"
+	"github.com/awslabs/goformation/v7/cloudformation/lambda"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
@@ -106,8 +106,8 @@ func (s *SQS) Template() *cloudformation.Template {
 	for _, trigger := range s.config.Triggers {
 		resourceName := prefix("SQS") + NormalizeResourceName(trigger.EventSourceArn)
 		template.Resources[resourceName] = &lambda.EventSourceMapping{
-			BatchSize:      batchSize,
-			EventSourceArn: trigger.EventSourceArn,
+			BatchSize:      cloudformation.Int(batchSize),
+			EventSourceArn: cloudformation.String(trigger.EventSourceArn),
 			FunctionName:   cloudformation.GetAtt(prefix(""), "Arn"),
 		}
 	}

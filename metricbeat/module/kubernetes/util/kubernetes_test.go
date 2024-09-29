@@ -265,6 +265,12 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	require.NoError(t, err)
 
 	log := logp.NewLogger("test")
+
+	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
+		"enabled": true,
+	})
+	require.NoError(t, err)
+
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
@@ -272,6 +278,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: true,
+			Namespace:  namespaceConfig,
 		},
 	}
 	client := k8sfake.NewSimpleClientset()
@@ -326,6 +333,10 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
+	namespaceConfig, err := conf.NewConfigFrom(map[string]interface{}{
+		"enabled": true,
+	})
+	require.NoError(t, err)
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
 		SyncPeriod: time.Minute,
@@ -333,6 +344,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
 			CronJob:    false,
 			Deployment: false,
+			Namespace:  namespaceConfig,
 		},
 	}
 
@@ -706,6 +718,10 @@ type mockWatcher struct {
 	handler kubernetes.ResourceEventHandler
 }
 
+func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return m.handler
+}
+
 func (m *mockWatcher) Start() error {
 	return nil
 }
@@ -716,10 +732,6 @@ func (m *mockWatcher) Stop() {
 
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
-}
-
-func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
-	return m.handler
 }
 
 func (m *mockWatcher) Store() cache.Store {

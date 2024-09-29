@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 func TestBatchSplitRetry(t *testing.T) {
@@ -111,12 +112,6 @@ func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
 	require.True(t, doneCalled, "Calling batch.Drop should invoke the done callback")
 }
 
-func TestNewBatchFreesEvents(t *testing.T) {
-	queueBatch := &mockQueueBatch{}
-	_ = newBatch(nil, queueBatch, 0)
-	assert.Equal(t, 1, queueBatch.freeEntriesCalled, "Creating a new ttlBatch should call FreeEntries on the underlying queue.Batch")
-}
-
 type mockQueueBatch struct {
 	freeEntriesCalled int
 }
@@ -128,12 +123,8 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
-func (b *mockQueueBatch) Entry(i int) interface{} {
+func (b *mockQueueBatch) Entry(i int) queue.Entry {
 	return fmt.Sprintf("event %v", i)
-}
-
-func (b *mockQueueBatch) FreeEntries() {
-	b.freeEntriesCalled++
 }
 
 type mockRetryer struct {

@@ -146,6 +146,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [float]
 ==== `delete`
@@ -178,6 +179,7 @@ Sets a value.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [[value-templates]]
 ==== Value templates
@@ -619,6 +621,7 @@ does not exist at the root level, please use the clause `.first_response.` to ac
           target: body.page
           value: '[[ .last_response.body.page ]]'
           fail_on_template_error: true
+          do_not_log_failure: true
     chain:
     - step:
           request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
@@ -637,16 +640,19 @@ because when pagination does not exist at the parent level `parent_last_response
 NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
-==== `request.tracer.filename`
+==== `request.tracer.enable`
 
-It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
-This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
-tune log rotation behavior.
-
-To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
-For Example, `http-request-trace-*.ndjson`.
+It is possible to log HTTP requests and responses to a local file-system for debugging configurations.
+This option is enabled by setting `request.tracer.enabled` to true and setting the `request.tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `request.tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+==== `request.tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== `request.tracer.maxsize`

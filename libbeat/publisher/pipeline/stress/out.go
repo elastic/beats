@@ -67,7 +67,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 		clients[i] = client
 	}
 
-	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, clients...)
+	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, nil, clients...)
 }
 
 func (*testOutput) Close() error { return nil }
@@ -93,7 +93,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 		if config.Fail.EveryBatch == t.batchCount {
 			t.batchCount = 0
-			t.observer.Failed(n)
+			t.observer.RetryableErrors(n)
 			batch.Retry()
 			return nil
 		}
@@ -104,7 +104,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	// ack complete batch
 	batch.ACK()
-	t.observer.Acked(n)
+	t.observer.AckedEvents(n)
 
 	return nil
 }

@@ -18,10 +18,9 @@
 package filestream
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/urso/sderr"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -160,7 +159,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 
 	errs := tg.Wait()
 	if len(errs) > 0 {
-		log.Error("%s", sderr.WrapAll(errs, "running prospector failed"))
+		log.Errorf("running prospector failed: %v", errors.Join(errs...))
 	}
 }
 

@@ -26,7 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	docker.DefaultCleanupTimeout = 60 * time.Second
 	kubernetes.DefaultCleanupTimeout = 60 * time.Second
 }

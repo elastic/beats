@@ -5,7 +5,15 @@
 package gcs
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"io/fs"
+	"os"
 	"time"
+
+	"cloud.google.com/go/storage"
+	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -17,7 +25,7 @@ type config struct {
 	// ProjectId - Defines the project id of the concerned gcs bucket in Google Cloud.
 	ProjectId string `config:"project_id" validate:"required"`
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
-	Auth authConfig `config:"auth" validate:"required"`
+	Auth authConfig `config:"auth"`
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
 	MaxWorkers *int `config:"max_workers,omitempty" validate:"max=5000"`
 	// Poll - Defines if polling should be performed on the input bucket source.
@@ -70,4 +78,30 @@ type fileCredentialsConfig struct {
 }
 type jsonCredentialsConfig struct {
 	AccountKey string `config:"account_key"`
+}
+
+func (c authConfig) Validate() error {
+	// credentials_file
+	if c.CredentialsFile != nil {
+		_, err := os.Stat(c.CredentialsFile.Path)
+		if errors.Is(err, fs.ErrNotExist) {
+			return fmt.Errorf("credentials_file is configured, but the file %q cannot be found", c.CredentialsFile.Path)
+		} else {
+			return nil
+		}
+	}
+
+	// credentials_json
+	if c.CredentialsJSON != nil && len(c.CredentialsJSON.AccountKey) > 0 {
+		return nil
+	}
+
+	// Application Default Credentials (ADC)
+	_, err := google.FindDefaultCredentials(context.Background(), storage.ScopeReadOnly)
+	if err == nil {
+		return nil
+	}
+
+	return fmt.Errorf("no authentication credentials were configured or detected " +
+		"(credentials_file, credentials_json, and application default credentials (ADC))")
 }

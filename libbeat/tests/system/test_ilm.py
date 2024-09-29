@@ -52,7 +52,7 @@ class TestRunILM(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        self.wait_until(lambda: self.log_contains("doBulkRequest: 1 events have been sent"))
         proc.check_kill_and_wait()
 
         self.idxmgmt.assert_data_stream_created(self.data_stream)
@@ -69,7 +69,7 @@ class TestRunILM(BaseTest):
         self.render_config(ilm={"enabled": False})
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        self.wait_until(lambda: self.log_contains("doBulkRequest: 1 events have been sent"))
         proc.check_kill_and_wait()
 
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
@@ -89,7 +89,7 @@ class TestRunILM(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains(MSG_ILM_POLICY_LOADED))
-        self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
+        self.wait_until(lambda: self.log_contains("doBulkRequest: 1 events have been sent"))
         proc.check_kill_and_wait()
 
         self.idxmgmt.assert_index_template_loaded(self.data_stream)

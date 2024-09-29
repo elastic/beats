@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -118,8 +119,14 @@ func (m *MetricRegistry) buildMetricKey(metric Metric) string {
 	keyComponents := []string{
 		metric.Namespace,
 		metric.ResourceId,
+		metric.Aggregations,
+		metric.TimeGrain,
+		strings.Join(metric.Names, ","),
 	}
-	keyComponents = append(keyComponents, metric.Names...)
+
+	for _, dim := range metric.Dimensions {
+		keyComponents = append(keyComponents, fmt.Sprintf("%s=%s", dim.Name, dim.Value))
+	}
 
 	return strings.Join(keyComponents, ",")
 }

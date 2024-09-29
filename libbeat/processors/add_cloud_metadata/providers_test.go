@@ -18,6 +18,7 @@
 package add_cloud_metadata
 
 import (
+	"os"
 	"sort"
 	"testing"
 
@@ -26,11 +27,13 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+func init() {
+	os.Unsetenv("BEATS_ADD_CLOUD_METADATA_PROVIDERS")
+}
+
 func TestProvidersFilter(t *testing.T) {
-	var all []string
 	var allLocal []string
 	for name, ff := range cloudMetaProviders {
-		all = append(all, name)
 		if ff.Local {
 			allLocal = append(allLocal, name)
 		}
@@ -38,12 +41,23 @@ func TestProvidersFilter(t *testing.T) {
 
 	cases := map[string]struct {
 		config   map[string]interface{}
+		env      string
 		fail     bool
 		expected []string
 	}{
 		"all with local access only if not configured": {
 			config:   map[string]interface{}{},
 			expected: allLocal,
+		},
+		"BEATS_ADD_CLOUD_METADATA_PROVIDERS overrides default": {
+			config:   map[string]interface{}{},
+			env:      "alibaba, digitalocean",
+			expected: []string{"alibaba", "digitalocean"},
+		},
+		"none if BEATS_ADD_CLOUD_METADATA_PROVIDERS is explicitly set to an empty list": {
+			config:   map[string]interface{}{},
+			env:      " ",
+			expected: nil,
 		},
 		"fail to load if unknown name is used": {
 			config: map[string]interface{}{
@@ -56,18 +70,25 @@ func TestProvidersFilter(t *testing.T) {
 				"providers": []string{"aws", "gcp", "digitalocean"},
 			},
 		},
+		"BEATS_ADD_CLOUD_METADATA_PROVIDERS overrides selected": {
+			config: map[string]interface{}{
+				"providers": []string{"aws", "gcp", "digitalocean"},
+			},
+			env:      "alibaba, digitalocean",
+			expected: []string{"alibaba", "digitalocean"},
+		},
 	}
 
 	copyStrings := func(in []string) (out []string) {
-		for _, str := range in {
-			out = append(out, str)
-		}
-		return out
+		return append(out, in...)
 	}
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			rawConfig := conf.MustNewConfigFrom(test.config)
+			if test.env != "" {
+				t.Setenv("BEATS_ADD_CLOUD_METADATA_PROVIDERS", test.env)
+			}
 
 			config := defaultConfig()
 			err := rawConfig.Unpack(&config)
