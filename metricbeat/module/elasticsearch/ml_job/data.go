@@ -82,7 +82,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		if node, exists := job["node"]; exists {
-			nodeHash := node.(map[string]interface{})
+			nodeHash, ok := node.(map[string]interface{})
+			if !ok {
+				errs = append(errs, errors.New("job[node] is not a map"))
+				continue
+			}
+
 			event.ModuleFields.Put("node.id", nodeHash["id"])
 			event.ModuleFields.Put("node.name", nodeHash["name"])
 		}
