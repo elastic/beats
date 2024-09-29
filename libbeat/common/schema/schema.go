@@ -55,9 +55,10 @@ type Converter func(key string, data map[string]interface{}) (interface{}, error
 func (conv Conv) Map(key string, event mapstr.M, data map[string]interface{}) []error {
 	value, err := conv.Func(conv.Key, data)
 	if err != nil {
-		if err, keyNotFound := err.(*KeyNotFoundError); keyNotFound {
-			err.Optional = conv.Optional
-			err.Required = conv.Required
+		var keyErr *KeyNotFoundError
+		if errors.As(err, &keyErr) {
+			keyErr.Optional = conv.Optional
+			keyErr.Required = conv.Required
 		}
 		if conv.IgnoreAllErrors {
 			logp.Debug("schema", "ignoring error for key %q: %s", key, err)

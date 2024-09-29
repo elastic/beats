@@ -72,6 +72,7 @@ package mapstriface
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -102,8 +103,9 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 		subEvent := mapstr.M{}
 		_, errs := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
 		for _, err := range errs {
-			if err, ok := err.(schema.KeyError); ok {
-				err.SetKey(convMap.Key + "." + err.Key())
+			var keyErr schema.KeyError
+			if errors.As(err, &keyErr) {
+				keyErr.SetKey(convMap.Key + "." + keyErr.Key())
 			}
 		}
 		event[key] = subEvent
