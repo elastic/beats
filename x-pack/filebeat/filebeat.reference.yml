@@ -2541,7 +2541,7 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_inactive: 0
+  #clean_inactive: -1
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -2884,9 +2884,8 @@ filebeat.inputs:
   # You may wish to have separate inputs for each service. You can use
   # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
-  #include_matches.or:
-    #- equals:
-      #- _SYSTEMD_UNIT=foo.service
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
@@ -3146,6 +3145,30 @@ filebeat.inputs:
 #            - type: container
 #              paths:
 #                - /var/log/containers/*.log
+
+#Example: for kubernetes container logs autodiscovery
+#  filebeat.autodiscover:
+#    providers:
+#      - type: kubernetes
+#        node: ${NODE_NAME}
+#        hints.enabled: true
+#        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#        use_kubeadm: true
+#        hints.default_config:
+#          type: filestream
+#          id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
+#          paths:
+#          - /var/log/containers/*-${data.kubernetes.container.id}.log
+#          parsers:
+#          - container: ~
+#          prospector:
+#            scanner:
+#              fingerprint.enabled: true
+#              symlinks: true
+#          file_identity.fingerprint: ~
+
+#By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#  use_kubeadm: true
 
 # ========================== Filebeat global options ===========================
 

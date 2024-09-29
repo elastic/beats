@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -142,7 +143,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	ctx := ctxtool.FromCanceller(env.Cancelation)
 
 	if cfg.Resource.Tracer != nil {
-		id := sanitizeFileName(env.ID)
+		id := sanitizeFileName(env.IDWithoutName)
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
@@ -165,7 +166,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, ast, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
+	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -366,9 +367,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 			e, ok := state["events"]
 			if !ok {
-				log.Error("unexpected missing events array from evaluation")
-				env.UpdateStatus(status.Degraded, "unexpected missing events array from evaluation")
-				isDegraded = true
+				return errors.New("unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
@@ -659,7 +658,7 @@ func handleRateLimit(log *logp.Logger, rateLimit map[string]interface{}, header 
 	}
 
 	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if limit == 0 {
+	if limit <= 0 {
 		w, ok := rateLimit["reset"]
 		if ok {
 			switch w := w.(type) {
@@ -729,9 +728,6 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
 func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
-	if !wantClient(cfg) {
-		return nil, nil, nil
-	}
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, nil, err
@@ -996,7 +992,19 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
+func getEnv(allowed []string) map[string]string {
+	env := make(map[string]string)
+	for _, kv := range os.Environ() {
+		k, v, ok := strings.Cut(kv, "=")
+		if !ok || !slices.Contains(allowed, k) {
+			continue
+		}
+		env[k] = v
+	}
+	return env
+}
+
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1014,13 +1022,12 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
+		lib.HTTPWithContext(ctx, client, limiter, auth),
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,
+			"env":       vars,
 		}),
-	}
-	if client != nil {
-		opts = append(opts, lib.HTTPWithContext(ctx, client, limiter, auth))
 	}
 	if len(patterns) != 0 {
 		opts = append(opts, lib.Regexp(patterns))

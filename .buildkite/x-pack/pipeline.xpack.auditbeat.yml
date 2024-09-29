@@ -19,12 +19,17 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
+
+  # Module tests
+  BEAT_PATH: "x-pack/auditbeat"
 
 steps:
   - group: "Check/Update"
@@ -38,15 +43,25 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: check/update"
+
+      - label: "x-pack/auditbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -59,19 +74,14 @@ steps:
     key: "x-pack-auditbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/auditbeat: Build Tests"
+      - label: ":ubuntu: x-pack/auditbeat: Build Tests (Module)"
         key: "mandatory-linux-unit-test"
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/auditbeat
-          echo "~~~ Running tests"
           cd x-pack/auditbeat
           mage update build test
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -81,7 +91,7 @@ steps:
           - "x-pack/auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/auditbeat: Build Tests"
+              context: "x-pack/auditbeat: Build Tests (Module)"
 
       - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
@@ -90,7 +100,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -109,7 +119,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -130,7 +140,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -156,7 +166,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -177,7 +187,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -198,7 +208,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -226,7 +236,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -246,7 +256,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -264,7 +274,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -297,7 +307,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -319,7 +329,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

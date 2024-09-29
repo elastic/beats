@@ -53,11 +53,12 @@ func New(config *Config, callback inputsource.NetworkFunc) *Server {
 
 func (u *Server) createConn() (net.PacketConn, error) {
 	var err error
-	udpAdddr, err := net.ResolveUDPAddr("udp", u.config.Host)
+	network := u.network()
+	udpAdddr, err := net.ResolveUDPAddr(network, u.config.Host)
 	if err != nil {
 		return nil, err
 	}
-	listener, err := net.ListenUDP("udp", udpAdddr)
+	listener, err := net.ListenUDP(network, udpAdddr)
 	if err != nil {
 		return nil, err
 	}
@@ -70,4 +71,11 @@ func (u *Server) createConn() (net.PacketConn, error) {
 	u.localaddress = listener.LocalAddr().String()
 
 	return listener, err
+}
+
+func (u *Server) network() string {
+	if u.config.Network != "" {
+		return u.config.Network
+	}
+	return networkUDP
 }

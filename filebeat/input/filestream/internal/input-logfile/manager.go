@@ -94,9 +94,6 @@ type StateStore interface {
 
 func (cim *InputManager) init() error {
 	cim.initOnce.Do(func() {
-		if cim.DefaultCleanTimeout <= 0 {
-			cim.DefaultCleanTimeout = 30 * time.Minute
-		}
 
 		log := cim.Logger.With("input_type", cim.Type)
 

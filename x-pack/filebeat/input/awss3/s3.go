@@ -29,9 +29,7 @@ func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*
 		s3Client = s3.NewFromConfig(awsConfig, config.s3ConfigModifier)
 	}
 
-	return &awsS3API{
-		client: s3Client,
-	}, nil
+	return newAWSs3API(s3Client), nil
 }
 
 func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {

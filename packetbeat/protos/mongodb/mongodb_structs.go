@@ -33,15 +33,19 @@ type mongodbMessage struct {
 	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
-	isResponse      bool
-	expectsResponse bool
+	isResponse bool
 
 	// Standard message header fields from mongodb wire protocol
 	// see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#standard-message-header
-	messageLength int
-	requestID     int
-	responseTo    int
+	messageLength int32
+	requestID     int32
+	responseTo    int32
 	opCode        opCode
+
+	// decoded flagBits
+	checkSumPresent bool
+	moreToCome      bool
+	exhaustAllowed  bool
 
 	// deduced from content. Either an operation from the original wire protocol or the name of a command (passed through a query)
 	// List of commands: http://docs.mongodb.org/manual/reference/command/
@@ -55,6 +59,12 @@ type mongodbMessage struct {
 	// Other fields vary very much depending on operation type
 	// lets just put them in a map
 	event mapstr.M
+}
+
+func (m *mongodbMessage) SetFlagBits(flagBits int32) {
+	m.checkSumPresent = flagBits&0x1 != 0    // 0 bit
+	m.moreToCome = flagBits&0x2 != 0         // 1 bit
+	m.exhaustAllowed = flagBits&0x10000 != 0 // 16 bit
 }
 
 // Represent a stream being parsed that contains a mongodb message
@@ -90,12 +100,13 @@ type transaction struct {
 
 	mongodb mapstr.M
 
-	event     mapstr.M
-	method    string
-	resource  string
-	error     string
-	params    map[string]interface{}
-	documents []interface{}
+	event            mapstr.M
+	method           string
+	resource         string
+	error            string
+	params           map[string]interface{}
+	requestDocuments []interface{}
+	documents        []interface{}
 }
 
 type msgKind byte
@@ -103,6 +114,7 @@ type msgKind byte
 const (
 	msgKindBody             msgKind = 0
 	msgKindDocumentSequence msgKind = 1
+	msgKindInternal         msgKind = 2
 )
 
 type opCode int32
@@ -147,8 +159,15 @@ func (o opCode) String() string {
 	return fmt.Sprintf("(value=%d)", int32(o))
 }
 
-func awaitsReply(c opCode) bool {
-	return c == opQuery || c == opGetMore
+func awaitsReply(msg *mongodbMessage) bool {
+	opCode := msg.opCode
+	// The request of opMsg type doesn't get response if moreToCome is set
+	// From documentation: https://www.mongodb.com/docs/manual/reference/mongodb-wire-protocol
+	// "Requests with the moreToCome bit set will not receive a reply"
+	if !msg.isResponse && opCode == opMsg && !msg.moreToCome {
+		return true
+	}
+	return opCode == opQuery || opCode == opGetMore
 }
 
 // List of mongodb user commands (send through a query of the legacy protocol)

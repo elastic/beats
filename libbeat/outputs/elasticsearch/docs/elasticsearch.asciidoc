@@ -60,8 +60,8 @@ This output works with all compatible versions of Elasticsearch. See the
 https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
 Matrix].
 
-For optimal experience, {beatname_uc} only connects to instances that are at least on the
-same version as the Beat. The check can be disabled by setting `output.elasticsearch.allow_older_versions`.
+Optionally, you can set {beatname_uc} to only connect to instances that are at least on the
+same version as the Beat. The check can be enabled by setting `output.elasticsearch.allow_older_versions` to `false`. Leaving the setting at it's default value of `true` avoids an issue where {beatname_uc} cannot connect to {es} after having been upgraded to a version higher than the {stack}.
 
 ==== Configuration options
 

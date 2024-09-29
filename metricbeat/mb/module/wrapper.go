@@ -19,6 +19,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -146,6 +148,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
+			msw.module.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
 			msw.run(done, out)
 		}(msw)
 	}
@@ -253,14 +256,32 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			if errors.As(err, &mb.PartialMetricsError{}) {
+				// mark module as running if metrics are partially available and display the error message
+				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			} else {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
+			if errors.As(err, &mb.PartialMetricsError{}) {
+				// mark module as running if metrics are partially available and display the error message
+				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			} else {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
 			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		} else {
+			msw.module.UpdateStatus(status.Running, "")
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))

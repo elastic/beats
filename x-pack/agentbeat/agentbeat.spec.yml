@@ -248,8 +248,10 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
-  - name: websocket
-    description: "Websocket"
+  - name: streaming
+    aliases:
+      - websocket
+    description: "Streaming"
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
@@ -490,6 +492,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: meraki/metrics
+    description: "Cisco Meraki metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: nats/metrics
     description: "NATS metrics"
     platforms: *platforms
@@ -497,6 +504,11 @@ inputs:
     command: *metricbeat_command
   - name: nginx/metrics
     description: "NGINX metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: panw/metrics
+    description: "Palo Alto Networks metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
