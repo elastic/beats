@@ -133,11 +133,11 @@ func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) 
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch ei := emptyIface.(type) {
 	case int, int32, int64, uint, uint32, uint64, float32, float64:
 		return fmt.Sprintf("%v", emptyIface), nil
 	case json.Number:
-		return string(emptyIface.(json.Number)), nil
+		return string(ei), nil
 	default:
 		msg := fmt.Sprintf("expected number, found %T", emptyIface)
 		return "", schema.NewWrongFormatError(key, msg)
@@ -205,15 +205,14 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch num := emptyIface.(type) {
 	case int64:
-		return emptyIface.(int64), nil
+		return num, nil
 	case int:
-		return int64(emptyIface.(int)), nil
+		return int64(num), nil
 	case float64:
-		return int64(emptyIface.(float64)), nil
+		return int64(num), nil
 	case json.Number:
-		num := emptyIface.(json.Number)
 		i64, err := num.Int64()
 		if err == nil {
 			return i64, nil
@@ -241,15 +240,14 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch num := emptyIface.(type) {
 	case float64:
-		return emptyIface.(float64), nil
+		return num, nil
 	case int:
-		return float64(emptyIface.(int)), nil
+		return float64(num), nil
 	case int64:
-		return float64(emptyIface.(int64)), nil
+		return float64(num), nil
 	case json.Number:
-		num := emptyIface.(json.Number)
 		i64, err := num.Float64()
 		if err == nil {
 			return i64, nil

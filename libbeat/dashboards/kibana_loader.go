@@ -22,8 +22,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -109,7 +109,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 	loader.statusMsg("Importing index file from %s", file)
 
 	// read json file
-	reader, err := ioutil.ReadFile(file)
+	reader, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read index-pattern from file %s: %w", file, err)
 	}
@@ -157,7 +157,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	params.Set("overwrite", "true")
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read dashboard from file %s: %w", file, err)
 	}
@@ -202,7 +202,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		if _, ok := loader.loadedAssets[referencePath]; ok {
 			continue
 		}
-		refContents, err := ioutil.ReadFile(referencePath)
+		refContents, err := os.ReadFile(referencePath)
 		if err != nil {
 			return "", fmt.Errorf("fail to read referenced asset from file %s: %w", referencePath, err)
 		}

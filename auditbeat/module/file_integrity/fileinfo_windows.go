@@ -44,7 +44,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	state := file.GetOSState(info)
 
 	fileInfo := &Metadata{
-		Inode: uint64(state.IdxHi<<32 + state.IdxLo),
+		Inode: state.IdxHi<<32 + state.IdxLo,
 		Mode:  info.Mode(),
 		Size:  uint64(info.Size()),
 		MTime: time.Unix(0, attrs.LastWriteTime.Nanoseconds()).UTC(),
@@ -88,6 +88,7 @@ func fileOwner(path string) (sid, owner string, err error) {
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		return "", "", fmt.Errorf("failed on GetSecurityInfo for %v: %w", path, err)
 	}
+	//nolint:errcheck // ignore
 	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
 
 	// Convert SID to a string and lookup the username.

@@ -7,6 +7,7 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -116,7 +117,7 @@ func (inp *o365input) Run(
 		if err == nil {
 			break
 		}
-		if ctx.Cancelation.Err() != err && err != context.Canceled {
+		if ctx.Cancelation.Err() != err && errors.Is(err, context.Canceled) {
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
@@ -124,9 +125,12 @@ func (inp *o365input) Run(
 				Timestamp: time.Now(),
 				Fields:    msg,
 			}
-			publisher.Publish(event, nil)
+			if err := publisher.Publish(event, nil); err != nil {
+				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
+			}
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
+			//nolint:errcheck // ignore
 			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
 		}
 	}
@@ -139,7 +143,10 @@ func (inp *o365input) runOnce(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	stream := src.(*stream)
+	stream, ok := src.(*stream)
+	if !ok {
+		return errors.New("unable to cast src to stream")
+	}
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
 
@@ -256,6 +263,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 		}
 	}
 	if env.Config.PreserveOriginalEvent {
+		//nolint:errcheck // ignore
 		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
@@ -263,6 +271,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 		for idx, e := range errs {
 			msgs[idx] = e.Error()
 		}
+		//nolint:errcheck // ignore
 		b.PutValue("error.message", msgs)
 	}
 	return b

@@ -29,10 +29,10 @@ import (
 )
 
 var (
-	scoreboardRegexp = regexp.MustCompile("(Scoreboard):\\s+((_|S|R|W|K|D|C|L|G|I|\\.)+)")
+	scoreboardRegexp = regexp.MustCompile(`(Scoreboard):\s+((_|S|R|W|K|D|C|L|G|I|\.)+)`)
 
 	// This should match: "CPUSystem: .01"
-	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
+	matchNumber = regexp.MustCompile(`(^[0-9a-zA-Z ]+):\s+(\d*\.?\d+)`)
 
 	schema = s.Schema{
 		"total_accesses":    c.Int("Total Accesses"),
