@@ -15,41 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build linux && (amd64 || arm64)
 
 package file_integrity
 
-import (
-	"errors"
+import "github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
-		// Auto and unset defaults to fsnotify
-		l := logger.Named("fsnotify")
-		l.Info("selected backend: fsnotify")
-		return &fsNotifyReader{
-			config:  c,
-			log:     l,
-			parsers: FileParsers(c),
-		}, nil
+func newEbpfReader(c Config, l *logp.Logger) (EventProducer, error) {
+	paths := make(map[string]struct{})
+	for _, p := range c.Paths {
+		paths[p] = struct{}{}
 	}
 
-	if c.Backend == BackendEBPF {
-		l := logger.Named("ebpf")
-		l.Info("selected backend: ebpf")
-
-		return newEbpfReader(c, l)
-	}
-
-	if c.Backend == BackendKprobes {
-		l := logger.Named("kprobes")
-		l.Info("selected backend: kprobes")
-		return newKProbesReader(c, l, FileParsers(c))
-	}
-
-	// unimplemented
-	return nil, errors.ErrUnsupported
+	return &ebpfReader{
+		config:  c,
+		log:     l,
+		parsers: FileParsers(c),
+		paths:   paths,
+		eventC:  make(chan Event),
+	}, nil
 }
