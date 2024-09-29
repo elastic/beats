@@ -407,6 +407,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			}
 
 			for _, userFromCache := range newInCache {
+				//nolint:errcheck // ignore
 				newUser := userFromCache.(*User)
 				oldUser, found := missingUserMap[newUser.UID]
 
