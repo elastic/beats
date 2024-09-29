@@ -18,6 +18,8 @@
 package schema
 
 import (
+	"errors"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -29,46 +31,49 @@ type ApplyOption func(mapstr.M, []error) (mapstr.M, []error)
 
 // AllRequired considers any missing field as an error, except if explicitly
 // set as optional
-func AllRequired(event mapstr.M, errors []error) (mapstr.M, []error) {
+func AllRequired(event mapstr.M, errs []error) (mapstr.M, []error) {
 	k := 0
-	for i, err := range errors {
-		if err, ok := err.(*KeyNotFoundError); ok {
-			if err.Optional {
+	for i, err := range errs {
+		var keyErr *KeyNotFoundError
+		if errors.As(err, &keyErr) {
+			if keyErr.Optional {
 				continue
 			}
 		}
-		errors[k] = errors[i]
+		errs[k] = errs[i]
 		k++
 	}
-	return event, errors[:k]
+	return event, errs[:k]
 }
 
 // FailOnRequired considers missing fields as an error only if they are set
 // as required
-func FailOnRequired(event mapstr.M, errors []error) (mapstr.M, []error) {
+func FailOnRequired(event mapstr.M, errs []error) (mapstr.M, []error) {
 	k := 0
-	for i, err := range errors {
-		if err, ok := err.(*KeyNotFoundError); ok {
-			if !err.Required {
+	for i, err := range errs {
+		var keyErr *KeyNotFoundError
+		if errors.As(err, &keyErr) {
+			if !keyErr.Required {
 				continue
 			}
 		}
-		errors[k] = errors[i]
+		errs[k] = errs[i]
 		k++
 	}
-	return event, errors[:k]
+	return event, errs[:k]
 }
 
 // NotFoundKeys calls a function with the list of missing keys as parameter
 func NotFoundKeys(cb func(keys []string)) ApplyOption {
-	return func(event mapstr.M, errors []error) (mapstr.M, []error) {
+	return func(event mapstr.M, errs []error) (mapstr.M, []error) {
 		var keys []string
-		for _, err := range errors {
-			if err, ok := err.(*KeyNotFoundError); ok {
-				keys = append(keys, err.Key())
+		for _, err := range errs {
+			var keyErr *KeyNotFoundError
+			if errors.As(err, &keyErr) {
+				keys = append(keys, keyErr.Key())
 			}
 		}
 		cb(keys)
-		return event, errors
+		return event, errs
 	}
 }

@@ -307,8 +307,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[primary] is not a bool", indexName)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[state] is not a string", indexName)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")

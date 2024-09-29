@@ -80,7 +80,10 @@ func NewIPv6Loopback() (lo IPv6Loopback, err error) {
 func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 	addr = make(net.IP, 16)
 	addr[0] = 0xFD
-	rand.Read(addr[1:])
+	_, err = rand.Read(addr[1:])
+	if err != nil {
+		return nil, fmt.Errorf("rand.Read failed: %w", err)
+	}
 	var req in6Ifreq
 	copy(req.addr[:], addr)
 	req.ifindex = lo.ifreq.index

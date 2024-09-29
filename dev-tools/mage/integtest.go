@@ -286,7 +286,9 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 	inTeardown := false
 	defer func() {
 		if recoverErr := recover(); recoverErr != nil {
-			err = recoverErr.(error)
+			if rerr, ok := recoverErr.(error); ok {
+				err = rerr
+			}
 			if !inTeardown {
 				// ignore errors
 				_ = r.steps.Teardown(r.env)
