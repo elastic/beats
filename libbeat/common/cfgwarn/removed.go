@@ -18,23 +18,22 @@
 package cfgwarn
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func checkRemovedSettings(cfg *config.C, settings ...string) error {
-	var errs multierror.Errors
+	var errs []error
 	for _, setting := range settings {
 		if err := checkRemovedSetting(cfg, setting); err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func checkRemovedSetting(cfg *config.C, setting string) error {

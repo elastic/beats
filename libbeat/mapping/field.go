@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
@@ -442,14 +440,14 @@ func ConcatFields(a, b Fields) (Fields, error) {
 }
 
 func (f Fields) conflicts(fields Fields) error {
-	var errs multierror.Errors
+	var errs []error
 	for _, key := range fields.GetKeys() {
 		keys := strings.Split(key, ".")
 		if err := f.canConcat(key, keys); err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // canConcat checks if the given string can be concatenated to the existing fields f

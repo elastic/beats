@@ -18,13 +18,13 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"gopkg.in/yaml.v2"
 )
 
@@ -100,7 +100,7 @@ func ValidateDirModulesDDatasetsDisabled() error {
 	if err != nil {
 		return err
 	}
-	var errs multierror.Errors
+	var errs []error
 	for path, cfg := range cfgs {
 		// A config.yml is a list of module configurations.
 		for modIdx, mod := range cfg {
@@ -118,7 +118,7 @@ func ValidateDirModulesDDatasetsDisabled() error {
 			}
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func loadModulesD() (modules map[string][]moduleDefinition, err error) {

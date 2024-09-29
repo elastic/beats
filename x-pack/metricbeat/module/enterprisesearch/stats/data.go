@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/joeshaw/multierror"
-
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -163,7 +161,7 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 	if err != nil {
 		return err
 	}
-	var errs multierror.Errors
+	var errs []error
 
 	// All events need to have a cluster_uuid to work with Stack Monitoring
 	event := mb.Event{
@@ -201,5 +199,5 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 		report.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

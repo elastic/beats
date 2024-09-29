@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -16,7 +17,6 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -510,7 +510,7 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 	}
 
 	// Keep track of all errors
-	var errs multierror.Errors
+	var errs []error
 
 	for _, i := range ifaces {
 		// Skip loopback interfaces
@@ -546,5 +546,5 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 		}
 	}
 
-	return append(ipv4List, ipv6List...), hwList, errs.Err()
+	return append(ipv4List, ipv6List...), hwList, errors.Join(errs...)
 }

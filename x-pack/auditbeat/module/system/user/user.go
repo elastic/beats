@@ -21,7 +21,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid/v5"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -326,7 +325,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 // reportState reports all existing users on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	ms.lastState = time.Now()
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
@@ -369,12 +368,12 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	currentTime := time.Now()
 
 	// If this is not the first call to Fetch/reportChanges,
@@ -460,7 +459,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {

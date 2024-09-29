@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -85,7 +84,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs multierror.Errors
+	var errs []error
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -180,7 +179,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Stop all runners

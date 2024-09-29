@@ -20,13 +20,12 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"syscall"
 	"time"
 	"unsafe"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
@@ -40,7 +39,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		return nil, fmt.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 
 	state := file.GetOSState(info)
 
@@ -73,7 +72,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
 		errs = append(errs, fmt.Errorf("GetFileOrigin failed: %w", err))
 	}
-	return fileInfo, errs.Err()
+	return fileInfo, errors.Join(errs...)
 }
 
 // fileOwner returns the SID and name (domain\user) of the file's owner.
@@ -92,7 +91,7 @@ func fileOwner(path string) (sid, owner string, err error) {
 	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
 
 	// Convert SID to a string and lookup the username.
-	var errs multierror.Errors
+	var errs []error
 	sid, err = securityID.String()
 	if err != nil {
 		errs = append(errs, err)
@@ -105,5 +104,5 @@ func fileOwner(path string) (sid, owner string, err error) {
 		owner = fmt.Sprintf(`%s\%s`, domain, account)
 	}
 
-	return sid, owner, errs.Err()
+	return sid, owner, errors.Join(errs...)
 }

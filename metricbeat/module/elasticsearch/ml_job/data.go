@@ -19,9 +19,8 @@ package ml_job
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -61,7 +60,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		return fmt.Errorf("failure parsing Elasticsearch ML Job Stats API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, job := range jobsData.Jobs {
 
 		if err := elastic.FixTimestampField(job, "data_counts.earliest_record_timestamp"); err != nil {
@@ -100,5 +99,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

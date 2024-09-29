@@ -6,9 +6,8 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -66,16 +65,16 @@ func (r *Coordinator) Run(ctx context.Context, t telemetry.T) error {
 		}(ctx, t, rfn)
 	}
 
-	// Wait for goroutine to complete and aggregate any errors from the goroutine and
+	// Wait for goroutine to complete and aggregate any errs from the goroutine and
 	// raise them back to the main program.
-	var errors multierror.Errors
+	var errs []error
 	for range r.runners {
 		err := <-results
 		if err != nil {
-			errors = append(errors, err)
+			errs = append(errs, err)
 		}
 	}
-	return errors.Err()
+	return errors.Join(errs...)
 }
 
 func (r *Coordinator) runFunc(

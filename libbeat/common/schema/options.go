@@ -18,8 +18,6 @@
 package schema
 
 import (
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -27,11 +25,11 @@ import (
 var DefaultApplyOptions = []ApplyOption{AllRequired}
 
 // ApplyOption modifies the result of Apply
-type ApplyOption func(mapstr.M, multierror.Errors) (mapstr.M, multierror.Errors)
+type ApplyOption func(mapstr.M, []error) (mapstr.M, []error)
 
 // AllRequired considers any missing field as an error, except if explicitly
 // set as optional
-func AllRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
+func AllRequired(event mapstr.M, errors []error) (mapstr.M, []error) {
 	k := 0
 	for i, err := range errors {
 		if err, ok := err.(*KeyNotFoundError); ok {
@@ -47,7 +45,7 @@ func AllRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror
 
 // FailOnRequired considers missing fields as an error only if they are set
 // as required
-func FailOnRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
+func FailOnRequired(event mapstr.M, errors []error) (mapstr.M, []error) {
 	k := 0
 	for i, err := range errors {
 		if err, ok := err.(*KeyNotFoundError); ok {
@@ -63,7 +61,7 @@ func FailOnRequired(event mapstr.M, errors multierror.Errors) (mapstr.M, multier
 
 // NotFoundKeys calls a function with the list of missing keys as parameter
 func NotFoundKeys(cb func(keys []string)) ApplyOption {
-	return func(event mapstr.M, errors multierror.Errors) (mapstr.M, multierror.Errors) {
+	return func(event mapstr.M, errors []error) (mapstr.M, []error) {
 		var keys []string
 		for _, err := range errors {
 			if err, ok := err.(*KeyNotFoundError); ok {

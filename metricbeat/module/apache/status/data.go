@@ -19,6 +19,7 @@ package status
 
 import (
 	"bufio"
+	"errors"
 	"regexp"
 	"strings"
 
@@ -102,8 +103,8 @@ func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
 	}
-	_, err := applicableSchema.ApplyTo(event, fullEvent)
-	return err.Err()
+	_, errs := applicableSchema.ApplyTo(event, fullEvent)
+	return errors.Join(errs...)
 }
 
 // Map body to MapStr

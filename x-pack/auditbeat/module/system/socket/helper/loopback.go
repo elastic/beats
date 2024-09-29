@@ -14,7 +14,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 )
 
@@ -119,7 +118,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 
 // Cleanup removes the addresses registered to this loopback.
 func (lo *IPv6Loopback) Cleanup() error {
-	var errs multierror.Errors
+	var errs []error
 	var req in6Ifreq
 	req.ifindex = lo.ifreq.index
 	req.prefix = 128
@@ -133,5 +132,5 @@ func (lo *IPv6Loopback) Cleanup() error {
 	if lo.fd != -1 {
 		unix.Close(lo.fd)
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }

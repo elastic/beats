@@ -27,7 +27,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -139,14 +138,14 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 	}
 
 	if err != nil {
-		errs := multierror.Errors{err}
+		errs := []error{err}
 		for _, id := range loaded {
 			err = fileset.DeletePipeline(esClient, id)
 			if err != nil {
 				errs = append(errs, err)
 			}
 		}
-		return nil, errs.Err()
+		return nil, errors.Join(errs...)
 	}
 	return loaded, nil
 }

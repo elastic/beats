@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/joeshaw/multierror"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -239,7 +238,7 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 }
 
 func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Event {
-	var errs multierror.Errors
+	var errs []error
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
 		ts = time.Now()
