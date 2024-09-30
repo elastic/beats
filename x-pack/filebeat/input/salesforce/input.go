@@ -13,10 +13,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -351,14 +349,6 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			s.clientSession.AuthorizationHeader(req)
 
-			reqDump, err := httputil.DumpRequestOut(req, true)
-			if err != nil {
-				s.log.Errorf("Error dumping request: %v", err)
-			} else {
-				s.log.Infof("Curl command: curl -X %s '%s' %s", req.Method, req.URL.String(), strings.Join(formatHeaders(req.Header), " "))
-				s.log.Infof("Full request dump:\n%s", string(reqDump))
-			}
-
 			// NOTE: If we ever see a production issue relaated to this, then only
 			// we should consider adding the header: "X-PrettyPrint:1"
 			//
@@ -579,9 +569,11 @@ func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// To share the backing array for performance.
 	r.ReuseRecord = true
 
-	// // Lazy quotes are enabled to allow for quoted fields with commas. More flexible
-	// // in handling CSVs.
-	// r.LazyQuotes = true
+	// Lazy quotes are enabled to allow for quoted fields with commas. More flexible
+	// in handling CSVs.
+	// NOTE(shmsr): Although, we didn't face any issue with LazyQuotes == false, but I
+	// think we should keep it enabled to avoid any issues in the future.
+	r.LazyQuotes = true
 
 	// Header row is always expected, otherwise we can't map values to keys in
 	// the event.
@@ -622,14 +614,4 @@ func (s *salesforceInput) decodeAsCSV(p []byte) ([]map[string]string, error) {
 	}
 
 	return results, nil
-}
-
-func formatHeaders(headers http.Header) []string {
-	var result []string
-	for key, values := range headers {
-		for _, value := range values {
-			result = append(result, fmt.Sprintf("-H '%s: %s'", key, value))
-		}
-	}
-	return result
 }
