@@ -227,6 +227,8 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       name: ["CPUUtilization"]
@@ -639,6 +641,7 @@ metricbeat.modules:
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
 
@@ -890,6 +893,9 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+  #username: "user"
+  #password: "secret"
+  #api_key: "foo:bar"
 
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
@@ -919,6 +925,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -970,6 +978,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -1010,6 +1020,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   # Set the namespace to watch for events
   #namespace: staging
   # Set the sync period of the watchers
@@ -1030,6 +1042,8 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -1039,6 +1053,8 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes controller manager
 # (URL and deployment method should be adapted to match the controller manager deployment / service / endpoint)
@@ -1048,6 +1064,8 @@ metricbeat.modules:
     - controllermanager
   hosts: ["http://localhost:10252"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes scheduler
 # (URL and deployment method should be adapted to match scheduler deployment / service / endpoint)
@@ -1057,6 +1075,8 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 #--------------------------------- KVM Module ---------------------------------
 - module: kvm
@@ -1100,6 +1120,14 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:11211"]
   enabled: true
+
+#----------------------------- Cisco Meraki Module -----------------------------
+- module: meraki
+  metricsets: ["device_health"]
+  enabled: true
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  
 
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
@@ -1267,6 +1295,14 @@ metricbeat.modules:
 
   # username: ""
   # password: ""
+
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
 
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm

@@ -466,9 +466,9 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
-// {BeatName}-{OptionalVariantSuffix}-oss-{version}-{os}-{arch}.docker.tar.gz
+// {BeatName}-oss-{OptionalVariantSuffix}-{version}-{os}-{arch}.docker.tar.gz
 // For example, `heartbeat-oss-8.16.0-linux-arm64.docker.tar.gz`
-var ossSuffixRegexp = regexp.MustCompile(`^(\w+)(-\w+)?-oss-.+$`)
+var ossSuffixRegexp = regexp.MustCompile(`^(\w+)-oss-.+$`)
 
 func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
 	vendor := info.Config.Labels["org.label-schema.vendor"]

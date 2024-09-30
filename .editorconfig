@@ -29,10 +29,6 @@ indent_style = tab
 [*.mk]
 indent_style = tab
 
-[Jenkinsfile]
-indent_size = 2
-indent_style = space
-
 [Vagrantfile]
 indent_size = 2
 indent_style = space
