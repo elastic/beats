@@ -31,10 +31,17 @@ const DefaultApiTimeout = 5 * time.Second
 // If durations are configured in non-whole minute periods, they are rounded up to the next minute e.g. 90s becomes 120s.
 //
 // If `latency` is configured, the period is shifted back in time by specified duration (before period alignment).
-func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration) (time.Time, time.Time) {
+// If endTime of the previous collection period is recorded, then use this endTime as the new startTime. This will guarantee no gap between collection timestamps.
+func GetStartTimeEndTime(now time.Time, period time.Duration, latency time.Duration, previousEndTime time.Time) (time.Time, time.Time) {
 	periodInMinutes := (period + time.Second*29).Round(time.Second * 60)
-	endTime := now.Add(latency * -1).Truncate(periodInMinutes)
-	startTime := endTime.Add(periodInMinutes * -1)
+	var startTime, endTime time.Time
+	if !previousEndTime.IsZero() {
+		startTime = previousEndTime
+		endTime = startTime.Add(periodInMinutes)
+	} else {
+		endTime = now.Add(latency * -1).Truncate(periodInMinutes)
+		startTime = endTime.Add(periodInMinutes * -1)
+	}
 	return startTime, endTime
 }
 
@@ -51,13 +58,20 @@ type MetricWithID struct {
 // API call per metric name and set of dimensions. This will increase API cost.
 // IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
 // monitoring account.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+// OwningAccount works alongside IncludeLinkedAccounts as a filter mechanism to extract metrics specific to a linked account.
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool,
+	owningAccount string, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+
 	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken:             nextToken,
 		IncludeLinkedAccounts: &includeLinkedAccounts,
+	}
+
+	if owningAccount != "" {
+		listMetricsInput.OwningAccount = &owningAccount
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -80,13 +94,14 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
 		}
 
-		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
 		for i, metric := range page.Metrics {
-			owningAccount := monitoringAccountID
-			if page.OwningAccounts != nil {
-				owningAccount = page.OwningAccounts[i]
+			if page.OwningAccounts == nil {
+				// When IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts.
+				// Hence, account ID is set to the monitoring account ID
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			} else {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, page.OwningAccounts[i]})
 			}
-			metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, owningAccount})
 		}
 	}
 	return metricWithAccountID, nil

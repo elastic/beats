@@ -128,6 +128,7 @@ func (r *runner) Start() {
 		err := r.input.Run(
 			v2.Context{
 				ID:             r.id,
+				IDWithoutName:  r.id,
 				Agent:          *r.agent,
 				Logger:         log,
 				Cancelation:    r.sig,

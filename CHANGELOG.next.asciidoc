@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
 - Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Redis: Added replication role as a field to submitted slowlogs
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 
 
@@ -55,12 +56,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
-- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
+
 
 *Osquerybeat*
 
@@ -114,6 +116,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
+- The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
 
 *Auditbeat*
 
@@ -165,6 +168,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+
 
 *Heartbeat*
 
@@ -193,6 +199,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
+- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 
 *Osquerybeat*
 
@@ -221,6 +228,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
+- Update to Go 1.22.7. {pull}41018[41018]
 
 *Auditbeat*
 
@@ -297,6 +305,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
+- Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
+- Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
+- Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
 
 *Auditbeat*
 
@@ -325,6 +337,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 - Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config api requests {pull}40086[40086]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
@@ -338,6 +353,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
+- Added Cisco Meraki module {pull}40836[40836]
+- Added Palo Alto Networks module {pull}40686[40686]
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 
 *Metricbeat*
 
