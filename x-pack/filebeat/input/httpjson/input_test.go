@@ -1660,9 +1660,10 @@ func newChainPaginationTestServer(
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          id,
-		Cancelation: ctx,
+		Logger:        logp.NewLogger("httpjson_test"),
+		ID:            id,
+		IDWithoutName: id,
+		Cancelation:   ctx,
 	}, cancel
 }
 

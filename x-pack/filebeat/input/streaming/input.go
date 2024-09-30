@@ -88,7 +88,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	log := env.Logger.With("input_url", cfg.URL)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
-	s, err := NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+	var (
+		s   StreamFollower
+		err error
+	)
+	// When and if the number of followers increases, this may
+	// want to be a registry. Until then, let's keep this simple.
+	switch cfg.Type {
+	case "", "websocket":
+		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+	case "crowdstrike":
+		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+	}
 	if err != nil {
 		return err
 	}
@@ -110,7 +121,7 @@ func getURL(ctx context.Context, name, src, url string, state map[string]any, re
 		return "", err
 	}
 
-	log.Debugw("cel engine state before url_eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: redaction})
+	log.Debugw("cel engine state before url_eval", logp.Namespace(name), "state", redactor{state: state, cfg: redaction})
 	start := now().In(time.UTC)
 	url, err = evalURLWith(ctx, url_prg, ast, state, start)
 	log.Debugw("url_eval result", logp.Namespace(name), "modified_url", url)
