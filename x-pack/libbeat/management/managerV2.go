@@ -834,6 +834,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
 		// filebeat/input/log/input.go.
 		// If they change the way they report errors, this will break.
+		//nolint:errorlint // There are no new changes to this line but
 		if u, ok := err.(interface {
 			Unwrap() []error
 		}); ok {
