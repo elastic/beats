@@ -60,6 +60,7 @@ grouped in the following categories:
 * <<exported-fields-linux>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-meraki>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -68,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -14495,6 +14497,104 @@ Network interface name.
 
 
 type: keyword
+
+--
+
+[float]
+=== in
+
+Incoming network stats per second.
+
+
+
+*`docker.network.in.bytes`*::
++
+--
+Incoming bytes per seconds.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.in.dropped`*::
++
+--
+Dropped incoming packets per second.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.in.errors`*::
++
+--
+Errors on incoming packets per second.
+
+
+type: long
+
+--
+
+*`docker.network.in.packets`*::
++
+--
+Incoming packets per second.
+
+
+type: long
+
+--
+
+[float]
+=== out
+
+Outgoing network stats per second.
+
+
+
+*`docker.network.out.bytes`*::
++
+--
+Outgoing bytes per second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.out.dropped`*::
++
+--
+Dropped outgoing packets per second.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.out.errors`*::
++
+--
+Errors on outgoing packets per second.
+
+
+type: long
+
+--
+
+*`docker.network.out.packets`*::
++
+--
+Outgoing packets per second.
+
+
+type: long
 
 --
 
@@ -50453,6 +50553,17 @@ type: long
 
 --
 
+[[exported-fields-meraki]]
+
+
+
+*`meraki.device.serial`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == MongoDB fields
 
@@ -57140,6 +57251,50 @@ format: bytes
 
 --
 
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
@@ -58257,6 +58412,16 @@ type: text
 Stats scraped from a Prometheus endpoint.
 
 
+
+*`metrics_count`*::
++
+--
+Number of metrics per Elasticsearch document.
+
+
+type: long
+
+--
 
 
 *`prometheus.labels.*`*::
@@ -67135,6 +67300,67 @@ type: long
 --
 
 [float]
+=== datastorecluster
+
+Datastore Cluster
+
+
+
+*`vsphere.datastorecluster.name`*::
++
+--
+The Datastore Cluster name.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.capacity.bytes`*::
++
+--
+Total capacity of this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.free_space.bytes`*::
++
+--
+Total free space on this storage pod, in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`vsphere.datastorecluster.datastore.names`*::
++
+--
+List of all the Datastore names associated with the Datastore Cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.datastorecluster.datastore.count`*::
++
+--
+Number of datastores in the Datastore Cluster.
+
+
+type: long
+
+--
+
+[float]
 === host
 
 Host information from vSphere environment.
@@ -67907,7 +68133,7 @@ type: long
 *`vsphere.virtualmachine.cpu.total.mhz`*::
 +
 --
-Total CPU in Mhz.
+Total Reserved CPU in Mhz.
 
 
 type: long
@@ -68049,6 +68275,25 @@ type: keyword
 --
 The uptime of the VM in seconds.
 
+
+type: long
+
+--
+
+
+*`vsphere.virtualmachine.snapshot.info`*::
++
+--
+Deatils of the snapshots of this virtualmachine.
+
+type: object
+
+--
+
+*`vsphere.virtualmachine.snapshot.count`*::
++
+--
+The number of snapshots of this virtualmachine.
 
 type: long
 

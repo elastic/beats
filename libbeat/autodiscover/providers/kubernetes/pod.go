@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -97,6 +97,15 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	}
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 
 	if metaConf.Node.Enabled() || config.Hints.Enabled() {
 		options := kubernetes.WatchOptions{

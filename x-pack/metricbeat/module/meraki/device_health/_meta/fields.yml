@@ -1,0 +1,7 @@
+- name: device
+  type: group
+  release: beta
+  fields:
+    - name: serial
+      type: keyword
+      dimension: true

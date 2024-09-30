@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -488,7 +488,7 @@ func newUserFromAPI(u userAPI) (*fetcher.User, error) {
 
 	if idRaw, ok := newUser.Fields["id"]; ok {
 		idStr, _ := idRaw.(string)
-		if newUser.ID, err = uuid.Parse(idStr); err != nil {
+		if newUser.ID, err = uuid.FromString(idStr); err != nil {
 			return nil, fmt.Errorf("unable to unmarshal user, invalid ID: %w", err)
 		}
 		delete(newUser.Fields, "id")
@@ -542,7 +542,7 @@ func newDeviceFromAPI(d deviceAPI) (*fetcher.Device, error) {
 
 	if idRaw, ok := newDevice.Fields["id"]; ok {
 		idStr, _ := idRaw.(string)
-		if newDevice.ID, err = uuid.Parse(idStr); err != nil {
+		if newDevice.ID, err = uuid.FromString(idStr); err != nil {
 			return nil, fmt.Errorf("unable to unmarshal device, invalid ID: %w", err)
 		}
 		delete(newDevice.Fields, "id")

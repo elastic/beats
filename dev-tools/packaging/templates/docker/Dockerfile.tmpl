@@ -6,6 +6,15 @@
 # the final image because of permission changes.
 FROM {{ .buildFrom }} AS home
 
+{{- if contains .buildFrom "wolfi" }}
+RUN for iter in {1..10}; do \
+        apk update && \
+        apk add --no-interactive --no-progress --no-cache libcap-utils && \
+        exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
+{{- end }}
+
 COPY beat {{ $beatHome }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
@@ -18,13 +27,36 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
 {{- end }}
     chmod 0775 {{ $beatHome }}/data {{ $beatHome }}/logs
 
+{{- if .linux_capabilities }}
+# Since the beat is stored at the other end of a symlink we must follow the symlink first
+# For security reasons setcap does not support symlinks. This is smart in the general case
+# but in our specific case since we're building a trusted image from trusted binaries this is
+# fine. Thus, we use readlink to follow the link and setcap on the actual binary
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
+{{- end }}
+
 FROM {{ .from }}
 
+{{- if contains .from "wolfi" }}
+RUN for iter in {1..10}; do \
+        apk update && \
+        apk add --no-interactive --no-progress --no-cache curl shadow bash && \
+        exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
+{{- end }}
+
 {{- if contains .from "ubi-minimal" }}
-RUN microdnf -y update && \
-    microdnf -y install findutils shadow-utils && \
-    microdnf clean all
-{{- else }}
+RUN for iter in {1..10}; do \
+        microdnf -y update && \
+        microdnf -y install findutils shadow-utils && \
+        microdnf clean all && \
+        exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
+{{- end }}
+
+{{- if contains .from "ubuntu" }}
 RUN for iter in {1..10}; do \
         apt-get update -y && \
         DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
@@ -60,7 +92,7 @@ LABEL \
   license="{{ .License }}" \
   description="{{ .BeatDescription }}"
 
-ENV ELASTIC_CONTAINER "true"
+ENV ELASTIC_CONTAINER="true"
 ENV PATH={{ $beatHome }}:$PATH
 ENV GODEBUG="madvdontneed=1"
 
@@ -97,19 +129,43 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
-{{- if .linux_capabilities }}
-# Since the beat is stored at the other end of a symlink we must follow the symlink first
-# For security reasons setcap does not support symlinks. This is smart in the general case
-# but in our specific case since we're building a trusted image from trusted binaries this is
-# fine. Thus, we use readlink to follow the link and setcap on the actual binary
-RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
-{{- end }}
-
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
+{{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal"))) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "wolfi"))  }}
+USER root
+# Install required dependencies from wolfi repository
+RUN for iter in {1..10}; do \
+        apk update && \
+        apk add --no-interactive --no-progress --no-cache nodejs-18=18.20.4-r0 npm=10.8.3-r0 glib dbus-glib libatk-1.0 \
+        libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
+        font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
+        exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
+    done; \
+    (exit $exit_code)
+
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV TZ=UTC
+ENV NPM_CONFIG_PREFIX={{ $beatHome }}/.npm
+ENV PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+
+RUN echo \
+    $NPM_CONFIG_PREFIX \
+    {{ $beatHome }}/.config \
+    {{ $beatHome }}/.synthetics \
+    {{ $beatHome }}/.npm \
+    {{ $beatHome }}/.cache \
+    | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
+
+USER {{ .user }}
+RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
+{{- end }}
+
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubuntu")) }}
+USER root
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
@@ -117,13 +173,12 @@ RUN echo \
     {{ $beatHome }}/.synthetics \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
-    | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
+    | xargs -IDIR sh -c 'mkdir -m 0770 -p DIR && chown -R {{ .user }} DIR'
 
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=18.20.3
+ENV NODE_VERSION=18.20.4
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -153,9 +208,9 @@ RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
 RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
-RUN chmod ug+rwX -R $NODE_PATH 
-USER root
+RUN chmod ug+rwX -R $NODE_PATH
 
+USER root
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
 # We don't use npx playwright install-deps because that could pull a newer version
 # Install additional fonts as well
@@ -169,10 +224,8 @@ RUN for iter in {1..10}; do \
 done; \
 (exit $exit_code)
 {{- end }}
-USER 1000
-{{- else }}
-USER 0
-{{- end }}
+
+USER {{ .user }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
