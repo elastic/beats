@@ -576,7 +576,7 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	// we construct a new response here from each of the pagination events
 	err := json.NewEncoder(body).Encode(msg)
 	if err != nil {
-		p.req.log.Errorf("error processing chain event: %w", err)
+		p.req.log.Errorf("error processing chain event: %v", err)
 		return
 	}
 	response.Body = io.NopCloser(body)
@@ -589,17 +589,17 @@ func (p *chainProcessor) handleEvent(ctx context.Context, msg mapstr.M) {
 	n, err := p.req.processChainPaginationEvents(ctx, p.trCtx, p.pub, &response, p.idx, p.req.log)
 	if err != nil {
 		if errors.Is(err, notLogged{}) {
-			p.req.log.Debugf("ignored error processing chain event: %w", err)
+			p.req.log.Debugf("ignored error processing chain event: %v", err)
 			return
 		}
-		p.req.log.Errorf("error processing chain event: %w", err)
+		p.req.log.Errorf("error processing chain event: %v", err)
 		return
 	}
 	p.n += n
 
 	err = response.Body.Close()
 	if err != nil {
-		p.req.log.Errorf("error closing http response body: %w", err)
+		p.req.log.Errorf("error closing http response body: %v", err)
 	}
 }
 
