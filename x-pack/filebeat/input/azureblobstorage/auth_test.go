@@ -5,14 +5,16 @@
 package azureblobstorage
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	"regexp"
 	"testing"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
@@ -25,21 +27,57 @@ import (
 
 // customTransporter implements the Transporter interface with a custom Do & RoundTrip method
 type customTransporter struct {
-	rt http.RoundTripper
+	rt      http.RoundTripper
+	servURL string
 }
 
 func (t *customTransporter) RoundTrip(req *http.Request) (*http.Response, error) {
 	return t.rt.RoundTrip(req)
 }
 
+// Do is responsible for the routing of the request to the appropriate handler based on the request URL
 func (t *customTransporter) Do(req *http.Request) (*http.Response, error) {
 	logp.L().Named("azure-blob-storage-test").Debug("request URL: ", req.URL)
-	tokens := strings.Split(req.URL.Path, "/")
-	// as soon as the container request is made, shut down gock so that the request is routed to the mockHandler
-	if mock.Containers[tokens[(len(tokens)-1)]] {
-		gock.Off()
+	re := regexp.MustCompile(`^/([0-9a-fA-F-]+)/?(oauth2/v2\.0/token|v2\.0/\.well-known/openid-configuration)`)
+	matches := re.FindStringSubmatch(req.URL.Path)
+
+	if len(matches) == 3 {
+		tenant_id := matches[1]
+		action := matches[2]
+
+		switch action {
+		case "v2.0/.well-known/openid-configuration":
+			return createJSONResponse(map[string]interface{}{
+				"token_endpoint":         t.servURL + "/" + tenant_id + "/oauth2/v2.0/token",
+				"authorization_endpoint": t.servURL + "/" + tenant_id + "/oauth2/v2.0/authorize",
+				"issuer":                 t.servURL + "/" + tenant_id + "/oauth2/v2.0/issuer",
+			}, 200)
+
+		case "oauth2/v2.0/token":
+			return createJSONResponse(map[string]interface{}{
+				"token_type":   "Bearer",
+				"expires_in":   3600,
+				"access_token": "mock_access_token_123",
+			}, 200)
+		}
 	}
 	return t.rt.RoundTrip(req)
+}
+
+func createJSONResponse(data interface{}, statusCode int) (*http.Response, error) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &http.Response{
+		StatusCode: statusCode,
+		Body:       io.NopCloser(bytes.NewBuffer(jsonData)),
+		Header:     make(http.Header),
+	}
+
+	resp.Header.Set("Content-Type", "application/json")
+	return resp, nil
 }
 
 func Test_OAuth2(t *testing.T) {
@@ -82,35 +120,10 @@ func Test_OAuth2(t *testing.T) {
 			serv := httptest.NewServer(tt.mockHandler())
 			t.Cleanup(serv.Close)
 
-			gock.InterceptClient(http.DefaultClient)
-			defer gock.Off()
-
-			tenant_id, ok := tt.baseConfig["auth.oauth2"].(map[string]interface{})["tenant_id"].(string)
-			if !ok {
-				t.Fatalf("tenant_id not found in baseConfig")
-			}
-
-			gock.New("https://login.microsoftonline.com").
-				Get("/" + tenant_id + "/v2.0/.well-known/openid-configuration").
-				Reply(200).
-				JSON(map[string]interface{}{
-					"token_endpoint":         serv.URL + "/" + tenant_id + "/oauth2/v2.0/token",
-					"authorization_endpoint": serv.URL + "/" + tenant_id + "/oauth2/v2.0/authorize",
-					"issuer":                 serv.URL + "/" + tenant_id + "/oauth2/v2.0/issuer",
-				})
-
-			gock.New(serv.URL).
-				Path("/" + tenant_id + "/oauth2/v2.0/token").
-				Reply(200).
-				JSON(map[string]interface{}{
-					"token_type":   "Bearer",
-					"expires_in":   3600,
-					"access_token": "mock_access_token_123",
-				})
-
 			httpClient := &http.Client{
 				Transport: &customTransporter{
-					rt: http.DefaultTransport, // gock intercepts this
+					rt:      http.DefaultTransport,
+					servURL: serv.URL,
 				},
 			}
 

@@ -117,7 +117,7 @@ func fetchBlobClientWithOAuth2(url string, credential *azidentity.ClientSecretCr
 		ClientOptions: oauth2Cfg.clientOptions,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Error fetching blob client for url : %s, error : %w", url, err)
+		return nil, fmt.Errorf("failed to fetch blob client for %s: %w", url, err)
 	}
 
 	return blobClient, nil

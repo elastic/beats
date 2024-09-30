@@ -5,7 +5,7 @@
 package azureblobstorage
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
@@ -75,7 +75,7 @@ func defaultConfig() config {
 
 func (c config) Validate() error {
 	if c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == "") {
-		return fmt.Errorf("client_id, client_secret and tenant_id are required for OAuth2 auth")
+		return errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth")
 	}
 	return nil
 }
