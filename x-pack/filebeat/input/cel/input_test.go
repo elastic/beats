@@ -365,6 +365,52 @@ var inputTests = []struct {
 			{"message": "Hello, Void!"},
 		},
 	},
+	{
+		name: "env_var_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events":[
+				{"message":env.?CELTESTENVVAR.orValue("not present")},
+				{"message":env.?NONCELTESTENVVAR.orValue("not present")},
+				{"message":env.?DISALLOWEDCELTESTENVVAR.orValue("not present")},
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
+		},
+	},
+	{
+		name: "env_var_dynamic",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events": ["CELTESTENVVAR","NONCELTESTENVVAR","DISALLOWEDCELTESTENVVAR"].map(k,
+				{"message":env[?k].orValue("not present")}
+			)}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
+		},
+	},
 
 	// FS-based tests.
 	{
@@ -1644,6 +1690,10 @@ func TestInput(t *testing.T) {
 	skipOnWindows := map[string]string{
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
+
+	// Set a var that is available to test env look-up.
+	os.Setenv("CELTESTENVVAR", "TESTVALUE")
+	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
 	logp.TestingSetup()
 	for _, test := range inputTests {

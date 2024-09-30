@@ -8,7 +8,6 @@ package procfs
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/prometheus/procfs"
@@ -62,35 +61,13 @@ func credsFromProc(proc procfs.Proc) (types.CredInfo, error) {
 		return types.CredInfo{}, err
 	}
 
-	ruid, err := strconv.Atoi(status.UIDs[0])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
+	ruid := status.UIDs[0]
+	euid := status.UIDs[1]
+	suid := status.UIDs[2]
 
-	euid, err := strconv.Atoi(status.UIDs[1])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	suid, err := strconv.Atoi(status.UIDs[2])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	rgid, err := strconv.Atoi(status.GIDs[0])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	egid, err := strconv.Atoi(status.GIDs[1])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	sgid, err := strconv.Atoi(status.GIDs[2])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
+	rgid := status.GIDs[0]
+	egid := status.GIDs[1]
+	sgid := status.GIDs[2]
 
 	// procfs library doesn't grab CapEff or CapPrm, make the direct syscall
 	hdr := unix.CapUserHeader{
