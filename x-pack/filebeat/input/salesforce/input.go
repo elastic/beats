@@ -337,14 +337,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 		for _, rec := range res.Records() {
 			logfile, ok := rec.Record().Fields()["LogFile"].(string)
 			if !ok {
-				s.log.Error("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
-				continue
+				return fmt.Errorf("LogFile field not found or not a string in Salesforce event log file: %v", rec.Record().Fields())
 			}
 
 			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+logfile, nil)
 			if err != nil {
-				s.log.Errorf("Error creating request for log file: %v", err)
-				continue
+				return fmt.Errorf("error creating request for log file: %w", err)
 			}
 
 			s.clientSession.AuthorizationHeader(req)
@@ -359,27 +357,23 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			resp, err := s.sfdcConfig.Client.Do(req)
 			if err != nil {
-				s.log.Errorf("Error fetching log file: %v", err)
-				continue
+				return fmt.Errorf("error fetching log file: %w", err)
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				s.log.Errorf("Unexpected status code %d for log file", resp.StatusCode)
 				resp.Body.Close()
-				continue
+				return fmt.Errorf("unexpected status code %d for log file", resp.StatusCode)
 			}
 
 			body, err := io.ReadAll(resp.Body)
 			resp.Body.Close()
 			if err != nil {
-				s.log.Errorf("Error reading log file body: %v", err)
-				continue
+				return fmt.Errorf("error reading log file body: %w", err)
 			}
 
 			recs, err := s.decodeAsCSV(body)
 			if err != nil {
-				s.log.Errorf("Error decoding CSV: %v", err)
-				continue
+				return fmt.Errorf("error decoding CSV: %w", err)
 			}
 
 			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
