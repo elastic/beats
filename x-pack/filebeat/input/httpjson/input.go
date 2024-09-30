@@ -123,7 +123,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if cfg.Request.Tracer != nil {
-		id := sanitizeFileName(ctx.ID)
+		id := sanitizeFileName(ctx.IDWithoutName)
 		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
 
 		// Propagate tracer behaviour to all chain children.
