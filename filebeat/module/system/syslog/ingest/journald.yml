@@ -1,0 +1,5 @@
+description: Journald Pipeline for syslog Filebeat module
+processors:
+- set:
+    field: aaa
+    value: 'journald.yml'
