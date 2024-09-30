@@ -13,5 +13,9 @@ var:
   - name: use_logs
     default: false
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/entrypoint.yml
+  - ingest/files.yml
+  - ingest/journald.yml
+
 input: config/syslog.yml
