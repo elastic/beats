@@ -70,13 +70,10 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		event.Put("datastore.count", len(data.DatastoreNames))
 		event.Put("datastore.names", data.DatastoreNames)
 	}
-<<<<<<< HEAD
-=======
 	if len(data.Snapshots) > 0 {
 		event.Put("snapshot.count", len(data.Snapshots))
 		event.Put("snapshot.info", data.Snapshots)
 	}
 
->>>>>>> e7637c08b2 (Update fields to use mapstr in vSphere virtualmachine metricset (#40707))
 	return event
 }
