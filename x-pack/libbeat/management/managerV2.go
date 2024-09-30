@@ -684,7 +684,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		// reloadInputs wraps the multierror so we have to call Unwrap
 		wr := errors.Unwrap(err)
 
-		//nolint:errcheck // ignore
+		//nolint:errorlint // ignore
 		if u, ok := wr.(interface {
 			Unwrap() []error
 		}); ok {

@@ -108,7 +108,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 		if err = unix.Bind(fd, &bindAddr); err == nil {
 			break
 		}
-		//nolint:errcheck // ignore
+		//nolint:errorlint // ignore
 		if errno, ok := err.(unix.Errno); !ok || errno != unix.EADDRNOTAVAIL {
 			break
 		}

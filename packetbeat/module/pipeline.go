@@ -179,6 +179,7 @@ func applyTemplates(prefix string, version string, filename string, original []b
 		if err != nil {
 			return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
+		//nolint:errcheck // ignore
 		content = newContent.(map[string]interface{})
 	default:
 		return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, filename)
