@@ -18,6 +18,7 @@
 package fileout
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -43,6 +44,9 @@ type PathFormatString struct {
 func (fs *PathFormatString) Run(timestamp time.Time) (string, error) {
 	placeholderEvent := &beat.Event{
 		Timestamp: timestamp,
+	}
+	if fs.efs == nil {
+		return "", fmt.Errorf("path format string is nil; check if `path` option is configured correctly")
 	}
 	return fs.efs.Run(placeholderEvent)
 }
