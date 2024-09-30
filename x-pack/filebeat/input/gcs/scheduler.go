@@ -212,7 +212,7 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
-				s.log.Errorf("adding failed job %s to job list caused an error: %w", err)
+				s.log.Errorf("adding failed job %s to job list caused an error: %w", name, err)
 				continue
 			}
 
