@@ -7,6 +7,7 @@ package private
 import (
 	"bytes"
 	"encoding/json"
+	"net/url"
 	"reflect"
 	"testing"
 
@@ -17,6 +18,7 @@ type redactTest struct {
 	name    string
 	in      any
 	tag     string
+	global  []string
 	want    any
 	wantErr error
 }
@@ -46,6 +48,79 @@ var redactTests = []redactTest{
 			"inner": map[string]any{
 				"private":    "secret",
 				"not_secret": "2",
+			}},
+	},
+	{
+		name: "map_string_inner_global",
+		in: map[string]any{
+			"inner": map[string]any{
+				"secret":     "1",
+				"not_secret": "2",
+			}},
+		global: []string{"inner.secret"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"not_secret": "2",
+			}},
+	},
+	{
+		name: "map_string_inner_next_inner_global",
+		in: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"secret":     "1",
+					"not_secret": "2",
+				},
+			}},
+		global: []string{"inner.next_inner.secret"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"not_secret": "2",
+				},
+			}},
+	},
+	{
+		name: "map_string_inner_next_inner_params_global",
+		in: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"headers": url.Values{
+						"secret":     []string{"1"},
+						"not_secret": []string{"2"},
+					},
+					"not_secret": "2",
+				},
+			}},
+		global: []string{"inner.next_inner.headers.secret"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"headers": url.Values{
+						"not_secret": []string{"2"},
+					},
+					"not_secret": "2",
+				},
+			}},
+	},
+	{
+		name: "map_string_inner_next_inner_params_global_internal",
+		in: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"headers": url.Values{
+						"secret":     []string{"1"},
+						"not_secret": []string{"2"},
+					},
+					"not_secret": "2",
+				},
+			}},
+		global: []string{"inner.next_inner.headers"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"next_inner": map[string]any{
+					"not_secret": "2",
+				},
 			}},
 	},
 	{
@@ -270,7 +345,7 @@ func TestRedact(t *testing.T) {
 					t.Fatalf("failed to get before state: %v", err)
 				}
 			}
-			got, err := Redact(test.in, test.tag)
+			got, err := Redact(test.in, test.tag, test.global)
 			if err != test.wantErr {
 				t.Fatalf("unexpected error from Redact: %v", err)
 			}

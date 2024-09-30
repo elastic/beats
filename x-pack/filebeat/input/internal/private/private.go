@@ -25,12 +25,17 @@ var privateKey = reflect.ValueOf("private")
 // used, falling back to the field name if not present. The tag parameter is
 // ignored for map values.
 //
+// The global parameter indicates a set of dot-separated paths to redact. Paths
+// originate at the root of val. If global is used, the resultin redaction is on
+// the union of the fields redacted with tags and the fields redacted with the
+// global paths.
+//
 // If a field has a `private:...` tag, its tag value will also be used to
 // determine the list of private fields. If the private tag is empty,
 // `private:""`, the fields with the tag will be marked as private. Otherwise
 // the comma-separated list of names with be used. The list may refer to its
 // own field.
-func Redact[T any](val T, tag string) (redacted T, err error) {
+func Redact[T any](val T, tag string, global []string) (redacted T, err error) {
 	defer func() {
 		switch r := recover().(type) {
 		case nil:
@@ -49,13 +54,13 @@ func Redact[T any](val T, tag string) (redacted T, err error) {
 	rv := reflect.ValueOf(val)
 	switch rv.Kind() {
 	case reflect.Map, reflect.Pointer, reflect.Struct:
-		return redact(rv, tag, 0, make(map[any]int)).Interface().(T), nil
+		return redact(rv, tag, slices.Clone(global), 0, make(map[any]int)).Interface().(T), nil
 	default:
 		return val, nil
 	}
 }
 
-func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Value {
+func redact(v reflect.Value, tag string, global []string, depth int, seen map[any]int) reflect.Value {
 	switch v.Kind() {
 	case reflect.Pointer:
 		if v.IsNil() {
@@ -69,19 +74,19 @@ func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Va
 			seen[ident] = depth
 			defer delete(seen, ident)
 		}
-		return redact(v.Elem(), tag, depth+1, seen).Addr()
+		return redact(v.Elem(), tag, global, depth+1, seen).Addr()
 	case reflect.Interface:
 		if v.IsNil() {
 			return v
 		}
-		return redact(v.Elem(), tag, depth+1, seen)
+		return redact(v.Elem(), tag, global, depth+1, seen)
 	case reflect.Array:
 		if v.Len() == 0 {
 			return v
 		}
 		r := reflect.New(v.Type()).Elem()
 		for i := 0; i < v.Len(); i++ {
-			r.Index(i).Set(redact(v.Index(i), tag, depth+1, seen))
+			r.Index(i).Set(redact(v.Index(i), tag, global, depth+1, seen))
 		}
 		return r
 	case reflect.Slice:
@@ -104,7 +109,7 @@ func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Va
 		}
 		r := reflect.MakeSlice(v.Type(), v.Len(), v.Cap())
 		for i := 0; i < v.Len(); i++ {
-			r.Index(i).Set(redact(v.Index(i), tag, depth+1, seen))
+			r.Index(i).Set(redact(v.Index(i), tag, global, depth+1, seen))
 		}
 		return r
 	case reflect.Map:
@@ -119,19 +124,18 @@ func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Va
 			seen[ident] = depth
 			defer delete(seen, ident)
 		}
-		var private []string
+		private := nextStep(global)
 		if privateKey.CanConvert(v.Type().Key()) {
 			p := v.MapIndex(privateKey.Convert(v.Type().Key()))
 			if p.IsValid() && p.CanInterface() {
 				switch p := p.Interface().(type) {
 				case string:
-					private = []string{p}
+					private = append(private, p)
 				case []string:
-					private = p
+					private = append(private, p...)
 				case []any:
-					private = make([]string, len(p))
-					for i, s := range p {
-						private[i] = fmt.Sprint(s)
+					for _, s := range p {
+						private = append(private, fmt.Sprint(s))
 					}
 				}
 			}
@@ -139,14 +143,15 @@ func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Va
 		r := reflect.MakeMap(v.Type())
 		it := v.MapRange()
 		for it.Next() {
-			if slices.Contains(private, it.Key().String()) {
+			name := it.Key().String()
+			if slices.Contains(private, name) {
 				continue
 			}
-			r.SetMapIndex(it.Key(), redact(it.Value(), tag, depth+1, seen))
+			r.SetMapIndex(it.Key(), redact(it.Value(), tag, nextPath(name, global), depth+1, seen))
 		}
 		return r
 	case reflect.Struct:
-		var private []string
+		private := nextStep(global)
 		rt := v.Type()
 		names := make([]string, rt.NumField())
 		for i := range names {
@@ -217,12 +222,41 @@ func redact(v reflect.Value, tag string, depth int, seen map[any]int) reflect.Va
 				continue
 			}
 			if r.Field(i).CanSet() {
-				r.Field(i).Set(redact(f, tag, depth+1, seen))
+				r.Field(i).Set(redact(f, tag, nextPath(names[i], global), depth+1, seen))
 			}
 		}
 		return r
 	}
 	return v
+}
+
+func nextStep(global []string) (private []string) {
+	if len(global) == 0 {
+		return nil
+	}
+	private = make([]string, 0, len(global))
+	for _, s := range global {
+		key, _, more := strings.Cut(s, ".")
+		if !more {
+			private = append(private, key)
+		}
+	}
+	return private
+}
+
+func nextPath(step string, global []string) []string {
+	if len(global) == 0 {
+		return nil
+	}
+	step += "."
+	next := make([]string, 0, len(global))
+	for _, s := range global {
+		if !strings.HasPrefix(s, step) {
+			continue
+		}
+		next = append(next, s[len(step):])
+	}
+	return next
 }
 
 type cycle struct {
