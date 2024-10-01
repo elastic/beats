@@ -58,9 +58,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 type metricData struct {
-<<<<<<< HEAD
-	assetNames assetNames
-=======
 	assetNames      assetNames
 	triggeredAlarms []triggeredAlarm
 }
@@ -72,7 +69,6 @@ type triggeredAlarm struct {
 	TriggeredTime common.Time `json:"triggered_time"`
 	Description   string      `json:"description"`
 	EntityName    string      `json:"entity_name"`
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 }
 
 type assetNames struct {
@@ -124,16 +120,12 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 			m.Logger().Errorf("Failed to retrieve object from host %s: %w", datastoreCluster[i].Name, err)
 		}
 
-<<<<<<< HEAD
-		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames})})
-=======
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve alerts from datastore cluster %s: %w", datastoreCluster[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{MetricSetFields: m.mapEvent(datastoreCluster[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm})})
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	}
 
 	return nil
@@ -159,8 +151,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, dsc *mo.StorageP
 		outputDsNames: outputDsNames,
 	}, nil
 }
-<<<<<<< HEAD
-=======
 
 func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
 	var triggeredAlarms []triggeredAlarm
@@ -201,4 +191,3 @@ func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAla
 
 	return triggeredAlarms, nil
 }
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

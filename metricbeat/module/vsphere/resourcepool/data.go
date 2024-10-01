@@ -60,12 +60,9 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 		event.Put("vm.count", len(data.assetNames.outputVmNames))
 	}
 
-<<<<<<< HEAD
-=======
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	return event
 }

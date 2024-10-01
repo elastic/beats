@@ -15,15 +15,6 @@
     },
     "vsphere": {
       "cluster": {
-<<<<<<< HEAD
-        "name": "Cluster_1",
-        "das_config": {
-          "enabled": false,
-          "admission": {
-            "control": {
-              "enabled": true
-            }
-=======
           "triggered_alarms": [
               {
                   "status": "red",
@@ -84,7 +75,6 @@
               "names": [
                   "Network_1"
               ]
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
           }
         },
         "host": {

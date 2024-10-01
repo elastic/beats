@@ -32,13 +32,10 @@ func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event.Put("config.status", net.ConfigStatus)
 	event.Put("type", net.Self.Type)
 
-<<<<<<< HEAD
-=======
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	if len(data.assetNames.outputHostNames) > 0 {
 		event.Put("host.names", data.assetNames.outputHostNames)
 		event.Put("host.count", len(data.assetNames.outputHostNames))

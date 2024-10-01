@@ -67120,8 +67120,6 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.cluster.triggered_alarms.*`*::
 +
 --
@@ -67132,7 +67130,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 [float]
 === datastore
 
@@ -67270,8 +67267,6 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.datastore.triggered_alarms.*`*::
 +
 --
@@ -67282,7 +67277,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 *`vsphere.datastore.vm.count`*::
 +
 --
@@ -67386,11 +67380,7 @@ type: long
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.datastorecluster.triggered_alarms.*`*::
-+
---
 List of all the triggered alarms.
 
 
@@ -67398,10 +67388,8 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 [float]
 === host
-
 Host information from vSphere environment.
 
 
@@ -67756,8 +67744,6 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.host.triggered_alarms.*`*::
 +
 --
@@ -67768,7 +67754,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 *`vsphere.host.uptime`*::
 +
 --
@@ -67898,8 +67883,6 @@ type: long
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.network.triggered_alarms.*`*::
 +
 --
@@ -67910,7 +67893,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 [float]
 === resourcepool
 
@@ -68137,8 +68119,6 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.resourcepool.triggered_alarms.*`*::
 +
 --
@@ -68149,7 +68129,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 [float]
 === virtualmachine
 
@@ -68376,8 +68355,6 @@ type: long
 
 --
 
-<<<<<<< HEAD
-=======
 *`vsphere.virtualmachine.triggered_alarms.*`*::
 +
 --
@@ -68388,7 +68365,6 @@ type: object
 
 --
 
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 [[exported-fields-windows]]
 == Windows fields
 

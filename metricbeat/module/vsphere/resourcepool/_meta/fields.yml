@@ -112,11 +112,8 @@
           type: keyword
           description: >
             Names of virtual machines on the resource pool.
-<<<<<<< HEAD
-=======
     - name: triggered_alarms.*
       type: object
       object_type: keyword
       description: >
         List of all the triggered alarms.
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

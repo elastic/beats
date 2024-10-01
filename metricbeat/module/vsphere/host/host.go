@@ -54,11 +54,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &HostMetricSet{ms}, nil
 }
 
-<<<<<<< HEAD
-type metricData struct {
-	perfMetrics map[string]interface{}
-	assetNames  assetNames
-=======
 type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
@@ -72,7 +67,6 @@ type metricData struct {
 	perfMetrics     map[string]interface{}
 	assetNames      assetNames
 	triggeredAlarms []triggeredAlarm
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 }
 
 type assetNames struct {
@@ -180,38 +174,6 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
 			}
 
-<<<<<<< HEAD
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-			if err != nil {
-				m.Logger().Errorf("Failed to query performance data from host %s: %v", hst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debug("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Errorf("Failed to convert performance data to metric series for host %s: %v", hst[i].Name, err)
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
-			}
-
-			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
-			})
-		}
-=======
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, hst[i].TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve triggered alarms from host %s: %w", hst[i].Name, err)
@@ -224,7 +186,6 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 				assetNames:      assetNames,
 			}),
 		})
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	}
 
 	return nil
@@ -271,8 +232,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputVmNames:      outputVmNames,
 	}, nil
 }
-<<<<<<< HEAD
-=======
 
 func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
 	var triggeredAlarms []triggeredAlarm
@@ -382,4 +341,3 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 
 	return metricMap, nil
 }
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

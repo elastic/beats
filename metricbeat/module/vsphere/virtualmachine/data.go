@@ -73,16 +73,11 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		event["datastore.names"] = data.DatastoreNames
 	}
 	if len(data.Snapshots) > 0 {
-<<<<<<< HEAD
-		event["snapshot.info"] = data.Snapshots
-		event["snapshot.count"] = len(data.Snapshots)
-=======
 		event.Put("snapshot.count", len(data.Snapshots))
 		event.Put("snapshot.info", data.Snapshots)
 	}
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
 	}
 
 	return event

@@ -46,11 +46,8 @@
           type: long
           description: >
             Number of virtual machines connected to this network.
-<<<<<<< HEAD
-=======
     - name: triggered_alarms.*
       type: object
       object_type: keyword
       description: >
         List of all the triggered alarms.
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))

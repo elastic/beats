@@ -15,8 +15,6 @@
     },
     "vsphere": {
         "host": {
-<<<<<<< HEAD
-=======
             "triggered_alarms": [
                 {
                     "status": "red",
@@ -51,7 +49,6 @@
                     "entity_name": "121.0.0.0"
                 }
             ],
->>>>>>> 0d56a640bd ([vSphere] update field name for triggered_alarm (#40876))
             "cpu": {
                 "used": {
                     "mhz": 67
