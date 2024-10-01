@@ -65,7 +65,7 @@ func (r *Coordinator) Run(ctx context.Context, t telemetry.T) error {
 		}(ctx, t, rfn)
 	}
 
-	// Wait for goroutine to complete and aggregate any errs from the goroutine and
+	// Wait for goroutine to complete and aggregate any errors from the goroutine and
 	// raise them back to the main program.
 	var errs []error
 	for range r.runners {
