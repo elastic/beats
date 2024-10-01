@@ -86,7 +86,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -102,7 +102,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debugf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Debugf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -149,13 +149,12 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	return nil
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
-
+func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (assetNames, error) {
 	outputVmNames := make([]string, 0, len(ds.Vm))
 	if len(ds.Vm) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, ds.Vm, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return assetNames{}, err
 		}
 
 		for _, ob := range objects {
@@ -181,7 +180,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		if len(hsRefs) > 0 {
 			err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
 			if err != nil {
-				return nil, err
+				return assetNames{}, err
 			}
 		}
 
@@ -191,7 +190,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		}
 	}
 
-	return &assetNames{
+	return assetNames{
 		outputHostNames: outputHostNames,
 		outputVmNames:   outputVmNames,
 	}, nil
