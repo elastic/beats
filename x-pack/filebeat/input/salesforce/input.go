@@ -177,6 +177,7 @@ func (s *salesforceInput) run() error {
 		}
 	}
 }
+
 func (s *salesforceInput) isError(err error) error {
 	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		s.log.Infof("input stopped because context was cancelled with: %v", err)
