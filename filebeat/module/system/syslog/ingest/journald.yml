@@ -11,13 +11,13 @@ processors:
     value: "{{host.hostname}}"
     if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
     allow_duplicates: false
-  - remove:
-      description: Remove the extra fields added by the Journald input
-      field:
-        - journald
-        - process.thread
-        - syslog
-        - systemd
+- remove:
+    description: Remove the extra fields added by the Journald input
+    field:
+      - journald
+      - process.thread
+      - syslog
+      - systemd
 on_failure:
 - set:
     field: error.message
