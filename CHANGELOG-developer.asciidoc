@@ -12,9 +12,6 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
-==== Breaking changes
- - Change cloud.auth: "elastic" to cloud.auth: "username". {pull}29862[29862]
-
 === Beats version 8.0.0
 https://github.com/elastic/beats/compare/7.x..main[Check the HEAD diff]
 
