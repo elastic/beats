@@ -136,36 +136,27 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
 
-	// Filter for required metrics
-	var metricIds []types.PerfMetricId
-	for metricName := range metricSet {
-		if metric, ok := metrics[metricName]; ok {
-			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
-		} else {
-			m.Logger().Warnf("Metric %s not found", metricName)
-		}
-	}
-
 	pc := property.DefaultCollector(c)
 	for i := range hst {
-		select {
-		case <-ctx.Done():
+		if ctx.Err() != nil {
 			return ctx.Err()
-		default:
-			assetNames, err := getAssetNames(ctx, pc, &hst[i])
-			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
-			}
-
-			metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metricIds)
-			if err != nil {
-				m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
-			}
-
-			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
-			})
 		}
+		assetNames, err := getAssetNames(ctx, pc, &hst[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
+		}
+
+		metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metrics)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
+		}
+
+		reporter.Event(mb.Event{
+			MetricSetFields: m.mapEvent(hst[i], &metricData{
+				perfMetrics: metricMap,
+				assetNames:  assetNames,
+			}),
+		})
 	}
 
 	return nil
@@ -213,17 +204,37 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 	}, nil
 }
 
-func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metricIds []types.PerfMetricId) (metricMap map[string]interface{}, err error) {
+func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
 	metricMap = make(map[string]interface{})
 
-	period := m.Module().Config().Period
-	refreshRate := int32(period.Seconds())
+	period := int32(m.Module().Config().Period.Seconds())
+	availableMetric, err := perfManager.AvailableMetric(ctx, hst.Reference(), period)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get available metrics: %w", err)
+	}
+
+	availableMetricByKey := availableMetric.ByKey()
+
+	// Filter for required metrics
+	var metricIDs []types.PerfMetricId
+	for key, metric := range metricSet {
+		if counter, ok := metrics[key]; ok {
+			if _, exists := availableMetricByKey[counter.Key]; exists {
+				metricIDs = append(metricIDs, types.PerfMetricId{
+					CounterId: counter.Key,
+					Instance:  "*",
+				})
+			}
+		} else {
+			m.Logger().Warnf("Metric %s not found", metric)
+		}
+	}
 
 	spec := types.PerfQuerySpec{
 		Entity:     hst.Reference(),
-		MetricId:   metricIds,
+		MetricId:   metricIDs,
 		MaxSample:  1,
-		IntervalId: refreshRate,
+		IntervalId: period,
 	}
 
 	// Query performance data
