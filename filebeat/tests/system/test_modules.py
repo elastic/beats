@@ -107,8 +107,11 @@ def load_fileset_test_cases():
             if not os.path.isfile(os.path.join(path, fileset, "manifest.yml")):
                 continue
 
-            test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
+            test_files_extensions = os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log,*.journal").split(",")
+            test_files = []
+            for ext in test_files_extensions:
+                test_files.extend(glob.glob(os.path.join(modules_dir, module,
+                                                         fileset, "test", ext)))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
