@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix
+//go:build !(linux || darwin || windows)
 
 package autodiscover
 
 // InitializeModule initializes this module.
 func InitializeModule() {
-	// does nothing on aix
+	// does nothing if kubernetes and docker are not supported
 }
