@@ -3,6 +3,23 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
+=======
+[[release-notes-8.15.2]]
+=== Beats version 8.15.2
+https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix bug that prevented the Elasticsearch output from recovering from an interrupted connection. {issue}40705[40705] {pull}40769[40796]
+
+*Metricbeat*
+
+- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+
+>>>>>>> 4184106c56 ([main](backport #41011) Add missing changelog for ES fix. (#41020))
 [[release-notes-8.15.1]]
 === Beats version 8.15.1
 https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
