@@ -195,8 +195,7 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
-		s.log.Errorf("Failed to open Salesforce session: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to open salesforce connection: %w", err)
 	}
 	s.log.Info("Salesforce session opened successfully")
 
