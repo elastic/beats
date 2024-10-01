@@ -20,7 +20,6 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Breaking changes
 
-- Change cloud.auth: "elastic" to cloud.auth: "username". {pull}29862[29862]
 - Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
 - For "metricbeat style" generated custom beats, the mage target `GoTestIntegration` has changed to `GoIntegTest` and `GoTestUnit` has changed to `GoUnitTest`. {pull}13341[13341]
 - Build docker and kubernetes features only on supported platforms. {pull}13509[13509]
