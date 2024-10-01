@@ -1,6 +1,9 @@
 description: Journald Pipeline for system/syslog Filebeat module
 processors:
 - set:
+    field: event.ingested
+    copy_from: _ingest.timestamp
+- set:
     field: "process.pid"
     value: '{{ journald.pid }}'
 - set:
@@ -13,11 +16,13 @@ processors:
     allow_duplicates: false
 - remove:
     description: Remove the extra fields added by the Journald input
+    ignore_missing: true
     field:
       - journald
       - process.thread
       - syslog
       - systemd
+      - message_id
 on_failure:
 - set:
     field: error.message

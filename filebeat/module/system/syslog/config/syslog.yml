@@ -8,6 +8,7 @@ paths:
 {{ end }}
 
 facilities:
+  - 0
   - 1
   - 2
   - 3
@@ -16,6 +17,9 @@ facilities:
   - 7
   - 8
   - 9
+  - 11
+  - 12
+  - 15
 tags:
   - journald
   - syslog
