@@ -151,9 +151,11 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		// Process S3 object (download, parse, create events).
 		publishCount := 0
 		err := objHandler.ProcessS3Object(in.log, func(e beat.Event) {
+			in.metrics.s3EventsCreatedTotal.Inc()
 			client.Publish(e)
 			publishCount++
 		})
+		in.metrics.s3EventsPerObject.Update(int64(publishCount))
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
