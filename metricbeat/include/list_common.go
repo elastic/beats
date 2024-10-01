@@ -85,6 +85,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/http/server"
 	_ "github.com/elastic/beats/v7/metricbeat/module/jolokia"
 	_ "github.com/elastic/beats/v7/metricbeat/module/jolokia/jmx"
+	_ "github.com/elastic/beats/v7/metricbeat/module/k6"
+	_ "github.com/elastic/beats/v7/metricbeat/module/k6/k6metricset"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kafka"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kafka/consumergroup"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kafka/partition"
