@@ -88,7 +88,7 @@ func TestConfigInvalid(t *testing.T) {
 		Unwrap() []error
 	})
 	if !ok {
-		t.Fatal("expected MultiError")
+		t.Fatal("expected slice error unwrapper")
 	}
 	assert.Len(t, merr.Unwrap(), 4)
 
