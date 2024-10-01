@@ -1,11 +1,8 @@
 description: Journald Pipeline for system/auth Filebeat module
 processors:
   - set:
-      field: AAA
-      value: "journald"
-  - set:
-      field: aaaBBB
-      value: "journald"
+      field: event.ingested
+      copy_from: _ingest.timestamp
   - rename:
       field: "journald.process.name"
       target_field: process.name
@@ -192,6 +189,14 @@ processors:
       if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
       ignore_failure: true
       ignore_missing: true
+  - remove:
+      description: Remove the extra fields added by the Journald input
+      field:
+        - journald
+        - process.thread
+        - syslog
+        - systemd
+
 on_failure:
   - set:
       field: error.message
