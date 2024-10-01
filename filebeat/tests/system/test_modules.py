@@ -189,6 +189,12 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.format=json".format(
                 module=module, fileset=fileset))
 
+        if ".journal" in test_file:
+            cmd.remove("-once")
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.use_journald=true".format(
+                module=module, fileset=fileset))
+
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
@@ -201,12 +207,20 @@ class Test(BaseTest):
             local_env = os.environ.copy()
             local_env["TZ"] = 'Etc/GMT+2'
 
-            subprocess.Popen(cmd,
-                             env=local_env,
-                             stdin=None,
-                             stdout=output,
-                             stderr=subprocess.STDOUT,
-                             bufsize=0).wait()
+            proc = subprocess.Popen(cmd,
+                                    env=local_env,
+                                    stdin=None,
+                                    stdout=output,
+                                    stderr=subprocess.STDOUT,
+                                    bufsize=0)
+            # The journald input (used by some modules like 'system') does not
+            # support the -once flag, hence we run Filebeat for at most
+            # 15 seconds, if it does not finish, then we try to gracefully
+            # terminate it.
+            try:
+                proc.wait(15)
+            except subprocess.TimeoutExpired:
+                proc.terminate()
 
         # List of errors to check in filebeat output logs
         errors = ["error loading pipeline for fileset"]
