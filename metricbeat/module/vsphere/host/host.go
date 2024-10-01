@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 
@@ -54,9 +55,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &HostMetricSet{ms}, nil
 }
 
+type triggerdAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
 type metricData struct {
-	perfMetrics map[string]interface{}
-	assetNames  assetNames
+	perfMetrics    map[string]interface{}
+	assetNames     assetNames
+	triggerdAlarms []triggerdAlarm
 }
 
 type assetNames struct {
@@ -122,7 +133,7 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 
 	// Retrieve summary property for all hosts.
 	var hst []mo.HostSystem
-	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "network", "name", "vm", "datastore"}, &hst)
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary", "network", "name", "vm", "datastore", "triggeredAlarmState"}, &hst)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -151,10 +162,16 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 			m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
 		}
 
+		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, hst[i].TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve triggerd alarms from host %s: %w", hst[i].Name, err)
+		}
+
 		reporter.Event(mb.Event{
 			MetricSetFields: m.mapEvent(hst[i], &metricData{
-				perfMetrics: metricMap,
-				assetNames:  assetNames,
+				perfMetrics:    metricMap,
+				triggerdAlarms: triggerdAlarm,
+				assetNames:     assetNames,
 			}),
 		})
 	}
@@ -202,6 +219,46 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputDsNames:      outputDsNames,
 		outputVmNames:      outputVmNames,
 	}, nil
+}
+
+func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
+	var triggeredAlarms []triggerdAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggerdAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
 }
 
 func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
