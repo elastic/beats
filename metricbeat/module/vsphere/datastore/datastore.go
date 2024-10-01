@@ -77,11 +77,11 @@ type assetNames struct {
 
 // Define metrics to be collected
 var metricSet = map[string]struct{}{
-	"datastore.read.average":              {},
-	"datastore.write.average":             {},
-	"datastore.datastoreIops.average":     {},
-	"datastore.totalReadLatency.average":  {},
-	"datastore.totalWriteLatency.average": {},
+	"datastore.read.average":      {},
+	"datastore.write.average":     {},
+	"disk.capacity.latest":        {},
+	"disk.capacity.usage.average": {},
+	"disk.provisioned.latest":     {},
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -97,7 +97,7 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	}
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -108,12 +108,12 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Datastore"}, true)
 	if err != nil {
-		return fmt.Errorf("error in CreateContainerView: %w", err)
+		return fmt.Errorf("error in creating container view: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debugf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Debugf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
@@ -133,41 +133,21 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 		return fmt.Errorf("failed to retrieve metrics: %w", err)
 	}
 
-	// Filter for required metrics
-	var metricIds []types.PerfMetricId
-	for metricName := range metricSet {
-		if metric, ok := metrics[metricName]; ok {
-			metricIds = append(metricIds, types.PerfMetricId{CounterId: metric.Key})
-		} else {
-			m.Logger().Warnf("Metric %s not found", metricName)
-		}
-	}
-
-	pc := property.DefaultCollector(c)
+	pc := property.DefaultCollector(client.Client)
 	for i := range dst {
-		select {
-		case <-ctx.Done():
+		if ctx.Err() != nil {
 			return ctx.Err()
-		default:
-			assetNames, err := getAssetNames(ctx, pc, &dst[i])
-			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
-				continue
-			}
+		}
 
-			spec := types.PerfQuerySpec{
-				Entity:     dst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
+		assetNames, err := getAssetNames(ctx, pc, &dst[i])
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve object from datastore %s: %v", dst[i].Name, err)
+		}
 
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-			if err != nil {
-				m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
-				continue
-			}
+		metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metrics)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
+		}
 
 		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, dst[i].TriggeredAlarmState)
 		if err != nil {
@@ -186,14 +166,14 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	return nil
 }
 
-func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (*assetNames, error) {
-
+func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore) (assetNames, error) {
 	outputVmNames := make([]string, 0, len(ds.Vm))
 	if len(ds.Vm) > 0 {
 		var objects []mo.ManagedEntity
 		if err := pc.Retrieve(ctx, ds.Vm, []string{"name"}, &objects); err != nil {
-			return nil, err
+			return assetNames{}, err
 		}
+
 		for _, ob := range objects {
 			if ob.Reference().Type == "VirtualMachine" {
 				name := strings.ReplaceAll(ob.Name, ".", "_")
@@ -201,6 +181,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 			}
 		}
 	}
+
 	// calling Host explicitly because of mo.Datastore.Host has types.DatastoreHostMount instead of mo.ManagedEntity
 	outputHostNames := make([]string, 0, len(ds.Host))
 	if len(ds.Host) > 0 {
@@ -216,7 +197,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		if len(hsRefs) > 0 {
 			err := pc.Retrieve(ctx, hsRefs, []string{"name"}, &hosts)
 			if err != nil {
-				return nil, err
+				return assetNames{}, err
 			}
 		}
 
@@ -226,7 +207,7 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		}
 	}
 
-	return &assetNames{
+	return assetNames{
 		outputHostNames: outputHostNames,
 		outputVmNames:   outputVmNames,
 	}, nil
