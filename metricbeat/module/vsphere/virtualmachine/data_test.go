@@ -122,25 +122,6 @@ func TestEventMapping(t *testing.T) {
 			"customField1": "value1",
 			"customField2": "value2",
 		},
-<<<<<<< HEAD
-		"network.names":   []string{"network-1", "network-2"},
-		"network_names":   []string{"network-1", "network-2"},
-		"datastore.names": []string{"ds1", "ds2"},
-		"snapshot.info": []VMSnapshotData{
-			{
-				ID:          123,
-				Name:        "Snapshot_1",
-				Description: "Test snapshot 1",
-				CreateTime:  time.Time{},
-				State:       types.VirtualMachinePowerStatePoweredOff,
-			},
-			{
-				ID:          745,
-				Name:        "Snapshot_2",
-				Description: "Test snapshot 2",
-				CreateTime:  time.Time{},
-				State:       types.VirtualMachinePowerStatePoweredOn,
-=======
 		"network_names": []string{"network-1", "network-2"},
 		"snapshot": mapstr.M{
 			"info": []VMSnapshotData{
@@ -158,7 +139,6 @@ func TestEventMapping(t *testing.T) {
 					CreateTime:  common.Time{},
 					State:       types.VirtualMachinePowerStatePoweredOn,
 				},
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 			},
 		},
 		"snapshot.count": 2,

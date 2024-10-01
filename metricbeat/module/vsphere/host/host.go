@@ -140,51 +140,6 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 	for i := range hst {
 		if ctx.Err() != nil {
 			return ctx.Err()
-<<<<<<< HEAD
-		default:
-			assetNames, err := getAssetNames(ctx, pc, &hst[i])
-			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", hst[i].Name, err)
-			}
-
-			spec := types.PerfQuerySpec{
-				Entity:     hst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
-
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-			if err != nil {
-				m.Logger().Errorf("Failed to query performance data from host %s: %v", hst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debug("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Errorf("Failed to convert performance data to metric series for host %s: %v", hst[i].Name, err)
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", hst[i].Name, result.Name)
-			}
-
-			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(hst[i], &metricData{perfMetrics: metricMap, assetNames: assetNames}),
-			})
-=======
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 		}
 		assetNames, err := getAssetNames(ctx, pc, &hst[i])
 		if err != nil {
@@ -248,8 +203,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 		outputVmNames:      outputVmNames,
 	}, nil
 }
-<<<<<<< HEAD
-=======
 
 func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
 	metricMap = make(map[string]interface{})
@@ -319,4 +272,3 @@ func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *perform
 
 	return metricMap, nil
 }
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))

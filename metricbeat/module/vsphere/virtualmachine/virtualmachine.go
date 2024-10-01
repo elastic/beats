@@ -61,19 +61,11 @@ type VMData struct {
 }
 
 type VMSnapshotData struct {
-<<<<<<< HEAD
-	ID          int32
-	Name        string
-	Description string
-	CreateTime  time.Time
-	State       types.VirtualMachinePowerState
-=======
 	ID          int32                          `json:"id"`
 	Name        string                         `json:"name"`
 	Description string                         `json:"description"`
 	CreateTime  common.Time                    `json:"createtime"`
 	State       types.VirtualMachinePowerState `json:"state"`
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 }
 
 // New creates a new instance of the MetricSet.

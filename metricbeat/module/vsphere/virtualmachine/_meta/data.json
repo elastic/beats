@@ -15,77 +15,6 @@
     },
     "vsphere": {
         "virtualmachine": {
-<<<<<<< HEAD
-            "network.names": [
-              "PROD_VCF"
-            ],
-            "os": "Microsoft Windows 10 (64-bit)",
-            "datastore": {
-              "count": 1
-            },
-            "memory": {
-              "used": {
-                "guest": {
-                  "bytes": 0
-                },
-                "host": {
-                  "bytes": 0
-                }
-              },
-              "total": {
-                "guest": {
-                  "bytes": 4294967296
-                }
-              },
-              "free": {
-                "guest": {
-                  "bytes": 4294967296
-                }
-              }
-            },
-            "network": {
-              "count": 1
-            },
-            "host.hostname": "phx-w1c1",
-            "name": "phx-14",
-            "cpu": {
-              "free": {
-                "mhz": 0
-              },
-              "used": {
-                "mhz": 0
-              },
-              "total": {
-                "mhz": 0
-              }
-            },
-            "uptime": 0,
-            "status": "green",
-            "network_names": [
-              "PROD_VCF"
-            ],
-            "datastore.names": [
-              "VxRailtec-Virtual-SAN-Datastore-247df-bc1d-5aad2"
-            ],
-            "host.id": "host-20",
-            "snapshot.info": [
-              {
-                "Name":        "Snapshot_1",
-                "Description": "Test snapshot 1",
-                "CreateTime": "2024-09-01T12:34:56Z"
-
-              },
-              {
-                "Name":        "Snapshot_2",
-                "Description": "Test snapshot 2",
-                "CreateTime": "2024-09-03T2:34:56Z"
-              }
-            ],
-            "snapshot.count": 2
-          }
-        }
-    }
-=======
             "name": "xt0nmfpv9",
             "uptime": 5348978,
             "status": "green",
@@ -162,4 +91,3 @@
         }
     }
 }
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))

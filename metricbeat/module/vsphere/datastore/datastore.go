@@ -126,56 +126,6 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 	for i := range dst {
 		if ctx.Err() != nil {
 			return ctx.Err()
-<<<<<<< HEAD
-		default:
-			assetNames, err := getAssetNames(ctx, pc, &dst[i])
-			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from host %s: %w", dst[i].Name, err)
-				continue
-			}
-
-			spec := types.PerfQuerySpec{
-				Entity:     dst[i].Reference(),
-				MetricId:   metricIds,
-				MaxSample:  1,
-				IntervalId: 20, // right now we are only grabbing real time metrics from the performance manager
-			}
-
-			// Query performance data
-			samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-			if err != nil {
-				m.Logger().Debugf("Failed to query performance data for host %s: %v", dst[i].Name, err)
-				continue
-			}
-
-			if len(samples) == 0 {
-				m.Logger().Debugf("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
-				continue
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
-			}
-
-			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(dst[i], &metricData{
-					perfMetrics: metricMap,
-					assetNames:  *assetNames,
-				}),
-			})
-=======
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
 		}
 
 		assetNames, err := getAssetNames(ctx, pc, &dst[i])
@@ -246,8 +196,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		outputVmNames:   outputVmNames,
 	}, nil
 }
-<<<<<<< HEAD
-=======
 
 func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
 	metricMap = make(map[string]interface{})
@@ -317,4 +265,3 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 
 	return metricMap, nil
 }
->>>>>>> 3f44bd1f9b ([Metricbeat][vSphere] New metrics support and minor changes to existing metricsets (#40766))
