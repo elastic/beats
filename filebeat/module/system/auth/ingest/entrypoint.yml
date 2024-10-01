@@ -1,4 +1,4 @@
-description: Entrypoint Pipeline for system/syslog Filebeat module
+description: Entrypoint Pipeline for system/auth Filebeat module
 processors:
   - script:
       source: |
@@ -6,15 +6,15 @@ processors:
               if(tags != null){
                 for (String tag : tags) {
                   if (tag.toLowerCase().equals('journald')) {
-                    ctx['syslog_pipeline'] = '{< IngestPipeline "journald" >}';
+                    ctx['auth_pipeline'] = '{< IngestPipeline "journald" >}';
                     return
                   }
                 }
               }
-              ctx['syslog_pipeline'] = '{< IngestPipeline "files" >}';
+              ctx['auth_pipeline'] = '{< IngestPipeline "files" >}';
               return;
   - pipeline:
-      name: "{{ syslog_pipeline }}"
+      name: "{{ auth_pipeline }}"
   - remove:
       ignore_failure: true
-      field: "syslog_pipeline"
+      field: "auth_pipeline"
