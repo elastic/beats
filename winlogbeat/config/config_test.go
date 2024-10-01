@@ -60,8 +60,7 @@ func TestConfigValidate(t *testing.T) {
 		},
 		{
 			WinlogbeatConfig{},
-			"at least one event log must be configured as part of " +
-				"event_logs",
+			"at least one event log must be configured as part of event_logs",
 		},
 	}
 
