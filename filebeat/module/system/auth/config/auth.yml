@@ -4,6 +4,8 @@ id: system-auth
 facilities:
   - 4
   - 10
+processors:
+  - add_locale: ~
 tags:
   - journald
   - auth

@@ -1,4 +1,4 @@
-description: Journald Pipeline for syslog Filebeat module
+description: Journald Pipeline for system/syslog Filebeat module
 processors:
 - set:
     field: "process.pid"
