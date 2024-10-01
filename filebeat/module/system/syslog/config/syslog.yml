@@ -1,6 +1,12 @@
 {{ define "journald" }}
 type: journald
 id: system-syslog
+
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+
 facilities:
   - 1
   - 2
