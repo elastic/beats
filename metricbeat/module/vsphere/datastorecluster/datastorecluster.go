@@ -119,11 +119,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
 		if err != nil {
-<<<<<<< HEAD
-			m.Logger().Errorf("Failed to retrieve object from host %s: %w", datastoreCluster[i].Name, err)
-=======
 			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: v", datastoreCluster[i].Name, err)
->>>>>>> 885a2db1c4 ([vSphere] add triggered alarm to existing metricsets. (#40714))
 		}
 
 		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)

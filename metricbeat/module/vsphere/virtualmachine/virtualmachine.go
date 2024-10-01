@@ -146,11 +146,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-<<<<<<< HEAD
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
-=======
 	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState", "snapshot"}, &vmt)
->>>>>>> 885a2db1c4 ([vSphere] add triggered alarm to existing metricsets. (#40714))
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}

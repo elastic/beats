@@ -169,35 +169,6 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 				continue
 			}
 
-<<<<<<< HEAD
-			if len(samples) == 0 {
-				m.Logger().Debugf("No samples returned from performance manager")
-				continue
-			}
-
-			results, err := perfManager.ToMetricSeries(ctx, samples)
-			if err != nil {
-				m.Logger().Debugf("Failed to query performance data to metric series for host %s: %v", dst[i].Name, err)
-				continue
-			}
-
-			metricMap := make(map[string]interface{})
-			for _, result := range results[0].Value {
-				if len(result.Value) > 0 {
-					metricMap[result.Name] = result.Value[0]
-					continue
-				}
-				m.Logger().Debugf("For host %s,Metric %v: No result found", dst[i].Name, result.Name)
-			}
-
-			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(dst[i], &metricData{
-					perfMetrics: metricMap,
-					assetNames:  *assetNames,
-				}),
-			})
-		}
-=======
 		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, dst[i].TriggeredAlarmState)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve alerts from datastore %s: %w", dst[i].Name, err)
@@ -210,7 +181,6 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 				assetNames:     assetNames,
 			}),
 		})
->>>>>>> 885a2db1c4 ([vSphere] add triggered alarm to existing metricsets. (#40714))
 	}
 
 	return nil
@@ -261,8 +231,6 @@ func getAssetNames(ctx context.Context, pc *property.Collector, ds *mo.Datastore
 		outputVmNames:   outputVmNames,
 	}, nil
 }
-<<<<<<< HEAD
-=======
 
 func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
 	var triggeredAlarms []triggerdAlarm
@@ -372,4 +340,3 @@ func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *pe
 
 	return metricMap, nil
 }
->>>>>>> 885a2db1c4 ([vSphere] add triggered alarm to existing metricsets. (#40714))
