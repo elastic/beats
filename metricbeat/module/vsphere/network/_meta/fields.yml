@@ -46,3 +46,8 @@
           type: long
           description: >
             Number of virtual machines connected to this network.
+    - name: triggerd_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggerd alarms.

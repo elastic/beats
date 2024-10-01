@@ -96,10 +96,6 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	}
 
 	contentType := GetContentType(resp.Header)
-	if contentType == "" {
-		return nil, fmt.Errorf("invalid format for response: %v", resp.Header)
-	}
-
 	appendTime := time.Now().Round(0)
 	b, err := io.ReadAll(reader)
 	if err != nil {
