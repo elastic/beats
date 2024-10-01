@@ -161,12 +161,18 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 		}
 	}
 
-	finalizers, processingErr := p.processS3Events(ctx, log, *msg.Body, eventCallback)
+	eventCount := 0
+	finalizers, processingErr := p.processS3Events(ctx, log, *msg.Body, func(e beat.Event) {
+		eventCount++
+		eventCallback(e)
+	})
 
 	return sqsProcessingResult{
 		log:             p.log,
 		msg:             msg,
+		processor:       p,
 		receiveCount:    receiveCount,
+		eventCount:      eventCount,
 		keepaliveCancel: keepaliveCancel,
 		processingErr:   processingErr,
 		finalizers:      finalizers,
