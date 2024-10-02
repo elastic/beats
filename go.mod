@@ -303,7 +303,7 @@ require (
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/klog/v2 v2.8.0 // indirect
+	k8s.io/klog/v2 v2.20.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.57 // indirect
