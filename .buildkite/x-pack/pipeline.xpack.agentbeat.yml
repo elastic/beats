@@ -107,9 +107,7 @@ steps:
 #          - agentbeat-package-linux
         command: |
           set -euo pipefail
-          # buildkite-agent artifact download x-pack/agentbeat/build/distributions/** . --build 01924d2b-b061-45ae-a106-e885584ff26f --step agentbeat-package-linux
           ./.buildkite/scripts/agentbeat/prepare_env.py
-          ls -lah x-pack/agentbeat/build/distributions/
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -117,18 +115,18 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
 
-#      - label: ":linux: Agentbeat/Integration tests Windows"
-#        key: "agentbeat-it-windows"
+      - label: ":linux: Agentbeat/Integration tests Windows"
+        key: "agentbeat-it-windows"
 #        depends_on:
 #          - agentbeat-package-linux
-#        commands:
-#          - ./.buildkite/scripts/agentbeat/prepare_env.py
-#        agents:
-#          provider: "gcp"
-#          image: "${IMAGE_WIN_2022}"
-#          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-#          disk_size: 200
-#          disk_type: "pd-ssd"
+        commands:
+          - ./.buildkite/scripts/agentbeat/prepare_env.py
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
 #
 #      - label: ":linux: Agentbeat/Integration tests macOS"
 #        key: "agentbeat-it-macos"

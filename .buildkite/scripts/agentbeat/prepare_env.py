@@ -1,43 +1,47 @@
 #!/usr/bin/env python3
 
-import os
 import platform
 import subprocess
+import sys
 
 
 def get_os() -> str:
-    return platform.system()
+    return platform.system().lower()
 
 
 def get_arch() -> str:
-    return platform.machine()
+    arch = platform.machine().lower()
+
+    if arch == "amd64":
+        return "x86_64"
+    else:
+        return arch
 
 
-def get_cwd() -> str:
-    return os.getcwd()
+def download_agentbeat_artifact(agent_os, agent_arch):
+    pattern = f"x-pack/agentbeat/build/distributions/agentbeat-*-{agent_os}-{agent_arch}.tar.gz"
 
-
-def download_agentbeat_artifact(os, arch):
-    pattern = "x-pack/agentbeat/build/distributions/agentbeat-9.0.0-SNAPSHOT-linux-x86_64.tar.gz"
-    # pattern = "x-pack/agentbeat/build/distributions/**"
-    # command = f"buildkite-agent artifact download \"{pattern}\" . --step 'agentbeat-package-linux'"
+    print("--- Downloading agentbeat artifact")
 
     try:
-        print("--- Downloading agentbeat artifact")
-        result = subprocess.run(
+        subprocess.run(
             ["buildkite-agent", "artifact", "download", pattern, ".",
              "--build", "01924d2b-b061-45ae-a106-e885584ff26f",
              "--step", "agentbeat-package-linux"],
-            check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(result.stdout.decode())
+            check=True, stdout=sys.stdout, stderr=subprocess.PIPE, text=True)
     except subprocess.CalledProcessError as e:
-        print("--- Error occurred while downloading agentbeat\n" + e.stderr)
+        print("--- Error occurred. Failed to download agentbeat: \n" + e.stderr)
         exit(1)
 
 
+def unzip_agentbeat():
+     print("todo unzip")
+
+
 def install_synthetics():
+    print("--- Installing @elastic/synthetics")
+
     try:
-        print("--- Installing @elastic/synthetics")
         subprocess.run(
             ["npm install -g @elastic/synthetics"],
             check=True
@@ -46,12 +50,6 @@ def install_synthetics():
         print("Failed to install @elastic/synthetics")
         exit(1)
 
-
-# print("--- OS: " + get_os())
-#
-# print("--- ARCH: " + get_arch())
-#
-# print("--- CWD: " + get_cwd())
-
+print("--- OS Data: " + get_os() + " " + get_arch())
 download_agentbeat_artifact(get_os(), get_arch())
 # install_synthetics()
