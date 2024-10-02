@@ -213,15 +213,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			resourceTypeTagFilters := constructTagsFilters(namespaceDetails)
 
 			//Check whether namespace is APIGW
-			useonlyrest := false
-			if len(resourceTypeTagFilters) == 1 {
-				for key := range resourceTypeTagFilters {
-					if strings.Compare(strings.ToLower(key), checkresource_type_lower) == 0 {
-						useonlyrest = true
+			if strings.Contains(strings.ToLower(namespace), checkns_lower) {
+				useonlyrest := false
+				if len(resourceTypeTagFilters) == 1 {
+					for key := range resourceTypeTagFilters {
+						if strings.Compare(strings.ToLower(key), checkresource_type_lower) == 0 {
+							useonlyrest = true
+						}
 					}
 				}
-			}
-			if strings.Contains(strings.ToLower(namespace), checkns_lower) {
 				// inforestapi includes only Rest APIs
 				if useonlyrest {
 					infoapi, err = aws.GetAPIGatewayRestAPIOutput(APIClients.Apigateway, config.LimitRestAPI)
