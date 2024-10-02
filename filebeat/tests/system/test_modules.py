@@ -178,8 +178,6 @@ class Test(BaseTest):
                 module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.input=file".format(
                 module=module, fileset=fileset),
-            "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
-                module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
         # allow connecting older versions of Elasticsearch
@@ -197,11 +195,20 @@ class Test(BaseTest):
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.use_journald=true".format(
                 module=module, fileset=fileset))
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.input.paths=[{test_file}]".format(
+                module=module, fileset=fileset, test_file=test_file))
+        else:
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
+                module=module, fileset=fileset, test_file=test_file))
 
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
-            output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
+            output.write(bytes("Command run: ", "utf-8"))
+            output.write(bytes(" ".join(cmd) + "\n\n", "utf-8"))
+            output.flush()
 
             # Use a fixed timezone so results don't vary depending on the environment
             # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,

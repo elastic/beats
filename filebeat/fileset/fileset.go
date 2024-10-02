@@ -317,6 +317,9 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 				builtinVars["beatVersion"].(string),
 			)
 		},
+		"append": func(s []any, vals ...any) []any {
+			return append(s, vals...)
+		},
 	}, nil
 }
 

@@ -9,7 +9,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "success",
-        "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
@@ -59,7 +58,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
@@ -107,7 +105,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
@@ -157,7 +154,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
@@ -207,7 +203,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "failure",
-        "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
@@ -252,7 +247,6 @@
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
@@ -298,7 +292,6 @@
         "event.kind": "event",
         "event.module": "system",
         "event.outcome": "success",
-        "event.timezone": "-02:00",
         "event.type": [
             "creation",
             "group"
@@ -338,7 +331,6 @@
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
-        "event.timezone": "-02:00",
         "fileset.name": "auth",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
