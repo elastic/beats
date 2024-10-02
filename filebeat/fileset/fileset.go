@@ -184,7 +184,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 
 		vars[name], err = resolveVariable(vars, value)
 		if err != nil {
-			return nil, fmt.Errorf("Error resolving variables on %s: %v", name, err)
+			return nil, fmt.Errorf("Error resolving variables on %s: %w", name, err)
 		}
 	}
 
@@ -471,7 +471,11 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			if err != nil {
 				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", path, err)
 			}
-			content = newContent.(map[string]interface{})
+			var ok bool
+			content, ok = newContent.(map[string]interface{})
+			if !ok {
+				return nil, errors.New("cannot convert newContent to map[string]interface{}")
+			}
 		default:
 			return nil, fmt.Errorf("Unsupported extension '%s' for pipeline file: %s", extension, path)
 		}
