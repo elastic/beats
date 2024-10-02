@@ -1,3 +1,20 @@
+{{/*
+ We use the template to detect the OS and select the correct input:
+ log or journald. Here is how it works:
+
+ First we define two blocks, 'journald'  and 'log-files', each one
+ containing the configuration for the journald input and log input,
+ respectively. Then we define the variable '$journaldDetected' as
+ false and check OS version and OS family, if journald should be used,
+ we set '$journaldDetected' to true. The last step is an if/else block
+ to decide which input to use based on the user defined
+ 'use_journald', 'use_logs' and '$journaldDetected' that we set.
+
+ 'use_journald', 'use_logs' take precedence over '$journaldDetected',
+ if both 'use_journald', 'use_logs' are set to true, then journald is
+ used.
+*/}}
+
 {{ define "journald" }}
 type: journald
 id: system-syslog
