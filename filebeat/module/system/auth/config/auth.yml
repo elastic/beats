@@ -1,19 +1,13 @@
 {{ define "journald" }}
 type: journald
 id: system-auth
-paths:
-{{ range $i, $path := .paths }}
- - {{$path}}
-{{ end }}
 
 facilities:
   - 4
   - 10
-processors:
-  - add_locale: ~
-tags:
-  - journald
-  - auth
+
+tags: {{ append .tags "journald" "auth" | tojson }}
+
 {{ end }}
 
 {{define "log-files" }}

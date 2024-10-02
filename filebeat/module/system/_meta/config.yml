@@ -36,3 +36,10 @@
     # Filebeat will autodetect whether use journald
     # to collect system logs. If both are true,
     # then journald is used.
+
+    # A list of tags to include in events. Including forwarded
+    # indicates that the events did not originate on this host and
+    # causes host.name to not be added to events. Include
+    # preserve_orginal_event causes the pipeline to retain the raw log
+    # in event.original. Defaults to [].
+    #var.tags
