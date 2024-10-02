@@ -25,18 +25,18 @@ func AzureStorageServer() http.Handler {
 		if r.Method == http.MethodGet {
 			switch len(path) {
 			case 1:
-				if containers[path[0]] {
+				if Containers[path[0]] {
 					w.Header().Set(contentType, xmlType)
 					w.Write([]byte(fetchContainer[path[0]]))
 					return
 				}
 			case 2:
-				if containers[path[0]] && availableBlobs[path[0]][path[1]] {
+				if Containers[path[0]] && availableBlobs[path[0]][path[1]] {
 					w.Write([]byte(blobs[path[0]][path[1]]))
 					return
 				}
 			case 3:
-				if containers[path[0]] {
+				if Containers[path[0]] {
 					objName := strings.Join(path[1:], "/")
 					if availableBlobs[path[0]][objName] {
 						w.Write([]byte(blobs[path[0]][objName]))

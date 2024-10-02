@@ -26,9 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// RegisterV2 is the special registry used for the V2 controller
-var RegisterV2 = NewRegistry()
-
 // InputRegName is the registation name for V2 inputs
 const InputRegName = "input"
 

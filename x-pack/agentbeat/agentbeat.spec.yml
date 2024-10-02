@@ -248,8 +248,10 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
-  - name: websocket
-    description: "Websocket"
+  - name: streaming
+    aliases:
+      - websocket
+    description: "Streaming"
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
