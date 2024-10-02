@@ -180,7 +180,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		// retrieve all the details for all the metrics available in the current region when no namespace is specified
 		// otherwise only retrieve metrics from the specific namespaces from the config
 		var listMetricsOutput []aws.MetricWithID
-		if namespaceDetailTotal == nil {
+		if len(namespaceDetailTotal) == 0 {
 			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
 			if err != nil {
 				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
