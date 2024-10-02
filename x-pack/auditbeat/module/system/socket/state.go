@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
@@ -312,6 +313,7 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 		list = prev.([]dns.Transaction)
 	}
 	list = append(list, tr)
+	logp.L().Infof("Adding Transaction for client %s", tr.Client.String())
 	dt.transactionByClient.Put(clientAddr, list)
 }
 
@@ -575,6 +577,13 @@ func (s *state) TerminateProcess(pid uint32) error {
 	defer s.Unlock()
 	delete(s.processes, pid)
 	return nil
+}
+
+func (s *state) processExists(pid uint32) bool {
+	s.Lock()
+	defer s.Unlock()
+	_, ok := s.processes[pid]
+	return ok
 }
 
 func (s *state) getProcess(pid uint32) *process {

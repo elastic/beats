@@ -1048,9 +1048,13 @@ func (e *doExit) String() string {
 
 // Update the state with the contents of this event.
 func (e *doExit) Update(s *state) (err error) {
-	// Only report exits of the main thread, a.k.a process exit
+	// Report exit of the main thread,
+	// or a TID that was originally reported by doFork.
 	if e.Meta.PID == e.Meta.TID {
 		err = s.TerminateProcess(e.Meta.PID)
+
+	} else if e.Meta.PID != e.Meta.TID && s.processExists(e.Meta.TID) {
+		err = s.TerminateProcess(e.Meta.TID)
 	}
 	// Cleanup any saved thread state
 	s.ThreadLeave(e.Meta.TID)
