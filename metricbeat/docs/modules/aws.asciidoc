@@ -146,7 +146,7 @@ Enforces the use of FIPS service endpoints. See <<aws-credentials-config,AWS cre
     - ec2
 ----
 
-* *max_apigateway_results*
+* *apigateway_max_results*
 
 This configuration works together with AWS/APIGateway namespace. It defines the maximum number of returned results per page. The default value is 25 and the maximum value is 500.
 See https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/apigateway@v1.25.8#GetRestApisInput.Limit[GetRestApisInput.Limit]
@@ -162,7 +162,7 @@ See https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/apigateway@v1.25.8#G
       metrics:
         - namespace: "AWS/ApiGateway"
           resource_type: "apigateway:restapis"
-          max_apigateway_results: 40
+          apigateway_max_results: 40
 ----
 
 The aws module comes with a predefined dashboard. For example:
