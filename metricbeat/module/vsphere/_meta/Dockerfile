@@ -1,5 +1,5 @@
 ARG VSPHERE_GOLANG_VERSION
-FROM golang:1.22.7
+FROM golang:1.23.2
 
 RUN apt-get install curl git
 RUN go install github.com/vmware/govmomi/vcsim@v0.30.4
