@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -200,7 +199,7 @@ func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 		"/etc/machine-id",
 		"/var/lib/dbus/machine-id",
 	} {
-		id, err := ioutil.ReadFile(file)
+		id, err := os.ReadFile(file)
 		if err == nil {
 			return strings.TrimSpace(string(id))
 		}
@@ -221,7 +220,7 @@ func (hd *DefaultDiscoveryUtils) GetPodName() (string, error) {
 // InClusterNamespace gets namespace from serviceaccount when beat is in cluster. // code borrowed from client-go with some changes.
 func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
-	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	data, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		return "", err
 	}

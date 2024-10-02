@@ -145,7 +145,7 @@ func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource
 		handler:      NoOpEventHandlerFuncs{},
 	}
 
-	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	_, err = w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(o interface{}) {
 			w.enqueue(o, add)
 		},
@@ -175,6 +175,9 @@ func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource
 			}
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	return w, nil
 }
