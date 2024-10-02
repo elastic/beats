@@ -22,21 +22,11 @@ import "github.com/elastic/elastic-agent-libs/dev-tools/mage/gotool"
 var (
 	// GoLicenserImportPath controls the import path used to install go-licenser.
 	GoLicenserImportPath = "github.com/elastic/go-licenser@latest"
-
-	// GoNoticeGeneratorImportPath controls the import path used to install go-licence-detector.
-	GoNoticeGeneratorImportPath = "go.elastic.co/go-licence-detector@latest"
 )
 
 // InstallGoLicenser target installs go-licenser
 func InstallGoLicenser() error {
 	return gotool.Install(
 		gotool.Install.Package(GoLicenserImportPath),
-	)
-}
-
-// InstallGoNoticeGen target installs go-licenser
-func InstallGoNoticeGen() error {
-	return gotool.Install(
-		gotool.Install.Package(GoNoticeGeneratorImportPath),
 	)
 }

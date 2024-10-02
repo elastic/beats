@@ -27,7 +27,7 @@ import (
 )
 
 func GenerateNotice(overrides, rules, noticeTemplate string) error {
-	mg.Deps(InstallGoNoticeGen, Deps.CheckModuleTidy)
+	mg.Deps(Deps.CheckModuleTidy)
 
 	err := gotool.Mod.Download(gotool.Download.All())
 	if err != nil {

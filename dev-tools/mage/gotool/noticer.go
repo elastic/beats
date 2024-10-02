@@ -26,7 +26,9 @@ var NoticeGenerator goNoticeGenerator = runGoNoticeGenerator
 
 func runGoNoticeGenerator(opts ...ArgOpt) error {
 	args := buildArgs(opts).build()
-	return sh.RunV("go-licence-detector", args...)
+
+	return sh.RunV("go",
+		append([]string{"run", "go.elastic.co/go-licence-detector"}, args...)...)
 }
 
 func (goNoticeGenerator) Dependencies(path string) ArgOpt   { return flagArg("-in", path) }

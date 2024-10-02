@@ -15,11 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// nolint:errorlint,forbidigo // it's a cli application
 package main
 
 import (
 	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
@@ -36,12 +40,13 @@ import (
 
 func main() {
 	var caPath, caKeyPath, dest, name, ipList, filePrefix, pass string
+	var rsa bool
 	flag.StringVar(&caPath, "ca", "",
 		"File path for CA in PEM format")
 	flag.StringVar(&caKeyPath, "ca-key", "",
 		"File path for the CA key in PEM format")
-	flag.StringVar(&caKeyPath, "dest", "",
-		"Directory to save the generated files")
+	flag.BoolVar(&rsa, "rsa", false,
+		"")
 	flag.StringVar(&name, "name", "localhost",
 		"used as \"distinguished name\" and \"Subject Alternate Name values\" for the child certificate")
 	flag.StringVar(&ipList, "ips", "127.0.0.1",
@@ -76,21 +81,16 @@ func main() {
 		netIPs = append(netIPs, net.ParseIP(ip))
 	}
 
-	var rootCert *x509.Certificate
-	var rootKey crypto.PrivateKey
-	if caPath == "" && caKeyPath == "" {
-		var pair certutil.Pair
-		rootKey, rootCert, pair, err = certutil.NewRootCA()
-		if err != nil {
-			panic(fmt.Errorf("could not create root CA certificate: %w", err))
-		}
+	rootCert, rootKey := getCA(rsa, caPath, caKeyPath, dest, filePrefix)
+	priv, pub := generateKey(rsa)
 
-		savePair(dest, filePrefix+"ca", pair)
-	} else {
-		rootKey, rootCert = loadCA(caPath, caKeyPath)
-	}
-
-	childCert, childPair, err := certutil.GenerateChildCert(name, netIPs, rootKey, rootCert)
+	childCert, childPair, err := certutil.GenerateChildCert(
+		name,
+		netIPs,
+		priv,
+		pub,
+		rootKey,
+		rootCert)
 	if err != nil {
 		panic(fmt.Errorf("error generating child certificate: %w", err))
 	}
@@ -113,9 +113,13 @@ func main() {
 		panic(fmt.Errorf("error getting ecdh.PrivateKey from the child's private key: %w", err))
 	}
 
+	blockType := "EC PRIVATE KEY"
+	if rsa {
+		blockType = "RSA PRIVATE KEY"
+	}
 	encPem, err := x509.EncryptPEMBlock( //nolint:staticcheck // we need to drop support for this, but while we don't, it needs to be tested.
 		rand.Reader,
-		"EC PRIVATE KEY",
+		blockType,
 		key,
 		[]byte(pass),
 		x509.PEMCipherAES128)
@@ -129,6 +133,49 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("could not save %s certificate encrypted key: %w", filePrefix+name+"_enc-key.pem", err))
 	}
+}
+
+func generateKey(useRSA bool) (crypto.PrivateKey, crypto.PublicKey) {
+	if useRSA {
+		priv, err := rsa.GenerateKey(rand.Reader, 2048)
+		if err != nil {
+			panic(fmt.Errorf("failed to generate RSA key: %v", err))
+		}
+
+		return priv, &priv.PublicKey
+	}
+
+	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	if err != nil {
+		panic(fmt.Errorf("failed to generate EC key: %v", err))
+	}
+
+	return priv, &priv.PublicKey
+}
+
+func getCA(rsa bool, caPath, caKeyPath, dest, filePrefix string) (*x509.Certificate, crypto.PrivateKey) {
+	var rootCert *x509.Certificate
+	var rootKey crypto.PrivateKey
+	var err error
+
+	if caPath == "" && caKeyPath == "" {
+		caFn := certutil.NewRootCA
+		if rsa {
+			caFn = certutil.NewRSARootCA
+		}
+
+		var pair certutil.Pair
+		rootKey, rootCert, pair, err = caFn()
+		if err != nil {
+			panic(fmt.Errorf("could not create root CA certificate: %w", err))
+		}
+
+		savePair(dest, filePrefix+"ca", pair)
+	} else {
+		rootKey, rootCert = loadCA(caPath, caKeyPath)
+	}
+
+	return rootCert, rootKey
 }
 
 func loadCA(caPath string, keyPath string) (crypto.PrivateKey, *x509.Certificate) {
