@@ -181,6 +181,9 @@ func newMonitorUnsafe(
 
 		logp.L().Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
+			// if statusReporter is set, as it is for running managed-mode, update the input status
+			// to failed, specifying the error
+			m.updateStatus(status.Failed, fmt.Sprintf("monitor could not be started: %s, err: %s", m.stdFields.ID, fullErr))
 			return nil, fullErr
 		}}
 
@@ -243,6 +246,7 @@ func (m *Monitor) Start() {
 
 	m.stats.StartMonitor(int64(m.endpoints))
 	m.state = MON_STARTED
+	m.updateStatus(status.Running, "")
 }
 
 // Stop stops the monitor without freeing it in global dedup
@@ -268,4 +272,11 @@ func (m *Monitor) Stop() {
 
 	m.stats.StopMonitor(int64(m.endpoints))
 	m.state = MON_STOPPED
+	m.updateStatus(status.Stopped, "")
+}
+
+func (m *Monitor) updateStatus(status status.Status, msg string) {
+	if m.statusReporter != nil {
+		m.statusReporter.UpdateStatus(status, msg)
+	}
 }
