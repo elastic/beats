@@ -1591,7 +1591,7 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
+  #username: "username"
   #password: "changeme"
 
   # Dictionary of HTTP parameters to pass within the URL with index operations.
@@ -2519,7 +2519,7 @@ setup.kibana:
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  #username: "elastic"
+  #username: "username"
   #password: "changeme"
 
   # Optional HTTP path
