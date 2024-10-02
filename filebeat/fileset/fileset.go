@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -145,11 +144,11 @@ type ProcessorRequirement struct {
 func (fs *Fileset) readManifest() (*manifest, error) {
 	cfg, err := common.LoadFile(filepath.Join(fs.modulePath, fs.name, "manifest.yml"))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading manifest file: %v", err)
+		return nil, fmt.Errorf("Error reading manifest file: %w", err)
 	}
 	manifest, err := newManifest(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
+		return nil, fmt.Errorf("Error unpacking manifest: %w", err)
 	}
 	return manifest, nil
 }
@@ -248,7 +247,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 			if ok {
 				transf, err := ApplyTemplate(vars, s, false)
 				if err != nil {
-					return nil, fmt.Errorf("array: %v", err)
+					return nil, fmt.Errorf("array: %w", err)
 				}
 				transformed = append(transformed, transf)
 			} else {
@@ -359,7 +358,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %w", err)
 	}
-	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+	contents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
 		return nil, fmt.Errorf("Error reading input file %s: %w", path, err)
 	}
@@ -445,7 +444,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %w", err)
 		}
 
-		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+		strContents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 		if err != nil {
 			return nil, fmt.Errorf("Error reading pipeline file %s: %w", path, err)
 		}
