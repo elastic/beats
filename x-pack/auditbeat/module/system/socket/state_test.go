@@ -155,7 +155,7 @@ func TestDNSMemoryUsage(t *testing.T) {
 	require.Equal(t, 1, len(st.processes))
 	require.NotNil(t, st.processes[rootPID])
 
-	// now close the final processs, make sure we've cleaned up the final process
+	// now close the final process, make sure we've cleaned up the final process
 	st.feedEvents([]event{&doExit{Meta: meta(rootPID, rootPID, 2)}})
 	require.Equal(t, 0, len(st.processes))
 }

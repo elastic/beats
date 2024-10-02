@@ -878,7 +878,7 @@ func (e *execveCall) getProcess() *process {
 		var err error
 		p.path, err = filepath.EvalSymlinks(fmt.Sprintf("/proc/%d/exe", e.Meta.PID))
 		if err != nil {
-			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") { //nolint:errorlint we're fetching the string body
+			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") { //nolint:errorlint // we're fetching the string body
 				// Keep the deleted path from the PathError.
 				p.path = pe.Path
 				// Keep the basename in case we can't get the process name.
