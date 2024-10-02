@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 - Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
 
 
 *Heartbeat*
