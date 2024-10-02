@@ -26,7 +26,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"net"
 	"net/http"
@@ -38,6 +37,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/iobuf"
 )
 
 var ser int64 = 1
@@ -150,7 +150,7 @@ func TestCAPinning(t *testing.T) {
 				resp, err := client.Do(req)
 				require.NoError(t, err)
 				defer resp.Body.Close()
-				content, err := ioutil.ReadAll(resp.Body)
+				content, err := iobuf.ReadAll(resp.Body)
 				require.NoError(t, err)
 
 				assert.True(t, bytes.Equal(msg, content))
@@ -234,7 +234,7 @@ func TestCAPinning(t *testing.T) {
 		resp, err := client.Do(req)
 		require.NoError(t, err)
 		defer resp.Body.Close()
-		content, err := ioutil.ReadAll(resp.Body)
+		content, err := iobuf.ReadAll(resp.Body)
 		require.NoError(t, err)
 
 		assert.True(t, bytes.Equal(msg, content))

@@ -18,7 +18,6 @@
 package loader
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -56,11 +55,7 @@ func TestInputsResolveNOOP(t *testing.T) {
 		},
 	}
 
-	tmp, err := ioutil.TempDir("", "config")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmp)
-
-	cfgPath := filepath.Join(tmp, "config.yml")
+	cfgPath := filepath.Join(t.TempDir(), "config.yml")
 	dumpToYAML(t, cfgPath, contents)
 
 	cfg, err := LoadFile(cfgPath)
@@ -87,9 +82,7 @@ func testToMapStr(t *testing.T) {
 }
 
 func testLoadFiles(t *testing.T) {
-	tmp, err := ioutil.TempDir("", "watch")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmp)
+	tmp := t.TempDir()
 
 	f1 := filepath.Join(tmp, "1.yml")
 	dumpToYAML(t, f1, map[string]interface{}{
@@ -132,6 +125,6 @@ func testLoadFiles(t *testing.T) {
 func dumpToYAML(t *testing.T, out string, in interface{}) {
 	b, err := yaml.Marshal(in)
 	require.NoError(t, err)
-	err = ioutil.WriteFile(out, b, 0600)
+	err = os.WriteFile(out, b, 0600)
 	require.NoError(t, err)
 }

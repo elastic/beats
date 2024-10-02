@@ -20,7 +20,7 @@
 package file
 
 import (
-	"io/ioutil"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,19 +29,15 @@ import (
 )
 
 func TestSafeFileRotateExistingFile(t *testing.T) {
-	tempdir, err := ioutil.TempDir("", "")
-	assert.NoError(t, err)
-	defer func() {
-		assert.NoError(t, os.RemoveAll(tempdir))
-	}()
+	tempdir := t.TempDir()
 
 	// create an existing registry file
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry"),
+	err := os.WriteFile(filepath.Join(tempdir, "registry"),
 		[]byte("existing filebeat"), 0x777)
 	assert.NoError(t, err)
 
 	// create a new registry.new file
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
+	err = os.WriteFile(filepath.Join(tempdir, "registry.new"),
 		[]byte("new filebeat"), 0x777)
 	assert.NoError(t, err)
 
@@ -50,35 +46,23 @@ func TestSafeFileRotateExistingFile(t *testing.T) {
 		filepath.Join(tempdir, "registry.new"))
 	assert.NoError(t, err)
 
-	contents, err := ioutil.ReadFile(filepath.Join(tempdir, "registry"))
+	contents, err := os.ReadFile(filepath.Join(tempdir, "registry"))
 	assert.NoError(t, err)
 	assert.Equal(t, []byte("new filebeat"), contents)
 
-	// do it again to make sure we deal with deleting the old file
+	// do it twice to make sure we deal with deleting the old file
+	for i := 0; i < 2; i++ {
+		expectedContents := []byte(fmt.Sprintf("new filebeat %d", i))
+		err = os.WriteFile(filepath.Join(tempdir, "registry.new"),
+			expectedContents, 0x777)
+		assert.NoError(t, err)
 
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
-		[]byte("new filebeat 1"), 0x777)
-	assert.NoError(t, err)
+		err = SafeFileRotate(filepath.Join(tempdir, "registry"),
+			filepath.Join(tempdir, "registry.new"))
+		assert.NoError(t, err)
 
-	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
-		filepath.Join(tempdir, "registry.new"))
-	assert.NoError(t, err)
-
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("new filebeat 1"), contents)
-
-	// and again for good measure
-
-	err = ioutil.WriteFile(filepath.Join(tempdir, "registry.new"),
-		[]byte("new filebeat 2"), 0x777)
-	assert.NoError(t, err)
-
-	err = SafeFileRotate(filepath.Join(tempdir, "registry"),
-		filepath.Join(tempdir, "registry.new"))
-	assert.NoError(t, err)
-
-	contents, err = ioutil.ReadFile(filepath.Join(tempdir, "registry"))
-	assert.NoError(t, err)
-	assert.Equal(t, []byte("new filebeat 2"), contents)
+		contents, err = os.ReadFile(filepath.Join(tempdir, "registry"))
+		assert.NoError(t, err)
+		assert.Equal(t, expectedContents, contents)
+	}
 }

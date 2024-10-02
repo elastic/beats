@@ -29,7 +29,7 @@ import (
 )
 
 func TestResolverWhenTheKeyDoesntExist(t *testing.T) {
-	path := GetTemporaryKeystoreFile()
+	path := GetTemporaryKeystoreFile(t)
 	defer os.Remove(path)
 
 	keystore := CreateAnExistingKeystore(path)
@@ -40,7 +40,7 @@ func TestResolverWhenTheKeyDoesntExist(t *testing.T) {
 }
 
 func TestResolverWhenTheKeyExist(t *testing.T) {
-	path := GetTemporaryKeystoreFile()
+	path := GetTemporaryKeystoreFile(t)
 	defer os.Remove(path)
 
 	keystore := CreateAnExistingKeystore(path)

@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/iobuf"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -118,7 +119,7 @@ func TestRateLimitedLogger(t *testing.T) {
 					r.Stop()
 				}
 
-				bs, err := io.ReadAll(buff)
+				bs, err := iobuf.ReadAll(buff)
 				require.NoError(t, err, "failed reading logs")
 				logs := string(bs)
 				got := strings.TrimSpace(logs)
@@ -152,7 +153,7 @@ func TestRateLimitedLogger(t *testing.T) {
 
 		var logs string
 		assert.Eventually(t, func() bool {
-			bs, err := io.ReadAll(buff)
+			bs, err := iobuf.ReadAll(buff)
 			require.NoError(t, err, "failed reading logs")
 			logs = strings.TrimSpace(string(bs))
 
@@ -182,7 +183,7 @@ func TestRateLimitedLogger(t *testing.T) {
 
 		var logs string
 		assert.Eventually(t, func() bool {
-			bs, err := io.ReadAll(buff)
+			bs, err := iobuf.ReadAll(buff)
 			require.NoError(t, err, "failed reading logs")
 			logs = strings.TrimSpace(string(bs))
 

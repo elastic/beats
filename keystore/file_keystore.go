@@ -27,7 +27,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -278,24 +277,18 @@ func (k *FileKeystore) doSave(override bool) error {
 }
 
 func (k *FileKeystore) loadRaw() ([]byte, error) {
-	f, err := os.OpenFile(k.Path, os.O_RDONLY, filePermission)
+	raw, err := os.ReadFile(k.Path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
 		}
 		return nil, err
 	}
-	defer f.Close()
 
 	if k.isStrictPerms {
 		if err := k.checkPermissions(k.Path); err != nil {
 			return nil, err
 		}
-	}
-
-	raw, err := ioutil.ReadAll(f)
-	if err != nil {
-		return nil, err
 	}
 
 	v := raw[0:len(version)]
@@ -362,7 +355,7 @@ func (k *FileKeystore) encrypt(reader io.Reader) (io.Reader, error) {
 		return nil, fmt.Errorf("could not create the keystore cipher to encrypt, error: %w", err)
 	}
 
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("could not read unencrypted data, error: %w", err)
 	}
@@ -380,7 +373,7 @@ func (k *FileKeystore) encrypt(reader io.Reader) (io.Reader, error) {
 
 // should receive an io.reader...
 func (k *FileKeystore) decrypt(reader io.Reader) (io.Reader, error) {
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("could not read all the data from the encrypted file, error: %w", err)
 	}
