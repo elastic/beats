@@ -195,8 +195,8 @@ func TestGroup_Go(t *testing.T) {
 	})
 
 	t.Run("without limit, all goroutines run", func(t *testing.T) {
-		// 100 <= limit <= 100000
-		limit := rand.Int63n(100000-100) + 100
+		// 100 <= limit <= 10000
+		limit := rand.Int63n(10000-100) + 100
 		t.Logf("running %d goroutines", limit)
 		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "")
 
@@ -241,12 +241,14 @@ func TestGroup_Go(t *testing.T) {
 		want := uint64(2)
 		g := NewGroup(want, time.Second, logger, "errorPrefix")
 
-		wg.Add(2)
+		wg.Add(1)
 		err := g.Go(workload(1))
 		require.NoError(t, err)
+		wg.Wait()
+
+		wg.Add(1)
 		err = g.Go(workload(2))
 		require.NoError(t, err)
-
 		wg.Wait()
 
 		err = g.Stop()

@@ -6,6 +6,7 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/x-pack/winlogbeat/cmd"
 )

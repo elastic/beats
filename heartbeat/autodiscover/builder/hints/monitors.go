@@ -34,10 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
-}
-
 const (
 	schedule   = "schedule"
 	hosts      = "hosts"
@@ -48,6 +44,14 @@ const (
 type heartbeatHints struct {
 	config *config
 	logger *logp.Logger
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder

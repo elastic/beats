@@ -9,7 +9,6 @@
       example: ami-abcd1234
       description: >
         Image ID for the cloud instance.
-
     # Alias for old fields
     - name: meta.cloud.provider
       default_field: true
@@ -52,5 +51,3 @@
       type: alias
       path: cloud.region
       migration: true
-
-    

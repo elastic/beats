@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -62,6 +64,18 @@ type conf struct {
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
 	Request *requestConfig `config:"request"`
+
+	// Tracer allows configuration of request trace logging.
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type requestConfig struct {
@@ -163,10 +177,23 @@ func (c *conf) Validate() error {
 	}
 	switch strings.ToLower(c.Dataset) {
 	case "", "all", "users", "devices":
-		return nil
 	default:
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
+
+	if c.Tracer == nil {
+		return nil
+	}
+	if c.Tracer.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.Tracer.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.Tracer.MaxSize = 1
+	}
+	return nil
 }
 
 func (c *conf) wantUsers() bool {

@@ -12,12 +12,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -124,6 +123,11 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 			largestDelay = metricMeta.ingestDelay
 		}
 	}
+
+	start := time.Now()
+	defer func() {
+		r.logger.Debugf("Total time taken for all ListTimeSeries requests: %s and config period: %s", time.Since(start), r.config.period.AsDuration())
+	}()
 
 	for mt, meta := range metricsToCollect {
 		wg.Add(1)
@@ -256,7 +260,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *durationpb.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
 	currentTime = time.Now().UTC()
@@ -280,10 +284,10 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 	}
 
 	interval := &monitoringpb.TimeInterval{
-		StartTime: &timestamp.Timestamp{
+		StartTime: &timestamppb.Timestamp{
 			Seconds: startTime.Unix(),
 		},
-		EndTime: &timestamp.Timestamp{
+		EndTime: &timestamppb.Timestamp{
 			Seconds: endTime.Unix(),
 		},
 	}

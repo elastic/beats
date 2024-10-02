@@ -1,5 +1,6 @@
 provider "aws" {
   version = "~> 3.33"
+  region = "us-east-1"
   default_tags {
     tags = {
       environment  = var.ENVIRONMENT
@@ -32,7 +33,7 @@ resource "aws_db_instance" "test" {
   identifier          = "metricbeat-test-${random_id.suffix.hex}"
   allocated_storage   = 20 // Gigabytes
   engine              = "mysql"
-  instance_class      = "db.t2.micro"
+  instance_class      = "db.t3.micro"
   name                = "metricbeattest"
   username            = "foo"
   password            = random_password.db.result

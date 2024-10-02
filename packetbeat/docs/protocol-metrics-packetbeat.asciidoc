@@ -2,7 +2,7 @@
 === Protocol-Specific Metrics
 
 Packetbeat exposes per-protocol metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/inputs` path. They can be used to
+These metrics are exposed under the `/inputs/` path. They can be used to
 observe the activity of Packetbeat for the monitored protocol.
 
 [float]

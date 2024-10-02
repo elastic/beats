@@ -29,5 +29,5 @@ metricbeat.autodiscover:
           config:
             - module: istio
               metricsets: ["proxy"]
-              hosts: "${data.host}:15090"
+              hosts: "${data.kubernetes.pod.ip}:15090"
 --------------------------------------------

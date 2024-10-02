@@ -57,17 +57,17 @@ may want to change that behavior, so just edit the YAML file and modify them:
 ------------------------------------------------
 
 [float]
-===== Running {beatname_uc} on master nodes
+===== Running {beatname_uc} on control plane nodes
 
-Kubernetes master nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
-to limit the workloads that can run on them. To run {beatname_uc} on master nodes you may need to
+Kubernetes control plane nodes can use https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/[taints]
+to limit the workloads that can run on them. To run {beatname_uc} on control plane nodes you may need to
 update the Daemonset spec to include proper tolerations:
 
 [source,yaml]
 ------------------------------------------------
 spec:
  tolerations:
- - key: node-role.kubernetes.io/master
+ - key: node-role.kubernetes.io/control-plane
    effect: NoSchedule
 ------------------------------------------------
 

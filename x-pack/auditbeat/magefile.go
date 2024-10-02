@@ -8,7 +8,10 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	"github.com/magefile/mage/mg"
 	"go.uber.org/multierr"
@@ -25,8 +28,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
-	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -74,6 +75,15 @@ func AssembleDarwinUniversal() error {
 	return build.AssembleDarwinUniversal()
 }
 
+// GenerateIncludeListGo generates an include/list.go file containing imports
+// for the packages that match the paths (or globs) in importDirs (optional)
+// and moduleDirs (optional).
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = []string{"processors/*"}
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -86,7 +96,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -107,7 +117,7 @@ func TestPackages() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, GenerateModuleIncludeListGo)
 }
 
 // Config generates both the short and reference configs.
@@ -141,4 +151,13 @@ func ExportDashboard() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards(devtools.OSSBeatDir("module"), "module")
+}
+
+// Test runs all available tests (unitTest + integTest)
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	test.Test()
 }

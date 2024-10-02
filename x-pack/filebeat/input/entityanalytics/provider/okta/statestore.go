@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/urso/sderr"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/kvstore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
 )
@@ -39,7 +37,8 @@ const (
 
 type User struct {
 	okta.User `json:"properties"`
-	State     State `json:"state"`
+	Groups    []okta.Group `json:"groups"`
+	State     State        `json:"state"`
 }
 
 type Device struct {
@@ -186,10 +185,8 @@ func (s *stateStore) close(commit bool) (err error) {
 			return
 		}
 		rollbackErr := s.tx.Rollback()
-		if rollbackErr == nil {
-			// FIXME: Use fmt.Errorf("multiple errors during statestore close: %w", errors.Join(err, rollbackErr))
-			// when go1.20 is supported.
-			err = sderr.WrapAll([]error{err, rollbackErr}, "multiple errors during statestore close")
+		if rollbackErr != nil {
+			err = fmt.Errorf("multiple errors during statestore close: %w", errors.Join(err, rollbackErr))
 		}
 	}()
 

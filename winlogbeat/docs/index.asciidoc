@@ -24,6 +24,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_parse_aws_vpc_flow_log_processor:
 :include_translate_sid_processor:
 :export_pipeline:
+:no_add_session_metadata_processor:
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 

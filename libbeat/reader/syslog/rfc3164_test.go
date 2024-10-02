@@ -88,6 +88,19 @@ func TestParseRFC3164(t *testing.T) {
 				msg:       "message",
 			},
 		},
+		"ok-procid-with-square-brackets-msg": {
+			in: "<114>Apr 12 13:30:01 aaaaaa001.adm.domain aaaaaa001[25259]: my.some.domain 10.11.12.13 - USERNAME [12/Apr/2024:13:29:59.993 +0200] /skodas \"GET /skodas/group/pod-documentation/aaa HTTP/1.1\" 301 301 290bytes 1 10327",
+			want: message{
+				timestamp: mustParseTime(time.Stamp, "Apr 12 13:30:01", time.Local),
+				priority:  114,
+				facility:  14,
+				severity:  2,
+				hostname:  "aaaaaa001.adm.domain",
+				process:   "aaaaaa001",
+				pid:       "25259",
+				msg:       "my.some.domain 10.11.12.13 - USERNAME [12/Apr/2024:13:29:59.993 +0200] /skodas \"GET /skodas/group/pod-documentation/aaa HTTP/1.1\" 301 301 290bytes 1 10327",
+			},
+		},
 		"err-pri-not-a-number": {
 			in: "<abc>Oct 11 22:14:15 test-host this is the message",
 			want: message{

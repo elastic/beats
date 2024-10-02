@@ -43,7 +43,12 @@ type s3ObjectProcessorFactory struct {
 	backupConfig  backupConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
+// errS3DownloadFailed reports problems downloading an S3 object. Download errors
+// should never treated as permanent, they are just an indication to apply a
+// retry backoff until the connection is healthy again.
+var errS3DownloadFailed = errors.New("S3 download failure")
+
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)
@@ -96,6 +101,14 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger,
 	}
 }
 
+// s3DownloadedObject encapsulate downloaded s3 object for internal processing
+type s3DownloadedObject struct {
+	body        io.ReadCloser
+	length      int64
+	contentType string
+	metadata    map[string]interface{}
+}
+
 type s3ObjectProcessor struct {
 	*s3ObjectProcessorFactory
 
@@ -107,6 +120,7 @@ type s3ObjectProcessor struct {
 	s3Obj        s3EventV2                  // S3 object information.
 	s3ObjHash    string
 	s3RequestURL string
+	eventCount   int64
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 }
@@ -133,22 +147,25 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	}()
 
 	// Request object (download).
-	contentType, meta, body, err := p.download()
+	s3Obj, err := p.download()
 	if err != nil {
-		return fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
-			time.Since(start).Nanoseconds(), err)
+		// Wrap downloadError in the result so the caller knows it's not a
+		// permanent failure.
+		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
 	}
-	defer body.Close()
-	p.s3Metadata = meta
+	defer s3Obj.body.Close()
 
-	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
+	p.s3Metadata = s3Obj.metadata
+	p.metrics.s3ObjectSizeInBytes.Update(s3Obj.length)
+
+	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
 	if p.readerConfig.ContentType != "" {
-		contentType = p.readerConfig.ContentType
+		s3Obj.contentType = p.readerConfig.ContentType
 	}
 
 	// try to create a decoder from the using the codec config
@@ -177,7 +194,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		// This is the legacy path. It will be removed in future and clubbed together with the decoder.
 		// Process object content stream.
 		switch {
-		case strings.HasPrefix(contentType, contentTypeJSON) || strings.HasPrefix(contentType, contentTypeNDJSON):
+		case strings.HasPrefix(s3Obj.contentType, contentTypeJSON) || strings.HasPrefix(s3Obj.contentType, contentTypeNDJSON):
 			err = p.readJSON(reader)
 		default:
 			err = p.readFile(reader)
@@ -188,20 +205,20 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 			time.Since(start).Nanoseconds(), err)
 	}
 
+	p.metrics.s3EventsPerObject.Update(p.eventCount)
 	return nil
 }
 
 // download requests the S3 object from AWS and returns the object's
-// Content-Type and reader to get the object's contents. The caller must
-// close the returned reader.
-func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
-	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+// Content-Type and reader to get the object's contents.
+// The caller must close the reader embedded in s3DownloadedObject.
+func (p *s3ObjectProcessor) download() (obj *s3DownloadedObject, err error) {
+	getObjectOutput, err := p.s3.GetObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
-		return "", nil, nil, err
+		return nil, err
 	}
-
 	if getObjectOutput == nil {
-		return "", nil, nil, fmt.Errorf("empty response from s3 get object: %w", err)
+		return nil, fmt.Errorf("empty response from s3 get object: %w", err)
 	}
 	s3RequestURL := getObjectOutput.ResultMetadata.Get(s3RequestURLMetadataKey)
 	if s3RequestURLAsString, ok := s3RequestURL.(string); ok {
@@ -209,10 +226,20 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	}
 
 	meta := s3Metadata(getObjectOutput, p.readerConfig.IncludeS3Metadata...)
-	if getObjectOutput.ContentType == nil {
-		return "", meta, getObjectOutput.Body, nil
+
+	ctType := ""
+	if getObjectOutput.ContentType != nil {
+		ctType = *getObjectOutput.ContentType
 	}
-	return *getObjectOutput.ContentType, meta, getObjectOutput.Body, nil
+
+	s := &s3DownloadedObject{
+		body:        getObjectOutput.Body,
+		length:      *getObjectOutput.ContentLength,
+		contentType: ctType,
+		metadata:    meta,
+	}
+
+	return s, nil
 }
 
 func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
@@ -385,9 +412,11 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
+// publish the generated event and perform necessary tracking
 func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
 	ack.Add()
 	event.Private = ack
+	p.eventCount += 1
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
 }
@@ -434,18 +463,15 @@ func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	if bucketName == "" {
 		return nil
 	}
-	backupKey := p.s3Obj.S3.Object.Key
-	if p.backupConfig.BackupToBucketPrefix != "" {
-		backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
-	}
-	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
+	backupKey := p.backupConfig.BackupToBucketPrefix + p.s3Obj.S3.Object.Key
+	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
 	if err != nil {
 		return fmt.Errorf("failed to copy object to backup bucket: %w", err)
 	}
 	if !p.backupConfig.Delete {
 		return nil
 	}
-	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	_, err = p.s3.DeleteObject(p.ctx, p.s3Obj.AWSRegion, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
 	if err != nil {
 		return fmt.Errorf("failed to delete object from bucket: %w", err)
 	}

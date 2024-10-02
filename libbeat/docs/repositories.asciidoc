@@ -151,7 +151,7 @@ To add the {repo} repository for YUM:
 +
 [source,sh]
 --------------------------------------------------
-sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 --------------------------------------------------
 
 . Create a file with a `.repo` extension (for example, `elastic.repo`) in

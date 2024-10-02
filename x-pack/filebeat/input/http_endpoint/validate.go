@@ -9,6 +9,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -69,7 +70,7 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 		if v.hmacPrefix != "" {
 			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
 		}
-		signature, err := hex.DecodeString(hmacHeaderValue)
+		signature, err := decodeHeaderValue(hmacHeaderValue)
 		if err != nil {
 			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
 		}
@@ -103,4 +104,23 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 	}
 
 	return http.StatusAccepted, nil
+}
+
+// decoders is the priority-ordered set of decoders to use for HMAC header values.
+var decoders = [...]func(string) ([]byte, error){
+	hex.DecodeString,
+	base64.RawStdEncoding.DecodeString,
+	base64.StdEncoding.DecodeString,
+}
+
+func decodeHeaderValue(s string) ([]byte, error) {
+	var errs []error
+	for _, d := range &decoders {
+		b, err := d(s)
+		if err == nil {
+			return b, nil
+		}
+		errs = append(errs, err)
+	}
+	return nil, errors.Join(errs...)
 }

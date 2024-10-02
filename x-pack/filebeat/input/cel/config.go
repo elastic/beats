@@ -47,6 +47,10 @@ type config struct {
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
 
+	// AllowedEnvironment is the set of env vars made
+	// visible to an executing CEL evaluation.
+	AllowedEnvironment []string `config:"allowed_environment"`
+
 	// Auth is the authentication config for connection to an HTTP
 	// API endpoint.
 	Auth authConfig `config:"auth"`
@@ -81,15 +85,11 @@ func (c config) Validate() error {
 		return fmt.Errorf("failed to check regular expressions: %w", err)
 	}
 	// TODO: Consider just building the program here to avoid this wasted work.
-	var client *http.Client
-	if wantClient(c) {
-		client = &http.Client{}
-	}
 	var patterns map[string]*regexp.Regexp
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -217,7 +217,16 @@ type ResourceConfig struct {
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
-	Tracer *lumberjack.Logger `config:"tracer"`
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type urlConfig struct {

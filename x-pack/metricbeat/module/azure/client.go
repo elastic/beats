@@ -9,116 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-// NewMetricRegistry instantiates a new metric registry.
-func NewMetricRegistry(logger *logp.Logger) *MetricRegistry {
-	return &MetricRegistry{
-		logger:          logger,
-		collectionsInfo: make(map[string]MetricCollectionInfo),
-	}
-}
-
-// MetricRegistry keeps track of the last time a metric was collected and
-// the time grain used.
-//
-// This is used to avoid collecting the same metric values over and over again
-// when the time grain is larger than the collection interval.
-type MetricRegistry struct {
-	logger          *logp.Logger
-	collectionsInfo map[string]MetricCollectionInfo
-}
-
-// Update updates the metric registry with the latest timestamp and
-// time grain for the given metric.
-func (m *MetricRegistry) Update(metric Metric, info MetricCollectionInfo) {
-	m.collectionsInfo[m.buildMetricKey(metric)] = info
-}
-
-// NeedsUpdate returns true if the metric needs to be collected again
-// for the given `referenceTime`.
-func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) bool {
-	// Build a key to store the metric in the registry.
-	// The key is a combination of the namespace,
-	// resource ID and metric names.
-	metricKey := m.buildMetricKey(metric)
-
-	// Get the now time in UTC, only to be used for logging.
-	// It's interesting to see when the registry evaluate each
-	// metric in relation to the reference time.
-	now := time.Now().UTC()
-
-	if collection, exists := m.collectionsInfo[metricKey]; exists {
-		// Turn the time grain into a duration (for example, PT5M -> 5 minutes).
-		timeGrainDuration := convertTimeGrainToDuration(collection.timeGrain)
-
-		// Calculate the start time of the time grain in relation to
-		// the reference time.
-		timeGrainStartTime := referenceTime.Add(-timeGrainDuration)
-
-		// If the last collection time is after the start time of the time grain,
-		// it means that we already have a value for the given time grain.
-		//
-		// In this case, the metricset does not need to collect the metric
-		// values again.
-		if collection.timestamp.After(timeGrainStartTime) {
-			m.logger.Debugw(
-				"MetricRegistry: Metric does not need an update",
-				"needs_update", false,
-				"reference_time", referenceTime,
-				"now", now,
-				"time_grain_start_time", timeGrainStartTime,
-				"last_collection_at", collection.timestamp,
-			)
-
-			return false
-		}
-
-		// The last collection time is before the start time of the time grain,
-		// it means that the metricset needs to collect the metric values again.
-		m.logger.Debugw(
-			"MetricRegistry: Metric needs an update",
-			"needs_update", true,
-			"reference_time", referenceTime,
-			"now", now,
-			"time_grain_start_time", timeGrainStartTime,
-			"last_collection_at", collection.timestamp,
-		)
-
-		return true
-	}
-
-	// If the metric is not in the registry, it means that it has never
-	// been collected before.
-	//
-	// In this case, we need to collect the metric.
-	m.logger.Debugw(
-		"MetricRegistry: Metric needs an update",
-		"needs_update", true,
-		"reference_time", referenceTime,
-		"now", now,
-	)
-
-	return true
-}
-
-// buildMetricKey builds a key for the metric registry.
-//
-// The key is a combination of the namespace, resource ID and metric names.
-func (m *MetricRegistry) buildMetricKey(metric Metric) string {
-	keyComponents := []string{
-		metric.Namespace,
-		metric.ResourceId,
-	}
-	keyComponents = append(keyComponents, metric.Names...)
-
-	return strings.Join(keyComponents, ",")
-}
 
 // MetricCollectionInfo contains information about the last time
 // a metric was collected and the time grain used.
@@ -223,19 +120,89 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	return nil
 }
 
+// buildTimespan returns the timespan for the metric values given the reference time,
+// time grain and collection period.
+//
+// (1) When the collection period is greater than the time grain, the timespan
+// will be:
+//
+// |                                            time grain
+// │                                          │◀──(PT1M)──▶ │
+// │                                                        │
+// ├──────────────────────────────────────────┼─────────────┼─────────────
+// │                                                        │
+// │                       timespan           │             │
+// |◀───────────────────────(5min)─────────────────────────▶│
+// │                                          │             │
+// |                        period                          │
+// │◀───────────────────────(5min)────────────┼────────────▶│
+// │                                                        │
+// │                                          │             │
+// |                                                        │
+// |                                                       Now
+// |                                                        │
+//
+// In this case, the API will return five metric values, because
+// the time grain is 1 minute and the timespan is 5 minutes.
+//
+// (2) When the collection period is equal to the time grain,
+// the timespan will be:
+//
+// |
+// │                       time grain                       │
+// |◀───────────────────────(5min)─────────────────────────▶│
+// │                                                        │
+// ├────────────────────────────────────────────────────────┼─────────────
+// │                                                        │
+// │                       timespan                         │
+// |◀───────────────────────(5min)─────────────────────────▶│
+// │                                                        │
+// |                        period                          │
+// │◀───────────────────────(5min)─────────────────────────▶│
+// │                                                        │
+// │                                                        │
+// |                                                        │
+// |                                                       Now
+// |                                                        │
+//
+// In this case, the API will return one metric value.
+//
+// (3) When the collection period is less than the time grain,
+// the timespan will be:
+//
+// |                                              period
+// │                                          │◀──(5min)──▶ │
+// │                                                        │
+// ├──────────────────────────────────────────┼─────────────┼─────────────
+// │                                                        │
+// │                       timespan           │             │
+// |◀───────────────────────(60min)────────────────────────▶│
+// │                                          │             │
+// |                      time grain                        │
+// │◀───────────────────────(PT1H)────────────┼────────────▶│
+// │                                                        │
+// │                                          │             │
+// |                                                       Now
+// |                                                        │
+// |
+//
+// In this case, the API will return one metric value.
+func buildTimespan(referenceTime time.Time, timeGrain string, collectionPeriod time.Duration) string {
+	timespanDuration := max(asDuration(timeGrain), collectionPeriod)
+
+	endTime := referenceTime
+	startTime := endTime.Add(timespanDuration * -1)
+
+	return fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
+}
+
 // GetMetricValues returns the metric values for the given cloud resources.
 func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
 	var result []Metric
 
-	// Same end time for all metrics in the same batch.
-	interval := client.Config.Period
-
-	// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-	endTime := referenceTime.Add(interval * (-1))
-	startTime := endTime.Add(interval * (-1))
-	timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-
 	for _, metric := range metrics {
+		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config.Period)
+
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.

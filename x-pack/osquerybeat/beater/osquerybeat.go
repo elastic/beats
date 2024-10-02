@@ -11,16 +11,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
 	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -128,6 +129,12 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	pj, err := proc.CreateJobObject()
+	if err != nil {
+		return fmt.Errorf("failed to create process JobObject: %w", err)
+	}
+	defer pj.Close()
+
 	ctx, err := bt.init()
 	if err != nil {
 		return err
@@ -135,7 +142,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx, bt.log)
+	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
@@ -170,7 +177,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Set reseable action handler
-	rah := newResetableActionHandler(bt.log)
+	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)

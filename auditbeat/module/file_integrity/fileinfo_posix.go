@@ -69,18 +69,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		fileInfo.Owner = owner.Username
 	}
 
-	var selinux []byte
-	getExtendedAttributes(path, map[string]*[]byte{
-		"security.selinux":        &selinux,
-		"system.posix_acl_access": &fileInfo.POSIXACLAccess,
-	})
-	// The selinux attr may be null terminated. It would be cheaper
-	// to use strings.TrimRight, but absent documentation saying
-	// that there is only ever a final null terminator, take the
-	// guaranteed correct path of terminating at the first found
-	// null byte.
-	selinux, _, _ = bytes.Cut(selinux, []byte{0})
-	fileInfo.SELinux = string(selinux)
+	fillExtendedAttributes(fileInfo, path)
 
 	group, err := user.LookupGroupId(strconv.Itoa(int(fileInfo.GID)))
 	if err != nil {
@@ -91,7 +80,23 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
 		errs = append(errs, err)
 	}
+
 	return fileInfo, errs.Err()
+}
+
+func fillExtendedAttributes(md *Metadata, path string) {
+	var selinux []byte
+	getExtendedAttributes(path, map[string]*[]byte{
+		"security.selinux":        &selinux,
+		"system.posix_acl_access": &md.POSIXACLAccess,
+	})
+	// The selinux attr may be null terminated. It would be cheaper
+	// to use strings.TrimRight, but absent documentation saying
+	// that there is only ever a final null terminator, take the
+	// guaranteed correct path of terminating at the first found
+	// null byte.
+	selinux, _, _ = bytes.Cut(selinux, []byte{0})
+	md.SELinux = string(selinux)
 }
 
 func getExtendedAttributes(path string, dst map[string]*[]byte) {

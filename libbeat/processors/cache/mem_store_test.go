@@ -335,6 +335,103 @@ var memStoreTests = []struct {
 			},
 		},
 	},
+	{
+		name: "re-hit",
+		cfg: config{
+			Store: &storeConfig{
+				Memory:   &memConfig{"test"},
+				Capacity: 1000,
+				Effort:   10,
+			},
+			Get: &getConfig{},
+		},
+		want: &memStore{
+			id:    "test",
+			cache: map[string]*CacheEntry{},
+			refs:  1,
+			// TTL, capacity and effort are set only by put.
+			ttl:    -1,
+			cap:    -1,
+			effort: -1,
+		},
+		steps: []memStoreTestSteps{
+			0: {
+				doTo: func(s *memStore) error {
+					putCfg := config{
+						Store: &storeConfig{
+							Memory:   &memConfig{"test"},
+							Capacity: 1000,
+							Effort:   10,
+						},
+						Put: &putConfig{
+							TTL: ptrTo(10 * time.Minute),
+						},
+					}
+					s.add(putCfg)
+					return nil
+				},
+				want: &memStore{
+					id:     "test",
+					cache:  map[string]*CacheEntry{},
+					refs:   2,
+					dirty:  false,
+					ttl:    10 * time.Minute,
+					cap:    1000,
+					effort: 10,
+				},
+			},
+			1: {
+				doTo: func(s *memStore) error {
+					s.Put("one", 1)
+					s.Put("two", 2)
+					s.Put("three", 3)
+					return nil
+				},
+				want: &memStore{
+					id: "test",
+					cache: map[string]*CacheEntry{
+						"one":   {Key: "one", Value: int(1), index: 0},
+						"two":   {Key: "two", Value: int(2), index: 1},
+						"three": {Key: "three", Value: int(3), index: 2},
+					},
+					expiries: expiryHeap{
+						{Key: "one", Value: int(1), index: 0},
+						{Key: "two", Value: int(2), index: 1},
+						{Key: "three", Value: int(3), index: 2},
+					},
+					refs:   2,
+					dirty:  true,
+					ttl:    10 * time.Minute,
+					cap:    1000,
+					effort: 10,
+				},
+			},
+			2: {
+				doTo: func(s *memStore) error {
+					s.Put("one", 1)
+					return nil
+				},
+				want: &memStore{
+					id: "test",
+					cache: map[string]*CacheEntry{
+						"one":   {Key: "one", Value: int(1), index: 1},
+						"two":   {Key: "two", Value: int(2), index: 0},
+						"three": {Key: "three", Value: int(3), index: 2},
+					},
+					expiries: expiryHeap{
+						{Key: "two", Value: int(2), index: 0},
+						{Key: "one", Value: int(1), index: 1},
+						{Key: "three", Value: int(3), index: 2},
+					},
+					refs:   2,
+					dirty:  true,
+					ttl:    10 * time.Minute,
+					cap:    1000,
+					effort: 10,
+				},
+			},
+		},
+	},
 }
 
 func TestMemStore(t *testing.T) {

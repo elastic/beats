@@ -20,6 +20,7 @@ package eslegclient
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -65,6 +66,11 @@ type Connection struct {
 	responseBuffer   *bytes.Buffer
 
 	isServerless bool
+
+	// requests will share the same cancellable context
+	// so they can be aborted on Close()
+	reqsContext context.Context
+	cancelReqs  func()
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -89,6 +95,11 @@ type ConnectionSettings struct {
 	IdleConnTimeout time.Duration
 
 	Transport httpcommon.HTTPTransportSettings
+
+	// UserAgent can be used to report the agent running mode
+	// to ES via the User Agent string. If running under Agent (fleetmode.Enabled() == true)
+	// then this string will be appended to the user agent.
+	UserAgent string
 }
 
 type ESPingData struct {
@@ -135,10 +146,14 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	if s.Beatname == "" {
-		s.Beatname = "Libbeat"
+	// fall back to a default if nothing has configured the user-agent field
+	if s.UserAgent == "" {
+		beatname := "Libbeat"
+		if s.Beatname != "" {
+			beatname = s.Beatname
+		}
+		s.UserAgent = useragent.UserAgent(beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	}
-	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
 	if _, ok := s.Headers[productorigin.Header]; !ok {
@@ -157,7 +172,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
-		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": s.UserAgent}),
 	)
 	if err != nil {
 		return nil, err
@@ -172,12 +187,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		logger.Info("kerberos client created")
 	}
 
+	ctx, cancelFunc := context.WithCancel(context.Background())
 	conn := Connection{
 		ConnectionSettings: s,
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
 		responseBuffer:     bytes.NewBuffer(nil),
+		reqsContext:        ctx,
+		cancelReqs:         cancelFunc,
 	}
 
 	if s.APIKey != "" {
@@ -491,7 +509,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
+	req, err := http.NewRequestWithContext(conn.reqsContext, method, url, body)
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err

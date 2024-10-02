@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -73,12 +73,18 @@ func TestDockerStart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer d.ContainerRemove(ID)
+	defer func() {
+		if err := d.ContainerRemove(ID); err != nil {
+			t.Log(err)
+		}
+	}()
 
 	checkEvent(t, listener, ID, true)
 
 	// Kill
-	d.ContainerKill(ID)
+	if err := d.ContainerKill(ID); err != nil {
+		t.Log(err)
+	}
 	checkEvent(t, listener, ID, false)
 }
 

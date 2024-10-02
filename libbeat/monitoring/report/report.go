@@ -64,7 +64,7 @@ func New(
 	cfg *conf.C,
 	outputs conf.Namespace,
 ) (Reporter, error) {
-	name, cfg, err := getReporterConfig(cfg, settings, outputs)
+	name, cfg, err := getReporterConfig(cfg, outputs)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,6 @@ func New(
 
 func getReporterConfig(
 	monitoringConfig *conf.C,
-	settings Settings,
 	outputs conf.Namespace,
 ) (string, *conf.C, error) {
 	cfg := collectSubObject(monitoringConfig)
@@ -96,10 +95,6 @@ func getReporterConfig(
 
 		// merge reporter config with output config if both are present
 		if outCfg := outputs.Config(); outputs.Name() == name && outCfg != nil {
-			// require monitoring to not configure any hosts if output is configured:
-			hosts := hostsCfg{}
-			rc.Unpack(&hosts)
-
 			merged, err := conf.MergeConfigs(outCfg, rc)
 			if err != nil {
 				return "", nil, err
@@ -133,7 +128,7 @@ func collectSubObject(cfg *conf.C) *conf.C {
 	for _, field := range cfg.GetFields() {
 		if obj, err := cfg.Child(field, -1); err == nil {
 			// on error field is no object, but primitive value -> ignore
-			out.SetChild(field, -1, obj)
+			out.SetChild(field, -1, obj) //nolint:errcheck // this error is safe to ignore
 			continue
 		}
 	}

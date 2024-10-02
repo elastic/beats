@@ -1,0 +1,613 @@
+[
+  {
+    "Timestamp": "2021-11-22T12:10:04.051729-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "1"
+        },
+        "custom": {
+          "syslog_timestamp": "Nov 22 18:10:04 "
+        },
+        "gid": 0,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084586,
+        "process": {
+          "capabilities": "1ffffffffff",
+          "command_line": "sudo journalctl --user --rotate",
+          "executable": "/usr/bin/sudo",
+          "name": "sudo"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 10
+          },
+          "priority": 6
+        }
+      },
+      "message": "pam_unix(sudo:session): session closed for user root",
+      "process": {
+        "args": [
+          "sudo",
+          "journalctl",
+          "--user",
+          "--rotate"
+        ],
+        "args_count": 4,
+        "command_line": "sudo journalctl --user --rotate",
+        "pid": 2084586,
+        "thread": {
+          "capabilities": {
+            "effective": [
+              "CAP_CHOWN",
+              "CAP_DAC_OVERRIDE",
+              "CAP_DAC_READ_SEARCH",
+              "CAP_FOWNER",
+              "CAP_FSETID",
+              "CAP_KILL",
+              "CAP_SETGID",
+              "CAP_SETUID",
+              "CAP_SETPCAP",
+              "CAP_LINUX_IMMUTABLE",
+              "CAP_NET_BIND_SERVICE",
+              "CAP_NET_BROADCAST",
+              "CAP_NET_ADMIN",
+              "CAP_NET_RAW",
+              "CAP_IPC_LOCK",
+              "CAP_IPC_OWNER",
+              "CAP_SYS_MODULE",
+              "CAP_SYS_RAWIO",
+              "CAP_SYS_CHROOT",
+              "CAP_SYS_PTRACE",
+              "CAP_SYS_PACCT",
+              "CAP_SYS_ADMIN",
+              "CAP_SYS_BOOT",
+              "CAP_SYS_NICE",
+              "CAP_SYS_RESOURCE",
+              "CAP_SYS_TIME",
+              "CAP_SYS_TTY_CONFIG",
+              "CAP_MKNOD",
+              "CAP_LEASE",
+              "CAP_AUDIT_WRITE",
+              "CAP_AUDIT_CONTROL",
+              "CAP_SETFCAP",
+              "CAP_MAC_OVERRIDE",
+              "CAP_MAC_ADMIN",
+              "CAP_SYSLOG",
+              "CAP_WAKE_ALARM",
+              "CAP_BLOCK_SUSPEND",
+              "CAP_AUDIT_READ",
+              "CAP_PERFMON",
+              "CAP_BPF",
+              "CAP_CHECKPOINT_RESTORE"
+            ]
+          }
+        }
+      },
+      "syslog": {
+        "facility": 10,
+        "identifier": "sudo",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/session-1.scope",
+        "invocation_id": "2172b101bd684f7b9ca1c434ff2cdd80",
+        "owner_uid": 1000,
+        "session": "1",
+        "slice": "user-1000.slice",
+        "transport": "syslog",
+        "unit": "session-1.scope",
+        "user_slice": "-.slice"
+      },
+      "user": {
+        "group": {
+          "id": "0"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98149-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "code": {
+          "file": "src/core/job.c",
+          "func": "job_emit_done_message",
+          "line": 713
+        },
+        "custom": {
+          "job_id": "287",
+          "job_result": "done",
+          "job_type": "start",
+          "tid": "1003",
+          "user_invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+          "user_unit": "log-service.service"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 1003,
+        "process": {
+          "capabilities": "0",
+          "command_line": "/usr/lib/systemd/systemd --user",
+          "executable": "/usr/lib/systemd/systemd",
+          "name": "systemd"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "Started Outputs some log lines.",
+      "message_id": "39f53479d3a045ac8e11786248231fbf",
+      "process": {
+        "args": [
+          "/usr/lib/systemd/systemd",
+          "--user"
+        ],
+        "args_count": 2,
+        "command_line": "/usr/lib/systemd/systemd --user",
+        "pid": 1003
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "systemd",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/init.scope",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "journal",
+        "unit": "user@1000.service",
+        "user_slice": "-.slice",
+        "user_unit": "init.scope"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "1st line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "2nd line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "3rd line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "4th line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "5th line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  },
+  {
+    "Timestamp": "2021-11-22T12:10:29.98211-05:00",
+    "Meta": {},
+    "Fields": {
+      "event": {
+        "kind": "event"
+      },
+      "host": {
+        "hostname": "x-wing",
+        "id": "a6a19d57efcf4bf38705c63217a63ba3"
+      },
+      "journald": {
+        "audit": {
+          "login_uid": 1000,
+          "session": "2"
+        },
+        "custom": {
+          "stream_id": "f9e37071747348e0a4fcc5c4d11a29c2"
+        },
+        "gid": 1000,
+        "host": {
+          "boot_id": "a05ba5675e444581b00ac5adf4340819"
+        },
+        "pid": 2084785,
+        "process": {
+          "capabilities": "0",
+          "name": "cat"
+        },
+        "uid": 1000
+      },
+      "log": {
+        "syslog": {
+          "facility": {
+            "code": 3
+          },
+          "priority": 6
+        }
+      },
+      "message": "6th line",
+      "process": {
+        "pid": 2084785
+      },
+      "syslog": {
+        "facility": 3,
+        "identifier": "cat",
+        "priority": 6
+      },
+      "systemd": {
+        "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/log-service.service",
+        "invocation_id": "ceb98539accb4f60be76734b4ddd6d44",
+        "owner_uid": 1000,
+        "slice": "user-1000.slice",
+        "transport": "stdout",
+        "unit": "user@1000.service",
+        "user_slice": "app.slice",
+        "user_unit": "log-service.service"
+      },
+      "user": {
+        "group": {
+          "id": "1000"
+        },
+        "id": "1000"
+      }
+    },
+    "Private": {},
+    "TimeSeries": false
+  }
+]

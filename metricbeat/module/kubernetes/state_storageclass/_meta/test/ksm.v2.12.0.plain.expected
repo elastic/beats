@@ -1,0 +1,23 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"created": "2024-04-23T08:49:46.000Z",
+			"name": "standard",
+			"provisioner": "rancher.io/local-path",
+			"reclaim_policy": "Delete",
+			"volume_binding_mode": "WaitForFirstConsumer"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.storageclass",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

@@ -59,10 +59,16 @@ var ec2MetadataFetcher = provider{
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
-			m["service"] = mapstr.M{
-				"name": "EC2",
+			meta := mapstr.M{
+				"cloud": mapstr.M{
+					"service": mapstr.M{
+						"name": "EC2",
+					},
+				},
 			}
-			return mapstr.M{"cloud": m}
+
+			meta.DeepUpdate(m)
+			return meta
 		}
 
 		fetcher, err := newGenericMetadataFetcher(config, "aws", ec2Schema, fetchRawProviderMetadata)
@@ -109,12 +115,12 @@ func fetchRawProviderMetadata(
 		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
 	}
 
-	_, _ = result.metadata.Put("instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	_, _ = result.metadata.Put("machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	_, _ = result.metadata.Put("region", awsRegion)
-	_, _ = result.metadata.Put("availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
-	_, _ = result.metadata.Put("account.id", accountID)
-	_, _ = result.metadata.Put("image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+	_, _ = result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
+	_, _ = result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
+	_, _ = result.metadata.Put("cloud.region", awsRegion)
+	_, _ = result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
+	_, _ = result.metadata.Put("cloud.account.id", accountID)
+	_, _ = result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
 
 }
 

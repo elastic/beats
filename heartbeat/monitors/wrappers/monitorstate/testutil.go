@@ -33,8 +33,8 @@ import (
 
 // Helpers for tests here and elsewhere
 
-func IntegESLoader(t *testing.T, indexPattern string, location *config.LocationWithID) StateLoader {
-	return MakeESLoader(IntegES(t), indexPattern, location)
+func IntegESLoader(t *testing.T, esc *eslegclient.Connection, indexPattern string, location *config.LocationWithID) StateLoader {
+	return MakeESLoader(esc, indexPattern, location)
 }
 
 func IntegES(t *testing.T) (esc *eslegclient.Connection) {

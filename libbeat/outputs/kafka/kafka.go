@@ -18,6 +18,8 @@
 package kafka
 
 import (
+	"fmt"
+
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -81,10 +83,20 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
 }
 
+// buildTopicSelector builds the topic selector for standalone Beat and when
+// running under Elastic-Agent based on cfg.
+//
+// When running standalone the topic selector works as expected and documented.
+// When running under Elastic-Agent, dynamic topic selection is also supported
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
+
+	if cfg == nil {
+		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil")
+	}
+
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "topic",
 		MultiKey:         "topics",

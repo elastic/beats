@@ -1,0 +1,66 @@
+---
+description: Pipeline for processing icmp traffic
+processors:
+- set:
+    field: ecs.version
+    value: '8.11.0'
+
+# Detection Rules compatibility
+- set:
+    tag: set_compatibility_type
+    field: network.protocol
+    copy_from: type
+
+##
+# Set host.mac to dash separated upper case value
+# as per ECS recommendation
+##
+- gsub:
+    field: host.mac
+    pattern: '[-:.]'
+    replacement: ''
+    ignore_missing: true
+    tag: gsub_host_mac
+- gsub:
+    field: host.mac
+    pattern: '(..)(?!$)'
+    replacement: '$1-'
+    ignore_missing: true
+    tag: gsub_host_mac
+- uppercase:
+    field: host.mac
+    ignore_missing: true
+- append:
+    field: related.hosts
+    value: "{{{observer.hostname}}}"
+    if: ctx.observer?.hostname != null && ctx.observer?.hostname != ''
+    allow_duplicates: false
+- foreach:
+    if: ctx.observer?.ip != null && ctx.observer.ip instanceof List
+    tag: foreach_observer_ip
+    field: observer.ip
+    processor:
+      append:
+        field: related.ip
+        value: '{{{_ingest._value}}}'
+        allow_duplicates: false
+- remove:
+    if: ctx.host != null && ctx.tags != null && ctx.tags.contains('forwarded')
+    field: host
+
+- pipeline:
+    if: ctx._conf?.geoip_enrich != null && ctx._conf.geoip_enrich
+    name: '{{ IngestPipeline "geoip" }}'
+    tag: pipeline_processor
+- remove:
+    field: _conf
+    ignore_missing: true
+
+on_failure:
+  - append:
+      field: error.message
+      value: |-
+          Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"
+  - set:
+      field: event.kind
+      value: pipeline_error

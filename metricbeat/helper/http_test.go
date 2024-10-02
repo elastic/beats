@@ -19,11 +19,12 @@ package helper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
@@ -31,6 +32,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -55,7 +57,7 @@ func TestGetAuthHeaderFromToken(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			content := []byte(test.Content)
-			tmpfile, err := ioutil.TempFile("", "token")
+			tmpfile, err := os.CreateTemp("", "token")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -236,14 +238,14 @@ func TestOverUnixSocket(t *testing.T) {
 			fmt.Fprintf(w, "ehlo!")
 		})
 
-		go http.Serve(l, mux)
+		go http.Serve(l, mux) //nolint:errcheck,gosec // Ignore the error, it's a test file
 
 		return l
 	}
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			tmpDir, err := ioutil.TempDir("", "testsocket")
+			tmpDir, err := os.MkdirTemp("", "testsocket")
 			require.NoError(t, err)
 			defer os.RemoveAll(tmpDir)
 
@@ -262,7 +264,7 @@ func TestOverUnixSocket(t *testing.T) {
 			r, err := h.FetchResponse()
 			require.NoError(t, err)
 			defer r.Body.Close()
-			content, err := ioutil.ReadAll(r.Body)
+			content, err := io.ReadAll(r.Body)
 			require.NoError(t, err)
 			assert.Equal(t, []byte("ehlo!"), content)
 		})
@@ -292,6 +294,42 @@ func TestUserAgentCheck(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Contains(t, ua, "Metricbeat")
+}
+
+func TestRefreshAuthorizationHeader(t *testing.T) {
+	path := t.TempDir()
+	bearerFileName := "token"
+	bearerFilePath := filepath.Join(path, bearerFileName)
+
+	getAuth := func(helper *HTTP) string {
+		for k, v := range helper.headers {
+			if k == "Authorization" {
+				return v[0]
+			}
+		}
+		return ""
+	}
+
+	firstToken := "token-1"
+	err := os.WriteFile(bearerFilePath, []byte(firstToken), 0644)
+	assert.NoError(t, err)
+
+	helper := &HTTP{bearerFile: bearerFilePath, headers: make(http.Header)}
+	updated, err := helper.RefreshAuthorizationHeader()
+	assert.NoError(t, err)
+	assert.True(t, updated)
+	expected := fmt.Sprintf("Bearer %s", firstToken)
+	assert.Equal(t, expected, getAuth(helper))
+
+	secondToken := "token-2"
+	err = os.WriteFile(bearerFilePath, []byte(secondToken), 0644)
+	assert.NoError(t, err)
+
+	updated, err = helper.RefreshAuthorizationHeader()
+	assert.NoError(t, err)
+	assert.True(t, updated)
+	expected = fmt.Sprintf("Bearer %s", secondToken)
+	assert.Equal(t, expected, getAuth(helper))
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {
@@ -327,3 +365,5 @@ func (*dummyModule) Config() mb.ModuleConfig {
 func (*dummyModule) UnpackConfig(interface{}) error {
 	return nil
 }
+func (dummyModule) UpdateStatus(_ status.Status, _ string)    {}
+func (dummyModule) SetStatusReporter(_ status.StatusReporter) {}

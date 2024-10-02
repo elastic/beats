@@ -20,7 +20,7 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike"
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/v7/metricbeat/module/apache"
@@ -181,8 +181,12 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi"
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/cluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastorecluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/network"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/resourcepool"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
