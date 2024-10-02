@@ -19,6 +19,7 @@ package licenser
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -26,15 +27,41 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/version"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func esRootHandler(w http.ResponseWriter, r *http.Request) {
+	respStr := fmt.Sprintf(`
+{
+  "name" : "582a64c35c16",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "fnanWPBeSNS9KZ930Z5JmA",
+  "version" : {
+    "number" : "%s",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "14b7170921f2f0e4109255b83cb9af175385d87f",
+    "build_date" : "2024-08-23T00:26:58.284513650Z",
+    "build_snapshot" : true,
+    "lucene_version" : "9.11.1",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}`, version.GetDefaultVersion())
+
+	w.Write([]byte(respStr))
+}
+
 func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Server, *eslegclient.Connection) {
 	mux := http.NewServeMux()
+	mux.Handle("/", http.HandlerFunc(esRootHandler))
 	mux.Handle("/_license/", handler)
 
 	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
 
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: server.URL,
