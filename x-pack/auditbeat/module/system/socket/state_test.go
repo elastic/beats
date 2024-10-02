@@ -97,18 +97,20 @@ func TestDNSMemoryUsage(t *testing.T) {
 	childThread2 := uint32(1236)
 	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
 	// construct a fake series of DNS events process events
-	st.OnDNSTransaction(dns.Transaction{
+	err := st.OnDNSTransaction(dns.Transaction{
 		Client:    net.UDPAddr{IP: net.ParseIP("192.168.1.2"), Port: 34074},
 		Server:    net.UDPAddr{IP: net.ParseIP("192.168.1.53"), Port: 53},
 		Domain:    "example.com",
 		Addresses: []net.IP{net.ParseIP("10.10.10.10")},
 	})
-	st.OnDNSTransaction(dns.Transaction{
+	require.NoError(t, err)
+	err = st.OnDNSTransaction(dns.Transaction{
 		Client:    net.UDPAddr{IP: net.ParseIP("192.168.1.2"), Port: 34074},
 		Server:    net.UDPAddr{IP: net.ParseIP("192.168.1.53"), Port: 53},
 		Domain:    "elastic.co",
 		Addresses: []net.IP{net.ParseIP("10.10.10.11")},
 	})
+	require.NoError(t, err)
 	events1 := []event{
 		callExecve(meta(rootPID, rootPID, 1), []string{"/usr/bin/curl"}),
 		&execveRet{Meta: meta(rootPID, rootPID, 2), Retval: int32(rootPID)},

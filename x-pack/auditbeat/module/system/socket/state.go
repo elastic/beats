@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
@@ -309,11 +308,14 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 		}
 	}
 	var list []dns.Transaction
+	var ok bool
 	if prev := dt.transactionByClient.Get(clientAddr); prev != nil {
-		list = prev.([]dns.Transaction)
+		list, ok = prev.([]dns.Transaction)
+		if !ok {
+			return
+		}
 	}
 	list = append(list, tr)
-	logp.L().Infof("Adding Transaction for client %s", tr.Client.String())
 	dt.transactionByClient.Put(clientAddr, list)
 }
 
@@ -334,7 +336,11 @@ func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
 	key := addr.String()
 	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {
-		list := listIf.([]dns.Transaction)
+		list, ok := listIf.([]dns.Transaction)
+		if !ok {
+			return
+		}
+
 		for _, tr := range list {
 			proc.addTransaction(tr)
 		}

@@ -157,22 +157,6 @@ func (e *tcpConnectResult) Update(s *state) error {
 	return fmt.Errorf("stored thread event has unexpected type %T", ev)
 }
 
-var tcpStates = []string{
-	"(zero)",
-	"TCP_ESTABLISHED",
-	"TCP_SYN_SENT",
-	"TCP_SYN_RECV",
-	"TCP_FIN_WAIT1",
-	"TCP_FIN_WAIT2",
-	"TCP_TIME_WAIT",
-	"TCP_CLOSE",
-	"TCP_CLOSE_WAIT",
-	"TCP_LAST_ACK",
-	"TCP_LISTEN",
-	"TCP_CLOSING",
-	"TCP_NEW_SYN_RECV",
-}
-
 type tcpAcceptResult struct {
 	Meta    tracing.Metadata `kprobe:"metadata"`
 	Sock    uintptr          `kprobe:"sock"`
@@ -894,7 +878,7 @@ func (e *execveCall) getProcess() *process {
 		var err error
 		p.path, err = filepath.EvalSymlinks(fmt.Sprintf("/proc/%d/exe", e.Meta.PID))
 		if err != nil {
-			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") {
+			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") { //nolint:errorlint we're fetching the string body
 				// Keep the deleted path from the PathError.
 				p.path = pe.Path
 				// Keep the basename in case we can't get the process name.
