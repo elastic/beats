@@ -5063,11 +5063,11 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-lambda-go@v1.44
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-sdk-go
-Version: v1.38.60
+Version: v1.54.19
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go@v1.38.60/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go@v1.54.19/LICENSE.txt:
 
 
                                  Apache License
