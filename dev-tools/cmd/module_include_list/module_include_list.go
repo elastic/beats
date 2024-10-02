@@ -170,7 +170,7 @@ func main() {
 }
 
 func usageFlag() {
-	fmt.Fprintf(os.Stderr, usageText)
+	fmt.Fprint(os.Stderr, usageText)
 	flag.PrintDefaults()
 }
 
