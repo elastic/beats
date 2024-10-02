@@ -28,10 +28,10 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/pkg/exemplar"
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
-	"github.com/prometheus/prometheus/pkg/timestamp"
+	"github.com/prometheus/prometheus/model/exemplar"
+	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/model/textparse"
+	"github.com/prometheus/prometheus/model/timestamp"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -41,7 +41,6 @@ const (
 	hdrContentType               = "Content-Type"
 	TextVersion                  = "0.0.4"
 	OpenMetricsType              = `application/openmetrics-text`
-	FmtUnknown            string = `<unknown>`
 	ContentTypeTextFormat string = `text/plain; version=` + TextVersion + `; charset=utf-8`
 )
 
@@ -296,7 +295,7 @@ func (m *OpenMetric) GetTimestampMs() int64 {
 type MetricFamily struct {
 	Name   *string
 	Help   *string
-	Type   textparse.MetricType
+	Type   model.MetricType
 	Unit   *string
 	Metric []*OpenMetric
 }
@@ -481,17 +480,19 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
+	parser, err := textparse.New(b, contentType, false, labels.NewSymbolTable())
+	if err != nil {
+		return nil, err
+	}
 	var (
-		parser               = textparse.New(b, contentType)
 		defTime              = timestamp.FromTime(ts)
 		metricFamiliesByName = map[string]*MetricFamily{}
 		summariesByName      = map[string]map[string]*OpenMetric{}
 		histogramsByName     = map[string]map[string]*OpenMetric{}
 		fam                  *MetricFamily
 		// metricTypes stores the metric type for each metric name.
-		metricTypes = make(map[string]textparse.MetricType)
+		metricTypes = make(map[string]model.MetricType)
 	)
-	var err error
 
 	for {
 		var (
@@ -626,13 +627,13 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			if metricTypeFound, ok := metricTypes[baseMetricNamekey]; ok {
 				mt = metricTypeFound
 			} else {
-				mt = textparse.MetricTypeUnknown
+				mt = model.MetricTypeUnknown
 			}
 		}
 
 		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
-		case textparse.MetricTypeCounter:
+		case model.MetricTypeCounter:
 			if contentType == OpenMetricsType && !isTotal(metricName) && !isCreated(metricName) {
 				// Possible suffixes for counter in Open metrics are _created and _total.
 				// Otherwise, ignore.
@@ -653,11 +654,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			} else {
 				lookupMetricName = metricName
 			}
-		case textparse.MetricTypeGauge:
+		case model.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Gauge: gauge, Label: labelPairs}
 			//lookupMetricName = metricName
-		case textparse.MetricTypeInfo:
+		case model.MetricTypeInfo:
 			// Info only exists for Openmetrics. It must have the suffix _info
 			if !isInfo(metricName) {
 				continue
@@ -666,14 +667,14 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			value := int64(v)
 			var info = &Info{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Info: info, Label: labelPairs}
-		case textparse.MetricTypeSummary:
+		case model.MetricTypeSummary:
 			lookupMetricName, metric = summaryMetricName(metricName, v, qv, lbls.String(), summariesByName)
 			metric.Label = labelPairs
 			if !isSum(metricName) {
 				// Avoid registering the metric multiple times.
 				continue
 			}
-		case textparse.MetricTypeHistogram:
+		case model.MetricTypeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
@@ -686,7 +687,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				// Avoid registering the metric multiple times.
 				continue
 			}
-		case textparse.MetricTypeGaugeHistogram:
+		case model.MetricTypeGaugeHistogram:
 			if hasExemplar := parser.Exemplar(&e); hasExemplar {
 				exm = &e
 			}
@@ -700,11 +701,11 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				// Avoid registering the metric multiple times.
 				continue
 			}
-		case textparse.MetricTypeStateset:
+		case model.MetricTypeStateset:
 			value := int64(v)
 			var stateset = &Stateset{Value: &value}
 			metric = &OpenMetric{Name: &metricName, Stateset: stateset, Label: labelPairs}
-		case textparse.MetricTypeUnknown:
+		case model.MetricTypeUnknown:
 			var unknown = &Unknown{Value: &v}
 			metric = &OpenMetric{Name: &metricName, Unknown: unknown, Label: labelPairs}
 		default:
@@ -724,7 +725,7 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 			}
 		}
 
-		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram && metric != nil {
+		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != model.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
 				e.Ts = t
 			}
@@ -753,7 +754,7 @@ func GetContentType(h http.Header) string {
 
 	mediatype, params, err := mime.ParseMediaType(ct)
 	if err != nil {
-		return FmtUnknown
+		return ""
 	}
 
 	const textType = "text/plain"
@@ -761,16 +762,16 @@ func GetContentType(h http.Header) string {
 	switch mediatype {
 	case OpenMetricsType:
 		if e, ok := params["encoding"]; ok && e != "delimited" {
-			return FmtUnknown
+			return ""
 		}
 		return OpenMetricsType
 
 	case textType:
 		if v, ok := params["version"]; ok && v != TextVersion {
-			return FmtUnknown
+			return ""
 		}
 		return ContentTypeTextFormat
 	}
 
-	return FmtUnknown
+	return ""
 }
