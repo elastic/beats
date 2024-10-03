@@ -24,6 +24,8 @@ import (
 	"os"
 	"strings"
 
+	"k8s.io/client-go/metadata"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -75,6 +77,28 @@ func GetKubernetesClient(kubeconfig string, opt KubeClientOptions) (kubernetes.I
 	cfg.QPS = opt.QPS
 	cfg.Burst = opt.Burst
 	client, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("unable to build kubernetes clientset: %w", err)
+	}
+
+	return client, nil
+}
+
+// GetKubernetesMetadataClient returns a kubernetes metadata-only client. If inCluster is true, it returns an
+// in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
+// it parses the config file to get the config required to build a client.
+func GetKubernetesMetadataClient(kubeconfig string, opt KubeClientOptions) (metadata.Interface, error) {
+	if kubeconfig == "" {
+		kubeconfig = GetKubeConfigEnvironmentVariable()
+	}
+
+	cfg, err := BuildConfig(kubeconfig)
+	if err != nil {
+		return nil, fmt.Errorf("unable to build kube config due to error: %w", err)
+	}
+	cfg.QPS = opt.QPS
+	cfg.Burst = opt.Burst
+	client, err := metadata.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kubernetes clientset: %w", err)
 	}

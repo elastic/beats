@@ -18,6 +18,9 @@
 package metadata
 
 import (
+	"fmt"
+
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -93,4 +96,33 @@ func (rs *replicaset) GenerateFromName(name string, opts ...FieldOptions) mapstr
 	}
 
 	return nil
+}
+
+// RemoveUnnecessaryReplicaSetData removes all data from a ReplicaSet resource, except what we need to compute
+// Pod metadata. This function works for both ReplicaSet and PartialObjectMetadata.
+func RemoveUnnecessaryReplicaSetData(obj interface{}) (interface{}, error) {
+	switch old := obj.(type) {
+	case *appsv1.ReplicaSet:
+		transformed := &appsv1.ReplicaSet{
+			ObjectMeta: kubernetes.ObjectMeta{
+				Name:            old.GetName(),
+				Namespace:       old.GetNamespace(),
+				OwnerReferences: old.GetOwnerReferences(),
+				ResourceVersion: old.GetResourceVersion(),
+			},
+		}
+		return transformed, nil
+	case *metav1.PartialObjectMetadata:
+		transformed := &metav1.PartialObjectMetadata{
+			ObjectMeta: kubernetes.ObjectMeta{
+				Name:            old.GetName(),
+				Namespace:       old.GetNamespace(),
+				OwnerReferences: old.GetOwnerReferences(),
+				ResourceVersion: old.GetResourceVersion(),
+			},
+		}
+		return transformed, nil
+	default:
+		return nil, fmt.Errorf("obj of type %T neither a ReplicaSet nor a PartialObjectMetadata", obj)
+	}
 }

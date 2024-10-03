@@ -120,7 +120,7 @@ func TestReplicaset_Generate(t *testing.T) {
 	}
 }
 
-func TestReplicase_GenerateFromName(t *testing.T) {
+func TestReplicaset_GenerateFromName(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	boolean := true
 	tests := []struct {
@@ -229,6 +229,131 @@ func TestReplicase_GenerateFromName(t *testing.T) {
 
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.GenerateFromName(fmt.Sprint(accessor.GetNamespace(), "/", accessor.GetName())))
+		})
+	}
+}
+
+func TestReplicaset_RemoveUnnecessaryData(t *testing.T) {
+	boolean := true
+	tests := []struct {
+		input  kubernetes.Resource
+		output kubernetes.Resource
+		name   string
+		err    error
+	}{
+		{
+			name: "test simple object with owner",
+			input: &appsv1.ReplicaSet{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "nginx-rs",
+					Namespace:       defaultNs,
+					UID:             uid,
+					ResourceVersion: "688594",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "Deployment",
+							Name:       "nginx-deployment",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
+				},
+				Spec: appsv1.ReplicaSetSpec{
+					Selector: &metav1.LabelSelector{
+						MatchLabels: map[string]string{
+							"app": "demo",
+						},
+					},
+					Template: v1.PodTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Labels: map[string]string{
+								"app": "demo",
+							},
+						},
+						Spec: v1.PodSpec{
+							Containers: []v1.Container{
+								{
+									Name:  "nginx",
+									Image: "nginx:1.12",
+									Ports: []v1.ContainerPort{
+										{
+											Name:          "http",
+											Protocol:      v1.ProtocolTCP,
+											ContainerPort: 80,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			output: &appsv1.ReplicaSet{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "nginx-rs",
+					Namespace:       defaultNs,
+					ResourceVersion: "688594",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "Deployment",
+							Name:       "nginx-deployment",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "test simple object with owner",
+			input: &metav1.PartialObjectMetadata{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "nginx-rs",
+					Namespace:       defaultNs,
+					UID:             uid,
+					ResourceVersion: "688594",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "Deployment",
+							Name:       "nginx-deployment",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
+				},
+			},
+			output: &metav1.PartialObjectMetadata{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            "nginx-rs",
+					Namespace:       defaultNs,
+					ResourceVersion: "688594",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "Deployment",
+							Name:       "nginx-deployment",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:  "wrong resource type",
+			input: &v1.Pod{},
+			err:   fmt.Errorf("obj of type *v1.Pod neither a ReplicaSet nor a PartialObjectMetadata"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			transformed, err := RemoveUnnecessaryReplicaSetData(test.input)
+			assert.Equal(t, test.err, err)
+			assert.Equal(t, test.output, transformed)
 		})
 	}
 }

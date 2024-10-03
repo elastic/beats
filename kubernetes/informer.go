@@ -21,6 +21,9 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/metadata"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -306,4 +309,26 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		indexers = cache.Indexers{}
 	}
 	return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
+}
+
+// NewMetadataInformer creates an informer for a given resource that only tracks the resource metadata.
+func NewMetadataInformer(client metadata.Interface, gvr schema.GroupVersionResource, opts WatchOptions, indexers cache.Indexers) cache.SharedInformer {
+	ctx := context.Background()
+	if indexers == nil {
+		indexers = cache.Indexers{}
+	}
+	informer := cache.NewSharedIndexInformer(
+		&cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return client.Resource(gvr).List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return client.Resource(gvr).Watch(ctx, options)
+			},
+		},
+		&metav1.PartialObjectMetadata{},
+		opts.SyncTimeout,
+		indexers,
+	)
+	return informer
 }
