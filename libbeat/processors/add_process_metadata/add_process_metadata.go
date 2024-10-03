@@ -54,6 +54,7 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
+	// cgroups resolver, turned to a stub function to make testing easier.
 	initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
 		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
 	}
