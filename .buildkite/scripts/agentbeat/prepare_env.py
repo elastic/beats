@@ -3,7 +3,20 @@
 import platform
 import subprocess
 import sys
+import tarfile
+import os
+import re
 
+PATH = 'x-pack/agentbeat/build/distributions'
+
+
+def log(msg):
+    sys.stdout.write(f'{msg}\n')
+    sys.stdout.flush()
+
+def log_err(msg):
+    sys.stderr.write(f'{msg}\n')
+    sys.stderr.flush()
 
 def get_os() -> str:
     return platform.system().lower()
@@ -12,56 +25,108 @@ def get_os() -> str:
 def get_arch() -> str:
     arch = platform.machine().lower()
 
-    if arch == "amd64":
-        return "x86_64"
+    if arch == 'amd64':
+        return 'x86_64'
     else:
         return arch
 
 
 def get_artifact_extension(agent_os) -> str:
-    if agent_os == "windows":
-        return "zip"
+    if agent_os == 'windows':
+        return 'zip'
     else:
-        return "tar.gz"
+        return 'tar.gz'
 
 
-def download_agentbeat_artifact(agent_os, agent_arch):
-    print(" ")
+def get_artifact_pattern() -> str:
+    agent_os = get_os()
+    agent_arch = get_arch()
     extension = get_artifact_extension(agent_os)
-    pattern = f"x-pack/agentbeat/build/distributions/agentbeat-*-{agent_os}-{agent_arch}.{extension}"
+    return f'{PATH}/agentbeat-*-{agent_os}-{agent_arch}.{extension}'
 
+
+def download_agentbeat(pattern, path) -> str:
+    log('--- Downloading agentbeat')
     try:
         subprocess.run(
-            ["buildkite-agent", "artifact", "download", pattern, ".",
-             "--build", "01924d2b-b061-45ae-a106-e885584ff26f",
-             "--step", "agentbeat-package-linux"],
+            ['buildkite-agent', 'artifact', 'download', pattern, '.',
+             '--build', '01924d2b-b061-45ae-a106-e885584ff26f',
+             '--step', 'agentbeat-package-linux'],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
     except subprocess.CalledProcessError:
         exit(1)
 
+    return get_filename(path)
 
-def unzip_agentbeat():
-    print("todo unzip")
+
+def get_filename(path) -> str:
+    try:
+        out = subprocess.run(
+            ['ls', '-p', path],
+            check=True, capture_output=True, text=True)
+        return out.stdout.strip()
+    except subprocess.CalledProcessError:
+        exit(1)
+
+
+def extract_agentbeat(filename):
+    log('~~~ Extracting agentbeat')
+    filepath = PATH + '/' + filename
+
+    if filepath.endswith('.zip'):
+        unzip_agentbeat(filepath)
+    else:
+        untar_agentbeat(filepath)
+    log('Successfully extracted agentbeat')
+
+
+def unzip_agentbeat(filepath):
     try:
         subprocess.run(
-            ["unzip"],
+            ['unzip', filepath],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        log_err(e)
+        exit(1)
+
+
+def untar_agentbeat(filepath):
+    try:
+        with tarfile.open(filepath, 'r:gz') as tar:
+            tar.list()
+            tar.extractall()
+    except Exception as e:
+        log_err(e)
+        exit(1)
+
+
+def add_to_path(filepath):
+    pattern = r'(.*)(?=\.zip|.tar\.gz)'
+    match = re.match(pattern, filepath)
+    if match:
+        path = f'../build/distributions/{match.group(1)}/agentbeat'
+        log('--- AGENTBEAT_PATH: ' + path)
+        os.environ['AGENTBEAT_PATH'] = path
+    else:
+        log_err("No agentbeat executable found")
         exit(1)
 
 
 def install_synthetics():
-    print("--- Installing @elastic/synthetics")
+    log('--- Installing @elastic/synthetics')
 
     try:
         subprocess.run(
-            ["npm install -g @elastic/synthetics"],
+            ['npm', 'install', '-g', '@elastic/synthetics'],
             check=True
         )
     except subprocess.CalledProcessError:
-        print("Failed to install @elastic/synthetics")
+        log_err('Failed to install @elastic/synthetics')
         exit(1)
 
-print("--- OS Data: " + get_os() + " " + get_arch())
-download_agentbeat_artifact(get_os(), get_arch())
-# install_synthetics()
+
+artifact_pattern = get_artifact_pattern()
+archive = download_agentbeat(artifact_pattern, PATH)
+extract_agentbeat(archive)
+add_to_path(archive)
+install_synthetics()

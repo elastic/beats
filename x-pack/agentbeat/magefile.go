@@ -213,3 +213,7 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+func TestWithSpecs(ctx context.Context) {
+	mg.Deps(devtools.ParseSpec)
+}
