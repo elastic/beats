@@ -240,6 +240,18 @@ func TestKafkaPublish(t *testing.T) {
 				"host": "test-host",
 			}),
 		},
+		{
+			"publish message with zstd compression to test topic",
+			map[string]interface{}{
+				"compression": "zstd",
+				"version":     "2.2.2",
+			},
+			testTopic,
+			single(mapstr.M{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
