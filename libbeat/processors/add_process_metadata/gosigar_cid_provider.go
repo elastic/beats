@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -40,7 +41,7 @@ type gosigarCidProvider struct {
 	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
 	cgroupRegex        *regexp.Regexp
-	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
+	processCgroupPaths processors.CGReader
 	pidCidCache        *common.Cache
 }
 
@@ -70,10 +71,9 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(cgroupPrefixes []string, cgroupRegex *regexp.Regexp, processCgroupPaths processors.CGReader, pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
-		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
 		processCgroupPaths: processCgroupPaths,
@@ -84,7 +84,7 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
-	pathList, err := p.processCgroupPaths(p.hostPath, pid)
+	pathList, err := p.processCgroupPaths.ProcessCgroupPaths(pid)
 	if err != nil {
 		var pathError *fs.PathError
 		if errors.As(err, &pathError) {

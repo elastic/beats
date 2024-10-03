@@ -47,9 +47,11 @@ const (
 	cgroupCacheExpiration = 5 * time.Minute
 )
 
-// processGroupPaths returns the cgroups associated with a process. This enables
+// initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
-var processCgroupPaths = cgroup.ProcessCgroupPaths
+var initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+}
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
@@ -66,6 +68,7 @@ type addDockerMetadata struct {
 	hostFS          resolve.Resolver // Directory where /proc is found
 	dedot           bool             // If set to true, replace dots in labels with `_`.
 	dockerAvailable bool             // If Docker exists in env, then it is set to true
+	cgreader        processors.CGReader
 }
 
 const selector = "add_docker_metadata"
@@ -110,15 +113,20 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		}
 	}
 
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostFS), false)
+	if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
 	return &addDockerMetadata{
 		log:             log,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
-		hostFS:          resolve.NewTestResolver(config.HostFS),
 		dedot:           config.DeDot,
 		dockerAvailable: dockerAvailable,
+		cgreader:        reader,
 	}, nil
 }
 
@@ -277,7 +285,7 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 		return cgroups, nil
 	}
 
-	cgroups, err := processCgroupPaths(d.hostFS, pid)
+	cgroups, err := d.cgreader.ProcessCgroupPaths(pid)
 	if err != nil {
 		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
