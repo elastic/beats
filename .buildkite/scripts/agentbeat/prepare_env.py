@@ -26,9 +26,9 @@ def get_artifact_extension(agent_os) -> str:
 
 
 def download_agentbeat_artifact(agent_os, agent_arch):
-    pattern = f"x-pack/agentbeat/build/distributions/agentbeat-*-{agent_os}-{agent_arch}.tar.gz"
-
-    print("--- Downloading agentbeat artifact")
+    print(" ")
+    extension = get_artifact_extension(agent_os)
+    pattern = f"x-pack/agentbeat/build/distributions/agentbeat-*-{agent_os}-{agent_arch}.{extension}"
 
     try:
         subprocess.run(
@@ -37,12 +37,17 @@ def download_agentbeat_artifact(agent_os, agent_arch):
              "--step", "agentbeat-package-linux"],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
     except subprocess.CalledProcessError:
-        print("Failed to download agentbeat")
         exit(1)
 
 
 def unzip_agentbeat():
     print("todo unzip")
+    try:
+        subprocess.run(
+            ["unzip"],
+            check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
+    except subprocess.CalledProcessError:
+        exit(1)
 
 
 def install_synthetics():
