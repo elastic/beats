@@ -5,7 +5,10 @@
 package azureblobstorage
 
 import (
+	"errors"
 	"time"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -44,19 +47,35 @@ type fileSelectorConfig struct {
 }
 
 type authConfig struct {
-	SharedCredentials *sharedKeyConfig        `config:"shared_credentials,omitempty"`
-	ConnectionString  *connectionStringConfig `config:"connection_string,omitempty"`
+	SharedCredentials *sharedKeyConfig        `config:"shared_credentials"`
+	ConnectionString  *connectionStringConfig `config:"connection_string"`
+	OAuth2            *OAuth2Config           `config:"oauth2"`
 }
 
 type connectionStringConfig struct {
-	URI string `config:"uri,omitempty"`
+	URI string `config:"uri"`
 }
 type sharedKeyConfig struct {
 	AccountKey string `config:"account_key"`
+}
+
+type OAuth2Config struct {
+	ClientID     string `config:"client_id"`
+	ClientSecret string `config:"client_secret"`
+	TenantID     string `config:"tenant_id"`
+	// clientOptions is used internally for testing purposes only
+	clientOptions azcore.ClientOptions
 }
 
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
 	}
+}
+
+func (c config) Validate() error {
+	if c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == "") {
+		return errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth")
+	}
+	return nil
 }
