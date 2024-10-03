@@ -45,7 +45,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
-			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil),
+			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil),
 			mockClient.EXPECT().Close(),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
@@ -118,11 +118,11 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).AnyTimes().Return(nil)
 
 		gomock.InOrder(
-			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any()).
 				Do(func(ctx context.Context, _ *logp.Logger, _ beat.Client, _ *awscommon.EventACKTracker, _ s3EventV2) {
 					require.NoError(t, timed.Wait(ctx, 5*visibilityTimeout))
 				}).Return(mockS3Handler),
-			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
+			mockS3Handler.EXPECT().ProcessS3Object(gomock.Any(), gomock.Any()).Return(nil),
 			mockClient.EXPECT().Close(),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 			mockS3Handler.EXPECT().FinalizeS3Object().Return(nil),
@@ -144,8 +144,8 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockS3Handler := NewMockS3ObjectHandler(ctrl)
 
 		gomock.InOrder(
-			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mockS3Handler),
-			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
+			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any()).Return(mockS3Handler),
+			mockS3Handler.EXPECT().ProcessS3Object(gomock.Any(), gomock.Any()).Return(errors.New("fake connectivity problem")),
 		)
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
@@ -170,8 +170,8 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		}
 
 		gomock.InOrder(
-			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mockS3Handler),
-			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
+			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any()).Return(mockS3Handler),
+			mockS3Handler.EXPECT().ProcessS3Object(gomock.Any(), gomock.Any()).Return(errors.New("fake connectivity problem")),
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
