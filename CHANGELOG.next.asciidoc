@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 - Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 
 
 *Heartbeat*
@@ -226,6 +227,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
+- Update to Go 1.22.7. {pull}41018[41018]
 
 *Auditbeat*
 
@@ -303,10 +305,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Added support for Microsoft Entra ID RBAC authentication. {issue}40434[40434] {pull}40879[40879]
 - Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
 - Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
 - Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
 - Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
+- Add CSV decoder to awss3 input. {pull}40896[40896]
 
 *Auditbeat*
 
@@ -340,6 +344,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset cluster for the vSphere module. {pull}40536[40536]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add AWS Cloudwatch capability to retrieve tags from AWS/ApiGateway resources {pull}40755[40755]
 - Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
@@ -351,6 +356,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 
 *Metricbeat*
 

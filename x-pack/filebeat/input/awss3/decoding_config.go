@@ -4,6 +4,12 @@
 
 package awss3
 
+import (
+	"errors"
+	"fmt"
+	"unicode/utf8"
+)
+
 // decoderConfig contains the configuration options for instantiating a decoder.
 type decoderConfig struct {
 	Codec *codecConfig `config:"codec"`
@@ -12,6 +18,48 @@ type decoderConfig struct {
 // codecConfig contains the configuration options for different codecs used by a decoder.
 type codecConfig struct {
 	Parquet *parquetCodecConfig `config:"parquet"`
+	CSV     *csvCodecConfig     `config:"csv"`
+}
+
+func (c *codecConfig) Validate() error {
+	if c.Parquet != nil && c.CSV != nil {
+		return errors.New("more than one decoder configured")
+	}
+	return nil
+}
+
+// csvCodecConfig contains the configuration options for the CSV codec.
+type csvCodecConfig struct {
+	Enabled bool `config:"enabled"`
+
+	// Fields is the set of field names. If it is present
+	// it is used to specify the object names of returned
+	// values and the FieldsPerRecord field in the csv.Reader.
+	// Otherwise, names are obtained from the first
+	// line of the CSV data.
+	Fields []string `config:"fields_names"`
+
+	// The fields below have the same meaning as the
+	// fields of the same name in csv.Reader.
+	Comma            *configRune `config:"comma"`
+	Comment          configRune  `config:"comment"`
+	LazyQuotes       bool        `config:"lazy_quotes"`
+	TrimLeadingSpace bool        `config:"trim_leading_space"`
+}
+
+type configRune rune
+
+func (r *configRune) Unpack(s string) error {
+	if s == "" {
+		return nil
+	}
+	n := utf8.RuneCountInString(s)
+	if n != 1 {
+		return fmt.Errorf("single character option given more than one character: %q", s)
+	}
+	_r, _ := utf8.DecodeRuneInString(s)
+	*r = configRune(_r)
+	return nil
 }
 
 // parquetCodecConfig contains the configuration options for the parquet codec.
