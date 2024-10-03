@@ -6,17 +6,22 @@ package awss3
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // all test files are read from the "testdata" directory
 const testDataPath = "testdata"
 
-func TestParquetDecoding(t *testing.T) {
+func TestDecoding(t *testing.T) {
 	testCases := []struct {
 		name          string
 		file          string
@@ -26,7 +31,7 @@ func TestParquetDecoding(t *testing.T) {
 		config        *readerConfig
 	}{
 		{
-			name:      "test decoding of a parquet file and compare the number of events with batch size 1",
+			name:      "parquet_batch_size_1",
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
@@ -41,7 +46,7 @@ func TestParquetDecoding(t *testing.T) {
 			},
 		},
 		{
-			name:      "test decoding of a parquet file and compare the number of events with batch size 100",
+			name:      "parquet_batch_size_100",
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
@@ -56,7 +61,7 @@ func TestParquetDecoding(t *testing.T) {
 			},
 		},
 		{
-			name:      "test decoding of a parquet file and compare the number of events with default parquet config",
+			name:      "parquet_default",
 			file:      "vpc-flow.gz.parquet",
 			numEvents: 1304,
 			config: &readerConfig{
@@ -70,7 +75,7 @@ func TestParquetDecoding(t *testing.T) {
 			},
 		},
 		{
-			name:          "test decoding of a parquet file and compare the number of events along with the content",
+			name:          "parquet_default_content_check",
 			file:          "cloudtrail.parquet",
 			numEvents:     1,
 			assertAgainst: "cloudtrail.json",
@@ -81,6 +86,38 @@ func TestParquetDecoding(t *testing.T) {
 							Enabled:         true,
 							ProcessParallel: true,
 							BatchSize:       1,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:          "gzip_csv",
+			file:          "txn.csv.gz",
+			numEvents:     4,
+			assertAgainst: "txn.json",
+			config: &readerConfig{
+				Decoding: decoderConfig{
+					Codec: &codecConfig{
+						CSV: &csvCodecConfig{
+							Enabled: true,
+							Comma:   ptr[configRune](' '),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:          "csv",
+			file:          "txn.csv",
+			numEvents:     4,
+			assertAgainst: "txn.json",
+			config: &readerConfig{
+				Decoding: decoderConfig{
+					Codec: &codecConfig{
+						CSV: &csvCodecConfig{
+							Enabled: true,
+							Comma:   ptr[configRune](' '),
 						},
 					},
 				},
@@ -97,9 +134,7 @@ func TestParquetDecoding(t *testing.T) {
 			}
 			// uses the s3_objects test method to perform the test
 			events := testProcessS3Object(t, file, tc.contentType, tc.numEvents, sel)
-			// if assertAgainst is not empty, then compare the events with the target file
-			// there is a chance for this comparison to become flaky if number of events > 1 as
-			// the order of events are not guaranteed by beats
+			// If assertAgainst is not empty, then compare the events with the target file.
 			if tc.assertAgainst != "" {
 				targetData := readJSONFromFile(t, filepath.Join(testDataPath, tc.assertAgainst))
 				assert.Equal(t, len(targetData), len(events))
@@ -128,3 +163,111 @@ func readJSONFromFile(t *testing.T, filepath string) []string {
 	}
 	return data
 }
+
+var codecConfigTests = []struct {
+	name    string
+	yaml    string
+	want    decoderConfig
+	wantErr error
+}{
+	{
+		name: "handle_rune",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+    comma: ' '
+    comment: '#'
+`,
+		want: decoderConfig{&codecConfig{
+			CSV: &csvCodecConfig{
+				Enabled: true,
+				Comma:   ptr[configRune](' '),
+				Comment: '#',
+			},
+		}},
+	},
+	{
+		name: "no_comma",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+`,
+		want: decoderConfig{&codecConfig{
+			CSV: &csvCodecConfig{
+				Enabled: true,
+			},
+		}},
+	},
+	{
+		name: "null_comma",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+    comma: "\u0000"
+`,
+		want: decoderConfig{&codecConfig{
+			CSV: &csvCodecConfig{
+				Enabled: true,
+				Comma:   ptr[configRune]('\x00'),
+			},
+		}},
+	},
+	{
+		name: "bad_rune",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+    comma: 'this is too long'
+`,
+		wantErr: errors.New(`single character option given more than one character: "this is too long" accessing 'codec.csv.comma'`),
+	},
+	{
+		name: "confused",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+  parquet:
+    enabled: true
+`,
+		wantErr: errors.New(`more than one decoder configured accessing 'codec'`),
+	},
+}
+
+func TestCodecConfig(t *testing.T) {
+	for _, test := range codecConfigTests {
+		t.Run(test.name, func(t *testing.T) {
+			c, err := conf.NewConfigWithYAML([]byte(test.yaml), "")
+			if err != nil {
+				t.Fatalf("unexpected error unmarshaling config: %v", err)
+			}
+
+			var got decoderConfig
+			err = c.Unpack(&got)
+			if !sameError(err, test.wantErr) {
+				t.Errorf("unexpected error unpacking config: got:%v want:%v", err, test.wantErr)
+			}
+
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("unexpected result\n--- want\n+++ got\n%s", cmp.Diff(test.want, got))
+			}
+		})
+	}
+}
+
+func sameError(a, b error) bool {
+	switch {
+	case a == nil && b == nil:
+		return true
+	case a == nil, b == nil:
+		return false
+	default:
+		return a.Error() == b.Error()
+	}
+}
+
+func ptr[T any](v T) *T { return &v }
