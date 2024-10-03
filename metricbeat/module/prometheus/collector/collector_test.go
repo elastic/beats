@@ -26,15 +26,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	pl "github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
+	"github.com/prometheus/common/model"
+	pl "github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"
@@ -52,7 +52,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: textparse.MetricTypeCounter,
+				Type: model.MetricTypeCounter,
 				Metric: []*p.OpenMetric{
 					{
 						Label: []*pl.Label{
@@ -82,7 +82,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: textparse.MetricTypeGauge,
+				Type: model.MetricTypeGauge,
 				Metric: []*p.OpenMetric{
 					{
 						Gauge: &p.Gauge{
@@ -106,7 +106,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: textparse.MetricTypeSummary,
+				Type: model.MetricTypeSummary,
 				Metric: []*p.OpenMetric{
 					{
 						Summary: &p.Summary{
@@ -148,7 +148,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: textparse.MetricTypeHistogram,
+				Type: model.MetricTypeHistogram,
 				Metric: []*p.OpenMetric{
 					{
 						Histogram: &p.Histogram{
@@ -188,7 +188,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: textparse.MetricTypeUnknown,
+				Type: model.MetricTypeUnknown,
 				Metric: []*p.OpenMetric{
 					{
 						Label: []*pl.Label{
@@ -228,7 +228,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_a_a_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeCounter,
+			Type: model.MetricTypeCounter,
 			Metric: []*p.OpenMetric{
 				{
 					Label: []*pl.Label{
@@ -246,7 +246,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_a_b_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeCounter,
+			Type: model.MetricTypeCounter,
 			Metric: []*p.OpenMetric{
 				{
 					Label: []*pl.Label{
@@ -264,7 +264,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_b_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeGauge,
+			Type: model.MetricTypeGauge,
 			Metric: []*p.OpenMetric{
 				{
 					Gauge: &p.Gauge{
@@ -276,7 +276,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_c_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeSummary,
+			Type: model.MetricTypeSummary,
 			Metric: []*p.OpenMetric{
 				{
 					Summary: &p.Summary{
@@ -295,7 +295,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_d_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeHistogram,
+			Type: model.MetricTypeHistogram,
 			Metric: []*p.OpenMetric{
 				{
 					Histogram: &p.Histogram{
@@ -314,7 +314,7 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_e_in"),
 			Help: proto.String("foo"),
-			Type: textparse.MetricTypeUnknown,
+			Type: model.MetricTypeUnknown,
 			Metric: []*p.OpenMetric{
 				{
 					Label: []*pl.Label{

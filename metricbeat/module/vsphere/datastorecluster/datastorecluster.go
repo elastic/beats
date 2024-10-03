@@ -26,7 +26,9 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 )
@@ -86,7 +88,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to logout from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -99,12 +101,12 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
 	var datastoreCluster []mo.StoragePod
-	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity"}, &datastoreCluster)
+	err = v.Retrieve(ctx, []string{"StoragePod"}, []string{"name", "summary", "childEntity", "triggeredAlarmState"}, &datastoreCluster)
 	if err != nil {
 		return fmt.Errorf("error in retrieve from vsphere: %w", err)
 	}
@@ -117,7 +119,7 @@ func (m *DatastoreClusterMetricSet) Fetch(ctx context.Context, reporter mb.Repor
 
 		assetNames, err := getAssetNames(ctx, pc, &datastoreCluster[i])
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve object from host %s: %w", datastoreCluster[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve object from datastore cluster %s: v", datastoreCluster[i].Name, err)
 		}
 
 		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, datastoreCluster[i].TriggeredAlarmState)

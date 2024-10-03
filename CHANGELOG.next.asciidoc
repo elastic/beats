@@ -56,13 +56,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow metricsets to report their status via control v2 protocol. {pull}40025[40025]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
-- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
 - Update metrics for the vSphere Host metricset. {pull}40429[40429]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 - Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
+
 
 *Osquerybeat*
 
@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 - Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 
 
 *Heartbeat*
@@ -302,7 +303,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
 - Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
 - Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
-- Add new metricset cluster for the vSphere module. {pull}40536[40536]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
@@ -338,6 +338,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 - Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
@@ -347,6 +348,16 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
 - Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634] 
+- Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
+- Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
+- Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
+- Add new metrics for the vSphere Host metricset. {pull}40429[40429]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634] {pull}40694[40694]
+- Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
@@ -354,7 +365,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add support for new metrics for vSphere module datastorecluster metricset. {pull}40694[40694]
 
 *Osquerybeat*
 

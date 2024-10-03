@@ -24,7 +24,7 @@ import (
 )
 
 func (m *DatastoreClusterMetricSet) mapEvent(datastoreCluster mo.StoragePod, data *metricData) mapstr.M {
-	return mapstr.M{
+	event := mapstr.M{
 		"name": datastoreCluster.Name,
 		"capacity": mapstr.M{
 			"bytes": datastoreCluster.Summary.Capacity,

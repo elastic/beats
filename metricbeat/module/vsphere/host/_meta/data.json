@@ -154,7 +154,7 @@
             "vm": {
                 "count": 2,
                 "names": [
-                    "DC0_H0_VM0", 
+                    "DC0_H0_VM0",
                     "DC0_H0_VM1"
                 ]
             },
@@ -164,7 +164,6 @@
                     "LocalDS_0"
                 ]
             },
-            "network_count": 1,
             "network_names": [
                 "VM Network"
             ],
