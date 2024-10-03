@@ -37,6 +37,10 @@
           type: keyword
           description: >
             List of all the Host names associated with the cluster.
+    - name: id
+      type: keyword
+      description: >
+        Cluster ID.
     - name: name
       type: keyword
       description: >

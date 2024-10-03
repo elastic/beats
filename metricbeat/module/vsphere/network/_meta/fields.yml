@@ -23,6 +23,10 @@
           type: long
           description: >
             Number of hosts connected to this network.
+    - name: id
+      type: keyword
+      description: >
+        Network ID.
     - name: name
       type: keyword
       description: >
