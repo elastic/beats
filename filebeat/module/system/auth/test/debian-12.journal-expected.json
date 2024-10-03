@@ -18,6 +18,57 @@
         "input.type": "journald",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "message": "Accepted publickey for vagrant from 10.0.2.2 port 48274 ssh2: ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
+        "process.args": [
+            "\"sshd: vagrant [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: vagrant [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 26538,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "10.0.2.2"
+        ],
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "source.address": "10.0.2.2",
+        "source.ip": "10.0.2.2",
+        "source.port": 48274,
+        "system.auth.ssh.event": "Accepted",
+        "system.auth.ssh.method": "publickey",
+        "system.auth.ssh.signature": "ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
+        "tags": [
+            "auth",
+            "journald"
+        ],
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "vagrant"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
         "message": "Accepted password for vagrant from 192.168.42.119 port 55310 ssh2",
         "process.args": [
             "\"sshd: vagrant [priv]\""
