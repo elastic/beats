@@ -57,7 +57,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
 	enableCgroups := false
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
