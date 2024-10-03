@@ -38,12 +38,6 @@ type s3PollerInput struct {
 	states          *states
 }
 
-// s3FetchTask contains metadata for one S3 object that a worker should fetch.
-type s3FetchTask struct {
-	s3ObjectHandler s3ObjectHandler
-	objectState     state
-}
-
 func newS3PollerInput(
 	config config,
 	awsConfig awssdk.Config,
@@ -245,10 +239,4 @@ func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 	event.S3.Bucket.ARN = in.config.getBucketARN()
 	event.S3.Object.Key = state.Key
 	return event
-}
-
-func (in *s3PollerInput) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
-	event := in.s3EventForState(state)
-
-	return in.s3ObjectHandler.Create(ctx, event)
 }

@@ -45,7 +45,6 @@ type s3ObjectProcessor struct {
 	s3Obj         s3EventV2     // S3 object information.
 	s3ObjHash     string
 	s3RequestURL  string
-	eventCount    int64
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 }
