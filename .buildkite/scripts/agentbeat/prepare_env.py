@@ -28,9 +28,9 @@ def download_agentbeat_artifact(agent_os, agent_arch):
             ["buildkite-agent", "artifact", "download", pattern, ".",
              "--build", "01924d2b-b061-45ae-a106-e885584ff26f",
              "--step", "agentbeat-package-linux"],
-            check=True, stdout=sys.stdout, stderr=subprocess.PIPE, text=True)
+            check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
     except subprocess.CalledProcessError as e:
-        print("--- Error occurred. Failed to download agentbeat: \n" + e.stderr)
+        print("Error occurred. Failed to download agentbeat: \n" + e.stderr)
         exit(1)
 
 
