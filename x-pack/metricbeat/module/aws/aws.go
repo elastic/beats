@@ -212,7 +212,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	//The Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
 	if config.LimitRestAPI != nil {
 		if *config.LimitRestAPI > 500 {
-			base.Logger().Debug("apigateway_max_results config value can not exceed value 500. Setting apigateway_max_results=25")
+			base.Logger().Debug("apigateway_max_results config value can not exceed value 500. Setting apigateway_max_results=500")
 			*config.LimitRestAPI = 500
 		} else if *config.LimitRestAPI <= 0 {
 			base.Logger().Debug("apigateway_max_results config value can not be <=0. Setting apigateway_max_results=25")
