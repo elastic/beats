@@ -169,7 +169,7 @@ class Test(BaseTest):
 
         cmd = [
             self.filebeat, "-systemTest",
-            "-e", "-d", "*", "-once",
+            "-d", "*", "-once",
             "-c", cfgfile,
             "-E", "setup.ilm.enabled=false",
             "-modules={}".format(module),
