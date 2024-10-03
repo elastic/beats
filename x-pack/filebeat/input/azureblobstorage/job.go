@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const jobErrString = "job with jobId %s encountered an error: %w"
+const jobErrString = "job with jobId %s encountered an error: %v"
 
 type job struct {
 	// client is an azure blob handle
