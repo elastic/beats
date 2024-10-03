@@ -5,9 +5,9 @@ go 1.22.0
 toolchain go1.22.7
 
 require (
-	cloud.google.com/go/bigquery v1.62.0
-	cloud.google.com/go/monitoring v1.20.4
-	cloud.google.com/go/pubsub v1.41.0
+	cloud.google.com/go/bigquery v1.63.1
+	cloud.google.com/go/monitoring v1.21.0
+	cloud.google.com/go/pubsub v1.42.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
@@ -139,15 +139,15 @@ require (
 	golang.org/x/crypto v0.27.0
 	golang.org/x/mod v0.21.0
 	golang.org/x/net v0.29.0
-	golang.org/x/oauth2 v0.22.0
+	golang.org/x/oauth2 v0.23.0
 	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.25.0
 	golang.org/x/text v0.18.0
 	golang.org/x/time v0.6.0
 	golang.org/x/tools v0.25.0
-	google.golang.org/api v0.191.0
-	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
-	google.golang.org/grpc v1.66.0
+	google.golang.org/api v0.197.0
+	google.golang.org/genproto v0.0.0-20240903143218-8af14fe29dc1 // indirect
+	google.golang.org/grpc v1.66.2
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
@@ -164,9 +164,9 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.115.0
-	cloud.google.com/go/compute v1.27.4
-	cloud.google.com/go/redis v1.16.4
+	cloud.google.com/go v0.115.1
+	cloud.google.com/go/compute v1.28.0
+	cloud.google.com/go/redis v1.17.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1
@@ -227,17 +227,17 @@ require (
 	go.opentelemetry.io/collector/consumer v0.109.0
 	go.opentelemetry.io/collector/pdata v1.15.0
 	go.opentelemetry.io/collector/receiver v0.109.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
+	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
-	cloud.google.com/go/auth v0.8.0 // indirect
+	cloud.google.com/go/auth v0.9.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
-	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	cloud.google.com/go/iam v1.1.12 // indirect
-	cloud.google.com/go/longrunning v0.5.11 // indirect
+	cloud.google.com/go/compute/metadata v0.5.2 // indirect
+	cloud.google.com/go/iam v1.2.1 // indirect
+	cloud.google.com/go/longrunning v0.6.1 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/Azure/azure-amqp-common-go/v4 v4.2.0 // indirect
@@ -313,7 +313,7 @@ require (
 	github.com/google/licenseclassifier v0.0.0-20221004142553-c1ed8fcf4bab // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/grafana/regexp v0.0.0-20240518133315-a468a5bfb3bc // indirect
 	github.com/hashicorp/cronexpr v1.1.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -381,16 +381,16 @@ require (
 	go.opentelemetry.io/collector/config/configtelemetry v0.109.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
 	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/term v0.24.0 // indirect
-	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd // indirect
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
