@@ -154,17 +154,37 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 		s3Obj.contentType = p.readerConfig.ContentType
 	}
 
-	// try to create a decoder from the using the codec config
-	decoder, err := newDecoder(p.readerConfig.Decoding, reader)
+	// try to create a dec from the using the codec config
+	dec, err := newDecoder(p.readerConfig.Decoding, reader)
 	if err != nil {
 		return err
 	}
-	if decoder != nil {
-		defer decoder.close()
+	var evtOffset int64
+	switch dec := dec.(type) {
+	case valueDecoder:
+		defer dec.close()
 
-		var evtOffset int64
-		for decoder.next() {
-			data, err := decoder.decode()
+		for dec.next() {
+			val, err := dec.decodeValue()
+			if err != nil {
+				if err == io.EOF {
+					return nil
+				}
+				break
+			}
+			data, err := json.Marshal(val)
+			if err != nil {
+				return err
+			}
+			evt := p.createEvent(string(data), evtOffset)
+			p.publish(p.acker, &evt)
+		}
+
+	case decoder:
+		defer dec.close()
+
+		for dec.next() {
+			data, err := dec.decode()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					return nil
@@ -176,7 +196,8 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 				break
 			}
 		}
-	} else {
+
+	default:
 		// This is the legacy path. It will be removed in future and clubbed together with the decoder.
 		// Process object content stream.
 		switch {
