@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
@@ -65,7 +66,7 @@ func (jb *job) GenerateECS(obj kubernetes.Resource) mapstr.M {
 
 // GenerateK8s generates job metadata from a resource object
 func (jb *job) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
-	_, ok := obj.(*kubernetes.Job)
+	_, ok := obj.(metav1.Object)
 	if !ok {
 		return nil
 	}
@@ -81,12 +82,12 @@ func (jb *job) GenerateFromName(name string, opts ...FieldOptions) mapstr.M {
 	}
 
 	if obj, ok, _ := jb.store.GetByKey(name); ok {
-		jobObj, ok := obj.(*kubernetes.Job)
+		res, ok := obj.(kubernetes.Resource)
 		if !ok {
 			return nil
 		}
 
-		return jb.GenerateK8s(jobObj, opts...)
+		return jb.GenerateK8s(res, opts...)
 	}
 
 	return nil

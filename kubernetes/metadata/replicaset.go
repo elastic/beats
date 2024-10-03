@@ -18,6 +18,7 @@
 package metadata
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
@@ -67,7 +68,7 @@ func (rs *replicaset) GenerateECS(obj kubernetes.Resource) mapstr.M {
 
 // GenerateK8s generates replicaset metadata from a resource object
 func (rs *replicaset) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
-	_, ok := obj.(*kubernetes.ReplicaSet)
+	_, ok := obj.(metav1.Object)
 	if !ok {
 		return nil
 	}
@@ -83,12 +84,12 @@ func (rs *replicaset) GenerateFromName(name string, opts ...FieldOptions) mapstr
 	}
 
 	if obj, ok, _ := rs.store.GetByKey(name); ok {
-		replicaSet, ok := obj.(*kubernetes.ReplicaSet)
+		res, ok := obj.(kubernetes.Resource)
 		if !ok {
 			return nil
 		}
 
-		return rs.GenerateK8s(replicaSet, opts...)
+		return rs.GenerateK8s(res, opts...)
 	}
 
 	return nil

@@ -39,7 +39,7 @@ func TestJob_Generate(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	boolean := true
 	tests := []struct {
-		input  kubernetes.Resource
+		input  *batchv1.Job
 		output mapstr.M
 		name   string
 	}{
@@ -92,6 +92,10 @@ func TestJob_Generate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
+			objMeta := &metav1.PartialObjectMetadata{
+				ObjectMeta: test.input.ObjectMeta,
+			}
+			assert.Equal(t, test.output, metagen.Generate(objMeta))
 		})
 	}
 }
@@ -128,6 +132,42 @@ func TestJob_GenerateFromName(t *testing.T) {
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Job",
 					APIVersion: "v1",
+				},
+			},
+			output: mapstr.M{
+				"job": mapstr.M{
+					"name": name,
+					"uid":  uid,
+				},
+				"labels": mapstr.M{
+					"foo": "bar",
+				},
+				"cronjob": mapstr.M{
+					"name": "nginx-job",
+				},
+				"namespace": defaultNs,
+			},
+		},
+		{
+			name: "test simple object with owner",
+			input: &metav1.PartialObjectMetadata{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: defaultNs,
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "CronJob",
+							Name:       "nginx-job",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
 				},
 			},
 			output: mapstr.M{

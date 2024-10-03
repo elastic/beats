@@ -21,10 +21,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"k8s.io/apimachinery/pkg/api/meta"
+
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -85,7 +86,7 @@ func (r *Resource) Generate(kind string, obj kubernetes.Resource, opts ...FieldO
 }
 
 // GenerateECS generates ECS metadata from a resource object
-func (r *Resource) GenerateECS(obj kubernetes.Resource) mapstr.M {
+func (r *Resource) GenerateECS(_ kubernetes.Resource) mapstr.M {
 	ecsMeta := mapstr.M{}
 	if r.clusterInfo.URL != "" {
 		_, _ = ecsMeta.Put("orchestrator.cluster.url", r.clusterInfo.URL)
