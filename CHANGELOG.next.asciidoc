@@ -237,6 +237,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update to Go 1.22.7. {pull}41018[41018]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 
+- Kubernetes autodiscovery now only watches metadata changes for ReplicaSets {pull}41100[41100]
 
 *Auditbeat*
 
