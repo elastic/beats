@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const (
@@ -38,7 +37,6 @@ const (
 
 type gosigarCidProvider struct {
 	log                *logp.Logger
-	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
 	cgroupRegex        *regexp.Regexp
 	processCgroupPaths processors.CGReader

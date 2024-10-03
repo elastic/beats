@@ -63,11 +63,10 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor beat.Processor
 
-	pidFields       []string         // Field names that contain PIDs.
-	cgroups         *common.Cache    // Cache of PID (int) to cgropus (map[string]string).
-	hostFS          resolve.Resolver // Directory where /proc is found
-	dedot           bool             // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool             // If Docker exists in env, then it is set to true
+	pidFields       []string      // Field names that contain PIDs.
+	cgroups         *common.Cache // Cache of PID (int) to cgropus (map[string]string).
+	dedot           bool          // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool          // If Docker exists in env, then it is set to true
 	cgreader        processors.CGReader
 }
 
