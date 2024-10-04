@@ -99,7 +99,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 - Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
 
-
 *Heartbeat*
 
 
