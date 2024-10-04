@@ -6,7 +6,6 @@ package cloudwatch
 
 import (
 	"fmt"
-	"maps"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,7 +13,6 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
-	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -42,7 +40,7 @@ type APIClients struct {
 	CloudWatchClient         *cloudwatch.Client
 	Resourcegroupstaggingapi *resourcegroupstaggingapi.Client
 	Apigateway               *apigateway.Client
-	Apigatewayv2             *apigatewayv2.Client
+	//Apigatewayv2             *apigatewayv2.Client
 }
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -236,13 +234,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						m.Logger().Errorf("could not get rest apis output: %v", err)
 					}
 
-					apiGatewayAPI, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
-					if err != nil {
-						m.Logger().Errorf("could not get http and websocket apis output: %v", err)
-					}
-					if len(apiGatewayAPI) > 0 {
-						maps.Copy(infoapi, apiGatewayAPI)
-					}
+					//apiGatewayAPI, err := aws.GetAPIGatewayAPIOutput(APIClients.Apigatewayv2)
+					//if err != nil {
+					//	m.Logger().Errorf("could not get http and websocket apis output: %v", err)
+					//}
+					//if len(apiGatewayAPI) > 0 {
+					//	maps.Copy(infoapi, apiGatewayAPI)
+					//}
 
 				}
 
@@ -293,9 +291,9 @@ func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionNa
 
 	})
 
-	APIClients.Apigatewayv2 = apigatewayv2.NewFromConfig(beatsConfig, func(o *apigatewayv2.Options) {
-
-	})
+	//APIClients.Apigatewayv2 = apigatewayv2.NewFromConfig(beatsConfig, func(o *apigatewayv2.Options) {
+	//
+	//})
 
 	return APIClients, nil
 }
