@@ -75,7 +75,6 @@ type Monitor struct {
 	statusReporter      status.StatusReporter
 }
 
-// SetStatusReporter
 func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
 	m.statusReporter = statusReporter
 }
