@@ -207,6 +207,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix upload of bundled ingest pipelines on Windows. {pull}41110[41110]
 
 *Winlogbeat*
 
