@@ -78,6 +78,7 @@ type AgentPolicy struct {
 	UnenrollTimeout    int                       `json:"unenroll_timeout,omitempty"`
 	InactivityTImeout  int                       `json:"inactivity_timeout,omitempty"`
 	AgentFeatures      []map[string]interface{}  `json:"agent_features,omitempty"`
+	Overrides          []map[string]interface{}  `json:"overrides,omitempty"`
 	IsProtected        bool                      `json:"is_protected"`
 }
 
@@ -110,6 +111,7 @@ type AgentPolicyUpdateRequest struct {
 	UnenrollTimeout    int                       `json:"unenroll_timeout,omitempty"`
 	InactivityTImeout  int                       `json:"inactivity_timeout,omitempty"`
 	AgentFeatures      []map[string]interface{}  `json:"agent_features,omitempty"`
+	Overrides          []map[string]interface{}  `json:"overrides,omitempty"`
 	IsProtected        *bool                     `json:"is_protected,omitempty"` // Optional bool for compatibility with the older pre 8.9.0 stack
 }
 
