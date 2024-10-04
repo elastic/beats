@@ -13,8 +13,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
-	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
@@ -138,24 +136,24 @@ func GetAPIGatewayRestAPIOutput(svcRestApi *apigateway.Client, limit *int32) (ma
 
 // GetAPIGatewayAPIOutput function gets results from apigatewayv2 api.
 // GetApis Apigateway API is used to retrieve the HTTP and WEBSOCKET specified info. This returns a map with the names and ids of relevant APIs configured
-func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
-	input := &apigatewayv2.GetApisInput{}
-
-	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
-	defer cancel()
-	result, err := svcHttpApi.GetApis(ctx, input)
-
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving GetApis %w", err)
-	}
-
-	// Iterate and display the APIs
-	infoAPImap := make(map[string]string, len(result.Items))
-	for _, api := range result.Items {
-		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.ApiId)
-	}
-	return infoAPImap, nil
-}
+//func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string, error) {
+//	input := &apigatewayv2.GetApisInput{}
+//
+//	ctx, cancel := getContextWithTimeout(DefaultApiTimeout)
+//	defer cancel()
+//	result, err := svcHttpApi.GetApis(ctx, input)
+//
+//	if err != nil {
+//		return nil, fmt.Errorf("error retrieving GetApis %w", err)
+//	}
+//
+//	// Iterate and display the APIs
+//	infoAPImap := make(map[string]string, len(result.Items))
+//	for _, api := range result.Items {
+//		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.ApiId)
+//	}
+//	return infoAPImap, nil
+//}
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []types.MetricDataQuery, svc cloudwatch.GetMetricDataAPIClient, startTime time.Time, endTime time.Time) ([]types.MetricDataResult, error) {
