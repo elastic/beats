@@ -66,6 +66,7 @@ linters:
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
     - depguard
+    - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
@@ -126,6 +127,25 @@ linters-settings:
             recommendations:
               - github.com/gofrs/uuid/v5
             reason: "Use one uuid library consistently across the codebase"
+
+  gomoddirectives:
+    # Forbid local `replace` directives
+    replace-local: false
+
+    # Forbid any `replace` directives that are intended temporarily only during
+    # development. The modules listed below are intended to be replaced permanently.
+    replace-allow-list:
+      - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+      - github.com/Shopify/sarama
+      - github.com/apoydence/eachers
+      - github.com/dop251/goja
+      - github.com/dop251/goja_nodejs
+      - github.com/fsnotify/fsevents
+      - github.com/fsnotify/fsnotify
+      - github.com/google/gopacket
+      - github.com/insomniacslk/dhcp
+      - github.com/meraki/dashboard-api-go/v3
+      - github.com/snowflakedb/gosnowflake
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
