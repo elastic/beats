@@ -14,7 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*awsS3API, error) {
@@ -32,9 +31,9 @@ func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*
 	return newAWSs3API(s3Client), nil
 }
 
-func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
+func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Client, error) {
 	return pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: awscommon.NewEventACKHandler(),
+		EventListener: acks.pipelineEventListener(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.

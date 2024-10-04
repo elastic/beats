@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -28,6 +27,10 @@ type sqsReaderInput struct {
 	msgHandler sqsProcessor
 	log        *logp.Logger
 	metrics    *inputMetrics
+
+	// The Beats pipeline, used to create clients for event publication when
+	// creating the worker goroutines.
+	pipeline beat.Pipeline
 
 	// The expected region based on the queue URL
 	detectedRegion string
@@ -83,6 +86,7 @@ func (in *sqsReaderInput) setup(
 	pipeline beat.Pipeline,
 ) error {
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
+	in.pipeline = pipeline
 
 	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if in.config.RegionName != "" {
@@ -108,7 +112,7 @@ func (in *sqsReaderInput) setup(
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
 
 	var err error
-	in.msgHandler, err = in.createEventProcessor(pipeline)
+	in.msgHandler, err = in.createEventProcessor()
 	if err != nil {
 		return fmt.Errorf("failed to initialize sqs reader: %w", err)
 	}
@@ -161,32 +165,72 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 	}
 }
 
-func (in *sqsReaderInput) workerLoop(ctx context.Context) {
+type sqsWorker struct {
+	input      *sqsReaderInput
+	client     beat.Client
+	ackHandler *awsACKHandler
+}
+
+func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
+	// Create a pipeline client scoped to this worker.
+	ackHandler := newAWSACKHandler()
+	client, err := in.pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: ackHandler.pipelineEventListener(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("connecting to pipeline: %w", err)
+	}
+	return &sqsWorker{
+		input:      in,
+		client:     client,
+		ackHandler: ackHandler,
+	}, nil
+}
+
+func (w *sqsWorker) run(ctx context.Context) {
+	defer w.client.Close()
+	defer w.ackHandler.Close()
+
 	for ctx.Err() == nil {
 		// Send a work request
 		select {
 		case <-ctx.Done():
 			// Shutting down
 			return
-		case in.workRequestChan <- struct{}{}:
+		case w.input.workRequestChan <- struct{}{}:
 		}
 		// The request is sent, wait for a response
 		select {
 		case <-ctx.Done():
 			return
-		case msg := <-in.workResponseChan:
-			start := time.Now()
-
-			id := in.metrics.beginSQSWorker()
-			if err := in.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-				in.log.Warnw("Failed processing SQS message.",
-					"error", err,
-					"message_id", *msg.MessageId,
-					"elapsed_time_ns", time.Since(start))
-			}
-			in.metrics.endSQSWorker(id)
+		case msg := <-w.input.workResponseChan:
+			w.processMessage(ctx, msg)
 		}
 	}
+}
+
+func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
+	publishCount := 0
+	id := w.input.metrics.beginSQSWorker()
+	result := w.input.msgHandler.ProcessSQS(ctx, &msg, func(e beat.Event) {
+		w.client.Publish(e)
+		publishCount++
+	})
+
+	if publishCount == 0 {
+		// No events made it through (probably an error state), wrap up immediately
+		result.Done()
+	} else {
+		// Add this result's Done callback to the pending ACKs list
+		w.ackHandler.Add(publishCount, result.Done)
+	}
+
+	w.input.metrics.endSQSWorker(id)
 }
 
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
@@ -196,7 +240,12 @@ func (in *sqsReaderInput) startWorkers(ctx context.Context) {
 		in.workerWg.Add(1)
 		go func() {
 			defer in.workerWg.Done()
-			in.workerLoop(ctx)
+			worker, err := in.newSQSWorker()
+			if err != nil {
+				in.log.Error(err)
+				return
+			}
+			go worker.run(ctx)
 		}()
 	}
 }
@@ -217,15 +266,15 @@ func (in *sqsReaderInput) logConfigSummary() {
 	}
 }
 
-func (in *sqsReaderInput) createEventProcessor(pipeline beat.Pipeline) (sqsProcessor, error) {
+func (in *sqsReaderInput) createEventProcessor() (sqsProcessor, error) {
 	fileSelectors := in.config.getFileSelectors()
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.log.Named("s3"), in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
 
 	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
 	if err != nil {
 		return nil, err
 	}
-	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory), nil
+	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory), nil
 }
 
 // Read all pending requests and return their count. If block is true,

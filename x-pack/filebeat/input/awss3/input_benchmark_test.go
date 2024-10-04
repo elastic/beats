@@ -211,7 +211,6 @@ file_selectors:
 func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
-		pipeline := &fakePipeline{}
 
 		config := makeBenchmarkConfig(t)
 		config.MaxNumberOfMessages = maxMessagesInflight
@@ -221,7 +220,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
-		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
 		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -307,6 +306,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
 			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
+		pipeline := pubtest.PublisherWithClient(client)
 
 		defer func() {
 			_ = client.Close()
@@ -342,13 +342,13 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				states, err := newStates(nil, store)
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{})
 				s3Poller := &s3PollerInput{
 					log:             logp.NewLogger(inputName),
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,
-					client:          client,
+					pipeline:        pipeline,
 					s3ObjectHandler: s3EventHandlerFactory,
 					states:          states,
 					provider:        "provider",

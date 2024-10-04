@@ -74,7 +74,7 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Expect the one message returned to have been processed.
 		mockMsgHandler.EXPECT().
-			ProcessSQS(gomock.Any(), gomock.Eq(&msg)).
+			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any()).
 			Times(1).
 			Return(nil)
 
