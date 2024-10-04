@@ -55,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &HostMetricSet{ms}, nil
 }
 
-type triggerdAlarm struct {
+type triggeredAlarm struct {
 	Name          string      `json:"name"`
 	ID            string      `json:"id"`
 	Status        string      `json:"status"`
@@ -65,9 +65,9 @@ type triggerdAlarm struct {
 }
 
 type metricData struct {
-	perfMetrics    map[string]interface{}
-	assetNames     assetNames
-	triggerdAlarms []triggerdAlarm
+	perfMetrics     map[string]interface{}
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
 type assetNames struct {
@@ -162,16 +162,16 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 			m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
 		}
 
-		triggerdAlarm, err := getTriggerdAlarm(ctx, pc, hst[i].TriggeredAlarmState)
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, hst[i].TriggeredAlarmState)
 		if err != nil {
-			m.Logger().Errorf("Failed to retrieve triggerd alarms from host %s: %w", hst[i].Name, err)
+			m.Logger().Errorf("Failed to retrieve triggered alarms from host %s: %w", hst[i].Name, err)
 		}
 
 		reporter.Event(mb.Event{
 			MetricSetFields: m.mapEvent(hst[i], &metricData{
-				perfMetrics:    metricMap,
-				triggerdAlarms: triggerdAlarm,
-				assetNames:     assetNames,
+				perfMetrics:     metricMap,
+				triggeredAlarms: triggeredAlarm,
+				assetNames:      assetNames,
 			}),
 		})
 	}
@@ -221,10 +221,10 @@ func getAssetNames(ctx context.Context, pc *property.Collector, hs *mo.HostSyste
 	}, nil
 }
 
-func getTriggerdAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggerdAlarm, error) {
-	var triggeredAlarms []triggerdAlarm
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
 	for _, alarmState := range triggeredAlarmState {
-		var triggeredAlarm triggerdAlarm
+		var triggeredAlarm triggeredAlarm
 		var alarm mo.Alarm
 		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
 		if err != nil {
