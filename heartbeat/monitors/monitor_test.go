@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -32,7 +33,9 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 // TestMonitorBasic tests a basic config
@@ -131,8 +134,6 @@ func TestCheckInvalidConfig(t *testing.T) {
 
 	require.Error(t, checkMonitorConfig(serverMonConf, reg))
 }
-<<<<<<< HEAD
-=======
 
 type MockStatusReporter struct {
 	us func(status status.Status, msg string)
@@ -190,4 +191,3 @@ func TestStatusReporter(t *testing.T) {
 
 	require.True(t, failed)
 }
->>>>>>> efb563c890 ([Heartbeat] Fix linting issues introduced by auto-merge #41077 (#41128))
