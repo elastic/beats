@@ -191,6 +191,7 @@ func WithGoIntegTestHostEnv(env map[string]string) map[string]string {
 	env["KIBANA_USER"] = "beats"
 	env["KIBANA_PASS"] = "testing"
 
+	env["PROXY_HOST"] = dockerServiceHostname
 	env["REDIS_HOST"] = dockerServiceHostname
 	env["SREDIS_HOST"] = dockerServiceHostname
 	env["LS_HOST"] = dockerServiceHostname
