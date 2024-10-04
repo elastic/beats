@@ -71,6 +71,14 @@ type Monitor struct {
 	stats plugin.RegistryRecorder
 
 	monitorStateTracker *monitorstate.Tracker
+<<<<<<< HEAD
+=======
+	statusReporter      status.StatusReporter
+}
+
+func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
+>>>>>>> efb563c890 ([Heartbeat] Fix linting issues introduced by auto-merge #41077 (#41128))
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
