@@ -97,9 +97,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
-- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
 - Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
-- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 
 
 *Heartbeat*
