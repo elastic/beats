@@ -172,6 +172,10 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan *s3Fetc
 
 		// Metrics
 		in.metrics.s3ObjectsAckedTotal.Inc()
+
+		if finalizeErr := objHandler.FinalizeS3Object(); finalizeErr != nil {
+			in.log.Errorf("failed finalizing objects from S3 bucket (manual cleanup is required): %w", finalizeErr)
+		}
 	}
 }
 
