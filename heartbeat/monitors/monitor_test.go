@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/config"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -152,7 +151,7 @@ func TestStatusReporter(t *testing.T) {
 		"name":     "myName",
 		"id":       "myId",
 	}
-	conf, err := config.NewConfigFrom(confMap)
+	cfg, err := conf.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	reg, _, _ := mockPluginsReg()
@@ -162,23 +161,23 @@ func TestStatusReporter(t *testing.T) {
 	mockDegradedPluginFactory := plugin.PluginFactory{
 		Name:    "fail",
 		Aliases: []string{"failAlias"},
-		Make: func(s string, config *config.C) (plugin.Plugin, error) {
+		Make: func(s string, cfg *conf.C) (plugin.Plugin, error) {
 			return plugin.Plugin{}, fmt.Errorf("error plugin")
 		},
 		Stats: plugin.NewPluginCountersRecorder("fail", monReg),
 	}
-	reg.Add(mockDegradedPluginFactory)
+	_ = reg.Add(mockDegradedPluginFactory)
 
 	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, true)
 	defer sched.Stop()
 
 	c, err := pipel.Connect()
 	require.NoError(t, err)
-	m, err := newMonitor(conf, reg, c, sched.Add, nil, nil)
+	m, err := newMonitor(cfg, reg, c, sched.Add, nil, nil)
 	require.NoError(t, err)
 
 	// Track status marked as failed during run_once execution
-	var failed bool = false
+	failed := false
 	m.SetStatusReporter(&MockStatusReporter{
 		us: func(s status.Status, msg string) {
 			if s == status.Failed {
