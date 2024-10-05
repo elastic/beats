@@ -191,10 +191,10 @@ func (l *Listener) handleConnection(conn net.Conn) {
 
 	// Track number of clients.
 	l.clientsCount.Inc()
-	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
+	log.Debugw("New client connection", "active_clients", l.clientsCount.Load())
 	defer func() {
 		l.clientsCount.Dec()
-		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
+		log.Debugw("Client disconnected", "active_clients", l.clientsCount.Load())
 	}()
 
 	handler := l.handlerFactory(*l.config)

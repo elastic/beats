@@ -102,6 +102,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	defer metrics.close()
 
 	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
+		log.Debugw("Data received", "bytes", len(data))
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{

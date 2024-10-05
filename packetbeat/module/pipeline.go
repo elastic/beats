@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -113,7 +112,10 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 	if err != nil {
 		return pipeline{}, err
 	}
-	ds, _, _ := strings.Cut(filename, string(os.PathSeparator))
+	ds, _, ok := strings.Cut(filename, "/")
+	if !ok {
+		return pipeline{}, fmt.Errorf("unexpected filename '%s': missing '/' between data stream and 'ingest'", filename)
+	}
 	p = pipeline{
 		id:       fileset.FormatPipelineID(info.IndexPrefix, "", "", ds, info.Version),
 		contents: updatedContent,

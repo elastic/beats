@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
 - Redis: Added replication role as a field to submitted slowlogs
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
 
 
 *Heartbeat*
@@ -168,6 +169,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
 - Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
+- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 
 
 *Heartbeat*
@@ -204,6 +207,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Fix upload of bundled ingest pipelines on Windows. {pull}41110[41110]
 
 *Winlogbeat*
 
@@ -304,10 +308,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
 - Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Added support for Microsoft Entra ID RBAC authentication. {issue}40434[40434] {pull}40879[40879]
 - Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
 - Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
 - Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
 - Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
+- Add CSV decoder to awss3 input. {pull}40896[40896]
+- Change request trace logging to include headers instead of complete request. {pull}41072[41072]
 
 *Auditbeat*
 
@@ -321,6 +328,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add journey duration to synthetics browser events. {pull}40230[40230]
+- Add monitor status reporter under managed mode. {pull}41077[41077]
 
 *Metricbeat*
 
