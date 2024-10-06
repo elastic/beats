@@ -328,8 +328,9 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
+          echo $$PLATFORMS
           cd metricbeat
-          mage package
+          PLATFORMS=$$PLATFORMS mage -v package
         retry:
           automatic:
             - limit: 1
@@ -350,9 +351,9 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
-          echo $PLATFORMS
+          echo $$PLATFORMS
           cd metricbeat
-          mage -v package
+          PLATFORMS=$$PLATFORMS PLATmage -v package
         retry:
           automatic:
             - limit: 1
