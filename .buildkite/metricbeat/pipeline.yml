@@ -350,8 +350,9 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
+          echo $PLATFORMS
           cd metricbeat
-          mage package
+          mage -v package
         retry:
           automatic:
             - limit: 1
