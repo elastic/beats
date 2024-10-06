@@ -216,14 +216,16 @@ It can be defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here 
 If no value is specified for this, by default its initialized to `50 seconds`. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
 The bucket level values will always take priority and override the root level values if both are specified. 
 
+NOTE: The `bucket_timeout` should depend on the size of the files and the network speed. If the timeout is too low, the input will not be able to read the file completely and `context_deadline_exceeded` errors will be seen in the logs. If the timeout is too high, the input will wait for a long time for the file to be read, which can cause the input to be slow. The ratio between the `bucket_timeout` and `poll_interval` should be considered while setting both the values. A low `poll_interval` and a very high `bucket_timeout` can cause resource utilization issues and as schedule ops will be spawned every poll iteration, so if previous poll ops are still running, it could cause a bottleneck over time.
+
 [id="attrib-max_workers-gcs"]
 [float]
 ==== `max_workers`
 
 This attribute defines the maximum number of workers (go routines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs 
-which read contents of file. More number of workers equals a greater amount of concurrency achieved. There is an upper cap of `5000` workers per bucket that 
-can be defined due to internal sdk constraints. This attribute can be specified both at the root level of the configuration as well at the bucket level. 
-The bucket level values will always take priority and override the root level values if both are specified.
+which read contents of file. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified. More number of workers does not always equal to a greater amount of concurrency and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high thresholds can cause resource utilization issues and can lead to a bottleneck in processing. Usually a maximum cap of `2000` workers is recommended. 
+
+NOTE: The value of `max_workers` is currently tied to the `batch_size` internally. This `batch_size` determines how many objects will be fetched in one single call. The `max_workers` value should be set based on the number of the and the network speed. A very low `max_worker` count will drastically increase the number of network calls required to fetch the objects, which can cause a bottleneck in processing. The `max_workers` size is tied to the `batch_size` currently to ensure even distribution of workloads across all go routines. This ensures that the input is able to process the files in an efficient manner.
 
 [id="attrib-poll-gcs"]
 [float]
@@ -242,6 +244,8 @@ defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = secon
 Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `300 seconds`. 
 This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority 
 and override the root level values if both are specified.
+
+NOTE: In an ideal scenario the `poll_interval` should be set to a value that is equal to the `bucket_timeout` value. This would ensure that another schedule op is not started before the current buckets have all been processed. If the `poll_interval` is set to a value that is less than the `bucket_timeout`, then the input will start another schedule op before the current one has finished, which can cause a bottleneck over time. Having a lower `poll_interval` can make the input faster at the cost of more resource utilization.
 
 [id="attrib-parse_json"]
 [float]
@@ -275,6 +279,8 @@ filebeat.inputs:
     - regex: 'docs/'
     - regex: '/Security-Logs/'
 ----
+
+NOTE: The `file_selectors` op is performed within the agent locally which scales vertically, hence using this option will cause the agent to download all the files and then filter them. This can cause a bottleneck in processing if the number of files is very high. It is recommended to use this attribute only when the number of files is limited or ample resources are available.
 
 [id="attrib-expand_event_list_from_field-gcs"]
 [float]
@@ -340,6 +346,8 @@ filebeat.inputs:
     bucket_timeout: 60s
     timestamp_epoch: 1630444800
 ----
+
+NOTE: The GCS api's don't provide a direct way to filter files based on the timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available. This option scales vertically and not horizontally.
 
 [id="bucket-overrides"]
 *The sample configs below will explain the bucket level overriding of attributes a bit further :-*
