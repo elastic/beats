@@ -323,10 +323,10 @@ steps:
   - group: "Packaging"
     key: "metricbeat-packaging"
     steps:
-      - label: ":ubuntu: Metricbeat: Packaging {Linux,Windows}(amd64), darwin({arm,amd}64)"
+      - label: ":ubuntu: Metricbeat: Packaging {linux,darwin}/{arm,amd}64 and windows/amd64"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           echo $$PLATFORMS
           cd metricbeat
