@@ -219,6 +219,8 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 					s.state.deleteFailedJob(name)
 				} else {
 					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
+					// if there is an error while validating the object, then update the failed job retry count and work towards natural removal
+					s.state.updateFailedJobs(name)
 				}
 				continue
 			}
