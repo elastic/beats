@@ -99,6 +99,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	defer metrics.Close()
 
 	server := udp.New(&s.config.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
+		log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Meta: mapstr.M{
