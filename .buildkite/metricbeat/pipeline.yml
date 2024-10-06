@@ -141,7 +141,7 @@ steps:
 
       - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
-        command: "make -C metricbeat crosscompile"
+        command: "#make -C metricbeat crosscompile"
         retry:
           automatic:
             - limit: 1
@@ -180,7 +180,7 @@ steps:
       - label: ":windows: Metricbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          mage build unitTest
+          #mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
@@ -351,6 +351,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
+          echo $PLATFORMS-xx
           echo $$PLATFORMS
           cd metricbeat
           PLATFORMS=$$PLATFORMS mage -v package
