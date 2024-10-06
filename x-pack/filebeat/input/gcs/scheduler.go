@@ -6,6 +6,7 @@ package gcs
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"sort"
@@ -212,7 +213,13 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
-				s.log.Errorf("adding failed job %s to job list caused an error: %v", name, err)
+				if errors.Is(err, storage.ErrObjectNotExist) {
+					s.log.Debugf("scheduler: failed job %s not found in bucket %s", name, s.src.BucketName)
+					// if the object is not found in the bucket, then remove it from the failed job list
+					s.state.deleteFailedJob(name)
+				} else {
+					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
+				}
 				continue
 			}
 
