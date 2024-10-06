@@ -79,8 +79,8 @@ steps:
       - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
-          # cd metricbeat
-          # mage build unitTest
+          cd metricbeat
+          mage build unitTest
         retry:
           automatic:
             - limit: 1
@@ -101,8 +101,8 @@ steps:
           set -euo pipefail
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
-          # cd metricbeat
-          # mage goIntegTest
+          cd metricbeat
+          mage goIntegTest
         retry:
           automatic:
             - limit: 1
@@ -123,8 +123,8 @@ steps:
           set -euo pipefail
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
-          # cd metricbeat
-          # mage pythonIntegTest
+          cd metricbeat
+          mage pythonIntegTest
         retry:
           automatic:
             - limit: 1
@@ -141,7 +141,7 @@ steps:
 
       - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
-        command: "#make -C metricbeat crosscompile"
+        command: "make -C metricbeat crosscompile"
         retry:
           automatic:
             - limit: 1
@@ -159,7 +159,7 @@ steps:
       - label: ":windows: Metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          # mage build unitTest
+          mage build unitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
@@ -180,7 +180,7 @@ steps:
       - label: ":windows: Metricbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          #mage build unitTest
+          mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
@@ -206,7 +206,7 @@ steps:
       - label: ":windows: Metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          # mage build unitTest
+          mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
@@ -227,7 +227,7 @@ steps:
       - label: ":windows: Metricbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          # mage build unitTest
+          mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
@@ -248,7 +248,7 @@ steps:
       - label: ":windows: Metricbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path metricbeat
-          # mage build unitTest
+          mage build unitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
@@ -276,8 +276,8 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          # cd metricbeat
-          # mage build unitTest
+          cd metricbeat
+          mage build unitTest
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -298,8 +298,8 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          # cd metricbeat
-          # mage build unitTest
+          cd metricbeat
+          mage build unitTest
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -328,6 +328,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
+          echo $PLATFORMS-xx
           echo $$PLATFORMS
           cd metricbeat
           PLATFORMS=$$PLATFORMS mage -v package
