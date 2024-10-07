@@ -15,11 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix
+package otelconsumer
 
-package autodiscover
+import (
+	"github.com/elastic/elastic-agent-libs/config"
+)
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing on aix
+type otelConsumerConfig struct {
+	Queue config.Namespace `config:"queue"`
+}
+
+func defaultConfig() otelConsumerConfig {
+	return otelConsumerConfig{}
 }
