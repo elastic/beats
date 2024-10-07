@@ -29,18 +29,14 @@ func TestCreateEvent(t *testing.T) {
 		"event": mapstr.M{
 			"id": *logEvent.EventId,
 		},
-<<<<<<< HEAD
-		"log.file.path": "logGroup1" + "/" + *logEvent.LogStreamName,
 		"awscloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,
 			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
-=======
 		"log": mapstr.M{
 			"file": mapstr.M{
 				"path": "logGroup1" + "/" + *logEvent.LogStreamName,
 			},
->>>>>>> 904d14b664 ([aws] Change log.file.path field in awscloudwatch input to nested object (#41099))
 		},
 		"aws.cloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
