@@ -149,9 +149,9 @@ For example:
 
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
-  --mount type=source=$(pwd}/data,destination=/usr/share/{beatname_lc}/data
-  --read-only
+docker run --rm \
+  --mount type=bind,source=$(pwd)/data,destination=/usr/share/{beatname_lc}/data \
+  --read-only \
   {dockerimage}
 --------------------------------------------
 
