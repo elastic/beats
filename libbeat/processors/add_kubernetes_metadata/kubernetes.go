@@ -282,15 +282,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(pod)
 			},
 		})
