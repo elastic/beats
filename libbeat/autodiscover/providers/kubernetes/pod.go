@@ -239,23 +239,26 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta, container mapstr.M
 
 	annotations := make(mapstr.M, 0)
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(mapstr.M)
-			if len(anns) != 0 {
-				annotations = anns.Clone()
+	rawMeta, found := event["kubernetes"]
+	if found {
+		kubeMetaMap, ok := rawMeta.(mapstr.M)
+		if ok {
+			kubeMeta = kubeMetaMap
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				anns, _ := rawAnn.(mapstr.M)
+				if len(anns) != 0 {
+					annotations = anns.Clone()
+				}
 			}
-		}
 
-		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
-			if len(namespaceAnnotations) != 0 {
-				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+			// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+			if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+				namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
+				if len(namespaceAnnotations) != 0 {
+					annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+				}
 			}
 		}
 	}
@@ -269,12 +272,14 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(mapstr.M)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
+	if rawCont, found := kubeMeta["container"]; found {
+		if containerMap, ok := rawCont.(mapstr.M); ok {
+			container = containerMap
+			// This would end up adding a runtime entry into the event. This would make sure
+			// that there is not an attempt to spin up a docker input for a rkt container and when a
+			// rkt input exists it would be natively supported.
+			e["container"] = container
+		}
 	}
 
 	cname := utils.GetContainerName(container)
