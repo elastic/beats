@@ -44,6 +44,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
 - Redis: Added replication role as a field to submitted slowlogs
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
+- Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
 
 
 *Heartbeat*
