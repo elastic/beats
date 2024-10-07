@@ -247,6 +247,7 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 	if err != nil {
 		t.Fatal(err)
 	}
+	//nolint:errcheck // ignore
 	pubsubInput := in.(*pubsubInput)
 	defer pubsubInput.Stop()
 
@@ -425,6 +426,7 @@ func TestEndToEndACK(t *testing.T) {
 	seen := make(map[string]struct{})
 	// ACK every other message
 	halfAcker := func(ev beat.Event, clientConfig beat.ClientConfig) bool {
+		//nolint:errcheck // ignore
 		msg := ev.Private.(*pubsub.Message)
 		seen[msg.ID] = struct{}{}
 		if count.Add(1)&1 != 0 {
@@ -453,6 +455,7 @@ func TestEndToEndACK(t *testing.T) {
 		assert.Len(t, events, len(seen))
 		got := make(map[string]struct{})
 		for _, ev := range events {
+			//nolint:errcheck // ignore
 			msg := ev.Private.(*pubsub.Message)
 			got[msg.ID] = struct{}{}
 		}
