@@ -112,10 +112,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Validate config of the `replace` processor {pull}40047[40047]
 - Allow port number 0 in the community ID flowhash processor {pull}40259[40259]
 - Fix handling of escaped brackets in syslog structured data. {issue}40445[40445] {pull}40446[40446]
-- Update Go version to 1.22.6. {pull}40528[40528]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
 - The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
+- Update Go version to 1.22.8. {pull}41139[41139]
 
 *Auditbeat*
 
@@ -201,6 +201,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
+- Fix http server helper SSL config. {pull}39405[39405]
 
 *Osquerybeat*
 

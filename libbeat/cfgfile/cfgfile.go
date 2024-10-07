@@ -98,8 +98,6 @@ func GetDefaultCfgfile() string {
 }
 
 // HandleFlags adapts default config settings based on command line flags.
-// This also stores if -E management.enabled=true was set on command line
-// to determine if running the Beat under agent.
 func HandleFlags() error {
 	// default for the home path is the binary location
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
@@ -117,27 +115,6 @@ func HandleFlags() error {
 		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
 	}
 
-	// Enable check to see if beat is running under Agent
-	// This is stored in a package so the modules which don't have
-	// access to the config can check this value.
-	type management struct {
-		Enabled bool `config:"management.enabled"`
-	}
-	var managementSettings management
-	cfgFlag := flag.Lookup("E")
-	if cfgFlag == nil {
-		fleetmode.SetAgentMode(false)
-		return nil
-	}
-	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
-	cliCfg := cfgObject.Config()
-
-	err = cliCfg.Unpack(&managementSettings)
-	if err != nil {
-		fleetmode.SetAgentMode(false)
-		return nil //nolint:nilerr // unpacking failing isn't an error for this case
-	}
-	fleetmode.SetAgentMode(managementSettings.Enabled)
 	return nil
 }
 
