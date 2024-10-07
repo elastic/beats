@@ -331,7 +331,7 @@ steps:
           echo $PLATFORMS-xx
           echo $$PLATFORMS
           cd metricbeat
-          PLATFORMS=$$PLATFORMS mage -v package
+          PLATFORMS=$$PLATFORMS mage package
         retry:
           automatic:
             - limit: 1
@@ -355,7 +355,7 @@ steps:
           echo $PLATFORMS-xx
           echo $$PLATFORMS
           cd metricbeat
-          PLATFORMS=$$PLATFORMS mage -v package
+          PLATFORMS=$$PLATFORMS mage package
         retry:
           automatic:
             - limit: 1
