@@ -61,7 +61,7 @@ type BeatsRootCmd struct {
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
 	// Add global Elasticsearch license endpoint check.
 	// Check we are actually talking with Elasticsearch, to ensure that used features actually exist.
-	_, _ = elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
+	elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
 
 	if err := platformcheck.CheckNativePlatformCompat(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)
@@ -78,11 +78,8 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	// Due to a dependence upon the beat name, the default config file path
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
-		panic(fmt.Errorf("failed to set default config file path: %w", err))
+		panic(fmt.Errorf("failed to set default config file path: %v", err))
 	}
-
-	// Initialize the configuration flags.
-	cfgfile.InitFlags()
 
 	// must be updated prior to CLI flag handling.
 
