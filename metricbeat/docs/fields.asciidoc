@@ -67120,10 +67120,10 @@ type: keyword
 
 --
 
-*`vsphere.cluster.triggerd_alarms.*`*::
+*`vsphere.cluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67283,10 +67283,10 @@ type: keyword
 
 --
 
-*`vsphere.datastore.triggerd_alarms.*`*::
+*`vsphere.datastore.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67386,10 +67386,10 @@ type: long
 
 --
 
-*`vsphere.datastorecluster.triggerd_alarms.*`*::
+*`vsphere.datastorecluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67753,10 +67753,10 @@ type: keyword
 
 --
 
-*`vsphere.host.triggerd_alarms.*`*::
+*`vsphere.host.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67892,10 +67892,10 @@ type: long
 
 --
 
-*`vsphere.network.triggerd_alarms.*`*::
+*`vsphere.network.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68128,10 +68128,10 @@ type: keyword
 
 --
 
-*`vsphere.resourcepool.triggerd_alarms.*`*::
+*`vsphere.resourcepool.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68365,10 +68365,10 @@ type: long
 
 --
 
-*`vsphere.virtualmachine.triggerd_alarms.*`*::
+*`vsphere.virtualmachine.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object

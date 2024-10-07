@@ -312,6 +312,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
 - Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
 - Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
+- Add CSV decoder to awss3 input. {pull}40896[40896]
+- Change request trace logging to include headers instead of complete request. {pull}41072[41072]
 
 *Auditbeat*
 
@@ -342,6 +344,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
+- Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
 - Add new metricset datastorecluster for vSphere module. {pull}40634[40634] 
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
 - Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
