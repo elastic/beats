@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
