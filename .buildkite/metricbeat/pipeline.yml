@@ -323,13 +323,15 @@ steps:
   - group: "Packaging"
     key: "metricbeat-packaging"
     steps:
-      - label: ":ubuntu: Metricbeat: Packaging Linux"
+      - label: ":ubuntu: Metricbeat: Packaging {linux,darwin}/{arm,amd}64 and windows/amd64"
         key: "packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
+          echo $PLATFORMS-xx
+          echo $$PLATFORMS
           cd metricbeat
-          mage package
+          PLATFORMS=$$PLATFORMS mage -v package
         retry:
           automatic:
             - limit: 1
@@ -350,8 +352,10 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
+          echo $PLATFORMS-xx
+          echo $$PLATFORMS
           cd metricbeat
-          mage package
+          PLATFORMS=$$PLATFORMS mage -v package
         retry:
           automatic:
             - limit: 1

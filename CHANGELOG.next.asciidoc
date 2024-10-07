@@ -231,6 +231,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
 - Update to Go 1.22.7. {pull}41018[41018]
+- Update to Go 1.23.2. {pull}41087[41087]
 
 *Auditbeat*
 
