@@ -230,7 +230,7 @@ func readRules(reader io.Reader, source string, knownRules ruleSet, log *logp.Lo
 		if log == nil {
 			return nil, fmt.Errorf("failed loading rules: %w", errors.Join(errs...))
 		}
-		log.Warnf("errors loading rules: %w", errors.Join(errs...))
+		log.Warnf("errors loading rules: %v", errors.Join(errs...))
 	}
 	return rules, nil
 }
