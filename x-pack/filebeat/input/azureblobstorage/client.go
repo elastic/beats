@@ -7,6 +7,7 @@ package azureblobstorage
 import (
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
@@ -16,10 +17,13 @@ import (
 )
 
 func fetchServiceClientAndCreds(cfg config, url string, log *logp.Logger) (*service.Client, *serviceCredentials, error) {
-	if cfg.Auth.SharedCredentials != nil {
+	switch {
+	case cfg.Auth.SharedCredentials != nil:
 		return fetchServiceClientWithSharedKeyCreds(url, cfg.AccountName, cfg.Auth.SharedCredentials, log)
-	} else if cfg.Auth.ConnectionString != nil {
+	case cfg.Auth.ConnectionString != nil:
 		return fetchServiceClientWithConnectionString(cfg.Auth.ConnectionString, log)
+	case cfg.Auth.OAuth2 != nil:
+		return fetchServiceClientWithOAuth2(url, cfg.Auth.OAuth2)
 	}
 
 	return nil, nil, fmt.Errorf("no valid auth specified")
@@ -52,8 +56,26 @@ func fetchServiceClientWithConnectionString(connectionString *connectionStringCo
 	return serviceClient, &serviceCredentials{connectionStrCreds: connectionString.URI, cType: connectionStringType}, nil
 }
 
+func fetchServiceClientWithOAuth2(url string, cfg *OAuth2Config) (*service.Client, *serviceCredentials, error) {
+	creds, err := azidentity.NewClientSecretCredential(cfg.TenantID, cfg.ClientID, cfg.ClientSecret, &azidentity.ClientSecretCredentialOptions{
+		ClientOptions: cfg.clientOptions,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create client secret credential with oauth2 config: %w", err)
+	}
+
+	client, err := azblob.NewClient(url, creds, &azblob.ClientOptions{
+		ClientOptions: cfg.clientOptions,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create azblob service client: %w", err)
+	}
+
+	return client.ServiceClient(), &serviceCredentials{oauth2Creds: creds, cType: oauth2Type}, nil
+}
+
 // fetchBlobClient, generic function that returns a BlobClient based on the credential type
-func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) (*blob.Client, error) {
+func fetchBlobClient(url string, credential *blobCredentials, cfg config, log *logp.Logger) (*blob.Client, error) {
 	if credential == nil {
 		return nil, fmt.Errorf("no valid blob credentials found")
 	}
@@ -63,6 +85,8 @@ func fetchBlobClient(url string, credential *blobCredentials, log *logp.Logger) 
 		return fetchBlobClientWithSharedKey(url, credential.serviceCreds.sharedKeyCreds, log)
 	case connectionStringType:
 		return fetchBlobClientWithConnectionString(credential.serviceCreds.connectionStrCreds, credential.containerName, credential.blobName, log)
+	case oauth2Type:
+		return fetchBlobClientWithOAuth2(url, credential.serviceCreds.oauth2Creds, cfg.Auth.OAuth2)
 	default:
 		return nil, fmt.Errorf("no valid service credential 'type' found: %s", credential.serviceCreds.cType)
 	}
@@ -83,6 +107,17 @@ func fetchBlobClientWithConnectionString(connectionString string, containerName 
 	if err != nil {
 		log.Errorf("Error fetching blob client for connectionString : %s, error : %v", connectionString, err)
 		return nil, err
+	}
+
+	return blobClient, nil
+}
+
+func fetchBlobClientWithOAuth2(url string, credential *azidentity.ClientSecretCredential, oauth2Cfg *OAuth2Config) (*blob.Client, error) {
+	blobClient, err := blob.NewClient(url, credential, &blob.ClientOptions{
+		ClientOptions: oauth2Cfg.clientOptions,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch blob client for %s: %w", url, err)
 	}
 
 	return blobClient, nil

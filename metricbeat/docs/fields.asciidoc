@@ -69,6 +69,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
+* <<exported-fields-panw>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-process>>
@@ -14496,6 +14497,104 @@ Network interface name.
 
 
 type: keyword
+
+--
+
+[float]
+=== in
+
+Incoming network stats per second.
+
+
+
+*`docker.network.in.bytes`*::
++
+--
+Incoming bytes per seconds.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.in.dropped`*::
++
+--
+Dropped incoming packets per second.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.in.errors`*::
++
+--
+Errors on incoming packets per second.
+
+
+type: long
+
+--
+
+*`docker.network.in.packets`*::
++
+--
+Incoming packets per second.
+
+
+type: long
+
+--
+
+[float]
+=== out
+
+Outgoing network stats per second.
+
+
+
+*`docker.network.out.bytes`*::
++
+--
+Outgoing bytes per second.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`docker.network.out.dropped`*::
++
+--
+Dropped outgoing packets per second.
+
+
+type: scaled_float
+
+--
+
+*`docker.network.out.errors`*::
++
+--
+Errors on outgoing packets per second.
+
+
+type: long
+
+--
+
+*`docker.network.out.packets`*::
++
+--
+Outgoing packets per second.
+
+
+type: long
 
 --
 
@@ -57152,6 +57251,50 @@ format: bytes
 
 --
 
+[[exported-fields-panw]]
+== Panw fields
+
+PAN-OS module
+
+
+[float]
+=== panw
+
+PAN-OS module
+
+
+
+*`panw.interfaces.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.routing.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.system.example`*::
++
+--
+type: keyword
+
+--
+
+
+*`panw.vpn.example`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
@@ -66977,10 +67120,10 @@ type: keyword
 
 --
 
-*`vsphere.cluster.triggerd_alarms.*`*::
+*`vsphere.cluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67140,10 +67283,10 @@ type: keyword
 
 --
 
-*`vsphere.datastore.triggerd_alarms.*`*::
+*`vsphere.datastore.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67243,10 +67386,10 @@ type: long
 
 --
 
-*`vsphere.datastorecluster.triggerd_alarms.*`*::
+*`vsphere.datastorecluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67610,10 +67753,10 @@ type: keyword
 
 --
 
-*`vsphere.host.triggerd_alarms.*`*::
+*`vsphere.host.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67749,10 +67892,10 @@ type: long
 
 --
 
-*`vsphere.network.triggerd_alarms.*`*::
+*`vsphere.network.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67985,10 +68128,10 @@ type: keyword
 
 --
 
-*`vsphere.resourcepool.triggerd_alarms.*`*::
+*`vsphere.resourcepool.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68222,10 +68365,10 @@ type: long
 
 --
 
-*`vsphere.virtualmachine.triggerd_alarms.*`*::
+*`vsphere.virtualmachine.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
