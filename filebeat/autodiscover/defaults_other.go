@@ -15,28 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package sys
+//go:build !(linux || darwin || windows)
 
-import (
-	"fmt"
-	"syscall"
-	"unsafe"
+package autodiscover
 
-	"golang.org/x/sys/windows"
-)
-
-var _ unsafe.Pointer
-
-var (
-	modkernel = windows.NewLazySystemDLL("Kernel32.dll")
-
-	procSystemTimeToFileTime = modkernel.NewProc("SystemTimeToFileTime")
-)
-
-func SystemTimeToFileTime(systemTime *windows.Systemtime, fileTime *windows.Filetime) error {
-	r1, _, err := syscall.SyscallN(procSystemTimeToFileTime.Addr(), uintptr(unsafe.Pointer(systemTime)), uintptr(unsafe.Pointer(fileTime)))
-	if r1 == 0 {
-		return fmt.Errorf("error converting system time to file time: %w", err)
-	}
-	return nil
+// InitializeModule initializes this module.
+func InitializeModule() {
+	// does nothing if kubernetes and docker are not supported
 }
