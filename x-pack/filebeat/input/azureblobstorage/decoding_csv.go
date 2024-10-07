@@ -23,7 +23,7 @@ type csvDecoder struct {
 	err error
 }
 
-// newParquetDecoder creates a new CSV decoder.
+// newCSVDecoder creates a new CSV decoder.
 func newCSVDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 	d := csvDecoder{r: csv.NewReader(r)}
 	d.r.ReuseRecord = true
