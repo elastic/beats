@@ -1,0 +1,50 @@
+- name: lists
+  type: group
+  description: >
+    Shows various internal information lists.
+  release: ga
+  fields:
+    - name: databases
+      type: long
+      description: >
+        Count of databases.
+    - name: users
+      type: long
+      description: >
+        Count of users.
+    - name: pools
+      type: long
+      description: >
+        Count of pools.
+    - name: free_clients
+      type: long
+      description: >
+        Count of free clients. These are clients that are disconnected, but PgBouncer keeps the memory around that was allocated for them so it can be reused for future clients to avoid allocations.
+    - name: used_clients
+      type: long
+      description: >
+        Count of used clients.
+    - name: login_clients
+      type: long
+      description: >
+        Count of clients in login state.
+    - name: free_servers
+      type: long
+      description: >
+        Count of free servers. These are servers that are disconnected, but PgBouncer keeps the memory around that was allocated for them so it can be reused for future servers to avoid allocations.
+    - name: used_servers
+      type: long
+      description: >
+        Count of used servers.
+    - name: dns_names
+      type: long
+      description: >
+        Count of DNS names in the cache.
+    - name: dns_zones
+      type: long
+      description: >
+        Count of DNS zones in the cache.
+    - name: dns_queries
+      type: long
+      description: >
+        Count of in-flight DNS queries.

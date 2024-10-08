@@ -4,13 +4,13 @@
 metricbeat.modules:
 - module: pgbouncer
   metricsets:
-    - stats
+    - lists
   period: 10s
-  hosts: ["postgresql://pgbouncer:6432/pgbouncer?sslmode=disable"]
+  hosts: ["postgresql://localhost:6432/pgbouncer?sslmode=disable"]
   username: test
   password: password
 output.elasticsearch:
-  hosts: ["http://elasticsearch:9200"]
+  hosts: ["http://localhost:9200"]
   username: elastic
   password: xxxx
   indices:

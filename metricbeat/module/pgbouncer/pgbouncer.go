@@ -16,7 +16,7 @@
 // under the License.
 
 /*
-Package pgbouncer is Metricbeat module for PostgreSQL server.
+Package pgbouncer is Metricbeat module for pgbouncer pooler.
 */
 package pgbouncer
 
@@ -52,7 +52,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
-// ParseURL is the postgres host parser
+// ParseURL is the pgbouncer host parser
 func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package stats
+package pools
 
 import (
 	"context"
@@ -27,7 +27,7 @@ import (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	mb.Registry.MustAddMetricSet("pgbouncer", "stats", New,
+	mb.Registry.MustAddMetricSet("pgbouncer", "pools", New,
 		mb.WithHostParser(pgbouncer.ParseURL),
 		mb.DefaultMetricSet(),
 	)
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case of an error, an error is reported.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
-	results, err := m.QueryStats(ctx, "SHOW STATS;")
+	results, err := m.QueryStats(ctx, "SHOW POOLS;")
 	if err != nil {
 		return fmt.Errorf("error in QueryStats: %w", err)
 	}

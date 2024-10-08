@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package stats
+package pools
 
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -23,25 +23,23 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Based on pgbouncer show stats;
+// Based on pgbouncer show pools;
 var schema = s.Schema{
-	"database":                      c.Str("database"),
-	"total_query_count":             c.Int("total_query_count"),
-	"total_server_assignment_count": c.Int("total_server_assignment_count"),
-	"total_received":                c.Int("total_received"),
-	"total_sent":                    c.Int("total_sent"),
-	"total_xact_time":               c.Int("total_xact_time"),
-	"total_query_time":              c.Int("total_query_time"),
-	"total_wait_time":               c.Int("total_wait_time"),
-	"total_xact_count":              c.Int("total_xact_count"),
-	"avg_xact_count":                c.Int("avg_xact_count"),
-	"avg_query_count":               c.Int("avg_query_count"),
-	"avg_server_assignment_count":   c.Int("avg_server_assignment_count"),
-	"avg_recv":                      c.Int("avg_recv"),
-	"avg_sent":                      c.Int("avg_sent"),
-	"avg_xact_time":                 c.Int("avg_xact_time"),
-	"avg_query_time":                c.Int("avg_query_time"),
-	"avg_wait_time":                 c.Int("avg_wait_time"),
+	"database":              c.Str("database"),
+	"user":                  c.Str("user"),
+	"cl_active":             c.Int("cl_active"),
+	"cl_waiting":            c.Int("cl_waiting"),
+	"cl_active_cancel_req":  c.Int("cl_active_cancel_req"),
+	"cl_waiting_cancel_req": c.Int("cl_waiting_cancel_req"),
+	"sv_active":             c.Int("sv_active"),
+	"sv_active_cancel":      c.Int("sv_active_cancel"),
+	"sv_being_canceled":     c.Int("sv_being_canceled"),
+	"sv_idle":               c.Int("sv_idle"),
+	"sv_used":               c.Int("sv_used"),
+	"sv_tested":             c.Int("sv_tested"),
+	"sv_login":              c.Int("sv_login"),
+	"maxwait_us":            c.Int("maxwait_us"),
+	"pool_mode":             c.Str("pool_mode"),
 }
 
 // MapResult maps a single result to a mapstr.M
