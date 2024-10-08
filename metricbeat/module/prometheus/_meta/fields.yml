@@ -6,6 +6,10 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
+    - name: metrics_count
+      type: long
+      description: >
+        Number of metrics per Elasticsearch document.
     - name: prometheus
       type: group
       fields:

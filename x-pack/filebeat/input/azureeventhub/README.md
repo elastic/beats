@@ -1,5 +1,170 @@
 # azure-eventhub input plugin for Filebeat
 
+## Invalid JSON sanitization
+
+A few Azure services produce invalid JSON logs. As of now, the following Azure services are known to produce
+invalid logs:
+
+- Azure App Services
+- Azure Functions
+- PostreSQL Flexible Servers
+
+To deal with these logs, over time, we have implemented a sanitization mechanism that tries to fix the invalid JSON or
+remove the invalid JSON from the log.
+
+Users can use the `sanitizers` configuration option to set up the input sanitization mechanism. If enabled, when the
+input detects invalid JSON, the input will try to fix or remove it from the log.
+
+Existing sanitizers:
+
+- `new_lines`: removes new lines inside JSON strings.
+- `single_quotes`: replaces single quotes with double quotes in JSON strings.
+- `replace_all`: replaces all occurrences of a substring matching a regex pattern with a fixed literal string.
+
+### Sanitizers
+
+#### new_lines
+
+Here is an example of the `sanitizers` configuration option with the `new_lines` sanitizer:
+
+```yaml
+- type: azure-eventhub
+  eventhub: "my-event-hub"
+  consumer_group: "$Default"
+  connection_string: "<redacted>"
+  storage_account: "my-storage-account"
+  storage_account_container: "my-container"
+  storage_account_key: "<redacted>"
+
+  sanitizers:
+    - type: new_lines
+```
+
+With the previous configuration, the `new_lines` sanitizer removes all the new lines inside JSON strings.
+
+For example, if the diagnostic settings send the following message:
+
+```json
+{
+  "test":"this is 'some' message
+  ",
+  "time":"2019-12-17T13:43:44.4946995Z"
+}
+```
+
+With the previous sample configuration, the input will replace the invalid JSON, updating the message to the following
+version:
+
+```json
+{
+  "test":"this is 'some' message",
+  "time":"2019-12-17T13:43:44.4946995Z"
+}
+```
+
+The `new_lines` sanitizer aims to restore JSON syntax validity.
+
+The new lines inside JSON strings were first spotted in the Azure App Services logs. To learn more, see the following
+GitHub issue:
+
+- https://github.com/elastic/beats/issues/34092
+
+#### double_quotes
+
+Here is an example of the `sanitizers` configuration option with the `double_quotes` sanitizer:
+
+```yaml
+- type: azure-eventhub
+  eventhub: "my-event-hub"
+  consumer_group: "$Default"
+  connection_string: "<redacted>"
+  storage_account: "my-storage-account"
+  storage_account_container: "my-container"
+  storage_account_key: "<redacted>"
+
+  sanitizers:
+    - type: double_quotes
+```
+
+With the previous configuration, the `double_quotes` sanitizer replaces all the single quotes used to delimit JSON
+strings with double quotes.
+
+For example, if the diagnostic settings send the following message:
+
+```json
+{
+  "test":'this is a message',
+  "time":"2019-12-17T13:43:44.4946995Z"
+}
+```
+
+With the previous sample configuration, the input will replace the invalid JSON, updating the message to the following
+version:
+
+```json
+{
+  "test":"this is a message",
+  "time":"2019-12-17T13:43:44.4946995Z"
+}
+```
+
+The `double_quotes` sanitizer aims to restore JSON syntax validity.
+
+Users first reported logs using single quotes to delimit JSON strings in the Azure Functions logs. To learn more, see
+the following GitHub issue:
+
+- https://github.com/elastic/azuremarketplacedev/issues/190
+
+#### replace_all
+
+Here is an example of the `sanitizers` configuration option with the `replace_all` sanitizer:
+
+```yaml
+- type: azure-eventhub
+  eventhub: "my-event-hub"
+  consumer_group: "$Default"
+  connection_string: "<redacted>"
+  storage_account: "my-storage-account"
+  storage_account_container: "my-container"
+  storage_account_key: "<redacted>"
+
+  sanitizers:
+    - type: replace_all
+      spec:
+        pattern: '\[\s*([^\[\]{},\s]+(?:\s+[^\[\]{},\s]+)*)\s*\]'
+        replacement: "{}"
+```
+
+
+With the previous configuration, the `replace_all` sanitizer replaces all the occurrences of substring matching the
+regex expression `pattern` with a fixed literal string `replacement`.
+
+For example, if the diagnostic settings send the following message:
+
+```json
+{
+    "AppImage": "orcas/postgres_standalone_16_u18:38.1.240825",
+    "AppType": "PostgreSQL",
+    "properties": [
+        218 B blob data
+    ]
+}
+```
+
+With the previous sample configuration, the input will replace the invalid JSON, updating the message to the following
+version:
+
+```json
+{
+    "AppImage": "orcas/postgres_standalone_16_u18:38.1.240825",
+    "AppType": "PostgreSQL",
+    "properties": {}
+}
+```
+
+The `replace_all` sanitizer aims to restore JSON syntax validity by replacing invalid, unfixable JSON with literal
+values.
+
 ## Test Scenarios
 
 Test event:
@@ -224,7 +389,7 @@ I see we have the following folder:
 filebeat-activitylogs-zmoog-0005 / mbranca-general.servicebus.windows.net / eventhubsdkupgrade / $Default / checkpoint
 ```
 
-The folder containts four blobs `0`, `1`, `2`, and `3` 
+The folder containts four blobs `0`, `1`, `2`, and `3`
 
 The metadata of blobs `0`, `2`, and `3`:
 
@@ -306,7 +471,7 @@ sending batch of 20 events
 batch sent successfully
 ```
 
-#### Check that the 100 events are processed 
+#### Check that the 100 events are processed
 
 I see the `filebeat-8.15.0` contains 100 events.
 
@@ -322,7 +487,7 @@ Here are the current sequence numbers:
 | 2         | 19              | 66880  |
 | 3         | 0               | -1     |
 
-Of the 100 events published, 
+Of the 100 events published,
 
 - 40 landed on partition 0 (0 > 39)
 - 40 landed on partition 1 (9 > 49)
@@ -404,7 +569,7 @@ Using the following configuration for all inputs:
 ```
 
 - Started input 1
-- Input 1 is running and processing events 
+- Input 1 is running and processing events
 
 ```shell
 $ pbpaste | grep '^{' |  jq -r 'select(."log.logger" == "input.azure-eventhub") | [."@timestamp",."log.level",."log.logger",.message,.partition,.count//0,.acked//0,.error.message//"na",.error] | @tsv' | sort
@@ -475,7 +640,7 @@ batch sent successfully
 ```
 
 
-#### Check that the 100 events are processed 
+#### Check that the 100 events are processed
 
 I see the `filebeat-8.15.0` contains 100 events.
 
@@ -502,10 +667,10 @@ After
 | 2         | 59              | 66880  |
 | 3         | 39              | 137280 |
 
-Of the 100 events published, 
+Of the 100 events published,
 
 - 20 landed on partition 0 (39 > 59)
-- 0 landed on partition 1 
+- 0 landed on partition 1
 - 40 landed on partition 2 (19 > 59)
 - 40 landed on partition 3 (0 > 39)
 
@@ -622,7 +787,7 @@ Using the following configuration:
       start_position: "earliest"
 ```
 
-Important: set the `cloud.id` with a deleted deployment, or set `cloud.auth` with invalid credentials. 
+Important: set the `cloud.id` with a deleted deployment, or set `cloud.auth` with invalid credentials.
 
 ```shell
 ./filebeat -e -v -d * \
@@ -715,7 +880,7 @@ I see the `.monitoring.metrics.filebeat.events.active` and `.monitoring.metrics.
 
 #### Check that after fixing the problem the input successfully processed the 10 events
 
-- Update `cloud.auth` with valid credentials 
+- Update `cloud.auth` with valid credentials
 - restart the input
 
 After restarting the input, here are the input metrics:
@@ -755,7 +920,7 @@ Current checkpoint info are:
 | 3         | 39              | 137280 |
 
 
-Of the 10 events published, 
+Of the 10 events published,
 
 - 0  landed on partition 0
 - 10 landed on partition 1 (49 > 59)

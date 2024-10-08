@@ -286,7 +286,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 	})
 
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.RegisterV2.MustRegisterInput(inputs)
+	b.Registry.MustRegisterInput(inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.

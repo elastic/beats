@@ -77,6 +77,7 @@ func TestPackages() error {
 func GenerateModuleIncludeListGo() error {
 	opts := devtools.DefaultIncludeListOptions()
 	opts.ImportDirs = append(opts.ImportDirs, "monitors/*")
+	opts.BuildTags = "\n//go:build linux || darwin || synthetics\n"
 	return devtools.GenerateIncludeListGo(opts)
 }
 

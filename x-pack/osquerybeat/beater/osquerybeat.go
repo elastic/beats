@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
@@ -142,7 +142,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx, bt.log)
+	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)

@@ -18,6 +18,7 @@
 package instance_test
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"net/http"
@@ -91,8 +92,8 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 		defer wg.Done()
 
 		// Set the configuration file path flag so the beat can read it
-		flag.Set("c", "testdata/mockbeat.yml")
-		instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
+		_ = flag.Set("c", "testdata/mockbeat.yml")
+		_ = instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
 			return &mockBeat, nil
 		})
 	}()
@@ -109,7 +110,16 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 	// the HTTP server goroutine
 	time.Sleep(10 * time.Millisecond)
 
-	resp, err := http.Get("http://localhost:5066/state")
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://localhost:5066/state", nil)
+	if err != nil {
+		t.Fatalf("error creating request: %v", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("calling state endpoint: %v", err)
+	}
+
 	if err != nil {
 		t.Fatal("calling state endpoint: ", err.Error())
 	}

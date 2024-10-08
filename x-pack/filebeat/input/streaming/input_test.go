@@ -265,9 +265,9 @@ var inputTests = []struct {
 		handler: defaultHandler,
 		config: map[string]interface{}{
 			"program": `
-                bytes(state.response).decode_json().as(inner_body,{
-					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [], 
-            })`,
+	              bytes(state.response).decode_json().as(inner_body,{
+					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [],
+	          })`,
 			"state": map[string]interface{}{
 				"cursor": map[string]int{
 					"last_updated": 1502908200,
@@ -275,20 +275,20 @@ var inputTests = []struct {
 			},
 		},
 		response: []string{`
-         {
-            "pps": {
-                "agent": "example.proofpoint.com",
-                "cid": "mmeng_uivm071"
-            },
-            "ts": 1502908200
-        }`,
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
 			`{
-            "pps": {
-                "agent": "example.proofpoint-1.com",
-                "cid": "mmeng_vxciml"
-            },
-            "ts": 1503081000
-        }`,
+	          "pps": {
+	              "agent": "example.proofpoint-1.com",
+	              "cid": "mmeng_vxciml"
+	          },
+	          "ts": 1503081000
+	      }`,
 		},
 		want: []map[string]interface{}{
 			{
@@ -314,13 +314,13 @@ var inputTests = []struct {
 			},
 		},
 		response: []string{`
-         {
-            "pps": {
-                "agent": "example.proofpoint.com",
-                "cid": "mmeng_uivm071"
-            },
-            "ts": 1502908200
-        }`,
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
 		},
 		want: []map[string]interface{}{
 			{
@@ -346,13 +346,13 @@ var inputTests = []struct {
 			},
 		},
 		response: []string{`
-         {
-            "pps": {
-                "agent": "example.proofpoint.com",
-                "cid": "mmeng_uivm071"
-            },
-            "ts": 1502908200
-        }`,
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
 		},
 		want: []map[string]interface{}{
 			{
@@ -381,6 +381,40 @@ var inputTests = []struct {
 			},
 		},
 		response: []string{`
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
+		},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts": float64(1502908200),
+			},
+		},
+	},
+	{
+		name:    "test_retry_success",
+		server:  webSocketServerWithRetry(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"retry": map[string]interface{}{
+				"max_attempts": 3,
+				"wait_min":     "1s",
+				"wait_max":     "2s",
+			},
+		},
+		response: []string{`
          {
             "pps": {
                 "agent": "example.proofpoint.com",
@@ -398,6 +432,23 @@ var inputTests = []struct {
 				"ts": float64(1502908200),
 			},
 		},
+	},
+	{
+		name:    "test_retry_failure",
+		server:  webSocketServerWithRetry(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"retry": map[string]interface{}{
+				"max_attempts": 2,
+				"wait_min":     "1s",
+				"wait_max":     "2s",
+			},
+		},
+		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake"),
 	},
 }
 
@@ -533,7 +584,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{
@@ -668,6 +719,39 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 						return false
 
 					}
+				},
+			}
+
+			conn, err := upgrader.Upgrade(w, r, nil)
+			if err != nil {
+				t.Fatalf("error upgrading connection to WebSocket: %v", err)
+				return
+			}
+
+			handler(t, conn, response)
+		}))
+		// only set the resource URL if it is not already set
+		if config["url"] == nil {
+			config["url"] = "ws" + server.URL[4:]
+		}
+		t.Cleanup(server.Close)
+	}
+}
+
+// webSocketServerWithRetry returns a function that creates a WebSocket server that rejects the first two connection attempts and accepts the third.
+func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
+	var attempt int
+	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			attempt++
+			if attempt <= 2 {
+				w.WriteHeader(http.StatusForbidden)
+				fmt.Fprintf(w, "connection attempt %d rejected", attempt)
+				return
+			}
+			upgrader := websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
 				},
 			}
 

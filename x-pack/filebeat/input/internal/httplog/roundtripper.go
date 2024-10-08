@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -71,7 +70,7 @@ type LoggingRoundTripper struct {
 //	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
-//	event.original (the request without body from httputil.DumpRequestOut)
+//	http.request.header
 //
 // Fields logged in responses:
 //
@@ -80,7 +79,7 @@ type LoggingRoundTripper struct {
 //	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
-//	event.original (the response without body from httputil.DumpResponse)
+//	http.response.header
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
@@ -120,13 +119,8 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
 		zap.Int("http.response.body.bytes", len(body)),
 		zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
+		zap.Any("http.response.header", resp.Header),
 	)
-	message, err := httputil.DumpResponse(resp, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
-	} else {
-		respParts = append(respParts, zap.ByteString("event.original", message))
-	}
 	switch len(errorsMessages) {
 	case 0:
 	case 1:
@@ -155,7 +149,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
-//	event.original (the request without body from httputil.DumpRequestOut)
+//	http.request.header
 //
 // Additional fields in extra will also be logged.
 func LogRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) *http.Request {
@@ -172,6 +166,7 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 		zap.String("url.port", req.URL.Port()),
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
+		zap.Any("http.request.header", req.Header),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
 	}, extra...)
 
@@ -189,12 +184,6 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 		zap.Int("http.request.body.bytes", len(body)),
 		zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 	)
-	message, err := httputil.DumpRequestOut(req, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump request: %s", err))
-	} else {
-		reqParts = append(reqParts, zap.ByteString("event.original", message))
-	}
 	switch len(errorsMessages) {
 	case 0:
 	case 1:

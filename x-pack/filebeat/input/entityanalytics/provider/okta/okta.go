@@ -113,7 +113,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	p.lim = rate.NewLimiter(1, 1)
 
 	if p.cfg.Tracer != nil {
-		id := sanitizeFileName(inputCtx.ID)
+		id := sanitizeFileName(inputCtx.IDWithoutName)
 		p.cfg.Tracer.Filename = strings.ReplaceAll(p.cfg.Tracer.Filename, "*", id)
 	}
 
@@ -695,6 +695,7 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("okta", u.User)
 	_, _ = userDoc.Put("labels.identity_source", inputID)
 	_, _ = userDoc.Put("user.id", u.ID)
+	_, _ = userDoc.Put("groups", u.Groups)
 
 	switch u.State {
 	case Deleted:

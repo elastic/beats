@@ -68,5 +68,6 @@
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"

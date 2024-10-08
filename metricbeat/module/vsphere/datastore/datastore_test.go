@@ -23,30 +23,28 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/vmware/govmomi/simulator"
 )
 
 func TestFetchEventContents(t *testing.T) {
 	// Creating a new simulator model with VPX server to collect broad range of data.
 	model := simulator.VPX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
-	defer model.Remove()
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2WithContext(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
 
 	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	t.Logf("Fetched event from %s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
 	assert.EqualValues(t, "LocalDS_0", event["name"])
 	assert.EqualValues(t, "OTHER", event["fstype"])
@@ -60,6 +58,9 @@ func TestFetchEventContents(t *testing.T) {
 		"vm.count",
 		"write.bytes",
 		"capacity.used.bytes",
+		"disk.capacity.usage.bytes",
+		"disk.capacity.bytes",
+		"disk.provisioned.bytes",
 	}
 	for _, field := range fields {
 		value, err := event.GetValue(field)
@@ -78,29 +79,26 @@ func TestFetchEventContents(t *testing.T) {
 	}
 }
 
-func TestData(t *testing.T) {
+func TestDataStoreMetricSetData(t *testing.T) {
 	model := simulator.ESX()
-	if err := model.Create(); err != nil {
-		t.Fatal(err)
-	}
+	err := model.Create()
+	require.NoError(t, err, "failed to create model")
+	t.Cleanup(model.Remove)
 
 	ts := model.Service.NewServer()
-	defer ts.Close()
+	t.Cleanup(ts.Close)
 
 	f := mbtest.NewReportingMetricSetV2WithContext(t, getConfig(ts))
 
-	if err := mbtest.WriteEventsReporterV2WithContext(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
+	err = mbtest.WriteEventsReporterV2WithContext(f, t, "")
+	assert.NoError(t, err, "failed to write events with reporter")
 }
 
 func getConfig(ts *simulator.Server) map[string]interface{} {
-	urlSimulator := ts.URL.Scheme + "://" + ts.URL.Host + ts.URL.Path
-
 	return map[string]interface{}{
 		"module":     "vsphere",
 		"metricsets": []string{"datastore"},
-		"hosts":      []string{urlSimulator},
+		"hosts":      []string{ts.URL.String()},
 		"username":   "user",
 		"password":   "pass",
 		"insecure":   true,

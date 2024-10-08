@@ -5,9 +5,13 @@
 package azureblobstorage
 
 import (
+	"errors"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 // MaxWorkers, Poll, PollInterval, FileSelectors, TimeStampEpoch & ExpandEventListFromField can
@@ -22,6 +26,7 @@ type config struct {
 	PollInterval             *time.Duration       `config:"poll_interval"`
 	Containers               []container          `config:"containers" validate:"required"`
 	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig             readerConfig         `config:",inline"`
 	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
@@ -33,6 +38,7 @@ type container struct {
 	Poll                     *bool                `config:"poll"`
 	PollInterval             *time.Duration       `config:"poll_interval"`
 	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig             readerConfig         `config:",inline"`
 	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
@@ -43,20 +49,42 @@ type fileSelectorConfig struct {
 	// TODO: Add support for reader config in future
 }
 
+// readerConfig defines the options for reading the content of an azure container.
+type readerConfig struct {
+	Parsers  parser.Config `config:",inline"`
+	Decoding decoderConfig `config:"decoding"`
+}
+
 type authConfig struct {
-	SharedCredentials *sharedKeyConfig        `config:"shared_credentials,omitempty"`
-	ConnectionString  *connectionStringConfig `config:"connection_string,omitempty"`
+	SharedCredentials *sharedKeyConfig        `config:"shared_credentials"`
+	ConnectionString  *connectionStringConfig `config:"connection_string"`
+	OAuth2            *OAuth2Config           `config:"oauth2"`
 }
 
 type connectionStringConfig struct {
-	URI string `config:"uri,omitempty"`
+	URI string `config:"uri"`
 }
 type sharedKeyConfig struct {
 	AccountKey string `config:"account_key"`
+}
+
+type OAuth2Config struct {
+	ClientID     string `config:"client_id"`
+	ClientSecret string `config:"client_secret"`
+	TenantID     string `config:"tenant_id"`
+	// clientOptions is used internally for testing purposes only
+	clientOptions azcore.ClientOptions
 }
 
 func defaultConfig() config {
 	return config{
 		AccountName: "some_account",
 	}
+}
+
+func (c config) Validate() error {
+	if c.Auth.OAuth2 != nil && (c.Auth.OAuth2.ClientID == "" || c.Auth.OAuth2.ClientSecret == "" || c.Auth.OAuth2.TenantID == "") {
+		return errors.New("client_id, client_secret and tenant_id are required for OAuth2 auth")
+	}
+	return nil
 }
