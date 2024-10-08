@@ -3,6 +3,7 @@ package lists
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var schema = s.Schema{
@@ -18,4 +19,8 @@ var schema = s.Schema{
 	"used_servers":  c.Int("used_servers"),
 	"dns_names":     c.Int("dns_names"),
 	"dns_zones":     c.Int("dns_zones"),
+}
+
+func MapResult(result map[string]interface{}) (mapstr.M, error) {
+	return schema.Apply(result)
 }
