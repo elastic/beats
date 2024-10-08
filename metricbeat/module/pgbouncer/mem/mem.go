@@ -55,20 +55,43 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It publishes the event which is then forwarded to the output. In case of an error, an error is reported.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+	// Create a new context for this operation.
 	ctx := context.Background()
+
+	// Execute the "SHOW MEM;" query against the database.
 	results, err := m.QueryStats(ctx, "SHOW MEM;")
 	if err != nil {
+		// Return the error if the query fails.
 		return fmt.Errorf("error in QueryStats: %w", err)
 	}
 
+	// Initialize an empty map to store aggregated results.
+	data := mapstr.M{}
+
+	// Iterate over each result from the query.
 	for _, result := range results {
-		var data mapstr.M
+		// Apply the predefined schema to the result to format it properly.
+		tmpData, err := schema.Apply(result)
+		if err != nil {
+			// Log the error and skip this iteration if schema application fails.
+			log.Printf("Error applying schema: %v", err)
+			continue
+		}
 
-		data, _ = schema.Apply(result)
+		// Aggregate the formatted data into the data map.
+		for k, v := range tmpData {
+			data[k] = v
+		}
+	}
 
+	// Check if there is any data collected.
+	if len(data) > 0 {
+		// Create and report an event with the collected data.
 		reporter.Event(mb.Event{
 			MetricSetFields: data,
 		})
 	}
+
+	// Return nil to indicate successful completion.
 	return nil
 }
