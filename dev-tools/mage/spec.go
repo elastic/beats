@@ -21,6 +21,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"log"
 	"os"
+	"strings"
 )
 
 type spec struct {
@@ -34,13 +35,17 @@ type input struct {
 	Command     command
 }
 
+func (i *input) GetCommand() string {
+	return strings.Join(i.Command.Args, " ")
+}
+
 type command struct {
 	Name string
 	Args []string
 }
 
-// ParseSpec parses agent.beat.spec.yml and generates test command
-func ParseSpec() {
+// SpecCommands parses agent.beat.spec.yml and collects commands for tests
+func SpecCommands() []string {
 	specPath := os.Getenv("AGENTBEAT_SPEC")
 	if specPath == "" {
 		log.Fatal("AGENTBEAT_SPEC is not defined")
@@ -51,20 +56,26 @@ func ParseSpec() {
 		log.Fatal("PLATFORM is not defined")
 	}
 
-	spec, err := parseToObj()
-	if err != nil {
-		log.Fatalf("Error parsing agentbeat.spec.yml: %v", err)
-	}
+	spec, _ := parseToObj(specPath)
 
-	inputList := filter(spec.Inputs, func(input input) bool {
+	filteredInputs := filter(spec.Inputs, func(input input) bool {
 		return contains(input.Platforms, platform)
 	})
 
-	log.Print(inputList)
+	commands := make(map[string]interface{})
+	for _, i := range filteredInputs {
+		commands[i.GetCommand()] = nil
+	}
+	keys := make([]string, 0, len(commands))
+	for k := range commands {
+		keys = append(keys, k)
+	}
+
+	return keys
 }
 
-func parseToObj() (spec, error) {
-	specFile, err := os.ReadFile("../agentbeat.spec.yml")
+func parseToObj(path string) (spec, error) {
+	specFile, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatalf("Error opening agentbeat.spec.yml: %v", err)
 		return spec{}, err

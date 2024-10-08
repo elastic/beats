@@ -10,6 +10,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -142,7 +143,7 @@ func Package() error {
 	return nil
 }
 
-// TestPackages tests the generated packages (i.e. file modes, owners, groups).
+// TestPackages tests the generated packages (i.agentbeatCmd. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
 }
@@ -214,6 +215,65 @@ func PythonIntegTest(ctx context.Context) error {
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
 
-func TestWithSpecs(ctx context.Context) {
-	mg.Deps(devtools.ParseSpec)
+// TestWithSpec executes unique commands from agentbeat.spec.yml and validates that app haven't exited with non-zero
+func TestWithSpec(ctx context.Context) {
+	var commands = devtools.SpecCommands()
+
+	agentbeatPath := os.Getenv("AGENTBEAT_PATH")
+	fmt.Printf("--- AGENTBEAT_PATH: %s", agentbeatPath)
+
+	cmdResults := make(map[string]bool)
+
+	for _, command := range commands {
+		cmdResults[command] = agentbeatCmd(agentbeatPath, command)
+	}
+
+	hasFailures := false
+	for cmd, res := range cmdResults {
+		if res {
+			fmt.Printf("Command [%s] succeeded", cmd)
+		} else {
+			fmt.Printf("Command [%s] failed", cmd)
+			hasFailures = true
+		}
+	}
+
+	if hasFailures {
+		fmt.Printf("Some inputs failed. Exiting with error")
+		os.Exit(1)
+	}
+}
+
+func agentbeatCmd(agentbeatPath string, command string) bool {
+	cmd := exec.Command(agentbeatPath, command)
+	fmt.Printf("Running command: %v", cmd)
+
+	if err := cmd.Start(); err != nil {
+		_ = fmt.Errorf("failed to start command: %v", err)
+	}
+
+	defer func() {
+		if err := cmd.Process.Kill(); err != nil {
+			_ = fmt.Errorf("failed to kill process: %v", err)
+		} else {
+			_ = fmt.Errorf("command process killed")
+		}
+	}()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	timeout := 2 * time.Second
+	deadline := time.After(timeout)
+
+	select {
+	case err := <-done:
+		_ = fmt.Errorf("command exited before %s: %v", timeout.String(), err)
+		return false
+
+	case <-deadline:
+		_ = fmt.Errorf("%s", cmd.Stdout)
+		return true
+	}
 }
