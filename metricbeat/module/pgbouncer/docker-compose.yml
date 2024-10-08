@@ -27,20 +27,23 @@ services:
       start_period: 15s
 
   elasticsearch:
-    image: elasticsearch:8.11.0
     hostname: elasticsearch
-    environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
-      - "discovery.type=single-node"
-      # - "transport.host=127.0.0.1"
+    extends:
+      file: ../../../testing/environments/latest.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
     ports:
       - 9200:9200
 
   kibana:
-    image: kibana:8.11.0
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    extends:
+      file: ../../../testing/environments/latest.yml
+      service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
     ports:
       - 5601:5601
