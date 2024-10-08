@@ -18,12 +18,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
+        file: ["bump-golang.yml", "bump-golang-7.17.yml"]
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Updatecli in the runner
         uses: updatecli/updatecli-action@6b8881a17fc8038e884ec94ff72a49e8e8a4069f # v0.76.1
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
@@ -33,7 +37,7 @@ jobs:
       - if: ${{ failure()  }}
         uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
         with:
-          channel-id: '#ingest-notifications'
+          channel-id: "#ingest-notifications"
           payload: |
             {
               "text": "${{ env.SLACK_MESSAGE }}",
