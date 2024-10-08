@@ -91,7 +91,11 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			if err != nil {
 				goto out
 			}
-			pe.CWD = intr.(string)
+			if str, ok := intr.(string); ok {
+				pe.CWD = str
+			} else {
+				goto out
+			}
 		out:
 		}
 		p.db.InsertExec(pe)
