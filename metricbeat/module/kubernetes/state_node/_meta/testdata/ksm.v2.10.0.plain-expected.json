@@ -15,6 +15,9 @@
                         "cores": 8
                     }
                 },
+                "kubelet": {
+                    "version": "v1.27.3"
+                },
                 "memory": {
                     "allocatable": {
                         "bytes": 12027240448

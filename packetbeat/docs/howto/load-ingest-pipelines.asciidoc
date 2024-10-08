@@ -1,0 +1,28 @@
+[[load-ingest-pipelines]]
+== Load ingest pipelines
+
+{beatname_uc} modules are implemented using {es} ingest node
+pipelines.  The events receive their transformations within
+{es}.  The ingest node pipelines must be loaded
+into {es}.  This can happen one of several ways.
+
+[id="{beatname_lc}-load-pipeline-auto"]
+[float]
+=== On connection to {es}
+
+{beatname_uc} will send ingest pipelines automatically to {es} if the
+{es} output is enabled.
+
+Make sure the user specified in +{beatname_lc}.yml+ is
+<<privileges-to-setup-beats,authorized to set up {beatname_uc}>>.
+
+If {beatname_uc} is sending events to {ls} or another output you need
+to load the ingest pipelines with the `setup` command or manually.
+
+[id="{beatname_lc}-load-pipeline-manual"]
+[float]
+=== Manually install pipelines
+
+Pipelines can be loaded them into {es} with the `_ingest/pipeline` REST API
+call. The user making the REST API call will need to have the `ingest_admin`
+role assigned to them.

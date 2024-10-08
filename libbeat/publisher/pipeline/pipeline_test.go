@@ -18,11 +18,100 @@
 package pipeline
 
 import (
+	"runtime"
 	"sync"
+	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
+	routinesChecker := resources.NewGoroutinesChecker()
+	defer routinesChecker.Check(t)
+
+	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
+
+	defer pipeline.Close()
+
+	n := 66000
+	clients := []beat.Client{}
+	for i := 0; i < n; i++ {
+		c, err := pipeline.ConnectWith(beat.ClientConfig{})
+		if err != nil {
+			t.Fatalf("Could not connect to pipeline: %s", err)
+		}
+		clients = append(clients, c)
+	}
+
+	for i, c := range clients {
+		c.Publish(beat.Event{
+			Fields: mapstr.M{
+				"count": i,
+			},
+		})
+	}
+
+	// Close the first 105 clients
+	nn := 105
+	clientsToClose := clients[:n]
+	clients = clients[nn:]
+
+	for _, c := range clientsToClose {
+		c.Close()
+	}
+
+	// Let other goroutines run
+	runtime.Gosched()
+	runtime.Gosched()
+
+	// Make sure all clients are closed
+	for _, c := range clients {
+		c.Close()
+	}
+}
+
+// makeDiscardQueue returns a queue that always discards all events
+// the producers are assigned an unique incremental ID, when their
+// close method is called, this ID is returned
+func makeDiscardQueue() queue.Queue {
+	var wg sync.WaitGroup
+	producerID := atomic.NewInt(0)
+
+	return &testQueue{
+		close: func() error {
+			//  Wait for all producers to finish
+			wg.Wait()
+			return nil
+		},
+		get: func(count int) (queue.Batch, error) {
+			return nil, nil
+		},
+
+		producer: func(cfg queue.ProducerConfig) queue.Producer {
+			producerID.Inc()
+
+			// count is a counter that increments on every published event
+			// it's also the returned Event ID
+			count := uint64(0)
+			producer := &testProducer{
+				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+					count++
+					return queue.EntryID(count), true
+				},
+				cancel: func() {
+					wg.Done()
+				},
+			}
+
+			wg.Add(1)
+			return producer
+		},
+	}
+}
 
 type testQueue struct {
 	close        func() error
@@ -32,18 +121,18 @@ type testQueue struct {
 }
 
 type testProducer struct {
-	publish func(try bool, event interface{}) (queue.EntryID, bool)
-	cancel  func() int
-}
-
-func (q *testQueue) Metrics() (queue.Metrics, error) {
-	return queue.Metrics{}, nil
+	publish func(try bool, event queue.Entry) (queue.EntryID, bool)
+	cancel  func()
 }
 
 func (q *testQueue) Close() error {
 	if q.close != nil {
 		return q.close()
 	}
+	return nil
+}
+
+func (q *testQueue) Done() <-chan struct{} {
 	return nil
 }
 
@@ -72,25 +161,24 @@ func (q *testQueue) Get(sz int) (queue.Batch, error) {
 	return nil, nil
 }
 
-func (p *testProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *testProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(false, event)
 	}
 	return 0, false
 }
 
-func (p *testProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *testProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	if p.publish != nil {
 		return p.publish(true, event)
 	}
 	return 0, false
 }
 
-func (p *testProducer) Cancel() int {
+func (p *testProducer) Close() {
 	if p.cancel != nil {
-		return p.cancel()
+		p.cancel()
 	}
-	return 0
 }
 
 func makeTestQueue() queue.Queue {
@@ -102,7 +190,7 @@ func makeTestQueue() queue.Queue {
 		close: func() error {
 			mux.Lock()
 			for producer := range producers {
-				producer.Cancel()
+				producer.Close()
 			}
 			mux.Unlock()
 
@@ -118,21 +206,17 @@ func makeTestQueue() queue.Queue {
 			var producer *testProducer
 			p := blockingProducer(cfg)
 			producer = &testProducer{
-				publish: func(try bool, event interface{}) (queue.EntryID, bool) {
+				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
 					if try {
 						return p.TryPublish(event)
 					}
 					return p.Publish(event)
 				},
-				cancel: func() int {
-					i := p.Cancel()
-
+				cancel: func() {
 					mux.Lock()
 					defer mux.Unlock()
 					delete(producers, producer)
 					wg.Done()
-
-					return i
 				},
 			}
 
@@ -150,15 +234,14 @@ func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	waiting := atomic.MakeInt(0)
 
 	return &testProducer{
-		publish: func(_ bool, _ interface{}) (queue.EntryID, bool) {
+		publish: func(_ bool, _ queue.Entry) (queue.EntryID, bool) {
 			waiting.Inc()
 			<-sig
 			return 0, false
 		},
 
-		cancel: func() int {
+		cancel: func() {
 			close(sig)
-			return waiting.Load()
 		},
 	}
 }

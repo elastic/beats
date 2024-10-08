@@ -270,7 +270,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
-		metrics:      newInputMetrics(c.Name, id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
@@ -316,6 +315,11 @@ func (l *winEventLog) IsFile() bool {
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
+	// we need to defer metrics initialization since when the event log
+	// is used from winlog input it would register it twice due to CheckConfig calls
+	if l.metrics == nil {
+		l.metrics = newInputMetrics(l.channelName, l.id)
+	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
 	} else if state.RecordNumber > 0 && l.channelName != "" {

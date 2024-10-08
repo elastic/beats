@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"unicode"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/mito/lib/xml"
 )
 
@@ -64,13 +65,14 @@ type decoderFunc func(p []byte, dst *response) error
 
 // encodeAsJSON encodes trReq as a JSON message.
 func encodeAsJSON(trReq transformable) ([]byte, error) {
-	if len(trReq.body()) == 0 {
+	body, err := trReq.GetValue("body")
+	if err == mapstr.ErrKeyNotFound {
 		return nil, nil
 	}
 	header := trReq.header()
 	header.Set("Content-Type", "application/json")
 	trReq.setHeader(header)
-	return json.Marshal(trReq.body())
+	return json.Marshal(body)
 }
 
 // decodeAsJSON decodes the JSON message in p into dst.

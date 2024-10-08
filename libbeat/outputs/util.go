@@ -20,11 +20,12 @@ package outputs
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Fail helper can be used by output factories, to create a failure response when
@@ -35,7 +36,7 @@ func Fail(err error) (Group, error) { return Group{}, err }
 // instances.  The first argument is expected to contain a queue
 // config.Namespace.  The queue config is passed to assign the queue
 // factory when elastic-agent reloads the output.
-func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Group, error) {
+func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.EncoderFactory, clients ...Client) (Group, error) {
 	var q queue.QueueFactory
 	if cfg.IsSet() && cfg.Config().Enabled() {
 		switch cfg.Name() {
@@ -46,8 +47,9 @@ func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Gro
 			}
 			q = memqueue.FactoryForSettings(settings)
 		case diskqueue.QueueType:
-			if publisher.UnderAgent() {
-				return Group{}, fmt.Errorf("disk queue not supported under agent")
+			if management.UnderAgent() {
+				logger := logp.NewLogger("output")
+				logger.Warn("Disk queue configuration found while running under agent: this configuration is unsupported and in technical preview.")
 			}
 			settings, err := diskqueue.SettingsForUserConfig(cfg.Config())
 			if err != nil {
@@ -59,10 +61,11 @@ func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Gro
 		}
 	}
 	return Group{
-		Clients:      clients,
-		BatchSize:    batchSize,
-		Retry:        retry,
-		QueueFactory: q,
+		Clients:        clients,
+		BatchSize:      batchSize,
+		Retry:          retry,
+		QueueFactory:   q,
+		EncoderFactory: encoderFactory,
 	}, nil
 }
 
@@ -79,12 +82,12 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, NewFailoverClient(netclients))
+		return Success(cfg, batchSize, retry, encoderFactory, NewFailoverClient(netclients))
 	}
 
 	clients := NetworkClients(netclients)
-	return Success(cfg, batchSize, retry, clients...)
+	return Success(cfg, batchSize, retry, encoderFactory, clients...)
 }

@@ -12,6 +12,8 @@ import (
 	"net/textproto"
 	"strings"
 
+	"gopkg.in/natefinch/lumberjack.v2"
+
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
@@ -35,6 +37,7 @@ type config struct {
 	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
+	Program               string                  `config:"program"`
 	SecretHeader          string                  `config:"secret.header"`
 	SecretValue           string                  `config:"secret.value"`
 	HMACHeader            string                  `config:"hmac.header"`
@@ -45,6 +48,16 @@ type config struct {
 	CRCSecret             string                  `config:"crc.secret"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
+	Tracer                *tracerConfig           `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 func defaultConfig() config {

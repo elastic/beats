@@ -35,10 +35,13 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
+	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -125,6 +128,7 @@ type beatConfig struct {
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
+	EventLogging    *config.C              `config:"logging.event_data"`
 	MetricLogging   *config.C              `config:"logging.metrics"`
 	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
@@ -197,7 +201,7 @@ func initRand() {
 	} else {
 		seed = n.Int64()
 	}
-	rand.Seed(seed)
+	rand.Seed(seed) //nolint:staticcheck // need seed from cryptographically strong PRNG.
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -224,7 +228,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.Initialize)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +239,12 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func()) (*Beat, error) {
+	// call all initialization functions
+	for _, f := range initFuncs {
+		f()
+	}
+
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
@@ -271,10 +280,237 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
 			StartTime:       time.Now(),
 			EphemeralID:     metricreport.EphemeralID(),
 		},
-		Fields: fields,
+		Fields:   fields,
+		Registry: reload.NewRegistry(),
 	}
 
 	return &Beat{Beat: b}, nil
+}
+
+// NewBeatReceiver creates a Beat that will be used in the context of an otel receiver
+func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, consumer consumer.Logs, core zapcore.Core) (*Beat, error) {
+	b, err := NewBeat(settings.Name,
+		settings.IndexPrefix,
+		settings.Version,
+		settings.ElasticLicensed,
+		settings.Initialize)
+	if err != nil {
+		return nil, err
+	}
+
+	b.Info.LogConsumer = consumer
+
+	// begin code similar to configure
+	if err = plugin.Initialize(); err != nil {
+		return nil, fmt.Errorf("error initializing plugins: %w", err)
+	}
+
+	b.InputQueueSize = settings.InputQueueSize
+
+	cfOpts := []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+	}
+
+	tmp, err := ucfg.NewFrom(receiverConfig, cfOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("error converting receiver config to ucfg: %w", err)
+	}
+
+	cfg := (*config.C)(tmp)
+	if err := initPaths(cfg); err != nil {
+		return nil, fmt.Errorf("error initializing paths: %w", err)
+	}
+
+	// We have to initialize the keystore before any unpack or merging the cloud
+	// options.
+	store, err := LoadKeystore(cfg, b.Info.Beat)
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize the keystore: %w", err)
+	}
+
+	if settings.DisableConfigResolver {
+		config.OverwriteConfigOpts(obfuscateConfigOpts())
+	} else {
+		// TODO: Allow the options to be more flexible for dynamic changes
+		config.OverwriteConfigOpts(configOpts(store))
+	}
+
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	if err != nil {
+		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
+	}
+	b.Beat.Instrumentation = instrumentation
+
+	b.keystore = store
+	b.Beat.Keystore = store
+	err = cloudid.OverwriteSettings(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error overwriting cloudid settings: %w", err)
+	}
+
+	b.RawConfig = cfg
+	err = cfg.Unpack(&b.Config)
+	if err != nil {
+		return nil, fmt.Errorf("error unpacking config data: %w", err)
+	}
+
+	logpConfig := logp.Config{}
+	logpConfig.Beat = b.Info.Name
+	logpConfig.Files.MaxSize = 1
+
+	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
+		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
+	}
+
+	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
+		return nil, fmt.Errorf("error configuring beats logp: %w", err)
+	}
+
+	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
+	}
+
+	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
+		return nil, fmt.Errorf("could not parse features: %w", err)
+	}
+	b.RegisterHostname(features.FQDN())
+
+	b.Beat.Config = &b.Config.BeatConfig
+
+	if name := b.Config.Name; name != "" {
+		b.Info.Name = name
+	}
+
+	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
+		return nil, fmt.Errorf("error setting timestamp precision: %w", err)
+	}
+
+	// log paths values to help with troubleshooting
+	logp.Info(paths.Paths.String())
+
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	err = b.loadMeta(metaPath)
+	if err != nil {
+		return nil, fmt.Errorf("error loading meta data: %w", err)
+	}
+
+	logp.Info("Beat ID: %v", b.Info.ID)
+
+	// Try to get the host's FQDN and set it.
+	h, err := sysinfo.Host()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get host information: %w", err)
+	}
+
+	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
+	if err != nil {
+		// FQDN lookup is "best effort".  We log the error, fallback to
+		// the OS-reported hostname, and move on.
+		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Info.FQDN = b.Info.Hostname
+	} else {
+		b.Info.FQDN = fqdn
+	}
+
+	// initialize config manager
+	m, err := management.NewManager(b.Config.Management, b.Registry)
+	if err != nil {
+		return nil, fmt.Errorf("error creating new manager: %w", err)
+	}
+	b.Manager = m
+
+	if b.Manager.AgentInfo().Version != "" {
+		// During the manager initialization the client to connect to the agent is
+		// also initialized. That makes the beat to read information sent by the
+		// agent, which includes the AgentInfo with the agent's package version.
+		// Components running under agent should report the agent's package version
+		// as their own version.
+		// In order to do so b.Info.Version needs to be set to the version the agent
+		// sent. As this Beat instance is initialized much before the package
+		// version is received, it's overridden here. So far it's early enough for
+		// the whole beat to report the right version.
+		b.Info.Version = b.Manager.AgentInfo().Version
+		version.SetPackageVersion(b.Info.Version)
+	}
+
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
+
+	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
+		return nil, fmt.Errorf("error checking raw config: %w", err)
+	}
+
+	b.Beat.BeatConfig, err = b.BeatConfig()
+	if err != nil {
+		return nil, fmt.Errorf("error setting BeatConfig: %w", err)
+	}
+
+	imFactory := settings.IndexManagement
+	if imFactory == nil {
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
+	}
+	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error setting index supporter: %w", err)
+	}
+
+	processingFactory := settings.Processing
+	if processingFactory == nil {
+		processingFactory = processing.MakeDefaultBeatSupport(true)
+	}
+
+	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	if err != nil {
+		return nil, fmt.Errorf("error creating processors: %w", err)
+	}
+
+	reg := monitoring.Default.GetRegistry(b.Info.Name)
+	if reg == nil {
+		reg = monitoring.Default.NewRegistry(b.Info.Name)
+	}
+
+	// This should be replaced with static config for otel consumer
+	// but need to figure out if we want the Queue settings from here.
+	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
+	if !outputEnabled {
+		if b.Manager.Enabled() {
+			logp.Info("Output is configured through Central Management")
+		} else {
+			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
+		}
+	}
+
+	tel := reg.GetRegistry("state")
+	if tel == nil {
+		tel = reg.NewRegistry("state")
+	}
+	monitors := pipeline.Monitors{
+		Metrics:   reg,
+		Telemetry: tel,
+		Logger:    logp.L().Named("publisher"),
+		Tracer:    b.Instrumentation.Tracer(),
+	}
+
+	outputFactory := b.makeOutputFactory(b.Config.Output)
+
+	pipelineSettings := pipeline.Settings{
+		Processors:     b.processors,
+		InputQueueSize: b.InputQueueSize,
+	}
+	publisher, err := pipeline.LoadWithSettings(b.Info, monitors, b.Config.Pipeline, outputFactory, pipelineSettings)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing publisher: %w", err)
+	}
+	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	b.Publisher = publisher
+
+	return b, nil
+
 }
 
 // InitWithSettings does initialization of things common to all actions (read confs, flags)
@@ -330,8 +566,9 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-	logSystemInfo(b.Info)
-	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	log := logp.NewLogger("beat")
+	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
 	if err != nil {
@@ -380,6 +617,10 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
+		// Since now publisher is closed on Stop, we want to give some
+		// time to ack any pending events by default to avoid
+		// changing on stop behavior too much.
+		WaitClose:      time.Second,
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
 	}
@@ -388,11 +629,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
-
-	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
-	//       but refine publisher to disconnect clients on stop automatically
-	// defer pipeline.Close()
+	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
 
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
@@ -506,11 +743,24 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// stopBeat must be idempotent since it will be called both from a signal and by the manager.
+	// Since publisher.Close is not safe to be called more than once this is necessary.
+	var once sync.Once
 	stopBeat := func() {
-		b.Instrumentation.Tracer().Close()
-		beater.Stop()
+		once.Do(func() {
+			b.Instrumentation.Tracer().Close()
+			// If the publisher has a Close() method, call it before stopping the beater.
+			if c, ok := b.Publisher.(io.Closer); ok {
+				c.Close()
+			}
+			beater.Stop()
+		})
 	}
 	svc.HandleSignals(stopBeat, cancel)
+
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(stopBeat)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
@@ -518,9 +768,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
-
-	// Allow the manager to stop a currently running beats out of bound.
-	b.Manager.SetStopCallback(beater.Stop)
 
 	err = beater.Run(&b.Beat)
 	if b.shouldReexec {
@@ -803,7 +1050,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
-	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
+	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
@@ -824,7 +1071,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	fqdn, err := h.FQDN()
+	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
@@ -835,10 +1085,28 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, b.Registry)
 	if err != nil {
 		return err
 	}
+	b.Manager = m
+
+	if b.Manager.AgentInfo().Version != "" {
+		// During the manager initialization the client to connect to the agent is
+		// also initialized. That makes the beat to read information sent by the
+		// agent, which includes the AgentInfo with the agent's package version.
+		// Components running under agent should report the agent's package version
+		// as their own version.
+		// In order to do so b.Info.Version needs to be set to the version the agent
+		// sent. As this Beat instance is initialized much before the package
+		// version is received, it's overridden here. So far it's early enough for
+		// the whole beat to report the right version.
+		b.Info.Version = b.Manager.AgentInfo().Version
+		version.SetPackageVersion(b.Info.Version)
+	}
+
+	// build the user-agent string to be used by the outputs
+	b.GenerateUserAgent()
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
 		return err
@@ -875,6 +1143,16 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
+		"beat_metrics.json", "application/json", func() []byte {
+			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				logp.L().Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
+				return []byte(err.Error())
+			}
+			return data
+		})
 
 	return err
 }
@@ -1318,15 +1596,19 @@ func handleError(err error) error {
 // in debugging. This information includes data about the beat, build, go
 // runtime, host, and process. If any of the data is not available it will be
 // omitted.
-func logSystemInfo(info beat.Info) {
+func (b *Beat) logSystemInfo(log *logp.Logger) {
 	defer logp.Recover("An unexpected error occurred while collecting " +
 		"information about the system.")
-	log := logp.NewLogger("beat").With(logp.Namespace("system_info"))
+	log = log.With(logp.Namespace("system_info"))
+
+	if b.Manager.Enabled() {
+		return
+	}
 
 	// Beat
 	beat := mapstr.M{
-		"type": info.Beat,
-		"uuid": info.ID,
+		"type": b.Info.Beat,
+		"uuid": b.Info.ID,
 		"path": mapstr.M{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),
@@ -1340,7 +1622,7 @@ func logSystemInfo(info beat.Info) {
 	build := mapstr.M{
 		"commit":  version.Commit(),
 		"time":    version.BuildTime(),
-		"version": info.Version,
+		"version": b.Info.Version,
 		"libbeat": version.GetDefaultVersion(),
 	}
 	log.Infow("Build info", "build", build)
@@ -1518,13 +1800,13 @@ func (bc *beatConfig) Validate() error {
 		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
 			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
 		}
-		//elastic-agent doesn't support disk queue yet
+		// elastic-agent doesn't support disk queue yet
 		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
 			return fmt.Errorf("disk queue is not supported when management is enabled")
 		}
 	}
 
-	//elastic-agent doesn't support disk queue yet
+	// elastic-agent doesn't support disk queue yet
 	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
 		return fmt.Errorf("disk queue is not supported when management is enabled")
 	}

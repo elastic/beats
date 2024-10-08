@@ -31,7 +31,7 @@ import (
 )
 
 func hetznerMetadataHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == hetznerMetadataInstanceIDURI {
 			_, _ = w.Write([]byte("111111"))
 			return
@@ -50,7 +50,7 @@ func hetznerMetadataHandler() http.HandlerFunc {
 		}
 
 		http.Error(w, "not found", http.StatusNotFound)
-	})
+	}
 }
 
 func TestRetrieveHetznerMetadata(t *testing.T) {

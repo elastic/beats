@@ -10,12 +10,15 @@ on:
 env:
   BEAT_MODULE: 'x-pack/functionbeat'
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
       with:
         go-version-file: .go-version
     - name: Run check/update

@@ -95,7 +95,8 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 	if se.URL != "" {
 		u, e := url.Parse(se.URL)
 		if e != nil {
-			logp.L().Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
+			_, _ = m.Put("url", mapstr.M{"full": se.URL})
+			logp.L().Warnf("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
 			_, _ = m.Put("url", wraputil.URLFields(u))
 		}

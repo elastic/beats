@@ -77,21 +77,18 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 		return fmt.Errorf("failure parsing Beat's State API response: %w", err)
 	}
 
-	event.MetricSetFields, _ = schema.Apply(data)
-
 	clusterUUID := getMonitoringClusterUUID(data)
 	if clusterUUID == "" {
 		if isOutputES(data) {
 			clusterUUID = getClusterUUID(data)
-			if clusterUUID != "" {
-				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
-				if event.MetricSetFields != nil {
-					event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-				}
+			if clusterUUID == "" {
+				return nil
 			}
 		}
 	}
+
+	event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
 	event.MetricSetFields, _ = schema.Apply(data)
 

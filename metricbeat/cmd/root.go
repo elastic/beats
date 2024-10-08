@@ -22,16 +22,18 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/metricbeat/include"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// import modules
-	_ "github.com/elastic/beats/v7/metricbeat/include"
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
@@ -51,7 +53,12 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // MetricbeatSettings contains the default settings for metricbeat
-func MetricbeatSettings() instance.Settings {
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func MetricbeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
@@ -59,6 +66,10 @@ func MetricbeatSettings() instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Initialize: []func(){
+			include.InitializeModule,
+			func() { module.RegisterMonitoringModules(moduleNameSpace) },
+		},
 	}
 }
 
@@ -71,5 +82,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(MetricbeatSettings())
+	RootCmd = Initialize(MetricbeatSettings(""))
 }

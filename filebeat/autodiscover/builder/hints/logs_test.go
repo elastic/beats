@@ -30,6 +30,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+func TestMain(t *testing.M) {
+	InitializeModule()
+}
+
 func TestGenerateHints(t *testing.T) {
 	customDockerCfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"default_config": map[string]interface{}{

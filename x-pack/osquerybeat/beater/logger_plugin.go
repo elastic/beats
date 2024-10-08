@@ -81,7 +81,7 @@ func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
 	case severityWarning:
 		log.Warnw(m.Message, args...)
 	case severityInfo:
-		log.Infow(m.Message, args...)
+		log.Debugw(m.Message, args...)
 	default:
 		log.Debugw(m.Message, args...)
 	}

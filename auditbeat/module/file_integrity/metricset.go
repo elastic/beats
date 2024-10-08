@@ -26,7 +26,9 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,7 +46,7 @@ const (
 var underTest bool //nolint:unused // Used in Darwin-only builds.
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),
 		mb.WithNamespace(namespace),
@@ -62,6 +64,11 @@ type EventProducer interface {
 	Start(done <-chan struct{}) (<-chan Event, error)
 }
 
+// eventProducerWithProcessor is an EventProducer that requires a Processor
+type eventProducerWithProcessor interface {
+	Processor() beat.Processor
+}
+
 // MetricSet for monitoring file integrity.
 type MetricSet struct {
 	mb.BaseMetricSet
@@ -71,13 +78,16 @@ type MetricSet struct {
 	log     *logp.Logger
 
 	// Runtime params that are initialized on Run().
-	bucket       datastore.BoltBucket
-	scanStart    time.Time
-	scanChan     <-chan Event
-	fsnotifyChan <-chan Event
+	bucket    datastore.BoltBucket
+	scanStart time.Time
+	scanChan  <-chan Event
+	eventChan <-chan Event
 
 	// Used when a hash can't be calculated
 	nullHashes map[HashType]Digest
+
+	// Processors
+	processors []beat.Processor
 }
 
 // New returns a new file.MetricSet.
@@ -87,7 +97,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	r, err := NewEventReader(config)
+	logger := logp.NewLogger(moduleName)
+	id := base.Module().Config().ID
+	if id != "" {
+		logger = logger.With("id", id)
+	}
+
+	r, err := NewEventReader(config, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize file event reader: %w", err)
 	}
@@ -96,7 +112,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		config:        config,
 		reader:        r,
-		log:           logp.NewLogger(moduleName),
+		log:           logger,
+	}
+
+	// reader supports a processor
+	if rWithProcessor, ok := r.(eventProducerWithProcessor); ok {
+		if proc := rWithProcessor.Processor(); proc != nil {
+			ms.processors = append(ms.processors, proc)
+		}
 	}
 
 	ms.nullHashes = make(map[HashType]Digest, len(config.HashTypes))
@@ -111,6 +134,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return ms, nil
 }
 
+func (ms *MetricSet) Processors() []beat.Processor {
+	return ms.processors
+}
+
 // Run runs the MetricSet. The method will not return control to the caller
 // until it is finished (to stop it close the reporter.Done() channel).
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
@@ -118,11 +145,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		return
 	}
 
-	for ms.fsnotifyChan != nil || ms.scanChan != nil {
+	for ms.eventChan != nil || ms.scanChan != nil {
 		select {
-		case event, ok := <-ms.fsnotifyChan:
+		case event, ok := <-ms.eventChan:
 			if !ok {
-				ms.fsnotifyChan = nil
+				ms.eventChan = nil
 				continue
 			}
 
@@ -161,9 +188,9 @@ func (ms *MetricSet) init(reporter mb.PushReporterV2) bool {
 	}
 	ms.bucket = bucket.(datastore.BoltBucket)
 
-	ms.fsnotifyChan, err = ms.reader.Start(reporter.Done())
+	ms.eventChan, err = ms.reader.Start(reporter.Done())
 	if err != nil {
-		err = fmt.Errorf("failed to start fsnotify event producer: %w", err)
+		err = fmt.Errorf("failed to start event producer: %w", err)
 		reporter.Error(err)
 		ms.log.Errorw("Failed to initialize", "error", err)
 		return false

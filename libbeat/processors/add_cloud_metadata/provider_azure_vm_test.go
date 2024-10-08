@@ -18,17 +18,37 @@
 package add_cloud_metadata
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4/fake"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
+	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var cluster1Name = "testcluster1Name"
+var cluster1ID = "testcluster1ID"
+
+var cluster1 = armcontainerservice.ManagedCluster{
+	ID:         to.Ptr(cluster1ID),
+	Name:       to.Ptr(cluster1Name),
+	Properties: &armcontainerservice.ManagedClusterProperties{NodeResourceGroup: to.Ptr("MC_myname_group_myname_eastus")},
+}
 
 const azInstanceIdentityDocument = `{
 	"azEnvironment": "AzurePublicCloud",
@@ -87,7 +107,62 @@ func initAzureTestServer() *httptest.Server {
 	}))
 }
 
+// NewTokenCredential creates an instance of the TokenCredential type.
+func newTokenCredential() *TokenCredential {
+	return &TokenCredential{}
+}
+
+// TokenCredential is a fake credential that implements the azcore.TokenCredential interface.
+type TokenCredential struct {
+	err error
+}
+
+// SetError sets the specified error to be returned from GetToken().
+// Use this to simulate an error during authentication.
+func (t *TokenCredential) SetError(err error) {
+	t.err = fmt.Errorf("Token cannot be created")
+}
+
+// GetToken implements the azcore.TokenCredential for the TokenCredential type.
+func (t *TokenCredential) GetToken(ctx context.Context, opts policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	if t.err != nil {
+		return azcore.AccessToken{}, t.err
+	}
+	return azcore.AccessToken{Token: "fake_token", ExpiresOn: time.Now().Add(24 * time.Hour)}, nil
+}
+
 func TestRetrieveAzureMetadata(t *testing.T) {
+
+	fakeMCServer := fake.ManagedClustersServer{
+		NewListPager: func(options *armcontainerservice.ManagedClustersClientListOptions) (resp azfake.PagerResponder[armcontainerservice.ManagedClustersClientListResponse]) {
+
+			page := armcontainerservice.ManagedClustersClientListResponse{
+				ManagedClusterListResult: armcontainerservice.ManagedClusterListResult{
+					Value: []*armcontainerservice.ManagedCluster{
+						&cluster1,
+					},
+				},
+			}
+			resp.AddPage(http.StatusOK, page, nil)
+			return resp
+		},
+	}
+	cred := newTokenCredential()
+	clusterClient, _ := armcontainerservice.NewManagedClustersClient("subscriptionID", cred, &arm.ClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Transport: fake.NewManagedClustersServerTransport(&fakeMCServer),
+		},
+	})
+
+	NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+		return clusterClient
+	}
+	defer func() {
+		NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+			return clientFactory.NewManagedClustersClient()
+		}
+	}()
+
 	logp.TestingSetup()
 
 	server := initAzureTestServer()
@@ -127,6 +202,12 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 				"name": "Virtual Machines",
 			},
 			"region": "eastus",
+		},
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
+				"id":   "testcluster1ID",
+				"name": "testcluster1Name",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

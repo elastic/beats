@@ -59,6 +59,22 @@ type Group struct {
 	BatchSize    int
 	Retry        int
 	QueueFactory queue.QueueFactory
+
+	// If the output supports early encoding (where events are converted to their
+	// output-serialized form before entering the queue) it should provide an
+	// encoder factory here. Events will be processed using the resulting encoders
+	// before being returned from the queue. This can provide significant cpu and
+	// memory savings for outputs that support it.
+	// - Each encoder will be accessed from only one goroutine at a time.
+	// - Encoders should add the event's output-serialized form, along with any
+	//   metadata needed to handle a Publish call, to the EncodedEvent field of
+	//   the underlying publisher.Event.
+	// - Encoders should clear the Content field of the underlying publisher.Event
+	//   so memory can be reclaimed for the unencoded version.
+	// - If there is a fatal error in encoding, provide a non-nil EncodedEvent
+	//   and clear Content anyway. Metadata about the error should be saved in
+	//   EncodedEvent and reported when Publish is called.
+	EncoderFactory queue.EncoderFactory
 }
 
 // RegisterType registers a new output type.

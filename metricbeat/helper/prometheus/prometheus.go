@@ -96,16 +96,12 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	}
 
 	contentType := GetContentType(resp.Header)
-	if contentType == "" {
-		return nil, fmt.Errorf("invalid format for response: %v", resp.Header)
-	}
-
 	appendTime := time.Now().Round(0)
 	b, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
-	families, err := ParseMetricFamilies(b, contentType, appendTime)
+	families, err := ParseMetricFamilies(b, contentType, appendTime, p.logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse families: %w", err)
 	}

@@ -22,6 +22,10 @@
       type: keyword
       description: >
         The known status for the task from Amazon ECS.
+    - name: memory_hard_limit
+      type: scaled_float
+      description: >
+        The Hard Memory Limit for the task from Amazon ECS.
     - name: cpu
       type: group
       description: Runtime CPU metrics.
@@ -251,11 +255,6 @@
               format: bytes
               description: >
                 Max memory usage.
-            - name: pct
-              type: scaled_float
-              format: percent
-              description: >
-                Memory usage percentage.
             - name: total
               type: long
               format: bytes

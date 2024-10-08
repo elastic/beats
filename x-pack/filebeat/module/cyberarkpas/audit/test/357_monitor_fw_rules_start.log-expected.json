@@ -38,7 +38,7 @@
         ]
     },
     {
-        "@timestamp": "2023-03-08T02:32:56.000-02:00",
+        "@timestamp": "2024-03-08T02:32:56.000-02:00",
         "cyberarkpas.audit.action": "Monitor FW rules start",
         "cyberarkpas.audit.desc": "Monitor FW rules start",
         "cyberarkpas.audit.issuer": "Batch",

@@ -1,9 +1,9 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
+        "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
         "image": {
-            "name": "registry.k8s.io/etcd:3.5.7-0"
+            "name": "docker.io/library/busybox:latest"
         },
         "runtime": "containerd"
     },
@@ -14,30 +14,21 @@
     },
     "kubernetes": {
         "container": {
-            "cpu": {
-                "request": {
-                    "cores": 0.1
-                }
-            },
-            "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
-            "memory": {
-                "request": {
-                    "bytes": 104857600
-                }
-            },
-            "name": "etcd",
+            "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
+            "name": "hello",
             "status": {
-                "phase": "running",
-                "ready": true,
+                "phase": "terminated",
+                "ready": false,
+                "reason": "Completed",
                 "restarts": 0
             }
         },
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "etcd-kind-control-plane"
+            "name": "hello-28564555-zdfjz"
         }
     },
     "metricset": {

@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,7 +61,6 @@ type config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	Config config
-	db     *sqlx.DB
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -374,12 +371,4 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
-}
-
-// Close closes the connection pool releasing its resources
-func (m *MetricSet) Close() (err error) {
-	if m.db == nil {
-		return nil
-	}
-	return m.db.Close()
 }

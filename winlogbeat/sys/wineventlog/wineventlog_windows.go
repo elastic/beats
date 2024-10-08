@@ -239,15 +239,9 @@ func RenderEvent(
 
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
-		eventHandle, providerName, EvtHandle(publisherHandle), lang, out)
+		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
-		// Do not try to recover from InsufficientBufferErrors because these
-		// can be retried with a larger buffer.
-		if errors.Is(err, sys.InsufficientBufferError{}) {
-			return err
-		}
-
 		err = RenderEventXML(eventHandle, renderBuf, out)
 	}
 
@@ -256,8 +250,8 @@ func RenderEvent(
 
 // Message reads the event data associated with the EvtHandle and renders
 // and returns the message only.
-func Message(h EvtHandle, buf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
-	providerName, err := evtRenderProviderName(buf, h)
+func Message(h EvtHandle, renderBuf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
+	providerName, err := evtRenderProviderName(renderBuf, h)
 	if err != nil {
 		return "", err
 	}
@@ -386,12 +380,15 @@ func Close(h EvtHandle) error {
 // publisherHandle is a handle to the publisher's metadata as provided by
 // EvtOpenPublisherMetadata.
 // lang is the language ID.
+// renderBuf is a scratch buffer to render the message, if not provided or of
+// insufficient size then a buffer from a system pool will be used
 func FormatEventString(
 	messageFlag EvtFormatMessageFlag,
 	eventHandle EvtHandle,
 	publisher string,
 	publisherHandle EvtHandle,
 	lang uint32,
+	renderBuf []byte,
 	out io.Writer,
 ) error {
 	// Open a publisher handle if one was not provided.
@@ -405,29 +402,42 @@ func FormatEventString(
 		defer _EvtClose(ph) //nolint:errcheck // This is just a resource release.
 	}
 
-	// Determine the buffer size needed (given in WCHARs).
-	var bufferUsed uint32
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
+	var bufferPtr *byte
+	if renderBuf != nil {
+		bufferPtr = &renderBuf[0]
+	}
+
+	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
+	var bufferNeeded uint32
+	bufferSize := uint32(len(renderBuf) / 2)
+
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bufferPtr, &bufferNeeded)
+	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
+	} else if err == nil {
+		// Windows API returns a null terminated WCHAR C-style string in the buffer. bufferNeeded applies
+		// only when ERROR_INSUFFICIENT_BUFFER is returned. Luckily the UTF16ToUTF8Bytes/UTF16ToString
+		// functions stop at null termination. Note, as signaled in a comment at the end of this function,
+		// this behavior is bad for EvtFormatMessageKeyword as then the API returns a list of null terminated
+		// strings in the buffer (it's fine for now as we don't use this parameter value).
+		return common.UTF16ToUTF8Bytes(renderBuf, out)
 	}
 
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
-	// The documentation for EvtFormatMessage specifies that the buffer is
-	// requested "in characters", and the buffer itself is LPWSTR, meaning the
-	// characters are WCHAR so double the value.
-	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
+	bb.Reserve(int(bufferNeeded * 2))
+	bufferSize = bufferNeeded
+
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
 	if err != nil {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	// This assumes there is only a single string value to read. This will
-	// not work to read keys (when messageFlag == EvtFormatMessageKeyword).
+	// not work to read keys (when messageFlag == EvtFormatMessageKeyword)
 	return common.UTF16ToUTF8Bytes(bb.Bytes(), out)
 }
 

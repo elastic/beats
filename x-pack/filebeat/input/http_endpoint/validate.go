@@ -9,16 +9,14 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
 	"io"
 	"net/http"
 	"strings"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -41,7 +39,7 @@ type apiValidator struct {
 	hmacPrefix         string
 }
 
-func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
+func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
 	if v.basicAuth {
 		username, password, _ := r.BasicAuth()
 		if v.username != username || v.password != password {
@@ -72,7 +70,7 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 		if v.hmacPrefix != "" {
 			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
 		}
-		signature, err := hex.DecodeString(hmacHeaderValue)
+		signature, err := decodeHeaderValue(hmacHeaderValue)
 		if err != nil {
 			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
 		}
@@ -105,39 +103,24 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 		}
 	}
 
-	return 0, nil
+	return http.StatusAccepted, nil
 }
 
-type apiValidationHandler struct {
-	next      http.Handler
-	validator *apiValidator
-	log       *logp.Logger
+// decoders is the priority-ordered set of decoders to use for HMAC header values.
+var decoders = [...]func(string) ([]byte, error){
+	hex.DecodeString,
+	base64.RawStdEncoding.DecodeString,
+	base64.StdEncoding.DecodeString,
 }
 
-func newAPIValidationHandler(next http.Handler, v *apiValidator, log *logp.Logger) http.Handler {
-	return &apiValidationHandler{
-		next:      next,
-		validator: v,
-		log:       log,
+func decodeHeaderValue(s string) ([]byte, error) {
+	var errs []error
+	for _, d := range &decoders {
+		b, err := d(s)
+		if err == nil {
+			return b, nil
+		}
+		errs = append(errs, err)
 	}
-}
-
-func (v *apiValidationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if status, err := v.validator.ValidateHeader(r); status != 0 && err != nil {
-		sendAPIErrorResponse(w, r, v.log, status, err)
-		return
-	}
-
-	v.next.ServeHTTP(w, r)
-}
-
-func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	if err := enc.Encode(map[string]interface{}{"message": apiError.Error()}); err != nil {
-		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
-	}
+	return nil, errors.Join(errs...)
 }

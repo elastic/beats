@@ -65,6 +65,14 @@ histogram_decimal_metric_count 5
 
 `
 
+	promInfoMetrics = `
+# TYPE target info
+target_info 1
+# TYPE first_metric gauge
+first_metric{label1="value1",label2="value2",label3="Value3",label4="FOO"} 1
+
+`
+
 	promGaugeKeyLabel = `
 # TYPE metrics_one_count_total gauge
 metrics_one_count_total{name="jane",surname="foster"} 1
@@ -506,6 +514,69 @@ func TestPrometheus(t *testing.T) {
 							},
 							"sum": 4310.0,
 						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.msg, func(t *testing.T) {
+			reporter := &mbtest.CapturingReporterV2{}
+			_ = p.ReportProcessedMetrics(test.mapping, reporter)
+			assert.Nil(t, reporter.GetErrors(), test.msg)
+			// Sort slice to avoid randomness
+			res := reporter.GetEvents()
+			sort.Slice(res, func(i, j int) bool {
+				return res[i].MetricSetFields.String() < res[j].MetricSetFields.String()
+			})
+			assert.Equal(t, len(test.expected), len(res))
+			for j, ev := range res {
+				assert.Equal(t, test.expected[j], ev.MetricSetFields, test.msg)
+			}
+		})
+	}
+}
+
+// NOTE: if the content type = text/plain prometheus doesn't support Info metrics
+// with the current implementation, info metrics should just be ignored and all other metrics
+// correctly processed
+func TestInfoMetricPrometheus(t *testing.T) {
+
+	p := &prometheus{mockFetcher{response: promInfoMetrics}, logp.NewLogger("test")}
+
+	tests := []struct {
+		mapping  *MetricsMapping
+		msg      string
+		expected []mapstr.M
+	}{
+		{
+			msg: "Ignore metrics not in mapping",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": Metric("first.metric"),
+				},
+			},
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
+						"metric": 1.0,
+					},
+				},
+			},
+		},
+		{
+			msg: "Ignore metric in mapping but of unsupported type (eg. Info metric)",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"first_metric": Metric("first.metric"),
+					"target_info":  Metric("target.info"),
+				},
+			},
+			expected: []mapstr.M{
+				mapstr.M{
+					"first": mapstr.M{
+						"metric": 1.0,
 					},
 				},
 			},

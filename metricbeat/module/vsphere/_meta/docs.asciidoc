@@ -1,11 +1,76 @@
-The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any Vmware SDK URL (ESXi/VCenter). This library is built for and tested against ESXi and vCenter 5.5, 6.0 and 6.5.
+The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any VMware SDK URL (ESXi/VCenter).
 
-By default it enables the metricsets `datastore`, `host` and `virtualmachine`.
+This module has been tested against ESXi and vCenter versions 5.5, 6.0, 6.5, and 7.0.3.
+
+By default, the vSphere module enables the following metricsets:
+
+1. cluster
+
+2. datastore
+
+3. datastorecluster
+
+4. host
+
+5. network
+
+6. resourcepool
+
+7. virtualmachine
+
+[float]
+=== Supported Periods:
+The Datastore and Host metricsets support performance data collection using the vSphere performance API. Given that the performance API imposes usage restrictions based on data collection intervals, users should configure the period optimally to ensure the receipt of real-time data. This configuration can be determined based on the https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html[Data Collection Intervals] and https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html[Data Collection Levels].
+
+[IMPORTANT]
+
+Only host and datastore metricsets have limitation of system configured period from vSphere instance. Users can still collect summary metrics if performance metrics are not supported for the configured instance.
+
+[float]
+==== Real-time data collection default interval:
+- 20s
+
+[float]
+==== Historical data collection default intervals:
+- 300s
+- 1800s
+- 7200s
+- 86400s
+
+[float]
+=== Example:
+If you need to configure multiple metricsets with different periods, you can achieve this by setting up multiple vSphere modules with different metricsets as demonstrated below:
+
+[source,yaml]
+----
+- module: vsphere
+  metricsets:
+   - cluster
+   - datastorecluster
+   - network
+   - resourcepool
+   - virtualmachine
+  period: 10s
+  hosts: ["https://localhost/sdk"]
+  username: "user"
+  password: "password"
+  insecure: false
+
+- module: vsphere
+  metricsets:
+   - datastore
+   - host
+  period: 300s
+  hosts: ["https://localhost/sdk"]
+  username: "user"
+  password: "password"
+  insecure: false
+----
 
 [float]
 === Dashboard
 
-The vsphere module comes with a predefined dashboard. For example:
+The vSphere module includes a predefined dashboard. For example:
 
 image::./images/metricbeat_vsphere_dashboard.png[]
 image::./images/metricbeat_vsphere_vm_dashboard.png[]
