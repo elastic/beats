@@ -23,10 +23,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNewMetricSet(t *testing.T) {
