@@ -130,7 +130,7 @@ func (d *csvDecoder) check() error {
 	return nil
 }
 
-// close closes the parquet decoder and releases the resources.
+// close closes the csv decoder and releases the resources.
 func (d *csvDecoder) close() error {
 	if d.err == io.EOF {
 		return nil
