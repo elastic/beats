@@ -318,6 +318,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
 - Add CSV decoder to awss3 input. {pull}40896[40896]
 - Change request trace logging to include headers instead of complete request. {pull}41072[41072]
+- Improved GCS input documentation. {pull}41143[41143]
+- Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 
 *Auditbeat*
 
