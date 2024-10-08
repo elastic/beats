@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 // MaxWorkers, Poll, PollInterval, FileSelectors, TimeStampEpoch & ExpandEventListFromField can
@@ -25,6 +26,7 @@ type config struct {
 	PollInterval             *time.Duration       `config:"poll_interval"`
 	Containers               []container          `config:"containers" validate:"required"`
 	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig             readerConfig         `config:",inline"`
 	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
@@ -36,6 +38,7 @@ type container struct {
 	Poll                     *bool                `config:"poll"`
 	PollInterval             *time.Duration       `config:"poll_interval"`
 	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig             readerConfig         `config:",inline"`
 	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
@@ -44,6 +47,12 @@ type container struct {
 type fileSelectorConfig struct {
 	Regex *match.Matcher `config:"regex" validate:"required"`
 	// TODO: Add support for reader config in future
+}
+
+// readerConfig defines the options for reading the content of an azure container.
+type readerConfig struct {
+	Parsers  parser.Config `config:",inline"`
+	Decoding decoderConfig `config:"decoding"`
 }
 
 type authConfig struct {
