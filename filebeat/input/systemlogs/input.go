@@ -138,9 +138,13 @@ func decide(c *conf.C) (bool, *conf.C, error) {
 		return false, cfg, err
 	}
 
+	// Default to files for now
+	cfg2, err := toFilesConfig(c)
+	return false, cfg2, err
+
 	// TODO: implement checking the files
 
-	return false, nil, errors.New("[WIP] either set use_journald or use_files")
+	// return false, nil, errors.New("[WIP] either set use_journald or use_files")
 }
 
 func toJournaldConfig(cfg *conf.C) (*conf.C, error) {

@@ -2,6 +2,9 @@ type: system-logs
 
 {{ if .use_journald }}
 use_journald: true
+tags:
+  - journald
+  - syslog
 {{ end }}
 
 {{ if .use_files }}
@@ -23,9 +26,6 @@ journald:
     - 11
     - 12
     - 15
-  tags:
-    - journald
-    - syslog
 
 files:
   id: system-syslog
