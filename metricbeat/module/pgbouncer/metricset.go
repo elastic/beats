@@ -1,4 +1,5 @@
 package pgbouncer
+
 import (
 	"context"
 	"database/sql"
@@ -8,14 +9,17 @@ import (
 	// Register pgbouncer database/sql driver
 	_ "github.com/lib/pq"
 )
+
 type MetricSet struct {
 	mb.BaseMetricSet
 	db *sql.DB
 }
+
 // NewMetricSet creates a pgbouncer metricset with a pool of connections
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{BaseMetricSet: base}, nil
 }
+
 // DB creates a database connection, it must be freed after use with `Close()`
 func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 	if ms.db == nil {
@@ -27,6 +31,7 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 	}
 	return ms.db.Conn(ctx)
 }
+
 // QueryStats makes the database call for a given metric
 func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]interface{}, error) {
 	db, err := ms.DB(ctx)
@@ -62,6 +67,7 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 	}
 	return results, nil
 }
+
 // Close closes the metricset and its connections
 func (ms *MetricSet) Close() error {
 	if ms.db == nil {

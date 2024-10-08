@@ -119,7 +119,7 @@ func TestParseUrl(t *testing.T) {
 				Username:        test.Username,
 				Password:        test.Password,
 				Timeout:         test.Timeout,
-				RequireUsername: test.RequireUsername, // Ustawienie na podstawie testu
+				RequireUsername: test.RequireUsername,
 			}
 
 			hostData, err := ParseURL(mod, test.URL)
@@ -139,7 +139,7 @@ type MockModule struct {
 	Username        string
 	Password        string
 	Timeout         time.Duration
-	RequireUsername bool // Defaultowo false
+	RequireUsername bool
 }
 
 func (m *MockModule) UnpackConfig(to interface{}) error {
