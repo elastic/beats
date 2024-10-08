@@ -175,14 +175,18 @@ func (m *MockModule) UnpackConfig(to interface{}) error {
 	if m.Username == "" {
 		return fmt.Errorf("simulated config error")
 	}
-	c := to.(*struct {
+	c, ok := to.(*struct {
 		Username string `config:"username"`
 		Password string `config:"password"`
 	})
+	if !ok {
+		return fmt.Errorf("type assertion failed")
+	}
 	c.Username = m.Username
 	c.Password = m.Password
 	return nil
 }
+
 func TestParseURL_UnpackConfigError(t *testing.T) {
 	mod := &MockModule{
 		Username: "",
