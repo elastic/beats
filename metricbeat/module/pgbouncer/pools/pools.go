@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/pgbouncer"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -57,14 +58,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, result := range results {
-		event, err := MapResult(result)
-		if err != nil {
-			return fmt.Errorf("error mapping result: %w", err)
-		}
+		var data mapstr.M
+
+		data, _ = schema.Apply(result)
+
 		reporter.Event(mb.Event{
-			MetricSetFields: event,
+			MetricSetFields: data,
 		})
 	}
-
 	return nil
 }

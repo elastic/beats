@@ -20,7 +20,6 @@ package pools
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Based on pgbouncer show pools;
@@ -40,9 +39,4 @@ var schema = s.Schema{
 	"sv_login":              c.Int("sv_login"),
 	"maxwait_us":            c.Int("maxwait_us"),
 	"pool_mode":             c.Str("pool_mode"),
-}
-
-// MapResult maps a single result to a mapstr.M
-func MapResult(result map[string]interface{}) (mapstr.M, error) {
-	return schema.Apply(result)
 }

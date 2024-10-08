@@ -20,7 +20,6 @@ package stats
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Based on pgbouncer show stats;
@@ -42,9 +41,4 @@ var schema = s.Schema{
 	"avg_xact_time":                 c.Int("avg_xact_time"),
 	"avg_query_time":                c.Int("avg_query_time"),
 	"avg_wait_time":                 c.Int("avg_wait_time"),
-}
-
-// MapResult maps a single result to a mapstr.M
-func MapResult(result map[string]interface{}) (mapstr.M, error) {
-	return schema.Apply(result)
 }
