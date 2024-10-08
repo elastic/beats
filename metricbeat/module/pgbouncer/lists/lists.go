@@ -50,13 +50,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		// Assign the value from "items"
 		resultMap[key] = value
 	}
-	event, err := MapResult(resultMap)
+	data, err := schema.Apply(resultMap)
 	if err != nil {
 		return fmt.Errorf("error mapping result: %w", err)
 	}
 
 	reporter.Event(mb.Event{
-		MetricSetFields: event,
+		MetricSetFields: data,
 	})
 
 	return nil
