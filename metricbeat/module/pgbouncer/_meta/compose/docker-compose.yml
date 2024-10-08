@@ -19,13 +19,6 @@ services:
     volumes:
       - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
       - ./userlist.txt:/etc/pgbouncer/userlist.txt
-  # metricbeat:
-  #   image: test
-  #   build:
-  #     context: ./../../../../beats
-  #     dockerfile: ./metricbeat/module/pgbouncer/_meta/Dockerfile
-  #     cache_from:
-  #       - test
 
   elasticsearch:
     image: elasticsearch:8.11.0

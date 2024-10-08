@@ -1,19 +1,11 @@
-# Module: pgbouncer
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-pgbouncer.html
-
 metricbeat.modules:
 - module: pgbouncer
-  metricsets:
-    - stats
-    - lists
-    - pools
+  # metricsets:
+  #   - stats
+  #   - lists
+  #   - pools
+  #   - mem
   period: 10s
-  hosts: ["postgresql://pgbouncer:6432/pgbouncer?sslmode=disable"]
-  username: test
-  password: password
-output.elasticsearch:
-  hosts: ["http://elasticsearch:9200"]
-  username: elastic
-  password: xxxx
-  indices:
-    - index: "test"
+  hosts: ["postgresql://localhost:6432/pgbouncer?sslmode=disable"]
+  # username: test
+  # password: password

@@ -1,10 +1,7 @@
-# Module: pgbouncer
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-pgbouncer.html
-
 metricbeat.modules:
 - module: pgbouncer
   metricsets:
-    - lists
+    - mem
   period: 10s
   hosts: ["postgresql://localhost:6432/pgbouncer?sslmode=disable"]
   username: test

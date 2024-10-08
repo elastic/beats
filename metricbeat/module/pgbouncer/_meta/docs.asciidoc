@@ -1,0 +1,51 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+PgBouncer is a popular, lightweight connection pooler for PostgreSQL. This module allows you to monitor PgBouncer using Metricbeat, gathering metrics that help optimize performance and maintain stability.
+
+This module periodically fetches metrics from the PgBouncer poolers available at https://www.pgbouncer.org/.
+
+Default metricsets include:
+- `lists`: Provides a list of databases and users currently connected to PgBouncer.
+- `mem`: Monitors memory usage details within PgBouncer, helping detect memory leaks or spikes.
+- `pools`: Tracks the status of connection pools, including active and idle connections.
+- `stats`: Collects comprehensive statistics on database connections and queries processed.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you must use PostgreSQL URLs of the following format with PgBouncer database name included:
+
+[source,yaml]
+-----------------------------------
+[postgres://][user:pass@]host[:port]/pgbouncer[?options]
+-----------------------------------
+
+The URL can be as simple as:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: pgbouncer
+  hosts: ["postgres://localhost/pgbouncer"]
+----------------------------------------------------------------------
+
+Or more complex like:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: pgbouncer
+  hosts: ["postgres://localhost/pgbouncer:40001?sslmode=disable", "postgres://otherhost/pgbouncer:40001"]
+----------------------------------------------------------------------
+
+Usernames and passwords specified in the URL take precedence over those specified in the `username` and `password` configuration options.
+For security best practices, consider using environment variables to pass sensitive information securely.
+
+[source,yaml]
+----
+- module: postgresql
+  metricsets: ["pools"]
+  hosts: ["postgres://localhost/pgbouncer:6432"]
+  username: root
+  password: test
+----

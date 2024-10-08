@@ -1,0 +1,35 @@
+{
+    "@timestamp": "2024-08-04T16:48:49.028Z",
+    "event": {
+        "dataset": "pgbouncer.pools",
+        "duration": 3184900,
+        "module": "pgbouncer"
+    },
+    "metricset": {
+        "name": "pools",
+        "period": 10000
+    },
+    "pgbouncer": {
+        "pools": {
+            "sv_tested": 0,
+            "cl_waiting": 0,
+            "sv_login": 0,
+            "maxwait_us": 0,
+            "pool_mode": "statement",
+            "cl_active": 3,
+            "database": "pgbouncer",
+            "sv_active_cancel": 0,
+            "user": "pgbouncer",
+            "cl_active_cancel_req": 0,
+            "sv_being_canceled": 0,
+            "sv_idle": 0,
+            "cl_waiting_cancel_req": 0,
+            "sv_active": 0,
+            "sv_used": 0
+        }
+    },
+    "service": {
+        "address": "postgresql://localhost:6432/pgbouncer?connect_timeout=10&sslmode=disable",
+        "type": "pgbouncer"
+    }
+}
