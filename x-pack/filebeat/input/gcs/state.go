@@ -79,6 +79,14 @@ func (s *state) updateFailedJobs(jobName string) {
 	s.mu.Unlock()
 }
 
+// deleteFailedJob, deletes a failed job from the failedJobs map
+// this is used when a job no longer exists in the bucket or gets expired
+func (s *state) deleteFailedJob(jobName string) {
+	s.mu.Lock()
+	delete(s.cp.FailedJobs, jobName)
+	s.mu.Unlock()
+}
+
 // setCheckpoint, sets checkpoint from source to current state instance
 // If for some reason the current state is empty, assigns new states as
 // a fail safe mechanism
