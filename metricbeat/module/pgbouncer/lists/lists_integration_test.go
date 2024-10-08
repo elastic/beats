@@ -18,7 +18,6 @@
 package lists
 
 import (
-	"fmt"
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -32,7 +31,6 @@ func TestMetricSet_Fetch(t *testing.T) {
 	service := compose.EnsureUp(t, "pgbouncer")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	fmt.Printf("%v", f)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
