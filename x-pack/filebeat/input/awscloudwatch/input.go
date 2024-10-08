@@ -130,7 +130,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 // fromConfig is a helper to parse input configurations and derive logGroupIDs & aws region
 // Returned logGroupIDs could be empty, which require other fallback mechanisms to derive them.
 // See getLogGroupNames for example.
-func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region string, err error) {
+func fromConfig(cfg config, awsCfg awssdk.Config) (logGrouIDs []string, region string, err error) {
 	// LogGroupARN has precedence over LogGroupName & RegionName
 	if cfg.LogGroupARN != "" {
 		parsedArn, err := arn.Parse(cfg.LogGroupARN)
@@ -144,14 +144,14 @@ func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region 
 
 		// refine to match AWS API parameter regex of logGroupIdentifier
 		groupId := strings.TrimSuffix(cfg.LogGroupARN, ":*")
-		logGroupIDs = append(logGroupIDs, groupId)
+		logGrouIDs = append(logGrouIDs, groupId)
 
-		return logGroupIDs, parsedArn.Region, nil
+		return logGrouIDs, parsedArn.Region, nil
 	}
 
 	// then fallback to LogrGroupName
 	if cfg.LogGroupName != "" {
-		logGroupIDs = append(logGroupIDs, cfg.LogGroupName)
+		logGrouIDs = append(logGrouIDs, cfg.LogGroupName)
 	}
 
 	// finally derive region
@@ -161,7 +161,7 @@ func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region 
 		region = awsCfg.Region
 	}
 
-	return logGroupIDs, region, nil
+	return logGrouIDs, region, nil
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
