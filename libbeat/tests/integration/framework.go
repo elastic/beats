@@ -21,23 +21,25 @@ package integration
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -50,11 +52,14 @@ type BeatProc struct {
 	RestartOnBeatOnExit bool
 	beatName            string
 	cmdMutex            sync.Mutex
+	waitingMutex        sync.Mutex
 	configFile          string
 	fullPath            string
 	logFileOffset       int64
+	eventLogFileOffset  int64
 	t                   *testing.T
 	tempDir             string
+	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
@@ -90,7 +95,7 @@ type Total struct {
 	Value int `json:"value"`
 }
 
-// NewBeat createa a new Beat process from the system tests binary.
+// NewBeat creates a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
@@ -98,10 +103,12 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
+
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
 	require.NoError(t, err, "error creating stdout file")
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
 	require.NoError(t, err, "error creating stderr file")
+
 	p := BeatProc{
 		Binary: binary,
 		baseArgs: append([]string{
@@ -111,6 +118,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 			"--path.logs", tempDir,
 			"-E", "logging.to_files=true",
 			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
 		}, args...),
 		tempDir:    tempDir,
 		beatName:   beatName,
@@ -123,31 +131,47 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		if !t.Failed() {
 			return
 		}
-		var maxlen int64 = 2048
-		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
-		if err != nil {
-			t.Logf("error reading stderr: %s", err)
-		}
-		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+		reportErrors(t, tempDir, beatName)
+	})
+	return &p
+}
 
-		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
-		if err != nil {
-			t.Logf("error reading stdout: %s", err)
-		}
-		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
+// See `NewBeat` for options and information for the parameters.
+func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	require.FileExistsf(t, binary, "agentbeat binary must exists")
+	tempDir := createTempDir(t)
+	configFile := filepath.Join(tempDir, beatName+".yml")
 
-		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
-		files, err := filepath.Glob(glob)
-		if err != nil {
-			t.Logf("glob error with: %s: %s", glob, err)
+	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
+	require.NoError(t, err, "error creating stdout file")
+	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
+	require.NoError(t, err, "error creating stderr file")
+
+	p := BeatProc{
+		Binary: binary,
+		baseArgs: append([]string{
+			"agentbeat",
+			"--systemTest",
+			beatName,
+			"--path.home", tempDir,
+			"--path.logs", tempDir,
+			"-E", "logging.to_files=true",
+			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
+		}, args...),
+		tempDir:    tempDir,
+		beatName:   beatName,
+		configFile: configFile,
+		t:          t,
+		stdout:     stdoutFile,
+		stderr:     stderrFile,
+	}
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
 		}
-		for _, f := range files {
-			contents, err := readLastNBytes(f, maxlen)
-			if err != nil {
-				t.Logf("error reading %s: %s", f, err)
-			}
-			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
-		}
+		reportErrors(t, tempDir, beatName)
 	})
 	return &p
 }
@@ -181,13 +205,8 @@ func (b *BeatProc) Start(args ...string) {
 
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
-		// 1. Kill the Beat
-		if err := b.Process.Signal(os.Interrupt); err != nil {
-			if !errors.Is(err, os.ErrProcessDone) {
-				t.Fatalf("could not stop process with PID: %d, err: %s",
-					b.Process.Pid, err)
-			}
-		}
+		// 1. Send an interrupt signal to the Beat
+		b.stopNonsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
 		if b.RestartOnBeatOnExit {
@@ -199,7 +218,7 @@ func (b *BeatProc) Start(args ...string) {
 			// wg.Wait() or there is a possibility of
 			// deadlock.
 			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps ensuring
+			// 4. Wait for the goroutine to finish, this helps to ensure
 			// no other Beat process was started
 			wg.Wait()
 		} else {
@@ -213,28 +232,58 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+
 	_, _ = b.stdout.Seek(0, 0)
 	_ = b.stdout.Truncate(0)
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
-	var procAttr os.ProcAttr
-	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
-	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
-	require.NoError(b.t, err, "error starting beat process")
-	b.Process = process
-}
 
-// waitBeatToExit blocks until the Beat exits, it returns
-// the process' exit code.
-// `startBeat` must be called before this method.
-func (b *BeatProc) waitBeatToExit() int {
-	processState, err := b.Process.Wait()
-	if err != nil {
-		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
-			b.beatName, err, processState.ExitCode())
+	cmd := exec.Cmd{
+		Path:   b.fullPath,
+		Args:   b.Args,
+		Stdout: b.stdout,
+		Stderr: b.stderr,
 	}
 
-	return processState.ExitCode()
+	var err error
+	b.stdin, err = cmd.StdinPipe()
+	require.NoError(b.t, err, "could not get cmd StdinPipe")
+
+	err = cmd.Start()
+	require.NoError(b.t, err, "error starting beat process")
+
+	b.Process = cmd.Process
+
+	b.t.Cleanup(func() {
+		// If the test failed, print the whole cmd line to help debugging
+		if b.t.Failed() {
+			args := strings.Join(cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+		}
+	})
+}
+
+// waitBeatToExit blocks until the Beat exits.
+// `startBeat` must be called before this method.
+func (b *BeatProc) waitBeatToExit() {
+	if !b.waitingMutex.TryLock() {
+		// b.stopNonsynced must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+
+	processState, err := b.Process.Wait()
+	if err != nil {
+		exitCode := "unknown"
+		if processState != nil {
+			exitCode = strconv.Itoa(processState.ExitCode())
+		}
+
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
+			b.beatName, err, exitCode)
+	}
+
+	return
 }
 
 // Stop stops the Beat process
@@ -242,22 +291,61 @@ func (b *BeatProc) waitBeatToExit() int {
 func (b *BeatProc) Stop() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+	b.stopNonsynced()
+}
+
+// stopNonsynced is the actual stop code, but without locking so it can be reused
+// by methods that have already acquired the lock.
+func (b *BeatProc) stopNonsynced() {
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
-		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+			b.Process.Pid, err)
+	}
+
+	if !b.waitingMutex.TryLock() {
+		// b.waitBeatToExit must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+	ps, err := b.Process.Wait()
+	if err != nil {
+		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+	}
+	if !ps.Success() {
+		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
 	}
 }
 
 // LogMatch tests each line of the logfile to see if contains any
-// match of the provided regular expression.  It will open the log
-// file on every call, read until EOF, then close it.  LogContains
+// match of the provided regular expression. It will open the log
+// file on every call, read until EOF, then close it. LogContains
 // will be faster so use that if possible.
 func (b *BeatProc) LogMatch(match string) bool {
 	re := regexp.MustCompile(match)
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
+	defer logFile.Close()
+
+	var found bool
+	found, b.logFileOffset = b.logRegExpMatch(re, logFile, b.logFileOffset)
+	if found {
+		return found
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return false
+	}
+	defer eventLogFile.Close()
+	found, b.eventLogFileOffset = b.logRegExpMatch(re, eventLogFile, b.eventLogFileOffset)
+
+	return found
+}
+
+func (b *BeatProc) logRegExpMatch(re *regexp.Regexp, logFile *os.File, offset int64) (bool, int64) {
+	_, err := logFile.Seek(offset, io.SeekStart)
 	if err != nil {
 		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -274,7 +362,7 @@ func (b *BeatProc) LogMatch(match string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(data))
+		offset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -284,20 +372,72 @@ func (b *BeatProc) LogMatch(match string) bool {
 		}
 
 		if re.MatchString(line) {
-			return true
+			return true, offset
 		}
 	}
 
-	return false
+	return false, offset
 }
 
 // LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
-// then close it.
+// then close it. It keeps track of the offset so subsequent calls
+// will only read log entries that were not read by the previous
+// call.
+//
+// The events log file is read after the normal log file and its
+// offset is tracked separately.
 func (b *BeatProc) LogContains(s string) bool {
-	t := b.t
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
+	defer logFile.Close()
+
+	var found bool
+	found, b.logFileOffset, _ = b.searchStrInLogs(logFile, s, b.logFileOffset)
+	if found {
+		return found
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return false
+	}
+	defer eventLogFile.Close()
+	found, b.eventLogFileOffset, _ = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
+
+	return found
+}
+
+// GetLogLine search for the string s starting at the beginning
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLogLine does not keep track of
+// any offset
+func (b *BeatProc) GetLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, _, line := b.searchStrInLogs(logFile, s, 0)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, _, line = b.searchStrInLogs(eventLogFile, s, 0)
+
+	return line
+}
+
+// searchStrInLogs search for s as a substring of any line in logFile starting
+// from offset.
+//
+// It will close logFile and return the current offset.
+func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64, string) {
+	t := b.t
+
+	_, err := logFile.Seek(offset, io.SeekStart)
 	if err != nil {
 		t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -314,7 +454,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(data))
+		offset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -324,11 +464,11 @@ func (b *BeatProc) LogContains(s string) bool {
 		}
 
 		if strings.Contains(line, s) {
-			return true
+			return true, offset, line
 		}
 	}
 
-	return false
+	return false, offset, ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -361,32 +501,36 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 	b.baseArgs = append(b.baseArgs, "-c", b.configFile)
 }
 
-// openLogFile opens the log file for reading and returns it.
-// It also registers a cleanup function to close the file
-// when the test ends.
-func (b *BeatProc) openLogFile() *os.File {
+// openGlobFile opens a file defined by glob. The glob must resolve to a single
+// file otherwise the test fails. It returns a *os.File and a boolean indicating
+// whether a file was found.
+//
+// If `waitForFile` is true, it will wait up to 5 seconds for the file to
+// be created. The test will fail if the file is not found. If it is false
+// and no file is found, nil and false are returned.
+func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 	t := b.t
-	glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(b.tempDir, b.beatName))
+
 	files, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("could not expand log file glob: %s", err)
 	}
 
-	require.Eventually(t, func() bool {
-		files, err = filepath.Glob(glob)
-		if err != nil {
-			t.Fatalf("could not expand log file glob: %s", err)
-		}
-		return len(files) == 1
-	}, 5*time.Second, 100*time.Millisecond,
-		"waiting for log file matching glob '%s' to be created", glob)
+	if waitForFile && len(files) == 0 {
+		require.Eventually(t, func() bool {
+			files, err = filepath.Glob(glob)
+			if err != nil {
+				t.Fatalf("could not expand log file glob: %s", err)
+			}
+			return len(files) == 1
+		}, 5*time.Second, 100*time.Millisecond,
+			"waiting for log file matching glob '%s' to be created", glob)
+	}
 
-	// On a normal operation there must be a single log, if there are more
-	// than one, then there is an issue and the Beat is logging too much,
-	// which is enough to stop the test
-	if len(files) != 1 {
-		t.Fatalf("there must be only one log file for %s, found: %d",
-			glob, len(files))
+	// We only reach this line if `waitForFile` is false, so we need
+	// to check whether we found a file
+	if len(files) == 0 {
+		return nil
 	}
 
 	f, err := os.Open(files[0])
@@ -395,6 +539,33 @@ func (b *BeatProc) openLogFile() *os.File {
 	}
 
 	return f
+}
+
+// openLogFile opens the log file for reading and returns it.
+// It's the caller's responsibility to close the file.
+// If the log file is not found, the test fails. The returned
+// value is never nil.
+func (b *BeatProc) openLogFile() *os.File {
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
+
+	return b.openGlobFile(glob, true)
+}
+
+// openEventLogFile opens the log file for reading and returns it.
+// If the events log file does not exist, nil is returned
+// It's the caller's responsibility to close the file.
+func (b *BeatProc) openEventLogFile() *os.File {
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
+
+	return b.openGlobFile(glob, false)
 }
 
 // createTempDir creates a temporary directory that will be
@@ -452,9 +623,9 @@ func EnsureESIsRunning(t *testing.T) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// If you're reading this message, you probably forgot to start ES
-		// run `mage compose:Up` from Filebeat's folder to start all
+		// run `mage docker:composeUp` from Filebeat's folder to start all
 		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
+		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage docker:composeUp)", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
@@ -508,11 +679,27 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	}
 	defer metaFile.Close()
 
-	metaBytes, err := ioutil.ReadAll(metaFile)
+	metaBytes, err := io.ReadAll(metaFile)
 	require.NoError(b.t, err, "error reading meta file")
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
 	return m, nil
+}
+
+// RemoveAllCLIArgs removes all CLI arguments configured.
+// It will also remove all configuration for home path and
+// logs, therefore some methods, like the ones that read logs,
+// might fail if Filebeat is not configured the way this framework
+// expects.
+//
+// The only CLI argument kept is the `--systemTest` that is necessary
+// to make the System Test Binary run Filebeat
+func (b *BeatProc) RemoveAllCLIArgs() {
+	b.baseArgs = []string{b.beatName, "--systemTest"}
+}
+
+func (b *BeatProc) Stdin() io.WriteCloser {
+	return b.stdin
 }
 
 func GetESURL(t *testing.T, scheme string) url.URL {
@@ -664,4 +851,86 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
 	}
 	return io.ReadAll(f)
+}
+
+func reportErrors(t *testing.T, tempDir string, beatName string) {
+	var maxlen int64 = 2048
+	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
+	if err != nil {
+		t.Logf("error reading stderr: %s", err)
+	}
+	t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+
+	stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
+	if err != nil {
+		t.Logf("error reading stdout: %s", err)
+	}
+	t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+
+	glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
+	files, err := filepath.Glob(glob)
+	if err != nil {
+		t.Logf("glob error with: %s: %s", glob, err)
+	}
+	for _, f := range files {
+		contents, err := readLastNBytes(f, maxlen)
+		if err != nil {
+			t.Logf("error reading %s: %s", f, err)
+		}
+		t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+	}
+}
+
+// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// Each line contains the current time (RFC3339) and a counter
+func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+	var file *os.File
+	var err error
+	if !append {
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("could not create file '%s': %s", path, err)
+		}
+	} else {
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("could not open or create file: '%s': %s", path, err)
+		}
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("could not close file: %s", err)
+		}
+	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("could not sync file: %s", err)
+		}
+	}()
+	now := time.Now().Format(time.RFC3339)
+	// If the length is different, e.g when there is no offset from UTC.
+	// add some padding so the length is predictable
+	if len(now) != len(time.RFC3339) {
+		paddingNeeded := len(time.RFC3339) - len(now)
+		for i := 0; i < paddingNeeded; i++ {
+			now += "-"
+		}
+	}
+	for i := 0; i < count; i++ {
+		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
+			t.Fatalf("could not write line %d to file: %s", count+1, err)
+		}
+	}
+}
+
+func (b *BeatProc) CountFileLines(glob string) int {
+	file := b.openGlobFile(glob, true)
+	defer file.Close()
+	data, err := io.ReadAll(file)
+	if err != nil {
+		b.t.Fatalf("could not read file '%s': %s", file.Name(), err)
+	}
+
+	return bytes.Count(data, []byte{'\n'})
 }

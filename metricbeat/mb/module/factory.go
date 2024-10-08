@@ -29,24 +29,34 @@ import (
 type Factory struct {
 	beatInfo beat.Info
 	options  []Option
+	registry *mb.Register
+}
+
+// metricSetWithProcessors is an interface to check if a MetricSet has directly attached Processors
+// NOTE: Processors that implement the Closer interface are going to be closed from the pipeline when required,
+// namely during dynamic configuration reloading. Thus, it is critical for the Metricset to always instantiate
+// properly the processor and not consider it as always running.
+type metricSetWithProcessors interface {
+	Processors() []beat.Processor
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, registry *mb.Register, options ...Option) *Factory {
 	return &Factory{
 		beatInfo: beatInfo,
 		options:  options,
+		registry: registry,
 	}
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, mb.Registry)
+	module, metricSets, err := mb.NewModule(c, r.registry)
 	if err != nil {
 		return nil, err
 	}
 
-	var runners []cfgfile.Runner
+	runners := make([]cfgfile.Runner, 0, len(metricSets))
 	for _, metricSet := range metricSets {
 		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.options...)
 		if err != nil {
@@ -58,9 +68,13 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 			return nil, err
 		}
 
-		err = connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
+		err = connector.UseMetricSetProcessors(r.registry, module.Name(), metricSet.Name())
 		if err != nil {
 			return nil, err
+		}
+
+		if msWithProcs, ok := metricSet.(metricSetWithProcessors); ok {
+			connector.addProcessors(msWithProcs.Processors())
 		}
 
 		client, err := connector.Connect()
@@ -75,7 +89,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 // CheckConfig checks if a config is valid or not
 func (r *Factory) CheckConfig(config *conf.C) error {
-	_, err := NewWrapper(config, mb.Registry, r.options...)
+	_, err := NewWrapper(config, r.registry, r.options...)
 	if err != nil {
 		return err
 	}

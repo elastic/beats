@@ -48,6 +48,7 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger            *logp.Logger
 	CloudwatchConfigs []Config `config:"metrics" validate:"nonzero,required"`
+	PreviousEndTime   time.Time
 }
 
 // Dimension holds name and value for cloudwatch metricset dimension config.
@@ -87,7 +88,7 @@ type namespaceDetail struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger(metricsetName)
+	logger := logp.NewLogger(aws.ModuleName + "." + metricsetName)
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
@@ -119,7 +120,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 	m.Logger().Debugf("startTime = %s, endTime = %s", startTime, endTime)
 
 	// Check statistic method in config
@@ -177,10 +179,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
-		if err != nil {
-			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+		// retrieve all the details for all the metrics available in the current region when no namespace is specified
+		// otherwise only retrieve metrics from the specific namespaces from the config
+		var listMetricsOutput []aws.MetricWithID
+		if len(namespaceDetailTotal) == 0 {
+			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
+			if err != nil {
+				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
+			}
+		} else {
+			for namespace := range namespaceDetailTotal {
+				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
+				if err != nil {
+					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, namespace, err)
+				}
+				listMetricsOutput = append(listMetricsOutput, listMetricsOutputPerNamespace...)
+			}
 		}
 
 		if len(listMetricsOutput) == 0 {

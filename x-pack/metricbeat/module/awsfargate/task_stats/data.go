@@ -57,6 +57,11 @@ func createEvent(stats *Stats) mb.Event {
 		_, _ = e.MetricSetFields.Put("task_known_status", taskKnownStatus)
 	}
 
+	memoryHardLimit := stats.Container.Limits.Memory
+	if memoryHardLimit != 0 {
+		_, _ = e.MetricSetFields.Put("memory_hard_limit", memoryHardLimit)
+	}
+
 	_, _ = e.MetricSetFields.Put("identifier", generateIdentifier(stats.Container.Name, stats.Container.DockerId))
 	return e
 }
@@ -163,7 +168,6 @@ func createMemoryFields(stats *Stats) mapstr.M {
 			},
 			"usage": mapstr.M{
 				"total": stats.memoryStats.Usage,
-				"pct":   stats.memoryStats.UsageP,
 				"max":   stats.memoryStats.MaxUsage,
 			},
 		}

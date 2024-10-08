@@ -26,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/auditbeat/core"
@@ -76,7 +76,7 @@ func createEvent(t *testing.T) {
 	}
 	defer c.Close()
 
-	reader, err := c.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	reader, err := c.ImagePull(context.Background(), "busybox", image.PullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
+	c.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {

@@ -18,14 +18,15 @@
 package statestore
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
-	"github.com/elastic/go-concert/atomic"
 	"github.com/elastic/go-concert/unison"
 )
 
 type sharedStore struct {
 	reg      *Registry
-	refCount atomic.Int
+	refCount atomic.Int64
 
 	name    string
 	backend backend.Store
@@ -43,12 +44,14 @@ type Store struct {
 }
 
 func newSharedStore(reg *Registry, name string, backend backend.Store) *sharedStore {
-	return &sharedStore{
+	s := &sharedStore{
 		reg:      reg,
-		refCount: atomic.MakeInt(1),
+		refCount: atomic.Int64{},
 		name:     name,
 		backend:  backend,
 	}
+	s.refCount.Store(1)
+	return s
 }
 
 func newStore(shared *sharedStore) *Store {
@@ -151,11 +154,11 @@ func (s *Store) Each(fn func(string, ValueDecoder) (bool, error)) error {
 }
 
 func (s *sharedStore) Retain() {
-	s.refCount.Inc()
+	s.refCount.Add(1)
 }
 
 func (s *sharedStore) Release() error {
-	if s.refCount.Dec() == 0 && s.tryUnregister() {
+	if s.refCount.Add(-1) == 0 && s.tryUnregister() {
 		return s.backend.Close()
 	}
 	return nil

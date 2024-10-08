@@ -33,7 +33,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 
-	files, err := filepath.Glob("./_meta/test/stats.*.json")
+	files, err := filepath.Glob("./_meta/test/*.stats.*.json")
 	require.NoError(t, err)
 
 	info := beat.Info{

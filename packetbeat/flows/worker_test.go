@@ -24,13 +24,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lookslike/isdef"
-
-	"github.com/elastic/go-lookslike"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 )
 
 // Use `go test -data` to update sample event files.
@@ -65,7 +65,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	bif.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{10, 1}}
 	bif.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{460, 2}}
-	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
+	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, false)
 
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
@@ -116,7 +116,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// Write the event to disk if -data is used.
 	if *dataFlag {
-		event.Fields.Put("@timestamp", common.Time(end)) //nolint:errcheck // Never fails.
+		event.Fields.Put("@timestamp", common.Time(end))
 		output, err := json.MarshalIndent(&event.Fields, "", "  ")
 		if err != nil {
 			t.Fatal(err)
@@ -126,4 +126,34 @@ func TestCreateEvent(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+
+	// when enableDeltaFlowReporting is true, the flow stats should be reset
+	expectbiFlow := &biFlow{
+		id:       id.rawFlowID,
+		killed:   1,
+		createTS: start,
+		ts:       end,
+		dir:      flowDirForward,
+	}
+	expectbiFlow.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
+	expectbiFlow.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
+
+	// Assert the biflow is not 0 before the test
+	assert.NotEqual(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
+	assert.NotEqual(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
+
+	event = createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, true)
+	result = validate(event.Fields)
+	if errs := result.Errors(); len(errs) > 0 {
+		for _, err := range errs {
+			t.Error(err)
+		}
+		t.FailNow()
+	}
+
+	// Assert the biflow is 0 after the test
+	assert.Equal(t, expectbiFlow.stats[0].uintFlags, bif.stats[0].uintFlags)
+	assert.Equal(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
+	assert.Equal(t, expectbiFlow.stats[1].uintFlags, bif.stats[1].uintFlags)
+	assert.Equal(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
 }

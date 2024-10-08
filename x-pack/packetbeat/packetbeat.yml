@@ -221,6 +221,9 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
+  # Pipeline to route events to protocol pipelines.
+  pipeline: "packetbeat-%{[agent.version]}-routing"
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # The Logstash hosts

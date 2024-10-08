@@ -336,8 +336,8 @@ If {kib} is not running on `localhost:5061`, you must also adjust the
 endif::no_dashboards[]
 
 [[template-subcommand]]*`template`*::
-Exports the index template to stdout. You can specify the `--es.version` and
-`--index` flags to further define what gets exported. Furthermore you can export
+Exports the index template to stdout. You can specify the `--es.version`
+flag to further define what gets exported. Furthermore you can export
 the template to a file instead of `stdout` by defining a directory via `--dir`.
 
 [[ilm-policy-subcommand]]
@@ -388,10 +388,6 @@ endif::export_pipeline[]
 *`-h, --help`*::
 Shows help for the `export` command.
 
-*`--index BASE_NAME`*::
-When used with <<template-subcommand,`template`>>, sets the base name to use for
-the index template. If this flag is not specified, the default base name is
-+{beatname_lc}+.
 
 *`--dir DIRNAME`*::
 
@@ -412,7 +408,7 @@ ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {version} --index myindexname
+{beatname_lc} export template --es.version {version}
 {beatname_lc} export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 -----
 endif::no_dashboards[]
@@ -421,7 +417,7 @@ ifdef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {version} --index myindexname
+{beatname_lc} export template --es.version {version}
 -----
 endif::no_dashboards[]
 endif::serverless[]
@@ -430,7 +426,7 @@ ifdef::serverless[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
-{beatname_lc} export template --es.version {version} --index myindexname
+{beatname_lc} export template --es.version {version}
 {beatname_lc} export function cloudwatch
 -----
 endif::serverless[]
@@ -744,6 +740,10 @@ and inputs, and runs each input until the harvesters are closed. If you set the
 `--once` flag, you should also set `close_eof` so the harvester is closed when
 the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
++
+The `--once` option is not currently supported with the
+{filebeat-ref}/filebeat-input-filestream.html[`filestream`] input type.
+
 endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::

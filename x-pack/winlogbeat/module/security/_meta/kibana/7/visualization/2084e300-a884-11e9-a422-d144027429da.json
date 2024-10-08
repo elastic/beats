@@ -126,11 +126,10 @@
             "type": "tagcloud"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:11.460Z",
     "id": "2084e300-a884-11e9-a422-d144027429da",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -149,6 +148,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:54.296Z",
-    "version": "WzIyMDAsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:11.460Z",
+    "version": "WzMxOSwxXQ=="
 }

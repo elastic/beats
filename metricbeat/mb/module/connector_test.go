@@ -67,7 +67,8 @@ func TestProcessorsForConfig(t *testing.T) {
 			t.Errorf("[%s] %v", description, err)
 			continue
 		}
-		processedEvent, err := processors.Run(&test.event)
+		testEvent := testCases[description].event
+		processedEvent, err := processors.Run(&testEvent)
 		// We don't check if err != nil, because we are testing the final outcome
 		// of running the processors, including when some of them fail.
 		if processedEvent == nil {

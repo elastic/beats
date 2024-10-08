@@ -22,8 +22,36 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+
 	as "github.com/aerospike/aerospike-client-go"
 )
+
+type Config struct {
+	ClusterName string            `config:"cluster_name"`
+	TLS         *tlscommon.Config `config:"ssl"`
+}
+
+// DefaultConfig return default config for the aerospike module.
+func DefaultConfig() Config {
+	return Config{}
+}
+
+func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
+	clientPolicy := as.NewClientPolicy()
+	if config.TLS.IsEnabled() {
+		tlsconfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
+		}
+		clientPolicy.TlsConfig = tlsconfig.ToConfig()
+	}
+
+	if config.ClusterName != "" {
+		clientPolicy.ClusterName = config.ClusterName
+	}
+	return clientPolicy, nil
+}
 
 func ParseHost(host string) (*as.Host, error) {
 	pieces := strings.Split(host, ":")

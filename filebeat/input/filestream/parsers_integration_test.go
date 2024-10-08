@@ -59,6 +59,39 @@ func TestParsersAgentLogs(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
+func TestParsersIncludeMessage(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	readLine := "include this"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                "fake-ID",
+		"paths":                             []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval": "100ms",
+		"parsers": []map[string]interface{}{
+			{
+				"include_message": map[string]interface{}{
+					"patterns": "^" + readLine + "$",
+				},
+			},
+		},
+	})
+
+	logs := []byte("do no include this line\r\n" + readLine + "\r\n")
+	env.mustWriteToFile(testlogName, logs)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(logs))
+
+	env.requireEventContents(0, "message", readLine)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
 // test_docker_logs_filtering from test_json.py
 func TestParsersDockerLogsFiltering(t *testing.T) {
 	env := newInputTestingEnvironment(t)

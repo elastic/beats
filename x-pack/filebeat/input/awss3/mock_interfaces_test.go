@@ -314,48 +314,48 @@ func (m *MockS3API) EXPECT() *MockS3APIMockRecorder {
 }
 
 // CopyObject mocks base method.
-func (m *MockS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+func (m *MockS3API) CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
+	ret := m.ctrl.Call(m, "CopyObject", ctx, region, from_bucket, to_bucket, from_key, to_key)
 	ret0, _ := ret[0].(*s3.CopyObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CopyObject indicates an expected call of CopyObject.
-func (mr *MockS3APIMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
+func (mr *MockS3APIMockRecorder) CopyObject(ctx, region, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*MockS3API)(nil).CopyObject), ctx, from_bucket, to_bucket, from_key, to_key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*MockS3API)(nil).CopyObject), ctx, region, from_bucket, to_bucket, from_key, to_key)
 }
 
 // DeleteObject mocks base method.
-func (m *MockS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+func (m *MockS3API) DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
+	ret := m.ctrl.Call(m, "DeleteObject", ctx, region, bucket, key)
 	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DeleteObject indicates an expected call of DeleteObject.
-func (mr *MockS3APIMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
+func (mr *MockS3APIMockRecorder) DeleteObject(ctx, region, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*MockS3API)(nil).DeleteObject), ctx, bucket, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*MockS3API)(nil).DeleteObject), ctx, region, bucket, key)
 }
 
 // GetObject mocks base method.
-func (m *MockS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
+func (m *MockS3API) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
+	ret := m.ctrl.Call(m, "GetObject", ctx, region, bucket, key)
 	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetObject indicates an expected call of GetObject.
-func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock.Call {
+func (mr *MockS3APIMockRecorder) GetObject(ctx, region, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, region, bucket, key)
 }
 
 // ListObjectsPaginator mocks base method.
@@ -396,18 +396,18 @@ func (m *Mocks3Getter) EXPECT() *Mocks3GetterMockRecorder {
 }
 
 // GetObject mocks base method.
-func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
+func (m *Mocks3Getter) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
+	ret := m.ctrl.Call(m, "GetObject", ctx, region, bucket, key)
 	ret0, _ := ret[0].(*s3.GetObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetObject indicates an expected call of GetObject.
-func (mr *Mocks3GetterMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock.Call {
+func (mr *Mocks3GetterMockRecorder) GetObject(ctx, region, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*Mocks3Getter)(nil).GetObject), ctx, bucket, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*Mocks3Getter)(nil).GetObject), ctx, region, bucket, key)
 }
 
 // Mocks3Mover is a mock of s3Mover interface.
@@ -434,33 +434,33 @@ func (m *Mocks3Mover) EXPECT() *Mocks3MoverMockRecorder {
 }
 
 // CopyObject mocks base method.
-func (m *Mocks3Mover) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+func (m *Mocks3Mover) CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CopyObject", ctx, from_bucket, to_bucket, from_key, to_key)
+	ret := m.ctrl.Call(m, "CopyObject", ctx, region, from_bucket, to_bucket, from_key, to_key)
 	ret0, _ := ret[0].(*s3.CopyObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CopyObject indicates an expected call of CopyObject.
-func (mr *Mocks3MoverMockRecorder) CopyObject(ctx, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
+func (mr *Mocks3MoverMockRecorder) CopyObject(ctx, region, from_bucket, to_bucket, from_key, to_key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*Mocks3Mover)(nil).CopyObject), ctx, from_bucket, to_bucket, from_key, to_key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyObject", reflect.TypeOf((*Mocks3Mover)(nil).CopyObject), ctx, region, from_bucket, to_bucket, from_key, to_key)
 }
 
 // DeleteObject mocks base method.
-func (m *Mocks3Mover) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
+func (m *Mocks3Mover) DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteObject", ctx, bucket, key)
+	ret := m.ctrl.Call(m, "DeleteObject", ctx, region, bucket, key)
 	ret0, _ := ret[0].(*s3.DeleteObjectOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DeleteObject indicates an expected call of DeleteObject.
-func (mr *Mocks3MoverMockRecorder) DeleteObject(ctx, bucket, key interface{}) *gomock.Call {
+func (mr *Mocks3MoverMockRecorder) DeleteObject(ctx, region, bucket, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*Mocks3Mover)(nil).DeleteObject), ctx, bucket, key)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteObject", reflect.TypeOf((*Mocks3Mover)(nil).DeleteObject), ctx, region, bucket, key)
 }
 
 // Mocks3Lister is a mock of s3Lister interface.

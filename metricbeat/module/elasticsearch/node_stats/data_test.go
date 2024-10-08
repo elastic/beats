@@ -22,6 +22,7 @@ package node_stats
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -60,3 +61,6 @@ func (m mockModule) Config() mb.ModuleConfig {
 func (m mockModule) UnpackConfig(to interface{}) error {
 	return nil
 }
+
+func (m mockModule) UpdateStatus(_ status.Status, _ string)    {}
+func (m mockModule) SetStatusReporter(_ status.StatusReporter) {}

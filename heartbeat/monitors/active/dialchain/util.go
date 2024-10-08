@@ -18,6 +18,7 @@
 package dialchain
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -58,7 +59,7 @@ func (t *timer) stop()                   { t.e = time.Now() }
 func (t *timer) duration() time.Duration { return t.e.Sub(t.s) }
 
 // makeDialer aliases transport.DialerFunc
-func makeDialer(fn func(network, address string) (net.Conn, error)) transport.Dialer {
+func makeDialer(fn func(ctx context.Context, network, address string) (net.Conn, error)) transport.Dialer {
 	return transport.DialerFunc(fn)
 }
 
@@ -66,7 +67,7 @@ func makeDialer(fn func(network, address string) (net.Conn, error)) transport.Di
 // The callback must return the original or a new address to be used with
 // the dialer.
 func beforeDial(dialer transport.Dialer, fn func(string) string) transport.Dialer {
-	return makeDialer(func(network, address string) (net.Conn, error) {
+	return makeDialer(func(ctx context.Context, network, address string) (net.Conn, error) {
 		address = fn(address)
 		return dialer.Dial(network, address)
 	})
@@ -74,7 +75,7 @@ func beforeDial(dialer transport.Dialer, fn func(string) string) transport.Diale
 
 // afterDial will run fn after the dialer did successfully return a connection.
 func afterDial(dialer transport.Dialer, fn func(net.Conn) (net.Conn, error)) transport.Dialer {
-	return makeDialer(func(network, address string) (net.Conn, error) {
+	return makeDialer(func(ctx context.Context, network, address string) (net.Conn, error) {
 		conn, err := dialer.Dial(network, address)
 		if err == nil {
 			conn, err = fn(conn)

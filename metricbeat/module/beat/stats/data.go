@@ -35,6 +35,7 @@ var (
 		"cgroup":     c.Ifc("beat.cgroup"),
 		"system":     c.Ifc("system"),
 		"apm_server": c.Ifc("apm-server"),
+		"output":     c.Ifc("output"),
 		"cpu":        c.Ifc("beat.cpu"),
 		"info":       c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
@@ -75,7 +76,8 @@ var (
 			"pipeline": c.Dict("pipeline", s.Schema{
 				"clients": c.Int("clients"),
 				"queue": c.Dict("queue", s.Schema{
-					"acked": c.Int("acked"),
+					"acked":      c.Int("acked"),
+					"max_events": c.Int("max_events"),
 				}),
 				"events": c.Dict("events", s.Schema{
 					"active":    c.Int("active"),

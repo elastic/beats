@@ -21,8 +21,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func stringp(x string) *string {
@@ -86,7 +88,7 @@ metric_without_suffix 10
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -135,9 +137,169 @@ process_cpu 20
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
+	}
+	require.ElementsMatch(t, expected, result)
+}
+
+func TestGroupWithHeaderBlockPrometheus(t *testing.T) {
+	input := `
+# HELP nginx_sts_server_bytes_total The request/response bytes
+# TYPE nginx_sts_server_bytes_total counter
+# HELP nginx_sts_server_connects_total The connects counter
+# TYPE nginx_sts_server_connects_total counter
+# HELP nginx_sts_server_session_seconds_total The session duration time
+# TYPE nginx_sts_server_session_seconds_total counter
+# HELP nginx_sts_server_session_seconds The average of session duration time in seconds
+# TYPE nginx_sts_server_session_seconds gauge
+# HELP nginx_sts_server_session_duration_seconds The histogram of session duration in seconds
+# TYPE nginx_sts_server_session_duration_seconds histogram
+nginx_sts_server_bytes_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",direction="in"} 0
+nginx_sts_server_bytes_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",direction="out"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="1xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="2xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="3xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="4xx"} 0
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="5xx"} 171
+nginx_sts_server_connects_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP",code="total"} 171
+nginx_sts_server_session_seconds_total{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP"} 0.016
+nginx_sts_server_session_seconds{listen="TCP:8091:127.0.0.1",port="8091",protocol="TCP"} 0.000
+`
+
+	expected := []*MetricFamily{
+		{
+			Name: stringp("nginx_sts_server_bytes_total"),
+			Help: stringp("The request/response bytes"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_bytes_total"),
+					Label: []*labels.Label{
+						{Name: "direction", Value: "in"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_bytes_total"),
+					Label: []*labels.Label{
+						{Name: "direction", Value: "out"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_connects_total"),
+			Help: stringp("The connects counter"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "1xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "2xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "3xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "4xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "5xx"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(171)},
+				},
+				{
+					Name: stringp("nginx_sts_server_connects_total"),
+					Label: []*labels.Label{
+						{Name: "code", Value: "total"},
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(171)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_session_seconds_total"),
+			Help: stringp("The session duration time"),
+			Type: "counter",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_session_seconds_total"),
+					Label: []*labels.Label{
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Counter: &Counter{Value: float64p(0.016)},
+				},
+			},
+		},
+		{
+			Name: stringp("nginx_sts_server_session_seconds"),
+			Help: stringp("The average of session duration time in seconds"),
+			Type: "gauge",
+			Metric: []*OpenMetric{
+				{
+					Name: stringp("nginx_sts_server_session_seconds"),
+					Label: []*labels.Label{
+						{Name: "listen", Value: "TCP:8091:127.0.0.1"},
+						{Name: "port", Value: "8091"},
+						{Name: "protocol", Value: "TCP"},
+					},
+					Gauge: &Gauge{Value: float64p(0.000)},
+				},
+			},
+		},
+	}
+
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
+	if err != nil {
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error: %v", ContentTypeTextFormat, err)
 	}
 	require.ElementsMatch(t, expected, result)
 }
@@ -189,7 +351,7 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -242,7 +404,7 @@ second_metric 0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -292,7 +454,60 @@ metric_without_suffix 3
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
+	if err != nil {
+		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
+	}
+	require.ElementsMatch(t, expected, result)
+}
+
+func TestInfoPrometheus(t *testing.T) {
+	input := `
+# TYPE target info
+target_info 1
+# TYPE first_metric gauge
+first_metric{label1="value1"} 1
+# EOF
+`
+	expected := []*MetricFamily{
+		{
+			Name: stringp("target_info"),
+			Help: nil,
+			Type: "unknown",
+			Unit: nil,
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{},
+					Name:  stringp("target_info"),
+					Unknown: &Unknown{
+						Value: float64p(1),
+					},
+				},
+			},
+		},
+		{
+			Name: stringp("first_metric"),
+			Help: nil,
+			Type: "gauge",
+			Unit: nil,
+			Metric: []*OpenMetric{
+				{
+					Label: []*labels.Label{
+						{
+							Name:  "label1",
+							Value: "value1",
+						},
+					},
+					Name: stringp("first_metric"),
+					Gauge: &Gauge{
+						Value: float64p(1),
+					},
+				},
+			},
+		},
+	}
+
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), logp.NewLogger("test"))
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -342,7 +557,7 @@ a{a="foo"} 1.0
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -395,7 +610,7 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -447,7 +662,7 @@ summary_metric_impossible 123
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -507,7 +722,7 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -566,7 +781,7 @@ http_server_requests_seconds_created{exception="None",uri="/actuator/prometheus"
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}
@@ -609,7 +824,7 @@ ggh 99
 		},
 	}
 
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -644,7 +859,7 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now())
+	result, err := ParseMetricFamilies([]byte(input[1:]), OpenMetricsType, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", OpenMetricsType)
 	}
@@ -678,7 +893,7 @@ redis_connected_clients{instance="rough-snowflake-web"} 10.0`
 			},
 		},
 	}
-	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now())
+	result, err := ParseMetricFamilies([]byte(input), ContentTypeTextFormat, time.Now(), nil)
 	if err != nil {
 		t.Fatalf("ParseMetricFamilies for content type %s returned an error.", ContentTypeTextFormat)
 	}

@@ -224,7 +224,7 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResponse, events []report.Event) {
 	var response struct {
 		Items []map[string]map[string]interface{} `json:"items"`
 	}

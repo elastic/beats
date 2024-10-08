@@ -22,6 +22,8 @@ package state_namespace
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -29,16 +31,15 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-var files = []string{
-	"../_meta/test/ksm.v2.8.2.plain",
-	"../_meta/test/ksm.v2.9.2.plain",
-	"../_meta/test/ksm.v2.10.0.plain",
-}
+var filesFolder = "../_meta/test/KSM"
+var expectedFolder = "./_meta/test"
 
 const name = util.NamespaceResource
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
+	testCases, err := k.GetTestCases(filesFolder, expectedFolder)
+	require.Equal(t, err, nil)
+	ptest.TestMetricSet(t, "kubernetes", name, testCases)
 }
 
 func TestData(t *testing.T) {
@@ -46,5 +47,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestMetricsFamily(t, files, mapping)
+	k.TestMetricsFamilyFromFolder(t, filesFolder, mapping)
 }

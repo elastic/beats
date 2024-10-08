@@ -3,3 +3,18 @@
   enabled: true
   period: 10s
   hosts: ["localhost:3000"]
+
+  # Aerospike Cluster Name
+  #cluster_name: myclustername
+
+  # Optional SSL/TLS (disabled by default)
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"

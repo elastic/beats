@@ -27,7 +27,7 @@ func TestRPMPackages(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	packages, err := listRPMPackages()
+	packages, err := listRPMPackages(false)
 	if err != nil {
 		t.Fatal(err)
 	}
