@@ -1,18 +1,21 @@
 type: system-logs
 {{ if .use_journald }}
 use_journald: true
+tags: {{ append .tags "journald" "auth" | tojson }}
 {{ end }}
 
 {{ if .use_files }}
 use_files: true
+tags: {{ .tags | tojson }}
 {{ end }}
+
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 journald:
   id: system-auth
   facilities:
     - 4
     - 10
-  tags: {{ append .tags "journald" "auth" | tojson }}
 
 files:
   id: system-auth
@@ -29,6 +32,3 @@ files:
   processors:
     - add_locale: ~
 
-  tags: {{ .tags | tojson }}
-
-  publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
