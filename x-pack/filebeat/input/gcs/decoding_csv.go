@@ -23,7 +23,7 @@ type csvDecoder struct {
 	err error
 }
 
-// newParquetDecoder creates a new CSV decoder.
+// newCSVDecoder creates a new CSV decoder.
 func newCSVDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 	d := csvDecoder{r: csv.NewReader(r)}
 	d.r.ReuseRecord = true
@@ -130,7 +130,7 @@ func (d *csvDecoder) check() error {
 	return nil
 }
 
-// close closes the parquet decoder and releases the resources.
+// close closes the csv decoder and releases the resources.
 func (d *csvDecoder) close() error {
 	if d.err == io.EOF {
 		return nil
