@@ -80,7 +80,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 			Logger:     log,
 			StateStore: store,
 			Type:       pluginName,
-			Configure:  configure,
+			Configure:  Configure,
 		},
 	}
 }
@@ -91,7 +91,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
