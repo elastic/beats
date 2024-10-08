@@ -2,20 +2,25 @@ package lists
 
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	"github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var schema = s.Schema{
-	"databases":     mapstrstr.Int("databases"),
-	"users":         mapstrstr.Int("users"),
-	"peers":         mapstrstr.Int("peers"),
-	"pools":         mapstrstr.Int("pools"),
-	"peer_pools":    mapstrstr.Int("peer_pools"),
-	"free_clients":  mapstrstr.Int("free_clients"),
-	"used_clients":  mapstrstr.Int("used_clients"),
-	"login_clients": mapstrstr.Int("login_clients"),
-	"free_servers":  mapstrstr.Int("free_servers"),
-	"used_servers":  mapstrstr.Int("used_servers"),
-	"dns_names":     mapstrstr.Int("dns_names"),
-	"dns_zones":     mapstrstr.Int("dns_zones"),
+	"databases":     c.Int("databases"),
+	"users":         c.Int("users"),
+	"peers":         c.Int("peers"),
+	"pools":         c.Int("pools"),
+	"peer_pools":    c.Int("peer_pools"),
+	"free_clients":  c.Int("free_clients"),
+	"used_clients":  c.Int("used_clients"),
+	"login_clients": c.Int("login_clients"),
+	"free_servers":  c.Int("free_servers"),
+	"used_servers":  c.Int("used_servers"),
+	"dns_names":     c.Int("dns_names"),
+	"dns_zones":     c.Int("dns_zones"),
+}
+
+func MapResult(result map[string]interface{}) (mapstr.M, error) {
+	return schema.Apply(result)
 }
