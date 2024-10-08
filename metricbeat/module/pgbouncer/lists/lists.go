@@ -39,7 +39,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SHOW LISTS;")
-	fmt.Printf("\nPOOLS PRINTING results: %v\n\n", results)
 	if err != nil {
 		return fmt.Errorf("error in QueryStats: %w", err)
 	}
@@ -51,12 +50,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		// Assign the value from "items"
 		resultMap[key] = value
 	}
-	fmt.Printf("\nPOOLS PRINTING resultMap: %v\n", resultMap)
 	event, err := MapResult(resultMap)
 	if err != nil {
 		return fmt.Errorf("error mapping result: %w", err)
 	}
-	fmt.Printf("\nPOOLS PRINTING mapped event: %v\n\n", event)
 
 	reporter.Event(mb.Event{
 		MetricSetFields: event,
