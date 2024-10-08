@@ -323,6 +323,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improved GCS input documentation. {pull}41143[41143]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Add CSV decoding capacity to gcs input {pull}40979[40979]
+- Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 
 *Auditbeat*
 
