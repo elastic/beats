@@ -62,23 +62,11 @@ type cloudwatchInput struct {
 
 func newInput(config config) (*cloudwatchInput, error) {
 	cfgwarn.Beta("aws-cloudwatch input type is used")
+
+	// perform AWS configuration validation
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
-	}
-
-	if config.LogGroupARN != "" {
-		logGroupName, regionName, err := parseARN(config.LogGroupARN)
-		if err != nil {
-			return nil, fmt.Errorf("parse log group ARN failed: %w", err)
-		}
-
-		config.LogGroupName = logGroupName
-		config.RegionName = regionName
-	}
-
-	if config.RegionName != "" {
-		awsConfig.Region = config.RegionName
 	}
 
 	return &cloudwatchInput{
@@ -103,15 +91,25 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	}
 	defer client.Close()
 
+	var logGroupIDs []string
+	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
+	if err != nil {
+		return fmt.Errorf("error processing configurations: %w", err)
+	}
+
+	in.awsConfig.Region = region
 	svc := cloudwatchlogs.NewFromConfig(in.awsConfig, func(o *cloudwatchlogs.Options) {
 		if in.config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
 
-	logGroupNames, err := getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
-	if err != nil {
-		return fmt.Errorf("failed to get log group names: %w", err)
+	if len(logGroupIDs) == 0 {
+		// fallback to LogGroupNamePrefix to derive group IDs
+		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix)
+		if err != nil {
+			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
+		}
 	}
 
 	log := inputContext.Logger
@@ -120,36 +118,54 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		in.metrics,
-		in.awsConfig.Region,
+		region,
 		in.config)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
-	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
+	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
 	cwPoller.startWorkers(ctx, svc, logProcessor)
-	cwPoller.receive(ctx, logGroupNames, time.Now)
+	cwPoller.receive(ctx, logGroupIDs, time.Now)
 	return nil
 }
 
-func parseARN(logGroupARN string) (string, string, error) {
-	arnParsed, err := arn.Parse(logGroupARN)
-	if err != nil {
-		return "", "", fmt.Errorf("error Parse arn %s: %w", logGroupARN, err)
+// fromConfig is a helper to parse input configurations and derive logGroupIDs & aws region
+// Returned logGroupIDs could be empty, which require other fallback mechanisms to derive them.
+// See getLogGroupNames for example.
+func fromConfig(cfg config, awsCfg awssdk.Config) (logGrouIDs []string, region string, err error) {
+	// LogGroupARN has precedence over LogGroupName & RegionName
+	if cfg.LogGroupARN != "" {
+		parsedArn, err := arn.Parse(cfg.LogGroupARN)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to parse log group ARN: %w", err)
+		}
+
+		if parsedArn.Region == "" {
+			return nil, "", fmt.Errorf("failed to parse log group ARN: missing region")
+		}
+
+		// refine to match AWS API parameter regex of logGroupIdentifier
+		groupId := strings.TrimSuffix(cfg.LogGroupARN, ":*")
+		logGrouIDs = append(logGrouIDs, groupId)
+
+		return logGrouIDs, parsedArn.Region, nil
 	}
 
-	if strings.Contains(arnParsed.Resource, ":") {
-		resourceARNSplit := strings.Split(arnParsed.Resource, ":")
-		if len(resourceARNSplit) >= 2 && resourceARNSplit[0] == "log-group" {
-			return resourceARNSplit[1], arnParsed.Region, nil
-		}
+	// then fallback to LogrGroupName
+	if cfg.LogGroupName != "" {
+		logGrouIDs = append(logGrouIDs, cfg.LogGroupName)
 	}
-	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
+
+	// finally derive region
+	if cfg.RegionName != "" {
+		region = cfg.RegionName
+	} else {
+		region = awsCfg.Region
+	}
+
+	return logGrouIDs, region, nil
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
-	if logGroupNamePrefix == "" {
-		return []string{logGroupName}, nil
-	}
-
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string) ([]string, error) {
 	// construct DescribeLogGroupsInput
 	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: awssdk.String(logGroupNamePrefix),
