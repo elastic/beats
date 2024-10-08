@@ -107,7 +107,7 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "pgbouncer",
 		"metricsets": []string{"stats"},
-		"hosts":      []string{fmt.Sprintf("localhost:6432/pgbouncer?sslmode=disable")},
+		"hosts":      []string{"localhost:6432/pgbouncer?sslmode=disable"},
 		"username":   "test",
 		"password":   postgresql.GetEnvPassword(),
 	}
