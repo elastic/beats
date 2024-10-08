@@ -61,10 +61,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	resultMap := make(map[string]interface{})
 	for _, s := range results {
-		key := s["list"].(string)
+		listValue, ok := s["list"].(string)
+		if !ok {
+			return fmt.Errorf("expected string type for 'list' but got something else")
+		}
+		key := listValue
 		value := s["items"]
-
-		// Assign the value from "items"
 		resultMap[key] = value
 	}
 	data, err := schema.Apply(resultMap)
@@ -75,6 +77,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	reporter.Event(mb.Event{
 		MetricSetFields: data,
 	})
-
 	return nil
 }
