@@ -14,7 +14,7 @@ var:
     default: []
   - name: use_journald
     default: false
-  - name: use_logs
+  - name: use_files
     default: false
 
 ingest_pipeline:

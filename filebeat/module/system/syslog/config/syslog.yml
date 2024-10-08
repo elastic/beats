@@ -1,4 +1,13 @@
 type: system-logs
+
+{{ if .use_journald }}
+use_journald: true
+{{ end }}
+
+{{ if .use_files }}
+use_files: true
+{{ end }}
+
 journald:
   id: system-syslog
   facilities:
