@@ -81,7 +81,7 @@ type ConnectionSettings struct {
 
 	Kerberos *kerberos.Config
 
-	OnConnectCallback func(Connection) error
+	OnConnectCallback func(*Connection) error
 	Observer          transport.IOStatser
 
 	Parameters       map[string]string
@@ -290,7 +290,7 @@ func (conn *Connection) Connect(ctx context.Context) error {
 	}
 
 	if conn.OnConnectCallback != nil {
-		if err := conn.OnConnectCallback(*conn); err != nil {
+		if err := conn.OnConnectCallback(conn); err != nil {
 			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}

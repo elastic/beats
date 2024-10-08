@@ -133,12 +133,12 @@ func NewClient(
 		return nil, err
 	}
 
-	conn.OnConnectCallback = func(conn eslegclient.Connection) error {
+	conn.OnConnectCallback = func(conn *eslegclient.Connection) error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
 		for _, callback := range globalCallbackRegistry.callbacks {
-			err := callback(&conn)
+			err := callback(conn)
 			if err != nil {
 				return err
 			}
@@ -149,7 +149,7 @@ func NewClient(
 			defer onConnect.mutex.Unlock()
 
 			for _, callback := range onConnect.callbacks {
-				err := callback(&conn)
+				err := callback(conn)
 				if err != nil {
 					return err
 				}
