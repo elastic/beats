@@ -29,7 +29,7 @@
 // tag::docker[]
 ["source","sh",subs="attributes"]
 ----
-docker run --net="host" {dockerimage} setup --index-management
+docker run --rm --net="host" {dockerimage} setup --index-management
 ----
 // end::docker[]
 
