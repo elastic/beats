@@ -22,20 +22,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestParseUrl(t *testing.T) {
 	tests := []struct {
-		Name            string
-		URL             string
-		Username        string
-		Password        string
-		Timeout         time.Duration
-		Expected        string
-		ExpectErr       bool
-		RequireUsername bool
+		Name      string
+		URL       string
+		Username  string
+		Password  string
+		Timeout   time.Duration
+		Expected  string
+		ExpectErr bool
 	}{
 		{
 			Name:      "simple test",
@@ -117,27 +119,18 @@ func TestParseUrl(t *testing.T) {
 			ExpectErr: true,
 		},
 		{
-			Name:            "empty username",
-			URL:             "postgres://localhost:5432",
-			RequireUsername: true,
-			Password:        "pass",
-			ExpectErr:       true,
-		},
-		{
 			Name:      "invalid schema",
 			URL:       "abcd://",
 			ExpectErr: true,
 		},
 	}
-
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			mod := &MockModule{
-				Username:        test.Username,
-				Password:        test.Password,
-				Timeout:         test.Timeout,
-				RequireUsername: test.RequireUsername,
-			}
+			mod := mbtest.NewTestModule(t, map[string]interface{}{
+				"username": test.Username,
+				"password": test.Password,
+			})
+			mod.ModConfig.Timeout = test.Timeout
 
 			hostData, err := ParseURL(mod, test.URL)
 
@@ -149,19 +142,38 @@ func TestParseUrl(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 type MockModule struct {
-	Username        string
-	Password        string
-	Timeout         time.Duration
-	RequireUsername bool
+	Username       string
+	Password       string
+	Timeout        time.Duration
+	statusReporter status.StatusReporter
+	statusUpdates  []statusUpdate
+}
+type statusUpdate struct {
+	status status.Status
+	msg    string
+}
+
+func (m *MockModule) Name() string {
+	return "mockmodule"
+}
+func (m *MockModule) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
+}
+func (m *MockModule) UpdateStatus(status status.Status, msg string) {
+	m.statusUpdates = append(m.statusUpdates, statusUpdate{status: status, msg: msg})
+}
+func (m *MockModule) Config() mb.ModuleConfig {
+	return mb.ModuleConfig{
+		Timeout: m.Timeout,
+	}
 }
 
 func (m *MockModule) UnpackConfig(to interface{}) error {
-	if m.RequireUsername && m.Username == "" {
-		return fmt.Errorf("no username provided")
+	if m.Username == "" {
+		return fmt.Errorf("simulated config error")
 	}
 	c := to.(*struct {
 		Username string `config:"username"`
@@ -171,13 +183,13 @@ func (m *MockModule) UnpackConfig(to interface{}) error {
 	c.Password = m.Password
 	return nil
 }
-
-func (m *MockModule) Config() mb.ModuleConfig {
-	return mb.ModuleConfig{
-		Timeout: m.Timeout,
+func TestParseURL_UnpackConfigError(t *testing.T) {
+	mod := &MockModule{
+		Username: "",
+		Password: "pass",
+		Timeout:  5 * time.Second,
 	}
-}
-
-func (m *MockModule) Name() string {
-	return "mockmodule"
+	_, err := ParseURL(mod, "postgres://localhost:5432")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "simulated config error")
 }
