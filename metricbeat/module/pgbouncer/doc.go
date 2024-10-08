@@ -16,6 +16,6 @@
 // under the License.
 
 /*
-Package postgresql is a Metricbeat module that contains MetricSets.
+Package pgbouncer is a Metricbeat module that contains MetricSets.
 */
 package pgbouncer

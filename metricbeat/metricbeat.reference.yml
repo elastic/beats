@@ -792,6 +792,8 @@ metricbeat.modules:
     include: []
     exclude: []
 
+#------------------------------ PGBouncer Module ------------------------------
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:

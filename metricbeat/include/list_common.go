@@ -135,6 +135,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics"
 	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics/collector"
+	_ "github.com/elastic/beats/v7/metricbeat/module/pgbouncer"
+	_ "github.com/elastic/beats/v7/metricbeat/module/pgbouncer/stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm/pool"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm/process"
@@ -191,6 +193,4 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/connection"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/mntr"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/server"
-	_ "github.com/elastic/beats/v7/metricbeat/module/pgbouncer"
-	_ "github.com/elastic/beats/v7/metricbeat/module/pgbouncer/stats"
 )

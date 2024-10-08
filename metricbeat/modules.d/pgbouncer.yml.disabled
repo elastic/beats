@@ -1,6 +1,9 @@
 # Module: pgbouncer
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-pgbouncer.html
 
+# Module: pgbouncer
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-pgbouncer.html
+
 metricbeat.modules:
 - module: pgbouncer
   metricsets:

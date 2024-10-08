@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  postgresql:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=test
+      - POSTGRES_DB=test
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth=md5
+
+  pgbouncer:
+    image: pgbouncer/pgbouncer
+    ports:
+      - 6432:6432
+    environment:
+      - DATABASES_HOST=postgresql
+      - DATABASES_PORT=5432
+      - DATABASES_USER=test
+      - DATABASES_PASSWORD=password
+      - DATABASES_DBNAME=test
+      - PGBOUNCER_LISTEN_PORT=6432
+
+  metricbeat:
+    image: test
+    build:
+      context: ./../../../../beats
+      dockerfile: ./metricbeat/module/pgbouncer/_meta/Dockerfile
+
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    hostname: elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=false"
+      - "discovery.type=single-node"
+      # - "transport.host=127.0.0.1"
+    ports:
+      - 9200:9200
+
+  kibana:
+    image: kibana:8.11.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
