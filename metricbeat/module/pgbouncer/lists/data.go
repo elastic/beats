@@ -2,7 +2,7 @@ package lists
 
 import (
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

@@ -3,7 +3,8 @@ package lists
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"log"
+	"os"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/pgbouncer"
@@ -11,6 +12,8 @@ import (
 
 // init registers the MetricSet with the central registry.
 func init() {
+	log.SetOutput(os.Stderr)
+	log.SetFlags(0)
 	mb.Registry.MustAddMetricSet("pgbouncer", "lists", New,
 		mb.WithHostParser(pgbouncer.ParseURL),
 		mb.DefaultMetricSet(),
@@ -43,29 +46,21 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	resultMap := make(map[string]interface{})
 	for _, s := range results {
 		key := s["list"].(string)
-		// Convert value to int if necessary
-		var value int
-		switch v := s["items"].(type) {
-		case string:
-			value, err = strconv.Atoi(v)
-			if err != nil {
-				return fmt.Errorf("error converting value to int: %w", err)
-			}
-		case int:
-			value = v
-		default:
-			return fmt.Errorf("unexpected type for value: %T", v)
-		}
+		value := s["items"]
 
-		// Assign the integer value
+		// Assign the value from "items"
 		resultMap[key] = value
 	}
+	fmt.Printf("\nPOOLS PRINTING resultMap: %v\n", resultMap)
 	event, err := MapResult(resultMap)
 	if err != nil {
 		return fmt.Errorf("error mapping result: %w", err)
 	}
+	fmt.Printf("\nPOOLS PRINTING mapped event: %v\n\n", event)
+
 	reporter.Event(mb.Event{
 		MetricSetFields: event,
 	})
+
 	return nil
 }

@@ -5,6 +5,8 @@ metricbeat.modules:
 - module: pgbouncer
   metricsets:
     - stats
+    - lists
+    - pools
   period: 10s
   hosts: ["postgresql://pgbouncer:6432/pgbouncer?sslmode=disable"]
   username: test
