@@ -12,7 +12,7 @@ env:
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
-  AGENTBEAT_SPEC: "../agentbeat.spec.yml"
+  AGENTBEAT_SPEC: "./agentbeat.spec.yml"
 
 steps:
 #  - group: "Check/Update"
@@ -112,6 +112,8 @@ steps:
         command: |
           set -euo pipefail
           ./.buildkite/scripts/agentbeat/prepare_env.py
+          cd x-pack/agentbeat
+          mage -v testWithSpec
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -123,8 +125,10 @@ steps:
         key: "agentbeat-it-windows"
 #        depends_on:
 #          - agentbeat-package-linux
-        commands:
-          - ./.buildkite/scripts/agentbeat/prepare_env.py
+        command: |
+          ./.buildkite/scripts/agentbeat/prepare_env.py
+          cd x-pack/agentbeat
+          mage -v testWithSpec
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"

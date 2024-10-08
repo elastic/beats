@@ -105,8 +105,8 @@ def add_to_path(filepath):
     match = re.match(pattern, filepath)
     if match:
         path = f'../build/distributions/{match.group(1)}/agentbeat'
-        log('--- AGENTBEAT_PATH: ' + path)
-        os.environ['AGENTBEAT_PATH'] = path
+        log("--- PATH: " + str(path))
+        os.environ['AGENTBEAT_PATH'] = str(path)
     else:
         log_err("No agentbeat executable found")
         exit(1)
