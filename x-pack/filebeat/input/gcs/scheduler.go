@@ -35,13 +35,14 @@ type scheduler struct {
 	state     *state
 	log       *logp.Logger
 	limiter   *limiter
+	metrics   *inputMetrics
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
 	state *state, log *logp.Logger,
 ) *scheduler {
-	return &scheduler{
+	s := scheduler{
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
@@ -49,7 +50,11 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		state:     state,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
+		metrics:   newInputMetrics(src.BucketName),
 	}
+	s.metrics.url.Set("gs://" + s.src.BucketName)
+	s.metrics.errorsTotal.Set(0)
+	return &s
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
@@ -87,19 +92,23 @@ func (l *limiter) release() {
 	l.wg.Done()
 }
 
+//nolint:gosec // value is always positive and within bounds, no scenario of overflow
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
+	s.metrics.gcsObjectsRequestedTotal.Add(uint64(s.src.MaxWorkers))
 	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
 	var numObs, numJobs int
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
 			return err
 		}
 		numObs += len(objects)
 		jobs := s.createJobs(objects, s.log)
 		s.log.Debugf("scheduler: %d objects fetched for current batch", len(objects))
+		s.metrics.gcsObjectsListedTotal.Add(uint64(len(objects)))
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
@@ -109,6 +118,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			}
 		}
 		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+		s.metrics.gcsJobsScheduledAfterValidation.Update(int64(len(jobs)))
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
@@ -200,7 +210,6 @@ func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
 
 func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 	jobMap := make(map[string]bool)
-
 	for _, j := range jobs {
 		jobMap[j.Name()] = true
 	}

@@ -41,15 +41,18 @@ type inputMetrics struct {
 	url         *monitoring.String // URL of the input resource
 	errorsTotal *monitoring.Uint   // number of errors encountered
 
-	gcsObjectsRequestedTotal *monitoring.Uint // Number of GCS objects downloaded.
-	gcsObjectsPublishedTotal *monitoring.Uint // Number of GCS objects processed that were published.
-	gcsObjectsListedTotal    *monitoring.Uint // Number of GCS objects returned by list operations.
-	gcsObjectsProcessedTotal *monitoring.Uint // Number of GCS objects that matched file_selectors rules.
-	gcsBytesProcessedTotal   *monitoring.Uint // Number of GCS bytes processed.
-	gcsEventsCreatedTotal    *monitoring.Uint // Number of events created from processing GCS data.
-	gcsObjectProcessingTime  metrics.Sample   // Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
-	gcsObjectSizeInBytes     metrics.Sample   // Histogram of processed GCS object size in bytes
-	gcsEventsPerObject       metrics.Sample   // Histogram of events in an individual GCS object
+	gcsObjectsRequestedTotal        *monitoring.Uint // Number of GCS objects downloaded.
+	gcsObjectsPublishedTotal        *monitoring.Uint // Number of GCS objects processed that were published.
+	gcsObjectsListedTotal           *monitoring.Uint // Number of GCS objects returned by list operations.
+	gcsObjectsProcessedTotal        *monitoring.Uint // Number of GCS objects that matched file_selectors rules.
+	gcsBytesProcessedTotal          *monitoring.Uint // Number of GCS bytes processed.
+	gcsEventsCreatedTotal           *monitoring.Uint // Number of events created from processing GCS data.
+	gcsFailedJobsTotal              *monitoring.Uint // Number of failed jobs.
+	gcsRecoveredJobsTotal           *monitoring.Uint // Number of recovered jobs.
+	gcsObjectProcessingTime         metrics.Sample   // Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
+	gcsObjectSizeInBytes            metrics.Sample   // Histogram of processed GCS object size in bytes
+	gcsEventsPerObject              metrics.Sample   // Histogram of events in an individual GCS object
+	gcsJobsScheduledAfterValidation metrics.Sample   // Number of jobs scheduled after validation.
 }
 
 func newInputMetrics(id string) *inputMetrics {
@@ -59,15 +62,18 @@ func newInputMetrics(id string) *inputMetrics {
 		url:         monitoring.NewString(reg, "url"),
 		errorsTotal: monitoring.NewUint(reg, "errors_total"),
 
-		gcsObjectsRequestedTotal: monitoring.NewUint(reg, "gcs_objects_requested_total"),
-		gcsObjectsPublishedTotal: monitoring.NewUint(reg, "gcs_objects_published_total"),
-		gcsObjectsListedTotal:    monitoring.NewUint(reg, "gcs_objects_listed_total"),
-		gcsObjectsProcessedTotal: monitoring.NewUint(reg, "gcs_objects_processed_total"),
-		gcsBytesProcessedTotal:   monitoring.NewUint(reg, "gcs_bytes_processed_total"),
-		gcsEventsCreatedTotal:    monitoring.NewUint(reg, "gcs_events_created_total"),
-		gcsObjectProcessingTime:  metrics.NewUniformSample(1024),
-		gcsObjectSizeInBytes:     metrics.NewUniformSample(1024),
-		gcsEventsPerObject:       metrics.NewUniformSample(1024),
+		gcsObjectsRequestedTotal:        monitoring.NewUint(reg, "gcs_objects_requested_total"),
+		gcsObjectsPublishedTotal:        monitoring.NewUint(reg, "gcs_objects_published_total"),
+		gcsObjectsListedTotal:           monitoring.NewUint(reg, "gcs_objects_listed_total"),
+		gcsObjectsProcessedTotal:        monitoring.NewUint(reg, "gcs_objects_processed_total"),
+		gcsBytesProcessedTotal:          monitoring.NewUint(reg, "gcs_bytes_processed_total"),
+		gcsEventsCreatedTotal:           monitoring.NewUint(reg, "gcs_events_created_total"),
+		gcsFailedJobsTotal:              monitoring.NewUint(reg, "gcs_failed_jobs_total"),
+		gcsRecoveredJobsTotal:           monitoring.NewUint(reg, "gcs_recovered_jobs_total"),
+		gcsObjectProcessingTime:         metrics.NewUniformSample(1024),
+		gcsObjectSizeInBytes:            metrics.NewUniformSample(1024),
+		gcsEventsPerObject:              metrics.NewUniformSample(1024),
+		gcsJobsScheduledAfterValidation: metrics.NewUniformSample(1024),
 	}
 
 	adapter.NewGoMetrics(reg, "gcs_object_processing_time", adapter.Accept).
@@ -76,6 +82,8 @@ func newInputMetrics(id string) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.gcsObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "gcs_events_per_object", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsEventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "gcs_jobs_scheduled_after_validation", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.gcsJobsScheduledAfterValidation)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	return out
 }
