@@ -69,7 +69,7 @@ func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	parse.SetURLUser(u, c.Username, c.Password)
