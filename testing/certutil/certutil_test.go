@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestECCertificates(t *testing.T) {
+func TestCertificates(t *testing.T) {
 	ecRootPair, ecChildPair, err := NewRootAndChildCerts()
 	require.NoError(t, err, "could not create EC certificates")
 

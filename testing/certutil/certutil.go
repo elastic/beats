@@ -71,14 +71,45 @@ func NewRSARootCA() (crypto.PrivateKey, *x509.Certificate, Pair, error) {
 	return rootKey, cert, pair, err
 }
 
-// GenerateChildCert generates a x509 Certificate as a child of caCert and
-// returns the following:
-// - the certificate in PEM format as a byte slice
-// - the private key in PEM format as a byte slice
+// GenerateChildCert generates a ECDSA (P-384) x509 Certificate as a child of
+// caCert and returns the following:
 // - the certificate and private key as a tls.Certificate
+// - a Pair with the certificate and its key im PEM format
 //
 // If any error occurs during the generation process, a non-nil error is returned.
-func GenerateChildCert(
+func GenerateChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, caCert *x509.Certificate) (*tls.Certificate, Pair, error) {
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return nil, Pair{}, fmt.Errorf("could not create RSA private key: %w", err)
+	}
+
+	cert, childPair, err :=
+		GenerateGenericChildCert(
+			name,
+			ips,
+			priv,
+			&priv.PublicKey,
+			caPrivKey,
+			caCert)
+	if err != nil {
+		return nil, Pair{}, fmt.Errorf(
+			"could not generate child TLS certificate CA: %w", err)
+	}
+
+	return cert, childPair, nil
+}
+
+// GenerateGenericChildCert generates a x509 Certificate using priv and pub
+// as the certificate's private and public keys and as a child of caCert.
+// Use this function if you need fine control over keys or ips and certificate name,
+// otherwise prefer GenerateChildCert or NewRootAndChildCerts/NewRSARootAndChildCerts
+//
+// It returns the following:
+// - the certificate and private key as a tls.Certificate
+// - a Pair with the certificate and its key im PEM format
+//
+// If any error occurs during the generation process, a non-nil error is returned.
+func GenerateGenericChildCert(
 	name string,
 	ips []net.IP,
 	priv crypto.PrivateKey,
@@ -263,7 +294,7 @@ func defaultChildCert(
 	pub crypto.PublicKey,
 	rootCACert *x509.Certificate) (Pair, error) {
 	_, childPair, err :=
-		GenerateChildCert(
+		GenerateGenericChildCert(
 			"localhost",
 			[]net.IP{net.ParseIP("127.0.0.1")},
 			priv,

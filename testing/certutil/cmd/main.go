@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// nolint:errorlint,forbidigo // it's a cli application
+//nolint:errorlint,forbidigo // it's a cli application
 package main
 
 import (
@@ -84,7 +84,7 @@ func main() {
 	rootCert, rootKey := getCA(rsa, caPath, caKeyPath, dest, filePrefix)
 	priv, pub := generateKey(rsa)
 
-	childCert, childPair, err := certutil.GenerateChildCert(
+	childCert, childPair, err := certutil.GenerateGenericChildCert(
 		name,
 		netIPs,
 		priv,
