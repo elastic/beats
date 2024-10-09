@@ -113,6 +113,12 @@ func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 		return nil, errors.Wrap(err, "failed to copy values from user configuration")
 	}
 
+	// Process jmx target params
+	rawConfig, err = processJmxTarget(rawConfig)
+	if err != nil {
+		return nil, errors.Wrap(err, "process jmx target params error")
+	}
+
 	// Create the base module
 	baseModule, err := newBaseModuleFromConfig(rawConfig)
 	if err != nil {
@@ -121,4 +127,37 @@ func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	baseModule.name = m.Module
 
 	return &baseModule, nil
+}
+
+func processJmxTarget(rawConfig *conf.C) (*conf.C, error) {
+	if !rawConfig.HasField("jmx") || !rawConfig.HasField("jmx_target") {
+		return rawConfig, nil
+	}
+
+	cfgMap := map[string]interface{}{}
+	if err := rawConfig.Unpack(&cfgMap); err != nil {
+		return rawConfig, errors.Wrap(err, "failed to converting config to map")
+	}
+
+	if _, ok := cfgMap["jmx_target"].(map[string]interface{}); !ok {
+		return rawConfig, nil
+	}
+	jmxTarget := cfgMap["jmx_target"]
+
+	if jmx, ok := cfgMap["jmx"].(map[string]interface{}); ok {
+		if mappings, ok1 := jmx["mappings"].([]interface{}); ok1 {
+			for _, mapping := range mappings {
+				if _, ok2 := mapping.(map[string]interface{}); ok2 {
+					mapping.(map[string]interface{})["target"] = jmxTarget
+				}
+			}
+		}
+	}
+
+	newConfig, err := conf.NewConfigFrom(cfgMap)
+	if err != nil {
+		return rawConfig, errors.Wrap(err, "failed to copy values from user configuration")
+	}
+
+	return newConfig, nil
 }
