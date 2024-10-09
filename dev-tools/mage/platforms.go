@@ -327,7 +327,7 @@ func newPlatformExpression(expr string) (*platformExpression, error) {
 //
 // By default, the initial set include only the platforms designated as defaults.
 // To add additional platforms to list use an addition term that is designated
-// with a plug sign (e.g. "+netbsd" or "+linux/armv7"). Or you may use "+all"
+// with a plus sign (e.g. "+netbsd" or "+linux/armv7"). Or you may use "+all"
 // to change the initial set to include all possible platforms then filter
 // from there (e.g. "+all linux windows").
 //
@@ -446,27 +446,33 @@ func (list BuildPlatformList) Filter(expr string) BuildPlatformList {
 	return out.deduplicate()
 }
 
-// Merge creates a new list with the two list merged.
+// Merge creates a new list with the two lists merged.
 func (list BuildPlatformList) Merge(with BuildPlatformList) BuildPlatformList {
-	out := append(list, with...)
+	out := make(BuildPlatformList, 0, len(list)+len(with))
+	out = append(out, list...)
 	out = append(out, with...)
 	return out.deduplicate()
 }
 
 // deduplicate removes duplicate platforms and sorts the list.
 func (list BuildPlatformList) deduplicate() BuildPlatformList {
-	set := map[string]BuildPlatform{}
-	for _, item := range list {
-		set[item.Name] = item
+	if len(list) <= 1 {
+		return list
 	}
 
-	var out BuildPlatformList
-	for _, v := range set {
-		out = append(out, v)
+	seen := make(map[string]struct{}, len(list))
+	out := make(BuildPlatformList, 0, len(list))
+
+	for _, item := range list {
+		if _, exists := seen[item.Name]; !exists {
+			seen[item.Name] = struct{}{}
+			out = append(out, item)
+		}
 	}
 
 	sort.Slice(out, func(i, j int) bool {
 		return out[i].Name < out[j].Name
 	})
+
 	return out
 }

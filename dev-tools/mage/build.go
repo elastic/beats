@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -124,8 +123,7 @@ func DefaultGolangCrossBuildArgs() BuildArgs {
 // environment.
 func GolangCrossBuild(params BuildArgs) error {
 	if os.Getenv("GOLANG_CROSSBUILD") != "1" {
-		return errors.New("Use the crossBuild target. golangCrossBuild can " +
-			"only be executed within the golang-crossbuild docker environment.")
+		return errors.New("use the crossBuild target. golangCrossBuild can only be executed within the golang-crossbuild docker environment")
 	}
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
@@ -206,7 +204,7 @@ func Build(params BuildArgs) error {
 	}
 
 	if GOOS == "windows" && params.WinMetadata {
-		log.Println("Generating a .syso containing Windows file metadata.")
+		fmt.Println("Generating a .syso containing Windows file metadata.")
 		syso, err := MakeWindowsSysoFile()
 		if err != nil {
 			return fmt.Errorf("failed generating Windows .syso metadata file: %w", err)
@@ -214,7 +212,7 @@ func Build(params BuildArgs) error {
 		defer os.Remove(syso)
 	}
 
-	log.Println("Adding build environment vars:", env)
+	fmt.Println("Adding build environment vars:", env)
 	return sh.RunWith(env, "go", args...)
 }
 

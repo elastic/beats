@@ -32,8 +32,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/exec"
@@ -125,7 +125,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 }
 
 func expandFile(src, dst string, args ...map[string]interface{}) error {
-	tmplData, err := ioutil.ReadFile(src)
+	tmplData, err := os.ReadFile(src)
 	if err != nil {
 		return fmt.Errorf("failed reading from template %v: %w", src, err)
 	}
@@ -140,7 +140,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 		return err
 	}
 
-	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
+	if err = os.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to write rendered template: %w", err)
 	}
 
@@ -262,13 +262,13 @@ func FindReplace(file string, re *regexp.Regexp, repl string) error {
 		return err
 	}
 
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
 	out := re.ReplaceAllString(string(contents), repl)
-	return ioutil.WriteFile(file, []byte(out), info.Mode().Perm())
+	return os.WriteFile(file, []byte(out), info.Mode().Perm())
 }
 
 // MustFindReplace invokes FindReplace and panics if an error occurs.
@@ -281,9 +281,9 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 // DownloadFile downloads the given URL and writes the file to destinationDir.
 // The path to the file is returned.
 func DownloadFile(url, destinationDir string) (string, error) {
-	log.Println("Downloading", url)
+	fmt.Println("Downloading", url)
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec // we trust the url
 	if err != nil {
 		return "", fmt.Errorf("http get failed: %w", err)
 	}
@@ -459,7 +459,7 @@ func Tar(src string, targetFile string) error {
 func untar(sourceFile, destinationDir string) error {
 	file, err := os.Open(sourceFile)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open source file: %w", err)
 	}
 	defer file.Close()
 
@@ -467,7 +467,7 @@ func untar(sourceFile, destinationDir string) error {
 
 	if strings.HasSuffix(sourceFile, ".gz") {
 		if fileReader, err = gzip.NewReader(file); err != nil {
-			return err
+			return fmt.Errorf("failed to create gzip reader: %w", err)
 		}
 		defer fileReader.Close()
 	}
@@ -480,38 +480,31 @@ func untar(sourceFile, destinationDir string) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			return fmt.Errorf("error reading tar: %w", err)
 		}
 
 		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)+string(os.PathSeparator)) {
 			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
 			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
-				return err
+				return fmt.Errorf("failed to create directory: %w", err)
 			}
 		case tar.TypeReg:
-			writer, err := os.Create(path)
+			writer, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(header.Mode))
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to create file: %w", err)
 			}
-
-			if _, err = io.Copy(writer, tarReader); err != nil {
-				return err
-			}
-
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
-				return err
-			}
-
-			if err = writer.Close(); err != nil {
-				return err
+			_, err = io.Copy(writer, tarReader)
+			writer.Close()
+			if err != nil {
+				return fmt.Errorf("failed to write file contents: %w", err)
 			}
 		default:
-			return fmt.Errorf("unable to untar type=%c in file=%s", header.Typeflag, path)
+			return fmt.Errorf("unsupported tar entry type: %c for file: %s", header.Typeflag, path)
 		}
 	}
 
@@ -532,42 +525,41 @@ func RunCmds(cmds ...[]string) error {
 	return nil
 }
 
-var (
-	parallelJobsLock      sync.Mutex
-	parallelJobsSemaphore chan int
-)
+var parallelJobsSemaphore chan struct{}
 
-func parallelJobs() chan int {
-	parallelJobsLock.Lock()
-	defer parallelJobsLock.Unlock()
-
+// parallelJobs returns a semaphore channel to limit the number of parallel jobs.
+func parallelJobs() chan struct{} {
 	if parallelJobsSemaphore == nil {
 		max := numParallel()
-		parallelJobsSemaphore = make(chan int, max)
-		log.Println("Max parallel jobs =", max)
+		parallelJobsSemaphore = make(chan struct{}, max)
+		fmt.Printf("Max parallel jobs: %d\n", max)
 	}
 
 	return parallelJobsSemaphore
 }
 
+// numParallel determines the maximum number of parallel jobs to run.
+// It considers the MAX_PARALLEL environment variable, the number of CPUs on the host,
+// and the number of CPUs reported by Docker.
 func numParallel() int {
-	if maxParallel := os.Getenv("MAX_PARALLEL"); maxParallel != "" {
-		if num, err := strconv.Atoi(maxParallel); err == nil && num > 0 {
-			return num
-		}
+	if maxParallel, err := strconv.Atoi(os.Getenv("MAX_PARALLEL")); err == nil && maxParallel > 0 {
+		return maxParallel
 	}
 
-	// To be conservative use the minimum of the number of CPUs between the host
-	// and the Docker host.
 	maxParallel := runtime.NumCPU()
 
+	// Adjust based on Docker-reported CPUs if available
 	info, err := GetDockerInfo()
 	// Check that info.NCPU != 0 since docker info doesn't return with an
-	// error status if communcation with the daemon failed.
-	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
-		maxParallel = info.NCPU
+	// error status if communication with the daemon fails.
+	if err == nil && info.NCPU != 0 {
+		maxParallel = int(math.Min(float64(maxParallel), float64(info.NCPU)))
 	}
 
+	// Parallelize conservatively to avoid overloading the host.
+	if maxParallel >= 2 {
+		return maxParallel / 2
+	}
 	return maxParallel
 }
 
@@ -579,41 +571,51 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 	for _, f := range fns {
 		fnWrapper := funcTypeWrap(f)
 		if fnWrapper == nil {
-			panic("attempted to add a dep that did not match required function type")
+			panic(fmt.Sprintf("unsupported function type: %T", f))
 		}
 		fnWrappers = append(fnWrappers, fnWrapper)
 	}
 
-	var mu sync.Mutex
-	var errs []string
+	errChan := make(chan error, len(fnWrappers))
 	var wg sync.WaitGroup
 
 	for _, fw := range fnWrappers {
 		wg.Add(1)
 		go func(fw func(context.Context) error) {
+			defer wg.Done()
 			defer func() {
-				if v := recover(); v != nil {
-					mu.Lock()
-					errs = append(errs, fmt.Sprint(v))
-					mu.Unlock()
+				if r := recover(); r != nil {
+					errChan <- fmt.Errorf("panic: %v", r)
 				}
-				wg.Done()
 				<-parallelJobs()
 			}()
+
+			select {
+			case parallelJobs() <- struct{}{}:
+			case <-ctx.Done():
+				errChan <- ctx.Err()
+				return
+			}
+
 			waitStart := time.Now()
-			parallelJobs() <- 1
-			log.Println("Parallel job waited", time.Since(waitStart), "before starting.")
+			fmt.Printf("Parallel job waited %v before starting.\n", time.Since(waitStart))
+
 			if err := fw(ctx); err != nil {
-				mu.Lock()
-				errs = append(errs, fmt.Sprint(err))
-				mu.Unlock()
+				errChan <- err
 			}
 		}(fw)
 	}
 
 	wg.Wait()
+	close(errChan)
+
+	var errs []error
+	for err := range errChan {
+		errs = append(errs, err)
+	}
+
 	if len(errs) > 0 {
-		panic(fmt.Errorf(strings.Join(errs, "\n")))
+		panic(errors.Join(errs...))
 	}
 }
 
@@ -627,23 +629,16 @@ func Parallel(fns ...interface{}) {
 func funcTypeWrap(fn interface{}) func(context.Context) error {
 	switch f := fn.(type) {
 	case func():
-		return func(context.Context) error {
-			f()
-			return nil
-		}
+		return func(context.Context) error { f(); return nil }
 	case func() error:
-		return func(context.Context) error {
-			return f()
-		}
+		return func(context.Context) error { return f() }
 	case func(context.Context):
-		return func(ctx context.Context) error {
-			f(ctx)
-			return nil
-		}
+		return func(ctx context.Context) error { f(ctx); return nil }
 	case func(context.Context) error:
 		return f
+	default:
+		return nil
 	}
-	return nil
 }
 
 // FindFiles return a list of file matching the given glob patterns.
@@ -675,7 +670,6 @@ func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]strin
 		}
 
 		if !info.Mode().IsRegular() {
-			// continue
 			return nil
 		}
 
@@ -696,31 +690,25 @@ func FileConcat(out string, perm os.FileMode, files ...string) error {
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
+	defer w.Flush()
 
-	append := func(file string) error {
+	for _, file := range files {
 		in, err := os.Open(file)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open input file %s: %w", file, err)
 		}
 		defer in.Close()
 
 		if _, err := io.Copy(w, in); err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	for _, in := range files {
-		if err := append(in); err != nil {
-			return err
+			return fmt.Errorf("failed to copy from %s: %w", file, err)
 		}
 	}
 
-	if err = w.Flush(); err != nil {
-		return err
+	if err := w.Flush(); err != nil {
+		return fmt.Errorf("failed to flush writer: %w", err)
 	}
-	return f.Close()
+
+	return nil
 }
 
 // MustFileConcat invokes FileConcat and panics if an error occurs.
@@ -748,11 +736,10 @@ func VerifySHA256(file string, hash string) error {
 	expectedHash := strings.TrimSpace(hash)
 
 	if computedHash != expectedHash {
-		return fmt.Errorf("SHA256 verification of %v failed. Expected=%v, "+
-			"but computed=%v", f.Name(), expectedHash, computedHash)
+		return fmt.Errorf("SHA256 verification of %v failed. Expected=%v, computed=%v", f.Name(), expectedHash, computedHash)
 	}
-	log.Println("SHA256 OK:", f.Name())
 
+	fmt.Printf("SHA256 OK: %s\n", f.Name())
 	return nil
 }
 
@@ -773,7 +760,7 @@ func CreateSHA512File(file string) error {
 	computedHash := hex.EncodeToString(sum.Sum(nil))
 	out := fmt.Sprintf("%v  %v", computedHash, filepath.Base(file))
 
-	return ioutil.WriteFile(file+".sha512", []byte(out), 0644)
+	return os.WriteFile(file+".sha512", []byte(out), 0644)
 }
 
 // Mage executes mage targets in the specified directory.

@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -57,11 +56,9 @@ func init() {
 	if packageTypes := os.Getenv("PACKAGES"); len(packageTypes) > 0 {
 		for _, pkgtype := range strings.Split(packageTypes, ",") {
 			var p PackageType
-			err := p.UnmarshalText([]byte(pkgtype))
-			if err != nil {
-				continue
+			if err := p.UnmarshalText([]byte(pkgtype)); err == nil {
+				SelectedPackageTypes = append(SelectedPackageTypes, p)
 			}
-			SelectedPackageTypes = append(SelectedPackageTypes, p)
 		}
 	}
 }
@@ -112,9 +109,8 @@ func ImageSelector(f ImageSelectorFunc) func(params *crossBuildParams) {
 // AddPlatforms sets dependencies on others platforms.
 func AddPlatforms(expressions ...string) func(params *crossBuildParams) {
 	return func(params *crossBuildParams) {
-		var list BuildPlatformList
 		for _, expr := range expressions {
-			list = NewPlatformList(expr)
+			list := NewPlatformList(expr)
 			params.Platforms = params.Platforms.Merge(list)
 		}
 	}
@@ -136,7 +132,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 	}
 
 	if len(params.Platforms) == 0 {
-		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
+		fmt.Printf("Skipping cross-build of target=%v because platforms list is empty.\n", params.Target)
 		return nil
 	}
 
@@ -147,14 +143,13 @@ func CrossBuild(options ...CrossBuildOption) error {
 			if platform.GOOS() == "aix" {
 				if len(params.Platforms) != 1 {
 					return errors.New("AIX cannot be crossbuilt with other platforms. Set PLATFORMS='aix/ppc64'")
-				} else {
-					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
-					log.Printf("Target is building for AIX, skipping normal crossbuild process")
-					args := DefaultBuildArgs()
-					args.OutputDir = filepath.Join("build", "golang-crossbuild")
-					args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
-					return Build(args)
 				}
+				// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
+				fmt.Printf("Target is building for AIX, skipping normal crossbuild process\n")
+				args := DefaultBuildArgs()
+				args.OutputDir = filepath.Join("build", "golang-crossbuild")
+				args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
+				return Build(args)
 			}
 		}
 		// If we're here, something isn't set.
@@ -163,7 +158,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	// Docker is required for this target.
 	if err := HaveDocker(); err != nil {
-		return err
+		return fmt.Errorf("docker is required for crossbuild: %w", err)
 	}
 
 	if CrossBuildMountModcache {
@@ -175,7 +170,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Build the magefile for Linux, so we can run it inside the container.
 	mg.Deps(buildMage)
 
-	log.Println("crossBuild: Platform list =", params.Platforms)
+	fmt.Printf("crossBuild: Platform list: %v\n", params.Platforms)
 	var deps []interface{}
 	for _, buildPlatform := range params.Platforms {
 		if !buildPlatform.Flags.CanCrossBuild() {
@@ -207,13 +202,26 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 	return CrossBuild(o...)
 }
 
-// buildMage pre-compiles the magefile to a binary using the GOARCH parameter.
-// It has the benefit of speeding up the build because the
-// mage -compile is done only once rather than in each Docker container.
+// buildMage pre-compiles the magefile to a binary using the current GOARCH.
+// It speeds up the build process by compiling mage only once for each architecture.
 func buildMage() error {
-	arch := runtime.GOARCH
-	return sh.RunWith(map[string]string{"CGO_ENABLED": "0"}, "mage", "-f", "-goos=linux", "-goarch="+arch,
-		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
+	const arch = runtime.GOARCH
+
+	args := []string{
+		"-f",
+		"-goos=linux",
+		"-goarch=" + arch,
+		"-compile",
+		filepath.Join("build", "mage-linux-"+arch),
+	}
+
+	env := map[string]string{"CGO_ENABLED": "0"}
+	err := sh.RunWith(env, "mage", args...)
+	if err != nil {
+		return fmt.Errorf("failed to compile mage: %w", err)
+	}
+
+	return nil
 }
 
 func CrossBuildImage(platform string) (string, error) {
@@ -246,10 +254,10 @@ func CrossBuildImage(platform string) (string, error) {
 
 	goVersion, err := GoVersion()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to get Go version: %w", err)
 	}
 
-	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
+	return fmt.Sprintf("%s:%s-%s", BeatsCrossBuildImage, goVersion, tagSuffix), nil
 }
 
 // GolangCrossBuilder executes the specified mage target inside of the
@@ -272,27 +280,29 @@ func (b GolangCrossBuilder) Build() error {
 
 	mountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
 	// use custom dir for build if given, subdir if not:
-	cwd := repoInfo.SubDir
-	if b.InDir != "" {
-		cwd = b.InDir
+	cwd := b.InDir
+	if cwd == "" {
+		cwd = repoInfo.SubDir
 	}
 	workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
 
 	builderArch := runtime.GOARCH
-	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
+	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build", "mage-linux-"+builderArch))
 	if err != nil {
-		return fmt.Errorf("failed to determine mage-linux-"+builderArch+" relative path: %w", err)
+		return fmt.Errorf("failed to determine mage-linux-%s relative path: %w", builderArch, err)
 	}
 
 	dockerRun := sh.RunCmd("docker", "run")
 	image, err := b.ImageSelector(b.Platform)
 	if err != nil {
-		return fmt.Errorf("failed to determine golang-crossbuild image tag: %w", err)
+		return fmt.Errorf("failed to determine golang-crossbuild image tag for platform %s: %w", b.Platform, err)
 	}
+
 	verbose := ""
 	if mg.Verbose() {
 		verbose = "true"
 	}
+
 	var args []string
 	// There's a bug on certain debian versions:
 	// https://discuss.linuxcontainers.org/t/debian-jessie-containers-have-extremely-low-performance/1272
@@ -309,35 +319,71 @@ func (b GolangCrossBuilder) Build() error {
 			"--env", "EXEC_GID="+strconv.Itoa(os.Getgid()),
 		)
 	}
+
 	if versionQualified {
 		args = append(args, "--env", "VERSION_QUALIFIER="+versionQualifier)
 	}
+
 	if CrossBuildMountModcache {
 		// Mount $GOPATH/pkg/mod into the container, read-only.
 		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
 		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
 	}
 
-	if b.Platform == "darwin/amd64" {
+	switch b.Platform {
+	case "darwin/amd64":
 		fmt.Printf(">> %v: Forcing DEV=0 for %s: https://github.com/elastic/golang-crossbuild/issues/217\n", b.Target, b.Platform)
 		args = append(args, "--env", "DEV=0")
-	} else {
-		args = append(args, "--env", fmt.Sprintf("DEV=%v", DevBuild))
+	default:
+		args = append(args, "--env", "DEV="+strconv.FormatBool(DevBuild))
 	}
 
+	// To speed up cross-compilation, we need to persist the build cache so that subsequent builds
+	// for the same arch are faster (⚡).
+	//
+	// As we want to persist the build cache, we need to mount the cache directory to the Docker host.
+	// This is done by mounting the host directory to the container.
+	//
+	// Path of the cache directory on the host:
+	// 		<os.TempDir>/build/.go-build/<b.Platform>
+	// Example: /tmp/build/.go-build/linux/amd64
+	// Reason for using <os.TempDir> and not <repoInfo.RootDir> as base because for
+	// builds happening on CI, the paths looks similar to:
+	// /opt/buildkite-agent/builds/bk-agent-prod-gcp-1727515099712207954/elastic/beats-xpack-agentbeat/
+	// where bk-agent-prod-gcp-1727515099712207954 is the agent so it keeps changing. So even if we do cache the
+	// build, it will be useless as the cache directory will be different for every build.
+	//
+	// As per: https://docs.docker.com/engine/storage/bind-mounts/#differences-between--v-and---mount-behavior
+	// If the directory doesn't exist, Docker does not automatically create it for you, but generates an error.
+	// So, we need to create the directory before mounting it.
+	//
+	// Also, in the container, the cache directory is mounted to /root/.cache/go-build.
+	buildCacheHostDir := filepath.Join(os.TempDir(), "build", ".go-build", b.Platform)
+	buildCacheContainerDir := "/root/.cache/go-build"
+
+	if err = os.MkdirAll(buildCacheHostDir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", buildCacheHostDir, err)
+	}
+
+	// Common arguments
 	args = append(args,
 		"--rm",
 		"--env", "GOFLAGS=-mod=readonly -buildvcs=false",
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
-		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
+		"--env", "SNAPSHOT="+strconv.FormatBool(Snapshot),
+
+		// To persist the build cache, we need to mount the cache directory to the Docker host.
+		// With docker run, mount types are: bind, volume and tmpfs. For our use case, we have
+		// decide to use the bind mount type.
+		"--mount", fmt.Sprintf("type=bind,source=%s,target=%s", buildCacheHostDir, buildCacheContainerDir),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 	)
 
+	// Image and build command arguments
 	args = append(args,
 		image,
-
 		// Arguments for docker crossbuild entrypoint. For details see
 		// https://github.com/elastic/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
 		"--build-cmd", buildCmd+" "+b.Target,
@@ -354,9 +400,9 @@ func DockerChown(path string) {
 	uid, _ := strconv.Atoi(EnvOr("EXEC_UID", "-1"))
 	gid, _ := strconv.Atoi(EnvOr("EXEC_GID", "-1"))
 	if uid > 0 && gid > 0 {
-		log.Printf(">>> Fixing file ownership issues from Docker at path=%v", path)
+		fmt.Printf(">>> Fixing file ownership issues from Docker at path=%v\n", path)
 		if err := chownPaths(uid, gid, path); err != nil {
-			log.Println(err)
+			fmt.Println(err)
 		}
 	}
 }
@@ -366,7 +412,7 @@ func chownPaths(uid, gid int, path string) error {
 	start := time.Now()
 	numFixed := 0
 	defer func() {
-		log.Printf("chown took: %v, changed %d files", time.Since(start), numFixed)
+		fmt.Printf("chown took: %v, changed %d files\n", time.Since(start), numFixed)
 	}()
 
 	return filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
