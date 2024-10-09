@@ -221,7 +221,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+			p.publishUser(u, state, inputCtx.ID, client, tracker, false)
 		}
 
 		end := time.Now()
@@ -298,7 +298,7 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		if len(updatedUsers) != 0 {
 			tracker = kvstore.NewTxTracker(ctx)
 			for _, u := range updatedUsers {
-				p.publishUser(u, state, inputCtx.ID, client, tracker)
+				p.publishUser(u, state, inputCtx.ID, client, tracker, true)
 			}
 			tracker.Wait()
 		}
@@ -390,7 +390,7 @@ func (p *adInput) publishMarker(ts, eventTime time.Time, inputID string, start b
 }
 
 // publishUser will publish a user document using the given beat.Client.
-func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker, update bool) {
 	userDoc := mapstr.M{}
 
 	_, _ = userDoc.Put("activedirectory", u.Entry)
@@ -401,6 +401,12 @@ func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client
 	case Deleted:
 		_, _ = userDoc.Put("event.action", "user-deleted")
 	case Discovered:
+		if update {
+			// If this in an update, any computer that is in the discovered
+			// state will already have been published, so we don't need to
+			// send the data again.
+			return
+		}
 		_, _ = userDoc.Put("event.action", "user-discovered")
 	case Modified:
 		_, _ = userDoc.Put("event.action", "user-modified")
