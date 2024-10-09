@@ -90,7 +90,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -115,7 +115,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -140,7 +140,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -167,7 +167,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -194,7 +194,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -222,7 +222,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -254,7 +254,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -281,7 +281,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -308,7 +308,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -336,7 +336,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -367,7 +367,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -394,7 +394,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:
@@ -421,7 +421,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/packetbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         notify:
           - github_commit_status:

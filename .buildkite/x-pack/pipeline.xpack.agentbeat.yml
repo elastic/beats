@@ -84,7 +84,7 @@ steps:
           - test-collector#v1.10.2:
               files: "x-pack/agentbeat/build/TEST-*.xml"
               format: "junit"
-              # branches: "main"
+              branches: "main"
               debug: true
         retry:
           automatic:
