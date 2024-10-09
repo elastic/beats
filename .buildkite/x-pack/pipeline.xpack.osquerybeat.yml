@@ -82,12 +82,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
@@ -107,12 +101,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Go Integration Tests"
@@ -134,12 +122,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Win 2016 Unit Tests"
@@ -161,12 +143,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Win-2022 Unit Tests"
@@ -193,12 +169,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Win 10 Unit Tests"
@@ -220,12 +190,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Win 11 Unit Tests"
@@ -247,12 +211,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Win 2019 Unit Tests"
@@ -276,12 +234,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: macOS x86_64 Unit Tests"
@@ -300,12 +252,6 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/osquerybeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: macOS arm64 Unit Tests"

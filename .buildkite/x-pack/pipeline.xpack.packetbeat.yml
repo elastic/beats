@@ -86,12 +86,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 Unit Tests"
@@ -111,12 +105,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
@@ -136,12 +124,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: RHEL9 Unit Tests"
@@ -163,12 +145,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2016 Unit Tests"
@@ -190,12 +166,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 Unit Tests"
@@ -218,12 +188,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 System Tests"
@@ -250,12 +214,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 Unit Tests"
@@ -277,12 +235,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 11 Unit Tests"
@@ -304,12 +256,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2019 Unit Tests"
@@ -332,12 +278,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 System Tests"
@@ -363,12 +303,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu arm64 Unit Tests"
@@ -390,12 +324,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: macOS x86_64 Unit Tests"
@@ -417,12 +345,6 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: macOS arm64 Unit Tests"
