@@ -164,7 +164,7 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 	}
 
 	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostPath), false)
-	if err != nil {
+	if err != nil && !errors.Is(err, cgroup.ErrCgroupsMissing) {
 		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
 	}
 

@@ -28,6 +28,7 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
@@ -51,6 +52,22 @@ func newCGHandlerBuilder(handler testCGRsolver) processors.InitCgroupHandler {
 	return func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
 		return handler, nil
 	}
+}
+
+func TestDefaultProcessorStartup(t *testing.T) {
+	// set initCgroupPaths to system non-test defaults
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
+
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false)
+	require.NoError(t, err)
+
+	// ensure the underlying provider has been initialized properly
+	unwrapped := proc.(*addProcessMetadata)
+	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
+	require.NoError(t, err)
+	require.NotNil(t, metadata)
 }
 
 func TestAddProcessMetadata(t *testing.T) {
