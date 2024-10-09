@@ -82,6 +82,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
@@ -101,6 +107,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
@@ -120,6 +132,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
@@ -141,6 +159,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Win 2016 Unit Tests"
@@ -162,6 +186,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Win 2022 Unit Tests"
@@ -188,6 +218,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Win 10 Unit Tests"
@@ -209,6 +245,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Win 11 Unit Tests"
@@ -230,6 +272,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Win 2019 Unit Tests"
@@ -254,6 +302,12 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Ubuntu arm64 Unit Tests"
