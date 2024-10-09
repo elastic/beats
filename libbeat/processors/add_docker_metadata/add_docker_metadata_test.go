@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -37,29 +38,35 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+type testCGReader struct {
+}
+
+func (r testCGReader) ProcessCgroupPaths(pid int) (cgroup.PathList, error) {
+	switch pid {
+	case 1000:
+		return cgroup.PathList{
+			V1: map[string]cgroup.ControllerPath{
+				"cpu": {ControllerPath: "/docker/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b", IsV2: false},
+			},
+		}, nil
+	case 2000:
+		return cgroup.PathList{
+			V1: map[string]cgroup.ControllerPath{
+				"memory": {ControllerPath: "/user.slice", IsV2: false},
+			},
+		}, nil
+	case 3000:
+		// Parser error (hopefully this never happens).
+		return cgroup.PathList{}, fmt.Errorf("cgroup parse failure")
+	default:
+		return cgroup.PathList{}, os.ErrNotExist
+	}
+}
+
 func init() {
 	// Stub out the procfs.
-	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
-
-		switch pid {
-		case 1000:
-			return cgroup.PathList{
-				V1: map[string]cgroup.ControllerPath{
-					"cpu": {ControllerPath: "/docker/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b", IsV2: false},
-				},
-			}, nil
-		case 2000:
-			return cgroup.PathList{
-				V1: map[string]cgroup.ControllerPath{
-					"memory": {ControllerPath: "/user.slice", IsV2: false},
-				},
-			}, nil
-		case 3000:
-			// Parser error (hopefully this never happens).
-			return cgroup.PathList{}, fmt.Errorf("cgroup parse failure")
-		default:
-			return cgroup.PathList{}, os.ErrNotExist
-		}
+	initCgroupPaths = func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
+		return testCGReader{}, nil
 	}
 }
 
