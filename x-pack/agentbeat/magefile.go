@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -217,10 +218,19 @@ func PythonIntegTest(ctx context.Context) error {
 
 // TestWithSpec executes unique commands from agentbeat.spec.yml and validates that app haven't exited with non-zero
 func TestWithSpec(ctx context.Context) {
-	var commands = devtools.SpecCommands()
+	specPath := os.Getenv("AGENTBEAT_SPEC")
+	if specPath == "" {
+		log.Fatal("AGENTBEAT_SPEC is not defined\n")
+	}
+
+	platform := os.Getenv("PLATFORM")
+	if platform == "" {
+		log.Fatal("PLATFORM is not defined\n")
+	}
+
+	var commands = devtools.SpecCommands(specPath, platform)
 
 	agentbeatPath := os.Getenv("AGENTBEAT_PATH")
-	fmt.Printf("--- AGENTBEAT_PATH: %s", agentbeatPath)
 
 	cmdResults := make(map[string]bool)
 
@@ -230,33 +240,32 @@ func TestWithSpec(ctx context.Context) {
 
 	hasFailures := false
 	for cmd, res := range cmdResults {
-		if res {
-			fmt.Printf("Command [%s] succeeded", cmd)
-		} else {
-			fmt.Printf("Command [%s] failed", cmd)
+		if !res {
+			fmt.Printf("~~~ Failed: [%s]\n", cmd)
+			fmt.Print(res)
 			hasFailures = true
 		}
 	}
 
 	if hasFailures {
-		fmt.Printf("Some inputs failed. Exiting with error")
+		fmt.Printf("Some inputs failed. Exiting with error\n")
 		os.Exit(1)
 	}
 }
 
 func agentbeatCmd(agentbeatPath string, command string) bool {
 	cmd := exec.Command(agentbeatPath, command)
-	fmt.Printf("Running command: %v", cmd)
+	fmt.Printf("Running command: %v\n", cmd)
 
 	if err := cmd.Start(); err != nil {
-		_ = fmt.Errorf("failed to start command: %v", err)
+		fmt.Printf("failed to start command: %v\n", err)
 	}
 
 	defer func() {
 		if err := cmd.Process.Kill(); err != nil {
-			_ = fmt.Errorf("failed to kill process: %v", err)
+			fmt.Printf("failed to kill process: %v\n", err)
 		} else {
-			_ = fmt.Errorf("command process killed")
+			fmt.Print("command process killed\n")
 		}
 	}()
 
@@ -269,11 +278,11 @@ func agentbeatCmd(agentbeatPath string, command string) bool {
 
 	select {
 	case err := <-done:
-		_ = fmt.Errorf("command exited before %s: %v", timeout.String(), err)
+		fmt.Printf("command exited before %s: %v\n", timeout.String(), err)
 		return false
 
 	case <-deadline:
-		_ = fmt.Errorf("%s", cmd.Stdout)
+		fmt.Printf("%s\n", cmd.Stdout)
 		return true
 	}
 }
