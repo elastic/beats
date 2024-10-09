@@ -325,7 +325,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		for _, c := range state.computers {
-			p.publishComputer(c, inputCtx.ID, client, tracker)
+			p.publishComputer(c, inputCtx.ID, client, tracker, false)
 		}
 
 		end := time.Now()
@@ -374,7 +374,7 @@ func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	if len(updatedDevices) != 0 {
 		tracker = kvstore.NewTxTracker(ctx)
 		for _, d := range updatedDevices {
-			p.publishComputer(d, inputCtx.ID, client, tracker)
+			p.publishComputer(d, inputCtx.ID, client, tracker, true)
 		}
 		tracker.Wait()
 	}
@@ -481,7 +481,7 @@ func (p *jamfInput) publishMarker(ts, eventTime time.Time, inputID string, start
 }
 
 // publishComputer will publish a computer document using the given beat.Client.
-func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Client, tracker *kvstore.TxTracker, update bool) {
 	devDoc := mapstr.M{}
 
 	id := "unknown"
@@ -496,6 +496,12 @@ func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Cli
 	case Deleted:
 		_, _ = devDoc.Put("event.action", "device-deleted")
 	case Discovered:
+		if update {
+			// If this in an update, any computer that is in the discovered
+			// state will already have been published, so we don't need to
+			// send the data again.
+			return
+		}
 		_, _ = devDoc.Put("event.action", "device-discovered")
 	case Modified:
 		_, _ = devDoc.Put("event.action", "device-modified")
