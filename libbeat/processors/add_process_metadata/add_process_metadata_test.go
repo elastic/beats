@@ -64,7 +64,7 @@ func TestDefaultProcessorStartup(t *testing.T) {
 	require.NoError(t, err)
 
 	// ensure the underlying provider has been initialized properly
-	unwrapped := proc.(*addProcessMetadata)
+	unwrapped, _ := proc.(*addProcessMetadata)
 	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
 	require.NoError(t, err)
 	require.NotNil(t, metadata)

@@ -84,7 +84,7 @@ func TestDefaultProcessorStartup(t *testing.T) {
 	proc, err := buildDockerMetadataProcessor(logp.L(), cfg, docker.NewWatcher)
 	require.NoError(t, err)
 
-	unwrapped := proc.(*addDockerMetadata)
+	unwrapped, _ := proc.(*addDockerMetadata)
 
 	// make sure pid readers have been initialized properly
 	_, err = unwrapped.getProcessCgroups(os.Getpid())
