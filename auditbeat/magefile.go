@@ -21,10 +21,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -33,8 +37,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
@@ -158,4 +160,13 @@ func Dashboards() error {
 // Docs collects the documentation.
 func Docs() {
 	mg.Deps(auditbeat.ModuleDocs, auditbeat.FieldDocs)
+}
+
+// PythonIntegTest executes the python system tests in the integration
+func PythonIntegTest() {
+	if os.Getenv("CI") == "true" && os.Getenv("STACK_ENVIRONMENT") == "next-major" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	integtest.PythonIntegTest(context.TODO())
 }

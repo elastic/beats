@@ -25,6 +25,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module Tests
+  BEAT_PATH: "filebeat"
+
 steps:
   - group: "Check/Update"
     key: "filebeat-check-update"
@@ -147,10 +150,6 @@ steps:
           TESTING_FILEBEAT_SKIP_DIFF: 1
           PYTEST_ADDOPTS: "-k test_modules"
         command: |
-          set -euo pipefail
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet filebeat
-          echo "~~~ Running tests"
           cd filebeat
           mage pythonIntegTest
         retry:
@@ -173,10 +172,6 @@ steps:
           STACK_ENVIRONMENT: "next-major"
           TESTING_FILEBEAT_SKIP_DIFF: 1
         command: |
-          set -euo pipefail
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet filebeat
-          echo "~~~ Running tests"
           cd filebeat
           mage pythonIntegTest
         retry:

@@ -9,11 +9,14 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -24,8 +27,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -230,4 +231,13 @@ func installDependencies(arch string, pkgs ...string) error {
 		"--no-install-recommends",
 	}, pkgs...)
 	return sh.Run("apt-get", args...)
+}
+
+// Test runs all available tests (unitTest + integTest)
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	test.Test()
 }

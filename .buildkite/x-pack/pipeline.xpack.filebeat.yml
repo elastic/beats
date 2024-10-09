@@ -25,6 +25,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module Tests
+  BEAT_PATH: "x-pack/filebeat"
+
 steps:
   - group: "Check/Update"
     key: "x-pack-filebeat-check-update"
@@ -149,10 +152,6 @@ steps:
           TESTING_FILEBEAT_SKIP_DIFF: 1
           PYTEST_ADDOPTS: "-k test_xpack_modules"
         command: |
-          set -euo pipefail
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/filebeat
-          echo "~~~ Running tests"
           cd x-pack/filebeat
           mage pythonIntegTest
         retry:
@@ -276,7 +275,6 @@ steps:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/filebeat/input/awss3/_meta/terraform"
           MODULE: "aws"
-          #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
           TEST_TAGS: "aws"
         agents:
           provider: "aws"
