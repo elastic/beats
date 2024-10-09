@@ -9,6 +9,12 @@ tags:
 
 {{ if .use_files }}
 use_files: true
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
 {{ end }}
 
 journald:
@@ -38,9 +44,3 @@ files:
   multiline:
     pattern: "^\\s"
     match: after
-  processors:
-    - add_locale: ~
-    - add_fields:
-        target: ''
-        fields:
-          ecs.version: 1.12.0
