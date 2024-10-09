@@ -196,7 +196,7 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.use_journald=true".format(
                 module=module, fileset=fileset))
             cmd.append("-M")
-            cmd.append("{module}.{fileset}.input.paths=[{test_file}]".format(
+            cmd.append("{module}.{fileset}.input.journald.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))
         else:
             cmd.append("-M")
