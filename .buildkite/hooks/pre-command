@@ -27,6 +27,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
