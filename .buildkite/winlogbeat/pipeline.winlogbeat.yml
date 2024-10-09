@@ -80,12 +80,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Crosscompile"
@@ -107,12 +101,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Win 2016 Unit Tests"
@@ -134,12 +122,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Win 2019 Unit Tests"
@@ -161,12 +143,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Win 2022 Unit Tests"
@@ -193,12 +169,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Win 10 Unit Tests"
@@ -220,12 +190,6 @@ steps:
         artifact_paths:
           - "winlogbeat/build/*.xml"
           - "winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "winlogbeat: Win 11 Unit Tests"

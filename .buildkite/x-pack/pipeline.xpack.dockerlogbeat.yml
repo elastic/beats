@@ -76,12 +76,6 @@ steps:
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
           - "x-pack/dockerlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/dockerlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
@@ -102,12 +96,6 @@ steps:
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
           - "x-pack/dockerlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/dockerlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Go Integration Tests"
