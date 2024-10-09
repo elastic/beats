@@ -7,6 +7,8 @@ tags: {{ append .tags "journald" "auth" | tojson }}
 {{ if .use_files }}
 use_files: true
 tags: {{ .tags | tojson }}
+processors:
+  - add_locale: ~
 {{ end }}
 
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
@@ -28,7 +30,4 @@ files:
   multiline:
     pattern: "^\\s"
     match: after
-
-  processors:
-    - add_locale: ~
 
