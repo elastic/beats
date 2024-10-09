@@ -86,6 +86,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Ubuntu x86_64 Unit Tests"
@@ -104,6 +110,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: RHEL9 Unit Tests"
@@ -124,6 +136,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Win 2016 Unit Tests"
@@ -144,6 +162,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Win 2022 Unit Tests"
@@ -163,6 +187,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
@@ -182,6 +212,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Python Integration Tests"
@@ -205,6 +241,12 @@ steps:
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Ubuntu arm64 Unit Tests"
@@ -226,6 +268,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: macOS x86_64 Unit Tests"
@@ -247,6 +295,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: macOS arm64 Unit Tests"
@@ -272,6 +326,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Win 2019 Unit Tests"
@@ -292,6 +352,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Win 11 Unit Tests"
@@ -312,6 +378,12 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "heartbeat: Win 10 Unit Tests"
