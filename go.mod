@@ -207,7 +207,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/icholy/digest v0.1.22
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
-	github.com/mjwolf/go-quark v0.1.3
+	github.com/mjwolf/go-quark v0.2.0
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.18
 	github.com/pkg/xattr v0.4.9

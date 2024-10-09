@@ -719,6 +719,8 @@ github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyua
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mjwolf/go-quark v0.1.3 h1:3dmrH/mP10YuTlZJ9TtdmyGLaLhzZl0V1pG3qHAK3Mg=
 github.com/mjwolf/go-quark v0.1.3/go.mod h1:qHZFSWAGUg6eOpvideVWvTtWx/HKvdECdb1d3PrLBow=
+github.com/mjwolf/go-quark v0.2.0 h1:arAKLySXUzueSbaUkvSo7CJQrIicWorbSQ7P9I0MxdY=
+github.com/mjwolf/go-quark v0.2.0/go.mod h1:qHZFSWAGUg6eOpvideVWvTtWx/HKvdECdb1d3PrLBow=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
 github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
 github.com/moby/spdystream v0.2.0 h1:cjW1zVyyoiM0T7b6UoySUFqzXMoqRckQtXwGPiBhOM8=
