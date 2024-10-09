@@ -197,7 +197,7 @@ processors:
         - process.thread
         - syslog
         - systemd
-
+        - message_id
 on_failure:
   - set:
       field: error.message

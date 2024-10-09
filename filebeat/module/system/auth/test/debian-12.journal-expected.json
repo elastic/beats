@@ -44,8 +44,6 @@
         "system.auth.ssh.signature": "ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -96,8 +94,6 @@
         "system.auth.ssh.method": "password",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -145,8 +141,6 @@
         "system.auth.ssh.event": "Invalid",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -196,8 +190,6 @@
         "system.auth.ssh.method": "password",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -247,8 +239,6 @@
         "system.auth.ssh.method": "password",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -298,8 +288,6 @@
         "system.auth.ssh.method": "password",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
@@ -340,8 +328,6 @@
         "system.auth.sudo.user": "root",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.effective.name": "root",
@@ -386,8 +372,6 @@
         "service.type": "system",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.effective.group.id": "0",
@@ -418,8 +402,6 @@
         "service.type": "system",
         "tags": [
             "auth",
-            "auth",
-            "journald",
             "journald"
         ],
         "user.group.id": "0",
