@@ -77,6 +77,12 @@ func TestDefaultProcessorStartup(t *testing.T) {
 		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
 	}
 
+	defer func() {
+		initCgroupPaths = func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
+			return testCGReader{}, nil
+		}
+	}()
+
 	rawCfg := defaultConfig()
 	cfg, err := config.NewConfigFrom(rawCfg)
 	require.NoError(t, err)
