@@ -35,6 +35,11 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   export BUILDKITE_ANALYTICS_TOKEN
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" ]]; then
+    AGENTBEAT_PATH=$(.buildkite/scripts/agentbeat/setup_agentbeat.py)
+    export AGENTBEAT_PATH
+fi
+
 CPU_ARCH=$(uname -m)
 PLATFORM_TYPE=$(uname)
 

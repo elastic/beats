@@ -4,7 +4,6 @@ import platform
 import subprocess
 import sys
 import tarfile
-import os
 import re
 
 PATH = 'x-pack/agentbeat/build/distributions'
@@ -46,7 +45,6 @@ def get_artifact_pattern() -> str:
 
 
 def download_agentbeat(pattern, path) -> str:
-    log('--- Downloading agentbeat')
     try:
         subprocess.run(
             ['buildkite-agent', 'artifact', 'download', pattern, '.',
@@ -70,20 +68,18 @@ def get_filename(path) -> str:
 
 
 def extract_agentbeat(filename):
-    log('~~~ Extracting agentbeat')
     filepath = PATH + '/' + filename
 
     if filepath.endswith('.zip'):
         unzip_agentbeat(filepath)
     else:
         untar_agentbeat(filepath)
-    log('Successfully extracted agentbeat')
 
 
 def unzip_agentbeat(filepath):
     try:
         subprocess.run(
-            ['unzip', filepath],
+            ['unzip', '-qq', filepath],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
     except subprocess.CalledProcessError as e:
         log_err(e)
@@ -93,40 +89,24 @@ def unzip_agentbeat(filepath):
 def untar_agentbeat(filepath):
     try:
         with tarfile.open(filepath, 'r:gz') as tar:
-            tar.list()
             tar.extractall()
     except Exception as e:
         log_err(e)
         exit(1)
 
 
-def add_to_path(filepath):
+def get_path_to_executable(filepath) -> str:
     pattern = r'(.*)(?=\.zip|.tar\.gz)'
     match = re.match(pattern, filepath)
     if match:
-        path = f'../build/distributions/{match.group(1)}/agentbeat'
-        log("--- PATH: " + str(path))
-        os.environ['AGENTBEAT_PATH'] = str(path)
+        path = f'../../{match.group(1)}/agentbeat'
+        return path
     else:
         log_err("No agentbeat executable found")
-        exit(1)
-
-
-def install_synthetics():
-    log('--- Installing @elastic/synthetics')
-
-    try:
-        subprocess.run(
-            ['npm', 'install', '-g', '@elastic/synthetics'],
-            check=True
-        )
-    except subprocess.CalledProcessError:
-        log_err('Failed to install @elastic/synthetics')
         exit(1)
 
 
 artifact_pattern = get_artifact_pattern()
 archive = download_agentbeat(artifact_pattern, PATH)
 extract_agentbeat(archive)
-add_to_path(archive)
-install_synthetics()
+log(get_path_to_executable(archive))
