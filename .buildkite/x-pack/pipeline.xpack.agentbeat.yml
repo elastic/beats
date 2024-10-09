@@ -110,9 +110,8 @@ steps:
 #        depends_on:
 #          - agentbeat-package-linux
         command: |
-          set -euo pipefail
-          ./.buildkite/scripts/agentbeat/prepare_env.py
           cd x-pack/agentbeat
+          ls -la ../../agentbeat-9.0.0-SNAPSHOT-linux-x86_64
           mage -v testWithSpec
         agents:
           provider: "gcp"
@@ -123,10 +122,11 @@ steps:
 
       - label: ":linux: Agentbeat/Integration tests Windows"
         key: "agentbeat-it-windows"
+        env:
+          PLATFORM: "windows/amd64"
 #        depends_on:
 #          - agentbeat-package-linux
         command: |
-          ./.buildkite/scripts/agentbeat/prepare_env.py
           cd x-pack/agentbeat
           mage -v testWithSpec
         agents:
@@ -142,7 +142,7 @@ steps:
 #          - agentbeat-package-linux
 #        command: |
 #          set -euo pipefail
-#          ./.buildkite/scripts/agentbeat/prepare_env.py
+#          ./.buildkite/scripts/agentbeat/setup_agentbeat.py
 #        agents:
 #          provider: "orka"
 #          imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -153,7 +153,7 @@ steps:
 #          - agentbeat-package-linux
 #        command: |
 #          set -euo pipefail
-#          ./.buildkite/scripts/agentbeat/prepare_env.py
+#          ./.buildkite/scripts/agentbeat/setup_agentbeat.py
 #        agents:
 #          provider: "orka"
 #          imagePrefix: "${IMAGE_MACOS_ARM}"

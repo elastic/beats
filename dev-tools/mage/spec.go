@@ -45,17 +45,7 @@ type command struct {
 }
 
 // SpecCommands parses agent.beat.spec.yml and collects commands for tests
-func SpecCommands() []string {
-	specPath := os.Getenv("AGENTBEAT_SPEC")
-	if specPath == "" {
-		log.Fatal("AGENTBEAT_SPEC is not defined")
-	}
-
-	platform := os.Getenv("PLATFORM")
-	if platform == "" {
-		log.Fatal("PLATFORM is not defined")
-	}
-
+func SpecCommands(specPath string, platform string) []string {
 	spec, _ := parseToObj(specPath)
 
 	filteredInputs := filter(spec.Inputs, func(input input) bool {
