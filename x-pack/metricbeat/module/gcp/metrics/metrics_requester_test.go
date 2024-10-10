@@ -24,6 +24,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 		collectionPeriod *durationpb.Duration
 		inputAligner     string
 		expectedAligner  string
+		inputReducer     string
 	}{
 		{
 			"test collectionPeriod equals to samplePeriod",
@@ -34,6 +35,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			},
 			"",
 			"ALIGN_NONE",
+			"REDUCE_NONE",
 		},
 		{
 			"test collectionPeriod larger than samplePeriod",
@@ -44,6 +46,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			},
 			"ALIGN_MEAN",
 			"ALIGN_MEAN",
+			"REDUCE_MEAN",
 		},
 		{
 			"test collectionPeriod smaller than samplePeriod",
@@ -54,6 +57,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			},
 			"ALIGN_MAX",
 			"ALIGN_NONE",
+			"REDUCE_MEAN",
 		},
 		{
 			"test collectionPeriod equals to samplePeriod with given aligner",
@@ -64,13 +68,14 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			},
 			"ALIGN_MEAN",
 			"ALIGN_NONE",
+			"REDUCE_MEAN",
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			_, aligner := getTimeIntervalAligner(c.ingestDelay, c.samplePeriod, c.collectionPeriod, c.inputAligner)
-			assert.Equal(t, c.expectedAligner, aligner)
+			_, aligner, reducer := getTimeIntervalAligner(c.ingestDelay, c.samplePeriod, c.collectionPeriod, c.inputAligner, c.inputReducer)
+			assert.Equal(t, c.expectedAligner, aligner, reducer)
 		})
 	}
 }

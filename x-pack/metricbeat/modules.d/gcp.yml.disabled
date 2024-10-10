@@ -39,6 +39,11 @@
   period: 1m
   metrics:
     - aligner: ALIGN_NONE
+      reducer: REDUCE_NONE
+      groupBy:
+        - "resource.labels.instance_id"
+        - "resource.labels.zone"
+        - "metric.labels.instance_name" 
       service: compute
       metric_types:
         - "instance/cpu/reserved_cores"

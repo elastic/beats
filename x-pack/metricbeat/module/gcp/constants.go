@@ -117,6 +117,7 @@ var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
 
 const (
 	DefaultAligner = "ALIGN_NONE"
+	DefaultReducer = "REDUCE_NONE"
 )
 
 var AlignersMapToSuffix = map[string]string{
