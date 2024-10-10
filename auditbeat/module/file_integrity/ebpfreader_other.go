@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func newEbpfReader(c Config, l *logp.Logger) (EventProducer, error) {
+func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
 	return nil, errors.New("ebpf reader is not implemented on this system")
-
 }

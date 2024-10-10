@@ -41,7 +41,7 @@ func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 		l := logger.Named("ebpf")
 		l.Info("selected backend: ebpf")
 
-		return newEbpfReader(c, l)
+		return newEBPFReader(c, l)
 	}
 
 	if c.Backend == BackendKprobes {

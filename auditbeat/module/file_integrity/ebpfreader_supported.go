@@ -21,7 +21,7 @@ package file_integrity
 
 import "github.com/elastic/elastic-agent-libs/logp"
 
-func newEbpfReader(c Config, l *logp.Logger) (EventProducer, error) {
+func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
 	paths := make(map[string]struct{})
 	for _, p := range c.Paths {
 		paths[p] = struct{}{}
