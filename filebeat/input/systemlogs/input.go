@@ -163,13 +163,34 @@ func useJournald(c *conf.C) (bool, error) {
 	return true, nil
 }
 
-// TODO: Finish cleaning up the config
-// Do not mutate the config?
-// Merge everything and skip files, journald, type, use_files, use_journal
 func toJournaldConfig(cfg *conf.C) (*conf.C, error) {
 	newCfg, err := cfg.Child("journald", -1)
 	if err != nil {
 		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
+	}
+
+	if _, err := cfg.Remove("journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("type", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("files", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_files", -1); err != nil {
+		return nil, err
+	}
+
+	if err := newCfg.Merge(cfg); err != nil {
+		return nil, err
 	}
 
 	if err := newCfg.SetString("type", -1, "journald"); err != nil {
@@ -194,6 +215,14 @@ func toFilesConfig(cfg *conf.C) (*conf.C, error) {
 	}
 
 	if _, err := cfg.Remove("files", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_files", -1); err != nil {
 		return nil, err
 	}
 
