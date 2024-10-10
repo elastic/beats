@@ -2,20 +2,18 @@ type: system-logs
 
 {{ if .use_journald }}
 use_journald: true
-tags:
-  - journald
-  - syslog
 {{ end }}
 
 {{ if .use_files }}
 use_files: true
+{{ end }}
+
 processors:
   - add_locale: ~
   - add_fields:
       target: ''
       fields:
         ecs.version: 1.12.0
-{{ end }}
 
 journald:
   id: system-syslog
