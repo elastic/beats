@@ -46,7 +46,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
-- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 
 
 *Heartbeat*
@@ -324,6 +323,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improved GCS input documentation. {pull}41143[41143]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Add CSV decoding capacity to gcs input {pull}40979[40979]
+- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 
 *Auditbeat*
 
