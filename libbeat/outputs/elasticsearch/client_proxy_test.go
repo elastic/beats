@@ -28,12 +28,12 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -221,17 +221,17 @@ type serverState struct {
 	serverURL string
 	proxyURL  string
 
-	_serverRequestCount atomic.Int // Requests directly to the server
-	_proxyRequestCount  atomic.Int // Requests via the proxy
+	_serverRequestCount atomic.Int64 // Requests directly to the server
+	_proxyRequestCount  atomic.Int64 // Requests via the proxy
 }
 
 // Convenience functions to unwrap the atomic primitives
-func (s serverState) serverRequestCount() int {
-	return s._serverRequestCount.Load()
+func (s *serverState) serverRequestCount() int {
+	return int(s._serverRequestCount.Load())
 }
 
-func (s serverState) proxyRequestCount() int {
-	return s._proxyRequestCount.Load()
+func (s *serverState) proxyRequestCount() int {
+	return int(s._proxyRequestCount.Load())
 }
 
 // startServers starts endpoints representing a backend server and a proxy,
@@ -243,13 +243,13 @@ func startServers(t *testing.T) (*serverState, func()) {
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
-			state._serverRequestCount.Inc()
+			state._serverRequestCount.Add(1)
 		}))
 	proxy := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
-			state._proxyRequestCount.Inc()
+			state._proxyRequestCount.Add(1)
 		}))
 	state.serverURL = server.URL
 	state.proxyURL = proxy.URL
