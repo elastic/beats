@@ -27,7 +27,6 @@ func init() {
 
 		// The system/socket dataset uses additional syscalls
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
-			"eventfd2",
 			"mount",
 			"mq_open", // required for creds kprobe guess trigger.
 			"perf_event_open",

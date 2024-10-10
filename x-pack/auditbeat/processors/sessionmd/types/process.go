@@ -451,7 +451,6 @@ func (p *Process) ToMap() mapstr.M {
 	if p.End != nil {
 		process.Put("end", p.End)
 	}
-	// TODO: are other Ends needed, ancestors shouldn't end before process
 
 	return process
 }
