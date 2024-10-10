@@ -2,15 +2,10 @@ description: Entrypoint Pipeline for system/syslog Filebeat module
 processors:
   - script:
       source: |
-              Collection tags = ctx?.tags;
-              if(tags != null){
-                for (String tag : tags) {
-                  if (tag.toLowerCase().equals('journald')) {
-                    ctx['syslog_pipeline'] = '{< IngestPipeline "journald" >}';
-                    return
-                  }
+              if(ctx?.journald != null){
+                  ctx['syslog_pipeline'] = '{< IngestPipeline "journald" >}';
+                  return;
                 }
-              }
               ctx['syslog_pipeline'] = '{< IngestPipeline "files" >}';
               return;
   - pipeline:

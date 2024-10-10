@@ -1,15 +1,15 @@
 type: system-logs
 {{ if .use_journald }}
 use_journald: true
-tags: {{ append .tags "journald" "auth" | tojson }}
 {{ end }}
 
 {{ if .use_files }}
 use_files: true
+{{ end }}
+
 tags: {{ .tags | tojson }}
 processors:
   - add_locale: ~
-{{ end }}
 
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
