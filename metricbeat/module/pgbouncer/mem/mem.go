@@ -74,7 +74,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		tmpData, err := schema.Apply(result)
 		if err != nil {
 			// Log the error and skip this iteration if schema application fails.
-			fmt.Errorf("Error applying schema: %w", err)
+			log.Printf("Error applying schema: %v", err)
 			continue
 		}
 
