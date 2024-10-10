@@ -61,6 +61,7 @@ type metricsConfig struct {
 	MetricTypes         []string `config:"metric_types" validate:"required"`
 	Aligner             string   `config:"aligner"`
 	Reducer             string   `config:"reducer"`
+	GroupBy             []string `config:"groupBy"`
 }
 
 // prefix returns the service metric prefix, falling back to the Google Cloud
@@ -205,7 +206,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 			m.Logger().Warnf("Reducer value will be reset from %s to `REDUCE_NONE` because the Aligner is missing.", sdc.Reducer)
 		}
 		// Collect time series values from Google Cloud Monitoring API
-		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, sdc.Reducer, metricsToCollect)
+		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, sdc.Reducer, sdc.GroupBy, metricsToCollect)
 		if err != nil {
 			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)

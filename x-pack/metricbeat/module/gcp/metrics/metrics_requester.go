@@ -35,7 +35,7 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string, reducer string) timeSeriesWithAligner {
+func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string, reducer string, groupBy []string) timeSeriesWithAligner {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
@@ -47,6 +47,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 			PerSeriesAligner:   gcp.AlignersMapToGCP[aligner],
 			AlignmentPeriod:    r.config.period,
 			CrossSeriesReducer: monitoringpb.Aggregation_Reducer(monitoringpb.Aggregation_Reducer_value[reducer]),
+			GroupByFields:      groupBy,
 		},
 	}
 
@@ -74,7 +75,7 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	return out
 }
 
-func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, reducer string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, reducer string, groupBy []string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
@@ -137,9 +138,9 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s, reducer=%s", mt, metricMeta, aligner, reducer)
+			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s, reducer=%s,groupBy= %s", mt, metricMeta, aligner, reducer, groupBy)
 			interval, aligner, reducer := getTimeIntervalAligner(largestDelay, metricMeta.samplePeriod, r.config.period, aligner, reducer)
-			ts := r.Metric(ctx, serviceName, mt, interval, aligner, reducer)
+			ts := r.Metric(ctx, serviceName, mt, interval, aligner, reducer, groupBy)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
