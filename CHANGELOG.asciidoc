@@ -3,6 +3,29 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
+=======
+[[release-notes-8.15.2]]
+=== Beats version 8.15.2
+https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
+
+==== Known issues
+
+*Affecting all Beats*
+
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix bug that prevented the Elasticsearch output from recovering from an interrupted connection. {issue}40705[40705] {pull}40769[40796]
+
+*Metricbeat*
+
+- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+
+>>>>>>> 9d87afaaf3 (Add container logging known issue (#41119))
 [[release-notes-8.15.1]]
 === Beats version 8.15.1
 https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
@@ -11,7 +34,11 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
+=======
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+>>>>>>> 9d87afaaf3 (Add container logging known issue (#41119))
 
 ==== Bugfixes
 
@@ -60,6 +87,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 ==== Known issues
+
+*Affecting all Beats*
+
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 
 *Filebeat*
 
