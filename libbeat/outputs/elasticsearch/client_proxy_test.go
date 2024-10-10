@@ -22,6 +22,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -209,10 +210,12 @@ func doClientPing(t *testing.T) {
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
 	// the client is pointed at the right server or proxy.
-	_ = client.Connect()
+	_ = client.Connect(ctx)
 }
 
 // serverState contains the state of the http listeners for proxy tests,

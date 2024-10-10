@@ -54,7 +54,7 @@ type mockNetworkClient struct {
 	outputs.Client
 }
 
-func (c *mockNetworkClient) Connect() error { return nil }
+func (c *mockNetworkClient) Connect(_ context.Context) error { return nil }
 
 type mockBatch struct {
 	mu     sync.Mutex
