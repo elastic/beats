@@ -50,6 +50,7 @@ type journald struct {
 	Units              []string
 	Transports         []string
 	Identifiers        []string
+	Facilities         []int
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 	Journalctl         bool
@@ -79,7 +80,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 			Logger:     log,
 			StateStore: store,
 			Type:       pluginName,
-			Configure:  configure,
+			Configure:  Configure,
 		},
 	}
 }
@@ -90,7 +91,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -113,6 +114,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
+		Facilities:         config.Facilities,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -128,6 +130,7 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		journalctl.SeekHead,
 		"",
 		inp.Since,
@@ -158,6 +161,7 @@ func (inp *journald) Run(
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		mode,
 		pos,
 		inp.Since,
