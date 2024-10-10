@@ -17,7 +17,6 @@ func init() {
 		// requirements beyond the default policy from libbeat so whitelist
 		// these additional syscalls.
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
-			"faccessat2",
 			"mremap",
 			"umask",
 			"setreuid",
@@ -27,6 +26,7 @@ func init() {
 
 		// The system/socket dataset uses additional syscalls
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"eventfd2",
 			"mount",
 			"mq_open", // required for creds kprobe guess trigger.
 			"perf_event_open",
