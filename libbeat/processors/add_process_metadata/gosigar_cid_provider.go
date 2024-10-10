@@ -18,9 +18,7 @@
 package add_process_metadata
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -84,15 +82,16 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
+<<<<<<< HEAD
 	pathList, err := p.processCgroupPaths(p.hostPath, pid)
+=======
+	//return nil if we aren't supporting cgroups
+	if p.processCgroupPaths == nil {
+		return cgroup.PathList{}, nil
+	}
+	pathList, err := p.processCgroupPaths.ProcessCgroupPaths(pid)
+>>>>>>> 648ec22dc6 (Add tests, fallback properly if we can't init the cgroups (#41189))
 	if err != nil {
-		var pathError *fs.PathError
-		if errors.As(err, &pathError) {
-			// do no thing when err is nil or when os.PathError happens because the process don't exist,
-			// or not running in linux system
-			return cgroup.PathList{}, nil
-		}
-		// should never happen
 		return cgroup.PathList{}, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
 

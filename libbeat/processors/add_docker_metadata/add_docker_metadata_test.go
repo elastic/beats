@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -61,6 +62,32 @@ func init() {
 			return cgroup.PathList{}, os.ErrNotExist
 		}
 	}
+}
+
+func TestDefaultProcessorStartup(t *testing.T) {
+	// set initCgroupPaths to system non-test defaults
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
+
+	defer func() {
+		initCgroupPaths = func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
+			return testCGReader{}, nil
+		}
+	}()
+
+	rawCfg := defaultConfig()
+	cfg, err := config.NewConfigFrom(rawCfg)
+	require.NoError(t, err)
+
+	proc, err := buildDockerMetadataProcessor(logp.L(), cfg, docker.NewWatcher)
+	require.NoError(t, err)
+
+	unwrapped, _ := proc.(*addDockerMetadata)
+
+	// make sure pid readers have been initialized properly
+	_, err = unwrapped.getProcessCgroups(os.Getpid())
+	require.NoError(t, err)
 }
 
 func TestInitializationNoDocker(t *testing.T) {
