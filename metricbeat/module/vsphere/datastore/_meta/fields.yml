@@ -51,6 +51,10 @@
       type: keyword
       description: >
         List of all the host names.
+    - name: id
+      type: keyword
+      description: >
+        Datastore ID.
     - name: name
       type: keyword
       description: >

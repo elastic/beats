@@ -15,6 +15,10 @@
           type: keyword
           description: >
             Hostname of the host.
+    - name: id
+      type: keyword
+      description: >
+        Virtual Machine ID.
     - name: name
       type: keyword
       description: >

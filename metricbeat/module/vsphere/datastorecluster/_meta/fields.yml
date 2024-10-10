@@ -4,6 +4,10 @@
   description: >
     Datastore Cluster
   fields:
+    - name: id
+      type: keyword
+      description: >
+        The Datastore Cluster ID.
     - name: name
       type: keyword
       description: >
