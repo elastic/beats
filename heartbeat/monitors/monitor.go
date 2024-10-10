@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
@@ -71,6 +72,11 @@ type Monitor struct {
 	stats plugin.RegistryRecorder
 
 	monitorStateTracker *monitorstate.Tracker
+	statusReporter      status.StatusReporter
+}
+
+func (m *Monitor) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -175,6 +181,9 @@ func newMonitorUnsafe(
 
 		logp.L().Error(fullErr)
 		p.Jobs = []jobs.Job{func(event *beat.Event) ([]jobs.Job, error) {
+			// if statusReporter is set, as it is for running managed-mode, update the input status
+			// to failed, specifying the error
+			m.updateStatus(status.Failed, fmt.Sprintf("monitor could not be started: %s, err: %s", m.stdFields.ID, fullErr))
 			return nil, fullErr
 		}}
 
@@ -237,6 +246,7 @@ func (m *Monitor) Start() {
 
 	m.stats.StartMonitor(int64(m.endpoints))
 	m.state = MON_STARTED
+	m.updateStatus(status.Running, "")
 }
 
 // Stop stops the monitor without freeing it in global dedup
@@ -262,4 +272,11 @@ func (m *Monitor) Stop() {
 
 	m.stats.StopMonitor(int64(m.endpoints))
 	m.state = MON_STOPPED
+	m.updateStatus(status.Stopped, "")
+}
+
+func (m *Monitor) updateStatus(status status.Status, msg string) {
+	if m.statusReporter != nil {
+		m.statusReporter.UpdateStatus(status, msg)
+	}
 }
