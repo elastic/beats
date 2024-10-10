@@ -7,6 +7,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
@@ -240,9 +241,10 @@ func TestWithSpec(ctx context.Context) {
 
 	hasFailures := false
 	for cmd, res := range cmdResults {
-		if !res {
-			fmt.Printf("~~~ Failed: [%s]\n", cmd)
-			fmt.Print(res)
+		if res {
+			fmt.Printf("--- :large_green_circle: Succeeded:[%s.10s...]\n", cmd)
+		} else {
+			fmt.Printf("--- :bangbang: Failed: [%s.10s...]\n", cmd)
 			hasFailures = true
 		}
 	}
@@ -255,7 +257,12 @@ func TestWithSpec(ctx context.Context) {
 
 func agentbeatCmd(agentbeatPath string, command string) bool {
 	cmd := exec.Command(agentbeatPath, command)
-	fmt.Printf("Running command: %v\n", cmd)
+	fmt.Printf("Executing: %s.10s...\n", cmd.String())
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Printf("Error creating stdout pipe: %v\n", err)
+	}
 
 	if err := cmd.Start(); err != nil {
 		fmt.Printf("failed to start command: %v\n", err)
@@ -279,6 +286,11 @@ func agentbeatCmd(agentbeatPath string, command string) bool {
 	select {
 	case err := <-done:
 		fmt.Printf("command exited before %s: %v\n", timeout.String(), err)
+		fmt.Println("printing command stdout")
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
+		}
 		return false
 
 	case <-deadline:
