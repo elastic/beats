@@ -14959,11 +14959,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sfdc
-Version: v0.0.0-20240621062639-bcc8456508ff
+Version: v0.0.0-20241010131323-8e176480d727
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sfdc@v0.0.0-20240621062639-bcc8456508ff/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sfdc@v0.0.0-20241010131323-8e176480d727/LICENSE.txt:
 
 MIT License
 
