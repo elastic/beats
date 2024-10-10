@@ -86,6 +86,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Unit Tests"
@@ -105,6 +111,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: RHEL9 Unit Tests"
@@ -125,6 +137,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2016 Unit Tests"
@@ -145,6 +163,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2022 Unit Tests"
@@ -185,6 +209,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Integration Tests"
@@ -206,6 +236,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Integration Tests"
@@ -227,6 +263,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Unit Tests"
@@ -247,6 +289,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: macOS x86_64 Unit Tests"
@@ -267,6 +315,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: macOS arm64 Unit Tests"
@@ -293,6 +347,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2019 Unit Tests"
@@ -314,6 +374,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 10 Unit Tests"
@@ -335,6 +401,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 11 Unit Tests"
