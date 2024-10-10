@@ -18505,11 +18505,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/gopacket
-Version: v1.1.20-0.20211202005954-d412fca7f83a
+Version: v1.1.20-0.20241002174017-e8c5fda595e6
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/gopacket@v1.1.20-0.20211202005954-d412fca7f83a/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/gopacket@v1.1.20-0.20241002174017-e8c5fda595e6/LICENSE:
 
 Copyright (c) 2012 Google, Inc. All rights reserved.
 Copyright (c) 2009-2011 Andreas Krennmair. All rights reserved.
