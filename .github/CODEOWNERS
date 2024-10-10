@@ -123,6 +123,7 @@ CHANGELOG*
 /x-pack/filebeat/input/httpjson/ @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httplog @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
+/x-pack/filebeat/input/internal/private @elastic/security-service-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
