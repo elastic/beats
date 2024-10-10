@@ -206,6 +206,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fix http server helper SSL config. {pull}39405[39405]
+- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 
 *Osquerybeat*
 
