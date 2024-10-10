@@ -94,6 +94,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
@@ -117,6 +123,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Go Integration Tests"
@@ -138,6 +150,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2016 Unit Tests"
@@ -159,6 +177,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2022 Unit Tests"
@@ -185,6 +209,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 10 Unit Tests"
@@ -206,6 +236,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 11 Unit Tests"
@@ -227,6 +263,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2019 Unit Tests"
@@ -253,6 +295,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
@@ -274,6 +322,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS arm64 Extended Tests"
