@@ -217,7 +217,7 @@ func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user strin
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
-		return nil, nil, errors.New("no group specified")
+		return nil, nil, errors.New("no user specified")
 	}
 
 	u := &url.URL{
@@ -238,7 +238,7 @@ func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string,
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
-		return nil, nil, errors.New("no group specified")
+		return nil, nil, errors.New("no user specified")
 	}
 
 	u := &url.URL{
