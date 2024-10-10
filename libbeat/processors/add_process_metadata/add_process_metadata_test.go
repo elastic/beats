@@ -31,12 +31,27 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
+
+type testCGRsolver struct {
+	res func(pid int) (cgroup.PathList, error)
+}
+
+func (t testCGRsolver) ProcessCgroupPaths(pid int) (cgroup.PathList, error) {
+	return t.res(pid)
+}
+
+func newCGHandlerBuilder(handler testCGRsolver) processors.InitCgroupHandler {
+	return func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
+		return handler, nil
+	}
+}
 
 func TestAddProcessMetadata(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
@@ -90,7 +105,7 @@ func TestAddProcessMetadata(t *testing.T) {
 	}
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
+	processCgroupPaths := func(pid int) (cgroup.PathList, error) {
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
@@ -135,6 +150,7 @@ func TestAddProcessMetadata(t *testing.T) {
 
 		return testMap[pid], nil
 	}
+	initCgroupPaths = newCGHandlerBuilder(testCGRsolver{res: processCgroupPaths})
 
 	for _, test := range []struct {
 		description             string
@@ -884,7 +900,7 @@ func TestUsingCache(t *testing.T) {
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
+	processCgroupPaths := func(pid int) (cgroup.PathList, error) {
 		testStruct := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
 				"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -909,7 +925,7 @@ func TestUsingCache(t *testing.T) {
 		// testMap :=
 		return testMap[pid], nil
 	}
-
+	initCgroupPaths = newCGHandlerBuilder(testCGRsolver{res: processCgroupPaths})
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids":        []string{"system.process.ppid"},
 		"include_fields":    []string{"container.id", "process.env"},
@@ -1202,7 +1218,7 @@ func TestPIDToInt(t *testing.T) {
 }
 
 func TestV2CID(t *testing.T) {
-	processCgroupPaths = func(_ resolve.Resolver, _ int) (cgroup.PathList, error) {
+	processCgroupPaths := func(_ int) (cgroup.PathList, error) {
 		testMap := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
 				"cpu": {IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
@@ -1210,7 +1226,9 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider(resolve.NewTestResolver(""), nil, defaultCgroupRegex, processCgroupPaths, nil)
+	resolver := testCGRsolver{res: processCgroupPaths}
+	initCgroupPaths = newCGHandlerBuilder(resolver)
+	provider := newCidProvider(nil, defaultCgroupRegex, resolver, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
