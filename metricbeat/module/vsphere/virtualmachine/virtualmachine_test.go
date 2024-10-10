@@ -47,10 +47,21 @@ func TestFetchEventContents(t *testing.T) {
 	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
-
-	assert.EqualValues(t, "ha-host", event["host.id"])
-	assert.EqualValues(t, "localhost.localdomain", event["host.hostname"])
+	assert.EqualValues(t, "green", event["status"])
+	assert.EqualValues(t, 0, event["uptime"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
+
+	host := event["host"].(mapstr.M)
+	assert.EqualValues(t, "ha-host", host["id"])
+	assert.EqualValues(t, "localhost.localdomain", host["hostname"])
+
+	datastore := event["datastore"].(mapstr.M)
+	assert.EqualValues(t, []string{"LocalDS_0"}, datastore["names"])
+	assert.EqualValues(t, 1, datastore["count"])
+
+	network := event["network"].(mapstr.M)
+	assert.EqualValues(t, []string{"VM Network"}, network["names"])
+	assert.EqualValues(t, 1, network["count"])
 
 	cpu := event["cpu"].(mapstr.M)
 

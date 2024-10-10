@@ -127,7 +127,7 @@ CHANGELOG*
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
 /x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
-/x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
+/x-pack/filebeat/input/streaming/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
 /x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
@@ -194,8 +194,8 @@ CHANGELOG*
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
-/x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations @elastic/security-service-integrations
+/x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
+/x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudrun_metrics @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudsql_mysql @elastic/obs-infraobs-integrations
@@ -204,21 +204,19 @@ CHANGELOG*
 /x-pack/metricbeat/module/gcp/carbon @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/compute @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/dataproc @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/gcp/dns @elastic/security-service-integrations
 /x-pack/metricbeat/module/gcp/firestore @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/gcp/firewall @elastic/security-service-integrations
 /x-pack/metricbeat/module/gcp/gke @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/loadbalancing_logs @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/loadbalancing_metrics @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/pubsub @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/redis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
-/x-pack/metricbeat/module/gcp/vpcflow @elastic/security-service-integrations
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations

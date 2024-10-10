@@ -9,6 +9,7 @@ scms:
       owner: '{{ .scm.owner }}'
       repository: '{{ .scm.repository }}'
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: main
       commitusingapi: true

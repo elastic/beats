@@ -18,9 +18,14 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   # Integration Tests
   K8S_VERSION: "v1.29.0"
   ASDF_KIND_VERSION: "0.20.0"
+
+  # Module Tests
+  BEAT_PATH: "metricbeat"
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -40,15 +45,25 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
               context: "metricbeat: check/update"
+
+      - label: "Metricbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -68,7 +83,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -76,25 +91,27 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Metricbeat: Go Integration Tests"
+      - label: ":ubuntu: Metricbeat: Go Integration Tests (Module)"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet metricbeat
-
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
           mage goIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -102,25 +119,27 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "metricbeat: Go Integration Tests"
+              context: "metricbeat: Go Integration Tests (Module)"
 
-      - label: ":ubuntu: Metricbeat: Python Integration Tests"
+      - label: ":ubuntu: Metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet metricbeat
-
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
           mage pythonIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -128,6 +147,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Python Integration Tests"
@@ -137,7 +162,7 @@ steps:
         command: "make -C metricbeat crosscompile"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -156,7 +181,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -166,6 +191,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Win 2016 Unit Tests"
@@ -177,7 +208,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -187,6 +218,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Win 2022 Unit Tests"
@@ -203,7 +240,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -213,6 +250,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Win 10 Unit Tests"
@@ -224,7 +267,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -234,6 +277,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Win 11 Unit Tests"
@@ -245,7 +294,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -255,6 +304,12 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: Win 2019 Unit Tests"
@@ -273,13 +328,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: macOS x86_64 Unit Tests"
@@ -295,13 +356,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "metricbeat: macOS arm64 Unit Tests"
@@ -325,7 +392,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -347,7 +414,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

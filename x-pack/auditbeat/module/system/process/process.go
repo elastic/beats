@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -115,7 +115,9 @@ type Process struct {
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
 	h := xxhash.New()
+	//nolint:errcheck // always return nil err
 	h.WriteString(strconv.Itoa(p.Info.PID))
+	//nolint:errcheck // always return nil err
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
 }
@@ -139,7 +141,9 @@ func (p Process) toMapStr() mapstr.M {
 func (p Process) entityID(hostID string) string {
 	h := system.NewEntityHash()
 	h.Write([]byte(hostID))
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
 	return h.Sum()
 }
@@ -445,13 +449,12 @@ func convertToCacheable(processes []*Process) []cache.Cacheable {
 }
 
 func (ms *MetricSet) getProcesses() ([]*Process, error) {
-	var processes []*Process
-
 	sysinfoProcs, err := sysinfo.Processes()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch processes: %w", err)
 	}
 
+	processes := make([]*Process, 0, len(sysinfoProcs))
 	for _, sysinfoProc := range sysinfoProcs {
 		var process *Process
 

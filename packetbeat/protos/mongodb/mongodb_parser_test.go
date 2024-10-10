@@ -20,6 +20,9 @@
 package mongodb
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -77,6 +80,39 @@ func TestMongodbParser_simpleRequest(t *testing.T) {
 	}
 }
 
+func TestMongodbParser_OpMsg(t *testing.T) {
+	files := []string{
+		"1req.bin",
+		"1res.bin",
+		"2req.bin",
+		"2req.bin",
+		"3req.bin",
+		"3res.bin",
+	}
+
+	for _, fn := range files {
+		data, err := os.ReadFile(filepath.Join("testdata", fn))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		st := &stream{data: data, message: new(mongodbMessage)}
+
+		ok, complete := mongodbMessageParser(st)
+
+		if !ok {
+			t.Errorf("Parsing returned error")
+		}
+		if !complete {
+			t.Errorf("Expecting a complete message")
+		}
+		_, err = json.Marshal(st.message.documents)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
 func TestMongodbParser_unknownOpCode(t *testing.T) {
 	var data []byte
 	data = addInt32(data, 16)   // length = 16
@@ -105,39 +141,6 @@ func addCStr(in []byte, v string) []byte {
 func addInt32(in []byte, v int32) []byte {
 	u := uint32(v)
 	return append(in, byte(u), byte(u>>8), byte(u>>16), byte(u>>24))
-}
-
-func Test_extract_documents(t *testing.T) {
-	type io struct {
-		Input  map[string]interface{}
-		Output []interface{}
-	}
-	tests := []io{
-		{
-			Input: map[string]interface{}{
-				"a":         1,
-				"documents": []interface{}{"a", "b", "c"},
-			},
-			Output: []interface{}{"a", "b", "c"},
-		},
-		{
-			Input: map[string]interface{}{
-				"a": 1,
-			},
-			Output: []interface{}{},
-		},
-		{
-			Input: map[string]interface{}{
-				"a":         1,
-				"documents": 1,
-			},
-			Output: []interface{}{},
-		},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test.Output, extractDocuments(test.Input))
-	}
 }
 
 func Test_isDatabaseCommand(t *testing.T) {

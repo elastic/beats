@@ -153,7 +153,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		s3Event := newS3Event("log.txt")
 
 		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{})
@@ -175,7 +175,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		s3Event := newS3Event("log.txt")
 
 		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, nil)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{})
@@ -197,7 +197,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		var events []beat.Event
 		gomock.InOrder(
 			mockS3API.EXPECT().
-				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(s3Resp, nil),
 			mockPublisher.EXPECT().
 				Publish(gomock.Any()).
@@ -227,7 +227,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockS3API.EXPECT().
-				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				CopyObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(nil, nil),
 		)
 
@@ -254,10 +254,10 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockS3API.EXPECT().
-				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				CopyObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(nil, nil),
 			mockS3API.EXPECT().
-				DeleteObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				DeleteObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(nil, nil),
 		)
 
@@ -284,7 +284,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockS3API.EXPECT().
-				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq("backup/testdata/log.txt")).
+				CopyObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq("backup/testdata/log.txt")).
 				Return(nil, nil),
 		)
 
@@ -326,7 +326,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	var events []beat.Event
 	gomock.InOrder(
 		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(s3Resp, nil),
 		mockPublisher.EXPECT().
 			Publish(gomock.Any()).
