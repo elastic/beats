@@ -54,6 +54,22 @@ func newCGHandlerBuilder(handler testCGRsolver) processors.InitCgroupHandler {
 	}
 }
 
+func TestNilProcessor(t *testing.T) {
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return &processors.NilCGReader{}, nil
+	}
+
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false)
+	require.NoError(t, err)
+
+	// make sure a nil cgroup reader doesn't blow anything up
+	unwrapped, _ := proc.(*addProcessMetadata)
+	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
+	require.NoError(t, err)
+	require.NotNil(t, metadata)
+
+}
+
 func TestDefaultProcessorStartup(t *testing.T) {
 	// set initCgroupPaths to system non-test defaults
 	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
@@ -67,7 +83,7 @@ func TestDefaultProcessorStartup(t *testing.T) {
 	unwrapped, _ := proc.(*addProcessMetadata)
 	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
 	require.NoError(t, err)
-	require.NotNil(t, metadata)
+	require.NotNil(t, metadata.fields)
 }
 
 func TestAddProcessMetadata(t *testing.T) {

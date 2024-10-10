@@ -18,6 +18,8 @@
 package processors
 
 import (
+	"io/fs"
+
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -29,4 +31,13 @@ type InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgrou
 // set different cgroups readers for testing.
 type CGReader interface {
 	ProcessCgroupPaths(pid int) (cgroup.PathList, error)
+}
+
+// NilCGReader does nothing
+type NilCGReader struct {
+}
+
+// ProcessCgroupPaths returns a blank pathLists and fs.ErrNotExist
+func (*NilCGReader) ProcessCgroupPaths(_ int) (cgroup.PathList, error) {
+	return cgroup.PathList{}, fs.ErrNotExist
 }
