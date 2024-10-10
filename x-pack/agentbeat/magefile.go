@@ -7,9 +7,12 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -142,7 +145,7 @@ func Package() error {
 	return nil
 }
 
-// TestPackages tests the generated packages (i.e. file modes, owners, groups).
+// TestPackages tests the generated packages (i.agentbeatCmd. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
 }
@@ -212,4 +215,86 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+// TestWithSpec executes unique commands from agentbeat.spec.yml and validates that app haven't exited with non-zero
+func TestWithSpec(ctx context.Context) {
+	specPath := os.Getenv("AGENTBEAT_SPEC")
+	if specPath == "" {
+		log.Fatal("AGENTBEAT_SPEC is not defined\n")
+	}
+
+	platform := os.Getenv("PLATFORM")
+	if platform == "" {
+		log.Fatal("PLATFORM is not defined\n")
+	}
+
+	var commands = devtools.SpecCommands(specPath, platform)
+
+	agentbeatPath := os.Getenv("AGENTBEAT_PATH")
+
+	cmdResults := make(map[string]bool)
+
+	for _, command := range commands {
+		cmdResults[command] = agentbeatCmd(agentbeatPath, command)
+	}
+
+	hasFailures := false
+	for cmd, res := range cmdResults {
+		if res {
+			fmt.Printf("--- :large_green_circle: Succeeded:[%s.10s...]\n", cmd)
+		} else {
+			fmt.Printf("--- :bangbang: Failed: [%s.10s...]\n", cmd)
+			hasFailures = true
+		}
+	}
+
+	if hasFailures {
+		fmt.Printf("Some inputs failed. Exiting with error\n")
+		os.Exit(1)
+	}
+}
+
+func agentbeatCmd(agentbeatPath string, command string) bool {
+	cmd := exec.Command(agentbeatPath, command)
+	fmt.Printf("Executing: %s.10s...\n", cmd.String())
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Printf("Error creating stdout pipe: %v\n", err)
+	}
+
+	if err := cmd.Start(); err != nil {
+		fmt.Printf("failed to start command: %v\n", err)
+	}
+
+	defer func() {
+		if err := cmd.Process.Kill(); err != nil {
+			fmt.Printf("failed to kill process: %v\n", err)
+		} else {
+			fmt.Print("command process killed\n")
+		}
+	}()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	timeout := 2 * time.Second
+	deadline := time.After(timeout)
+
+	select {
+	case err := <-done:
+		fmt.Printf("command exited before %s: %v\n", timeout.String(), err)
+		fmt.Println("printing command stdout")
+		scanner := bufio.NewScanner(stdout)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
+		}
+		return false
+
+	case <-deadline:
+		fmt.Printf("%s\n", cmd.Stdout)
+		return true
+	}
 }
