@@ -81,9 +81,6 @@ func newCidProvider(cgroupPrefixes []string, cgroupRegex *regexp.Regexp, process
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
 	//return nil if we aren't supporting cgroups
-	if p.processCgroupPaths == nil {
-		return cgroup.PathList{}, nil
-	}
 	pathList, err := p.processCgroupPaths.ProcessCgroupPaths(pid)
 	if err != nil {
 		return cgroup.PathList{}, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
