@@ -124,6 +124,76 @@ var redactTests = []redactTest{
 			}},
 	},
 	{
+		name: "map_string_inner_next_inner_params_global_internal_slice",
+		in: map[string]any{
+			"inner": map[string]any{
+				"next_inner": []map[string]any{
+					{
+						"headers": url.Values{
+							"secret":     []string{"1"},
+							"not_secret": []string{"2"},
+						},
+						"not_secret": "2",
+					},
+					{
+						"headers": url.Values{
+							"secret":     []string{"3"},
+							"not_secret": []string{"4"},
+						},
+						"not_secret": "4",
+					},
+				},
+			}},
+		global: []string{"inner.next_inner.headers"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"next_inner": []map[string]any{
+					{"not_secret": "2"},
+					{"not_secret": "4"},
+				},
+			}},
+	},
+	{
+		name: "map_string_inner_next_inner_params_global_internal_slice_precise",
+		in: map[string]any{
+			"inner": map[string]any{
+				"next_inner": []map[string]any{
+					{
+						"headers": url.Values{
+							"secret":     []string{"1"},
+							"not_secret": []string{"2"},
+						},
+						"not_secret": "2",
+					},
+					{
+						"headers": url.Values{
+							"secret":     []string{"3"},
+							"not_secret": []string{"4"},
+						},
+						"not_secret": "4",
+					},
+				},
+			}},
+		global: []string{"inner.next_inner.headers.secret"},
+		want: map[string]any{
+			"inner": map[string]any{
+				"next_inner": []map[string]any{
+					{
+						"headers": url.Values{
+							"not_secret": []string{"2"},
+						},
+						"not_secret": "2",
+					},
+					{
+						"headers": url.Values{
+							"not_secret": []string{"4"},
+						},
+						"not_secret": "4",
+					},
+				},
+			}},
+	},
+	{
 		name: "map_slice",
 		in: map[string]any{
 			"private":    []string{"secret"},
