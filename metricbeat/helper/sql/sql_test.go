@@ -22,7 +22,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"math"
 	"testing"
 	"time"
 
@@ -72,13 +71,16 @@ type mockTableMode struct {
 }
 
 func (m *mockTableMode) Scan(dest ...interface{}) error {
+	if len(dest) != len(m.results) {
+		return fmt.Errorf("expected %d results, got %d", len(m.results), len(dest))
+	}
+
 	for i, d := range dest {
-		d1 := d.(*interface{})
-		*d1 = m.results[i].v
+		dPtr := d.(*interface{})
+		*dPtr = m.results[i].v
 	}
 
 	m.totalResults++
-
 	return nil
 }
 
@@ -87,7 +89,11 @@ func (m *mockTableMode) Next() bool {
 }
 
 func (m *mockTableMode) Columns() ([]string, error) {
-	return []string{"hello", "integer", "signed_integer", "unsigned_integer", "float64", "float32", "null", "boolean", "array", "byte_array", "time"}, nil
+	cols := make([]string, len(m.results))
+	for i, r := range m.results {
+		cols[i] = r.k
+	}
+	return cols, nil
 }
 
 func (m mockTableMode) Err() error {
@@ -95,6 +101,7 @@ func (m mockTableMode) Err() error {
 }
 
 var results = []kv{
+	{k: "varchar", v: []byte("00100")},
 	{k: "hello", v: "world"},
 	{k: "integer", v: int(10)},
 	{k: "signed_integer", v: int(-10)},
@@ -138,50 +145,52 @@ func TestFetchTableMode(t *testing.T) {
 
 func checkValue(t *testing.T, res kv, ms mapstr.M) {
 	switch v := res.v.(type) {
-	case string, bool:
-		if ms[res.k] != v {
-			t.Fail()
-		}
 	case nil:
 		if ms[res.k] != nil {
-			t.Fail()
+			t.Fatalf("Value mismatch for key '%s': expected nil, got %v", res.k, ms[res.k])
+		}
+	case bool, int64, uint64, float32, float64, string:
+		if ms[res.k] != v {
+			t.Fatalf("Value mismatch for key '%s': expected %v (%T), got %v (%T)", res.k, v, v, ms[res.k], ms[res.k])
 		}
 	case int:
-		if ms[res.k] != float64(v) {
-			t.Fail()
+		if ms[res.k] != int64(v) {
+			t.Fatalf("Value mismatch for key '%s': expected %v (int64), got %v (%T)", res.k, int64(v), ms[res.k], ms[res.k])
+		}
+	case int32:
+		if ms[res.k] != int64(v) {
+			t.Fatalf("Value mismatch for key '%s': expected %v (int64), got %v (%T)", res.k, int64(v), ms[res.k], ms[res.k])
 		}
 	case uint:
-		if ms[res.k] != float64(v) {
-			t.Fail()
+		if ms[res.k] != uint64(v) {
+			t.Fatalf("Value mismatch for key '%s': expected %v (uint64), got %v (%T)", res.k, uint64(v), ms[res.k], ms[res.k])
 		}
-	case float32:
-		if math.Abs(float64(ms[res.k].(float64)-float64(v))) > 1 {
-			t.Fail()
+	case uint32:
+		if ms[res.k] != uint64(v) {
+			t.Fatalf("Value mismatch for key '%s': expected %v (uint64), got %v (%T)", res.k, uint64(v), ms[res.k], ms[res.k])
 		}
-	case float64:
-		if ms[res.k] != v {
-			t.Fail()
+	case []byte:
+		msVal, ok := ms[res.k].(string)
+		if !ok {
+			t.Fatalf("Type mismatch for key '%s': expected string, got %T", res.k, ms[res.k])
+		} else if string(v) != msVal {
+			t.Fatalf("Value mismatch for key '%s': expected %s, got %s", res.k, string(v), msVal)
 		}
 	case []interface{}:
 		for i, val := range v {
 			if ms[res.k].([]interface{})[i] != val {
-				t.Fail()
+				t.Fatal()
 			}
 		}
-	case []byte:
-		ar := ms[res.k].(string)
-		if ar != string(v) {
-			t.Fail()
-		}
 	case time.Time:
-		ar := ms[res.k].(string)
-		if v.Format(time.RFC3339Nano) != ar {
-			t.Fail()
+		msVal, ok := ms[res.k].(string)
+		if !ok {
+			t.Fatalf("Type mismatch for key '%s': expected string, got %T", res.k, ms[res.k])
+		} else if v.Format(time.RFC3339Nano) != msVal {
+			t.Fatalf("Value mismatch for key '%s': expected %s, got %s", res.k, v.Format(time.RFC3339Nano), msVal)
 		}
 	default:
-		if ms[res.k] != res.v {
-			t.Fail()
-		}
+		t.Fatalf("Unsupported type for key '%s': %T", res.k, v)
 	}
 }
 
