@@ -18,6 +18,11 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" ]]; then
+    AGENTBEAT_PATH=$(.buildkite/scripts/agentbeat/setup_agentbeat.py)
+    export AGENTBEAT_PATH
+fi
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || \
@@ -33,11 +38,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   echo "--- Prepare BK test analytics token :vault:"
   BUILDKITE_ANALYTICS_TOKEN=$(vault kv get -field token kv/ci-shared/platform-ingest/buildkite_beats_analytics_token)
   export BUILDKITE_ANALYTICS_TOKEN
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" ]]; then
-    AGENTBEAT_PATH=$(.buildkite/scripts/agentbeat/setup_agentbeat.py)
-    export AGENTBEAT_PATH
 fi
 
 CPU_ARCH=$(uname -m)

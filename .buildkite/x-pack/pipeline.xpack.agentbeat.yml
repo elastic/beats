@@ -89,6 +89,12 @@ steps:
       #          - x-pack/agentbeat/build/distributions/**/*
       #          - "x-pack/agentbeat/build/*.xml"
       #          - "x-pack/agentbeat/build/*.json"
+#              plugins:
+#                - test-collector#v1.10.2:
+#                    files: "x-pack/agentbeat/build/TEST-*.xml"
+#                    format: "junit"
+#                    branches: "main"
+#                    debug: true
       #        retry:
       #          automatic:
       #            - limit: 1
@@ -103,7 +109,7 @@ steps:
       #          - github_commit_status:
       #              context: "agentbeat: Integration tests"
 
-      - label: ":linux: Agentbeat/Integration tests Linux"
+      - label: ":linux: x-pack/agentbeat: Ubuntu x86_64 Spec tests"
         key: "agentbeat-it-linux"
         env:
           PLATFORM: "linux/amd64"
@@ -111,8 +117,8 @@ steps:
 #          - agentbeat-package-linux
         command: |
           cd x-pack/agentbeat
-          ls -la ../../agentbeat-9.0.0-SNAPSHOT-linux-x86_64
-          mage -v testWithSpec
+          ../../agentbeat-9.0.0-SNAPSHOT-linux-x86_64/agentbeat filebeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E management.restart_on_output_change=true -E logging.level=info -E logging.to_stderr=true -E gc_percent=${FILEBEAT_GOGC:100} -E filebeat.config.modules.enabled=false -E logging.event_data.to_stderr=true -E logging.event_data.to_files=false
+          # mage -v testWithSpec
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -120,14 +126,14 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
 
-      - label: ":linux: Agentbeat/Integration tests Windows"
+      - label: ":windows: x-pack/agentbeat: Windows x86_64 Spec tests"
         key: "agentbeat-it-windows"
         env:
           PLATFORM: "windows/amd64"
 #        depends_on:
 #          - agentbeat-package-linux
         command: |
-          cd x-pack/agentbeat
+          Set-Location -Path x-pack/agentbeat
           mage -v testWithSpec
         agents:
           provider: "gcp"
