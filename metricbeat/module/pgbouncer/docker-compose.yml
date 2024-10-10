@@ -12,13 +12,12 @@ services:
       - POSTGRES_INITDB_ARGS=--auth=md5
 
   pgbouncer:
-    image: edoburu/pgbouncer
+    build:
+      context: ./_meta
+      dockerfile: Dockerfile
     hostname: pgbouncer
     ports:
       - 6432:6432
-    volumes:
-      - ./_meta/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
-      - ./_meta/userlist.txt:/etc/pgbouncer/userlist.txt
     healthcheck:
       test: ['CMD-SHELL', 'psql -h localhost -p 6432 -U test -d pgbouncer -c "SHOW STATS"']
       interval: 15s
