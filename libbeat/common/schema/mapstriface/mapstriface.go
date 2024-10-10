@@ -113,7 +113,7 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 	default:
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
-		logp.Err(err.Error())
+		logp.Err("%s", err.Error())
 		return multierror.Errors{err}
 	}
 }

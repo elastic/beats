@@ -613,7 +613,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 	wg.Wait()
 	if len(errs) > 0 {
-		panic(fmt.Errorf(strings.Join(errs, "\n")))
+		panic(errors.New(strings.Join(errs, "\n")))
 	}
 }
 
