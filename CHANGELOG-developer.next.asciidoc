@@ -70,6 +70,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Debug log entries from the acker (`stateful ack ...` or `stateless ack ...`) removed. {pull}39672[39672]
 - Rename x-pack/filebeat websocket input to streaming. {issue}40264[40264] {pull}40421[40421]
 - Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
+- Use Docker Compose V2 (`docker compose`) instead of Compose V1 (`docker-compose`) {pull}40890[40890]
 
 ==== Bugfixes
 

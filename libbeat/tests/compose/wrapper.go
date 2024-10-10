@@ -168,12 +168,16 @@ func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) 
 	}
 	args = append(args, command)
 	args = append(args, arg...)
-	cmd := exec.CommandContext(ctx, "docker-compose", args...)
+	cmd := exec.CommandContext(ctx, "docker", append([]string{"compose"}, args...)...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if len(d.Environment) > 0 {
 		cmd.Env = append(os.Environ(), d.Environment...)
 	}
+
+	// Debug message
+	fmt.Println(">>>>", "docker", strings.Join(append([]string{"compose"}, args...), " "))
+
 	return cmd
 }
 

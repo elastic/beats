@@ -48,7 +48,7 @@ func TestSimulate(t *testing.T) {
 		t.Fatal(err)
 	}
 	if *wintest.KeepRunning {
-		fmt.Fprintln(os.Stdout, "docker-compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
+		fmt.Fprintln(os.Stdout, "docker compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
 	}
 	t.Cleanup(func() {
 		stop := !*wintest.KeepRunning

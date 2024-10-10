@@ -81,7 +81,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		t.Fatal(err)
 	}
 	if *wintest.KeepRunning {
-		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker-compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
+		fmt.Fprintln(os.Stdout, "Use this to manually cleanup containers: docker compose", "-p", devtools.DockerComposeProjectName(), "rm", "--stop", "--force")
 	}
 	t.Cleanup(func() {
 		stop := !*wintest.KeepRunning

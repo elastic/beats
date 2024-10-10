@@ -78,7 +78,7 @@ func saveLogs(env map[string]string, root, target string) error {
 		env,
 		f, // stdout
 		f, // stderr
-		"docker-compose",
+		"docker", "compose",
 		"-p", devtools.DockerComposeProjectName(),
 		"logs",
 		"--no-color",
@@ -140,7 +140,8 @@ func dockerCompose(env map[string]string, verbose bool) error {
 			env,
 			out,
 			os.Stderr,
-			"docker-compose", args...,
+			"docker",
+			append([]string{"compose"}, args...)...,
 		)
 		if err == nil {
 			break
