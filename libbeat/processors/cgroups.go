@@ -15,11 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix
+package processors
 
-package autodiscover
+import (
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+)
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing on aix
+// InitCgroupHandler is a type for creating stubs for the cgroup resolver. Used primarily for testing.
+type InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (CGReader, error)
+
+// CGReader wraps the group Reader.ProcessCgroupPaths() call, this allows us to
+// set different cgroups readers for testing.
+type CGReader interface {
+	ProcessCgroupPaths(pid int) (cgroup.PathList, error)
 }
