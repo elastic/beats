@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        file: ["bump-golang.yml", "bump-golang-7.17.yml"]
+        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
     steps:
       - uses: actions/checkout@v4
 
