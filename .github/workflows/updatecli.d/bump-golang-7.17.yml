@@ -90,6 +90,20 @@ targets:
       content: 'go {{ source "gomod" }}'
       file: go.mod
       matchpattern: 'go \d+.\d+'
+  goModTidy:
+    dependson:
+      - update-gomod
+    disablesourceinput: true
+    kind: shell
+    name: Run `go mod tidy`
+    spec:
+      changedif:
+        kind: file/checksum
+        spec:
+          files:
+            - go.mod
+            - go.sum
+      command: go mod tidy
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion
