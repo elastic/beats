@@ -20,6 +20,7 @@ package systemlogs
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	v1 "github.com/elastic/beats/v7/filebeat/input"
@@ -66,21 +67,42 @@ func newV1Input(
 	outlet channel.Connector,
 	context v1.Context,
 ) (v1.Input, error) {
-
-	useJournald, cfg, err := decide(cfg)
+	journald, err := useJournald(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("cannot decide between journald and files: %w", err)
 	}
 
-	if !useJournald {
-		inp, err := loginput.NewInput(cfg, outlet, context)
-		if err != nil {
-			return nil, fmt.Errorf("cannot create log input: %w", err)
-		}
-		return inp, err
+	if journald {
+		return nil, v2.ErrUnknownInput
 	}
 
-	return nil, v2.ErrUnknownInput
+	// Convert the configuration and create a log input
+	logCfg, err := toFilesConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return loginput.NewInput(logCfg, outlet, context)
+}
+
+// configure checks whether the journald input must be created and
+// delegates to journald.Configure if needed.
+func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+	jouranl, err := useJournald(cfg)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot decide between journald and files: %w", err)
+	}
+
+	if !jouranl {
+		return nil, nil, v2.ErrUnknownInput
+	}
+
+	journaldCfg, err := toJournaldConfig(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return journald.Configure(journaldCfg)
 }
 
 // PluginV2 creates a v2 plugin that will instantiate a journald
@@ -103,50 +125,47 @@ func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 	}
 }
 
-// configure checks whether the journald input must be created and
-// delegates to journald.Configure if needed.
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	useJournald, cfg, err := decide(cfg)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot decide between journald and files: %w", err)
-	}
-
-	if useJournald {
-		return journald.Configure(cfg)
-	}
-
-	return nil, nil, errors.New("cannot initialise system-logs with journald input")
-}
-
-// decide returns:
-//   - use Jounrald (input V2)
-//   - the new config
-//   - error, if any
-func decide(c *conf.C) (bool, *conf.C, error) {
+func useJournald(c *conf.C) (bool, error) {
 	cfg := config{}
 	if err := c.Unpack(&cfg); err != nil {
-		return false, nil, err
+		return false, nil
 	}
 
 	if cfg.UseJournald {
-		cfg, err := toJournaldConfig(c)
-		return true, cfg, err
+		return true, nil
 	}
 
 	if cfg.UseFiles {
-		cfg, err := toFilesConfig(c)
-		return false, cfg, err
+		return false, nil
 	}
 
-	// Default to files for now
-	cfg2, err := toFilesConfig(c)
-	return false, cfg2, err
+	globs := struct {
+		Paths []string `config:"files.paths"`
+	}{}
 
-	// TODO: implement checking the files
+	if err := c.Unpack(&globs); err != nil {
+		return false, fmt.Errorf("cannot parse paths from config: %w", err)
+	}
 
-	// return false, nil, errors.New("[WIP] either set use_journald or use_files")
+	for _, g := range globs.Paths {
+		paths, err := filepath.Glob(g)
+		if err != nil {
+			return false, fmt.Errorf("cannot resolve glob: %w", err)
+		}
+		if len(paths) != 0 {
+			// We found at least one system log file,
+			// journald will not be used, return early
+			return false, nil
+		}
+	}
+
+	// if no system log files are found, then use jounrald
+	return true, nil
 }
 
+// TODO: Finish cleaning up the config
+// Do not mutate the config?
+// Merge everything and skip files, journald, type, use_files, use_journal
 func toJournaldConfig(cfg *conf.C) (*conf.C, error) {
 	newCfg, err := cfg.Child("journald", -1)
 	if err != nil {
@@ -164,6 +183,22 @@ func toFilesConfig(cfg *conf.C) (*conf.C, error) {
 	newCfg, err := cfg.Child("files", -1)
 	if err != nil {
 		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
+	}
+
+	if _, err := cfg.Remove("journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("type", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("files", -1); err != nil {
+		return nil, err
+	}
+
+	if err := newCfg.Merge(cfg); err != nil {
+		return nil, err
 	}
 
 	if err := newCfg.SetString("type", -1, "log"); err != nil {
