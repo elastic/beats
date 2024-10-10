@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package procfs_provider
+package procfsprovider
 
 import (
 	"context"

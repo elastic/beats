@@ -17,8 +17,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfs_provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/modernprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -39,6 +40,7 @@ type addSessionMetadata struct {
 	logger   *logp.Logger
 	db       *processdb.DB
 	provider provider.Provider
+	backend  string
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
@@ -56,33 +58,35 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	backfilledPIDs := db.ScrapeProcfs()
-	logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	if c.Backend != "modern" {
+		backfilledPIDs := db.ScrapeProcfs()
+		logger.Infof("backfilled %d processes", len(backfilledPIDs))
+	}
 
 	var p provider.Provider
 
 	switch c.Backend {
 	case "auto":
-		p, err = ebpf_provider.NewProvider(ctx, logger, db)
+		p, err = modernprovider.NewProvider(ctx, logger)
 		if err != nil {
-			// Most likely cause of error is not supporting ebpf on system, try procfs
-			p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
+			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
+			p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
 			logger.Info("backend=auto using procfs")
 		} else {
-			logger.Info("backend=auto using ebpf")
-		}
-	case "ebpf":
-		p, err = ebpf_provider.NewProvider(ctx, logger, db)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
+			logger.Info("backend=auto using modern")
 		}
 	case "procfs":
-		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
+		p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
+			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
+		}
+	case "modern":
+		p, err = modernprovider.NewProvider(ctx, logger)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create modern provider: %w", err)
 		}
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
@@ -92,6 +96,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		logger:   logger,
 		db:       db,
 		provider: p,
+		backend:  c.Backend,
 	}, nil
 }
 
@@ -145,13 +150,24 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		return nil, fmt.Errorf("cannot parse pid field '%s': %w", p.config.PIDField, err)
 	}
 
-	fullProcess, err := p.db.GetProcess(pid)
-	if err != nil {
-		e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-		p.logger.Errorf("%v", e)
-		return nil, e
+	var fullProcess types.Process
+	if p.backend == "modern" {
+		// modern doesn't enrich with the processor DB;  process info is taken directly from modern cache
+		proc, err := p.provider.GetProcess(pid)
+		if err != nil {
+			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+			p.logger.Errorf("%v", e)
+			return nil, e
+		}
+		fullProcess = *proc
+	} else {
+		fullProcess, err = p.db.GetProcess(pid)
+		if err != nil {
+			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+			p.logger.Errorf("%v", e)
+			return nil, e
+		}
 	}
-
 	processMap := fullProcess.ToMap()
 
 	if b, err := ev.Fields.HasKey("process"); !b || err != nil {
