@@ -1,0 +1,32 @@
+---
+description: Winlogbeat Routing Pipeline
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - pipeline:
+      name: '{< IngestPipeline "security" >}'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx.winlog?.provider_name)
+  - pipeline:
+      name: '{< IngestPipeline "sysmon" >}'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-sysmon/operational'
+  - pipeline:
+      name: '{< IngestPipeline "powershell" >}'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'windows powershell'
+  - pipeline:
+      name: '{< IngestPipeline "powershell_operational" >}'
+      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-powershell/operational'
+  - set:
+      field: host.os.type
+      value: windows
+      override: false
+  - set:
+      field: host.os.family
+      value: windows
+      override: false
+
+on_failure:
+  - set:
+      field: error.message
+      value: |-
+        Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"
