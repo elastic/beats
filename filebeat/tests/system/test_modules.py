@@ -191,6 +191,7 @@ class Test(BaseTest):
                 module=module, fileset=fileset))
 
         if ".journal" in test_file:
+            cmd.remove("-once")
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.use_journald=true".format(
                 module=module, fileset=fileset))
@@ -198,7 +199,6 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.input.journald.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))
         else:
-            cmd.remove("-once")
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
                 module=module, fileset=fileset, test_file=test_file))

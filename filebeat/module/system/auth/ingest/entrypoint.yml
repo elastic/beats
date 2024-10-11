@@ -3,10 +3,10 @@ processors:
   - script:
       source: |
               if(ctx?.journald != null){
-                  ctx['syslog_pipeline'] = '{< IngestPipeline "journald" >}';
+                  ctx['auth_pipeline'] = '{< IngestPipeline "journald" >}';
                   return;
                 }
-              ctx['syslog_pipeline'] = '{< IngestPipeline "files" >}';
+              ctx['auth_pipeline'] = '{< IngestPipeline "files" >}';
               return;
   - pipeline:
       name: "{{ auth_pipeline }}"
