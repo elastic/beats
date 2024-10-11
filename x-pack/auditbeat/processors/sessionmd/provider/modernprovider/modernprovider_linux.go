@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	quark "github.com/mjwolf/go-quark"
+	quark "github.com/elastic/go-quark"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
