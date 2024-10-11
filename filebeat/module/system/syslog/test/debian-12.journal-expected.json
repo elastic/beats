@@ -3,6 +3,7 @@
         "event.dataset": "system.syslog",
         "event.kind": "event",
         "event.module": "system",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
@@ -20,10 +21,6 @@
             "vagrant-debian-12"
         ],
         "service.type": "system",
-        "tags": [
-            "journald",
-            "syslog"
-        ],
         "user.group.id": "0",
         "user.id": "0"
     },
@@ -31,6 +28,7 @@
         "event.dataset": "system.syslog",
         "event.kind": "event",
         "event.module": "system",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
@@ -42,16 +40,13 @@
         "related.hosts": [
             "vagrant-debian-12"
         ],
-        "service.type": "system",
-        "tags": [
-            "journald",
-            "syslog"
-        ]
+        "service.type": "system"
     },
     {
         "event.dataset": "system.syslog",
         "event.kind": "event",
         "event.module": "system",
+        "event.timezone": "-02:00",
         "fileset.name": "syslog",
         "host.hostname": "bookworm",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
@@ -63,10 +58,6 @@
         "related.hosts": [
             "bookworm"
         ],
-        "service.type": "system",
-        "tags": [
-            "journald",
-            "syslog"
-        ]
+        "service.type": "system"
     }
 ]
