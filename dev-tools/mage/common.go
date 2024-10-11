@@ -282,9 +282,14 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 func DownloadFile(url, destinationDir string) (string, error) {
 	log.Println("Downloading", url)
 
-	resp, err := http.Get(url) //nolint:noctx // we can ignore context for dev tools
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
 	if err != nil {
-		return "", fmt.Errorf("http get failed: %w", err)
+		return "", fmt.Errorf("failed to create http request: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to download file: %w", err)
 	}
 	defer resp.Body.Close()
 
