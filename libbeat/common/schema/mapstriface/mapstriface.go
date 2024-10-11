@@ -225,7 +225,7 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		if err == nil {
 			return int64(f64), nil
 		}
-		msg := fmt.Sprintf("expected integer, found json.Number (%v) that cannot be converted", num)
+		msg := fmt.Sprintf("expected integer, found json.Number (%v) that cannot be converted", val)
 		return 0, schema.NewWrongFormatError(key, msg)
 	default:
 		msg := fmt.Sprintf("expected integer, found %T", emptyIface)
@@ -260,7 +260,7 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 		if err == nil {
 			return f64, nil
 		}
-		msg := fmt.Sprintf("expected float, found json.Number (%v) that cannot be converted", num)
+		msg := fmt.Sprintf("expected float, found json.Number (%v) that cannot be converted", val)
 		return 0.0, schema.NewWrongFormatError(key, msg)
 	default:
 		msg := fmt.Sprintf("expected float, found %T", emptyIface)
