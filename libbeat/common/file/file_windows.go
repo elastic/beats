@@ -34,12 +34,6 @@ type StateOS struct {
 	Vol   uint64 `json:"vol," struct:"vol"`
 }
 
-var (
-	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
-
-	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
-)
-
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
 	if info == nil {
@@ -149,10 +143,8 @@ func IsRemoved(f *os.File) bool {
 	}{}
 	infoSz := unsafe.Sizeof(info)
 
-	const class = 1 // FileStandardInfo
-	r1, _, _ := syscall.Syscall6(
-		procGetFileInformationByHandleEx.Addr(), 4, uintptr(hdl), class, uintptr(unsafe.Pointer(&info)), infoSz, 0, 0)
-	if r1 == 0 {
+	err := windows.GetFileInformationByHandleEx(windows.Handle(hdl), windows.FileStandardInfo, (*byte)(unsafe.Pointer(&info)), uint32(infoSz))
+	if err != nil {
 		return true // assume file is removed if syscall errors
 	}
 	return info.DeletePending
