@@ -55,7 +55,7 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 
 	cgroups, err := p.getProcessCgroups(pid)
 	if err != nil {
-		return "", fmt.Errorf("failed to get cgroups for pid=%v: %v", pid, err)
+		return "", fmt.Errorf("failed to get cgroups for pid=%v: %w", pid, err)
 	}
 
 	cid = p.getContainerID(cgroups)
