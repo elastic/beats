@@ -184,7 +184,9 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer closeAuditClient(ms.client, ms.log)
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
-	// Will result in EPERM.
+	// Will result in EPERM. Also, ensure that another socket is used to determine the
+	// status, because audit data can already buffering for ms.client. Which can lead
+	// to an ENOBUFS error bubbling up.
 	status, err := getStatus()
 	if err != nil {
 		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
