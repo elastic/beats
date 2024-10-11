@@ -107,7 +107,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	if len(logGroupIDs) == 0 {
 		// We haven't extracted group identifiers directly from the input configurations,
 		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
-		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LinkedAccountsForPrefixMode)
+		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
 		if err != nil {
 			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
 		}

@@ -56,7 +56,7 @@ Note: `region_name` is required when log_group_name is given.
 
 [float]
 ==== `log_group_name_prefix`
-The prefix for a group of log group names. See `linked_accounts_for_prefix_mode` option for linked source accounts behavior.
+The prefix for a group of log group names. See `include_linked_accounts_for_prefix_mode` option for linked source accounts behavior.
 
 Note: `region_name` is required when
 `log_group_name_prefix` is given. `log_group_name` and `log_group_name_prefix`
@@ -64,7 +64,7 @@ cannot be given at the same time. The number of workers that will process the
 log groups under this prefix is set through the `number_of_workers` config.
 
 [float]
-==== `linked_accounts_for_prefix_mode`
+==== `include_linked_accounts_for_prefix_mode`
 Configure whether to include linked source accounts that contains the prefix value defined through `log_group_name_prefix`.
 Accepts a boolean and this is by default disabled.
 
