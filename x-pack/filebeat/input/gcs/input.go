@@ -71,6 +71,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			TimeStampEpoch:           bucket.TimeStampEpoch,
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
+			ReaderConfig:             bucket.ReaderConfig,
 		})
 	}
 
@@ -125,6 +126,7 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		b.FileSelectors = cfg.FileSelectors
 	}
+	b.ReaderConfig = cfg.ReaderConfig
 
 	return b
 }

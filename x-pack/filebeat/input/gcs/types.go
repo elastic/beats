@@ -20,6 +20,7 @@ type Source struct {
 	ParseJSON                bool
 	TimeStampEpoch           *int64
 	FileSelectors            []fileSelectorConfig
+	ReaderConfig             readerConfig
 	ExpandEventListFromField string
 }
 

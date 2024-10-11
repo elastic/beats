@@ -16,6 +16,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 // MaxWorkers, Poll, PollInterval, BucketTimeOut, ParseJSON, FileSelectors, TimeStampEpoch & ExpandEventListFromField
@@ -41,6 +42,8 @@ type config struct {
 	Buckets []bucket `config:"buckets" validate:"required"`
 	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
 	FileSelectors []fileSelectorConfig `config:"file_selectors"`
+	// ReaderConfig is the default parser and decoder configuration.
+	ReaderConfig readerConfig `config:",inline"`
 	// TimeStampEpoch - Defines the epoch time in seconds, which is used to filter out objects that are older than the specified timestamp.
 	TimeStampEpoch *int64 `config:"timestamp_epoch"`
 	// ExpandEventListFromField - Defines the field name that will be used to expand the event into separate events.
@@ -58,6 +61,7 @@ type bucket struct {
 	PollInterval             *time.Duration       `config:"poll_interval,omitempty"`
 	ParseJSON                *bool                `config:"parse_json,omitempty"`
 	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig             readerConfig         `config:",inline"`
 	TimeStampEpoch           *int64               `config:"timestamp_epoch"`
 	ExpandEventListFromField string               `config:"expand_event_list_from_field"`
 }
@@ -66,6 +70,12 @@ type bucket struct {
 type fileSelectorConfig struct {
 	Regex *match.Matcher `config:"regex" validate:"required"`
 	// TODO: Add support for reader config in future
+}
+
+// readerConfig defines the options for reading the content of an GCS object.
+type readerConfig struct {
+	Parsers  parser.Config `config:",inline"`
+	Decoding decoderConfig `config:"decoding"`
 }
 
 type authConfig struct {

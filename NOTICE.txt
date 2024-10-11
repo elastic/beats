@@ -13019,11 +13019,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.11.0
+Version: v0.12.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.11.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.12.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -14959,11 +14959,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sfdc
-Version: v0.0.0-20240621062639-bcc8456508ff
+Version: v0.0.0-20241010131323-8e176480d727
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sfdc@v0.0.0-20240621062639-bcc8456508ff/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sfdc@v0.0.0-20241010131323-8e176480d727/LICENSE.txt:
 
 MIT License
 
