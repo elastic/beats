@@ -165,17 +165,17 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 }
 
 func getStatus() (*libaudit.AuditStatus, error) {
-       client, err := libaudit.NewAuditClient(nil)
-        defer func() {
-            if client != nil {
-                client.Close()
-            }
-        }()
+	client, err := libaudit.NewAuditClient(nil)
+	defer func() {
+		if client != nil {
+			client.Close()
+		}
+	}()
 
-       if err != nil {
-               return nil, err
-       }
-       return client.GetStatus()
+	if err != nil {
+		return nil, err
+	}
+	return client.GetStatus()
 }
 
 // Run initializes the audit client and receives audit messages from the
