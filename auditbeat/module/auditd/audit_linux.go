@@ -166,15 +166,10 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 
 func getStatus() (*libaudit.AuditStatus, error) {
 	client, err := libaudit.NewAuditClient(nil)
-	defer func() {
-		if client != nil {
-			client.Close()
-		}
-	}()
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create audit client when getting status: %w", err)
 	}
+	defer client.Close()
 	return client.GetStatus()
 }
 
