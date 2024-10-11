@@ -51,6 +51,10 @@ processor_start_position: {{ .processor_start_position }}
 partition_receive_timeout: {{ .partition_receive_timeout }}
 {{ end }}
 
+{{ if .processor_log_events }}
+processor_log_events: {{ .processor_log_events }}
+{{ end }}
+
 {{ if .partition_receive_count }}
 partition_receive_count: {{ .partition_receive_count }}
 {{ end }}
