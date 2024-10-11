@@ -15,41 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
-
-package file_integrity
+package processors
 
 import (
-	"errors"
-
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
-	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
-		// Auto and unset defaults to fsnotify
-		l := logger.Named("fsnotify")
-		l.Info("selected backend: fsnotify")
-		return &fsNotifyReader{
-			config:  c,
-			log:     l,
-			parsers: FileParsers(c),
-		}, nil
-	}
+// InitCgroupHandler is a type for creating stubs for the cgroup resolver. Used primarily for testing.
+type InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (CGReader, error)
 
-	if c.Backend == BackendEBPF {
-		l := logger.Named("ebpf")
-		l.Info("selected backend: ebpf")
-
-		return newEBPFReader(c, l)
-	}
-
-	if c.Backend == BackendKprobes {
-		l := logger.Named("kprobes")
-		l.Info("selected backend: kprobes")
-		return newKProbesReader(c, l, FileParsers(c))
-	}
-
-	// unimplemented
-	return nil, errors.ErrUnsupported
+// CGReader wraps the group Reader.ProcessCgroupPaths() call, this allows us to
+// set different cgroups readers for testing.
+type CGReader interface {
+	ProcessCgroupPaths(pid int) (cgroup.PathList, error)
 }
