@@ -164,6 +164,20 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	}
 }
 
+func getStatus() (*libaudit.AuditStatus, error) {
+       client, err := libaudit.NewAuditClient(nil)
+        defer func() {
+            if client != nil {
+                client.Close()
+            }
+        }()
+
+       if err != nil {
+               return nil, err
+       }
+       return client.GetStatus()
+}
+
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
@@ -171,7 +185,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
 	// Will result in EPERM.
-	status, err := ms.client.GetStatus()
+	status, err := getStatus()
 	if err != nil {
 		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
 		reporter.Error(err)
