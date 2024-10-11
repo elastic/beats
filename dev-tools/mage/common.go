@@ -125,7 +125,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 }
 
 func expandFile(src, dst string, args ...map[string]interface{}) error {
-	tmplData, err := ioutil.ReadFile(src)
+	tmplData, err := os.ReadFile(src)
 	if err != nil {
 		return fmt.Errorf("failed reading from template %v: %w", src, err)
 	}
@@ -140,7 +140,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 		return err
 	}
 
-	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
+	if err = os.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to write rendered template: %w", err)
 	}
 
@@ -262,13 +262,13 @@ func FindReplace(file string, re *regexp.Regexp, repl string) error {
 		return err
 	}
 
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
 	out := re.ReplaceAllString(string(contents), repl)
-	return ioutil.WriteFile(file, []byte(out), info.Mode().Perm())
+	return os.WriteFile(file, []byte(out), info.Mode().Perm())
 }
 
 // MustFindReplace invokes FindReplace and panics if an error occurs.
@@ -283,7 +283,7 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 func DownloadFile(url, destinationDir string) (string, error) {
 	log.Println("Downloading", url)
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec // url cannot be a constant
 	if err != nil {
 		return "", fmt.Errorf("http get failed: %w", err)
 	}
@@ -339,7 +339,7 @@ func unzip(sourceFile, destinationDir string) error {
 		defer innerFile.Close()
 
 		path := filepath.Join(destinationDir, f.Name)
-		if !strings.HasPrefix(path, destinationDir) {
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
 			return fmt.Errorf("illegal file path in zip: %v", f.Name)
 		}
 
@@ -357,7 +357,7 @@ func unzip(sourceFile, destinationDir string) error {
 		}
 		defer out.Close()
 
-		if _, err = io.Copy(out, innerFile); err != nil {
+		if _, err = io.Copy(out, innerFile); err != nil { //nolint:gosec // this is only used for dev tools
 			return err
 		}
 
@@ -390,7 +390,7 @@ func TarWithOptions(src string, targetFile string, trimSource bool) error {
 	tw := tar.NewWriter(zr)
 
 	// walk through every file in the folder
-	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+	err = filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
 		if errFn != nil {
 			return fmt.Errorf("error traversing the file system: %w", errFn)
 		}
@@ -438,6 +438,9 @@ func TarWithOptions(src string, targetFile string, trimSource bool) error {
 		}
 		return nil
 	})
+	if err != nil {
+		return fmt.Errorf("error walking dir: %w", err)
+	}
 
 	// produce tar
 	if err := tw.Close(); err != nil {
@@ -477,14 +480,14 @@ func untar(sourceFile, destinationDir string) error {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
 		}
 
 		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
+		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
 			return fmt.Errorf("illegal file path in tar: %v", header.Name)
 		}
 
@@ -499,7 +502,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 
-			if _, err = io.Copy(writer, tarReader); err != nil {
+			if _, err = io.Copy(writer, tarReader); err != nil { //nolint:gosec // this is only used for dev tools
 				return err
 			}
 
@@ -896,7 +899,7 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	matches := parseVersionRegex.FindStringSubmatch(version)
 	if len(matches) == 0 {
 		err = fmt.Errorf("failed to parse version '%v'", version)
-		return
+		return major, minor, patch, err
 	}
 
 	data := map[string]string{}
@@ -906,7 +909,7 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	major, _ = strconv.Atoi(data["major"])
 	minor, _ = strconv.Atoi(data["minor"])
 	patch, _ = strconv.Atoi(data["patch"])
-	return
+	return major, minor, patch, nil
 }
 
 // ListMatchingEnvVars returns all of the environment variables names that begin
