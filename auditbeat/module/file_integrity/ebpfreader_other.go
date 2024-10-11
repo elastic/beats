@@ -15,17 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
+//go:build linux && !(amd64 || arm64)
 
-package instance
+package file_integrity
 
 import (
+	"errors"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// doReexec is a noop on Windows, it only logs a message explaining it.
-func (b *Beat) doReexec() error {
-	logger := logp.L().Named("ssl.cert.reloader")
-	logger.Info("reloading certs/reexecing is not supported on Windows. %s will not restart", b.Info.Beat)
-	return nil
+func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
+	return nil, errors.New("ebpf reader is not implemented on this system")
 }

@@ -15,11 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build aix
+//go:build linux && (amd64 || arm64)
 
-package autodiscover
+package file_integrity
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	// does nothing on aix
+import "github.com/elastic/elastic-agent-libs/logp"
+
+func newEBPFReader(c Config, l *logp.Logger) (EventProducer, error) {
+	paths := make(map[string]struct{})
+	for _, p := range c.Paths {
+		paths[p] = struct{}{}
+	}
+
+	return &ebpfReader{
+		config:  c,
+		log:     l,
+		parsers: FileParsers(c),
+		paths:   paths,
+		eventC:  make(chan Event),
+	}, nil
 }
