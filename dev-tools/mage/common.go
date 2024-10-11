@@ -32,7 +32,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -283,7 +282,7 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 func DownloadFile(url, destinationDir string) (string, error) {
 	log.Println("Downloading", url)
 
-	resp, err := http.Get(url) //nolint:gosec // url cannot be a constant
+	resp, err := http.Get(url) //nolint:noctx // we can ignore context for dev tools
 	if err != nil {
 		return "", fmt.Errorf("http get failed: %w", err)
 	}
@@ -338,9 +337,9 @@ func unzip(sourceFile, destinationDir string) error {
 		}
 		defer innerFile.Close()
 
-		path := filepath.Join(destinationDir, f.Name)
-		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
-			return fmt.Errorf("illegal file path in zip: %v", f.Name)
+		path, err := sanitizeFilePath(f.Name, destinationDir)
+		if err != nil {
+			return err
 		}
 
 		if f.FileInfo().IsDir() {
@@ -372,6 +371,16 @@ func unzip(sourceFile, destinationDir string) error {
 	}
 
 	return nil
+}
+
+// sanitizeExtractPath sanitizes against path traversal attacks.
+// See https://security.snyk.io/research/zip-slip-vulnerability.
+func sanitizeFilePath(filePath string, workdir string) (string, error) {
+	destPath := filepath.Join(workdir, filePath)
+	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
+	}
+	return destPath, nil
 }
 
 // Tar compress a directory using tar + gzip algorithms but without adding
@@ -486,9 +495,9 @@ func untar(sourceFile, destinationDir string) error {
 			return err
 		}
 
-		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, filepath.Clean(destinationDir)) {
-			return fmt.Errorf("illegal file path in tar: %v", header.Name)
+		path, err := sanitizeFilePath(header.Name, destinationDir)
+		if err != nil {
+			return err
 		}
 
 		switch header.Typeflag {
@@ -776,7 +785,7 @@ func CreateSHA512File(file string) error {
 	computedHash := hex.EncodeToString(sum.Sum(nil))
 	out := fmt.Sprintf("%v  %v", computedHash, filepath.Base(file))
 
-	return ioutil.WriteFile(file+".sha512", []byte(out), 0644)
+	return os.WriteFile(file+".sha512", []byte(out), 0644)
 }
 
 // Mage executes mage targets in the specified directory.
@@ -803,7 +812,7 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 	var files []string
 	for _, s := range sources {
-		filepath.Walk(s, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(s, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				if os.IsNotExist(err) {
 					return nil
@@ -817,6 +826,9 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 			return nil
 		})
+		if err != nil {
+			panic(fmt.Errorf("failed to walk source %v: %w", s, err))
+		}
 	}
 
 	execute, err := target.Path(dst, files...)
