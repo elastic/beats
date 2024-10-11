@@ -31,8 +31,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/elastic/go-sysinfo"
-	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
 
 	"gopkg.in/yaml.v2"
@@ -317,9 +315,6 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 				builtinVars["beatVersion"].(string),
 			)
 		},
-		"append": func(s []any, vals ...any) []any {
-			return append(s, vals...)
-		},
 	}, nil
 }
 
@@ -337,11 +332,6 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 		domain = split[1]
 	}
 
-	hostInfo, err := sysinfo.Host()
-	if err != nil && !errors.Is(err, types.ErrNotImplemented) {
-		return nil, fmt.Errorf("cannot get host information: %w", err)
-	}
-
 	vars := map[string]interface{}{
 		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
@@ -349,8 +339,6 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 		"module":      fs.mname,
 		"fileset":     fs.name,
 		"beatVersion": info.Version,
-		"osVersion":   hostInfo.Info().OS.Version,
-		"osFamily":    hostInfo.Info().OS.Family,
 	}
 
 	return vars, nil

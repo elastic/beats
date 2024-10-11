@@ -207,7 +207,6 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added filebeat debug histograms for s3 object size and events per processed s3 object. {pull}40775[40775]
 - Simplified GCS input state checkpoint calculation logic. {issue}40878[40878] {pull}40937[40937] 
 - Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}40674[40674] {pull}40936[40936]
-- Filebeat module template now support 'append' function {pull}41061[41061]
 
 ==== Deprecated
 

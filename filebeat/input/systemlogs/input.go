@@ -61,7 +61,8 @@ func (c *config) Validate() error {
 	return nil
 }
 
-// newV1Input creates a new log input
+// newV1Input checks whether the log input must be created and
+// delegates to loginput.NewInput if needed.
 func newV1Input(
 	cfg *conf.C,
 	outlet channel.Connector,
@@ -105,7 +106,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return journald.Configure(journaldCfg)
 }
 
-// PluginV2 creates a v2 plugin that will instantiate a journald
+// PluginV2 creates a v2.Plugin that will instantiate a journald
 // input if needed.
 func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 	logger = logger.Named(pluginName)
@@ -125,6 +126,15 @@ func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 	}
 }
 
+// useJournald returns true if jounrald should be used.
+// If there is an error, false is always retruned.
+//
+// The decision logic is:
+//   - If UseJournald is set, return true
+//   - If UseFiles is set, return false
+//   - If the globs defined in `files.paths` match any existing file,
+//     return false
+//   - Otherwise return true
 func useJournald(c *conf.C) (bool, error) {
 	cfg := config{}
 	if err := c.Unpack(&cfg); err != nil {
