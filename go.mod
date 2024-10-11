@@ -2,8 +2,6 @@ module github.com/elastic/beats/v7
 
 go 1.22.0
 
-toolchain go1.22.7
-
 require (
 	cloud.google.com/go/bigquery v1.62.0
 	cloud.google.com/go/monitoring v1.20.4
@@ -191,10 +189,10 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.8.2
-	github.com/elastic/elastic-agent-libs v0.11.0
+	github.com/elastic/elastic-agent-libs v0.12.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
-	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
+	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
@@ -418,7 +416,7 @@ replace (
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
 	github.com/fsnotify/fsnotify => github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3
-	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
+	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19

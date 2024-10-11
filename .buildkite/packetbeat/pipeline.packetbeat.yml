@@ -85,6 +85,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Ubuntu x86_64 Unit Tests"
@@ -103,6 +109,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: RHEL9 Unit Tests"
@@ -123,6 +135,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Win 2016 Unit Tests"
@@ -143,6 +161,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Win 2022 Unit Tests"
@@ -168,6 +192,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Win 10 Unit Tests"
@@ -189,6 +219,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Win 11 Unit Tests"
@@ -210,6 +246,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Win 2019 Unit Tests"
@@ -235,6 +277,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: macOS x86_64 Unit Tests"
@@ -256,6 +304,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: macOS arm64 Unit Tests"
@@ -276,6 +330,12 @@ steps:
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "packetbeat: Ubuntu arm64 Unit Tests"
