@@ -17,9 +17,27 @@
 
 //go:build aix
 
+<<<<<<< HEAD:filebeat/autodiscover/defaults_aix.go
 package autodiscover
+=======
+import (
+	"io/fs"
+
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+)
+>>>>>>> 764ba96d34 (Create nil cgroups reader for processor, improve error handling (#41198)):libbeat/processors/cgroups.go
 
 // InitializeModule initializes this module.
 func InitializeModule() {
 	// does nothing on aix
+}
+
+// NilCGReader does nothing
+type NilCGReader struct {
+}
+
+// ProcessCgroupPaths returns a blank pathLists and fs.ErrNotExist
+func (*NilCGReader) ProcessCgroupPaths(_ int) (cgroup.PathList, error) {
+	return cgroup.PathList{}, fs.ErrNotExist
 }

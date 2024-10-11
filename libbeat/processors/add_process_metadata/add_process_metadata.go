@@ -160,6 +160,16 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostPath), false)
+	if errors.Is(err, cgroup.ErrCgroupsMissing) {
+		reader = &processors.NilCGReader{}
+	} else if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
+>>>>>>> 764ba96d34 (Create nil cgroups reader for processor, improve error handling (#41198))
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
 		if withCache && config.CgroupCacheExpireTime != 0 {
