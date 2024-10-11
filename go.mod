@@ -192,7 +192,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.12.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
-	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
+	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb

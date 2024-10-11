@@ -174,6 +174,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - Fixed failed job handling and removed false-positive error logs in the GCS input. {pull}41142[41142]
+- Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
 
 *Heartbeat*
 
