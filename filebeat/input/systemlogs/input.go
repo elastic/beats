@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	v1 "github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/journald"
 	loginput "github.com/elastic/beats/v7/filebeat/input/log"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -84,26 +83,6 @@ func newV1Input(
 	}
 
 	return loginput.NewInput(logCfg, outlet, context)
-}
-
-// configure checks whether the journald input must be created and
-// delegates to journald.Configure if needed.
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	jouranl, err := useJournald(cfg)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot decide between journald and files: %w", err)
-	}
-
-	if !jouranl {
-		return nil, nil, v2.ErrUnknownInput
-	}
-
-	journaldCfg, err := toJournaldConfig(cfg)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return journald.Configure(journaldCfg)
 }
 
 // PluginV2 creates a v2.Plugin that will instantiate a journald
