@@ -11,7 +11,7 @@ const (
 	beatsContainer2 = "beatscontainer2"
 )
 
-var containers = map[string]bool{
+var Containers = map[string]bool{
 	beatsContainer:  true,
 	beatsContainer2: true,
 }
