@@ -24,8 +24,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strconv"
-	"syscall"
 
+	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -37,21 +37,18 @@ var (
 	errorNames = map[uint32]string{
 		1077: "ERROR_SERVICE_NEVER_STARTED",
 	}
-	InvalidDatabaseHandle = ^Handle(0)
 )
 
-type Handle uintptr
-
 type Reader struct {
-	handle            Handle
-	state             ServiceEnumState
+	handle            windows.Handle
+	state             uint32
 	guid              string            // Host's MachineGuid value (a unique ID for the host).
 	ids               map[string]string // Cache of service IDs.
 	protectedServices map[string]struct{}
 }
 
 func NewReader() (*Reader, error) {
-	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
+	handle, err := windows.OpenSCManager(nil, nil, windows.SC_MANAGER_ENUMERATE_SERVICE|windows.SC_MANAGER_CONNECT)
 	if err != nil {
 		return nil, fmt.Errorf("initialization failed: %w", err)
 	}
@@ -63,7 +60,7 @@ func NewReader() (*Reader, error) {
 
 	r := &Reader{
 		handle:            handle,
-		state:             ServiceStateAll,
+		state:             windows.SERVICE_STATE_ALL,
 		guid:              guid,
 		ids:               map[string]string{},
 		protectedServices: map[string]struct{}{},
@@ -112,34 +109,7 @@ func (reader *Reader) Read() ([]mapstr.M, error) {
 }
 
 func (reader *Reader) Close() error {
-	return closeHandle(reader.handle)
-}
-
-func openSCManager(machineName string, databaseName string, desiredAccess ServiceSCMAccessRight) (Handle, error) {
-	var machineNamePtr *uint16
-	if machineName != "" {
-		var err error
-		machineNamePtr, err = syscall.UTF16PtrFromString(machineName)
-		if err != nil {
-			return InvalidDatabaseHandle, err
-		}
-	}
-
-	var databaseNamePtr *uint16
-	if databaseName != "" {
-		var err error
-		databaseNamePtr, err = syscall.UTF16PtrFromString(databaseName)
-		if err != nil {
-			return InvalidDatabaseHandle, err
-		}
-	}
-
-	handle, err := _OpenSCManager(machineNamePtr, databaseNamePtr, desiredAccess)
-	if err != nil {
-		return InvalidDatabaseHandle, ServiceErrno(err.(syscall.Errno))
-	}
-
-	return handle, nil
+	return windows.CloseServiceHandle(reader.handle)
 }
 
 // getMachineGUID returns the machine's GUID value which is unique to a Windows
@@ -187,11 +157,4 @@ func getErrorCode(errno uint32) string {
 		return name
 	}
 	return strconv.Itoa(int(errno))
-}
-
-func closeHandle(handle Handle) error {
-	if err := _CloseServiceHandle(uintptr(handle)); err != nil {
-		return ServiceErrno(err.(syscall.Errno))
-	}
-	return nil
 }

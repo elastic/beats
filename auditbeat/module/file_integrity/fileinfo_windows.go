@@ -24,9 +24,9 @@ import (
 	"os"
 	"syscall"
 	"time"
-	"unsafe"
 
 	"github.com/joeshaw/multierror"
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
@@ -78,27 +78,19 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 
 // fileOwner returns the SID and name (domain\user) of the file's owner.
 func fileOwner(path string) (sid, owner string, err error) {
-	var securityID *syscall.SID
-	var securityDescriptor *SecurityDescriptor
-
-	pathW, err := syscall.UTF16PtrFromString(path)
+	sd, err := windows.GetNamedSecurityInfo(path, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION)
 	if err != nil {
-		return sid, owner, fmt.Errorf("failed to convert path:'%s' to UTF16: %w", path, err)
-	}
-	if err = GetNamedSecurityInfo(pathW, FileObject,
-		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		return "", "", fmt.Errorf("failed on GetSecurityInfo for %v: %w", path, err)
 	}
-	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
 
 	// Convert SID to a string and lookup the username.
 	var errs multierror.Errors
-	sid, err = securityID.String()
+	ownerSid, _, err := sd.Owner()
 	if err != nil {
 		errs = append(errs, err)
 	}
 
-	account, domain, _, err := securityID.LookupAccount("")
+	account, domain, _, err := ownerSid.LookupAccount("")
 	if err != nil {
 		errs = append(errs, err)
 	} else {
