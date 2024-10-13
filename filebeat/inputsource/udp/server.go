@@ -46,7 +46,6 @@ func New(config *Config, callback inputsource.NetworkFunc) *Server {
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
 	})
-
 	return server
 }
 
