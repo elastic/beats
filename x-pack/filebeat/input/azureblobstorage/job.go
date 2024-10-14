@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const jobErrString = "job with jobId %s encountered an error: %w"
+const jobErrString = "job with jobId %s encountered an error: %v"
 
 type job struct {
 	// client is an azure blob handle
@@ -134,20 +134,47 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 		}
 	}()
 
-	err = j.readJsonAndPublish(ctx, reader, id)
+	return j.decode(ctx, reader, id)
+}
+
+func (j *job) decode(ctx context.Context, r io.Reader, id string) error {
+	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
 	if err != nil {
-		return fmt.Errorf("failed to read data from blob with error: %w", err)
+		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
+	}
+	dec, err := newDecoder(j.src.ReaderConfig.Decoding, r)
+	if err != nil {
+		return err
+	}
+	var evtOffset int64
+	switch dec := dec.(type) {
+	case decoder:
+		defer dec.close()
+
+		for dec.next() {
+			msg, err := dec.decode()
+			if err != nil {
+				if err == io.EOF {
+					return nil
+				}
+				break
+			}
+			evt := j.createEvent(string(msg), evtOffset)
+			j.publish(evt, !dec.more(), id)
+		}
+
+	default:
+		err = j.readJsonAndPublish(ctx, r, id)
+		if err != nil {
+			return fmt.Errorf("failed to read data from blob with error: %w", err)
+		}
 	}
 
 	return err
 }
 
 func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) error {
-	r, err := j.addGzipDecoderIfNeeded(bufio.NewReader(r))
-	if err != nil {
-		return fmt.Errorf("failed to add gzip decoder to blob: %s, with error: %w", *j.blob.Name, err)
-	}
-
+	var err error
 	// checks if the root element is an array or not
 	r, j.isRootArray, err = evaluateJSON(bufio.NewReader(r))
 	if err != nil {
@@ -183,22 +210,25 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 			return err
 		}
 		evt := j.createEvent(string(data), offset)
-
-		if !dec.More() {
-			// if this is the last object, then perform a complete state save
-			cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
-			if err := j.publisher.Publish(evt, cp); err != nil {
-				j.log.Errorf(jobErrString, id, err)
-			}
-			done()
-		} else {
-			// since we don't update the cursor checkpoint, lack of a lock here should be fine
-			if err := j.publisher.Publish(evt, nil); err != nil {
-				j.log.Errorf(jobErrString, id, err)
-			}
-		}
+		j.publish(evt, !dec.More(), id)
 	}
 	return nil
+}
+
+func (j *job) publish(evt beat.Event, last bool, id string) {
+	if last {
+		// if this is the last object, then perform a complete state save
+		cp, done := j.state.saveForTx(*j.blob.Name, *j.blob.Properties.LastModified)
+		if err := j.publisher.Publish(evt, cp); err != nil {
+			j.log.Errorf(jobErrString, id, err)
+		}
+		done()
+		return
+	}
+	// since we don't update the cursor checkpoint, lack of a lock here should be fine
+	if err := j.publisher.Publish(evt, nil); err != nil {
+		j.log.Errorf(jobErrString, id, err)
+	}
 }
 
 // splitEventList splits the event list into individual events and publishes them
