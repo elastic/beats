@@ -21,6 +21,7 @@ type Source struct {
 	PollInterval             time.Duration
 	TimeStampEpoch           *int64
 	FileSelectors            []fileSelectorConfig
+	ReaderConfig             readerConfig
 	ExpandEventListFromField string
 }
 
