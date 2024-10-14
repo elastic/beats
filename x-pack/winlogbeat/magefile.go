@@ -9,11 +9,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/magefile/mage/mg"
-
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
@@ -27,6 +24,8 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	// mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
 	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
 )
@@ -48,13 +47,4 @@ func Update() { mg.Deps(winlogbeat.Update.All) }
 func Ironbank() error {
 	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
 	return nil
-}
-
-// Test runs all available tests (unitTest + integTest)
-func UnitTest() {
-	if os.Getenv("CI") == "true" {
-		mg.Deps(devtools.DefineModules)
-	}
-
-	unittest.UnitTest()
 }
