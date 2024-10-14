@@ -29,43 +29,43 @@ steps:
           - github_commit_status:
               context: "agentbeat: pre-commit"
 
-#  - wait: ~
-#    # with PRs, we want to run mandatory tests only if check/update step succeed
-#    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
-#    # this allows building DRA artifacts even if there is flakiness in check/update step
-#    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-#    depends_on: "x-pack-agentbeat-check-update"
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-agentbeat-check-update"
 
   - group: "Agentbeat tests"
     key: "agentbeat-mandatory-tests"
 
     steps:
-      - label: ":linux: Agentbeat packaging Linux"
-        key: "agentbeat-package-linux"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
-        command: |
-          set -euo pipefail
-          cd x-pack/agentbeat
-          mage package
-        artifact_paths:
-          - x-pack/agentbeat/build/distributions/**/*
-          - "x-pack/agentbeat/build/*.xml"
-          - "x-pack/agentbeat/build/*.json"
-        retry:
-          automatic:
-            - limit: 2
-        timeout_in_minutes: 60
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        notify:
-          - github_commit_status:
-              context: "agentbeat: Packaging"
+#      - label: ":linux: Agentbeat packaging Linux"
+#        key: "agentbeat-package-linux"
+#        env:
+#          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+#          SNAPSHOT: true
+#        command: |
+#          set -euo pipefail
+#          cd x-pack/agentbeat
+#          mage package
+#        artifact_paths:
+#          - x-pack/agentbeat/build/distributions/**/*
+#          - "x-pack/agentbeat/build/*.xml"
+#          - "x-pack/agentbeat/build/*.json"
+#        retry:
+#          automatic:
+#            - limit: 2
+#        timeout_in_minutes: 60
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
+#          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        notify:
+#          - github_commit_status:
+#              context: "agentbeat: Packaging"
 
       #      - label: ":linux: Agentbeat/Integration tests Linux"
       #        key: "agentbeat-it-linux"
@@ -109,42 +109,42 @@ steps:
       #          - github_commit_status:
       #              context: "agentbeat: Integration tests"
 
-      - label: ":linux: x-pack/agentbeat: Ubuntu x86_64 Spec tests"
-        key: "agentbeat-it-linux"
-        env:
-          PLATFORM: "linux/amd64"
-        depends_on:
-          - agentbeat-package-linux
-        command: |
-          cd x-pack/agentbeat
-          mage -v testWithSpec
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-
-      - label: ":windows: x-pack/agentbeat: Windows x86_64 Spec tests"
-        key: "agentbeat-it-windows"
-        env:
-          PLATFORM: "windows/amd64"
-        depends_on:
-          - agentbeat-package-linux
-        command: |
-          Set-Location -Path x-pack/agentbeat
-          mage -v testWithSpec
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
+#      - label: ":linux: x-pack/agentbeat: Ubuntu x86_64 Spec tests"
+#        key: "agentbeat-it-linux"
+#        env:
+#          PLATFORM: "linux/amd64"
+#        depends_on:
+#          - agentbeat-package-linux
+#        command: |
+#          cd x-pack/agentbeat
+#          mage -v testWithSpec
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
+#          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#
+#      - label: ":windows: x-pack/agentbeat: Windows x86_64 Spec tests"
+#        key: "agentbeat-it-windows"
+#        env:
+#          PLATFORM: "windows/amd64"
+#        depends_on:
+#          - agentbeat-package-linux
+#        command: |
+#          Set-Location -Path x-pack/agentbeat
+#          mage -v testWithSpec
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_2022}"
+#          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 200
+#          disk_type: "pd-ssd"
 
       - label: ":macos: x-pack/agentbeat: macOS x86_64 Spec tests"
         key: "agentbeat-it-macos"
-        depends_on:
-          - agentbeat-package-linux
+#        depends_on:
+#          - agentbeat-package-linux
         command: |
           cd x-pack/agentbeat
           mage -v testWithSpec
@@ -152,13 +152,13 @@ steps:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
 
-#      - label: ":linux: Agentbeat/Integration tests macOS arm64"
-#        key: "agentbeat-it-macos-arm"
+      - label: ":linux: Agentbeat/Integration tests macOS arm64"
+        key: "agentbeat-it-macos-arm"
 #        depends_on:
 #          - agentbeat-package-linux
-#        command: |
-#          set -euo pipefail
-#          ./.buildkite/scripts/agentbeat/setup_agentbeat.py
-#        agents:
-#          provider: "orka"
-#          imagePrefix: "${IMAGE_MACOS_ARM}"
+        command: |
+          cd x-pack/agentbeat
+          mage -v testWithSpec
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
