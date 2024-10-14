@@ -36,7 +36,7 @@ var privateKey = reflect.ValueOf("private")
 // the comma-separated list of names with be used. The list may refer to its
 // own field.
 func Redact[T any](val T, tag string, global []string, replace ...Replacer) (redacted T, err error) {
-	rep, err := compileReplacers(replace)
+	reps, err := compileReplacers(replace)
 	if err != nil {
 		return redacted, err
 	}
@@ -58,16 +58,35 @@ func Redact[T any](val T, tag string, global []string, replace ...Replacer) (red
 	rv := reflect.ValueOf(val)
 	switch rv.Kind() {
 	case reflect.Map, reflect.Pointer, reflect.Struct:
-		return redact(rv, rep, tag, slices.Clone(global), 0, make(map[any]int)).Interface().(T), nil
+		return redact(rv, reps, tag, slices.Clone(global), 0, make(map[any]int)).Interface().(T), nil
 	default:
 		return val, nil
 	}
 }
 
+// Replacer is a function that will return a redaction replacement
+// for the provided type. It must be a func(T) T.
+type Replacer any
+
+// NewStringReplacer returns a string Replacer that returns s.
+func NewStringReplacer(s string) Replacer {
+	return func(string) string {
+		return s
+	}
+}
+
+// NewBytesReplacer returns a []byte Replacer that returns the bytes
+// representation of s.
+func NewBytesReplacer(s string) Replacer {
+	return func([]byte) []byte {
+		return []byte(s)
+	}
+}
+
 type replacers map[reflect.Type]func(reflect.Value) reflect.Value
 
-func compileReplacers(replace []Replacer) (map[reflect.Type]func(reflect.Value) reflect.Value, error) {
-	replacers := make(map[reflect.Type]func(reflect.Value) reflect.Value)
+func compileReplacers(replace []Replacer) (replacers, error) {
+	reps := make(replacers)
 	for _, r := range replace {
 		rv := reflect.ValueOf(r)
 		rt := rv.Type()
@@ -84,17 +103,17 @@ func compileReplacers(replace []Replacer) (map[reflect.Type]func(reflect.Value) 
 		if in != out {
 			return nil, fmt.Errorf("replacer does not preserve type: fn(%s) %s", in, out)
 		}
-		if _, exists := replacers[in]; exists {
+		if _, exists := reps[in]; exists {
 			return nil, fmt.Errorf("multiple replacers for %s", in)
 		}
-		replacers[in] = func(v reflect.Value) reflect.Value {
+		reps[in] = func(v reflect.Value) reflect.Value {
 			return rv.Call([]reflect.Value{v})[0]
 		}
 	}
-	if len(replacers) == 0 {
-		replacers = nil
+	if len(reps) == 0 {
+		reps = nil
 	}
-	return replacers, nil
+	return reps, nil
 }
 
 func redact(v reflect.Value, reps replacers, tag string, global []string, depth int, seen map[any]int) reflect.Value {
@@ -371,23 +390,4 @@ type cycle struct {
 
 func (e cycle) Error() string {
 	return fmt.Sprintf("cycle including %s", e.typ)
-}
-
-// Replacer is a function that will return a redaction replacement
-// for the provided type. It must be a func(T) T.
-type Replacer any
-
-// NewStringReplacer returns a string Replacer that returns s.
-func NewStringReplacer(s string) Replacer {
-	return func(string) string {
-		return s
-	}
-}
-
-// NewBytesReplacer returns a []byte Replacer that returns the bytes
-// representation of s.
-func NewBytesReplacer(s string) Replacer {
-	return func([]byte) []byte {
-		return []byte(s)
-	}
 }
