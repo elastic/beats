@@ -207,7 +207,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window, log)
 }
 
-// GetUserRoles returns Okta group roles using the groups API endpoint. host is the
+// GetUserFactors returns Okta group roles using the groups API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. group must not be empty.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
