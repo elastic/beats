@@ -217,6 +217,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 
+*Functionbeat*
+
+- Fix deployment for CloudWatch Logs function type {issue}33173[33173] {pull}36305[36305]
+
+
 *Elastic Logging Plugin*
 
 

@@ -151,9 +151,10 @@ func (c CloudwatchLogs) Name() string {
 // AWSLogsSubscriptionFilter overrides the type from goformation to allow to pass an empty string.
 // The API support an empty string, but requires one, the original type does not permit that.
 type AWSLogsSubscriptionFilter struct {
-	DestinationArn string `json:"DestinationArn,omitempty"`
-	FilterPattern  string `json:"FilterPattern"`
-	LogGroupName   string `json:"LogGroupName,omitempty"`
+	DestinationArn             string   `json:"DestinationArn,omitempty"`
+	FilterPattern              string   `json:"FilterPattern"`
+	LogGroupName               string   `json:"LogGroupName,omitempty"`
+	AWSCloudFormationDependsOn []string `json:"-"`
 }
 
 // MarshalJSON is a custom JSON marshalling hook that embeds this object into
@@ -164,9 +165,11 @@ func (r AWSLogsSubscriptionFilter) MarshalJSON() ([]byte, error) {
 		Type           string
 		Properties     Properties
 		DeletionPolicy policies.DeletionPolicy `json:"DeletionPolicy,omitempty"`
+		DependsOn      []string                `json:"DependsOn,omitempty"`
 	}{
 		Type:       r.AWSCloudFormationType(),
 		Properties: (Properties)(r),
+		DependsOn:  r.AWSCloudFormationDependsOn,
 	})
 }
 
@@ -184,7 +187,9 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 	template := cloudformation.NewTemplate()
 	for idx, trigger := range c.config.Triggers {
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html
-		template.Resources[prefix("Permission"+strconv.Itoa(idx))] = &lambda.Permission{
+		permissionLogicalID := prefix("Permission" + strconv.Itoa(idx))
+
+		template.Resources[permissionLogicalID] = &lambda.Permission{
 			Action:       "lambda:InvokeFunction",
 			FunctionName: cloudformation.GetAtt(prefix(""), "Arn"),
 			Principal: cloudformation.Join("", []string{
@@ -211,9 +216,10 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
 		template.Resources[prefix("SF")+NormalizeResourceName(string(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
-			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
-			FilterPattern:  trigger.FilterPattern,
-			LogGroupName:   string(trigger.LogGroupName),
+			DestinationArn:             cloudformation.GetAtt(prefix(""), "Arn"),
+			FilterPattern:              trigger.FilterPattern,
+			LogGroupName:               string(trigger.LogGroupName),
+			AWSCloudFormationDependsOn: []string{permissionLogicalID},
 		}
 	}
 	return template
