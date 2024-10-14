@@ -15,12 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pdh
+package processors
 
-//go:generate go run mkpdh_defs.go
-//go:generate go run ../run.go -cmd "go tool cgo -godefs defs_pdh_windows.go" -goarch amd64 -output defs_pdh_windows_amd64.go
-//go:generate go run ../run.go -cmd "go tool cgo -godefs defs_pdh_windows.go" -goarch 386 -output defs_pdh_windows_386.go
-//go:generate go run ../run.go -cmd "go tool cgo -godefs defs_pdh_windows.go" -goarch arm64 -output defs_pdh_windows_arm64.go
-//go:generate go run ../run.go -cmd "go tool cgo -godefs defs_pdh_windows.go" -goarch arm -output defs_pdh_windows_arm.go
-//go:generate go run $GOROOT/src/syscall/mksyscall_windows.go -output zpdh_windows.go pdh_windows.go
-//go:generate goimports -w defs_pdh_windows_amd64.go defs_pdh_windows_386.go defs_pdh_windows_arm64.go defs_pdh_windows_arm.go zpdh_windows.go
+import (
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+)
+
+// InitCgroupHandler is a type for creating stubs for the cgroup resolver. Used primarily for testing.
+type InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (CGReader, error)
+
+// CGReader wraps the group Reader.ProcessCgroupPaths() call, this allows us to
+// set different cgroups readers for testing.
+type CGReader interface {
+	ProcessCgroupPaths(pid int) (cgroup.PathList, error)
+}
