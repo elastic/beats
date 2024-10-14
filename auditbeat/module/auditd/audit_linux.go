@@ -80,8 +80,6 @@ func init() {
 	)
 }
 
-type StatusGetter func() (*libaudit.AuditStatus, error)
-
 // MetricSet listens for audit messages from the Linux kernel using a netlink
 // socket. It buffers the messages to ensure ordering and then streams the
 // output. MetricSet implements the mb.PushMetricSet interface, and therefore
