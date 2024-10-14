@@ -58,7 +58,7 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 
 	cgroups, err := p.getProcessCgroups(pid)
 	if err != nil {
-		return "", fmt.Errorf("failed to get cgroups for pid=%v: %w", pid, err)
+		p.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 	}
 
 	cid = p.getContainerID(cgroups)
@@ -84,12 +84,7 @@ func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRe
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) {
-<<<<<<< HEAD
 	pathList, err := p.processCgroupPaths(p.hostPath, pid)
-=======
-	//return nil if we aren't supporting cgroups
-	pathList, err := p.processCgroupPaths.ProcessCgroupPaths(pid)
->>>>>>> 764ba96d34 (Create nil cgroups reader for processor, improve error handling (#41198))
 	if err != nil {
 		var pathError *fs.PathError
 		if errors.As(err, &pathError) {

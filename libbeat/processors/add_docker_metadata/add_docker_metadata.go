@@ -110,16 +110,6 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostFS), false)
-	if errors.Is(err, cgroup.ErrCgroupsMissing) {
-		reader = &processors.NilCGReader{}
-	} else if err != nil {
-		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
-	}
-
->>>>>>> 764ba96d34 (Create nil cgroups reader for processor, improve error handling (#41198))
 	return &addDockerMetadata{
 		log:             log,
 		watcher:         watcher,
@@ -287,17 +277,11 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 		return cgroups, nil
 	}
 
-<<<<<<< HEAD
 	cgroups, err := processCgroupPaths(d.hostFS, pid)
-=======
-	cgroups, err := d.cgreader.ProcessCgroupPaths(pid)
->>>>>>> 764ba96d34 (Create nil cgroups reader for processor, improve error handling (#41198))
 	if err != nil {
 		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
-	if len(cgroups.Flatten()) == 0 {
-		return cgroup.PathList{}, fs.ErrNotExist
-	}
+
 	d.cgroups.Put(pid, cgroups)
 	return cgroups, nil
 }
