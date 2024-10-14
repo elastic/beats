@@ -54,7 +54,7 @@
     - name: id
       type: keyword
       description: >
-        Datastore ID.
+        Unique datastore ID.
     - name: name
       type: keyword
       description: >
@@ -86,4 +86,3 @@
       description: >
         Rate of writing data to the datastore.
       format: bytes
-

@@ -7,11 +7,11 @@
     - name: id
       type: keyword
       description: >
-        Datastore Cluster ID.
+        Unique datastore cluster ID.
     - name: name
       type: keyword
       description: >
-        The Datastore Cluster name.
+        The datastore cluster name.
     - name: capacity.bytes
       type: long
       description: >
@@ -25,11 +25,11 @@
     - name: datastore.names
       type: keyword
       description: >
-        List of all the Datastore names associated with the Datastore Cluster.
+        List of all the datastore names associated with the datastore cluster.
     - name: datastore.count
       type: long
       description: >
-        Number of datastores in the Datastore Cluster.
+        Number of datastores in the datastore cluster.
     - name: triggered_alarms.*
       type: object
       object_type: keyword

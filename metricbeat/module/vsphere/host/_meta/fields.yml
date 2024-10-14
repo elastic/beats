@@ -55,7 +55,7 @@
     - name: id
       type: keyword
       description: >
-        Host ID.
+        Unique Host ID.
     - name: memory.free.bytes
       type: long
       description: >
