@@ -36,7 +36,6 @@ type Config struct {
 	AWSConfig             awscommon.ConfigAWS `config:",inline"`
 	TagsFilter            []Tag               `config:"tags_filter"`
 	IncludeLinkedAccounts *bool               `config:"include_linked_accounts"`
-	LimitRestAPI          *int32              `config:"apigateway_max_results"`
 	OwningAccount         string              `config:"owning_account"`
 }
 
@@ -207,18 +206,6 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	})
 	metricSet.MonitoringAccountName = getAccountName(svcIam, base, metricSet)
-
-	//Validate LimitRestAPI value.
-	//The Limit variable defines maximum number of returned results per page. The default value is 25 and the maximum value is 500.
-	if config.LimitRestAPI != nil {
-		if *config.LimitRestAPI > 500 {
-			base.Logger().Debug("apigateway_max_results config value can not exceed value 500. Setting apigateway_max_results=500")
-			*config.LimitRestAPI = 500
-		} else if *config.LimitRestAPI <= 0 {
-			base.Logger().Debug("apigateway_max_results config value can not be <=0. Setting apigateway_max_results=25")
-			*config.LimitRestAPI = 25
-		}
-	}
 
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
