@@ -5,13 +5,14 @@
 package awss3
 
 import (
+	"github.com/zyedidia/generic/queue"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/fifo"
 )
 
 type awsACKHandler struct {
-	pending    fifo.FIFO[pendingACK]
+	pending    *queue.Queue[pendingACK]
 	ackedCount int
 
 	pendingChan chan pendingACK
@@ -25,6 +26,23 @@ type pendingACK struct {
 
 func newAWSACKHandler() *awsACKHandler {
 	handler := &awsACKHandler{
+		pending: queue.New[pendingACK](),
+
+		// Channel buffer sizes are somewhat arbitrary: synchronous channels
+		// would be safe, but buffers slightly reduce scheduler overhead since
+		// the ack loop goroutine doesn't need to wake up as often.
+		//
+		// pendingChan receives one message each time an S3/SQS worker goroutine
+		// finishes processing an object. If it is full, workers will not be able
+		// to advance to the next object until the ack loop wakes up.
+		//
+		// ackChan receives approximately one message every time an acknowledged
+		// batch of events contains at least one event from this input. (Sometimes
+		// fewer if messages can be coalesced.) If it is full, acknowledgement
+		// notifications for inputs/queue will stall until the ack loop wakes up.
+		// (This is a much worse consequence than pendingChan, but ackChan also
+		// receives fewer messages than pendingChan by a factor of ~thousands,
+		// so in practice it's still low-impact.)
 		pendingChan: make(chan pendingACK, 10),
 		ackChan:     make(chan int, 10),
 	}
@@ -59,7 +77,7 @@ func (ah *awsACKHandler) run() {
 		select {
 		case result, ok := <-ah.pendingChan:
 			if ok {
-				ah.pending.Add(result)
+				ah.pending.Enqueue(result)
 			} else {
 				// Channel is closed, reset so we don't receive any more values
 				ah.pendingChan = nil
@@ -69,8 +87,8 @@ func (ah *awsACKHandler) run() {
 		}
 
 		// Finalize any objects that are now completed
-		for !ah.pending.Empty() && ah.ackedCount >= ah.pending.First().eventCount {
-			result := ah.pending.ConsumeFirst()
+		for !ah.pending.Empty() && ah.ackedCount >= ah.pending.Peek().eventCount {
+			result := ah.pending.Dequeue()
 			ah.ackedCount -= result.eventCount
 			// Run finalization asynchronously so we don't block the SQS worker
 			// or the queue by ignoring the ack handler's input channels. Ordering

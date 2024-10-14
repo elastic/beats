@@ -33,7 +33,7 @@ func TestSQSReceiver(t *testing.T) {
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 
-	const maxMessages = 5
+	const workerCount = 5
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -79,7 +79,7 @@ func TestSQSReceiver(t *testing.T) {
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler
@@ -120,7 +120,7 @@ func TestSQSReceiver(t *testing.T) {
 			}).AnyTimes()
 
 		// Execute SQSReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler

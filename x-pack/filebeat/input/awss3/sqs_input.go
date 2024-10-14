@@ -49,7 +49,7 @@ func newSQSReaderInput(config config, awsConfig awssdk.Config) *sqsReaderInput {
 	return &sqsReaderInput{
 		config:           config,
 		awsConfig:        awsConfig,
-		workRequestChan:  make(chan struct{}, config.MaxNumberOfMessages),
+		workRequestChan:  make(chan struct{}, config.NumberOfWorkers),
 		workResponseChan: make(chan types.Message),
 	}
 }
@@ -109,7 +109,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
+	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()
@@ -236,7 +236,7 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
 	// Start the worker goroutines that will fetch messages via workRequestChan
 	// and workResponseChan until the input shuts down.
-	for i := 0; i < in.config.MaxNumberOfMessages; i++ {
+	for i := 0; i < in.config.NumberOfWorkers; i++ {
 		in.workerWg.Add(1)
 		go func() {
 			defer in.workerWg.Done()
@@ -258,7 +258,7 @@ func (in *sqsReaderInput) logConfigSummary() {
 		log.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", in.awsConfig.Region, in.detectedRegion, in.awsConfig.Region)
 	}
 	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
-	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
+	log.Infof("AWS SQS number_of_workers is set to %v.", in.config.NumberOfWorkers)
 
 	if in.config.BackupConfig.GetBucketName() != "" {
 		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets " +

@@ -208,15 +208,15 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
 
 		config := makeBenchmarkConfig(t)
-		config.MaxNumberOfMessages = maxMessagesInflight
+		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
+		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
@@ -239,7 +239,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		b.StopTimer()
 		elapsed := time.Since(start)
 
-		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(workerCount), "number_of_workers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
 		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")

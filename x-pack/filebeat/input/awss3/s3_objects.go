@@ -177,7 +177,8 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 				return err
 			}
 			evt := p.createEvent(string(data), evtOffset)
-			p.publish(p.acker, &evt)
+
+			p.eventCallback(evt)
 		}
 
 	case decoder:
