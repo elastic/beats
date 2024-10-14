@@ -94,6 +94,7 @@ func TestImmutable(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+    assert.NotNil(t, auditMetricSet)
 	auditMetricSet.control.Close()
 	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
@@ -131,6 +132,7 @@ func TestData(t *testing.T) {
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+    assert.NotNil(t, auditMetricSet)
 	auditMetricSet.control.Close()
 	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
@@ -168,6 +170,7 @@ func TestLoginType(t *testing.T) {
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+    assert.NotNil(t, auditMetricSet)
 	auditMetricSet.control.Close()
 	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
