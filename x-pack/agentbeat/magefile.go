@@ -7,13 +7,13 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/sh"
@@ -236,7 +236,7 @@ func TestWithSpec(ctx context.Context) {
 	cmdResults := make(map[string]bool)
 
 	for _, command := range commands {
-		cmdResults[command] = runCmd(agentbeatPath, command)
+		cmdResults[command] = runCmd(agentbeatPath, strings.Split(command, " "))
 	}
 
 	hasFailures := false
@@ -255,14 +255,13 @@ func TestWithSpec(ctx context.Context) {
 	}
 }
 
-func runCmd(agentbeatPath string, command string) bool {
-	cmd := exec.Command(agentbeatPath, command)
+func runCmd(agentbeatPath string, command []string) bool {
+	cmd := exec.Command(agentbeatPath, command...)
 	fmt.Printf("Executing: %s\n", cmd.String())
 
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		fmt.Printf("Error creating stdout pipe: %v\n", err)
-	}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
 
 	if err := cmd.Start(); err != nil {
 		fmt.Printf("failed to start command: %v\n", err)
@@ -286,11 +285,6 @@ func runCmd(agentbeatPath string, command string) bool {
 	select {
 	case err := <-done:
 		fmt.Printf("command exited before %s: %v\n", timeout.String(), err)
-		fmt.Println("printing command stdout")
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			fmt.Println(scanner.Text())
-		}
 		return false
 
 	case <-deadline:
