@@ -27,7 +27,7 @@ func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zo
 
 // NewStackdriverMetadataServiceForTimeSeries apart from having a long name takes a time series object to return the
 // Stackdriver canonical Metadata extractor
-func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName string, projectName string) MetadataService {
+func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName, projectName string) MetadataService {
 	return &StackdriverTimeSeriesMetadataCollector{
 		timeSeries:       ts,
 		organizationID:   organizationID,
