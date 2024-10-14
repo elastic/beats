@@ -21,6 +21,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
@@ -36,6 +37,7 @@ func init() {
 
 // Test started when the test binary is started
 func TestSystem(t *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		main()
 	}

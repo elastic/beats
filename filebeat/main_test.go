@@ -26,6 +26,7 @@ import (
 
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
@@ -45,6 +46,7 @@ func init() {
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		if err := fbCommand.Execute(); err != nil {
 			os.Exit(1)

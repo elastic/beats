@@ -10,6 +10,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/cmd"
 )
 
@@ -25,6 +26,7 @@ func init() {
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(_ *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		main()
 	}
