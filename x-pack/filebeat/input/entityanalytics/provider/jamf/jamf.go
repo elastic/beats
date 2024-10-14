@@ -119,6 +119,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
+	var last time.Time
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
@@ -126,8 +127,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 				return inputCtx.Cancelation.Err()
 			}
 			return nil
-		case <-syncTimer.C:
-			start := time.Now()
+		case start := <-syncTimer.C:
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
@@ -146,9 +146,9 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			}
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		case <-updateTimer.C:
-			start := time.Now()
-			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
+			last = start
+		case start := <-updateTimer.C:
+			if err := p.runIncrementalUpdate(inputCtx, store, last, client); err != nil {
 				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
@@ -156,6 +156,7 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
+			last = start
 		}
 	}
 }
@@ -325,7 +326,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		for _, c := range state.computers {
-			p.publishComputer(c, inputCtx.ID, client, tracker, false)
+			p.publishComputer(c, inputCtx.ID, client, tracker)
 		}
 
 		end := time.Now()
@@ -350,7 +351,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, last time.Time, client beat.Client) error {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
@@ -374,7 +375,9 @@ func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	if len(updatedDevices) != 0 {
 		tracker = kvstore.NewTxTracker(ctx)
 		for _, d := range updatedDevices {
-			p.publishComputer(d, inputCtx.ID, client, tracker, true)
+			if d.Modified.After(last) {
+				p.publishComputer(d, inputCtx.ID, client, tracker)
+			}
 		}
 		tracker.Wait()
 	}
@@ -481,7 +484,7 @@ func (p *jamfInput) publishMarker(ts, eventTime time.Time, inputID string, start
 }
 
 // publishComputer will publish a computer document using the given beat.Client.
-func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Client, tracker *kvstore.TxTracker, update bool) {
+func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
 	devDoc := mapstr.M{}
 
 	id := "unknown"
@@ -496,12 +499,6 @@ func (p *jamfInput) publishComputer(c *Computer, inputID string, client beat.Cli
 	case Deleted:
 		_, _ = devDoc.Put("event.action", "device-deleted")
 	case Discovered:
-		if update {
-			// If this in an update, any computer that is in the discovered
-			// state will already have been published, so we don't need to
-			// send the data again.
-			return
-		}
 		_, _ = devDoc.Put("event.action", "device-discovered")
 	case Modified:
 		_, _ = devDoc.Put("event.action", "device-modified")
