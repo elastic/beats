@@ -105,6 +105,8 @@ func pointer[T any](d T) *T {
 
 func TestParseClientPolicy(t *testing.T) {
 	sampleClusterName := "TestCluster"
+	sampleUser := "TestUser"
+	samplePassword := "MySecretPassword"
 
 	TLSPolicy := as.NewClientPolicy()
 	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)})
@@ -112,6 +114,15 @@ func TestParseClientPolicy(t *testing.T) {
 
 	ClusterNamePolicy := as.NewClientPolicy()
 	ClusterNamePolicy.ClusterName = sampleClusterName
+
+	UserPasswordClientPolicy := as.NewClientPolicy()
+	UserPasswordClientPolicy.User = sampleUser
+	UserPasswordClientPolicy.Password = samplePassword
+
+	UserPasswordTLSPolicy := as.NewClientPolicy()
+	UserPasswordTLSPolicy.User = sampleUser
+	UserPasswordTLSPolicy.Password = samplePassword
+	UserPasswordTLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	tests := []struct {
 		Name                 string
@@ -141,6 +152,43 @@ func TestParseClientPolicy(t *testing.T) {
 				ClusterName: sampleClusterName,
 			},
 			expectedClientPolicy: ClusterNamePolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Username and password are honored",
+			Config: Config{
+				User:     sampleUser,
+				Password: samplePassword,
+			},
+			expectedClientPolicy: UserPasswordClientPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Username is set and password is not set",
+			Config: Config{
+				User: sampleUser,
+			},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          nil,
+		},
+		{
+			Name: "Password is set and user is not set",
+			Config: Config{
+				Password: samplePassword,
+			},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          nil,
+		},
+		{
+			Name: "TLS Declaration",
+			Config: Config{
+				TLS: &tlscommon.Config{
+					Enabled: pointer(true),
+				},
+				User:     sampleUser,
+				Password: samplePassword,
+			},
+			expectedClientPolicy: TLSPolicy,
 			expectedErr:          nil,
 		},
 	}
