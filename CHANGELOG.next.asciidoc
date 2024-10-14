@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Redis: Added replication role as a field to submitted slowlogs
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- `max_number_of_messages` config for S3 input's SQS mode is now ignored. Instead use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. {pull}40699[40699]
 
 
 *Heartbeat*
