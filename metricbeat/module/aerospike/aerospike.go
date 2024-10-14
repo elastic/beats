@@ -30,6 +30,8 @@ import (
 type Config struct {
 	ClusterName string            `config:"cluster_name"`
 	TLS         *tlscommon.Config `config:"ssl"`
+	User        string            `config:"username"`
+	Password    string            `config:"password"`
 }
 
 // DefaultConfig return default config for the aerospike module.
@@ -45,6 +47,11 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
 		}
 		clientPolicy.TlsConfig = tlsconfig.ToConfig()
+	}
+
+	if len(config.User) > 0 && len(config.Password) > 0 {
+		clientPolicy.User = config.User
+		clientPolicy.Password = config.Password
 	}
 
 	if config.ClusterName != "" {
