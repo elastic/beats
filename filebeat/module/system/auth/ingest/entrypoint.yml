@@ -1,5 +1,8 @@
 description: Entrypoint Pipeline for system/auth Filebeat module
 processors:
+  - set:
+      field: event.ingested
+      copy_from: _ingest.timestamp
   - script:
       source: |
               if(ctx?.journald != null){
