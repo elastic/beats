@@ -23,6 +23,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 	"github.com/elastic/beats/v7/packetbeat/cmd"
 )
@@ -38,6 +39,7 @@ func init() {
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(*testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		main()
 	}

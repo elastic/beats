@@ -21,7 +21,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -32,15 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/licenser"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
-
-func init() {
-	// backwards compatibility workaround, convert -flags to --flags:
-	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-			os.Args[1+i] = "-" + arg
-		}
-	}
-}
 
 // BeatsRootCmd handles all application command line interface, parses user
 // flags and runs subcommands
@@ -76,6 +66,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
+	cfgfile.Initialize()
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %w", err))
