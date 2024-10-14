@@ -28,6 +28,9 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Module Tests
+  BEAT_PATH: "auditbeat"
+
 steps:
   - group: "Check/Update"
     key: "auditbeat-check-update"
@@ -113,10 +116,6 @@ steps:
         env:
           STACK_ENVIRONMENT: "next-major"
         command: |
-          set -euo pipefail
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet auditbeat
-          echo "~~~ Running tests"
           cd auditbeat
           mage pythonIntegTest
         retry:

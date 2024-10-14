@@ -126,17 +126,9 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win 2019 Unit Tests"
 
-      - label: ":ubuntu: Heartbeat: Go (Module) Integration Tests"
+      # Heartbeat has no modules yet
+      - label: ":ubuntu: Heartbeat: Go Integration Tests"
         command: |
-          set -euo pipefail
-          echo "~~~ Installing @elastic/synthetics"
-          npm install -g @elastic/synthetics
-
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet heartbeat
-
-          echo "~~~ Running tests"
           cd heartbeat
           mage -v goIntegTest
         retry:
@@ -153,14 +145,9 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Heartbeat: Python (Module) Integration Tests"
+      # Heartbeat has no modules yet
+      - label: ":ubuntu: Heartbeat: Python Integration Tests"
         command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet heartbeat
-
-          echo "~~~ Running tests"
           cd heartbeat
           mage pythonIntegTest
         retry:

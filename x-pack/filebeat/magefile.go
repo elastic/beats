@@ -10,9 +10,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
@@ -25,8 +28,6 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -172,6 +173,10 @@ func GoIntegTest(ctx context.Context) error {
 
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" && os.Getenv("STACK_ENVIRONMENT") == "prev-minor" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.Deps(Fields, Dashboards)
 	}
@@ -188,4 +193,13 @@ func PythonIntegTest(ctx context.Context) error {
 		args.ForceCreateVenv = true
 		return devtools.PythonTest(args)
 	})
+}
+
+// Test runs all available tests (unitTest + integTest).
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	test.Test()
 }

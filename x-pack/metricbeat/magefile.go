@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -216,6 +217,10 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -228,6 +233,10 @@ func GoIntegTest(ctx context.Context) error {
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
