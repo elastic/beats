@@ -77,6 +77,12 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*-unit.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
@@ -97,6 +103,12 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Go Integration Tests"
@@ -117,6 +129,12 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
@@ -180,6 +198,12 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Ubuntu arm64 Unit Tests"

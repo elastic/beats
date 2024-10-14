@@ -205,7 +205,7 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
-# Install synthetics as a regular user, installing npm deps as root odesn't work
+# Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
@@ -227,7 +227,11 @@ done; \
 (exit $exit_code)
 {{- end }}
 
-USER {{ .user }}
+{{- if eq .user "root" }}
+USER 0
+{{- else }}
+USER 1000
+{{- end }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}

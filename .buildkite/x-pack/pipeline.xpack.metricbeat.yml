@@ -87,6 +87,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
@@ -108,6 +114,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Go Integration Tests (Module)"
@@ -129,6 +141,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Python Integration Tests (Module)"
@@ -150,6 +168,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 2016 Unit Tests"
@@ -171,6 +195,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 2022 Unit Tests"
@@ -197,6 +227,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 10 Unit Tests"
@@ -218,6 +254,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 11 Unit Tests"
@@ -239,6 +281,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Win 2019 Unit Tests"
@@ -263,6 +311,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
@@ -284,6 +338,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS arm64 Unit Tests"
@@ -310,6 +370,12 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: AWS Tests"

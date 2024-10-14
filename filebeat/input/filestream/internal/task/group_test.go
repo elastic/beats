@@ -67,6 +67,7 @@ func TestNewGroup(t *testing.T) {
 }
 
 func TestGroup_Go(t *testing.T) {
+	t.Skip("Flaky tests: https://github.com/elastic/beats/issues/41218")
 	t.Run("don't run more than limit goroutines", func(t *testing.T) {
 		done := make(chan struct{})
 		defer close(done)
