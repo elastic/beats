@@ -63,6 +63,9 @@ type config struct {
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
 
+	// Facility is a list of facilities to filter journal messages
+	Facilities []int `config:"facilities"`
+
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
 }

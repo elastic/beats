@@ -44,8 +44,12 @@ func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName st
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: mapstr.M{
-			"message":       *logEvent.Message,
-			"log.file.path": logGroup + "/" + *logEvent.LogStreamName,
+			"message": *logEvent.Message,
+			"log": mapstr.M{
+				"file": mapstr.M{
+					"path": logGroup + "/" + *logEvent.LogStreamName,
+				},
+			},
 			"event": mapstr.M{
 				"id":       *logEvent.EventId,
 				"ingested": time.Now(),

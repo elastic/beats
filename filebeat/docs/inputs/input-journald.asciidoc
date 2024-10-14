@@ -170,6 +170,13 @@ Valid transports:
 * kernel: messages from the kernel
 
 [float]
+[id="{beatname_lc}-input-{type}-facilities"]
+==== `facilities`
+
+Filter entries by facilities, facilities must be specified using their
+numeric code.
+
+[float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 

@@ -57,6 +57,8 @@ RUN for iter in {1..10}; do \
 {{- end }}
 
 {{- if contains .from "ubuntu" }}
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
+
 RUN for iter in {1..10}; do \
         apt-get update -y && \
         DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
@@ -203,7 +205,7 @@ RUN cd /usr/share/heartbeat/.node \
     && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
     && chmod ug+rwX -R $NODE_PATH
 
-# Install synthetics as a regular user, installing npm deps as root odesn't work
+# Install synthetics as a regular user, installing npm deps as root doesn't work
 RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
@@ -225,7 +227,11 @@ done; \
 (exit $exit_code)
 {{- end }}
 
-USER {{ .user }}
+{{- if eq .user "root" }}
+USER 0
+{{- else }}
+USER 1000
+{{- end }}
 
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
