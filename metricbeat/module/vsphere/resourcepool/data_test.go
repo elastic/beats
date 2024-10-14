@@ -31,6 +31,11 @@ func TestEventMapping(t *testing.T) {
 		ManagedEntity: mo.ManagedEntity{
 			OverallStatus: "green",
 			Name:          "resourcepool-test",
+			ExtensibleManagedObject: mo.ExtensibleManagedObject{
+				Self: types.ManagedObjectReference{
+					Value: "RS_0",
+				},
+			},
 		},
 		Summary: &types.ResourcePoolSummary{
 			QuickStats: &types.ResourcePoolQuickStats{
@@ -69,6 +74,9 @@ func TestEventMapping(t *testing.T) {
 
 	status, _ := event.GetValue("status")
 	assert.EqualValues(t, "green", status)
+
+	id, _ := event.GetValue("id")
+	assert.EqualValues(t, "RS_0", id)
 
 	name := event["name"].(string)
 	assert.EqualValues(t, name, "resourcepool-test")

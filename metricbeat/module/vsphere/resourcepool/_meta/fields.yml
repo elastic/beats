@@ -29,7 +29,7 @@
     - name: id
       type: keyword
       description: >
-        Resource pool ID.
+        Resource Pool ID.
     - name: memory
       type: group
       fields:
