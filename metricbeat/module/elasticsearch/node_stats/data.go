@@ -20,9 +20,9 @@ package node_stats
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/pkg/errors"
 
 	"github.com/joeshaw/multierror"
 
@@ -381,8 +381,19 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("failure to apply node schema: %w", err))
-			continue
+			allKeyNotFoundErr := true
+			for _, e := range err.(*multierror.MultiError).Errors {
+				var keyNotFoundError *s.KeyNotFoundError
+				if !errors.As(e, &keyNotFoundError) {
+					allKeyNotFoundErr = false
+					break
+				}
+			}
+
+			if !allKeyNotFoundErr {
+				errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+				continue
+			}
 		}
 
 		name, err := event.MetricSetFields.GetValue("name")
