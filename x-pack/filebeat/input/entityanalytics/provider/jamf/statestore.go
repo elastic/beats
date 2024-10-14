@@ -35,7 +35,8 @@ const (
 
 type Computer struct {
 	jamf.Computer `json:"properties"`
-	State         State `json:"state"`
+	State         State     `json:"state"`
+	Modified      time.Time `json:"modified"`
 }
 
 // stateStore wraps a kvstore.Transaction and provides convenience methods for
@@ -107,7 +108,7 @@ func (s *stateStore) storeComputer(c jamf.Computer) (_ *Computer, changed bool) 
 	if !ok {
 		// Whether this is managed or not, it is discovered. The next sync
 		// will change its state to Deleted if it is unmanaged.
-		curr := &Computer{Computer: c, State: Discovered}
+		curr := &Computer{Computer: c, State: Discovered, Modified: time.Now()}
 		s.computers[*c.Udid] = curr
 		return curr, true
 	}
@@ -120,6 +121,7 @@ func (s *stateStore) storeComputer(c jamf.Computer) (_ *Computer, changed bool) 
 	}
 	if changed {
 		stored.State = Modified
+		stored.Modified = time.Now()
 	}
 	return stored, changed
 }

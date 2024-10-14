@@ -130,6 +130,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
+	var last time.Time
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
@@ -137,8 +138,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 				return inputCtx.Cancelation.Err()
 			}
 			return nil
-		case <-syncTimer.C:
-			start := time.Now()
+		case start := <-syncTimer.C:
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
@@ -157,9 +157,9 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 			}
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		case <-updateTimer.C:
-			start := time.Now()
-			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
+			last = start
+		case start := <-updateTimer.C:
+			if err := p.runIncrementalUpdate(inputCtx, store, last, client); err != nil {
 				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
@@ -167,6 +167,7 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
+			last = start
 		}
 	}
 }
@@ -221,7 +222,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker, false)
+			p.publishUser(u, state, inputCtx.ID, client, tracker)
 		}
 
 		end := time.Now()
@@ -246,7 +247,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, last time.Time, client beat.Client) error {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
@@ -298,7 +299,9 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		if len(updatedUsers) != 0 {
 			tracker = kvstore.NewTxTracker(ctx)
 			for _, u := range updatedUsers {
-				p.publishUser(u, state, inputCtx.ID, client, tracker, true)
+				if u.WhenChanged.After(last) {
+					p.publishUser(u, state, inputCtx.ID, client, tracker)
+				}
 			}
 			tracker.Wait()
 		}
@@ -390,7 +393,7 @@ func (p *adInput) publishMarker(ts, eventTime time.Time, inputID string, start b
 }
 
 // publishUser will publish a user document using the given beat.Client.
-func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker, update bool) {
+func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
 	userDoc := mapstr.M{}
 
 	_, _ = userDoc.Put("activedirectory", u.Entry)
@@ -401,12 +404,6 @@ func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client
 	case Deleted:
 		_, _ = userDoc.Put("event.action", "user-deleted")
 	case Discovered:
-		if update {
-			// If this in an update, any computer that is in the discovered
-			// state will already have been published, so we don't need to
-			// send the data again.
-			return
-		}
 		_, _ = userDoc.Put("event.action", "user-discovered")
 	case Modified:
 		_, _ = userDoc.Put("event.action", "user-modified")
