@@ -22,7 +22,7 @@ clean:
 	@for f in $(ALL); do rm -f "$$f-kubernetes.yaml"; done
 
 $(ALL):
-	@echo "Generating $@-kubernetes.yaml"
+	@echo "Generating $@-kubernetes.yaml for version ${BEAT_VERSION} and image modifier '${IMAGE_MODIFIER}'"
 	@rm -f $@-kubernetes.yaml
 	@for f in service-account role role-binding configmap deployment daemonset ; do \
 		if [ -f "$@/$@-$$f.yaml" ]; then \
