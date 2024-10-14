@@ -75,10 +75,12 @@ var (
 func TestImmutable(t *testing.T) {
 	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		// With one extra for SetImmutable
 		returnACK().returnStatus().returnACK().returnACK().
@@ -92,6 +94,8 @@ func TestImmutable(t *testing.T) {
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -110,10 +114,12 @@ func TestImmutable(t *testing.T) {
 func TestData(t *testing.T) {
 	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -125,6 +131,8 @@ func TestData(t *testing.T) {
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -143,10 +151,12 @@ func TestData(t *testing.T) {
 func TestLoginType(t *testing.T) {
 	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -158,6 +168,8 @@ func TestLoginType(t *testing.T) {
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 

@@ -191,9 +191,11 @@ func TestGoldenFiles(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error reading log file '%s': %v", file, err)
 			}
-			mock := NewMock().
+			// Create mocks of netlink client and control that provide the expected responses.
+			controlMock := NewMock().
 				// Get Status response for initClient
-				returnACK().returnStatus().
+				returnACK().returnStatus()
+			mock := NewMock().
 				// Send expected ACKs for initialization
 				returnACK().returnStatus().returnACK().returnACK().
 				returnACK().returnACK().returnACK().
@@ -204,6 +206,8 @@ func TestGoldenFiles(t *testing.T) {
 
 			ms := mbtest.NewPushMetricSetV2WithRegistry(t, configForGolden(), ab.Registry)
 			auditMetricSet := ms.(*MetricSet)
+			auditMetricSet.control.Close()
+			auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 			auditMetricSet.client.Close()
 			auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 			mbEvents := runTerminableReporter(fileTimeout, ms, isTestEvent)

@@ -80,6 +80,8 @@ func init() {
 	)
 }
 
+type StatusGetter func() (*libaudit.AuditStatus, error)
+
 // MetricSet listens for audit messages from the Linux kernel using a netlink
 // socket. It buffers the messages to ensure ordering and then streams the
 // output. MetricSet implements the mb.PushMetricSet interface, and therefore
@@ -87,6 +89,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config     Config
+	control    *libaudit.AuditClient
 	client     *libaudit.AuditClient
 	log        *logp.Logger
 	kernelLost struct {
@@ -107,9 +110,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
+	control, err := libaudit.NewAuditClient(nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create audit control client: %w", err)
+	}
+
 	client, err := newAuditClient(&config, log)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create audit client: %w", err)
+		return nil, fmt.Errorf("failed to create audit data client: %w", err)
 	}
 
 	reassemblerGapsMetric.Set(0)
@@ -119,6 +127,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:        base,
+		control:              control,
 		client:               client,
 		config:               config,
 		log:                  log,
@@ -164,25 +173,17 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	}
 }
 
-func getStatus() (*libaudit.AuditStatus, error) {
-	client, err := libaudit.NewAuditClient(nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create audit client when getting status: %w", err)
-	}
-	defer client.Close()
-	return client.GetStatus()
-}
-
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer closeAuditClient(ms.client, ms.log)
+	defer ms.control.Close()
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
 	// Will result in EPERM. Also, ensure that another socket is used to determine the
 	// status, because audit data can already buffering for ms.client. Which can lead
 	// to an ENOBUFS error bubbling up.
-	status, err := getStatus()
+	status, err := ms.control.GetStatus()
 	if err != nil {
 		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
 		reporter.Error(err)
