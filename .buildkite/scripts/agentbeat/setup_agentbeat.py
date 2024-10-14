@@ -48,7 +48,7 @@ def download_agentbeat(pattern, path) -> str:
     try:
         subprocess.run(
             ['buildkite-agent', 'artifact', 'download', pattern, '.',
-             # '--build', '01924d2b-b061-45ae-a106-e885584ff26f',
+             '--build', '01924d2b-b061-45ae-a106-e885584ff26f',
              '--step', 'agentbeat-package-linux'],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
     except subprocess.CalledProcessError:
@@ -58,6 +58,7 @@ def download_agentbeat(pattern, path) -> str:
 
 
 def get_filename(path) -> str:
+    print("--- Getting filename")
     try:
         out = subprocess.run(
             ['ls', '-p', path],
@@ -108,5 +109,7 @@ def get_path_to_executable(filepath) -> str:
 
 artifact_pattern = get_artifact_pattern()
 archive = download_agentbeat(artifact_pattern, PATH)
+print("--- Extracting")
 extract_agentbeat(archive)
+print("--- Getting path to exec")
 log(get_path_to_executable(archive))
