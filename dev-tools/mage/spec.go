@@ -19,6 +19,7 @@ package mage
 
 import (
 	"gopkg.in/yaml.v2"
+
 	"log"
 	"os"
 	"strings"
