@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Improve Beat `test output` command to honor proxy_url setting for output.logstash and output.elasticsearch. {issue}24751[24751] {pull}36715[36715]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]

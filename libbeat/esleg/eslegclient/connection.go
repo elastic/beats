@@ -18,17 +18,20 @@
 package eslegclient
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
+	"golang.org/x/net/proxy"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
@@ -329,16 +332,116 @@ func (conn *Connection) Close() error {
 	return nil
 }
 
+type httpClientProxySettings httpcommon.HTTPClientProxySettings
+
+// ProxyDialer is a dialer that can be registered to golang.org/x/net/proxy
+func (h *httpClientProxySettings) ProxyDialer(_ *url.URL, forward proxy.Dialer) (proxy.Dialer, error) {
+	return transport.DialerFunc(func(_, address string) (net.Conn, error) {
+
+		// Headers given to the CONNECT request
+		hdr := h.Headers.Headers()
+		if h.URL.User != nil {
+			username := h.URL.User.Username()
+			password, _ := h.URL.User.Password()
+			if len(hdr) == 0 {
+				hdr = http.Header{}
+			}
+			hdr.Add("Proxy-Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(username+":"+password)))
+		}
+
+		req := &http.Request{
+			Method: "CONNECT",
+			URL:    &url.URL{Opaque: address},
+			Host:   address,
+			Header: hdr,
+		}
+
+		// Dial the proxy host
+		c, err := forward.Dial("tcp", h.URL.Host)
+		if err != nil {
+			return nil, err
+		}
+
+		// Write the CONNECT request
+		if err := req.Write(c); err != nil {
+			c.Close()
+			return nil, err
+		}
+
+		res, err := http.ReadResponse(bufio.NewReader(c), req)
+		if err != nil {
+			c.Close()
+			return nil, err
+		}
+		res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			c.Close()
+			return nil, fmt.Errorf("proxy server returned status code %d", res.StatusCode)
+		}
+
+		return c, nil
+	}), nil
+}
+
+func (conn *Connection) testProxyDialer(d testing.Driver, forward transport.Dialer) transport.Dialer {
+	dialer := forward
+
+	switch scheme := conn.Transport.Proxy.URL.Scheme; scheme {
+	case "https":
+		tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+		if err != nil {
+			d.Fatal("load tls config", err)
+		}
+		dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+		fallthrough
+	case "http":
+		proxy.RegisterDialerType(scheme, ((*httpClientProxySettings)(&conn.Transport.Proxy)).ProxyDialer)
+	}
+
+	dialer, err := transport.ProxyDialer(logp.L(), &transport.ProxyConfig{URL: conn.Transport.Proxy.URL.String()}, dialer)
+	d.Fatal("proxy", err)
+	return dialer
+}
+
 func (conn *Connection) Test(d testing.Driver) {
 	d.Run("elasticsearch: "+conn.URL, func(d testing.Driver) {
 		u, err := url.Parse(conn.URL)
 		d.Fatal("parse url", err)
 
+		isPeerProxyServer := conn.Transport.Proxy.URL != nil && !conn.Transport.Proxy.Disable
+
+		if isPeerProxyServer {
+			d.Run("proxy", func(d testing.Driver) {
+				dialer := transport.TestNetDialer(d, conn.Transport.Timeout)
+
+				if conn.Transport.Proxy.URL.Scheme == "https" {
+					tls, err := tlscommon.LoadTLSConfig(conn.Transport.TLS)
+					if err != nil {
+						d.Fatal("load tls config", err)
+					}
+					dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+				}
+
+				_, err := dialer.Dial("tcp", conn.Transport.Proxy.URL.Host)
+				d.Fatal("dial up", err)
+			})
+		}
+
 		address := u.Host
 
 		d.Run("connection", func(d testing.Driver) {
-			netDialer := transport.TestNetDialer(d, conn.Transport.Timeout)
-			_, err = netDialer.Dial("tcp", address)
+			var dialer transport.Dialer
+
+			if !isPeerProxyServer {
+				// Hasn't examined connectivity to the direct peer yet.
+				dialer = transport.TestNetDialer(d, conn.Transport.Timeout)
+			} else {
+				dialer = transport.NetDialer(conn.Transport.Timeout)
+				dialer = conn.testProxyDialer(d, dialer)
+			}
+
+			_, err := dialer.Dial("tcp", address)
 			d.Fatal("dial up", err)
 		})
 
@@ -351,9 +454,15 @@ func (conn *Connection) Test(d testing.Driver) {
 					d.Fatal("load tls config", err)
 				}
 
-				netDialer := transport.NetDialer(conn.Transport.Timeout)
-				tlsDialer := transport.TestTLSDialer(d, netDialer, tls, conn.Transport.Timeout)
-				_, err = tlsDialer.Dial("tcp", address)
+				dialer := transport.NetDialer(conn.Transport.Timeout)
+
+				if isPeerProxyServer {
+					dialer = conn.testProxyDialer(d, dialer)
+				}
+
+				dialer = transport.TestTLSDialer(d, dialer, tls, conn.Transport.Timeout)
+
+				_, err = dialer.Dial("tcp", address)
 				d.Fatal("dial up", err)
 			})
 		}
