@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-
 import platform
+import re
 import subprocess
 import sys
 import tarfile
-import re
 
 PATH = 'x-pack/agentbeat/build/distributions'
 
@@ -48,9 +47,10 @@ def download_agentbeat(pattern, path) -> str:
     try:
         subprocess.run(
             ['buildkite-agent', 'artifact', 'download', pattern, '.',
-             '--build', '01924d2b-b061-45ae-a106-e885584ff26f',
+             # '--build', '01928f55-8452-41c6-89ba-fe21f019f53c',
              '--step', 'agentbeat-package-linux'],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
+
     except subprocess.CalledProcessError:
         exit(1)
 
@@ -58,11 +58,11 @@ def download_agentbeat(pattern, path) -> str:
 
 
 def get_filename(path) -> str:
-    print("--- Getting filename")
     try:
         out = subprocess.run(
             ['ls', '-p', path],
             check=True, capture_output=True, text=True)
+        print("--- ls -p: " + out.stdout)
         return out.stdout.strip()
     except subprocess.CalledProcessError:
         exit(1)
@@ -89,9 +89,10 @@ def unzip_agentbeat(filepath):
 
 def untar_agentbeat(filepath):
     try:
-        with tarfile.open(filepath, 'r:gz') as tar:
-            tar.extractall()
-    except Exception as e:
+        subprocess.run(
+            ['tar', '-xvf', filepath],
+            check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
+    except subprocess.CalledProcessError as e:
         log_err(e)
         exit(1)
 
@@ -106,10 +107,7 @@ def get_path_to_executable(filepath) -> str:
         log_err("No agentbeat executable found")
         exit(1)
 
-
 artifact_pattern = get_artifact_pattern()
 archive = download_agentbeat(artifact_pattern, PATH)
-print("--- Extracting")
 extract_agentbeat(archive)
-print("--- Getting path to exec")
 log(get_path_to_executable(archive))
