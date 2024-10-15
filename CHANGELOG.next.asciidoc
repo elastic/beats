@@ -328,6 +328,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - System module now supports reading from jounrald. {pull}41061[41061]
+- Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 
 *Auditbeat*
 
