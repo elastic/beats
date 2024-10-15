@@ -93,7 +93,9 @@ func (ah *awsACKHandler) run() {
 			// Run finalization asynchronously so we don't block the SQS worker
 			// or the queue by ignoring the ack handler's input channels. Ordering
 			// is no longer important at this point.
-			go result.ackCallback()
+			if result.ackCallback != nil {
+				go result.ackCallback()
+			}
 		}
 
 		// If the input is closed and all acks are completed, we're done
