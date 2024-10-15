@@ -23,7 +23,7 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
