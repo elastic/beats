@@ -325,6 +325,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improved GCS input documentation. {pull}41143[41143]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Add CSV decoding capacity to gcs input {pull}40979[40979]
+- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - System module now supports reading from jounrald. {pull}41061[41061]
 
