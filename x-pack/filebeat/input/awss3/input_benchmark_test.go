@@ -27,8 +27,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -165,16 +163,15 @@ var _ beat.Pipeline = (*fakePipeline)(nil)
 
 // fakePipeline returns new ackClients.
 type fakePipeline struct {
-	ackHandler *awsACKHandler
 }
 
 func newFakePipeline() *fakePipeline {
-	return &fakePipeline{ackHandler: newAWSACKHandler()}
+	return &fakePipeline{}
 }
 
-func (c *fakePipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
+func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
 	return &ackClient{
-		ackHandler: c.ackHandler,
+		eventListener: config.EventListener,
 	}, nil
 }
 
@@ -186,13 +183,14 @@ var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type ackClient struct {
-	ackHandler *awsACKHandler
+	eventListener beat.EventListener
 }
 
 func (c *ackClient) Close() error { return nil }
 
 func (c *ackClient) Publish(event beat.Event) {
-	c.ackHandler.Add(1, nil)
+	c.eventListener.AddEvent(event, true)
+	go c.eventListener.ACKEvents(1)
 }
 
 func (c *ackClient) PublishAll(event []beat.Event) {
@@ -312,15 +310,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
-
-		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		})
 		pipeline := newFakePipeline()
-
-		defer func() {
-			_ = client.Close()
-		}()
 
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = numberOfWorkers
