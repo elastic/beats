@@ -78,7 +78,7 @@ func TestEventMapping(t *testing.T) {
 	id, _ := event.GetValue("id")
 	assert.EqualValues(t, "RS_0", id)
 
-	name := event["name"].(string)
+	name, _ := event.GetValue("name")
 	assert.EqualValues(t, name, "resourcepool-test")
 
 	cpuUsage, _ := event.GetValue("cpu.usage.mhz")
