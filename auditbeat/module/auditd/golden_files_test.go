@@ -205,7 +205,10 @@ func TestGoldenFiles(t *testing.T) {
 				returnMessage(terminator)
 
 			ms := mbtest.NewPushMetricSetV2WithRegistry(t, configForGolden(), ab.Registry)
-			auditMetricSet := ms.(*MetricSet)
+			auditMetricSet, ok := ms.(*MetricSet)
+			if !ok {
+				t.Fatalf("Expected *MetricSet but got %T", ms)
+			}
 			auditMetricSet.control.Close()
 			auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 			auditMetricSet.client.Close()
