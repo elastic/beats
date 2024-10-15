@@ -171,11 +171,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: heartbeat
-<<<<<<< HEAD
-        image: docker.elastic.co/beats/heartbeat:8.16.0
-=======
-        image: docker.elastic.co/beats/heartbeat-wolfi:9.0.0
->>>>>>> 3492089397 (Switch K8s tests to Wolfi by default and make it configurable (#41222))
+        image: docker.elastic.co/beats/heartbeat-wolfi:8.16.0
         args: [
           "-c", "/etc/heartbeat.yml",
           "-e",
