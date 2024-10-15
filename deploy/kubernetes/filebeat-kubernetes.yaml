@@ -183,7 +183,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
+<<<<<<< HEAD
         image: docker.elastic.co/beats/filebeat:8.16.0
+=======
+        image: docker.elastic.co/beats/filebeat-wolfi:9.0.0
+>>>>>>> 3492089397 (Switch K8s tests to Wolfi by default and make it configurable (#41222))
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
