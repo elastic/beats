@@ -504,17 +504,17 @@ func getGroupName(id string) (string, bool) {
 func getEntryTypeName(entryType uint32) string {
 	switch int(entryType) {
 	case quark.QUARK_ELT_INIT:
-		return "init"
+		return string(Init)
 	case quark.QUARK_ELT_SSHD:
-		return "sshd"
+		return string(Sshd)
 	case quark.QUARK_ELT_SSM:
-		return "ssm"
+		return string(Ssm)
 	case quark.QUARK_ELT_CONTAINER:
-		return "container"
+		return string(Container)
 	case quark.QUARK_ELT_TERM:
-		return "terminal"
+		return string(Terminal)
 	case quark.QUARK_ELT_CONSOLE:
-		return "console"
+		return string(EntryConsole)
 	case quark.QUARK_ELT_KTHREAD:
 		return "kthread"
 	default:
