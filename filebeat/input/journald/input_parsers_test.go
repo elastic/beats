@@ -30,6 +30,19 @@ import (
 // TestInputParsers ensures journald input support parsers,
 // it only tests a single parser, but that is enough to ensure
 // we're correctly using the parsers
+//
+// TODO(Tiago): Fix "this test", well the way we read data from journalctl
+// it can happen that we get a read error when reading the stdout from journalctl
+// the error is "read |0: file already closed". It breaks this parsers/multiline
+// test because it will cause Next() to return an error, making the multiline return
+// earlier. All the messages end up being correctly read by Journald input's reader,
+// however the line aggregation is not correct.
+//
+// It's also interesting that it only seems to happen if more than one test is run
+// (like when running `go test ./...` or this test is run multiple times, by
+// passing -count to `go test`.
+// Running go run golang.org/x/tools/cmd/stress@latest ./filebeat.test -test.v -test.run=TestInputParsers
+// never causes a failure.
 func TestInputParsers(t *testing.T) {
 	inputParsersExpected := []string{"1st line\n2nd line\n3rd line", "4th line\n5th line\n6th line"}
 	env := newInputTestingEnvironment(t)

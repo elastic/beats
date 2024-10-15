@@ -39,7 +39,7 @@ var _ Jctl = &JctlMock{}
 //			KillFunc: func() error {
 //				panic("mock out the Kill method")
 //			},
-//			NextFunc: func(canceler input.Canceler) ([]byte, error) {
+//			NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
 //				panic("mock out the Next method")
 //			},
 //		}
@@ -53,7 +53,7 @@ type JctlMock struct {
 	KillFunc func() error
 
 	// NextFunc mocks the Next method.
-	NextFunc func(canceler input.Canceler) ([]byte, error)
+	NextFunc func(canceler input.Canceler) ([]byte, bool, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -98,7 +98,7 @@ func (mock *JctlMock) KillCalls() []struct {
 }
 
 // Next calls NextFunc.
-func (mock *JctlMock) Next(canceler input.Canceler) ([]byte, error) {
+func (mock *JctlMock) Next(canceler input.Canceler) ([]byte, bool, error) {
 	if mock.NextFunc == nil {
 		panic("JctlMock.NextFunc: method is nil but Jctl.Next was just called")
 	}
