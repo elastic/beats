@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
 
 *Packetbeat*
 
