@@ -135,6 +135,8 @@
   #credential_profile_name: test-aws-s3-input
 
   # ARN of the log group to collect logs from
+  # This ARN could refer to a log group from a linked source account
+  # Note: This property precedes over `log_group_name` & `log_group_name_prefix`
   #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
 
   # Name of the log group to collect logs from.
