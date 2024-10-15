@@ -45,6 +45,12 @@ metricbeat.modules:
   # Aerospike Cluster Name
   #cluster_name: myclustername
 
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
 
