@@ -14746,12 +14746,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/mjwolf/go-quark
-Version: v0.2.0
+Dependency : github.com/elastic/go-quark
+Version: v0.1.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mjwolf/go-quark@v0.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.1.0/LICENSE.txt:
 
 Source code in this repository is licensed under the Apache License Version 2.0,
 an Apache compatible license.

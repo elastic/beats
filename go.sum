@@ -381,6 +381,8 @@ github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f h1:TsPpU5EAwlt
 github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f/go.mod h1:HHaWnZamYKWsR9/eZNHqRHob8iQDKnchHmmskT/SKko=
 github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595 h1:q8n4QjcLa4q39Q3fqHRknTBXBtegjriHFrB42YKgXGI=
 github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595/go.mod h1:s09U1b4P1ZxnKx2OsqY7KlHdCesqZWIhyq0Gs/QC/Us=
+github.com/elastic/go-quark v0.1.0 h1:VYjlWGlbjzcg6IqdqlykPw0rg2Za7cFnb9hDSoqs9MQ=
+github.com/elastic/go-quark v0.1.0/go.mod h1:/ngqgumD/Z5vnFZ4XPN2kCbxnEfG5/Uc+bRvOBabVVA=
 github.com/elastic/go-seccomp-bpf v1.4.0 h1:6y3lYrEHrLH9QzUgOiK8WDqmPaMnnB785WxibCNIOH4=
 github.com/elastic/go-seccomp-bpf v1.4.0/go.mod h1:wIMxjTbKpWGQk4CV9WltlG6haB4brjSH/dvAohBPM1I=
 github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727 h1:yuiN60oaQUz2PtNpNhDI2H6zrCdfiiptmNdwV5WUaKA=
@@ -739,8 +741,6 @@ github.com/mitchellh/iochan v1.0.0 h1:C+X3KsSTLFVBr/tK1eYN/vs4rJcvsiLU338UhYPJWe
 github.com/mitchellh/iochan v1.0.0/go.mod h1:JwYml1nuB7xOzsp52dPpHFffvOCDupsG0QubkSMEySY=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/mjwolf/go-quark v0.2.0 h1:arAKLySXUzueSbaUkvSo7CJQrIicWorbSQ7P9I0MxdY=
-github.com/mjwolf/go-quark v0.2.0/go.mod h1:qHZFSWAGUg6eOpvideVWvTtWx/HKvdECdb1d3PrLBow=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
 github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
 github.com/moby/spdystream v0.2.0 h1:cjW1zVyyoiM0T7b6UoySUFqzXMoqRckQtXwGPiBhOM8=
