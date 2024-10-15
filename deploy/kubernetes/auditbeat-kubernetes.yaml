@@ -209,11 +209,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-<<<<<<< HEAD
-        image: docker.elastic.co/beats/auditbeat:8.16.0
-=======
-        image: docker.elastic.co/beats/auditbeat-wolfi:9.0.0
->>>>>>> 3492089397 (Switch K8s tests to Wolfi by default and make it configurable (#41222))
+        image: docker.elastic.co/beats/auditbeat-wolfi:8.16.0
         args: [
           "-c", "/etc/auditbeat.yml",
           "-e",
