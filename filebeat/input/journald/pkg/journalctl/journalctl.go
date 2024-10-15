@@ -24,6 +24,7 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+	"sync"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -37,6 +38,7 @@ type journalctl struct {
 
 	logger   *logp.Logger
 	canceler input.Canceler
+	waitDone sync.WaitGroup
 }
 
 // Factory returns an instance of journalctl ready to use.
@@ -95,7 +97,7 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 			data, err := reader.ReadBytes('\n')
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
-					logger.Errorf("cannot read from journalctl stdout: %s", err)
+					logger.Errorf("cannot read from journalctl stdout: '%s'", err)
 				}
 				return
 			}
@@ -118,10 +120,13 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 
 	// Whenever the journalctl process exits, the `Wait` call returns,
 	// if there was an error it is logged and this goroutine exits.
+	jctl.waitDone.Add(1)
 	go func() {
+		defer jctl.waitDone.Done()
 		if err := cmd.Wait(); err != nil {
 			jctl.logger.Errorf("journalctl exited with an error, exit code %d ", cmd.ProcessState.ExitCode())
 		}
+		jctl.logger.Debugf("journalctl exit code: %d", cmd.ProcessState.ExitCode())
 	}()
 
 	return &jctl, nil
@@ -130,18 +135,31 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 // Kill Terminates the journalctl process using a SIGKILL.
 func (j *journalctl) Kill() error {
 	j.logger.Debug("sending SIGKILL to journalctl")
-	err := j.cmd.Process.Kill()
-	return err
+	return j.cmd.Process.Kill()
 }
 
-func (j *journalctl) Next(cancel input.Canceler) ([]byte, error) {
+// Next returns the next journal entry (as JSON). If `finished` is true, then
+// journalctl finished returning all data and exited successfully, if journalctl
+// exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
+// byte array is returned.
+func (j *journalctl) Next(cancel input.Canceler) ([]byte, bool, error) {
 	select {
 	case <-cancel.Done():
-		return []byte{}, ErrCancelled
+		return []byte{}, false, ErrCancelled
 	case d, open := <-j.dataChan:
 		if !open {
-			return []byte{}, errors.New("no more data to read, journalctl might have exited unexpectedly")
+			// Wait for the process to exit, so we can read the exit code.
+			j.waitDone.Wait()
+			if j.cmd.ProcessState.ExitCode() == 0 {
+				return []byte{}, true, nil
+			}
+			return []byte{},
+				false,
+				fmt.Errorf(
+					"no more data to read, journalctl exited unexpectedly, exit code: %d",
+					j.cmd.ProcessState.ExitCode())
 		}
-		return d, nil
+
+		return d, false, nil
 	}
 }

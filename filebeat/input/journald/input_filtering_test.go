@@ -274,9 +274,11 @@ func TestInputSeek(t *testing.T) {
 
 			env.waitUntilEventCount(len(testCase.expectedMessages))
 
-			for idx, event := range env.pipeline.GetAllEvents() {
-				if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
-					t.Fatalf("expecting event message %q, got %q", expected, got)
+			if !t.Failed() {
+				for idx, event := range env.pipeline.GetAllEvents() {
+					if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
+						t.Fatalf("expecting event message %q, got %q", expected, got)
+					}
 				}
 			}
 		})
