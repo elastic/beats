@@ -19,6 +19,7 @@ package aerospike
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -124,6 +125,15 @@ func TestParseClientPolicy(t *testing.T) {
 	UserPasswordTLSPolicy.Password = samplePassword
 	UserPasswordTLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
+	ExternalAuthModePolicy := as.NewClientPolicy()
+	ExternalAuthModePolicy.AuthMode = as.AuthModeExternal
+
+	PKIAuthModePolicy := as.NewClientPolicy()
+	PKIAuthModePolicy.AuthMode = as.AuthModePKI
+
+	InternalAuthModePolicy := as.NewClientPolicy()
+	InternalAuthModePolicy.AuthMode = as.AuthModeInternal
+
 	tests := []struct {
 		Name                 string
 		Config               Config
@@ -180,7 +190,7 @@ func TestParseClientPolicy(t *testing.T) {
 			expectedErr:          nil,
 		},
 		{
-			Name: "TLS Declaration",
+			Name: "TLS and Basic Auth",
 			Config: Config{
 				TLS: &tlscommon.Config{
 					Enabled: pointer(true),
@@ -188,8 +198,31 @@ func TestParseClientPolicy(t *testing.T) {
 				User:     sampleUser,
 				Password: samplePassword,
 			},
-			expectedClientPolicy: TLSPolicy,
+			expectedClientPolicy: UserPasswordTLSPolicy,
 			expectedErr:          nil,
+		},
+		{
+			Name: "Unsupported Authentication Mode",
+			Config: Config{
+				AuthMode: "doesnotexist",
+			},
+			expectedErr: fmt.Errorf("unknown authentication mode 'doesnotexist'"),
+		},
+		{
+			Name: "External Authentication Mode",
+			Config: Config{
+				AuthMode: AUTH_MODE_EXTERNAL,
+			},
+			expectedClientPolicy: ExternalAuthModePolicy,
+			expectedErr:          fmt.Errorf("unknown authentication mode 'doesnotexist'"),
+		},
+		{
+			Name: "Internal Authentication Mode",
+			Config: Config{
+				AuthMode: AUTH_MODE_INTERNAL,
+			},
+			expectedClientPolicy: InternalAuthModePolicy,
+			expectedErr:          fmt.Errorf("unknown authentication mode 'doesnotexist'"),
 		},
 	}
 
@@ -206,6 +239,16 @@ func TestParseClientPolicy(t *testing.T) {
 		}
 		assert.Equalf(t, test.expectedClientPolicy.ClusterName, result.ClusterName,
 			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
+
+		assert.Equalf(t, test.expectedClientPolicy.User, result.User,
+			"Aerospike policy user name is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
+
+		assert.Equalf(t, test.expectedClientPolicy.Password, result.Password,
+			"Aerospike policy password is wrong. Got '%s' expected '%s'", result.Password, test.expectedClientPolicy.Password)
+
+		assert.Equalf(t, test.expectedClientPolicy.AuthMode, result.AuthMode,
+			"Aerospike policy authentication mode is wrong. Got '%s' expected '%s'", result.AuthMode, test.expectedClientPolicy.AuthMode)
+
 		if test.Config.TLS.IsEnabled() {
 			assert.NotNil(t, result.TlsConfig, "Aerospike policy: TLS is not set even though TLS is specified in the configuration")
 		}
