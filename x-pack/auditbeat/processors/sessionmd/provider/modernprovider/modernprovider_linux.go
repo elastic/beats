@@ -116,7 +116,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 			p.qqMtx.Unlock()
 			if err != nil {
 				logger.Errorf("get events from quark: %w", err)
-				continue
+				break
 			}
 			for _, event := range events {
 				logger.Infof("event: %v", event)
@@ -125,7 +125,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				err = qq.Block()
 				if err != nil {
 					logger.Errorf("quark block: %w", err)
-					continue
+					break
 				}
 			}
 		}
