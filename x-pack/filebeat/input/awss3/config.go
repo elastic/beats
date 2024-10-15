@@ -246,6 +246,7 @@ func (c config) getBucketARN() string {
 // Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
 	if c.NonAWSBucketName != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
 		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
 	}
 

@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -187,22 +186,20 @@ func TestS3ObjectProcessor(t *testing.T) {
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
 		mockS3API := NewMockS3API(ctrl)
-		mockPublisher := NewMockBeatClient(ctrl)
 		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
 
-		var events []beat.Event
 		gomock.InOrder(
 			mockS3API.EXPECT().
 				GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 				Return(s3Resp, nil),
-			mockPublisher.EXPECT().
-				Publish(gomock.Any()).
-				Do(func(event beat.Event) { events = append(events, event) }).
-				Times(2),
 		)
 
+		var events []beat.Event
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
-		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
+		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(event beat.Event) {
+			events = append(events, event)
+		})
+		assert.Equal(t, 2, len(events))
 		require.NoError(t, err)
 	})
 
@@ -309,7 +306,6 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	ctrl, ctx := gomock.WithContext(ctx, t)
 	defer ctrl.Finish()
 	mockS3API := NewMockS3API(ctrl)
-	mockPublisher := NewMockBeatClient(ctrl)
 
 	s3Event, s3Resp := newS3Object(t, file, contentType)
 	var events []beat.Event
@@ -317,21 +313,16 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 		mockS3API.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(s3Resp, nil),
-		mockPublisher.EXPECT().
-			Publish(gomock.Any()).
-			Do(func(event beat.Event) { events = append(events, event) }).
-			Times(numEvents),
 	)
 
 	s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, selectors, backupConfig{})
-	ack := awscommon.NewEventACKTracker(ctx)
 	err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(
-		logp.NewLogger(inputName), func(_ beat.Event) {})
+		logp.NewLogger(inputName),
+		func(event beat.Event) { events = append(events, event) })
 
 	if !expectErr {
 		require.NoError(t, err)
 		assert.Equal(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.PendingACKs)
 	} else {
 		require.Error(t, err)
 	}

@@ -151,7 +151,6 @@ func newSQSS3EventProcessor(
 }
 
 type sqsProcessingResult struct {
-	log             *logp.Logger
 	processor       *sqsS3EventProcessor
 	msg             *types.Message
 	receiveCount    int // How many times this SQS object has been read
@@ -201,7 +200,6 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	})
 
 	return sqsProcessingResult{
-		log:             p.log,
 		msg:             msg,
 		processor:       p,
 		receiveCount:    receiveCount,
@@ -228,7 +226,11 @@ func (r sqsProcessingResult) Done() {
 			p.log.Errorf("failed deleting message from SQS queue (it may be reprocessed): %v", msgDelErr.Error())
 			return
 		}
-		p.metrics.sqsMessagesDeletedTotal.Inc()
+		if p.metrics != nil {
+			// This nil check always passes in production, but it's nice when unit
+			// tests don't have to initialize irrelevant fields
+			p.metrics.sqsMessagesDeletedTotal.Inc()
+		}
 		// SQS message finished and deleted, finalize s3 objects
 		if finalizeErr := r.finalizeS3Objects(); finalizeErr != nil {
 			p.log.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %v", finalizeErr.Error())
