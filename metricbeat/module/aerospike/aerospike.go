@@ -32,7 +32,15 @@ type Config struct {
 	TLS         *tlscommon.Config `config:"ssl"`
 	User        string            `config:"username"`
 	Password    string            `config:"password"`
+	AuthMode    string            `config:"auth_mode"`
 }
+
+const (
+	AUTH_MODE_UNSET    string = ""
+	AUTH_MODE_INTERNAL string = "internal"
+	AUTH_MODE_PKI      string = "pki"
+	AUTH_MODE_EXTERNAL string = "external"
+)
 
 // DefaultConfig return default config for the aerospike module.
 func DefaultConfig() Config {
@@ -52,6 +60,19 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 	if len(config.User) > 0 && len(config.Password) > 0 {
 		clientPolicy.User = config.User
 		clientPolicy.Password = config.Password
+	}
+
+	switch config.AuthMode {
+	case AUTH_MODE_UNSET:
+		// Use default behavior of client
+	case AUTH_MODE_INTERNAL:
+		clientPolicy.AuthMode = as.AuthModeInternal
+	case AUTH_MODE_EXTERNAL:
+		clientPolicy.AuthMode = as.AuthModeExternal
+	case AUTH_MODE_PKI:
+		clientPolicy.AuthMode = as.AuthModePKI
+	default:
+		return nil, fmt.Errorf("unknown authentication mode '%s'", config.AuthMode)
 	}
 
 	if config.ClusterName != "" {
