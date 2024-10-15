@@ -95,7 +95,7 @@ func readPIDNsInode() (uint64, error) {
 func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
 
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_KPROBE | quark.QQ_MIN_AGG | quark.QQ_ENTRY_LEADER
+	attr.Flags = quark.QQ_NO_SNAPSHOT | quark.QQ_ENTRY_LEADER
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
@@ -112,16 +112,16 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 	go func(qq *quark.Queue, logger *logp.Logger, p *prvdr) {
 		for {
 			p.qqMtx.Lock()
-			procs, err := qq.GetEvents()
+			events, err := qq.GetEvents()
 			p.qqMtx.Unlock()
 			if err != nil {
 				logger.Errorf("get events from quark: %w", err)
 				continue
 			}
-			for _, proc := range procs {
-				logger.Infof("proc: %v", proc)
+			for _, event := range events {
+				logger.Infof("event: %v", event)
 			}
-			if len(procs) == 0 {
+			if len(events) == 0 {
 				err = qq.Block()
 				if err != nil {
 					logger.Errorf("quark block: %w", err)
