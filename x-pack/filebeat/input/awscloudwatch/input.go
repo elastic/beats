@@ -166,16 +166,11 @@ func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region 
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve LogGroupArn entries that matches the provided logGroupNamePrefix
-func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, withLinkedAccount *bool) ([]string, error) {
-	var linkedAccounts bool
-	if withLinkedAccount != nil {
-		linkedAccounts = *withLinkedAccount
-	}
-
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, withLinkedAccount bool) ([]string, error) {
 	// construct DescribeLogGroupsInput
 	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix:    awssdk.String(logGroupNamePrefix),
-		IncludeLinkedAccounts: awssdk.Bool(linkedAccounts),
+		IncludeLinkedAccounts: awssdk.Bool(withLinkedAccount),
 	}
 
 	// make API request

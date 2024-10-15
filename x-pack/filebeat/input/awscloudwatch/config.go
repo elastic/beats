@@ -17,7 +17,7 @@ type config struct {
 	LogGroupARN                        string              `config:"log_group_arn"`
 	LogGroupName                       string              `config:"log_group_name"`
 	LogGroupNamePrefix                 string              `config:"log_group_name_prefix"`
-	IncludeLinkedAccountsForPrefixMode *bool               `config:"include_linked_accounts_for_prefix_mode"`
+	IncludeLinkedAccountsForPrefixMode bool                `config:"include_linked_accounts_for_prefix_mode"`
 	RegionName                         string              `config:"region_name"`
 	LogStreams                         []*string           `config:"log_streams"`
 	LogStreamPrefix                    string              `config:"log_stream_prefix"`
