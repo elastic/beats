@@ -29,7 +29,11 @@ func TestCreateEvent(t *testing.T) {
 		"event": mapstr.M{
 			"id": *logEvent.EventId,
 		},
-		"log.file.path": "logGroup1" + "/" + *logEvent.LogStreamName,
+		"log": mapstr.M{
+			"file": mapstr.M{
+				"path": "logGroup1" + "/" + *logEvent.LogStreamName,
+			},
+		},
 		"awscloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
 			"log_stream":     *logEvent.LogStreamName,

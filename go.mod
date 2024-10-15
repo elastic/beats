@@ -2,8 +2,6 @@ module github.com/elastic/beats/v7
 
 go 1.22.0
 
-toolchain go1.22.7
-
 require (
 	cloud.google.com/go/bigquery v1.62.0
 	cloud.google.com/go/monitoring v1.20.4
@@ -190,11 +188,11 @@ require (
 	github.com/dgraph-io/badger/v4 v4.2.1-0.20240828131336-2725dc8ed5c2
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
-	github.com/elastic/elastic-agent-autodiscover v0.8.2
-	github.com/elastic/elastic-agent-libs v0.11.0
+	github.com/elastic/elastic-agent-autodiscover v0.9.0
+	github.com/elastic/elastic-agent-libs v0.12.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.1
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
-	github.com/elastic/go-sfdc v0.0.0-20240621062639-bcc8456508ff
+	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
