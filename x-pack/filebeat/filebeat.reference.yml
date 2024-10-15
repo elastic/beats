@@ -3078,9 +3078,14 @@ filebeat.inputs:
   #log_group_name: test
 
   # The prefix for a group of log group names.
+  # You can include linked source accounts by using the property `include_linked_accounts_for_prefix_mode`.
   # Note: `region_name` is required when `log_group_name_prefix` is given.
   # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
   #log_group_name_prefix: /aws/
+
+  # State whether to include linked source accounts when obtaining log groups matching the prefix provided through `log_group_name_prefix`
+  # This property works together with `log_group_name_prefix` and default value (if unset) is false
+  #include_linked_accounts_for_prefix_mode: true
 
   # Region that the specified log group or log group prefix belongs to.
   #region_name: us-east-1
