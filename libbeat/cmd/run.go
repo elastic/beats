@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
@@ -42,9 +43,13 @@ func genRunCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Comm
 
 	// Run subcommand flags, only available to *beat run
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("N"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("N")
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("httpprof"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("httpprof")
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("cpuprofile"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("cpuprofile")
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("memprofile"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("memprofile")
 
 	if settings.RunFlags != nil {
 		runCmd.Flags().AddFlagSet(settings.RunFlags)

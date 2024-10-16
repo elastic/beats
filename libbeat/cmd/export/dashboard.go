@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -101,8 +102,11 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
+	cfgfile.AddAllowedBackwardsCompatibleFlag("id")
 	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
+	cfgfile.AddAllowedBackwardsCompatibleFlag("yml")
 	genTemplateConfigCmd.Flags().String("folder", "", "Target folder to save exported assets")
+	cfgfile.AddAllowedBackwardsCompatibleFlag("folder")
 
 	return genTemplateConfigCmd
 }
