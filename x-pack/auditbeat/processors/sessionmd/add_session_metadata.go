@@ -13,6 +13,7 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
@@ -46,6 +47,7 @@ type addSessionMetadata struct {
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
+	cfgwarn.Beta("add_session_metadata processor is a beta feature.")
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -166,7 +168,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		proc, err := p.provider.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Errorf("%v", e)
+			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 		fullProcess = *proc
@@ -174,7 +176,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Errorf("%v", e)
+			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 	}

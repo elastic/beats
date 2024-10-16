@@ -36,7 +36,6 @@ type prvdr struct {
 	backoffStart   time.Time
 	since          time.Time
 	backoffSkipped int
-	mtx            *sync.Mutex
 }
 
 type TTYType int
@@ -86,11 +85,11 @@ func readPIDNsInode() (uint64, error) {
 
 	pidNsInodeRaw, err := os.Readlink("/proc/self/ns/pid")
 	if err != nil {
-		return 0, fmt.Errorf("could not read /proc/self/ns/pid, process entity IDs will not be correct: %w", err)
+		return 0, fmt.Errorf("could not read /proc/self/ns/pid: %w", err)
 	}
 
 	if _, err = fmt.Sscanf(pidNsInodeRaw, "pid:[%d]", &ret); err != nil {
-		return 0, fmt.Errorf("could not parse contents of /proc/self/ns/pid (%s)process entity IDs will not be correct: %w", pidNsInodeRaw, err)
+		return 0, fmt.Errorf("could not parse contents of /proc/self/ns/pid (%q): %w", pidNsInodeRaw, err)
 	}
 
 	return ret, nil
@@ -104,19 +103,16 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
 
-	var qqMtx sync.Mutex
-	var mtx sync.Mutex
-	p := prvdr{
+	p := &prvdr{
 		ctx:            ctx,
 		logger:         logger,
 		qq:             qq,
-		qqMtx:          &qqMtx,
+		qqMtx:          new(sync.Mutex),
 		combinedWait:   0 * time.Millisecond,
 		inBackoff:      false,
 		backoffStart:   time.Now(),
 		since:          time.Now(),
 		backoffSkipped: 0,
-		mtx:            &mtx,
 	}
 
 	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr) {
@@ -137,12 +133,18 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				}
 			}
 		}
-	}(ctx, qq, logger, &p)
+	}(ctx, qq, logger, p)
 
-	bootID, _ = readBootID()
-	pidNsInode, _ = readPIDNsInode()
+	bootID, err = readBootID()
+	if err != nil {
+		p.logger.Errorw("failed to read boot ID, entity ID will not be correct", "error", err)
+	}
+	pidNsInode, err = readPIDNsInode()
+	if err != nil {
+		p.logger.Errorw("failed to read PID namespace inode, entity ID will not be correct", "error", err)
+	}
 
-	return &p, nil
+	return p, nil
 }
 
 const (
@@ -153,10 +155,12 @@ const (
 )
 
 func (p *prvdr) SyncDB(_ *beat.Event, pid uint32) error {
-	p.mtx.Lock()
-	defer p.mtx.Unlock()
+	p.qqMtx.Lock()
+	defer p.qqMtx.Unlock()
 
-	if _, found := p.lookupLocked(pid); found {
+	// Use qq.Lookup, not lookupLocked, in this function. Mutex is locked for entire function
+
+	if _, found := p.qq.Lookup(int(pid)); found {
 		return nil
 	}
 
@@ -189,7 +193,7 @@ func (p *prvdr) SyncDB(_ *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if _, found := p.lookupLocked(pid); found {
+		if _, found := p.qq.Lookup(int(pid)); found {
 			p.logger.Debugw("got process that was missing ", "waited", waited)
 			p.combinedWait = p.combinedWait + waited
 			return nil
