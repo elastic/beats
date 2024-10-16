@@ -448,6 +448,9 @@ func (p *Process) ToMap() mapstr.M {
 	if p.EntryLeader.Start != nil {
 		process.Put("entry_leader.start", p.EntryLeader.Start)
 	}
+	if p.End != nil {
+		process.Put("end", p.End)
+	}
 
 	return process
 }
