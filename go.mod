@@ -215,6 +215,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/tklauser/go-sysconf v0.3.10
 	github.com/xdg-go/scram v1.1.2
+	github.com/zyedidia/generic v1.2.1
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0

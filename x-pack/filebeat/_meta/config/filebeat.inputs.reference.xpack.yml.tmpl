@@ -79,8 +79,8 @@
   # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
-  # Maximum number of SQS messages that can be inflight at any time.
-  #max_number_of_messages: 5
+  # Number of workers on S3 bucket or SQS queue
+  #number_of_workers: 5
 
   # Maximum duration of an AWS API call (excluding S3 GetObject calls).
   #api_timeout: 120s
