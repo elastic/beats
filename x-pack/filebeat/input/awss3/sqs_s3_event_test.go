@@ -66,18 +66,11 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil)
 
-<<<<<<< HEAD
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory)
-		err := p.ProcessSQS(ctx, &invalidBodyMsg)
-		require.Error(t, err)
-		t.Log(err)
-=======
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		result := p.ProcessSQS(ctx, &invalidBodyMsg, func(_ beat.Event) {})
 		require.Error(t, result.processingErr)
 		t.Log(result.processingErr)
 		result.Done()
->>>>>>> d2867fdd9f (Add asynchronous ACK handling to S3 and SQS inputs (#40699))
 	})
 
 	t.Run("zero S3 events in body", func(t *testing.T) {

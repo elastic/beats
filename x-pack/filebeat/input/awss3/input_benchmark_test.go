@@ -163,10 +163,6 @@ var _ beat.Pipeline = (*fakePipeline)(nil)
 type fakePipeline struct {
 }
 
-<<<<<<< HEAD
-func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-	return &ackClient{}, nil
-=======
 func newFakePipeline() *fakePipeline {
 	return &fakePipeline{}
 }
@@ -175,7 +171,6 @@ func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error
 	return &ackClient{
 		eventListener: config.EventListener,
 	}, nil
->>>>>>> d2867fdd9f (Add asynchronous ACK handling to S3 and SQS inputs (#40699))
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
@@ -222,23 +217,14 @@ func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
 
-<<<<<<< HEAD
-		conf := makeBenchmarkConfig(t)
-		conf.MaxNumberOfMessages = maxMessagesInflight
-		sqsReader := newSQSReaderInput(conf, aws.Config{})
-		sqsReader.log = log.Named("sqs")
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
-		sqsReader.sqs = newConstantSQS()
-=======
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
 		sqsReader.pipeline = newFakePipeline()
 		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
-		sqsReader.sqs, err = newConstantSQS()
+		sqsReader.sqs = newConstantSQS()
 		require.NoError(t, err)
->>>>>>> d2867fdd9f (Add asynchronous ACK handling to S3 and SQS inputs (#40699))
 		sqsReader.s3 = newConstantS3(t)
 		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
 		require.NoError(t, err, "createEventProcessor must succeed")
