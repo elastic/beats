@@ -6,8 +6,9 @@
         "module": "iis"
     },
     "iis": {
-        "application_pool": {
+        "application_pool": [{
             "name": "test.local",
+            "status":"started",
             "net_clr": {
                 "total_exceptions_thrown": 0
             },
@@ -18,7 +19,35 @@
                 "virtual_bytes": 667226112,
                 "working_set": 36044800
             }
-        }
+        },
+        {
+            "name": ".NetAppPool",
+            "status":"started",
+            "net_clr": {
+                "total_exceptions_thrown": 2
+            },
+            "process": {
+                "handle_count": 187,
+                "private_byte": 75536674,
+                "thread_count": 67,
+                "virtual_bytes": 19087654,
+                "working_set": 897543256
+            }
+        },
+        {
+            "name": "testAppPool",
+            "status":"stopped",
+            "net_clr": {
+                "total_exceptions_thrown": 0
+            },
+            "process": {
+                "handle_count": 224,
+                "private_byte": 1875368,
+                "thread_count": 34,
+                "virtual_bytes": 76888563,
+                "working_set": 190876423
+            }
+        }]
     },
     "metricset": {
         "name": "application_pool",
