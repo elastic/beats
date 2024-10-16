@@ -13,19 +13,19 @@ By "lightweight", we mean that Beats have a small installation footprint, use
 limited system resources, and have no runtime dependencies.
 
 This repository contains
-[libbeat](https://github.com/elastic/beats/tree/main/libbeat), our Go
+[libbeat](https://github.com/elastic/beats/tree/8.16/libbeat), our Go
 framework for creating Beats, and all the officially supported Beats:
 
 Beat  | Description
 --- | ---
-[Auditbeat](https://github.com/elastic/beats/tree/main/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
-[Filebeat](https://github.com/elastic/beats/tree/main/filebeat) | Tails and ships log files
-[Functionbeat](https://github.com/elastic/beats/tree/main/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
-[Heartbeat](https://github.com/elastic/beats/tree/main/heartbeat) | Ping remote services for availability
-[Metricbeat](https://github.com/elastic/beats/tree/main/metricbeat) | Fetches sets of metrics from the operating system and services
-[Packetbeat](https://github.com/elastic/beats/tree/main/packetbeat) | Monitors the network and applications by sniffing packets
-[Winlogbeat](https://github.com/elastic/beats/tree/main/winlogbeat) | Fetches and ships Windows Event logs
-[Osquerybeat](https://github.com/elastic/beats/tree/main/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
+[Auditbeat](https://github.com/elastic/beats/tree/8.16/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
+[Filebeat](https://github.com/elastic/beats/tree/8.16/filebeat) | Tails and ships log files
+[Functionbeat](https://github.com/elastic/beats/tree/8.16/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
+[Heartbeat](https://github.com/elastic/beats/tree/8.16/heartbeat) | Ping remote services for availability
+[Metricbeat](https://github.com/elastic/beats/tree/8.16/metricbeat) | Fetches sets of metrics from the operating system and services
+[Packetbeat](https://github.com/elastic/beats/tree/8.16/packetbeat) | Monitors the network and applications by sniffing packets
+[Winlogbeat](https://github.com/elastic/beats/tree/8.16/winlogbeat) | Fetches and ships Windows Event logs
+[Osquerybeat](https://github.com/elastic/beats/tree/8.16/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
