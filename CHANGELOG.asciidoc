@@ -3,6 +3,173 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.15.3]]
+=== Beats version 8.15.3
+https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Validate config of the `replace` processor {pull}40047[40047]
+- Allow port number 0 in the community ID flowhash processor {pull}40259[40259]
+- The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
+- Update Go version to 1.22.8. {pull}41139[41139]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
+
+*Heartbeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+- Fix upload of bundled ingest pipelines on Windows. {pull}41110[41110]
+
+*Winlogbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.22.7. {pull}41018[41018]
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
 [[release-notes-8.15.2]]
 === Beats version 8.15.2
 https://github.com/elastic/beats/compare/v8.15.1\...v8.15.2[View commits]
