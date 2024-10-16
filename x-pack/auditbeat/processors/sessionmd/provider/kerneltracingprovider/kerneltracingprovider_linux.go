@@ -152,7 +152,7 @@ const (
 	resetDuration     = 5 * time.Second         // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
-func (p prvdr) SyncDB(_ *beat.Event, pid uint32) error {
+func (p *prvdr) SyncDB(_ *beat.Event, pid uint32) error {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 
@@ -207,7 +207,7 @@ func (p prvdr) SyncDB(_ *beat.Event, pid uint32) error {
 	}
 }
 
-func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
+func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	proc, found := p.lookupLocked(pid)
 	if !found {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
