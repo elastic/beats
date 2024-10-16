@@ -315,11 +315,9 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 	if len(updatedUsers) != 0 {
 		tracker = kvstore.NewTxTracker(ctx)
 		for _, u := range updatedUsers {
-			if u.WhenChanged.After(last) {
-				p.publishUser(u, state, inputCtx.ID, client, tracker)
-				if u.WhenChanged.After(latest) {
-					latest = u.WhenChanged
-				}
+			p.publishUser(u, state, inputCtx.ID, client, tracker)
+			if u.WhenChanged.After(latest) {
+				latest = u.WhenChanged
 			}
 		}
 		tracker.Wait()
@@ -353,19 +351,14 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		return nil, err
 	}
 
-	var whenChanged time.Time
 	users := make([]*User, 0, len(entries))
 	for _, u := range entries {
 		users = append(users, state.storeUser(u))
-		if u.WhenChanged.After(whenChanged) {
-			whenChanged = u.WhenChanged
+		if u.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = u.WhenChanged
 		}
 	}
 	p.logger.Debugf("processed %d users from API", len(users))
-	if whenChanged.After(state.whenChanged) {
-		state.whenChanged = whenChanged
-	}
-
 	return users, nil
 }
 
