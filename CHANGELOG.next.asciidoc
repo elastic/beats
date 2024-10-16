@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+- System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files. {pull}41061[41061]
 
 
 *Heartbeat*
@@ -324,6 +326,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improved GCS input documentation. {pull}41143[41143]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Add CSV decoding capacity to gcs input {pull}40979[40979]
+- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
+- Jounrald input now supports filtering by facilities {pull}41061[41061]
+- System module now supports reading from jounrald. {pull}41061[41061]
+- Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 
 *Auditbeat*
 

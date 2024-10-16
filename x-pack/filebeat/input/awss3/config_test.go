@@ -30,17 +30,17 @@ func TestConfig(t *testing.T) {
 		parserConf := parser.Config{}
 		require.NoError(t, parserConf.Unpack(conf.MustNewConfigFrom("")))
 		return config{
-			QueueURL:            quequeURL,
-			BucketARN:           s3Bucket,
-			NonAWSBucketName:    nonAWSS3Bucket,
-			APITimeout:          120 * time.Second,
-			VisibilityTimeout:   300 * time.Second,
-			SQSMaxReceiveCount:  5,
-			SQSWaitTime:         20 * time.Second,
-			BucketListInterval:  120 * time.Second,
-			BucketListPrefix:    "",
-			PathStyle:           false,
-			MaxNumberOfMessages: 5,
+			QueueURL:           quequeURL,
+			BucketARN:          s3Bucket,
+			NonAWSBucketName:   nonAWSS3Bucket,
+			APITimeout:         120 * time.Second,
+			VisibilityTimeout:  300 * time.Second,
+			SQSMaxReceiveCount: 5,
+			SQSWaitTime:        20 * time.Second,
+			BucketListInterval: 120 * time.Second,
+			BucketListPrefix:   "",
+			PathStyle:          false,
+			NumberOfWorkers:    5,
 			ReaderConfig: readerConfig{
 				BufferSize:     16 * humanize.KiByte,
 				MaxBytes:       10 * humanize.MiByte,
@@ -302,18 +302,6 @@ func TestConfig(t *testing.T) {
 				"number_of_workers": "0",
 			},
 			expectedErr: "number_of_workers <0> must be greater than 0",
-			expectedCfg: nil,
-		},
-		{
-			name:           "error on max_number_of_messages == 0",
-			queueURL:       queueURL,
-			s3Bucket:       "",
-			nonAWSS3Bucket: "",
-			config: mapstr.M{
-				"queue_url":              queueURL,
-				"max_number_of_messages": "0",
-			},
-			expectedErr: "max_number_of_messages <0> must be greater than 0",
 			expectedCfg: nil,
 		},
 		{
