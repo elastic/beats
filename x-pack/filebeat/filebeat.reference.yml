@@ -139,7 +139,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Process CloudTrail logs
@@ -188,9 +188,6 @@ filebeat.modules:
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
 
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
-
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
 
@@ -212,7 +209,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -248,9 +245,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -273,7 +267,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -309,9 +303,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -334,7 +325,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -370,9 +361,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -395,7 +383,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -431,9 +419,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -456,7 +441,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -492,9 +477,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -3013,8 +2995,8 @@ filebeat.inputs:
   # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
-  # Maximum number of SQS messages that can be inflight at any time.
-  #max_number_of_messages: 5
+  # Number of workers on S3 bucket or SQS queue
+  #number_of_workers: 5
 
   # Maximum duration of an AWS API call (excluding S3 GetObject calls).
   #api_timeout: 120s
@@ -3078,9 +3060,14 @@ filebeat.inputs:
   #log_group_name: test
 
   # The prefix for a group of log group names.
+  # You can include linked source accounts by using the property `include_linked_accounts_for_prefix_mode`.
   # Note: `region_name` is required when `log_group_name_prefix` is given.
   # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
   #log_group_name_prefix: /aws/
+
+  # State whether to include linked source accounts when obtaining log groups matching the prefix provided through `log_group_name_prefix`
+  # This property works together with `log_group_name_prefix` and default value (if unset) is false
+  #include_linked_accounts_for_prefix_mode: true
 
   # Region that the specified log group or log group prefix belongs to.
   #region_name: us-east-1

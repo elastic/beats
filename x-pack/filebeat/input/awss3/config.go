@@ -24,37 +24,36 @@ import (
 )
 
 type config struct {
-	APITimeout          time.Duration        `config:"api_timeout"`
-	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
-	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url"`
-	RegionName          string               `config:"region"`
-	BucketARN           string               `config:"bucket_arn"`
-	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
-	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
-	BucketListPrefix    string               `config:"bucket_list_prefix"`
-	NumberOfWorkers     int                  `config:"number_of_workers"`
-	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
-	PathStyle           bool                 `config:"path_style"`
-	ProviderOverride    string               `config:"provider"`
-	BackupConfig        backupConfig         `config:",inline"`
+	APITimeout         time.Duration        `config:"api_timeout"`
+	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
+	QueueURL           string               `config:"queue_url"`
+	RegionName         string               `config:"region"`
+	BucketARN          string               `config:"bucket_arn"`
+	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	BucketListInterval time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix   string               `config:"bucket_list_prefix"`
+	NumberOfWorkers    int                  `config:"number_of_workers"`
+	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
+	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	PathStyle          bool                 `config:"path_style"`
+	ProviderOverride   string               `config:"provider"`
+	BackupConfig       backupConfig         `config:",inline"`
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           false,
+		APITimeout:         120 * time.Second,
+		VisibilityTimeout:  300 * time.Second,
+		BucketListInterval: 120 * time.Second,
+		BucketListPrefix:   "",
+		SQSWaitTime:        20 * time.Second,
+		SQSMaxReceiveCount: 5,
+		NumberOfWorkers:    5,
+		PathStyle:          false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -91,11 +90,6 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && (c.SQSWaitTime <= 0 || c.SQSWaitTime.Seconds() > 20) {
 		return fmt.Errorf("wait_time <%v> must be greater than 0 and "+
 			"less than or equal to 20s", c.SQSWaitTime)
-	}
-
-	if c.QueueURL != "" && c.MaxNumberOfMessages <= 0 {
-		return fmt.Errorf("max_number_of_messages <%v> must be greater than 0",
-			c.MaxNumberOfMessages)
 	}
 
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
@@ -252,6 +246,7 @@ func (c config) getBucketARN() string {
 // Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
 	if c.NonAWSBucketName != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
 		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
 	}
 

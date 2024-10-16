@@ -105,8 +105,9 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	})
 
 	if len(logGroupIDs) == 0 {
-		// fallback to LogGroupNamePrefix to derive group IDs
-		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix)
+		// We haven't extracted group identifiers directly from the input configurations,
+		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
+		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
 		if err != nil {
 			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
 		}
@@ -164,15 +165,16 @@ func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region 
 	return logGroupIDs, region, nil
 }
 
-// getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string) ([]string, error) {
+// getLogGroupNames uses DescribeLogGroups API to retrieve LogGroupArn entries that matches the provided logGroupNamePrefix
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, withLinkedAccount bool) ([]string, error) {
 	// construct DescribeLogGroupsInput
 	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
-		LogGroupNamePrefix: awssdk.String(logGroupNamePrefix),
+		LogGroupNamePrefix:    awssdk.String(logGroupNamePrefix),
+		IncludeLinkedAccounts: awssdk.Bool(withLinkedAccount),
 	}
 
 	// make API request
-	var logGroupNames []string
+	var logGroupIDs []string
 	paginator := cloudwatchlogs.NewDescribeLogGroupsPaginator(svc, describeLogGroupsInput)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
@@ -181,8 +183,8 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string) ([]
 		}
 
 		for _, lg := range page.LogGroups {
-			logGroupNames = append(logGroupNames, *lg.LogGroupName)
+			logGroupIDs = append(logGroupIDs, *lg.LogGroupArn)
 		}
 	}
-	return logGroupNames, nil
+	return logGroupIDs, nil
 }
