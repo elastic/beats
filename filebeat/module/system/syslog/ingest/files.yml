@@ -59,6 +59,9 @@ processors:
     value: "{{host.hostname}}"
     if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
     allow_duplicates: false
+- set:
+    field: input.type
+    value: log
 on_failure:
 - set:
     field: error.message

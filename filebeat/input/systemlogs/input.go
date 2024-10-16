@@ -115,16 +115,20 @@ func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 //     return false
 //   - Otherwise return true
 func useJournald(c *conf.C) (bool, error) {
+	logger := logp.L().Named("input.system-logs")
+
 	cfg := config{}
 	if err := c.Unpack(&cfg); err != nil {
 		return false, nil
 	}
 
 	if cfg.UseJournald {
+		logger.Info("using journald input because 'use_journald' is set")
 		return true, nil
 	}
 
 	if cfg.UseFiles {
+		logger.Info("using log input because 'use_files' is set")
 		return false, nil
 	}
 
@@ -144,6 +148,9 @@ func useJournald(c *conf.C) (bool, error) {
 		if len(paths) != 0 {
 			// We found at least one system log file,
 			// journald will not be used, return early
+			logger.Info(
+				"using log input because file(s) was(were) found when testing glob '%s'",
+				g)
 			return false, nil
 		}
 	}
@@ -230,5 +237,6 @@ func toFilesConfig(cfg *conf.C) (*conf.C, error) {
 	if err := cfg.SetString("type", -1, pluginName); err != nil {
 		return nil, fmt.Errorf("cannot set type back to '%s': %w", pluginName, err)
 	}
+
 	return newCfg, nil
 }
