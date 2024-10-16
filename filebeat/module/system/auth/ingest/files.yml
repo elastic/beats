@@ -54,6 +54,9 @@ processors:
             value: '{{{ _ingest.on_failure_message }}}'
   - remove:
       field: system.auth.timestamp
+  - set:
+      field: input.type
+      value: log
 on_failure:
   - set:
       field: error.message
