@@ -39,19 +39,20 @@ import (
 )
 
 func main() {
-	var caPath, caKeyPath, dest, name, ipList, filePrefix, pass string
-	var rsa bool
+	var caPath, caKeyPath, dest, name, ipList, prefix, pass string
+	var rsaflag bool
 	flag.StringVar(&caPath, "ca", "",
 		"File path for CA in PEM format")
 	flag.StringVar(&caKeyPath, "ca-key", "",
 		"File path for the CA key in PEM format")
-	flag.BoolVar(&rsa, "rsa", false,
+	flag.BoolVar(&rsaflag, "rsaflag", false,
 		"")
+	// TODO: accept multiple DNS names
 	flag.StringVar(&name, "name", "localhost",
 		"used as \"distinguished name\" and \"Subject Alternate Name values\" for the child certificate")
 	flag.StringVar(&ipList, "ips", "127.0.0.1",
 		"a comma separated list of IP addresses for the child certificate")
-	flag.StringVar(&filePrefix, "prefix", "current timestamp",
+	flag.StringVar(&prefix, "prefix", "current timestamp",
 		"a prefix to be added to the file name. If not provided a timestamp will be used")
 	flag.StringVar(&pass, "pass", "",
 		"a passphrase to encrypt the certificate key")
@@ -64,10 +65,10 @@ func main() {
 			caPath, caKeyPath)
 
 	}
-	if filePrefix == "" {
-		filePrefix = fmt.Sprintf("%d", time.Now().Unix())
+	if prefix == "current timestamp" {
+		prefix = fmt.Sprintf("%d", time.Now().Unix())
 	}
-	filePrefix += "-"
+	filePrefix := prefix + "-"
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -81,8 +82,8 @@ func main() {
 		netIPs = append(netIPs, net.ParseIP(ip))
 	}
 
-	rootCert, rootKey := getCA(rsa, caPath, caKeyPath, dest, filePrefix)
-	priv, pub := generateKey(rsa)
+	rootCert, rootKey := getCA(rsaflag, caPath, caKeyPath, dest, prefix)
+	priv, pub := generateKey(rsaflag)
 
 	childCert, childPair, err := certutil.GenerateGenericChildCert(
 		name,
@@ -90,7 +91,8 @@ func main() {
 		priv,
 		pub,
 		rootKey,
-		rootCert)
+		rootCert,
+		certutil.WithCNPrefix(prefix))
 	if err != nil {
 		panic(fmt.Errorf("error generating child certificate: %w", err))
 	}
@@ -114,7 +116,7 @@ func main() {
 	}
 
 	blockType := "EC PRIVATE KEY"
-	if rsa {
+	if rsaflag {
 		blockType = "RSA PRIVATE KEY"
 	}
 	encPem, err := x509.EncryptPEMBlock( //nolint:staticcheck // we need to drop support for this, but while we don't, it needs to be tested.
@@ -153,7 +155,7 @@ func generateKey(useRSA bool) (crypto.PrivateKey, crypto.PublicKey) {
 	return priv, &priv.PublicKey
 }
 
-func getCA(rsa bool, caPath, caKeyPath, dest, filePrefix string) (*x509.Certificate, crypto.PrivateKey) {
+func getCA(rsa bool, caPath, caKeyPath, dest, prefix string) (*x509.Certificate, crypto.PrivateKey) {
 	var rootCert *x509.Certificate
 	var rootKey crypto.PrivateKey
 	var err error
@@ -165,12 +167,12 @@ func getCA(rsa bool, caPath, caKeyPath, dest, filePrefix string) (*x509.Certific
 		}
 
 		var pair certutil.Pair
-		rootKey, rootCert, pair, err = caFn()
+		rootKey, rootCert, pair, err = caFn(certutil.WithCNPrefix(prefix))
 		if err != nil {
 			panic(fmt.Errorf("could not create root CA certificate: %w", err))
 		}
 
-		savePair(dest, filePrefix+"ca", pair)
+		savePair(dest, prefix+"-ca", pair)
 	} else {
 		rootKey, rootCert = loadCA(caPath, caKeyPath)
 	}

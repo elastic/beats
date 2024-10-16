@@ -40,19 +40,40 @@ type Pair struct {
 	Key  []byte
 }
 
+type configs struct {
+	cnPrefix string
+	dnsNames []string
+}
+
+type Option func(opt *configs)
+
+// WithCNPrefix adds cnPrefix as prefix for the CN.
+func WithCNPrefix(cnPrefix string) Option {
+	return func(opt *configs) {
+		opt.cnPrefix = cnPrefix
+	}
+}
+
+// WithDNSNames adds dnsNames to the DNSNames.
+func WithDNSNames(dnsNames ...string) Option {
+	return func(opt *configs) {
+		opt.dnsNames = dnsNames
+	}
+}
+
 // NewRootCA generates a new x509 Certificate using ECDSA P-384 and returns:
 // - the private key
 // - the certificate
 // - the certificate and its key in PEM format as a byte slice.
 //
 // If any error occurs during the generation process, a non-nil error is returned.
-func NewRootCA() (crypto.PrivateKey, *x509.Certificate, Pair, error) {
+func NewRootCA(opts ...Option) (crypto.PrivateKey, *x509.Certificate, Pair, error) {
 	rootKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
 		return nil, nil, Pair{}, fmt.Errorf("could not create private key: %w", err)
 	}
 
-	cert, pair, err := newRootCert(rootKey, &rootKey.PublicKey)
+	cert, pair, err := newRootCert(rootKey, &rootKey.PublicKey, opts...)
 	return rootKey, cert, pair, err
 }
 
@@ -62,12 +83,12 @@ func NewRootCA() (crypto.PrivateKey, *x509.Certificate, Pair, error) {
 // - the certificate and its key in PEM format as a byte slice.
 //
 // If any error occurs during the generation process, a non-nil error is returned.
-func NewRSARootCA() (crypto.PrivateKey, *x509.Certificate, Pair, error) {
+func NewRSARootCA(opts ...Option) (crypto.PrivateKey, *x509.Certificate, Pair, error) {
 	rootKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, nil, Pair{}, fmt.Errorf("could not create private key: %w", err)
 	}
-	cert, pair, err := newRootCert(rootKey, &rootKey.PublicKey)
+	cert, pair, err := newRootCert(rootKey, &rootKey.PublicKey, opts...)
 	return rootKey, cert, pair, err
 }
 
@@ -77,7 +98,36 @@ func NewRSARootCA() (crypto.PrivateKey, *x509.Certificate, Pair, error) {
 // - a Pair with the certificate and its key im PEM format
 //
 // If any error occurs during the generation process, a non-nil error is returned.
-func GenerateChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, caCert *x509.Certificate) (*tls.Certificate, Pair, error) {
+func GenerateChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, caCert *x509.Certificate, opts ...Option) (*tls.Certificate, Pair, error) {
+	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	if err != nil {
+		return nil, Pair{}, fmt.Errorf("could not create ECDSA private key: %w", err)
+	}
+
+	cert, childPair, err :=
+		GenerateGenericChildCert(
+			name,
+			ips,
+			priv,
+			&priv.PublicKey,
+			caPrivKey,
+			caCert,
+			opts...)
+	if err != nil {
+		return nil, Pair{}, fmt.Errorf(
+			"could not generate child TLS certificate CA: %w", err)
+	}
+
+	return cert, childPair, nil
+}
+
+// GenerateRSAChildCert generates a RSA with a 2048-bit key x509 Certificate as a
+// child of caCert and returns the following:
+// - the certificate and private key as a tls.Certificate
+// - a Pair with the certificate and its key im PEM format
+//
+// If any error occurs during the generation process, a non-nil error is returned.
+func GenerateRSAChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, caCert *x509.Certificate, opts ...Option) (*tls.Certificate, Pair, error) {
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, Pair{}, fmt.Errorf("could not create RSA private key: %w", err)
@@ -90,10 +140,11 @@ func GenerateChildCert(name string, ips []net.IP, caPrivKey crypto.PrivateKey, c
 			priv,
 			&priv.PublicKey,
 			caPrivKey,
-			caCert)
+			caCert,
+			opts...)
 	if err != nil {
 		return nil, Pair{}, fmt.Errorf(
-			"could not generate child TLS certificate CA: %w", err)
+			"could not generate child TLS certificate: %w", err)
 	}
 
 	return cert, childPair, nil
@@ -115,18 +166,26 @@ func GenerateGenericChildCert(
 	priv crypto.PrivateKey,
 	pub crypto.PublicKey,
 	caPrivKey crypto.PrivateKey,
-	caCert *x509.Certificate) (*tls.Certificate, Pair, error) {
+	caCert *x509.Certificate,
+	opts ...Option) (*tls.Certificate, Pair, error) {
 
+	cfg := getCgf(opts)
+
+	cn := "Police Public Call Box"
+	if cfg.cnPrefix != "" {
+		cn = fmt.Sprintf("[%s] %s", cfg.cnPrefix, cn)
+	}
+	dnsNames := append([]string{name}, cfg.dnsNames...)
 	notBefore, notAfter := makeNotBeforeAndAfter()
 
 	certTemplate := &x509.Certificate{
-		DNSNames:     []string{name},
+		DNSNames:     dnsNames,
 		IPAddresses:  ips,
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			Locality:     []string{"anywhere in time and space"},
 			Organization: []string{"TARDIS"},
-			CommonName:   "Police Public Call Box",
+			CommonName:   cn,
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
@@ -220,7 +279,12 @@ func NewRSARootAndChildCerts() (Pair, Pair, error) {
 //   - a Pair containing the certificate and private key in PEM format.
 //
 // If an error occurs during certificate creation, it returns a non-nil error.
-func newRootCert(priv crypto.PrivateKey, pub crypto.PublicKey) (*x509.Certificate, Pair, error) {
+func newRootCert(priv crypto.PrivateKey, pub crypto.PublicKey, opts ...Option) (*x509.Certificate, Pair, error) {
+	cn := "High Council"
+	cfg := getCgf(opts)
+	if cfg.cnPrefix != "" {
+		cn = fmt.Sprintf("[%s] %s", cfg.cnPrefix, cn)
+	}
 	notBefore, notAfter := makeNotBeforeAndAfter()
 
 	rootTemplate := x509.Certificate{
@@ -230,7 +294,7 @@ func newRootCert(priv crypto.PrivateKey, pub crypto.PublicKey) (*x509.Certificat
 			Locality:           []string{"The Capitol"},
 			OrganizationalUnit: []string{"Time Lords"},
 			Organization:       []string{"High Council of the Time Lords"},
-			CommonName:         "High Council",
+			CommonName:         cn,
 		},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
@@ -284,6 +348,14 @@ func newRootCert(priv crypto.PrivateKey, pub crypto.PublicKey) (*x509.Certificat
 		Cert: rootCertPemBuff.Bytes(),
 		Key:  rootPrivateKeyBuff.Bytes(),
 	}, nil
+}
+
+func getCgf(opts []Option) configs {
+	cfg := configs{dnsNames: []string{}}
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+	return cfg
 }
 
 // defaultChildCert generates a child certificate for localhost and 127.0.0.1.
