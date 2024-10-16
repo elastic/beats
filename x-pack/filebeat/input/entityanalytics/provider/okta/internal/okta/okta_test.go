@@ -116,6 +116,56 @@ func Test(t *testing.T) {
 				t.Logf("groups: %s", b)
 			})
 
+			t.Run("my_roles", func(t *testing.T) {
+				query := make(url.Values)
+				query.Set("limit", "200")
+				roles, _, err := GetUserRoles(context.Background(), http.DefaultClient, host, key, me.ID, limiter, window, logger)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if len(roles) == 0 {
+					t.Fatalf("unexpected len(roles): got:%d want>0", len(roles))
+				}
+
+				if omit&OmitCredentials != 0 && me.Credentials != nil {
+					t.Errorf("unexpected credentials with %s: %#v", omit, me.Credentials)
+				}
+
+				if !*logResponses {
+					return
+				}
+				b, err := json.Marshal(roles)
+				if err != nil {
+					t.Errorf("failed to marshal roles for logging: %v", err)
+				}
+				t.Logf("roles: %s", b)
+			})
+
+			t.Run("my_factors", func(t *testing.T) {
+				query := make(url.Values)
+				query.Set("limit", "200")
+				factors, _, err := GetUserFactors(context.Background(), http.DefaultClient, host, key, me.ID, limiter, window, logger)
+				if err != nil {
+					t.Fatalf("unexpected error: %v", err)
+				}
+				if len(factors) == 0 {
+					t.Fatalf("unexpected len(factors): got:%d want>0", len(factors))
+				}
+
+				if omit&OmitCredentials != 0 && me.Credentials != nil {
+					t.Errorf("unexpected credentials with %s: %#v", omit, me.Credentials)
+				}
+
+				if !*logResponses {
+					return
+				}
+				b, err := json.Marshal(factors)
+				if err != nil {
+					t.Errorf("failed to marshal factors for logging: %v", err)
+				}
+				t.Logf("factors: %s", b)
+			})
+
 			t.Run("user", func(t *testing.T) {
 				login, _ := me.Profile["login"].(string)
 				if login == "" {
