@@ -214,28 +214,62 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	_, err = p.doFetchUsers(ctx, state, true)
+	users, err := p.doFetchUsers(ctx, state, true)
 	if err != nil {
 		return time.Time{}, err
 	}
 
-	var latest time.Time
-	if len(state.users) != 0 {
-		tracker := kvstore.NewTxTracker(ctx)
-
-		start := time.Now()
-		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
-			if u.WhenChanged.After(latest) {
-				latest = u.WhenChanged
+	var (
+		tracker *kvstore.TxTracker
+		latest  time.Time
+	)
+	if len(users) != 0 || state.len() != 0 {
+		// Active Directory does not have a notion of deleted users
+		// beyond absence from the directory, so compare found users
+		// with users already known by the state store and if any
+		// are in the store but not returned in the previous fetch,
+		// mark them as deleted and publish the deletion. We do not
+		// have the time of the deletion, so use now.
+		if state.len() != 0 {
+			found := make(map[string]bool)
+			for _, u := range users {
+				found[u.ID] = true
 			}
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+			deleted := make(map[string]*User)
+			now := time.Now()
+			state.forEach(func(u *User) {
+				if u.State == Deleted {
+					// We have already seen that this is deleted
+					// so we do not need to publish again. The
+					// user will be deleted from the store when
+					// the state is closed.
+					return
+				}
+				if found[u.ID] {
+					// We have the user, so we do not need to
+					// mark it as deleted.
+					return
+				}
+				// This modifies the state store's copy since u
+				// is a pointer held by the state store map.
+				u.State = Deleted
+				u.WhenChanged = now
+				deleted[u.ID] = u
+			})
+			for _, u := range deleted {
+				users = append(users, u)
+			}
 		}
-
-		end := time.Now()
-		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
-
-		tracker.Wait()
+		if len(users) != 0 {
+			tracker = kvstore.NewTxTracker(ctx)
+			for _, u := range users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+				if u.WhenChanged.After(latest) {
+					latest = u.WhenChanged
+				}
+			}
+			tracker.Wait()
+		}
 	}
 
 	if ctx.Err() != nil {
@@ -278,46 +312,17 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		tracker *kvstore.TxTracker
 		latest  time.Time
 	)
-	if len(updatedUsers) != 0 || state.len() != 0 {
-		// Active Directory does not have a notion of deleted users
-		// beyond absence from the directory, so compare found users
-		// with users already known by the state store and if any
-		// are in the store but not returned in the previous fetch,
-		// mark them as deleted and publish the deletion. We do not
-		// have the time of the deletion, so use now.
-		if state.len() != 0 {
-			found := make(map[string]bool)
-			for _, u := range updatedUsers {
-				found[u.ID] = true
-			}
-			deleted := make(map[string]*User)
-			now := time.Now()
-			state.forEach(func(u *User) {
-				if u.State == Deleted || found[u.ID] {
-					return
-				}
-				// This modifies the state store's copy since u
-				// is a pointer held by the state store map.
-				u.State = Deleted
-				u.WhenChanged = now
-				deleted[u.ID] = u
-			})
-			for _, u := range deleted {
-				updatedUsers = append(updatedUsers, u)
-			}
-		}
-		if len(updatedUsers) != 0 {
-			tracker = kvstore.NewTxTracker(ctx)
-			for _, u := range updatedUsers {
-				if u.WhenChanged.After(last) {
-					p.publishUser(u, state, inputCtx.ID, client, tracker)
-					if u.WhenChanged.After(latest) {
-						latest = u.WhenChanged
-					}
+	if len(updatedUsers) != 0 {
+		tracker = kvstore.NewTxTracker(ctx)
+		for _, u := range updatedUsers {
+			if u.WhenChanged.After(last) {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+				if u.WhenChanged.After(latest) {
+					latest = u.WhenChanged
 				}
 			}
-			tracker.Wait()
 		}
+		tracker.Wait()
 	}
 
 	if ctx.Err() != nil {
@@ -348,27 +353,15 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		return nil, err
 	}
 
-	var (
-		users       []*User
-		whenChanged time.Time
-	)
-	if fullSync {
-		for _, u := range entries {
-			state.storeUser(u)
-			if u.WhenChanged.After(whenChanged) {
-				whenChanged = u.WhenChanged
-			}
+	var whenChanged time.Time
+	users := make([]*User, 0, len(entries))
+	for _, u := range entries {
+		users = append(users, state.storeUser(u))
+		if u.WhenChanged.After(whenChanged) {
+			whenChanged = u.WhenChanged
 		}
-	} else {
-		users = make([]*User, 0, len(entries))
-		for _, u := range entries {
-			users = append(users, state.storeUser(u))
-			if u.WhenChanged.After(whenChanged) {
-				whenChanged = u.WhenChanged
-			}
-		}
-		p.logger.Debugf("processed %d users from API", len(users))
 	}
+	p.logger.Debugf("processed %d users from API", len(users))
 	if whenChanged.After(state.whenChanged) {
 		state.whenChanged = whenChanged
 	}
