@@ -54,17 +54,17 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	switch syscall {
 	case "execveat", "execve":
 		pe := types.ProcessExecEvent{}
-		proc_info, err := p.reader.GetProcess(pid)
+		procInfo, err := p.reader.GetProcess(pid)
 		if err == nil {
-			pe.PIDs = proc_info.PIDs
-			pe.Creds = proc_info.Creds
-			pe.CTTY = proc_info.CTTY
-			pe.CWD = proc_info.Cwd
-			pe.Argv = proc_info.Argv
-			pe.Env = proc_info.Env
-			pe.Filename = proc_info.Filename
+			pe.PIDs = procInfo.PIDs
+			pe.Creds = procInfo.Creds
+			pe.CTTY = procInfo.CTTY
+			pe.CWD = procInfo.Cwd
+			pe.Argv = procInfo.Argv
+			pe.Env = procInfo.Env
+			pe.Filename = procInfo.Filename
 		} else {
-			p.logger.Warnf("couldn't get process info from proc for pid %v: %w", pid, err)
+			p.logger.Warnw("couldn't get process info from proc for pid %v: %v", "pid", pid, "error", err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
 			pe.PIDs.Tgid = pid

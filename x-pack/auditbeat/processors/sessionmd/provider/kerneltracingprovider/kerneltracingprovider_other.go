@@ -4,7 +4,7 @@
 
 //go:build linux && !((amd64 || arm64) && cgo)
 
-package modernprovider
+package kerneltracingprovider
 
 import (
 	"context"

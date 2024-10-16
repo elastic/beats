@@ -1491,7 +1491,7 @@ func TestPIDReuseNewSession(t *testing.T) {
 		ExitCode: 0,
 	})
 
-	//2nd session
+	// 2nd session
 	x1 := bashPID
 	x2 := sshd0PID
 	sshd0PID = command0PID

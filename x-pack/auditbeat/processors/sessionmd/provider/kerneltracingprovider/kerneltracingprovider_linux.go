@@ -4,7 +4,7 @@
 
 //go:build linux && (amd64 || arm64) && cgo
 
-package modernprovider
+package kerneltracingprovider
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,10 +27,16 @@ import (
 )
 
 type prvdr struct {
-	ctx    context.Context
-	logger *logp.Logger
-	qq     *quark.Queue
-	qqMtx  *sync.Mutex
+	ctx            context.Context
+	logger         *logp.Logger
+	qq             *quark.Queue
+	qqMtx          *sync.Mutex
+	combinedWait   time.Duration
+	inBackoff      bool
+	backoffStart   time.Time
+	since          time.Time
+	backoffSkipped int
+	mtx            *sync.Mutex
 }
 
 type TTYType int
@@ -42,16 +48,15 @@ const (
 	TTYConsole
 )
 
-type EntryType string
-
 const (
-	Init         EntryType = "init"
-	Sshd         EntryType = "sshd"
-	Ssm          EntryType = "ssm"
-	Container    EntryType = "container"
-	Terminal     EntryType = "terminal"
-	EntryConsole EntryType = "console"
-	EntryUnknown EntryType = "unknown"
+	Init         = "init"
+	Sshd         = "sshd"
+	Ssm          = "ssm"
+	Container    = "container"
+	Terminal     = "terminal"
+	Kthread      = "kthread"
+	EntryConsole = "console"
+	EntryUnknown = "unknown"
 )
 
 const (
@@ -60,7 +65,6 @@ const (
 	ttyMajor        = 4
 	consoleMaxMinor = 63
 	ttyMaxMinor     = 255
-	retryCount      = 2
 )
 
 var (
@@ -71,7 +75,7 @@ var (
 func readBootID() (string, error) {
 	bootID, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
 	if err != nil {
-		panic(fmt.Sprintf("could not read /proc/sys/kernel/random/boot_id: %v", err))
+		return "", fmt.Errorf("could not read /proc/sys/kernel/random/boot_id, process entity IDs will not be correct: %w", err)
 	}
 
 	return strings.TrimRight(string(bootID), "\n"), nil
@@ -82,54 +86,58 @@ func readPIDNsInode() (uint64, error) {
 
 	pidNsInodeRaw, err := os.Readlink("/proc/self/ns/pid")
 	if err != nil {
-		panic(fmt.Sprintf("could not read /proc/self/ns/pid: %v", err))
+		return 0, fmt.Errorf("could not read /proc/self/ns/pid, process entity IDs will not be correct: %w", err)
 	}
 
 	if _, err = fmt.Sscanf(pidNsInodeRaw, "pid:[%d]", &ret); err != nil {
-		panic(fmt.Sprintf("could not parse contents of /proc/self/ns/pid (%s): %v", pidNsInodeRaw, err))
+		return 0, fmt.Errorf("could not parse contents of /proc/self/ns/pid (%s)process entity IDs will not be correct: %w", pidNsInodeRaw, err)
 	}
 
 	return ret, nil
 }
 
 func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
-
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_NO_SNAPSHOT | quark.QQ_ENTRY_LEADER
+	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
 
 	var qqMtx sync.Mutex
+	var mtx sync.Mutex
 	p := prvdr{
-		ctx:    ctx,
-		logger: logger,
-		qq:     qq,
-		qqMtx:  &qqMtx,
+		ctx:            ctx,
+		logger:         logger,
+		qq:             qq,
+		qqMtx:          &qqMtx,
+		combinedWait:   0 * time.Millisecond,
+		inBackoff:      false,
+		backoffStart:   time.Now(),
+		since:          time.Now(),
+		backoffSkipped: 0,
+		mtx:            &mtx,
 	}
 
-	go func(qq *quark.Queue, logger *logp.Logger, p *prvdr) {
-		for {
+	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr) {
+		defer qq.Close()
+		for ctx.Err() == nil {
 			p.qqMtx.Lock()
 			events, err := qq.GetEvents()
 			p.qqMtx.Unlock()
 			if err != nil {
-				logger.Errorf("get events from quark: %w", err)
+				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
 				break
-			}
-			for _, event := range events {
-				logger.Infof("event: %v", event)
 			}
 			if len(events) == 0 {
 				err = qq.Block()
 				if err != nil {
-					logger.Errorf("quark block: %w", err)
+					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
 					break
 				}
 			}
 		}
-	}(qq, logger, &p)
+	}(ctx, qq, logger, &p)
 
 	bootID, _ = readBootID()
 	pidNsInode, _ = readPIDNsInode()
@@ -144,41 +152,36 @@ const (
 	resetDuration     = 5 * time.Second         // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
-var (
-	combinedWait   = 0 * time.Millisecond
-	inBackoff      = false
-	backoffStart   = time.Now()
-	since          = time.Now()
-	backoffSkipped = 0
-)
+func (p prvdr) SyncDB(_ *beat.Event, pid uint32) error {
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
 
-func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	if _, found := p.lookupLocked(pid); found {
 		return nil
 	}
 
 	now := time.Now()
-	if inBackoff {
-		if now.Sub(backoffStart) > backoffDuration {
-			p.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
-			inBackoff = false
-			combinedWait = 0 * time.Millisecond
+	if p.inBackoff {
+		if now.Sub(p.backoffStart) > backoffDuration {
+			p.logger.Warnw("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
+			p.inBackoff = false
+			p.combinedWait = 0 * time.Millisecond
 		} else {
-			backoffSkipped += 1
+			p.backoffSkipped += 1
 			return nil
 		}
 	} else {
-		if combinedWait > combinedWaitLimit {
+		if p.combinedWait > combinedWaitLimit {
 			p.logger.Warn("starting backoff")
-			inBackoff = true
-			backoffStart = now
-			backoffSkipped = 0
+			p.inBackoff = true
+			p.backoffStart = now
+			p.backoffSkipped = 0
 			return nil
 		}
 		// maintain a moving window of time for the delays we track
-		if now.Sub(since) > resetDuration {
-			since = now
-			combinedWait = 0 * time.Millisecond
+		if now.Sub(p.since) > resetDuration {
+			p.since = now
+			p.combinedWait = 0 * time.Millisecond
 		}
 	}
 
@@ -187,15 +190,13 @@ func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	for {
 		waited := time.Since(start)
 		if _, found := p.lookupLocked(pid); found {
-			p.logger.Debugf("got process that was missing after %v", waited)
-			combinedWait = combinedWait + waited
+			p.logger.Debugw("got process that was missing ", "waited", waited)
+			p.combinedWait = p.combinedWait + waited
 			return nil
 		}
 		if waited >= maxWaitLimit {
-			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
-			p.logger.Warnf("%w", e)
-			combinedWait = combinedWait + waited
-			return e
+			p.combinedWait = p.combinedWait + waited
+			return fmt.Errorf("process %v was not seen after %v", pid, waited)
 		}
 		time.Sleep(nextWait)
 		if nextWait*2+waited > maxWaitLimit {
@@ -480,7 +481,7 @@ func basename(pathStr string) string {
 		return ""
 	}
 
-	return path.Base(pathStr)
+	return filepath.Base(pathStr)
 }
 
 // getUserName will return the name associated with the user ID, if it exists
@@ -504,19 +505,19 @@ func getGroupName(id string) (string, bool) {
 func getEntryTypeName(entryType uint32) string {
 	switch int(entryType) {
 	case quark.QUARK_ELT_INIT:
-		return string(Init)
+		return Init
 	case quark.QUARK_ELT_SSHD:
-		return string(Sshd)
+		return Sshd
 	case quark.QUARK_ELT_SSM:
-		return string(Ssm)
+		return Ssm
 	case quark.QUARK_ELT_CONTAINER:
-		return string(Container)
+		return Container
 	case quark.QUARK_ELT_TERM:
-		return string(Terminal)
+		return Terminal
 	case quark.QUARK_ELT_CONSOLE:
-		return string(EntryConsole)
+		return EntryConsole
 	case quark.QUARK_ELT_KTHREAD:
-		return "kthread"
+		return Kthread
 	default:
 		return "unknown"
 	}

@@ -40,9 +40,10 @@ This enhanced data enables the powerful {security-guide}/session-view.html[Sessi
 The `add_session_metadata` processor operates using various backend options.
 
 * `auto` is the recommended setting.
-  It attempts to use `modern` first, falling back to `procfs` if necessary, ensuring compatibility even on systems without `modern` support.
-* `modern` collects process information with eBPF or kprobes.
-  This backend requires a system with Linux kernel 5.10.16 or above, kernel support for eBPF enabled, and auditbeat running as superuser. //TODO: ***Update requirements***
+  It attempts to use `kernel_tracing` first, falling back to `procfs` if necessary, ensuring compatibility even on systems without `kernel_tracing` support.
+* `kernel_tracing` collects process information with eBPF or kprobes.
+  This backend will prefer to use eBPF, if eBPF is not supported kprobes will be used. eBPF requires a system with Linux kernel 5.10.16 or above, kernel support for eBPF enabled, and auditbeat running as superuser.
+  Kprobe support required Linux kernel 3.10.0 or above, and auditbeat running as a superuser.
 * `procfs` collects process information with the proc filesystem.
   This is compatible with older systems that may not support ebpf.
     To gather complete process info, auditbeat requires permissions to read all process data in procfs; for example, run as a superuser or have the `SYS_PTRACE` capability.
@@ -50,7 +51,7 @@ The `add_session_metadata` processor operates using various backend options.
 [[add-session-metadata-containers]]
 ===== Containers
 If you are running {auditbeat} in a container, the container must run in the host's PID namespace.
-With the `auto` or `modern` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`.
+With the `auto` or `kernel_tracing` backend, these host directories must also be mounted to the same path within the container: `/sys/kernel/debug`, `/sys/fs/bpf`.
 
 [[add-session-metadata-enable]]
 ==== Enable and configure Session View in {auditbeat}

@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/modernprovider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/kerneltracingprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfsprovider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	cfg "github.com/elastic/elastic-agent-libs/config"
@@ -36,6 +36,8 @@ func InitializeModule() {
 }
 
 type addSessionMetadata struct {
+	ctx      context.Context
+	cancel   context.CancelFunc
 	config   config
 	logger   *logp.Logger
 	db       *processdb.DB
@@ -51,14 +53,15 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	logger := logp.NewLogger(logName)
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
 	db, err := processdb.NewDB(reader, *logger)
 	if err != nil {
+		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	if c.Backend != "modern" {
+	if c.Backend != "kernel_tracing" {
 		backfilledPIDs := db.ScrapeProcfs()
 		logger.Infof("backfilled %d processes", len(backfilledPIDs))
 	}
@@ -67,31 +70,37 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		p, err = modernprovider.NewProvider(ctx, logger)
+		p, err = kerneltracingprovider.NewProvider(ctx, logger)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
 			p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
+				cancel()
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
 			logger.Info("backend=auto using procfs")
 		} else {
-			logger.Info("backend=auto using modern")
+			logger.Info("backend=auto using kernel_tracing")
 		}
 	case "procfs":
 		p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
+			cancel()
 			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}
-	case "modern":
-		p, err = modernprovider.NewProvider(ctx, logger)
+	case "kernel_tracing":
+		p, err = kerneltracingprovider.NewProvider(ctx, logger)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create modern provider: %w", err)
+			cancel()
+			return nil, fmt.Errorf("failed to create kernel_tracing provider: %w", err)
 		}
 	default:
+		cancel()
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
 	return &addSessionMetadata{
+		ctx:      ctx,
+		cancel:   cancel,
 		config:   c,
 		logger:   logger,
 		db:       db,
@@ -132,6 +141,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 
 func (p *addSessionMetadata) Close() error {
 	p.db.Close()
+	p.cancel()
 	return nil
 }
 
@@ -151,8 +161,8 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	}
 
 	var fullProcess types.Process
-	if p.backend == "modern" {
-		// modern doesn't enrich with the processor DB;  process info is taken directly from modern cache
+	if p.backend == "kernel_tracing" {
+		// kernel_tracing doesn't enrich with the processor DB;  process info is taken directly from quark cache
 		proc, err := p.provider.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
