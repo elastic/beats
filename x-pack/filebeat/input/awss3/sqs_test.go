@@ -62,8 +62,6 @@ func TestSQSReceiver(t *testing.T) {
 			ReceiveMessage(gomock.Any(), gomock.Any()).
 			Times(1).
 			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
-				// Stop the test.
-				cancel()
 				return nil, nil
 			})
 
