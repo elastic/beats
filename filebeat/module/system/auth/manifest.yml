@@ -22,4 +22,6 @@ ingest_pipeline:
   - ingest/files.yml
   - ingest/journald.yml
   - ingest/grok-auth-messages.yml
+  - ingest/common.yml
+
 input: config/auth.yml
