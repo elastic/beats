@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Filebeat*
 
-- Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
+- Change `log.file.path` field in awscloudwatch input to nested object. {pull}41099[41099]
 
 ==== Bugfixes
 
@@ -28,7 +28,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Metricbeat*
 
-- Use namespace for GetListMetrics when exists in AWS. {pull}41022[41022]
+- Use namespace for GetListMetrics when it exists in AWS. {pull}41022[41022]
 
 *Packetbeat*
 
@@ -42,7 +42,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Metricbeat*
 
-- Restore docker.network.in.* and docker.network.out.* fields in docker module. {pull}40968[40968]
+- Restore `docker.network.in.*` and `docker.network.out.*` fields in docker module. {pull}40968[40968]
 
 
 [[release-notes-8.15.2]]
