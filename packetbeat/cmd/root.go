@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -51,10 +52,15 @@ var RootCmd *cmd.BeatsRootCmd
 func PacketbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("I")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("t")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("O"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("O")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("l")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("dump")
 
 	return instance.Settings{
 		RunFlags:       runFlags,
