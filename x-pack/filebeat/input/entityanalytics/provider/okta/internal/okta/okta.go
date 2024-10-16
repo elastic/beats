@@ -72,7 +72,7 @@ type Group struct {
 	Profile map[string]any `json:"profile"`
 }
 
-// Role is an Okta identity factor description.
+// Factor is an Okta identity factor description.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
 type Factor struct {
