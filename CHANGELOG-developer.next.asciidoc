@@ -210,6 +210,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}40674[40674] {pull}40936[40936]
 - Add field redaction package. {pull}40997[40997]
 - Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
+- Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
 
 ==== Deprecated
 
