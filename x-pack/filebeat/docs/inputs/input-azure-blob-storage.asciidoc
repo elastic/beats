@@ -26,7 +26,7 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types"]
-NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
+NOTE: NOTE: Currently only `JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed.
 As for authentication types, we currently have support for `shared access keys` and `connection strings`.
 
 [id="basic-config"]
@@ -224,10 +224,9 @@ This is a specific subfield of a container. It specifies the container name.
 [float]
 ==== `max_workers`
 
-This attribute defines the maximum number of workers (go routines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs 
-which read contents of file. More number of workers equals a greater amount of concurrency achieved. There is an upper cap of `5000` workers per container that 
-can be defined due to internal sdk constraints. This attribute can be specified both at the root level of the configuration as well at the container level. 
-The container level values will always take priority and override the root level values if both are specified.
+This attribute defines the maximum number of workers (goroutines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs which read the contents of files. This attribute can be specified both at the root level of the configuration and at the container level. Container level values override the root level values if both are specified. Larger number of workers do not necessarily improve of throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and can lead to a bottleneck in processing. Usually a maximum cap of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which can cause a bottleneck in processing.
+
+NOTE: The value of `max_workers` is tied to the `batch_size` currently to ensure even distribution of workloads across all goroutines. This ensures that the input is able to process the files in an efficient manner. This `batch_size` determines how many blobs will be fetched in one single call. The `max_workers` value should be set based on the number of files to be read, the resources available and the network speed. For example,`max_workers=3` would mean that every pagination request a total number of `3` blobs are fetched and distributed among `3 goroutines`, `max_workers=100` would mean `100` blobs are fetched in every pagination request and distributed among `100 goroutines`.
 
 [id="attrib-poll"]
 [float]
@@ -325,6 +324,8 @@ filebeat.inputs:
     - regex: '/Security-Logs/'
 ----
 
+The `file_selectors` operation is performed within the agent locally, hence using this option will cause the agent to download all the files and then filter them. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
+
 [id="attrib-expand_event_list_from_field"]
 [float]
 ==== `expand_event_list_from_field`
@@ -384,6 +385,8 @@ filebeat.inputs:
   - name: container_1
     timestamp_epoch: 1627233600
 ----
+
+The Azure Blob Storage APIs don't provide a direct way to filter files based on the timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
 [id="container-overrides"]
 *The sample configs below will explain the container level overriding of attributes a bit further :-*
