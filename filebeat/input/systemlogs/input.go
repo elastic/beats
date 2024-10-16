@@ -119,7 +119,7 @@ func useJournald(c *conf.C) (bool, error) {
 
 	cfg := config{}
 	if err := c.Unpack(&cfg); err != nil {
-		return false, nil
+		return false, fmt.Errorf("cannot unpack 'system-logs' config: %w", err)
 	}
 
 	if cfg.UseJournald {
@@ -159,7 +159,7 @@ func useJournald(c *conf.C) (bool, error) {
 	return true, nil
 }
 
-func toJournaldConfig(cfg *conf.C) (*conf.C, error) {
+func toJournaldConfig(cfg *conf.C) (*conf.C, error) { //nolint:unused // It's used on Linux
 	newCfg, err := cfg.Child("journald", -1)
 	if err != nil {
 		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
