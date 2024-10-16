@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Affecting all Beats*
 
-- Validate config of the `replace` processor. {pull}40047[40047]
 - Allow port number 0 in the community ID flowhash processor. {pull}40259[40259]
 - The journald input now restarts if there is an error/crash. {issue}32782[32782] {pull}40558[40558]
 - Update Go version to 1.22.8. {pull}41139[41139]
