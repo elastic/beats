@@ -159,7 +159,7 @@ func useJournald(c *conf.C) (bool, error) {
 	return true, nil
 }
 
-func toJournaldConfig(cfg *conf.C) (*conf.C, error) { // nolint:unused // It's used on Linux
+func toJournaldConfig(cfg *conf.C) (*conf.C, error) { //nolint:unused // It's used on Linux
 	newCfg, err := cfg.Child("journald", -1)
 	if err != nil {
 		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
