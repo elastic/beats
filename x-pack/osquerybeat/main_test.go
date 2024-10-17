@@ -10,6 +10,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/cmd"
 )
 
@@ -20,11 +21,14 @@ func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("systemTest")
 	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("test.coverprofile")
 }
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(_ *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		main()
 	}
