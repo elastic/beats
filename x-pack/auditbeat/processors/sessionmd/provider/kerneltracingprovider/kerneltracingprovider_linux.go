@@ -71,15 +71,17 @@ var (
 	pidNsInode uint64
 )
 
+// readBootID returns the boot ID of the Linux system from "/proc/sys/kernel/random/boot_id"
 func readBootID() (string, error) {
 	bootID, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
 	if err != nil {
-		return "", fmt.Errorf("could not read /proc/sys/kernel/random/boot_id, process entity IDs will not be correct: %w", err)
+		return "", fmt.Errorf("could not read /proc/sys/kernel/random/boot_id: %w", err)
 	}
 
 	return strings.TrimRight(string(bootID), "\n"), nil
 }
 
+// readPIDNsInode returns the PID namespace inode that auditbeat is running in from "/proc/self/ns/pid"
 func readPIDNsInode() (uint64, error) {
 	var ret uint64
 
@@ -95,6 +97,7 @@ func readPIDNsInode() (uint64, error) {
 	return ret, nil
 }
 
+// NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
 	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
@@ -154,42 +157,31 @@ const (
 	resetDuration     = 5 * time.Second         // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
-func (p *prvdr) SyncDB(_ *beat.Event, pid uint32) error {
+// Sync ensures that the specified pid is present in the internal cache, to ensure the processor is capable of enriching the process.
+// The function waits up to a maximum limit (maxWaitLimit) for the pid to appear in the cache using an exponential delay strategy.
+// If the pid is not found within the time limit, then an error is returned.
+//
+// The function also maintains a moving window of time for tracking delays, and applies a backoff strategy if the combined wait time
+// exceeds a certain limit (combinedWaitLimit). This is done so that in the case where there are multiple delays, the cumulative delay
+// does not exceed a reasonable threshold that would delay all other events processed by auditbeat. When in the backoff state, enrichment
+// will proceed without waiting for the process data to exist in the cache, likely resulting in missing enrichment data.
+func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 	p.qqMtx.Lock()
 	defer p.qqMtx.Unlock()
 
-	// Use qq.Lookup, not lookupLocked, in this function. Mutex is locked for entire function
-
+	// If pid is already in qq, return immediately
 	if _, found := p.qq.Lookup(int(pid)); found {
 		return nil
 	}
 
-	now := time.Now()
+	start := time.Now()
+
+	p.handleBackoff(start)
 	if p.inBackoff {
-		if now.Sub(p.backoffStart) > backoffDuration {
-			p.logger.Warnw("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
-			p.inBackoff = false
-			p.combinedWait = 0 * time.Millisecond
-		} else {
-			p.backoffSkipped += 1
-			return nil
-		}
-	} else {
-		if p.combinedWait > combinedWaitLimit {
-			p.logger.Warn("starting backoff")
-			p.inBackoff = true
-			p.backoffStart = now
-			p.backoffSkipped = 0
-			return nil
-		}
-		// maintain a moving window of time for the delays we track
-		if now.Sub(p.since) > resetDuration {
-			p.since = now
-			p.combinedWait = 0 * time.Millisecond
-		}
+		return nil
 	}
 
-	start := now
+	// Wait until either the process exists within the cache or the maxWaitLimit is exceeded, with an exponential delay
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
@@ -211,6 +203,38 @@ func (p *prvdr) SyncDB(_ *beat.Event, pid uint32) error {
 	}
 }
 
+// handleBackoff handles backoff logic of `Sync`
+// If the combinedWait time exceeds the combinedWaitLimit duration, the provider will go into backoff state until the backoffDuration is exceeded.
+// If in a backoff period, it will track the number of skipped processes, and then log the number when exiting backoff.
+//
+// If there have been no backoffs within the resetDuration, the combinedWait duration is reset to zero, to keep a moving window in which delays are tracked.
+func (p *prvdr) handleBackoff(now time.Time) {
+	if p.inBackoff {
+		if now.Sub(p.backoffStart) > backoffDuration {
+			p.logger.Warnw("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
+			p.inBackoff = false
+			p.combinedWait = 0 * time.Millisecond
+		} else {
+			p.backoffSkipped += 1
+			return
+		}
+	} else {
+		if p.combinedWait > combinedWaitLimit {
+			p.logger.Warn("starting backoff")
+			p.inBackoff = true
+			p.backoffStart = now
+			p.backoffSkipped = 0
+			return
+		}
+		if now.Sub(p.since) > resetDuration {
+			p.since = now
+			p.combinedWait = 0 * time.Millisecond
+		}
+	}
+}
+
+// GetProcess returns a reference to Process struct that contains all known information for the
+// process, and its ancestors (parent, process group leader, session leader, and entry leader).
 func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	proc, found := p.lookupLocked(pid)
 	if !found {
@@ -271,6 +295,7 @@ func (p prvdr) lookupLocked(pid uint32) (quark.Process, bool) {
 	return p.qq.Lookup(int(pid))
 }
 
+// fillParent populates the parent process fields with the attributes of the process with PID `ppid`
 func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	proc, found := p.lookupLocked(ppid)
 	if !found {
@@ -304,6 +329,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	process.Parent.EntityID = calculateEntityIDv1(ppid, *process.Start)
 }
 
+// fillGroupLeader populates the process group leader fields with the attributes of the process with PID `pgid`
 func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	proc, found := p.lookupLocked(pgid)
 	if !found {
@@ -338,6 +364,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 	process.GroupLeader.EntityID = calculateEntityIDv1(pgid, *process.GroupLeader.Start)
 }
 
+// fillSessionLeader populates the session leader fields with the attributes of the process with PID `sid`
 func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	proc, found := p.lookupLocked(sid)
 	if !found {
@@ -372,6 +399,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 	process.SessionLeader.EntityID = calculateEntityIDv1(sid, *process.SessionLeader.Start)
 }
 
+// fillEntryLeader populates the entry leader fields with the attributes of the process with PID `elid`
 func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	proc, found := p.lookupLocked(elid)
 	if !found {
@@ -406,6 +434,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 	process.EntryLeader.EntryMeta.Type = getEntryTypeName(proc.Proc.EntryLeaderType)
 }
 
+// setEntityID sets entityID for the process and its parent, group leader, session leader, entry leader if possible
 func setEntityID(process *types.Process) {
 	if process.PID != 0 && process.Start != nil {
 		process.EntityID = calculateEntityIDv1(process.PID, *process.Start)
@@ -428,6 +457,7 @@ func setEntityID(process *types.Process) {
 	}
 }
 
+// setSameAsProcess sets if the process is the same as its group leader, session leader, entry leader
 func setSameAsProcess(process *types.Process) {
 	if process.GroupLeader.PID != 0 && process.GroupLeader.Start != nil {
 		sameAsProcess := process.PID == process.GroupLeader.PID
@@ -445,10 +475,12 @@ func setSameAsProcess(process *types.Process) {
 	}
 }
 
+// interactiveFromTTY returns if this is an interactive tty device.
 func interactiveFromTTY(tty types.TTYDev) bool {
 	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
 }
 
+// getTTYType returns the type of a TTY device based on its major and minor numbers.
 func getTTYType(major uint32, minor uint32) TTYType {
 	if major >= ptsMinMajor && major <= ptsMaxMajor {
 		return Pts
@@ -465,6 +497,8 @@ func getTTYType(major uint32, minor uint32) TTYType {
 	return TTYUnknown
 }
 
+// calculateEntityIDv1 calculates the entity ID for a process.
+// This is a globally unique identifier for the process.
 func calculateEntityIDv1(pid uint32, startTime time.Time) string {
 	return base64.StdEncoding.EncodeToString(
 		[]byte(
