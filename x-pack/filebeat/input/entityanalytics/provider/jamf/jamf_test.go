@@ -47,7 +47,6 @@ func TestJamfDoFetch(t *testing.T) {
 		wantComputers = append(wantComputers, &Computer{
 			Computer: c,
 			State:    Discovered,
-			Modified: time.Now(),
 		})
 	}
 
@@ -90,11 +89,8 @@ func TestJamfDoFetch(t *testing.T) {
 			t.Fatalf("unexpected error from doFetch: %v", err)
 		}
 
-		validTime := cmp.Comparer(func(a, b time.Time) bool {
-			return !a.IsZero() && !b.IsZero()
-		})
-		if wantComputers != nil && !cmp.Equal(wantComputers, got, validTime) {
-			t.Errorf("unexpected result\n--- want\n+++ got\n%s", cmp.Diff(wantComputers, got, validTime))
+		if wantComputers != nil && !cmp.Equal(wantComputers, got) {
+			t.Errorf("unexpected result\n--- want\n+++ got\n%s", cmp.Diff(wantComputers, got))
 		}
 	})
 }
