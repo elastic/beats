@@ -22,6 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -469,13 +471,14 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
 	resourceWatchers.lock.Lock()
-	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
-		watcher:         &mockWatcher{},
+	watcher := &metaWatcher{
+		watcher:         newMockWatcher(),
 		started:         false,
 		metricsetsUsing: []string{"pod"},
-		metadataObjects: make(map[string]bool),
 		enrichers:       make(map[string]*enricher),
 	}
+	resourceWatchers.metaWatchersMap[PodResource] = watcher
+	addEventHandlerToWatcher(watcher, resourceWatchers)
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
@@ -489,8 +492,10 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 			Namespace: "default",
 		},
 	}
-	id := "default/enrich"
-	metadataObjects := map[string]bool{id: true}
+	events := []mapstr.M{
+		{"name": "unknown"},
+		{"name": "enrich"},
+	}
 
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
@@ -509,30 +514,22 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	wData := resourceWatchers.metaWatchersMap[PodResource]
-	mockW := wData.watcher.(*mockWatcher)
+	mockW, ok := wData.watcher.(*mockWatcher)
+	require.True(t, ok)
 	require.NotNil(t, mockW.handler)
 	resourceWatchers.lock.Unlock()
 
 	enricher.Start(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.metaWatchersMap[PodResource]
 	require.True(t, watcher.started)
-	mockW = watcher.watcher.(*mockWatcher)
 	resourceWatchers.lock.Unlock()
 
 	mockW.handler.OnAdd(resource)
-
-	resourceWatchers.lock.Lock()
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-	resourceWatchers.lock.Unlock()
-
-	require.Equal(t, resource, funcs.updated)
+	err := mockW.Store().Add(resource)
+	require.NoError(t, err)
 
 	// Test enricher
-	events := []mapstr.M{
-		{"name": "unknown"},
-		{"name": "enrich"},
-	}
+
 	enricher.Enrich(events)
 
 	require.Equal(t, []mapstr.M{
@@ -543,6 +540,8 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 			"meta":    mapstr.M{"orchestrator": mapstr.M{"cluster": mapstr.M{"name": "gke-4242"}}},
 		},
 	}, events)
+
+	require.Equal(t, resource, funcs.updated)
 
 	// Enrich a pod (metadata goes in root level)
 	events = []mapstr.M{
@@ -565,14 +564,13 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	// Emit delete event
 	resourceWatchers.lock.Lock()
 	wData = resourceWatchers.metaWatchersMap[PodResource]
-	mockW = wData.watcher.(*mockWatcher)
+	mockW, ok = wData.watcher.(*mockWatcher)
+	require.True(t, ok)
 	resourceWatchers.lock.Unlock()
 
 	mockW.handler.OnDelete(resource)
-
-	resourceWatchers.lock.Lock()
-	require.Equal(t, map[string]bool{}, watcher.metadataObjects)
-	resourceWatchers.lock.Unlock()
+	err = mockW.Store().Delete(resource)
+	require.NoError(t, err)
 
 	require.Equal(t, resource, funcs.deleted)
 
@@ -594,87 +592,16 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 }
 
-// Test if we can add metadata from past events to an enricher that is associated
-// with a resource that had already triggered the handler functions
-func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
-	log := logp.NewLogger(selector)
-
-	resourceWatchers := NewWatchers()
-
-	resourceWatchers.lock.Lock()
-	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
-		watcher:         &mockWatcher{},
-		started:         false,
-		metricsetsUsing: []string{"pod", "state_pod"},
-		metadataObjects: make(map[string]bool),
-		enrichers:       make(map[string]*enricher),
-	}
-	resourceWatchers.lock.Unlock()
-
-	funcs := mockFuncs{}
-	resource1 := &v1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			UID:  types.UID("mockuid"),
-			Name: "enrich",
-			Labels: map[string]string{
-				"label": "value",
-			},
-			Namespace: "default",
-		},
-	}
-	id1 := "default/enrich"
-	resource2 := &v1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			UID:  types.UID("mockuid2"),
-			Name: "enrich-2",
-			Labels: map[string]string{
-				"label": "value",
-			},
-			Namespace: "default-2",
-		},
-	}
-	id2 := "default-2/enrich-2"
-
-	config := &kubernetesConfig{
-		Namespace:  "test-ns",
-		SyncPeriod: time.Minute,
-		Node:       "test-node",
-		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
-			CronJob:    false,
-			Deployment: false,
-		},
-	}
-
-	enricher := buildMetadataEnricher("pod", PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index, log)
-	enricher.Start(resourceWatchers)
-
-	resourceWatchers.lock.Lock()
-
-	watcher := resourceWatchers.metaWatchersMap[PodResource]
-	mockW := watcher.watcher.(*mockWatcher)
-	resourceWatchers.lock.Unlock()
-
-	mockW.handler.OnAdd(resource1)
-
-	resourceWatchers.lock.Lock()
-	metadataObjects := map[string]bool{id1: true}
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-	resourceWatchers.lock.Unlock()
-
-	mockW.handler.OnUpdate(resource2)
-
-	resourceWatchers.lock.Lock()
-	metadataObjects[id2] = true
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-	resourceWatchers.lock.Unlock()
-
-	mockW.handler.OnDelete(resource1)
-
-	resourceWatchers.lock.Lock()
-	delete(metadataObjects, id1)
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-	resourceWatchers.lock.Unlock()
+func TestGetWatcherStoreKeyFromMetadataKey(t *testing.T) {
+	t.Run("global resource", func(t *testing.T) {
+		assert.Equal(t, "name", getWatcherStoreKeyFromMetadataKey("name"))
+	})
+	t.Run("namespaced resource", func(t *testing.T) {
+		assert.Equal(t, "namespace/name", getWatcherStoreKeyFromMetadataKey("namespace/name"))
+	})
+	t.Run("container", func(t *testing.T) {
+		assert.Equal(t, "namespace/pod", getWatcherStoreKeyFromMetadataKey("namespace/pod/container"))
+	})
 }
 
 type mockFuncs struct {
@@ -716,6 +643,19 @@ func (f *mockFuncs) index(m mapstr.M) string {
 
 type mockWatcher struct {
 	handler kubernetes.ResourceEventHandler
+	store   cache.Store
+}
+
+func newMockWatcher() *mockWatcher {
+	return &mockWatcher{
+		store: cache.NewStore(func(obj interface{}) (string, error) {
+			objName, err := cache.ObjectToName(obj)
+			if err != nil {
+				return "", err
+			}
+			return objName.Name, nil
+		}),
+	}
 }
 
 func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
@@ -735,7 +675,7 @@ func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 }
 
 func (m *mockWatcher) Store() cache.Store {
-	return nil
+	return m.store
 }
 
 func (m *mockWatcher) Client() k8s.Interface {
