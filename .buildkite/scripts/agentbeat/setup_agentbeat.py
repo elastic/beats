@@ -6,6 +6,26 @@ import sys
 import tarfile
 
 PATH = 'x-pack/agentbeat/build/distributions'
+PLATFORMS = {
+                'windows': {
+                    'amd64': 'x86_64',
+                },
+                'linux': {
+                    'x86_64': 'x86_64',
+                    'aarch64': 'arm64',
+                },
+                'darwin': {
+                    'x86_64': 'x86_64',
+                    'arm64': 'aarch64',
+                }
+            }
+
+
+class Archive:
+    def __init__(self, os, arch, ext):
+            self.os = os
+            self.arch = arch
+            self.ext = ext
 
 
 def log(msg):
@@ -18,38 +38,29 @@ def log_err(msg):
     sys.stderr.flush()
 
 
-def get_os() -> str:
-    return platform.system().lower()
+def get_archive_params() -> Archive:
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+    arch = PLATFORMS.get(system, {}).get(machine)
+    ext = get_artifact_extension(system)
+
+    return Archive(system, arch, ext)
 
 
-def get_arch() -> str:
-    arch = platform.machine().lower()
-
-    if arch == 'amd64':
-        return 'x86_64'
-    else:
-        if get_os() == 'darwin':
-            return 'aarch64'
-        else:
-            return arch
-
-
-def get_artifact_extension(agent_os) -> str:
-    if agent_os == 'windows':
+def get_artifact_extension(system) -> str:
+    if system == 'windows':
         return 'zip'
     else:
         return 'tar.gz'
 
 
-def get_artifact_pattern() -> str:
-    agent_os = get_os()
-    agent_arch = get_arch()
-    extension = get_artifact_extension(agent_os)
-    print('Artifact params: ' + agent_os + ' ' + agent_arch + ' ' + extension)
-    return f'{PATH}/agentbeat-*-{agent_os}-{agent_arch}.{extension}'
+def get_artifact_pattern(archive_obj) -> str:
+    return f'{PATH}/agentbeat-*-{archive_obj.os}-{archive_obj.arch}.{archive_obj.ext}'
 
 
-def download_agentbeat(pattern, path) -> str:
+def download_agentbeat(archive_obj) -> str:
+    pattern = get_artifact_pattern(archive_obj)
+    log('--- Downloading Agentbeat artifact by pattern: ' + pattern)
     try:
         subprocess.run(
             ['buildkite-agent', 'artifact', 'download', pattern, '.',
@@ -59,15 +70,14 @@ def download_agentbeat(pattern, path) -> str:
     except subprocess.CalledProcessError:
         exit(1)
 
-    return get_filename(path)
+    return get_full_filename()
 
 
-def get_filename(path) -> str:
+def get_full_filename() -> str:
     try:
         out = subprocess.run(
-            ['ls', '-p', path],
+            ['ls', '-p', PATH],
             check=True, capture_output=True, text=True)
-        print("--- ls -p: " + out.stdout)
         return out.stdout.strip()
     except subprocess.CalledProcessError:
         exit(1)
@@ -75,6 +85,7 @@ def get_filename(path) -> str:
 
 def extract_agentbeat(filename):
     filepath = PATH + '/' + filename
+    log('Extracting Agentbeat artifact: ' + filepath)
 
     if filepath.endswith('.zip'):
         unzip_agentbeat(filepath)
@@ -109,10 +120,10 @@ def get_path_to_executable(filepath) -> str:
         path = f'../../{match.group(1)}/agentbeat'
         return path
     else:
-        log_err("No agentbeat executable found")
+        log_err('No agentbeat executable found')
         exit(1)
 
-artifact_pattern = get_artifact_pattern()
-archive = download_agentbeat(artifact_pattern, PATH)
+archive_params = get_archive_params()
+archive = download_agentbeat(archive_params)
 extract_agentbeat(archive)
 log(get_path_to_executable(archive))
