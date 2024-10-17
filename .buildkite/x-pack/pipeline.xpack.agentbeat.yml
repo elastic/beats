@@ -131,7 +131,7 @@ steps:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
 
-      - label: ":macos: Agentbeat/Integration tests macOS arm64"
+      - label: ":macos: x-pack/agentbeat: macOS arm64 Spec tests"
         key: "agentbeat-it-macos-arm64"
         depends_on:
           - agentbeat-package-linux
