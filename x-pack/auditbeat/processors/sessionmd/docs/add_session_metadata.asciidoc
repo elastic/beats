@@ -1,10 +1,8 @@
 [[add-session-metadata]]
-=== Add session metadata (Beta)
+=== Add session metadata
 ++++
 <titleabbrev>add_session_metadata</titleabbrev>
 ++++
-
-beta::[]
 
 The `add_session_metadata` processor enriches process events with additional
 information that users can see using the {security-guide}/session-view.html[Session View] tool in the
