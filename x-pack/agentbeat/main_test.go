@@ -9,8 +9,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 )
 
 var (

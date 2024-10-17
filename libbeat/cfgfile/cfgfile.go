@@ -39,8 +39,6 @@ var (
 	defaults                        *config.C
 	homePath                        *string
 	configPath                      *string
-	dataPath                        *string
-	logsPath                        *string
 	allowedBackwardsCompatibleFlags []string
 )
 
@@ -66,9 +64,9 @@ func Initialize() {
 		AddAllowedBackwardsCompatibleFlag("path.home")
 		configPath = config.ConfigOverwriteFlag(nil, overwrites, "path.config", "path.config", "", "Configuration path")
 		AddAllowedBackwardsCompatibleFlag("path.config")
-		dataPath = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
 		AddAllowedBackwardsCompatibleFlag("path.data")
-		logsPath = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
 		AddAllowedBackwardsCompatibleFlag("path.logs")
 	})
 }
