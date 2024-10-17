@@ -155,10 +155,11 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:      c.queue,
-			ch:         targetChan,
-			batchSize:  outGrp.BatchSize,
-			timeToLive: outGrp.Retry + 1,
+			queue:       c.queue,
+			ch:          targetChan,
+			batchEvents: outGrp.BatchEvents,
+			batchBytes:  outGrp.BatchBytes,
+			timeToLive:  outGrp.Retry + 1,
 		})
 }
 
@@ -276,7 +277,9 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
+		// Memqueue creation can only fail when it's configured for byte-based limits,
+		// so we don't need to handle the fallback error.
+		queue, _ = memqueue.NewQueue(logger, queueObserver, s, c.inputQueueSize, outGrp.EncoderFactory)
 	}
 	c.queue = queue
 
@@ -298,12 +301,12 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ queue.Entry) (queue.EntryID, bool) {
-	return 0, false
+func (emptyProducer) Publish(_ queue.Entry) bool {
+	return false
 }
 
-func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
-	return 0, false
+func (emptyProducer) TryPublish(_ queue.Entry) bool {
+	return false
 }
 
 func (emptyProducer) Close() {

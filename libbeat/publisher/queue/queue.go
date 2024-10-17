@@ -50,9 +50,10 @@ type Queue interface {
 
 	Producer(cfg ProducerConfig) Producer
 
-	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
-	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
+	// Get retrieves an event batch with up to eventCount events or up to
+	// byteCount bytes, whichever is limit matches the queue type. If the
+	// parameter is 0, there is no limit.
+	Get(eventCount int, byteCount int) (Batch, error)
 }
 
 // If encoderFactory is provided, then the resulting queue must use it to
@@ -83,21 +84,16 @@ type ProducerConfig struct {
 	ACK func(count int)
 }
 
-type EntryID uint64
-
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
-	// Publish adds an entry to the queue, blocking if necessary, and returns
-	// the new entry's id and true on success.
-	Publish(entry Entry) (EntryID, bool)
+	// Publish adds an entry to the queue, blocking until there is space
+	// if necessary, and returns true on success.
+	Publish(entry Entry) bool
 
-	// TryPublish adds an entry to the queue if doing so will not block the
-	// caller, otherwise it immediately returns. The reasons a publish attempt
-	// might block are defined by the specific queue implementation and its
-	// configuration. If the event was successfully added, returns true with
-	// the event's assigned ID, and false otherwise.
-	TryPublish(entry Entry) (EntryID, bool)
+	// TryPublish adds an entry to the queue if the queue has space for it,
+	// otherwise it returns false immediately.
+	TryPublish(entry Entry) bool
 
 	// Close closes this Producer endpoint.
 	// Note: A queue may still send ACK signals even after Close is called on
