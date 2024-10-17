@@ -115,6 +115,11 @@ func esConnect(t *testing.T, index string) *esConnection {
 		Password:  password,
 		Transport: transport,
 	})
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to LS: %s:", err)
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -207,7 +212,9 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	// The Elasticsearch output requires events to be encoded
 	// before calling Publish, so create an event encoder.
 	es.encoder = grp.EncoderFactory()
-	es.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	es.Connect(ctx)
 
 	return es
 }

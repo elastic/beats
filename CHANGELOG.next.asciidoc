@@ -118,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Aborts all active connections for Elasticsearch output. {pull}40572[40572]
 - Closes beat Publisher on beat stop and by the Agent manager. {pull}40572[40572]
 - The journald input now restarts if there is an error/crash {issue}32782[32782] {pull}40558[40558]
+- Fix Elasticsearch output not recovering from network errors {issue}40705[40705] {pull}40794[40794]
 - Update Go version to 1.22.8. {pull}41139[41139]
 
 *Auditbeat*
