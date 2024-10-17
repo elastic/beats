@@ -45,6 +45,18 @@ services under "Google Cloud metrics", but does not work for other services
 (`kubernetes` aka GKE for example).
 This option allow to override the default and specify an arbitrary metric prefix.
 
+* *reducer*: A Reducer operation describes how to aggregate data points from multiple 
+time series into a single time series, where the value of each data point in the resulting series 
+is a function of all the already aligned values in the input time series. Default value is REDUCE_NONE but 
+other values supported are REDUCE_MEAN, REDUCE_MIN, REDUCE_MAX etc. 
+Please check https://cloud.google.com/monitoring/api/ref_v3/rpc/google.monitoring.v3#reducer[Reducers] for the full list.
+
+* *groupBy*: A groupBy operation is used to group time series data based on one or more labels. 
+The time series data are grouped according to their values for the selected labels. 
+When using a `reducer` that aggregates data points from multiple time series into a single time series, 
+the `groupBy` operation will group the result based on the selected labels and maintain those labels in the resulting data.
+It is essential to use `groupBy` with `reducer` operation to retrieve the time series results along with the selected label values.
+
 [float]
 === Example Configuration
 * `metrics` metricset is enabled to collect metrics from all zones under
