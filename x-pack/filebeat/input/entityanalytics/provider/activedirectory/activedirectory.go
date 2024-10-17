@@ -219,10 +219,6 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		return time.Time{}, err
 	}
 
-	var (
-		tracker *kvstore.TxTracker
-		latest  time.Time
-	)
 	if len(users) != 0 || state.len() != 0 {
 		// Active Directory does not have a notion of deleted users
 		// beyond absence from the directory, so compare found users
@@ -261,13 +257,15 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 			}
 		}
 		if len(users) != 0 {
+			var tracker *kvstore.TxTracker
+			start := time.Now()
+			p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 			tracker = kvstore.NewTxTracker(ctx)
 			for _, u := range users {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
-				if u.WhenChanged.After(latest) {
-					latest = u.WhenChanged
-				}
 			}
+			end := time.Now()
+			p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
 			tracker.Wait()
 		}
 	}
@@ -276,6 +274,11 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		return time.Time{}, ctx.Err()
 	}
 
+	// state.whenChanged is modified by the call to doFetchUsers to be
+	// the latest modification time for all of the users that have been
+	// collected in that call. This will not include any of the deleted
+	// users since they were not collected.
+	latest := state.whenChanged
 	state.lastSync = latest
 	err = state.close(true)
 	if err != nil {
@@ -308,17 +311,10 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		return last, err
 	}
 
-	var (
-		tracker *kvstore.TxTracker
-		latest  time.Time
-	)
 	if len(updatedUsers) != 0 {
-		tracker = kvstore.NewTxTracker(ctx)
+		tracker := kvstore.NewTxTracker(ctx)
 		for _, u := range updatedUsers {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
-			if u.WhenChanged.After(latest) {
-				latest = u.WhenChanged
-			}
 		}
 		tracker.Wait()
 	}
@@ -327,6 +323,10 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		return last, ctx.Err()
 	}
 
+	// state.whenChanged is modified by the call to doFetchUsers to be
+	// the latest modification time for all of the users that have been
+	// collected in that call.
+	latest := state.whenChanged
 	state.lastUpdate = latest
 	if err = state.close(true); err != nil {
 		return last, fmt.Errorf("unable to commit state: %w", err)
@@ -337,7 +337,8 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 
 // doFetchUsers handles fetching user identities from Active Directory. If
 // fullSync is true, then any existing whenChanged will be ignored, forcing a
-// full synchronization from Active Directory.
+// full synchronization from Active Directory. The whenChanged time of state
+// is modified to be the time stamp of the latest User.WhenChanged value.
 // Returns a set of modified users by ID.
 func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
 	var since time.Time
