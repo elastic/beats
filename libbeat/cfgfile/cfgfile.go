@@ -39,8 +39,6 @@ var (
 	defaults                        *config.C
 	homePath                        *string
 	configPath                      *string
-	dataPath                        *string
-	logsPath                        *string
 	allowedBackwardsCompatibleFlags []string
 )
 
@@ -66,9 +64,9 @@ func Initialize() {
 		AddAllowedBackwardsCompatibleFlag("path.home")
 		configPath = config.ConfigOverwriteFlag(nil, overwrites, "path.config", "path.config", "", "Configuration path")
 		AddAllowedBackwardsCompatibleFlag("path.config")
-		dataPath = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
 		AddAllowedBackwardsCompatibleFlag("path.data")
-		logsPath = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
 		AddAllowedBackwardsCompatibleFlag("path.logs")
 	})
 }
@@ -92,8 +90,11 @@ func AddAllowedBackwardsCompatibleFlag(f string) {
 func ConvertFlagsForBackwardsCompatibility() {
 	// backwards compatibility workaround, convert -flags to --flags:
 	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && isAllowedBackwardsCompatibleFlag(strings.TrimPrefix(arg, "-")) {
-			os.Args[1+i] = "-" + arg
+		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") {
+			candidate, _, _ := strings.Cut(strings.TrimPrefix(arg, "-"), "=")
+			if isAllowedBackwardsCompatibleFlag(candidate) {
+				os.Args[1+i] = "-" + arg
+			}
 		}
 	}
 }
