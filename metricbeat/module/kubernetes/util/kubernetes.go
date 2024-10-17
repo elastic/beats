@@ -1104,10 +1104,9 @@ func (e *enricher) Enrich(events []mapstr.M) {
 				}
 
 				// don't apply pod metadata to module level
-				k8sMeta = k8sMeta.Clone()
 				delete(k8sMeta, "pod")
 			}
-			ecsMeta := meta.Clone()
+			ecsMeta := meta
 			err = ecsMeta.Delete("kubernetes")
 			if err != nil {
 				logp.Debug("kubernetes", "Failed to delete field '%s': %s", "kubernetes", err)
@@ -1123,6 +1122,7 @@ func (e *enricher) Enrich(events []mapstr.M) {
 
 // getMetadata returns metadata for the given event. If the metadata doesn't exist in the cache, we try to get it
 // from the watcher store.
+// The returned map is copy to be owned by the caller.
 func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 	e.Lock()
 	defer e.Unlock()
@@ -1131,6 +1131,9 @@ func (e *enricher) getMetadata(event mapstr.M) mapstr.M {
 	if eventMeta == nil {
 		e.updateMetadataCacheFromWatcher(metaKey)
 		eventMeta = e.metadataCache[metaKey]
+	}
+	if eventMeta != nil {
+		eventMeta = eventMeta.Clone()
 	}
 	return eventMeta
 }
