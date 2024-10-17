@@ -19,14 +19,13 @@ package wineventlog
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
-
-	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -73,7 +72,7 @@ type Query struct {
 // Build builds a query from the given parameters. The query is returned as a
 // XML string and can be used with Subscribe function.
 func (q Query) Build() (string, error) {
-	var errs multierror.Errors
+	var errs []error
 	if q.Log == "" {
 		errs = append(errs, fmt.Errorf("empty log name"))
 	}
@@ -91,7 +90,7 @@ func (q Query) Build() (string, error) {
 		}
 	}
 	if len(errs) > 0 {
-		return "", errs.Err()
+		return "", errors.Join(errs...)
 	}
 	return executeTemplate(queryTemplate, qp)
 }
