@@ -12,9 +12,11 @@ def log(msg):
     sys.stdout.write(f'{msg}\n')
     sys.stdout.flush()
 
+
 def log_err(msg):
     sys.stderr.write(f'{msg}\n')
     sys.stderr.flush()
+
 
 def get_os() -> str:
     return platform.system().lower()
@@ -26,7 +28,10 @@ def get_arch() -> str:
     if arch == 'amd64':
         return 'x86_64'
     else:
-        return arch
+        if get_os() == 'darwin':
+            return 'aarch64'
+        else:
+            return arch
 
 
 def get_artifact_extension(agent_os) -> str:
@@ -40,6 +45,7 @@ def get_artifact_pattern() -> str:
     agent_os = get_os()
     agent_arch = get_arch()
     extension = get_artifact_extension(agent_os)
+    print('Artifact params: ' + agent_os + ' ' + agent_arch + ' ' + extension)
     return f'{PATH}/agentbeat-*-{agent_os}-{agent_arch}.{extension}'
 
 
@@ -47,7 +53,6 @@ def download_agentbeat(pattern, path) -> str:
     try:
         subprocess.run(
             ['buildkite-agent', 'artifact', 'download', pattern, '.',
-             # '--build', '01928f55-8452-41c6-89ba-fe21f019f53c',
              '--step', 'agentbeat-package-linux'],
             check=True, stdout=sys.stdout, stderr=sys.stderr, text=True)
 
