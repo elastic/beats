@@ -1,0 +1,1 @@
+This is the `pools` metricset of the PgBouncer module.
