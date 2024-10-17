@@ -35,14 +35,14 @@ func Confirm(prompt string, def bool) (bool, error) {
 }
 
 func confirm(r io.Reader, out io.Writer, prompt string, def bool) (bool, error) {
-	options := " [Y/n]"
+	options := "[Y/n]"
 	if !def {
-		options = " [y/N]"
+		options = "[y/N]"
 	}
 
 	reader := bufio.NewScanner(r)
 	for {
-		fmt.Fprintf(out, prompt+options+":")
+		fmt.Fprintf(out, "%s %s:", prompt, options)
 
 		if !reader.Scan() {
 			break

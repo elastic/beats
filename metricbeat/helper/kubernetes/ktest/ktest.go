@@ -103,7 +103,7 @@ func TestMetricsFamilyFromFiles(t *testing.T, files []string, mapping *p.Metrics
 func TestMetricsFamilyFromFolder(t *testing.T, folder string, mapping *p.MetricsMapping) {
 	files, err := getFiles(folder)
 	if err != nil {
-		t.Fatalf(err.Error())
+		t.Fatal(err.Error())
 	}
 	TestMetricsFamilyFromFiles(t, files, mapping)
 }
