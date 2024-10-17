@@ -119,7 +119,6 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 		return err
 	}
 
-	var last time.Time
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
@@ -127,7 +126,8 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 				return inputCtx.Cancelation.Err()
 			}
 			return nil
-		case start := <-syncTimer.C:
+		case <-syncTimer.C:
+			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
 				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
@@ -146,9 +146,9 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			}
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-			last = start
-		case start := <-updateTimer.C:
-			if err := p.runIncrementalUpdate(inputCtx, store, last, client); err != nil {
+		case <-updateTimer.C:
+			start := time.Now()
+			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
 				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
@@ -156,7 +156,6 @@ func (p *jamfInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 			p.metrics.updateProcessingTime.Update(time.Since(start).Nanoseconds())
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-			last = start
 		}
 	}
 }
@@ -351,7 +350,7 @@ func (p *jamfInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, last time.Time, client beat.Client) error {
+func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
@@ -375,9 +374,7 @@ func (p *jamfInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	if len(updatedDevices) != 0 {
 		tracker = kvstore.NewTxTracker(ctx)
 		for _, d := range updatedDevices {
-			if d.Modified.After(last) {
-				p.publishComputer(d, inputCtx.ID, client, tracker)
-			}
+			p.publishComputer(d, inputCtx.ID, client, tracker)
 		}
 		tracker.Wait()
 	}

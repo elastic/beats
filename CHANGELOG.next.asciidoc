@@ -165,6 +165,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Don't send redundant documents for non-modified entities in the Jamf and Active Directory entityanalytics input. {pull}41179[41179]
+- Don't send redundant documents for non-modified entities in the Active Directory entityanalytics input. {pull}41179[41179]
 
 *Heartbeat*
 
