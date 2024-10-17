@@ -23,6 +23,9 @@ processors:
       - syslog
       - systemd
       - message_id
+- set:
+    field: input.type
+    value: journald
 on_failure:
 - set:
     field: error.message
