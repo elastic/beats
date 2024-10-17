@@ -18,15 +18,16 @@
 package testing
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 // ClientCounter can be used to create a beat.PipelineConnector that count
 // pipeline connects and disconnects.
 type ClientCounter struct {
-	total  atomic.Int
-	active atomic.Int
+	total  atomic.Int64
+	active atomic.Int64
 }
 
 // FakeConnector implements the beat.PipelineConnector interface.
@@ -111,21 +112,21 @@ func ChClient(ch chan beat.Event) beat.Client {
 }
 
 // Active returns the number of currently active connections.
-func (c *ClientCounter) Active() int { return c.active.Load() }
+func (c *ClientCounter) Active() int { return int(c.active.Load()) }
 
 // Total returns the total number of calls to Connect.
-func (c *ClientCounter) Total() int { return c.total.Load() }
+func (c *ClientCounter) Total() int { return int(c.total.Load()) }
 
 // BuildConnector create a pipeline that updates the active and tocal
 // connection counters on Connect and Close calls.
 func (c *ClientCounter) BuildConnector() beat.PipelineConnector {
 	return FakeConnector{
 		ConnectFunc: func(_ beat.ClientConfig) (beat.Client, error) {
-			c.total.Inc()
-			c.active.Inc()
+			c.total.Add(1)
+			c.active.Add(1)
 			return &FakeClient{
 				CloseFunc: func() error {
-					c.active.Dec()
+					c.active.Add(-1)
 					return nil
 				},
 			}, nil
