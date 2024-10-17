@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 - Allow port number 0 in the community ID flowhash processor. {pull}40259[40259]
 - The journald input now restarts if there is an error/crash. {issue}32782[32782] {pull}40558[40558]
-- Update Go version to 1.22.8. {pull}41139[41139]
 
 *Filebeat*
 
@@ -38,7 +37,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Affecting all Beats*
 
-- Update Go version to 1.22.7. {pull}41018[41018]
+- Update Go version to 1.22.8. {pull}41139[41139]
 
 *Metricbeat*
 
