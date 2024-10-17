@@ -19,7 +19,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" && "$BUILDKITE_STEP_KEY" == *"agentbeat-it"* ]]; then
-#    .buildkite/scripts/agentbeat/setup_agentbeat.py
     AGENTBEAT_PATH=$(.buildkite/scripts/agentbeat/setup_agentbeat.py | tail -n 1)
     export AGENTBEAT_PATH
 fi
