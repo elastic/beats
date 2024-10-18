@@ -27,6 +27,7 @@ func (m *HostMetricSet) mapEvent(hs mo.HostSystem, data *metricData) mapstr.M {
 	const bytesMultiplier int64 = 1024 * 1024
 	event := mapstr.M{
 		"name":   hs.Summary.Config.Name,
+		"id":     hs.Self.Value,
 		"status": hs.Summary.OverallStatus,
 		"uptime": hs.Summary.QuickStats.Uptime,
 		"cpu":    mapstr.M{"used": mapstr.M{"mhz": hs.Summary.QuickStats.OverallCpuUsage}},
