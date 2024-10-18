@@ -275,10 +275,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		// TODO(Tiago): find out the correct lifecycle for this context/connection
-		ctx, cancel := context.WithCancel(context.TODO())
-		defer cancel()
-		esClient, err := makeESClient(ctx, outCfg.Config(), 1, 1*time.Nanosecond)
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
 			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
 		} else {
