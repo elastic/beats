@@ -72,10 +72,9 @@ package mapstriface
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
@@ -91,30 +90,31 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
+func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) []error {
 	d, err := mapstr.M(data).GetValue(convMap.Key)
 	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
 		err.Optional = convMap.Optional
 		err.Required = convMap.Required
-		return multierror.Errors{err}
+		return []error{err}
 	}
 	switch subData := d.(type) {
 	case map[string]interface{}, mapstr.M:
 		subEvent := mapstr.M{}
-		_, errors := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
-		for _, err := range errors {
-			if err, ok := err.(schema.KeyError); ok {
-				err.SetKey(convMap.Key + "." + err.Key())
+		_, errs := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
+		for _, err := range errs {
+			var keyErr schema.KeyError
+			if errors.As(err, &keyErr) {
+				keyErr.SetKey(convMap.Key + "." + keyErr.Key())
 			}
 		}
 		event[key] = subEvent
-		return errors
+		return errs
 	default:
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
 		logp.Err(err.Error())
-		return multierror.Errors{err}
+		return []error{err}
 	}
 }
 
@@ -135,11 +135,11 @@ func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) 
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch ei := emptyIface.(type) {
 	case int, int32, int64, uint, uint32, uint64, float32, float64:
 		return fmt.Sprintf("%v", emptyIface), nil
 	case json.Number:
-		return string(emptyIface.(json.Number)), nil
+		return string(ei), nil
 	default:
 		msg := fmt.Sprintf("expected number, found %T", emptyIface)
 		return "", schema.NewWrongFormatError(key, msg)
@@ -207,15 +207,14 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch num := emptyIface.(type) {
 	case int64:
-		return emptyIface.(int64), nil
+		return num, nil
 	case int:
-		return int64(emptyIface.(int)), nil
+		return int64(num), nil
 	case float64:
-		return int64(emptyIface.(float64)), nil
+		return int64(num), nil
 	case json.Number:
-		num := emptyIface.(json.Number)
 		i64, err := num.Int64()
 		if err == nil {
 			return i64, nil
@@ -243,15 +242,14 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
 	}
-	switch emptyIface.(type) {
+	switch num := emptyIface.(type) {
 	case float64:
-		return emptyIface.(float64), nil
+		return num, nil
 	case int:
-		return float64(emptyIface.(int)), nil
+		return float64(num), nil
 	case int64:
-		return float64(emptyIface.(int64)), nil
+		return float64(num), nil
 	case json.Number:
-		num := emptyIface.(json.Number)
 		i64, err := num.Float64()
 		if err == nil {
 			return i64, nil
@@ -280,17 +278,11 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)
 	}
 
-	switch emptyIface.(type) {
+	switch ts := emptyIface.(type) {
 	case time.Time:
-		ts, ok := emptyIface.(time.Time)
-		if ok {
-			return common.Time(ts), nil
-		}
+		return common.Time(ts), nil
 	case common.Time:
-		ts, ok := emptyIface.(common.Time)
-		if ok {
-			return ts, nil
-		}
+		return ts, nil
 	}
 
 	msg := fmt.Sprintf("expected date, found %T", emptyIface)

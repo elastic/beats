@@ -21,14 +21,13 @@ package tracing
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -53,7 +52,7 @@ type TraceFS struct {
 // It autodetects a tracefs mounted on /sys/kernel/tracing or via
 // debugfs at /sys/kernel/debug/tracing.
 func NewTraceFS() (*TraceFS, error) {
-	var errs multierror.Errors
+	var errs []error
 	ptr, err := NewTraceFSWithPath(traceFSPath)
 	if err != nil {
 		errs = append(errs, err)
@@ -64,7 +63,7 @@ func NewTraceFS() (*TraceFS, error) {
 			errs = nil
 		}
 	}
-	return ptr, errs.Err()
+	return ptr, errors.Join(errs...)
 }
 
 // NewTraceFSWithPath creates a new accessor for the event tracing feature

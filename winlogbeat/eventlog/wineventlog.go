@@ -32,7 +32,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/rcrowley/go-metrics"
 	"golang.org/x/sys/windows"
 
@@ -143,7 +142,7 @@ var defaultWinEventLogConfig = winEventLogConfig{
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.
 func (c *winEventLogConfig) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	if c.XMLQuery != "" {
 		if c.ID == "" {
@@ -171,7 +170,7 @@ func (c *winEventLogConfig) Validate() error {
 		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Validate that winEventLog implements the EventLog interface.
