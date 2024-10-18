@@ -76,7 +76,7 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	}
 
 	// best guess render buffer size, 16KB, to avoid rendering message twice in most cases
-	const bestGuessRenderBufferSize = 1 << 14
+	const bestGuessRenderBufferSize = 19 // 512KB, 256K wide characters
 
 	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
 	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
