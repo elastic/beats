@@ -145,7 +145,7 @@ func Package() error {
 	return nil
 }
 
-// TestPackages tests the generated packages (i.runCmd. file modes, owners, groups).
+// TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
 }
