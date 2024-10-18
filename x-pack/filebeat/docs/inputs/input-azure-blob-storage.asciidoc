@@ -226,12 +226,12 @@ This is a specific subfield of a container. It specifies the container name.
 
 This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
 
-The `max_workers` parameter is aligned with `batch_size` to ensure an even distribution of workloads across all workers. This configuration enables efficient file processing by optimizing resource allocation. The `batch_size` defines the number of blobs retrieved in a single request, and the `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources, and network bandwidth.
+The batch size for workload distribution is calculated by the input to ensure that there is an even workload across all workers. This means that for a given `max_workers` parameter value, the input will calculate the optimal batch size for that setting. The `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources and network bandwidth.
 
-For instance:
+Example:
 
-- Setting `max_workers=3` would result in each pagination request fetching `3 blobs`, which are then distributed among `3 workers`.
-- Setting `max_workers=100` would fetch `100 blobs` per pagination request, distributed among `100 workers`.
+- Setting `max_workers=3` would result in each request fetching `3 blobs` (batch size = 3), which are then distributed among `3 workers`.
+- Setting `max_workers=100` would fetch `100 blobs` (batch size = 100) per request, distributed among `100 workers`.
 
 [id="attrib-poll"]
 [float]
