@@ -403,35 +403,35 @@ func FormatEventString(
 	}
 
 	var bufferPtr *byte
-	if renderBuf != nil {
+	if len(renderBuf) > 0 {
 		bufferPtr = &renderBuf[0]
 	}
 
 	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
 	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	var bufferNeeded uint32
+	var bufferUsed uint32
 	bufferSize := uint32(len(renderBuf) / 2)
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bufferPtr, &bufferNeeded)
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bufferPtr, &bufferUsed)
 	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	} else if err == nil {
-		// Windows API returns a null terminated WCHAR C-style string in the buffer. bufferNeeded applies
-		// only when ERROR_INSUFFICIENT_BUFFER is returned. Luckily the UTF16ToUTF8Bytes/UTF16ToString
-		// functions stop at null termination. Note, as signaled in a comment at the end of this function,
-		// this behavior is bad for EvtFormatMessageKeyword as then the API returns a list of null terminated
-		// strings in the buffer (it's fine for now as we don't use this parameter value).
-		return common.UTF16ToUTF8Bytes(renderBuf, out)
+		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// bufferSize to our buffer, truncating the message if our buffer was too small.
+		if bufferUsed <= bufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+		}
 	}
 
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
 
-	bb.Reserve(int(bufferNeeded * 2))
-	bufferSize = bufferNeeded
+	bb.Reserve(int(bufferUsed * 2))
+	bufferSize = bufferUsed
 
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bb.PtrAt(0), &bufferUsed)
 	if err != nil {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
@@ -550,20 +550,36 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 }
 
 func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out io.Writer) error {
-	var bufferUsed, propertyCount uint32
-	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
-		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
-		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
+	var bufferUsed, bufferSize, propertyCount uint32
+	var bufferPtr *byte
+
+	bufferSize = uint32(len(renderBuf))
+	if bufferSize > 0 {
+		bufferPtr = &renderBuf[0]
 	}
-	if err != nil {
+	err := _EvtRender(0, eventHandle, flag, bufferSize, bufferPtr, &bufferUsed, &propertyCount)
+	if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
 		return err
+	} else if err == nil {
+		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtRender returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// bufferSize to our buffer, truncating the message if our buffer was too small.
+		if bufferUsed <= bufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+		}
 	}
 
-	if int(bufferUsed) > len(renderBuf) {
-		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
-			"to the buffer, but the buffer can only hold %d bytes",
-			bufferUsed, len(renderBuf))
+	// Get a buffer from the pool and adjust its length.
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
+
+	bb.Reserve(int(bufferUsed))
+	bufferSize = bufferUsed
+
+	err = _EvtRender(0, eventHandle, flag, bufferSize, bb.PtrAt(0), &bufferUsed, &propertyCount)
+	if err != nil {
+		return fmt.Errorf("failed in EvtRender: %w", err)
 	}
-	return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+
+	return common.UTF16ToUTF8Bytes(bb.Bytes(), out)
 }
