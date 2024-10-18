@@ -267,10 +267,11 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 	// Check if the input has been cancelled
 	select {
 	case <-cancel.Done():
-		// The caller is responsible for calling Reader.Next to terminate
+		// The caller is responsible for calling Reader.Close to terminate
 		// journalctl. Cancelling this canceller only means this Next call was
 		// cancelled. Because the input has been cancelled, we ignore the message
-		return JournalEntry{}, err
+		// and any error it might have returned.
+		return JournalEntry{}, ErrCancelled
 	default:
 		// Three options:
 		//   - Journalctl finished reading messages from previous boots
@@ -291,7 +292,7 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 				// Corner case: journalctl exited with an error before reading the
 				// 1st message. This means we don't have a cursor and need to restart
 				// it with the initial arguments.
-				extraArgs = r.firstRunArgs
+				extraArgs = append(extraArgs, r.firstRunArgs...)
 			} else if r.cursor != "" {
 				// There is a cursor, so just append it to our arguments
 				extraArgs = append(extraArgs, "--after-cursor", r.cursor)
@@ -338,7 +339,6 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 
 		// Restart journalctl if needed
 		if restart {
-			// jctl, err := r.jctlFactory(r.canceler, r.logger.Named("journalctl-runner"), "journalctl", args...)
 			if err := r.newJctl(extraArgs...); err != nil {
 				// If we cannot restart journalct, there is nothing we can do.
 				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
