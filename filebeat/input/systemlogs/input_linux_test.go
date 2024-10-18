@@ -27,7 +27,8 @@ import (
 
 func TestJournaldInputIsCreated(t *testing.T) {
 	c := map[string]any{
-		"files.paths":      []string{"/file/does/not/exist"},
+		"files.paths": []string{"/file/does/not/exist"},
+		// The 'journald' object needs to exist for the input to be instantiated
 		"journald.enabled": true,
 	}
 
