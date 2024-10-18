@@ -21,7 +21,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
 	"strconv"
 	"strings"
 	"time"
@@ -71,7 +70,9 @@ func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, er
 	return d.fetchTableMode(rows)
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// fetchTableMode scans the provided SQL rows and publishes the event for queries that return the response in a table format.
+// It takes the rows returned from a SQL query and converts them into a slice of mapstr.M, where each mapstr.M represents a row
+// and the keys are the column names (with underscores replaced by dots).
 func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	// Extracted from
 	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
@@ -114,7 +115,8 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	return rr, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// FetchVariableMode executes the provided SQL query and returns the results in a key/value format.
+// The query is expected to return rows with two columns: the first column is the key, and the second column is the value.
 func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
@@ -123,7 +125,8 @@ func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, e
 	return d.fetchVariableMode(rows)
 }
 
-// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
+// fetchVariableMode scans the provided SQL rows and returns the results in a key/value format.
+// The query is expected to return rows with two columns: the first column is the key, and the second column is the value.
 func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	data := mapstr.M{}
 
@@ -167,24 +170,35 @@ func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 }
 
 func getValue(pval *interface{}) interface{} {
-	switch v := (*pval).(type) {
-	case nil, bool:
-		return v
+	if pval == nil {
+		return nil
+	}
+
+	v := *pval
+
+	switch val := v.(type) {
+	case nil, bool, int64, uint64, float32, float64, string, []interface{}:
+		return val
+	case int:
+		return int64(val)
+	case uint:
+		return uint64(val)
+	case uint32:
+		return uint64(val)
 	case []byte:
-		s := string(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			return num
-		}
-		return s
+		return string(val)
 	case time.Time:
-		return v.Format(time.RFC3339Nano)
-	case []interface{}:
-		return v
+		return val.Format(time.RFC3339Nano)
+	// TODO(xdsarkar): Handle sql.* types as well?
+	// case sql.*:
 	default:
-		s := fmt.Sprint(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
+		// For any other types, convert to string and try to parse as number
+		s := fmt.Sprint(val)
+		if len(s) > 1 && s[0] == '0' && s[1] != '.' {
+			// Preserve string with leading zeros
+			return s
+		}
+		if num, err := strconv.ParseFloat(s, 64); err == nil {
 			return num
 		}
 		return s
