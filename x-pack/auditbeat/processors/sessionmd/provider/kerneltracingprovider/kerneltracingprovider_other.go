@@ -22,7 +22,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 	return prvdr{}, fmt.Errorf("build type not supported, cgo required")
 }
 
-func (p prvdr) SyncDB(event *beat.Event, pid uint32) error {
+func (p prvdr) Sync(event *beat.Event, pid uint32) error {
 	return fmt.Errorf("build type not supported")
 }
 
