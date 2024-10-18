@@ -20,6 +20,7 @@ package systemlogs
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -145,10 +146,20 @@ func useJournald(c *conf.C) (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("cannot resolve glob: %w", err)
 		}
-		if len(paths) != 0 {
-			// We found at least one system log file,
-			// journald will not be used, return early
-			logger.Info(
+
+		for _, p := range paths {
+			stat, err := os.Stat(p)
+			if err != nil {
+				return false, fmt.Errorf("cannot stat '%s': %w", p, err)
+			}
+
+			// Ignore directories
+			if stat.IsDir() {
+				continue
+			}
+
+			// We found one file, return early
+			logger.Infof(
 				"using log input because file(s) was(were) found when testing glob '%s'",
 				g)
 			return false, nil
@@ -156,6 +167,8 @@ func useJournald(c *conf.C) (bool, error) {
 	}
 
 	// if no system log files are found, then use jounrald
+	logger.Info("no files were found, using journald input")
+
 	return true, nil
 }
 
