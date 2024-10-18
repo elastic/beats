@@ -413,7 +413,7 @@ func FormatEventString(
 	bufferSize := uint32(len(renderBuf) / 2)
 
 	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bufferPtr, &bufferUsed)
-	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) { //nolint:errorlint // This is an errno.
+	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	} else if err == nil {
 		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
