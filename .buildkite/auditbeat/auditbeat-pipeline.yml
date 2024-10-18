@@ -15,7 +15,7 @@ env:
   IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
   IMAGE_UBUNTU_2204_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  IMAGE_UBUNTU_2404_X86_64: "familty/platform-ingest-beats-ubuntu-2404"
+  IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
   IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
