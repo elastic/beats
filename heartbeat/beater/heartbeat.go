@@ -88,11 +88,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		// TODO(Tiago): I believe this cannot be cancelled here, but all tests are passing
-		// so I need to fund out the correct life cycle for this connection/context
-		ctx, cancel := context.WithCancel(context.TODO())
-		defer cancel()
-		esClient, err := makeESClient(ctx, b.Config.Output.Config(), 3, 2*time.Second)
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
