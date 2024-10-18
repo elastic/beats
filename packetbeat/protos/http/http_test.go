@@ -986,7 +986,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
 	if rawMessageObscured < 0 {
-		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
+		t.Error("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
 
@@ -1021,7 +1021,7 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
 	if rawMessageObscured < 0 {
-		t.Errorf("Failed to redact proxy-authorization header: " + string(msg[:]))
+		t.Error("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
 
