@@ -96,7 +96,8 @@ type Reader struct {
 	// the journalctl process
 	jctlLogger *logp.Logger
 
-	// args are arguments for journalctl that never change
+	// args are arguments for journalctl that never change,
+	// like the message filters, format, etc
 	args []string
 
 	// firstRunArgs are the arguments used in the first call to
@@ -359,7 +360,7 @@ func (r *Reader) handleMessage(msg []byte) (JournalEntry, error) {
 			"look at the events log file for the raw journal event")
 
 		// Log raw data to events log file
-		msg := fmt.Sprintf("data cannot be parsed as map[string]any JSON: '%s'",
+		msg := fmt.Sprintf("data cannot be parsed as map[string]any. Data: '%s'",
 			string(msg))
 		r.logger.Errorw(
 			msg,
