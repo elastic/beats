@@ -750,6 +750,14 @@ processors:
           type:
             - end
           action: windows-firewall-driver-error
+        "5136":
+          category:
+            - iam
+            - configuration
+          type:
+            - admin
+            - change
+          action: directory-service-object-modified          
         "5140":
           category:
             - network
@@ -2660,7 +2668,8 @@ processors:
               "4750", "4751", "4752", "4753", "4754", "4755", "4756", "4757",
               "4758", "4759", "4760", "4761", "4762", "4763", "4764", "4767",
               "4781", "4798", "4799", "4817", "4904", "4905", "4907", "4912",
-              "4648", "4797", "5140", "5145", "5379", "5380", "5381", "5382"].contains(ctx.event.code)) {
+              "4648", "4797", "5136", "5140", "5145", "5379", "5380", "5381",
+              "5382"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.winlog?.event_data?.SubjectUserSid != null) {
