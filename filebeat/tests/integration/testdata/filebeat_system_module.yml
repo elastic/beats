@@ -3,7 +3,7 @@ filebeat.modules:
     syslog:
       enabled: true
       var.paths:
-        - "%s/*"
+        - "%s"
 
 path.home: %s
 
