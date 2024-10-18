@@ -558,7 +558,7 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 		bufferPtr = &renderBuf[0]
 	}
 	err := _EvtRender(0, eventHandle, flag, bufferSize, bufferPtr, &bufferUsed, &propertyCount)
-	if err != nil && err != ERROR_INSUFFICIENT_BUFFER {
+	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER {
 		return err
 	} else if err == nil {
 		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
