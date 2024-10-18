@@ -13,7 +13,6 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
@@ -47,7 +46,6 @@ type addSessionMetadata struct {
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
-	cfgwarn.Beta("add_session_metadata processor is a beta feature.")
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -129,7 +127,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
 	}
 
-	err = p.provider.SyncDB(ev, pid)
+	err = p.provider.Sync(ev, pid)
 	if err != nil {
 		return ev, err
 	}
