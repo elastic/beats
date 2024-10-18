@@ -28,7 +28,7 @@ type diskQueueBatch struct {
 	frames []*readFrame
 }
 
-func (dq *diskQueue) Get(eventCount int) (queue.Batch, error) {
+func (dq *diskQueue) Get(eventCount int, _ int) (queue.Batch, error) {
 	// We can always eventually read at least one frame unless the queue or the
 	// consumer is closed.
 	frame, ok := <-dq.readerLoop.output

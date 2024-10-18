@@ -297,7 +297,7 @@ func multiConsumer(numConsumers, maxEvents, batchSize int) workerFactory {
 
 				go func() {
 					for {
-						batch, err := b.Get(batchSize)
+						batch, err := b.Get(batchSize, 0)
 						if err != nil {
 							return
 						}
