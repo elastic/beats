@@ -109,8 +109,9 @@ type ConditionalOverride struct {
 	Config *config.C
 }
 
-// ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
-// flag so that it reflects the beat name.
+// ChangeDefaultCfgfileFlag replaces the value and default value for
+// the `-c` flag so that it reflects the beat name.  It will call
+// Initialize() to register the `-c` flags
 func ChangeDefaultCfgfileFlag(beatName string) error {
 	Initialize()
 	configfiles.SetDefault(beatName + ".yml")
@@ -133,9 +134,10 @@ func GetDefaultCfgfile() string {
 	return cfg
 }
 
-// HandleFlags adapts default config settings based on command line flags.
-// This also stores if -E management.enabled=true was set on command line
-// to determine if running the Beat under agent.
+// HandleFlags adapts default config settings based on command line
+// flags.  This also stores if -E management.enabled=true was set on
+// command line to determine if running the Beat under agent.  It will
+// call Initialize() to register the flags like `-E`.
 func HandleFlags() error {
 	Initialize()
 	// default for the home path is the binary location
@@ -281,7 +283,9 @@ func SetConfigPath(path string) {
 	*configPath = path
 }
 
-// GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.
+// GetPathConfig returns ${path.config}. If ${path.config} is not set,
+// ${path.home} is returned.  It will call Initialize to ensure that
+// `path.config` and `path.home` are set.
 func GetPathConfig() string {
 	Initialize()
 	if *configPath != "" {
