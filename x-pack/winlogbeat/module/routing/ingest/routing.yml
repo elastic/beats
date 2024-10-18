@@ -15,7 +15,7 @@ processors:
       if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'windows powershell'
   - pipeline:
       name: '{< IngestPipeline "powershell_operational" >}'
-      if: ctx.winlog?.channel instanceof String && ctx.winlog.channel.toLowerCase() == 'microsoft-windows-powershell/operational'
+      if: ctx.winlog?.channel instanceof String && (ctx.winlog.channel.toLowerCase() == 'microsoft-windows-powershell/operational' || ctx.winlog.channel.toLowerCase() == 'powershellcore/operational')
   - set:
       field: host.os.type
       value: windows
