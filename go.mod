@@ -195,6 +195,7 @@ require (
 	github.com/elastic/go-quark v0.1.2
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
+	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -339,6 +340,7 @@ require (
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mileusna/useragent v1.3.4 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

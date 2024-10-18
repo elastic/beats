@@ -59,10 +59,10 @@ func newPublishClient(
 	return p, nil
 }
 
-func (c *publishClient) Connect() error {
+func (c *publishClient) Connect(ctx context.Context) error {
 	c.log.Debug("Monitoring client: connect.")
 
-	err := c.es.Connect()
+	err := c.es.Connect(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}
