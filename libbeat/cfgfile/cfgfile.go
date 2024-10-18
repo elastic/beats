@@ -56,8 +56,8 @@ func Initialize() {
 			"path": map[string]interface{}{
 				"home":   ".", // to be initialized by beat
 				"config": "${path.home}",
-				"data":   fmt.Sprint("${path.home}", string(os.PathSeparator), "data"),
-				"logs":   fmt.Sprint("${path.home}", string(os.PathSeparator), "logs"),
+				"data":   filepath.Join("${path.home}", "data"),
+				"logs":   filepath.Join("${path.home}", "logs"),
 			},
 		})
 		homePath = config.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Home path")
