@@ -22,7 +22,7 @@ env:
 
   # Integration Tests
   K8S_VERSION: "v1.31.0"
-  ASDF_KIND_VERSION: "0.20.0"
+  ASDF_KIND_VERSION: "0.24.0"
 
   # Module Tests
   BEAT_PATH: "metricbeat"
@@ -107,6 +107,7 @@ steps:
           set -euo pipefail
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
+          asdf install kind "${ASDF_KIND_VERSION}"
           cd metricbeat
           mage goIntegTest
         retry:
