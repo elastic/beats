@@ -39,9 +39,9 @@ The `add_session_metadata` processor operates using various backend options.
 
 * `auto` is the recommended setting.
   It attempts to use `kernel_tracing` first, falling back to `procfs` if necessary, ensuring compatibility even on systems without `kernel_tracing` support.
-* `kernel_tracing` collects process information with eBPF or kprobes.
-  This backend will prefer to use eBPF, if eBPF is not supported kprobes will be used. eBPF requires a system with Linux kernel 5.10.16 or above, kernel support for eBPF enabled, and auditbeat running as superuser.
-  Kprobe support required Linux kernel 3.10.0 or above, and auditbeat running as a superuser.
+* `kernel_tracing` gathers information about processes using either eBPF or kprobes.
+  It will use eBPF if available, but if not, it will fall back to kprobes. eBPF requires a system with kernel support for eBPF enabled, support for eBPF ring buffer, and auditbeat running as superuser.
+  Kprobe support requires Linux kernel 3.10.0 or above, and auditbeat running as a superuser.
 * `procfs` collects process information with the proc filesystem.
   This is compatible with older systems that may not support ebpf.
     To gather complete process info, auditbeat requires permissions to read all process data in procfs; for example, run as a superuser or have the `SYS_PTRACE` capability.
