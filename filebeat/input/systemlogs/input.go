@@ -163,11 +163,12 @@ func useJournald(c *conf.C) (bool, error) {
 				"using log input because file(s) was(were) found when testing glob '%s'",
 				g)
 			return false, nil
-
 		}
 	}
 
 	// if no system log files are found, then use jounrald
+	logger.Info("no files were found, using journald input")
+
 	return true, nil
 }
 
