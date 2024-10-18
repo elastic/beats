@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -461,14 +461,14 @@ func (r *resource) isDeleted() bool {
 // Retain is used to indicate that 'resource' gets an additional 'owner'.
 // Owners of an resource can be active inputs or pending update operations
 // not yet written to disk.
-func (r *resource) Retain() { r.pending.Inc() }
+func (r *resource) Retain() { r.pending.Add(1) }
 
 // Release reduced the owner ship counter of the resource.
-func (r *resource) Release() { r.pending.Dec() }
+func (r *resource) Release() { r.pending.Add(^uint64(0)) }
 
 // UpdatesReleaseN is used to release ownership of N pending update operations.
 func (r *resource) UpdatesReleaseN(n uint) {
-	r.pending.Sub(uint64(n))
+	r.pending.Add(^uint64(n - 1))
 }
 
 // Finished returns true if the resource is not in use and if there are no pending updates
