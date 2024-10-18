@@ -39,59 +39,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// How to write to journal from CLI:
-// https://www.baeldung.com/linux/systemd-journal-message-terminal
+func TestInputCanReadAllBoots(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{path.Join("testdata", "multiple-boots.journal")},
+	}
+	inp := env.mustCreateInput(cfg)
 
-// TestGenerateJournalEntries generates entries in the user's journal.
-// It is kept commented out at the top of the file as reference and
-// easy access.
-//
-// How to generate a journal file with only the entries you want:
-//  1. Add the dependencies for this test
-//     go get github.com/ssgreg/journald
-//  2. Uncomment and run the test:
-//  3. Add the following import:
-//     journaldlogger "github.com/ssgreg/journald"
-//  4. Get a VM, ssh into it, make sure you can access the test from it
-//  5. Find the journal file, usually at /var/log/journal/<machine ID>/user-1000.journal
-//  7. Clean and rotate the journal
-//     sudo journalctl  --vacuum-time=1s
-//     sudo journalctl --rotate
-//  8. Run this test: `go test -run=TestGenerateJournalEntries`
-//  9. Copy the journal file somewhere else
-//     cp /var/log/journal/21282bcb80a74c08a0d14a047372256c/user-1000.journal /tmp/foo.journal
-//  10. Read the journal file:
-//     journalctl --file=/tmp/foo.journal -n 10
-//  11. Read the journal with all fields as JSON
-//     journalctl --file=/tmp/foo.journal -n 10 -o json
-// func TestGenerateJournalEntries(t *testing.T) {
-// 	fields := []map[string]any{
-// 		{
-// 			"BAR": "bar",
-// 		},
-// 		{
-// 			"FOO": "foo",
-// 		},
-// 		{
-// 			"BAR": "bar",
-// 			"FOO": "foo",
-// 		},
-// 		{
-// 			"FOO_BAR": "foo",
-// 		},
-// 		{
-// 			"FOO_BAR": "bar",
-// 		},
-// 		{
-// 			"FOO_BAR": "foo bar",
-// 		},
-// 	}
-// 	for i, m := range fields {
-// 		if err := journaldlogger.Send(fmt.Sprintf("message %d", i), journaldlogger.PriorityInfo, m); err != nil {
-// 			t.Fatal(err)
-// 		}
-// 	}
-// }
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(6)
+}
 
 func TestInputFieldsTranslation(t *testing.T) {
 	// A few random keys to verify
