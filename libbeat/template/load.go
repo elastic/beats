@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
@@ -174,6 +175,15 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // template if it exists. If you wish to not overwrite an existing template
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
+	sameTemplate, sameTemplateErr := l.sameAsExistingTemplate(templateName, template)
+	if sameTemplateErr != nil {
+		l.log.Warnf("Get template %s from Elasticsearch failed. Template check will be ignored: %v", templateName, sameTemplateErr)
+	} else {
+		if sameTemplate {
+			l.log.Infof("Template %s is already present in Elasticsearch, skipping...", templateName)
+			return nil
+		}
+	}
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
 	path := "/_index_template/" + templateName
 	status, body, err := l.client.Request("PUT", path, "", nil, template)
@@ -223,6 +233,29 @@ func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (l *ESLoader) sameAsExistingTemplate(name string, newTemplate map[string]interface{}) (bool, error) {
+	path := "/_index_template/" + name
+	status, body, err := l.client.Request("GET", path, "", nil, nil)
+	if err != nil {
+		return false, fmt.Errorf("failed to get template %s: %w", name, err)
+	}
+	if status > http.StatusMultipleChoices {
+		return false, fmt.Errorf("unexpected status code %d when getting template %s: %s", status, name, string(body))
+	}
+	getJson := make(map[string]interface{})
+	if err := json.Unmarshal(body, &getJson); err != nil {
+		return false, fmt.Errorf("failed to read JSON response when getting template %s: %w", name, err)
+	}
+	oldTemplate := getJson["index_templates"].([]interface{})
+	if len(oldTemplate) != 1 {
+		return false, fmt.Errorf("more than one template with name %s found", name)
+	}
+	if reflect.DeepEqual(oldTemplate[0].(map[string]interface{}), newTemplate) {
+		return true, nil
+	}
+	return false, nil
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.
