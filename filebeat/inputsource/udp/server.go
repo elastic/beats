@@ -61,8 +61,10 @@ func (u *Server) createConn() (net.PacketConn, error) {
 		return nil, err
 	}
 
-	if err := listener.SetReadBuffer(int(u.config.ReadBuffer)); err != nil {
-		return nil, err
+	if int(u.config.ReadBuffer) != 0 {
+		if err := listener.SetReadBuffer(int(u.config.ReadBuffer)); err != nil {
+			return nil, err
+		}
 	}
 
 	u.localaddress = listener.LocalAddr().String()
