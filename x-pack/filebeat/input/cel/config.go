@@ -58,6 +58,12 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+
+	// FailureDumpPath configures the CEL program to retain
+	// the full evaluation state using the cel.OptTrackState
+	// option. The state is written to a file in the path if
+	// the evaluation fails.
+	FailureDumpPath string `config:"failure_dump"`
 }
 
 type redact struct {
@@ -89,7 +95,8 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	wantDump := c.FailureDumpPath != ""
+	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

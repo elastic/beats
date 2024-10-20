@@ -796,6 +796,11 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
 
 [float]
+==== `failure_dump`
+
+This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails, the complete set of states for the CEL program's evaluation will be written as a JSON file, along with the error that was reported. This option should only be used when debugging a failure as it imposes a significant performance impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and making dumps that are intractable to analysis.
+
+[float]
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
