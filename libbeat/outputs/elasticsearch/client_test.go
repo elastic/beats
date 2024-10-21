@@ -748,8 +748,10 @@ func TestClientWithHeaders(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// simple ping
-	err = client.Connect()
+	err = client.Connect(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, requestCount)
 
@@ -943,11 +945,13 @@ func TestClientWithAPIKey(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// This connection will fail since the server doesn't return a valid
 	// response. This is fine since we're just testing the headers in the
 	// original client request.
 	//nolint:errcheck // connection doesn't need to succeed
-	client.Connect()
+	client.Connect(ctx)
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
 
