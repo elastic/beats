@@ -38,7 +38,7 @@ func TestQueueGetObserver(t *testing.T) {
 	for i := 0; i < eventCount; i++ {
 		dq.readerLoop.output <- &readFrame{bytesOnDisk: 123}
 	}
-	_, err := dq.Get(eventCount)
+	_, err := dq.Get(eventCount, 0)
 	assert.NoError(t, err, "Queue Get call should succeed")
 	assertRegistryUint(t, reg, "queue.consumed.events", eventCount, "Get call should report consumed events")
 	assertRegistryUint(t, reg, "queue.consumed.bytes", eventCount*123, "Get call should report consumed bytes")

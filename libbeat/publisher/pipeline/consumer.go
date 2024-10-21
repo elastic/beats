@@ -58,10 +58,11 @@ type eventConsumer struct {
 // consumerTarget specifies the queue to read from, the parameters needed
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
-	queue      queue.Queue
-	ch         chan publisher.Batch
-	timeToLive int
-	batchSize  int
+	queue       queue.Queue
+	ch          chan publisher.Batch
+	timeToLive  int
+	batchEvents int
+	batchBytes  int
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -134,7 +135,8 @@ outerLoop:
 			c.queueReader.req <- queueReaderRequest{
 				queue:      target.queue,
 				retryer:    c,
-				batchSize:  target.batchSize,
+				eventCount: target.batchEvents,
+				byteCount:  target.batchBytes,
 				timeToLive: target.timeToLive,
 			}
 		}

@@ -86,12 +86,13 @@ func TestProduceConsumer(t *testing.T) {
 // than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
 func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
-	q := NewQueue(nil, nil,
+	q, err := NewQueue(nil, nil,
 		Settings{
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
 			FlushTimeout:  time.Millisecond,
 		}, 0, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
@@ -104,14 +105,14 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 		// Publish 2 events, this will make the queue full, but
 		// both will be accepted
 		for i := 0; i < 2; i++ {
-			id, ok := p.Publish(fmt.Sprintf("Event %d", i))
+			ok := p.Publish(fmt.Sprintf("Event %d", i))
 			if !ok {
-				t.Errorf("failed to publish to the queue, event ID: %v", id)
+				t.Errorf("failed to publish to the queue")
 				return
 			}
 			publishCount.Add(1)
 		}
-		_, ok := p.Publish("Event 3")
+		ok := p.Publish("Event 3")
 		if ok {
 			t.Errorf("publishing the 3rd event must fail")
 			return
@@ -156,12 +157,13 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	var activeEvents atomic.Int64
 
-	q := NewQueue(nil, nil,
+	q, err := NewQueue(nil, nil,
 		Settings{
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
 			FlushTimeout:  10 * time.Millisecond,
 		}, 1, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	p := q.Producer(queue.ProducerConfig{
 		ACK: func(count int) {
@@ -184,7 +186,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 			// decrement afterwards if it failed (otherwise the event count
 			// could become negative even under correct queue operation).
 			activeEvents.Add(1)
-			_, ok := p.Publish(event)
+			ok := p.Publish(event)
 			if !ok {
 				activeEvents.Add(-1)
 			}
@@ -210,7 +212,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// Get call will block until the queue itself is cancelled.
 	go func() {
 		for i := 0; i < 2; i++ {
-			batch, err := q.Get(2)
+			batch, err := q.Get(2, 0)
 			// Only error to worry about is queue closing, which isn't
 			// a test failure.
 			if err == nil {
@@ -229,11 +231,12 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
-		return NewQueue(nil, nil, Settings{
+		q, _ := NewQueue(nil, nil, Settings{
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
 		}, 0, nil)
+		return q
 	}
 }
 

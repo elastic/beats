@@ -38,7 +38,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	// available. This test verifies that Get requests that can be completely
 	// filled do not wait for the flush timer.
 
-	broker := newQueue(
+	broker, err := newQueue(
 		logp.NewLogger("testing"),
 		nil,
 		Settings{
@@ -47,6 +47,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 			FlushTimeout:  10 * time.Second,
 		},
 		10, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
@@ -54,7 +55,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
-		_, ok := producer.Publish(i)
+		ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
 
@@ -65,11 +66,11 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	go func() {
 		// Run the Get asynchronously so the test itself doesn't block if
 		// there's a logical error.
-		_, _ = broker.Get(100)
+		_, _ = broker.Get(100, 0)
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
-	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
+	assert.Equal(t, 100, rl.consumedEventCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
 
 func TestFlushSettingsBlockPartialBatches(t *testing.T) {
@@ -77,7 +78,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	// there are enough events. This one uses the same setup to confirm that
 	// Get requests are delayed if there aren't enough events.
 
-	broker := newQueue(
+	broker, err := newQueue(
 		logp.NewLogger("testing"),
 		nil,
 		Settings{
@@ -86,6 +87,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 			FlushTimeout:  10 * time.Second,
 		},
 		10, nil)
+	require.NoError(t, err, "Queue creation must succeed")
 
 	producer := newProducer(broker, nil, nil)
 	rl := broker.runLoop
@@ -93,7 +95,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
-		_, ok := producer.Publish("some event")
+		ok := producer.Publish("some event")
 		require.True(t, ok, "Queue publish call must succeed")
 	}
 
@@ -102,19 +104,19 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	go func() {
 		// Run the Get asynchronously so the test itself doesn't block if
 		// there's a logical error.
-		_, _ = broker.Get(101)
+		_, _ = broker.Get(101, 0)
 	}()
 	rl.runIteration()
 	assert.NotNil(t, rl.pendingGetRequest, "Queue should have a pending get request since the queue doesn't have the requested event count")
-	assert.Equal(t, 0, rl.consumedCount, "Queue should have a consumedCount of 0 since the Get request couldn't be completely filled")
+	assert.Equal(t, 0, rl.consumedEventCount, "Queue should have a consumedCount of 0 since the Get request couldn't be completely filled")
 
 	// Now confirm that adding one more event unblocks the request
 	go func() {
-		_, _ = producer.Publish("some event")
+		_ = producer.Publish("some event")
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
-	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
+	assert.Equal(t, 101, rl.consumedEventCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
 }
 
 func TestObserverAddEvent(t *testing.T) {
@@ -123,15 +125,15 @@ func TestObserverAddEvent(t *testing.T) {
 	reg := monitoring.NewRegistry()
 	rl := &runLoop{
 		observer: queue.NewQueueObserver(reg),
-		broker: &broker{
-			buf: make([]queueEntry, 100),
-		},
+		buf:      newCircularBuffer(100),
+		broker:   &broker{},
 	}
-	request := &pushRequest{
+	request := pushRequest{
 		event:     publisher.Event{},
 		eventSize: 123,
+		resp:      make(chan bool, 1),
 	}
-	rl.insert(request, 0)
+	rl.doInsert(request)
 	assertRegistryUint(t, reg, "queue.added.events", 1, "Queue insert should report added event")
 	assertRegistryUint(t, reg, "queue.added.bytes", 123, "Queue insert should report added bytes")
 }
@@ -139,21 +141,22 @@ func TestObserverAddEvent(t *testing.T) {
 func TestObserverConsumeEvents(t *testing.T) {
 	// Confirm that event batches sent to the output are reported in
 	// queue.consumed.events and queue.consumed.bytes.
+	const bufSize = 100
 	reg := monitoring.NewRegistry()
 	rl := &runLoop{
-		observer: queue.NewQueueObserver(reg),
-		broker: &broker{
-			buf: make([]queueEntry, 100),
-		},
+		observer:   queue.NewQueueObserver(reg),
+		buf:        newCircularBuffer(bufSize),
 		eventCount: 50,
+		broker:     &broker{},
 	}
 	// Initialize the queue entries to a test byte size
-	for i := range rl.broker.buf {
-		rl.broker.buf[i].eventSize = 123
+	for i := 0; i < bufSize; i++ {
+		index := entryIndex(i)
+		rl.buf.entry(index).eventSize = 123
 	}
 	request := &getRequest{
-		entryCount:   len(rl.broker.buf),
-		responseChan: make(chan *batch, 1),
+		entryCount:   rl.buf.size(),
+		responseChan: make(chan batch, 1),
 	}
 	rl.handleGetReply(request)
 	// We should have gotten back 50 events, everything in the queue, so we expect the size
@@ -164,18 +167,20 @@ func TestObserverConsumeEvents(t *testing.T) {
 
 func TestObserverRemoveEvents(t *testing.T) {
 	reg := monitoring.NewRegistry()
+	const bufSize = 100
 	rl := &runLoop{
 		observer: queue.NewQueueObserver(reg),
+		buf:      newCircularBuffer(bufSize),
 		broker: &broker{
 			ctx:        context.Background(),
-			buf:        make([]queueEntry, 100),
 			deleteChan: make(chan int, 1),
 		},
 		eventCount: 50,
 	}
 	// Initialize the queue entries to a test byte size
-	for i := range rl.broker.buf {
-		rl.broker.buf[i].eventSize = 123
+	for i := 0; i < bufSize; i++ {
+		index := entryIndex(i)
+		rl.buf.entry(index).eventSize = 123
 	}
 	const deleteCount = 25
 	rl.broker.deleteChan <- deleteCount

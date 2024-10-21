@@ -56,7 +56,8 @@ type IndexSelector interface {
 // configuration into the outputs.
 type Group struct {
 	Clients      []Client
-	BatchSize    int
+	BatchEvents  int
+	BatchBytes   int
 	Retry        int
 	QueueFactory queue.QueueFactory
 
