@@ -1,0 +1,66 @@
+- name: pools
+  type: group
+  description: >
+    Shows the current state of the connection pools.
+  release: ga
+  fields:
+    - name: database
+      type: keyword
+      description: >
+        Name of the database.
+    - name: user
+      type: keyword
+      description: >
+        Name of the user.
+    - name: cl_active
+      type: long
+      description: >
+        Client connections that are either linked to server connections or are idle with no queries waiting to be processed.
+    - name: cl_waiting
+      type: long
+      description: >
+        Client connections that have sent queries but have not yet got a server connection.
+    - name: cl_active_cancel_req
+      type: long
+      description: >
+        Client connections that have forwarded query cancellations to the server and are waiting for the server response.
+    - name: cl_waiting_cancel_req
+      type: long
+      description: >
+        Client connections that have not forwarded query cancellations to the server yet.
+    - name: sv_active
+      type: long
+      description: >
+        Server connections that are linked to a client.
+    - name: sv_active_cancel
+      type: long
+      description: >
+        Server connections that are currently forwarding a cancel request.
+    - name: sv_being_canceled
+      type: long
+      description: >
+        Servers that normally could become idle but are waiting to do so until all in-flight cancel requests have completed that were sent to cancel a query on this server.
+    - name: sv_idle
+      type: long
+      description: >
+        Server connections that are unused and immediately usable for client queries.
+    - name: sv_used
+      type: long
+      description: >
+        Server connections that have been idle for more than server_check_delay, so they need server_check_query to run on them before they can be used again.
+    - name: sv_tested
+      type: long
+      description: >
+        Server connections that are currently running either server_reset_query or server_check_query.
+    - name: sv_login
+      type: long
+      description: >
+        Server connections currently in the process of logging in.
+    - name: maxwait_us
+      type: long
+      description: >
+        Microsecond part of the maximum waiting time. Represents the total wait time in microseconds.
+    - name: pool_mode
+      type: keyword
+      description: >
+        The pooling mode in use.
