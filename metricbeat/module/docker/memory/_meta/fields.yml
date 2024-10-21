@@ -53,7 +53,7 @@
           type: scaled_float
           format: percent
           description: >
-            Memory resident set size percentage.
+            Memory resident set size percentage, expressed as a value between 0 and 1.
     - name: usage
       type: group
       description: >
@@ -68,7 +68,7 @@
           type: scaled_float
           format: percent
           description: >
-            Memory usage percentage.
+            Memory usage percentage, expressed as a value between 0 and 1.
         - name: total
           type: long
           format: bytes
