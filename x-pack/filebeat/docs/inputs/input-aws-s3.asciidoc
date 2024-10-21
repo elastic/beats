@@ -307,18 +307,6 @@ The maximum number of bytes that a single log message can have. All bytes after
 multiline log messages, which can get large. This only applies to non-JSON logs.
 The default is `10 MiB`.
 
-[float]
-==== `max_number_of_messages`
-
-The maximum number of SQS messages that can be inflight at any time. Defaults
-to 5. Setting this parameter too high can overload Elastic Agent and cause
-ingest failures in situations where the SQS messages contain many S3 objects
-or the S3 objects themselves contain large numbers of messages.
-We recommend to keep the default value 5 and use the `Balanced` or `Optimized for
-Throughput` setting in the
-{fleet-guide}/es-output-settings.html#es-output-settings-performance-tuning-settings[preset]
-options to tune your Elastic Agent performance.
-
 [id="input-{type}-parsers"]
 [float]
 ==== `parsers`
@@ -504,7 +492,7 @@ Prefix to apply for the list request to the S3 bucket. Default empty.
 [float]
 ==== `number_of_workers`
 
-Number of workers that will process the S3 objects listed. (Required when `bucket_arn` is set).
+Number of workers that will process the S3 or SQS objects listed. Required when `bucket_arn` is set, otherwise (in the SQS case) defaults to 5.
 
 
 [float]

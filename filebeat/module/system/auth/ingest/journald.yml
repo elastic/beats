@@ -1,0 +1,33 @@
+description: Journald Pipeline for system/auth Filebeat module
+processors:
+  - rename:
+      field: "journald.process.name"
+      target_field: process.name
+  - rename:
+      field: message
+      target_field: _temp.message
+  - pipeline:
+      description: Grok specific auth messages.
+      name: '{< IngestPipeline "grok-auth-messages" >}'
+      ignore_failure: true
+  - rename:
+      field: _temp.message
+      target_field: message
+  - pipeline:
+      name: "{< IngestPipeline "common" >}"
+  - remove:
+      description: Remove the extra fields added by the Journald input
+      ignore_missing: true
+      field:
+        - journald
+        - process.thread
+        - syslog
+        - systemd
+        - message_id
+  - set:
+      field: input.type
+      value: journald
+on_failure:
+  - set:
+      field: error.message
+      value: '{{{ _ingest.on_failure_message }}}'
