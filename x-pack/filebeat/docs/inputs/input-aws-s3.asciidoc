@@ -82,6 +82,8 @@ Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS
   expand_event_list_from_field: Records
 ----
 
+The `aws-s3` input will automatically decompress gzipped files transparently, with no additional configuration required.
+
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
