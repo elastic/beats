@@ -290,7 +290,7 @@ var batchPool = sync.Pool{
 }
 
 func newBatch(queue *broker, start, count int) *batch {
-	batch := batchPool.Get().(*batch)
+	batch := batchPool.Get().(*batch) //nolint: errcheck // we want this to panic if there's an error
 	batch.next = nil
 	batch.queue = queue
 	batch.start = start
