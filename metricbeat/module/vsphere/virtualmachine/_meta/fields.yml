@@ -18,7 +18,7 @@
     - name: id
       type: keyword
       description: >
-        Virtual machine ID.
+        Unique virtual machine ID.
     - name: name
       type: keyword
       description: >
