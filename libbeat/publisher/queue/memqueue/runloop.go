@@ -204,12 +204,14 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 
 func (l *runLoop) handleDelete(count int) {
 	byteCount := 0
+	// remove entries from the queue
 	for i := 0; i < count; i++ {
-		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
-		byteCount += entry.eventSize
+		index := (l.bufPos + i) % len(l.broker.buf)
+		byteCount += l.broker.buf[index].eventSize
+		l.broker.buf[index].event = nil
 	}
-	// Advance position and counters. Event data was already cleared in
-	// batch.FreeEntries when the events were vended.
+
+	// advance the buffer position and update tracking fields
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count
