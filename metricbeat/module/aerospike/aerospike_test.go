@@ -241,7 +241,7 @@ func TestParseClientPolicy(t *testing.T) {
 			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
 
 		assert.Equalf(t, test.expectedClientPolicy.User, result.User,
-			"Aerospike policy user name is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
+			"Aerospike policy username is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
 
 		assert.Equalf(t, test.expectedClientPolicy.Password, result.Password,
 			"Aerospike policy password is wrong. Got '%s' expected '%s'", result.Password, test.expectedClientPolicy.Password)
