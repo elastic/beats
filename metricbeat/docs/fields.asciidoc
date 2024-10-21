@@ -67554,7 +67554,7 @@ format: bytes
 *`vsphere.host.id`*::
 +
 --
-Unique Host ID.
+Unique host ID.
 
 
 type: keyword
@@ -68229,7 +68229,7 @@ type: keyword
 *`vsphere.virtualmachine.id`*::
 +
 --
-Virtual machine ID.
+Unique virtual machine ID.
 
 
 type: keyword
