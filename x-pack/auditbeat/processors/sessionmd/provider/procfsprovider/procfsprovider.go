@@ -30,6 +30,7 @@ type prvdr struct {
 	pidField string
 }
 
+// NewProvider returns a new instance of procfsprovider.
 func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, reader procfs.Reader, pidField string) (provider.Provider, error) {
 	return prvdr{
 		ctx:      ctx,
@@ -40,12 +41,15 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 	}, nil
 }
 
+// GetProcess is not implemented in this provider.
+// This provider adds to the processdb, and process information is retrieved from the DB, not directly from the provider
 func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-// SyncDB will update the process DB with process info from procfs or the event itself
-func (p prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+// Sync updates the process information database using on the syscall event data and by scraping procfs.
+// As process information will not be available in procfs after a process has exited, the provider is susceptible to missing information in short-lived events.
+func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
 	if err != nil {
 		return fmt.Errorf("event not supported, no syscall data")
