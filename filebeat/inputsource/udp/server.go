@@ -20,8 +20,6 @@ package udp
 import (
 	"net"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/dgram"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -62,12 +60,13 @@ func (u *Server) createConn() (net.PacketConn, error) {
 	if err != nil {
 		return nil, err
 	}
-	socketSize := int(u.config.ReadBuffer) * humanize.KiByte
-	if socketSize != 0 {
+
+	if int(u.config.ReadBuffer) != 0 {
 		if err := listener.SetReadBuffer(int(u.config.ReadBuffer)); err != nil {
 			return nil, err
 		}
 	}
+
 	u.localaddress = listener.LocalAddr().String()
 
 	return listener, err
