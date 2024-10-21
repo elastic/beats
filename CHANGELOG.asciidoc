@@ -3,6 +3,156 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.25]]
+=== Beats version 7.17.25
+https://github.com/elastic/beats/compare/v7.17.24\...v7.17.25[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Osquerybeat*
+
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Agent*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update Go to 1.22.8. {pull}41106[41106]
+
+*Auditbeat*
+
+
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.22.7. {pull}41019[41019]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-7.17.24]]
 === Beats version 7.17.24
 https://github.com/elastic/beats/compare/v7.17.23\...v7.17.24[View commits]
