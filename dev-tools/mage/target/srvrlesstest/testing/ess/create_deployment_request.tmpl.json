@@ -1,0 +1,102 @@
+{
+  "resources": {
+    "integrations_server": [
+      {
+        "elasticsearch_cluster_ref_id": "main-elasticsearch",
+        "region": "{{ .request.Region }}",
+        "plan": {
+          "cluster_topology": [
+            {
+              "instance_configuration_id": "{{ .integrations_server_conf_id }}",
+              "zone_count": 1,
+              "size": {
+                "resource": "memory",
+                "value": 1024
+              }
+            }
+          ],
+          "integrations_server": {
+            "version": "{{ .request.Version }}"
+          }
+        },
+        "ref_id": "main-integrations_server"
+      }
+    ],
+    "elasticsearch": [
+      {
+        "region": "{{ .request.Region }}",
+        "settings": {
+          "dedicated_masters_threshold": 6
+        },
+        "plan": {
+          "cluster_topology": [
+            {
+              "zone_count": 1,
+              "elasticsearch": {
+                "node_attributes": {
+                  "data": "hot"
+                }
+              },
+              "instance_configuration_id": "{{.elasticsearch_conf_id}}",
+              "node_roles": [
+                "master",
+                "ingest",
+                "transform",
+                "data_hot",
+                "remote_cluster_client",
+                "data_content"
+              ],
+              "id": "hot_content",
+              "size": {
+                "resource": "memory",
+                "value": 8192
+              }
+            }
+          ],
+          "elasticsearch": {
+            "version": "{{ .request.Version }}",
+            "enabled_built_in_plugins": []
+          },
+          "deployment_template": {
+            "id": "{{ .elasticsearch_deployment_template_id }}"
+          }
+        },
+        "ref_id": "main-elasticsearch"
+      }
+    ],
+    "enterprise_search": [],
+    "kibana": [
+      {
+        "elasticsearch_cluster_ref_id": "main-elasticsearch",
+        "region": "{{ .request.Region }}",
+        "plan": {
+          "cluster_topology": [
+            {
+              "instance_configuration_id": "{{.kibana_instance_configuration_id}}",
+              "zone_count": 1,
+              "size": {
+                "resource": "memory",
+                "value": 1024
+              }
+            }
+          ],
+          "kibana": {
+            "version": "{{ .request.Version }}",
+            "user_settings_json": {
+              "xpack.fleet.enableExperimental": ["agentTamperProtectionEnabled"]
+            }
+          }
+        },
+        "ref_id": "main-kibana"
+      }
+    ]
+  },
+  "settings": {
+    "autoscaling_enabled": false
+  },
+  "name": "{{ .request.Name }}",
+  "metadata": {
+    "system_owned": false,
+    "tags": {{ json .request.Tags }}
+  }
+}

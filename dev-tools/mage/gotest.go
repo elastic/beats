@@ -428,3 +428,30 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	}()
 	return sh.RunV("go", args...)
 }
+
+func GoTestBuild(ctx context.Context, params GoTestArgs) error {
+	if params.OutputFile == "" {
+		return fmt.Errorf("missing output file")
+	}
+
+	fmt.Println(">> go test:", params.TestName, "Building Test Binary")
+
+	args := []string{"test", "-c", "-o", params.OutputFile}
+
+	if len(params.Tags) > 0 {
+		params := strings.Join(params.Tags, " ")
+		if params != "" {
+			args = append(args, "-tags", params)
+		}
+	}
+
+	args = append(args, params.Packages...)
+
+	goTestBuild := makeCommand(ctx, params.Env, "go", args...)
+
+	err := goTestBuild.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}

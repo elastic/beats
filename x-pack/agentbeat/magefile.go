@@ -9,11 +9,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/srvrlesstest"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/sh"
@@ -217,78 +215,8 @@ func PythonIntegTest(ctx context.Context) error {
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
 
-// TestWithSpec executes unique commands from agentbeat.spec.yml and validates that app haven't exited with non-zero
-func TestWithSpec(ctx context.Context) {
-	specPath := os.Getenv("AGENTBEAT_SPEC")
-	if specPath == "" {
-		log.Fatal("AGENTBEAT_SPEC is not defined\n")
-	}
-
-	platform := os.Getenv("PLATFORM")
-	if platform == "" {
-		log.Fatal("PLATFORM is not defined\n")
-	}
-
-	var commands = devtools.SpecCommands(specPath, platform)
-
-	agentbeatPath := os.Getenv("AGENTBEAT_PATH")
-
-	cmdResults := make(map[string]bool)
-
-	for _, command := range commands {
-		cmdResults[command] = runCmd(agentbeatPath, strings.Split(command, " "))
-	}
-
-	hasFailures := false
-	for cmd, res := range cmdResults {
-		if res {
-			fmt.Printf("--- :large_green_circle: Succeeded: [%s.10s...]\n", cmd)
-		} else {
-			fmt.Printf("--- :bangbang: Failed: [%s.10s...]\n", cmd)
-			hasFailures = true
-		}
-	}
-
-	if hasFailures {
-		fmt.Printf("Some inputs failed. Exiting with error\n")
-		os.Exit(1)
-	}
-}
-
-func runCmd(agentbeatPath string, command []string) bool {
-	cmd := exec.Command(agentbeatPath, command...)
-	fmt.Printf("Executing: %s\n", cmd.String())
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	if err := cmd.Start(); err != nil {
-		fmt.Printf("failed to start command: %v\n", err)
-	}
-
-	defer func() {
-		if err := cmd.Process.Kill(); err != nil {
-			fmt.Printf("failed to kill process: %v\n", err)
-		} else {
-			fmt.Print("command process killed\n")
-		}
-	}()
-
-	done := make(chan error, 1)
-	go func() {
-		done <- cmd.Wait()
-	}()
-	timeout := 2 * time.Second
-	deadline := time.After(timeout)
-
-	select {
-	case err := <-done:
-		fmt.Printf("command exited before %s: %v\n", timeout.String(), err)
-		return false
-
-	case <-deadline:
-		fmt.Printf("%s\n", cmd.Stdout)
-		return true
-	}
+// ServerlessTest starts serverless integration tests
+func ServerlessTest(ctx context.Context, beat string) error {
+	devtools.TestBeatServerless(beat)
+	return srvrlesstest.IntegRunner(ctx, false, "TestBeatsServerless")
 }

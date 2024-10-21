@@ -1,0 +1,13 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts:
+      - >-
+        ${ES_HOST}
+    api_key: ${API_KEY}
+agent:
+  monitoring:
+    enabled: false
+inputs:
+  - id: connectors
+    type: connectors-py

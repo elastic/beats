@@ -1,0 +1,15 @@
+gcp:
+  integrations_server_conf_id: "gcp.integrationsserver.n2.68x32x45.2"
+  elasticsearch_conf_id: "gcp.es.datahot.n2.68x10x45"
+  elasticsearch_deployment_template_id: "gcp-storage-optimized-v5"
+  kibana_instance_configuration_id: "gcp.kibana.n2.68x32x45"
+azure:
+  integrations_server_conf_id: "azure.integrationsserver.fsv2.2"
+  elasticsearch_conf_id: "azure.es.datahot.edsv4"
+  elasticsearch_deployment_template_id: "azure-storage-optimized-v2"
+  kibana_instance_configuration_id: "azure.kibana.fsv2"
+aws:
+  integrations_server_conf_id: "aws.integrationsserver.c5d.2.1"
+  elasticsearch_conf_id: "aws.es.datahot.i3.1.1"
+  elasticsearch_deployment_template_id: "aws-storage-optimized-v5"
+  kibana_instance_configuration_id: "aws.kibana.c5d.1.1"

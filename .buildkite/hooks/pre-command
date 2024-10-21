@@ -21,8 +21,8 @@ fi
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" && "$BUILDKITE_STEP_KEY" == *"agentbeat-it"* ]]; then
     out=$(.buildkite/scripts/agentbeat/setup_agentbeat.py)
     echo "$out"
-    AGENTBEAT_PATH=$(echo "$out" | tail -n 1)
-    export AGENTBEAT_PATH
+    AGENT_BUILD_DIR=$(echo "$out" | tail -n 1)
+    export AGENT_BUILD_DIR
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \

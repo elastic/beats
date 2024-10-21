@@ -1,0 +1,12 @@
+# This file is generated automatically. Please do not manually edit it.
+
+# The testVersions list in this file specifies Elastic Agent versions to be used as
+# the starting (pre-upgrade) or ending (post-upgrade) versions of Elastic Agent in
+# upgrade integration tests.
+
+testVersions:
+  - 8.16.0-SNAPSHOT
+  - 8.15.2-SNAPSHOT
+  - 8.15.1
+  - 8.15.0
+  - 7.17.25-SNAPSHOT
