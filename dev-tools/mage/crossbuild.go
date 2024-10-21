@@ -317,6 +317,11 @@ func (b GolangCrossBuilder) Build() error {
 		hostDir := filepath.Join(build.Default.GOPATH, "pkg", "mod")
 		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
 	}
+	if os.Getenv("GOEXPERIMENT") != "" {
+		// GOEXPERIMENT is set in the environment, that needs to be propagated into
+		// the docker container so the go builder uses the same experiment settings.
+		args = append(args, "--env", "GOEXPERIMENT="+os.Getenv("GOEXPERIMENT"))
+	}
 
 	if b.Platform == "darwin/amd64" {
 		fmt.Printf(">> %v: Forcing DEV=0 for %s: https://github.com/elastic/golang-crossbuild/issues/217\n", b.Target, b.Platform)
