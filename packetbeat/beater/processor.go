@@ -158,7 +158,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 	if config.Interfaces[0].File == "" {
 		err = watch.Init(config.Procs)
 		if err != nil {
-			logp.Critical(err.Error())
+			logp.Critical("%s", err.Error())
 			return nil, err
 		}
 	} else {
