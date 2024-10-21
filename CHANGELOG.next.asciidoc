@@ -44,7 +44,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 
-
 *Heartbeat*
 
 - Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
