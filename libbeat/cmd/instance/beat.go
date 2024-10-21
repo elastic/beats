@@ -388,7 +388,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info(paths.Paths.String())
+	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
@@ -603,7 +603,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			logp.Info("Output is configured through Central Management")
 		} else {
 			msg := "no outputs are defined, please define one under the output section"
-			logp.Info(msg)
+			logp.Info("%s", msg)
 			return nil, errors.New(msg)
 		}
 	}
@@ -1055,7 +1055,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info(paths.Paths.String())
+	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
