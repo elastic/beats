@@ -409,18 +409,18 @@ func FormatEventString(
 
 	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
 	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	var bufferUsed uint32
-	bufferSize := uint32(len(renderBuf) / 2)
+	var wstrBufferUsed uint32
+	wstrBufferSize := uint32(len(renderBuf) / 2)
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bufferPtr, &bufferUsed)
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wstrBufferSize, bufferPtr, &wstrBufferUsed)
 	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	} else if err == nil {
-		// bufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// wstrBufferUsed indicates the size used internally to render the message. When called with nil buffer
 		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
-		// bufferSize to our buffer, truncating the message if our buffer was too small.
-		if bufferUsed <= bufferSize {
-			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed*2], out)
+		// wstrBufferSize to our buffer, truncating the message if our buffer was too small.
+		if wstrBufferUsed <= wstrBufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:wstrBufferUsed*2], out)
 		}
 	}
 
@@ -428,10 +428,10 @@ func FormatEventString(
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
 
-	bb.Reserve(int(bufferUsed * 2))
-	bufferSize = bufferUsed
+	bb.Reserve(int(wstrBufferUsed * 2))
+	wstrBufferSize = wstrBufferUsed
 
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bb.PtrAt(0), &bufferUsed)
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wstrBufferSize, bb.PtrAt(0), &wstrBufferUsed)
 	if err != nil {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
