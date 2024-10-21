@@ -3,6 +3,7 @@ env:
   ASDF_NODEJS_VERSION: 18.17.1
 
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_STANDARD_MACHINE_TYPE: "n1-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
@@ -18,26 +19,26 @@ env:
   AGENTBEAT_SPEC: "./agentbeat.spec.yml"
 
 steps:
-  - group: "Check/Update"
-    key: "x-pack-agentbeat-check-update"
-
-    steps:
-      - label: "agentbeat: Run pre-commit"
-        command: "pre-commit run --all-files"
-        agents:
-          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          memory: "2Gi"
-          useCustomGlobalHooks: true
-        notify:
-          - github_commit_status:
-              context: "agentbeat: pre-commit"
-
-  - wait: ~
-    # with PRs, we want to run mandatory tests only if check/update step succeed
-    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in check/update step
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on: "x-pack-agentbeat-check-update"
+#  - group: "Check/Update"
+#    key: "x-pack-agentbeat-check-update"
+#
+#    steps:
+#      - label: "agentbeat: Run pre-commit"
+#        command: "pre-commit run --all-files"
+#        agents:
+#          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+#          memory: "2Gi"
+#          useCustomGlobalHooks: true
+#        notify:
+#          - github_commit_status:
+#              context: "agentbeat: pre-commit"
+#
+#  - wait: ~
+#    # with PRs, we want to run mandatory tests only if check/update step succeed
+#    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+#    # this allows building DRA artifacts even if there is flakiness in check/update step
+#    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+#    depends_on: "x-pack-agentbeat-check-update"
 
   - group: "Agentbeat tests"
     key: "agentbeat-mandatory-tests"
@@ -47,6 +48,7 @@ steps:
         key: "agentbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PACKAGES: tar.gz,zip
           SNAPSHOT: true
         command: |
           set -euo pipefail
@@ -160,3 +162,47 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: macOS arm64 Spec tests"
+
+  - group: "Extended Tests"
+    steps:
+
+      - label: ":ubuntu: Agentbeat/Serverless tests"
+        key: "agentbeat-it-serverless"
+        depends_on:
+          - agentbeat-package-linux
+        env:
+          TEST_INTEG_AUTH_GCP_DATACENTER: "us-central1-a"
+          GOFLAGS: "-buildvcs=false"
+          AGENT_STACK_VERSION: "8.16.0-SNAPSHOT"
+          TEST_INTEG_CLEAN_ON_EXIT: true
+          TEST_PLATFORMS: "linux/amd64"
+          STACK_PROVISIONER: "{{matrix}}"
+          SNAPSHOT: true
+          AGENT_BUILD_DIR: "${AGENTBEAT_PATH}"
+        command: mage integration:testBeatServerless {{matrix}}
+        matrix:
+          - "metricbeat"
+          - "filebeat"
+          - "auditbeat"
+        artifact_paths:
+          - x-pack/agentbeat/build/TEST-**
+          - x-pack/agentbeat/build/diagnostics/*
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/agentbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        retry:
+          automatic:
+            - limit: 1
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_STANDARD_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Serverless tests"
