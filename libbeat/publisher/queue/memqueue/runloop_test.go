@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -176,11 +177,20 @@ func TestObserverRemoveEvents(t *testing.T) {
 	// Initialize the queue entries to a test byte size
 	for i := range rl.broker.buf {
 		rl.broker.buf[i].eventSize = 123
+		rl.broker.buf[i].event = publisher.Event{}
 	}
 	const deleteCount = 25
 	rl.broker.deleteChan <- deleteCount
 	// Run one iteration of the run loop, so it can handle the delete request
 	rl.runIteration()
+
+	// The entries should actually be deleted
+	expectedRemaining := len(rl.broker.buf) - deleteCount
+	remainingEntries := slices.DeleteFunc(slices.Clone(rl.broker.buf), func(entry queueEntry) bool {
+		return entry.event == nil
+	})
+	assert.Len(t, remainingEntries, expectedRemaining)
+
 	// It should have deleted 25 events, so we expect the size to be 25 * 123.
 	assertRegistryUint(t, reg, "queue.removed.events", deleteCount, "Deleting from the queue should report the removed events")
 	assertRegistryUint(t, reg, "queue.removed.bytes", deleteCount*123, "Deleting from the queue should report the removed bytes")
