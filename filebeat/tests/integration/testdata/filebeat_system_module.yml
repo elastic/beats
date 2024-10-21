@@ -1,0 +1,16 @@
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: true
+      var.paths:
+        - "%s"
+
+path.home: %s
+
+queue.mem:
+  flush.timeout: 0
+
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
