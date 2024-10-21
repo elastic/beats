@@ -620,7 +620,11 @@ func (l *License) ToMapStr() common.MapStr {
 func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, errors.Wrap(err, "failure to determine if "+groupKey+" settings exist")
+=======
+		return nil, fmt.Errorf("failure to determine if %s settings exist: %w", groupKey, err)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 
 	if !hasSettingGroup {
@@ -629,12 +633,20 @@ func getSettingGroup(allSettings common.MapStr, groupKey string) (common.MapStr,
 
 	settings, err := allSettings.GetValue(groupKey)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, errors.Wrap(err, "failure to extract "+groupKey+" settings")
+=======
+		return nil, fmt.Errorf("failure to extract %s settings: %w", groupKey, err)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
+<<<<<<< HEAD
 		return nil, errors.Wrap(err, groupKey+" settings are not a map")
+=======
+		return nil, fmt.Errorf("%s settings are not a map", groupKey)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 
 	return common.MapStr(v), nil

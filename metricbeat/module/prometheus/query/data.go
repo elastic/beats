@@ -19,6 +19,7 @@ package query
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -122,8 +123,12 @@ func parseResponse(body []byte, pathConfig QueryConfig) ([]mb.Event, error) {
 		}
 		events = append(events, evnts...)
 	default:
+<<<<<<< HEAD
 		msg := fmt.Sprintf("Unknown resultType '%v'", resultType)
 		return events, errors.New(msg)
+=======
+		return events, fmt.Errorf("Unknown resultType '%v'", resultType)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 	return events, nil
 }
@@ -225,8 +230,12 @@ func getEventFromScalarOrString(body []byte, resultType string, queryName string
 		} else if resultType == "string" {
 			value, ok := convertedArray.Data.Results[1].(string)
 			if !ok {
+<<<<<<< HEAD
 				msg := fmt.Sprintf("Could not parse value of result: %v", convertedArray.Data.Results)
 				return mb.Event{}, errors.New(msg)
+=======
+				return mb.Event{}, fmt.Errorf("Could not parse value of result: %v", convertedArray.Data.Results)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 			}
 			return mb.Event{
 				Timestamp: getTimestamp(timestamp),
@@ -251,8 +260,12 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 	}
 	timestamp, ok := vector[0].(float64)
 	if !ok {
+<<<<<<< HEAD
 		msg := fmt.Sprintf("Could not parse timestamp of result: %v", vector)
 		return 0, errors.New(msg)
+=======
+		return 0, fmt.Errorf("Could not parse timestamp of result: %v", vector)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 	return timestamp, nil
 }
@@ -260,6 +273,7 @@ func getTimestampFromVector(vector []interface{}) (float64, error) {
 func getValueFromVector(vector []interface{}) (float64, error) {
 	// Example input: [ <unix_time>, "<sample_value>" ]
 	if len(vector) != 2 {
+<<<<<<< HEAD
 		return 0, errors.New("Could not parse results")
 	}
 	value, ok := vector[1].(string)
@@ -271,6 +285,17 @@ func getValueFromVector(vector []interface{}) (float64, error) {
 	if err != nil {
 		msg := fmt.Sprintf("Could not parse value of result: %v", vector)
 		return 0, errors.New(msg)
+=======
+		return 0, errors.New("could not parse results")
+	}
+	value, ok := vector[1].(string)
+	if !ok {
+		return 0, fmt.Errorf("Could not parse value of result: %v", vector)
+	}
+	val, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		return 0, fmt.Errorf("Could not parse value of result: %v", vector)
+>>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 	return val, nil
 }
