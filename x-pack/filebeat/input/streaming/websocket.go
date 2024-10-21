@@ -228,7 +228,11 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 			if err == nil {
 				return conn, response, nil
 			}
-			log.Debugw("attempt %d: webSocket connection failed. retrying...\n", attempt)
+			if err == websocket.ErrBadHandshake {
+				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				continue
+			}
+			log.Debugf("attempt %d: webSocket connection failed. retrying...\n", attempt)
 			waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 			time.Sleep(waitTime)
 		}

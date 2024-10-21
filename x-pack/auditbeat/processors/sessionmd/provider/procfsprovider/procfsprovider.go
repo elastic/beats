@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package procfs_provider
+package procfsprovider
 
 import (
 	"context"
@@ -30,6 +30,7 @@ type prvdr struct {
 	pidField string
 }
 
+// NewProvider returns a new instance of procfsprovider.
 func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, reader procfs.Reader, pidField string) (provider.Provider, error) {
 	return prvdr{
 		ctx:      ctx,
@@ -40,8 +41,15 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 	}, nil
 }
 
-// SyncDB will update the process DB with process info from procfs or the event itself
-func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
+// GetProcess is not implemented in this provider.
+// This provider adds to the processdb, and process information is retrieved from the DB, not directly from the provider
+func (p prvdr) GetProcess(pid uint32) (*types.Process, error) {
+	return nil, fmt.Errorf("not implemented")
+}
+
+// Sync updates the process information database using on the syscall event data and by scraping procfs.
+// As process information will not be available in procfs after a process has exited, the provider is susceptible to missing information in short-lived events.
+func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
 	if err != nil {
 		return fmt.Errorf("event not supported, no syscall data")
@@ -50,17 +58,17 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	switch syscall {
 	case "execveat", "execve":
 		pe := types.ProcessExecEvent{}
-		proc_info, err := s.reader.GetProcess(pid)
+		procInfo, err := p.reader.GetProcess(pid)
 		if err == nil {
-			pe.PIDs = proc_info.PIDs
-			pe.Creds = proc_info.Creds
-			pe.CTTY = proc_info.CTTY
-			pe.CWD = proc_info.Cwd
-			pe.Argv = proc_info.Argv
-			pe.Env = proc_info.Env
-			pe.Filename = proc_info.Filename
+			pe.PIDs = procInfo.PIDs
+			pe.Creds = procInfo.Creds
+			pe.CTTY = procInfo.CTTY
+			pe.CWD = procInfo.Cwd
+			pe.Argv = procInfo.Argv
+			pe.Env = procInfo.Env
+			pe.Filename = procInfo.Filename
 		} else {
-			s.logger.Warnf("couldn't get process info from proc for pid %v: %v", pid, err)
+			p.logger.Warnw("couldn't get process info from proc for pid", "pid", pid, "error", err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
 			pe.PIDs.Tgid = pid
@@ -77,7 +85,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			}
 			pe.PIDs.Ppid = uint32(i)
 
-			parent, err = s.db.GetProcess(pe.PIDs.Ppid)
+			parent, err = p.db.GetProcess(pe.PIDs.Ppid)
 			if err != nil {
 				goto out
 			}
@@ -87,10 +95,14 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 			if err != nil {
 				goto out
 			}
-			pe.CWD = intr.(string)
+			if str, ok := intr.(string); ok {
+				pe.CWD = str
+			} else {
+				goto out
+			}
 		out:
 		}
-		s.db.InsertExec(pe)
+		p.db.InsertExec(pe)
 		if err != nil {
 			return fmt.Errorf("insert exec to db: %w", err)
 		}
@@ -100,7 +112,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 				Tgid: pid,
 			},
 		}
-		s.db.InsertExit(pe)
+		p.db.InsertExit(pe)
 	case "setsid":
 		intr, err := ev.Fields.GetValue("auditd.result")
 		if err != nil {
@@ -117,7 +129,7 @@ func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 					Sid:  pid,
 				},
 			}
-			s.db.InsertSetsid(setsid_ev)
+			p.db.InsertSetsid(setsid_ev)
 		}
 	}
 	return nil
