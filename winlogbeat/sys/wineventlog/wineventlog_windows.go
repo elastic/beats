@@ -420,7 +420,7 @@ func FormatEventString(
 		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
 		// bufferSize to our buffer, truncating the message if our buffer was too small.
 		if bufferUsed <= bufferSize {
-			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
+			return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed*2], out)
 		}
 	}
 
