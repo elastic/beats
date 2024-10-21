@@ -1672,6 +1672,48 @@ var inputTests = []struct {
 			},
 		}},
 	},
+	{
+		name: "dump_no_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": "failure_dumps",
+		},
+		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		wantNoFile: filepath.Join("failure_dumps", "dump_20100208000000Z"),
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+	{
+		name: "dump_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": "failure_dumps",
+		},
+		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		wantFile: filepath.Join("failure_dumps", "dump_20100209000000Z"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
 
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
@@ -1694,6 +1736,11 @@ func TestInput(t *testing.T) {
 	// Set a var that is available to test env look-up.
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
+
+	err := os.RemoveAll("failure_dumps")
+	if err != nil {
+		t.Fatalf("failed to remove failure_dumps directory: %v", err)
+	}
 
 	logp.TestingSetup()
 	for _, test := range inputTests {
@@ -1757,6 +1804,20 @@ func TestInput(t *testing.T) {
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
 			if test.wantErr != nil {
 				return
 			}
@@ -1787,20 +1848,6 @@ func TestInput(t *testing.T) {
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
-				}
-			}
-			if test.wantFile != "" {
-				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
-					t.Errorf("expected log file not found: %v", err)
-				}
-			}
-			if test.wantNoFile != "" {
-				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
-				if err != nil {
-					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
-				}
-				if len(paths) != 0 {
-					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 		})

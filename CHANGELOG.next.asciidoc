@@ -319,6 +319,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - System module now supports reading from jounrald. {pull}41061[41061]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 - Improved Azure Blob Storage input documentation. {pull}41252[41252]
+- Add evaluation state dump debugging option to CEL input. {pull}[]
 
 *Auditbeat*
 
