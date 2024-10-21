@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v7.17.24\...v7.17.25[View commits]
 
 *Osquerybeat*
 
-- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Disable `allow_unsafe` osquery configuration. {pull}40130[40130]
 
 ==== Bugfixes
 
