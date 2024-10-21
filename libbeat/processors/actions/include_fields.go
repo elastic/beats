@@ -84,7 +84,7 @@ func (f *includeFields) Run(event *beat.Event) (*beat.Event, error) {
 
 	event.Fields = filtered
 	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+		return event, errors.New(strings.Join(errs, ", "))
 	}
 	return event, nil
 }
