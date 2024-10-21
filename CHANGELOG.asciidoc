@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v7.17.24\...v7.17.25[View commits]
 
 *Affecting all Beats*
 
-- Update Go version to 1.22.7. {pull}41019[41019]
+- Update Go version to 1.22.8. {pull}41106[41106]
 
 
 [[release-notes-7.17.24]]
