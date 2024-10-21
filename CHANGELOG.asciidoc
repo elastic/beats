@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 *Affecting all Beats*
 
 - Update Go version to 1.22.8. {pull}41139[41139]
+- Add kafka compression support for ZSTD.
 
 *Metricbeat*
 
@@ -99,7 +100,6 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 - Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
 - Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
 - Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
-- Add kafka compression support for ZSTD.
 
 *Metricbeat*
 
