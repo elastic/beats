@@ -112,6 +112,10 @@ type Batch interface {
 	Count() int
 	Entry(i int) Entry
 	Done()
+	// Release internal references to the contained events if supported
+	// (the disk queue does not currently implement this).
+	// Entry() should not be used after this call.
+	FreeEntries()
 }
 
 // Outputs can provide an EncoderFactory to enable early encoding, in which
