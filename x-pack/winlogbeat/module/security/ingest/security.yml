@@ -2232,6 +2232,27 @@ processors:
           }
           ArrayList results = new ArrayList();
         }
+        if (ctx?.winlog?.event_data?.ElevatedToken != null) {
+          def code = ctx.winlog.event_data.ElevatedToken.replace("%%","");
+          def t = params.get(ctx.winlog.event_data.ElevatedToken);
+          if (t != null) {
+            ctx.winlog.event_data.put("ElevatedTokenDescription", t);
+          }
+        }
+        if (ctx?.winlog?.event_data?.ImpersonationLevel != null) {
+          def code = ctx.winlog.event_data.ImpersonationLevel.replace("%%","");
+          def t = params.get(ctx.winlog.event_data.ImpersonationLevel);
+          if (t != null) {
+            ctx.winlog.event_data.put("ImpersonationLevelDescription", t);
+          }
+        }
+        if (ctx?.winlog?.event_data?.VirtualAccount != null) {
+          def code = ctx.winlog.event_data.VirtualAccount.replace("%%","");
+          def t = params.get(ctx.winlog.event_data.VirtualAccount);
+          if (t != null) {
+            ctx.winlog.event_data.put("VirtualAccountDescription", t);
+          }
+        }
   - script:
       lang: painless
       ignore_failure: false
