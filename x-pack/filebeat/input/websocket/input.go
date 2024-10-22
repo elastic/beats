@@ -113,6 +113,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		resp.Body.Close()
 	}
 	if err != nil {
+		if err == websocket.ErrBadHandshake {
+			log.Errorw("websocket connection failed with bad handshake", "status", resp.StatusCode)
+		}
 		metrics.errorsTotal.Inc()
 		log.Errorw("failed to establish websocket connection", "error", err)
 		return err
