@@ -93,7 +93,7 @@ func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 
 	return v2.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Stable,
+		Stability:  feature.Experimental,
 		Deprecated: false,
 		Info:       "system-logs input",
 		Doc:        "The system-logs input collects system logs on Linux by reading them from journald or traditional log files",

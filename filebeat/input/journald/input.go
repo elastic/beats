@@ -42,6 +42,7 @@ type journalReader interface {
 }
 
 type journald struct {
+	ID                 string
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
 	Since              time.Duration
@@ -108,6 +109,7 @@ func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	}
 
 	return sources, &journald{
+		ID:                 config.ID,
 		Since:              config.Since,
 		Seek:               config.Seek,
 		Matches:            journalfield.IncludeMatches(config.Matches),
@@ -124,7 +126,7 @@ func (inp *journald) Name() string { return pluginName }
 
 func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 	reader, err := journalctl.New(
-		ctx.Logger,
+		ctx.Logger.With("input_id", inp.ID),
 		ctx.Cancelation,
 		inp.Units,
 		inp.Identifiers,
@@ -149,7 +151,9 @@ func (inp *journald) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	logger := ctx.Logger.With("path", src.Name())
+	logger := ctx.Logger.
+		With("path", src.Name()).
+		With("input_id", inp.ID)
 	currentCheckpoint := initCheckpoint(logger, cursor)
 
 	mode := inp.Seek

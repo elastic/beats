@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os/exec"
 	"strings"
 	"sync"
@@ -97,7 +98,20 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 			data, err := reader.ReadBytes('\n')
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
-					logger.Errorf("cannot read from journalctl stdout: '%s'", err)
+					var logError = false
+					var pathError *fs.PathError
+					if errors.As(err, &pathError) {
+						if pathError.Op == "read" && pathError.Path == "|0" && pathError.Err.Error() == "file already closed" {
+							logger.Debugf("cannot read from journalctl stdout: '%s'", err)
+						} else {
+							logError = true
+						}
+					} else {
+						logError = true
+					}
+					if logError {
+						logger.Errorf("cannot read from journalctl stdout: '%s'", err)
+					}
 				}
 				return
 			}
