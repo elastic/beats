@@ -63,9 +63,9 @@ func TestInputParsers(t *testing.T) {
 	expectedFoo := "bar"
 	expectedAnswer := int64(42)
 	if foo != expectedFoo {
-		t.Errorf("expecting foo to be '%s' got '%s' instead", expectedFoo, foo)
+		t.Errorf("expecting 'foo' from the Journal JSON to be '%s' got '%s' instead", expectedFoo, foo)
 	}
 	if answer != expectedAnswer {
-		t.Errorf("expecting foo to be '%d' got '%d' instead", expectedAnswer, answer)
+		t.Errorf("expecting 'answer' from the Journal JSON to be '%d' got '%d' instead", expectedAnswer, answer)
 	}
 }
