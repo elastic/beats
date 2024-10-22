@@ -88,7 +88,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: false # packaging with `DEV=true` may cause linker issues while crosscompiling
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -122,7 +123,8 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: true
-          DEV: false # packaging with `DEV=true` may cause linker issues while crosscompiling
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -152,7 +154,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: false # packaging with `DEV=true` may cause linker issues while crosscompiling
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
