@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -1947,7 +1946,8 @@ func retryHandler() http.HandlerFunc {
 			w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count++
 	}
 }
