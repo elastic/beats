@@ -3,6 +3,29 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.25]]
+=== Beats version 7.17.25
+https://github.com/elastic/beats/compare/v7.17.24\...v7.17.25[View commits]
+
+==== Breaking changes
+
+*Osquerybeat*
+
+- Disable `allow_unsafe` osquery configuration. {pull}40130[40130]
+
+==== Bugfixes
+
+*Metricbeat*
+
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true`. {issue}40437[40437] {pull}40467[40467]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.8. {pull}41106[41106]
+
+
 [[release-notes-7.17.24]]
 === Beats version 7.17.24
 https://github.com/elastic/beats/compare/v7.17.23\...v7.17.24[View commits]
