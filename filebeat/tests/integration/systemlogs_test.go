@@ -71,7 +71,11 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 
 	// Scan every event in the output until at least one from
 	// each fileset (auth, syslog) is found.
-	waitForAllFilesets(t, filepath.Join(workDir, "output*.ndjson"))
+	waitForAllFilesets(
+		t,
+		filepath.Join(workDir, "output*.ndjson"),
+		"did not find events from both filesets: 'auth' and 'syslog'",
+	)
 }
 
 func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
@@ -80,7 +84,7 @@ func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
 		findFilesetNames(t, outputGlob),
 		time.Minute,
 		10*time.Millisecond,
-		msgAndArgs)
+		msgAndArgs...)
 }
 
 func findFilesetNames(t *testing.T, outputGlob string) func() bool {
