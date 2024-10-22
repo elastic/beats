@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	cp "github.com/otiai10/copy"
+
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -47,7 +49,7 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 	copyModulesDir(t, workDir)
 
 	// As the name says, we want this folder to exist bu t be empty
-	globWithoutFiles := filepath.Join(t.TempDir(), "*")
+	globWithoutFiles := filepath.Join(filebeat.TempDir(), "this-folder-does-not-exist")
 	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, workDir)
 
 	filebeat.WriteConfigFile(yamlCfg)
@@ -94,13 +96,13 @@ func copyModulesDir(t *testing.T, dst string) {
 	if err != nil {
 		t.Fatalf("cannot get the current directory: %s", err)
 	}
-	localModules := os.DirFS(filepath.Join(pwd, "../", "../", "module"))
-	localModulesD := os.DirFS(filepath.Join(pwd, "../", "../", "modules.d"))
+	localModules := filepath.Join(pwd, "../", "../", "module")
+	localModulesD := filepath.Join(pwd, "../", "../", "modules.d")
 
-	if err := os.CopyFS(filepath.Join(dst, "module"), localModules); err != nil {
+	if err := cp.Copy(localModules, filepath.Join(dst, "module")); err != nil {
 		t.Fatalf("cannot copy 'module' folder to test folder: %s", err)
 	}
-	if err := os.CopyFS(filepath.Join(dst, "modules.d"), localModulesD); err != nil {
+	if err := cp.Copy(localModulesD, filepath.Join(dst, "modules.d")); err != nil {
 		t.Fatalf("cannot copy 'modules.d' folder to test folder: %s", err)
 	}
 }
