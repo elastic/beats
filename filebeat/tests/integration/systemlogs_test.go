@@ -20,8 +20,12 @@
 package integration
 
 import (
+	"bufio"
 	_ "embed"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -29,6 +33,7 @@ import (
 	"time"
 
 	cp "github.com/otiai10/copy"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -50,7 +55,7 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 
 	// As the name says, we want this folder to exist bu t be empty
 	globWithoutFiles := filepath.Join(filebeat.TempDir(), "this-folder-does-not-exist")
-	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, workDir)
+	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, globWithoutFiles, workDir)
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
@@ -63,6 +68,79 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 		"journalctl started with PID",
 		10*time.Second,
 		"system-logs did not start journald input")
+
+	// Scan every event in the output until at least one from
+	// each fileset (auth, syslog) is found.
+	waitForAllFilesets(t, filepath.Join(workDir, "output*.ndjson"))
+}
+
+func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
+	require.Eventually(
+		t,
+		findFilesetNames(t, outputGlob),
+		time.Minute,
+		10*time.Millisecond,
+		msgAndArgs)
+}
+
+func findFilesetNames(t *testing.T, outputGlob string) func() bool {
+	f := func() bool {
+		files, err := filepath.Glob(outputGlob)
+		if err != nil {
+			t.Fatalf("cannot get files list for glob '%s': '%s'", outputGlob, err)
+		}
+
+		if len(files) > 1 {
+			t.Fatalf(
+				"only a single output file is supported, found: %d. Files: %s",
+				len(files),
+				files,
+			)
+		}
+
+		foundSyslog := false
+		foundAuth := false
+
+		file, err := os.Open(files[0])
+		defer file.Close()
+		r := bufio.NewReader(file)
+		for {
+			line, err := r.ReadBytes('\n')
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					break
+				} else {
+					t.Fatalf("cannot read '%s': '%s", file.Name(), err)
+				}
+			}
+
+			data := struct {
+				Fileset struct {
+					Name string `json:"name"`
+				} `json:"fileset"`
+			}{}
+
+			if err := json.Unmarshal(line, &data); err != nil {
+				t.Fatalf("cannot parse output line as JSON: %s", err)
+			}
+
+			if data.Fileset.Name == "syslog" {
+				foundSyslog = true
+			}
+
+			if data.Fileset.Name == "auth" {
+				foundAuth = true
+			}
+
+			if foundAuth && foundSyslog {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return f
 }
 
 func TestSystemLogsCanUseLogInput(t *testing.T) {
