@@ -67943,7 +67943,7 @@ Cluster information.
 *`vsphere.cluster.datastore.names`*::
 +
 --
-List of all the Datastore names associated with the cluster.
+List of all the datastore names associated with the cluster.
 
 
 type: keyword
@@ -67953,7 +67953,7 @@ type: keyword
 *`vsphere.cluster.datastore.count`*::
 +
 --
-Number of Datastores associated with the cluster.
+Number of datastores associated with the cluster.
 
 
 type: long
@@ -67985,7 +67985,7 @@ type: boolean
 *`vsphere.cluster.host.count`*::
 +
 --
-Number of Hosts associated with the cluster.
+Number of hosts associated with the cluster.
 
 
 type: long
@@ -67995,7 +67995,17 @@ type: long
 *`vsphere.cluster.host.names`*::
 +
 --
-List of all the Host names associated with the cluster.
+List of all the host names associated with the cluster.
+
+
+type: keyword
+
+--
+
+*`vsphere.cluster.id`*::
++
+--
+Unique cluster ID.
 
 
 type: keyword
@@ -68016,7 +68026,7 @@ type: keyword
 *`vsphere.cluster.network.count`*::
 +
 --
-Number of Networks associated with the cluster.
+Number of networks associated with the cluster.
 
 
 type: long
@@ -68026,7 +68036,7 @@ type: long
 *`vsphere.cluster.network.names`*::
 +
 --
-List of all the Network names associated with the cluster.
+List of all the network names associated with the cluster.
 
 
 type: keyword
@@ -68164,6 +68174,16 @@ type: keyword
 
 --
 
+*`vsphere.datastore.id`*::
++
+--
+Unique datastore ID.
+
+
+type: keyword
+
+--
+
 *`vsphere.datastore.name`*::
 +
 --
@@ -68245,10 +68265,20 @@ Datastore Cluster
 
 
 
+*`vsphere.datastorecluster.id`*::
++
+--
+Unique datastore cluster ID.
+
+
+type: keyword
+
+--
+
 *`vsphere.datastorecluster.name`*::
 +
 --
-The Datastore Cluster name.
+The datastore cluster name.
 
 
 type: keyword
@@ -68282,7 +68312,7 @@ format: bytes
 *`vsphere.datastorecluster.datastore.names`*::
 +
 --
-List of all the Datastore names associated with the Datastore Cluster.
+List of all the datastore names associated with the datastore cluster.
 
 
 type: keyword
@@ -68292,7 +68322,7 @@ type: keyword
 *`vsphere.datastorecluster.datastore.count`*::
 +
 --
-Number of datastores in the Datastore Cluster.
+Number of datastores in the datastore cluster.
 
 
 type: long
@@ -68431,6 +68461,16 @@ Sum of disk read and write rates each second in bytes.
 type: long
 
 format: bytes
+
+--
+
+*`vsphere.host.id`*::
++
+--
+Unique host ID.
+
+
+type: keyword
 
 --
 
@@ -68754,6 +68794,16 @@ type: long
 
 --
 
+*`vsphere.network.id`*::
++
+--
+Unique network ID.
+
+
+type: keyword
+
+--
+
 *`vsphere.network.name`*::
 +
 --
@@ -68767,7 +68817,7 @@ type: keyword
 *`vsphere.network.status`*::
 +
 --
-General health of the Network.
+General health of the network.
 
 
 type: keyword
@@ -68861,6 +68911,16 @@ The static CPU resource entitlement for a virtual machine.
 
 
 type: long
+
+--
+
+*`vsphere.resourcepool.id`*::
++
+--
+Unique resource pool ID.
+
+
+type: keyword
 
 --
 
@@ -69079,10 +69139,20 @@ type: keyword
 
 --
 
+*`vsphere.virtualmachine.id`*::
++
+--
+Unique virtual machine ID.
+
+
+type: keyword
+
+--
+
 *`vsphere.virtualmachine.name`*::
 +
 --
-Virtual Machine name.
+Virtual machine name.
 
 
 type: keyword
@@ -69092,7 +69162,7 @@ type: keyword
 *`vsphere.virtualmachine.os`*::
 +
 --
-Virtual Machine Operating System name.
+Virtual machine Operating System name.
 
 
 type: keyword
@@ -69132,7 +69202,7 @@ type: long
 *`vsphere.virtualmachine.memory.used.guest.bytes`*::
 +
 --
-Used Memory of Guest in bytes.
+Used memory of Guest in bytes.
 
 
 type: long
@@ -69144,7 +69214,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.used.host.bytes`*::
 +
 --
-Used Memory of Host in bytes.
+Used memory of Host in bytes.
 
 
 type: long
@@ -69156,7 +69226,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.total.guest.bytes`*::
 +
 --
-Total Memory of Guest in bytes.
+Total memory of Guest in bytes.
 
 
 type: long
@@ -69168,7 +69238,7 @@ format: bytes
 *`vsphere.virtualmachine.memory.free.guest.bytes`*::
 +
 --
-Free Memory of Guest in bytes.
+Free memory of Guest in bytes.
 
 
 type: long
