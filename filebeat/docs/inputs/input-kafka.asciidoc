@@ -60,6 +60,9 @@ might work as well, but are not supported.
 The `kafka` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
+NOTE: If you're using {agent} with a Kafka input and need to increase throughput, we recommend scaling horizontally by additional {agents} to read from the Kafka topic.
+Note that each {agent} reads concurrently from each of the partitions it has been assigned. 
+
 [float]
 [[kafka-hosts]]
 ===== `hosts`
