@@ -89,23 +89,19 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	bb.Reserve(int(wcharBufferSize * 2))
 
 	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferUsed)
-
-	// wcharBufferUsed indicates the size used internally to render the message. When called with nil buffer
-	// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
-	// wcharBufferSize to our buffer, truncating the message if our buffer was too small.
-	if wcharBufferUsed > wcharBufferSize {
-		err = windows.ERROR_INSUFFICIENT_BUFFER
-	}
-
 	switch err { //nolint:errorlint // This is an errno or nil.
-	case nil: // OK
-		return sys.UTF16BytesToString(bb.Bytes())
-
 	// Ignore some errors so it can tolerate missing or mismatched parameter values.
-	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+	case nil, // OK
+		windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
 		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
 		windows.ERROR_EVT_MAX_INSERTS_REACHED:
-		return sys.UTF16BytesToString(bb.Bytes())
+		// wcharBufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// wcharBufferSize to our buffer, truncating the message if our buffer was too small.
+		if wcharBufferUsed <= wcharBufferSize {
+			return sys.UTF16BytesToString(bb.Bytes())
+		}
+		fallthrough
 
 	case windows.ERROR_INSUFFICIENT_BUFFER:
 		bb.Reserve(int(wcharBufferUsed * 2))
