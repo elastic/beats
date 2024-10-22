@@ -1,4 +1,6 @@
 type: system-logs
+id: system-auth
+
 {{ if .use_journald }}
 use_journald: true
 {{ end }}
