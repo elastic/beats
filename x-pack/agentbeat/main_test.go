@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 )
 
 var (
@@ -22,11 +24,14 @@ func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 	abCommand = AgentBeat()
 	abCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("systemTest")
 	abCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("test.coverprofile")
 }
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		if err := abCommand.Execute(); err != nil {
 			os.Exit(1)

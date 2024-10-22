@@ -974,9 +974,11 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags parses the command line flags. It invokes the HandleFlags
-// callback if implemented by the Beat.
+// handleFlags converts -flag to --flags, parses the command line
+// flags, and it invokes the HandleFlags callback if implemented by
+// the Beat.
 func (b *Beat) handleFlags() error {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	flag.Parse()
 	return cfgfile.HandleFlags()
 }
