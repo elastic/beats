@@ -75,23 +75,27 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 		valuesPtr = &values[0]
 	}
 
-	// best guess render buffer size, 16KB, to avoid rendering message twice in most cases
-	const bestGuessRenderBufferSize = 19 // 512KB, 256K wide characters
+	// best guess render buffer size, to avoid rendering message twice in most cases
+	const bestGuessRenderBufferSize = 1 << 19 // 512KB, 256K wide characters
 
 	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
 	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	var bufferNeeded uint32
-	bufferSize := uint32(bestGuessRenderBufferSize / 2)
+	var wcharBufferNeeded uint32
+	wcharBufferSize := uint32(bestGuessRenderBufferSize / 2)
 
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
-	bb.Reserve(int(bufferSize * 2))
+	bb.Reserve(int(wcharBufferSize * 2))
 
-	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
+	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferNeeded)
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil: // OK
-		return sys.UTF16BytesToString(bb.Bytes())
+		if wcharBufferNeeded <= wcharBufferSize {
+			return sys.UTF16BytesToString(bb.Bytes())
+		}
+		bb.Reserve(int(wcharBufferNeeded * 2))
+		wcharBufferSize = wcharBufferNeeded
 
 	// Ignore some errors so it can tolerate missing or mismatched parameter values.
 	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
@@ -100,14 +104,14 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 		return sys.UTF16BytesToString(bb.Bytes())
 
 	case windows.ERROR_INSUFFICIENT_BUFFER:
-		bb.Reserve(int(bufferNeeded * 2))
-		bufferSize = bufferNeeded
+		bb.Reserve(int(wcharBufferNeeded * 2))
+		wcharBufferSize = wcharBufferNeeded
 
 	default:
 		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferNeeded)
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil: // OK
 

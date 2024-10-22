@@ -409,18 +409,18 @@ func FormatEventString(
 
 	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
 	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	var wstrBufferUsed uint32
-	wstrBufferSize := uint32(len(renderBuf) / 2)
+	var wcharBufferUsed uint32
+	wcharBufferSize := uint32(len(renderBuf) / 2)
 
-	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wstrBufferSize, bufferPtr, &wstrBufferUsed)
+	err := _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wcharBufferSize, bufferPtr, &wcharBufferUsed)
 	if err != nil && !errors.Is(err, windows.ERROR_INSUFFICIENT_BUFFER) {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	} else if err == nil {
-		// wstrBufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// wcharBufferUsed indicates the size used internally to render the message. When called with nil buffer
 		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
-		// wstrBufferSize to our buffer, truncating the message if our buffer was too small.
-		if wstrBufferUsed <= wstrBufferSize {
-			return common.UTF16ToUTF8Bytes(renderBuf[:wstrBufferUsed*2], out)
+		// wcharBufferSize to our buffer, truncating the message if our buffer was too small.
+		if wcharBufferUsed <= wcharBufferSize {
+			return common.UTF16ToUTF8Bytes(renderBuf[:wcharBufferUsed*2], out)
 		}
 	}
 
@@ -428,10 +428,10 @@ func FormatEventString(
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
 
-	bb.Reserve(int(wstrBufferUsed * 2))
-	wstrBufferSize = wstrBufferUsed
+	bb.Reserve(int(wcharBufferUsed * 2))
+	wcharBufferSize = wcharBufferUsed
 
-	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wstrBufferSize, bb.PtrAt(0), &wstrBufferUsed)
+	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferUsed)
 	if err != nil {
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
