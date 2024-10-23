@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
+        file: ["bump-golang.yml", "bump-golang-7.17.yml"]
     steps:
       - uses: actions/checkout@v4
 
@@ -29,7 +29,18 @@ jobs:
         with:
           go-version-file: .go-version
 
-      - name: Run Updatecli in Apply mode
+      - name: Run Updatecli in local mode
+        run: updatecli --experimental apply --commit false --push false --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - run: go mod tidy
+
+      - name: Run Updatecli in push mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

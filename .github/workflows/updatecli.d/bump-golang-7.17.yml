@@ -6,8 +6,8 @@ scms:
   githubConfig:
     kind: github
     spec:
-      owner: '{{ .scm.owner }}'
-      repository: '{{ .scm.repository }}'
+      owner: "{{ .scm.owner }}"
+      repository: "{{ .scm.repository }}"
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
@@ -90,20 +90,6 @@ targets:
       content: 'go {{ source "gomod" }}'
       file: go.mod
       matchpattern: 'go \d+.\d+'
-  goModTidy:
-    dependson:
-      - update-gomod
-    disablesourceinput: true
-    kind: shell
-    name: Run `go mod tidy`
-    spec:
-      changedif:
-        kind: file/checksum
-        spec:
-          files:
-            - go.mod
-            - go.sum
-      command: go mod tidy
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion
