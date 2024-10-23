@@ -101,7 +101,18 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 					var logError = false
 					var pathError *fs.PathError
 					if errors.As(err, &pathError) {
-						if pathError.Op == "read" && pathError.Path == "|0" && pathError.Err.Error() == "file already closed" {
+						// Because we're reading from the stdout from a process that will
+						// eventually exit, it can happen that when reading we get the
+						// fs.PathError below instead of an io.EOF. This is expected,
+						// it only means the process has exited, its stdout has been
+						// closed and there is nothing else for us to read.
+						// This is expected and does not cause any data loss.
+						// So we log at level debug to have it in our logs if ever needed
+						// while avoiding adding error level logs on user's deployments
+						// for situations that are well handled.
+						if pathError.Op == "read" &&
+							pathError.Path == "|0" &&
+							pathError.Err.Error() == "file already closed" {
 							logger.Debugf("cannot read from journalctl stdout: '%s'", err)
 						} else {
 							logError = true

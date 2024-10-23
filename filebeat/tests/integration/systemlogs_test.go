@@ -106,7 +106,11 @@ func findFilesetNames(t *testing.T, outputGlob string) func() bool {
 		foundAuth := false
 
 		file, err := os.Open(files[0])
+		if err != nil {
+			t.Fatalf("cannot open '%s': '%s'", files[0], err)
+		}
 		defer file.Close()
+
 		r := bufio.NewReader(file)
 		for {
 			line, err := r.ReadBytes('\n')
@@ -128,11 +132,10 @@ func findFilesetNames(t *testing.T, outputGlob string) func() bool {
 				t.Fatalf("cannot parse output line as JSON: %s", err)
 			}
 
-			if data.Fileset.Name == "syslog" {
+			switch data.Fileset.Name {
+			case "syslog":
 				foundSyslog = true
-			}
-
-			if data.Fileset.Name == "auth" {
+			case "auth":
 				foundAuth = true
 			}
 

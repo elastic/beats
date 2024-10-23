@@ -18,4 +18,4 @@ output:
   file:
     path: ${path.home}
     filename: "output"
-    rotate_every_kb: 62500 # 500Mb
+    rotate_every_kb: 500000 # 500mb
