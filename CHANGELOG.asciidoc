@@ -7,6 +7,12 @@
 === Beats version 8.15.3
 https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
+==== Known issues
+
+*Affecting all Beats*
+
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
 ==== Breaking changes
 
 *Filebeat*
@@ -54,6 +60,12 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
 
+==== Known issues
+
+*Affecting all Beats*
+
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -72,7 +84,9 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
 *Affecting all Beats*
 
-- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. 
+- Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
 ==== Bugfixes
 
@@ -129,6 +143,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 *Filebeat*
 
 - The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
 ==== Breaking changes
 
