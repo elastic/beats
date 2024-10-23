@@ -128,16 +128,10 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	syncTimer := time.NewTimer(syncWaitTime)
 	updateTimer := time.NewTimer(updateWaitTime)
 
-<<<<<<< HEAD
-=======
-	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
-	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
-
 	var (
 		last time.Time
 		err  error
 	)
->>>>>>> 6b540745cb (x-pack/filebeat/input/entityanalytics/provider/activedirectory: improve modification time and deletion logic (#41179))
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
