@@ -7,6 +7,7 @@ package httpjson
 import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -29,6 +30,7 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, nil, err
 	}
+	conf.ucfg = cfg
 	sources, inp := newCursorInput(conf)
 	return sources, inp, nil
 }
@@ -40,6 +42,9 @@ func newCursorInput(config config) ([]inputcursor.Source, inputcursor.Input) {
 }
 
 func (in *cursorInput) Test(src inputcursor.Source, _ v2.TestContext) error {
+	if _, ok := src.(*cel.Source); ok {
+		return cel.Input{}.Test(src, v2.TestContext{})
+	}
 	return test((src.(*source)).config.Request.URL.URL)
 }
 

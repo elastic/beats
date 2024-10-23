@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -113,11 +114,27 @@ func test(url *url.URL) error {
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
 	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
-	defer unreg()
-	return run(ctx, cfg, pub, crsr, reg)
+	return run(ctx, cfg, pub, crsr, reg, unreg)
 }
 
-func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
+func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry, unreg func()) error {
+	if cfg.CEL != nil {
+		unreg()
+		// Apply cel defaults and re-unmarshal config.
+		*cfg.CEL = cel.DefaultConfig()
+		err := cfg.ucfg.Unpack(&cfg)
+		if err != nil {
+			return err
+		}
+		// Paper over impedance mismatch.
+		var csr inputcursor.Cursor
+		if crsr != nil {
+			csr = *crsr
+		}
+		return cel.Input{}.Run(ctx, &cel.Source{Config: *cfg.CEL}, csr, pub)
+	}
+	defer unreg()
+
 	log := ctx.Logger.With("input_url", cfg.Request.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)

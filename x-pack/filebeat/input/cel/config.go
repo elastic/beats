@@ -21,8 +21,9 @@ import (
 
 const defaultMaxExecutions = 1000
 
-// config is the top-level configuration for a cel input.
-type config struct {
+// Config is the top-level configuration for a cel input. It is an internal
+// type that is only exported to allow use by the httpjson package.
+type Config struct {
 	// Interval is the period interval between runs of the input.
 	Interval time.Duration `config:"interval" validate:"required"`
 
@@ -69,7 +70,7 @@ type redact struct {
 	Delete bool `config:"delete"`
 }
 
-func (c config) Validate() error {
+func (c Config) Validate() error {
 	if c.Redact == nil {
 		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
@@ -96,7 +97,7 @@ func (c config) Validate() error {
 	return nil
 }
 
-func defaultConfig() config {
+func DefaultConfig() Config {
 	maxExecutions := defaultMaxExecutions
 	maxAttempts := 5
 	waitMin := time.Second
@@ -104,7 +105,7 @@ func defaultConfig() config {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 30 * time.Second
 
-	return config{
+	return Config{
 		MaxExecutions: &maxExecutions,
 		Interval:      time.Minute,
 		Resource: &ResourceConfig{

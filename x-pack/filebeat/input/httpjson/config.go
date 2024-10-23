@@ -10,16 +10,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type config struct {
-	Interval time.Duration   `config:"interval" validate:"required"`
+	Interval time.Duration   `config:"interval"`
 	Auth     *authConfig     `config:"auth"`
-	Request  *requestConfig  `config:"request" validate:"required"`
+	Request  *requestConfig  `config:"request"`
 	Response *responseConfig `config:"response"`
 	Cursor   cursorConfig    `config:"cursor"`
 	Chain    []chainConfig   `config:"chain"`
+
+	CEL  *cel.Config `config:"cel"`
+	ucfg *conf.C
 }
 
 type cursorConfig map[string]cursorEntry
@@ -35,8 +40,18 @@ func (ce cursorEntry) mustIgnoreEmptyValue() bool {
 }
 
 func (c config) Validate() error {
-	if c.Interval <= 0 {
+	if c.CEL != nil {
+		return c.CEL.Validate()
+	}
+
+	if c.Interval == 0 {
+		return errors.New("interval must be configured")
+	}
+	if c.Interval < 0 {
 		return errors.New("interval must be greater than 0")
+	}
+	if c.Request == nil {
+		return errors.New("request configuration must be present")
 	}
 	for _, v := range c.Chain {
 		if v.Step == nil && v.While == nil {
