@@ -10,6 +10,7 @@ package cel
 import (
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -166,7 +167,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace)
+	wantDump := cfg.FailureDumpPath != ""
+	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace, wantDump)
 	if err != nil {
 		return err
 	}
@@ -251,12 +253,21 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			state, err = evalWith(ctx, prg, ast, state, start)
+			state, err = evalWith(ctx, prg, ast, state, start, wantDump)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
+				var dump dumpError
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					return err
+				case errors.As(err, &dump):
+					dir := strings.ReplaceAll(cfg.FailureDumpPath, "*", sanitizeFileName(env.IDWithoutName))
+					path := filepath.Join(dir, "dump_"+i.now().In(time.UTC).Format("20060102150405.999Z"))
+					log.Debugw("writing failure dump file", "path", path)
+					err := dump.writeToFile(path)
+					if err != nil {
+						log.Errorw("failed to write failure dump", "path", path, "error", err)
+					}
 				}
 				log.Errorw("failed evaluation", "error", err)
 				env.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
@@ -1004,7 +1015,7 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details bool) (cel.Program, *cel.Ast, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
@@ -1042,7 +1053,11 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		return nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
-	prg, err := env.Program(ast)
+	var progOpts []cel.ProgramOption
+	if details {
+		progOpts = []cel.ProgramOption{cel.EvalOptions(cel.OptTrackState)}
+	}
+	prg, err := env.Program(ast, progOpts...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
@@ -1064,8 +1079,8 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool) (map[string]interface{}, error) {
+	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -1080,6 +1095,9 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 	})
 	if err != nil {
 		err = lib.DecoratedError{AST: ast, Err: err}
+		if details {
+			err = dumpError{error: err, dump: lib.NewDump(ast, det)}
+		}
 	}
 	if e := ctx.Err(); e != nil {
 		err = e
@@ -1106,6 +1124,36 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 		clearWantMore(state)
 		return state, errors.New(errMsg)
 	}
+}
+
+// dumpError is an evaluation state dump associated with an error.
+type dumpError struct {
+	error
+	dump *lib.Dump
+}
+
+func (e dumpError) writeToFile(path string) (err error) {
+	err = os.MkdirAll(filepath.Dir(path), 0o700)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errors.Join(err, f.Sync(), f.Close())
+	}()
+	enc := json.NewEncoder(f)
+	enc.SetEscapeHTML(false)
+	type dump struct {
+		Error string          `json:"error"`
+		State []lib.NodeValue `json:"state"`
+	}
+	return enc.Encode(dump{
+		Error: e.Error(),
+		State: e.dump.NodeValues(),
+	})
 }
 
 // clearWantMore sets the state to not request additional work in a periodic evaluation.
