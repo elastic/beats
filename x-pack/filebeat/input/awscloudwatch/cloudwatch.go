@@ -37,7 +37,7 @@ type cloudwatchPoller struct {
 }
 
 type workResponse struct {
-	logGroup           string
+	logGroupId         string
 	startTime, endTime time.Time
 }
 
@@ -64,8 +64,8 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	}
 }
 
-func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, startTime, endTime time.Time, logProcessor *logProcessor) {
-	err := p.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime, logProcessor)
+func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroupId string, startTime, endTime time.Time, logProcessor *logProcessor) {
+	err := p.getLogEventsFromCloudWatch(svc, logGroupId, startTime, endTime, logProcessor)
 	if err != nil {
 		var errRequestCanceled *awssdk.RequestCanceledError
 		if errors.As(err, &errRequestCanceled) {
@@ -76,9 +76,9 @@ func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroup string, star
 }
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroup string, startTime, endTime time.Time, logProcessor *logProcessor) error {
+func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroupId string, startTime, endTime time.Time, logProcessor *logProcessor) error {
 	// construct FilterLogEventsInput
-	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroup)
+	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroupId)
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(svc, filterLogEventsInput)
 	for paginator.HasMorePages() {
 		filterLogEventsOutput, err := paginator.NextPage(context.TODO())
@@ -96,16 +96,16 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client
 		p.log.Debug("done sleeping")
 
 		p.log.Debugf("Processing #%v events", len(logEvents))
-		logProcessor.processLogEvents(logEvents, logGroup, p.region)
+		logProcessor.processLogEvents(logEvents, logGroupId, p.region)
 	}
 	return nil
 }
 
-func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime, endTime time.Time, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
+func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime, endTime time.Time, logGroupId string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(logGroup),
-		StartTime:    awssdk.Int64(unixMsFromTime(startTime)),
-		EndTime:      awssdk.Int64(unixMsFromTime(endTime)),
+		LogGroupIdentifier: awssdk.String(logGroupId),
+		StartTime:          awssdk.Int64(unixMsFromTime(startTime)),
+		EndTime:            awssdk.Int64(unixMsFromTime(endTime)),
 	}
 
 	if len(p.config.LogStreams) > 0 {
@@ -138,9 +138,9 @@ func (p *cloudwatchPoller) startWorkers(
 					work = <-p.workResponseChan
 				}
 
-				p.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", work.logGroup)
-				p.run(svc, work.logGroup, work.startTime, work.endTime, logProcessor)
-				p.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", work.logGroup)
+				p.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", work.logGroupId)
+				p.run(svc, work.logGroupId, work.startTime, work.endTime, logProcessor)
+				p.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", work.logGroupId)
 			}
 		}()
 	}
@@ -149,7 +149,7 @@ func (p *cloudwatchPoller) startWorkers(
 // receive implements the main run loop that distributes tasks to the worker
 // goroutines. It accepts a "clock" callback (which on a live input should
 // equal time.Now) to allow deterministic unit tests.
-func (p *cloudwatchPoller) receive(ctx context.Context, logGroupNames []string, clock func() time.Time) {
+func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, clock func() time.Time) {
 	defer p.workerWg.Wait()
 	// startTime and endTime are the bounds of the current scanning interval.
 	// If we're starting at the end of the logs, advance the start time to the
@@ -160,15 +160,15 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupNames []string, 
 		startTime = endTime.Add(-p.config.ScanFrequency)
 	}
 	for ctx.Err() == nil {
-		for _, lg := range logGroupNames {
+		for _, lg := range logGroupIDs {
 			select {
 			case <-ctx.Done():
 				return
 			case <-p.workRequestChan:
 				p.workResponseChan <- workResponse{
-					logGroup:  lg,
-					startTime: startTime,
-					endTime:   endTime,
+					logGroupId: lg,
+					startTime:  startTime,
+					endTime:    endTime,
 				}
 			}
 		}

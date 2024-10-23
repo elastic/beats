@@ -21,7 +21,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -32,15 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/licenser"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
-
-func init() {
-	// backwards compatibility workaround, convert -flags to --flags:
-	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-			os.Args[1+i] = "-" + arg
-		}
-	}
-}
 
 // BeatsRootCmd handles all application command line interface, parses user
 // flags and runs subcommands
@@ -76,13 +66,11 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
+	cfgfile.Initialize()
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %w", err))
 	}
-
-	// Initialize the configuration flags.
-	cfgfile.InitFlags()
 
 	// must be updated prior to CLI flag handling.
 
@@ -99,18 +87,30 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 
 	// Persistent flags, common across all subcommands
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("E"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("E")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("c")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("d"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("d")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("v")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("e"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("e")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("environment")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("path.config")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("path.data")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("path.logs")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("path.home")
 	rootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("strict.perms"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("strict.perms")
 	if f := flag.CommandLine.Lookup("plugin"); f != nil {
 		rootCmd.PersistentFlags().AddGoFlag(f)
+		cfgfile.AddAllowedBackwardsCompatibleFlag("plugin")
 	}
 
 	// Inherit root flags from run command
