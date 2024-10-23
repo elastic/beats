@@ -107,7 +107,6 @@ steps:
           set -euo pipefail
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
-          asdf install kind "${ASDF_KIND_VERSION}"
           cd metricbeat
           mage goIntegTest
         retry:
