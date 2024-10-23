@@ -5,7 +5,11 @@ processors:
     copy_from: _ingest.timestamp
 - set:
     field: "process.pid"
-    value: '{{ journald.pid }}'
+    value: "{{ journald.pid }}"
+- set:
+    field: "process.name"
+    value: "{{ journald.process.name }}"
+    ignore_failure: true
 - set:
     field: event.kind
     value: event
