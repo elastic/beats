@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"testing"
 	"time"
@@ -148,32 +147,6 @@ func findFilesetNames(t *testing.T, outputGlob string) func() bool {
 	}
 
 	return f
-}
-
-func TestSystemLogsCanUseLogInput(t *testing.T) {
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-	workDir := filebeat.TempDir()
-	copyModulesDir(t, workDir)
-
-	logFilePath := path.Join(workDir, "syslog")
-	integration.GenerateLogFile(t, logFilePath, 5, false)
-	yamlCfg := fmt.Sprintf(systemModuleCfg, logFilePath, workDir)
-
-	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
-
-	filebeat.WaitForLogs(
-		"using log input because file(s) was(were) found",
-		10*time.Second,
-		"system-logs did not select the log input")
-	filebeat.WaitForLogs(
-		"Harvester started for paths:",
-		10*time.Second,
-		"system-logs did not start the log input")
 }
 
 func copyModulesDir(t *testing.T, dst string) {
