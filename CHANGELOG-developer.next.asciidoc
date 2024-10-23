@@ -64,6 +64,16 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Fix type mismatch in libbeat/metric/system/cgroup/cgv2 when building on mips platforms. {pull}34658[34658]
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 - Skip flakey test in HTTPJSON input {issue}34929[34929] {issue}37146[37146] {pull}37162[37162]
+- Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714]
+- Fix copy arguments for strict aligned architectures. {pull}36976[36976]
+- Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
+- Skip flakey metrics test on windows in filebeat httpjson input. {issue}39676[39676] {pull}39678[39678]
+- Fix flakey test on Windows 2022 in packetbeat/route. {issue}39698[39698] {pull}39822[39822]
+- Fix bug in minimum length for request trace logging. {pull}39834[39834]
+- Close connections properly in Filbeat's HTTPJSON input. {pull}39790[39790]
+- Add the Offset property to libbeat/reader.Message to store the total number of bytes read and discarded before generating the message. This enables inputs to accurately determine how much data has been read up to the message, using Message.Bytes + Message.Offset. {pull}39873[39873] {issue}39653[39653]
+- AWS CloudWatch Metrics record previous endTime to use for next collection period and change log.logger from cloudwatch to aws.cloudwatch. {pull}40870[40870]
+- Fix flaky test in cel and httpjson inputs of filebeat. {issue}40503[40503] {pull}41358[41358]
 
 ==== Added
 

@@ -7,8 +7,12 @@ package httpjson
 import (
 	"context"
 	"fmt"
+<<<<<<< HEAD
 	"io/ioutil"
 	"math/rand"
+=======
+	"io"
+>>>>>>> 794b832932 (x-pack/filebeat/input/{cel,httpjson}: fix flaky test (#41358))
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -331,7 +335,8 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count += 1
 	}
 }
