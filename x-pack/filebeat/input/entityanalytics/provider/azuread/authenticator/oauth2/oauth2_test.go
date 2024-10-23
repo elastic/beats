@@ -63,7 +63,7 @@ func TestRenew(t *testing.T) {
 		value := "test-value"
 		expiresIn := 1000
 
-		clientSecret := "value&chars=to|escape"
+		clientSecret := "value&chars=to|escape" // #nosec G101
 		srv := testSetupServer(t, clientSecret, value, expiresIn)
 		defer srv.Close()
 
