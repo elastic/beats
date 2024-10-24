@@ -19,10 +19,10 @@ func TestNewLowerCaseProcessor(t *testing.T) {
 		},
 	)
 
-	procInt, err := NewLowerCaseProcessor(c)
+	procInt, err := NewLowerCaseKeyProcessor(c)
 	assert.NoError(t, err)
 
-	processor, ok := procInt.(*lowerCaseProcessor)
+	processor, ok := procInt.(*changeFieldProcessor)
 	assert.True(t, ok)
 	assert.Equal(t, []string{"field1", "field2"}, processor.Fields)
 	assert.True(t, processor.IgnoreMissing)
@@ -119,10 +119,11 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			p := &lowerCaseProcessor{
+			p := &changeFieldProcessor{
 				Fields:        test.Fields,
 				IgnoreMissing: test.IgnoreMissing,
 				FailOnError:   test.FailOnError,
+				changeFunc:    lowerCaseKey,
 			}
 
 			event, err := p.Run(&beat.Event{Fields: test.Input})

@@ -1,32 +1,41 @@
-[[lowercase-fields]]
-=== Lowercase fields from events
+[[lowercase-keys]]
+=== Lowercase keys from events
 
 ++++
-<titleabbrev>lowercase_fields</titleabbrev>
+<titleabbrev>lowercase_keys</titleabbrev>
 ++++
 
-The `lowercase_fields` processor specifies a list of fields to lowercase.
+The `lowercase_keys` processor specifies a list of fields that must be lowercased. Note this applies only to matching keys and not values.
 
 For example:
 
-[source,yaml]
 ------------------------------------------------------------------------------
 processors:
-  - lowercase_fields:
+  - lowercase_keys:
       fields:
         - "a.B"
       ignore_missing: false
       fail_on_error: true
 ------------------------------------------------------------------------------
 
-[source,json]
+[input.json]
 -------------------------------------------------------------------------------
 {
-  "a.b": {}
+  "a.B": {"c.D"}
 }
 -------------------------------------------------------------------------------
 
-The `lowercase_fields` processor has the following configuration settings:
+
+[output.json]
+-------------------------------------------------------------------------------
+{
+  "a.b": {"c.D"}
+}
+-------------------------------------------------------------------------------
+
+
+
+The `lowercase_keys` processor has the following configuration settings:
 
 `fields`:: The fields to lowercase.
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.

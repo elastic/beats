@@ -25,79 +25,29 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
-
-type lowerCaseProcessor struct {
-	Fields        []string
-	IgnoreMissing bool
-	FailOnError   bool
-}
 
 func init() {
 	processors.RegisterPlugin(
-		"lowercase_fields",
+		"lowercase_keys",
 		checks.ConfigChecked(
-			NewLowerCaseProcessor,
+			NewLowerCaseKeyProcessor,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "when", "ignore_missing", "fail_on_error"),
 		),
 	)
 }
 
-func NewLowerCaseProcessor(c *conf.C) (processors.Processor, error) {
-	config := struct {
-		Fields        []string `config:"fields"`
-		IgnoreMissing bool     `config:"ignore_missing"`
-		FailOnError   bool     `config:"fail_on_error"`
-	}{
-		IgnoreMissing: false,
-		FailOnError:   true,
-	}
-
-	if err := c.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the lowercase_fields configuration: %s", err)
-	}
-
-	// Skip mandatory fields
-	for _, readOnly := range processors.MandatoryExportedFields {
-		for i, field := range config.Fields {
-			if field == readOnly {
-				config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
-			}
-		}
-	}
-
-	return &lowerCaseProcessor{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing, FailOnError: config.FailOnError}, nil
+// NewLowerCaseKeyProcessor converts event keys matching the provided fields to lowercase
+func NewLowerCaseKeyProcessor(c *conf.C) (processors.Processor, error) {
+	return NewChangeFieldProcessor(c, "lower", lowerCaseKey)
 }
 
-func (p *lowerCaseProcessor) Run(event *beat.Event) (*beat.Event, error) {
-	var backup *beat.Event
-	if p.FailOnError {
-		backup = event.Clone()
-	}
+func lowerCaseKey(event *beat.Event, field string) error {
 
-	for _, field := range p.Fields {
-		if err := p.lowerCaseField(event, field); err != nil {
-			if p.FailOnError {
-				event = backup
-				event.PutValue("error.message", err.Error())
-				return event, err
-			}
-		}
-	}
-
-	return event, nil
-}
-
-func (p *lowerCaseProcessor) lowerCaseField(event *beat.Event, field string) error {
 	value, err := event.GetValue(field)
 	if err != nil {
-		if p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
-			return nil
-		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, err)
+		return err
 	}
 
 	if err := event.Delete(field); err != nil {
@@ -119,8 +69,4 @@ func (p *lowerCaseProcessor) lowerCaseField(event *beat.Event, field string) err
 	}
 
 	return nil
-}
-
-func (p *lowerCaseProcessor) String() string {
-	return fmt.Sprintf("lowercase_fields=%+v", *p)
 }
