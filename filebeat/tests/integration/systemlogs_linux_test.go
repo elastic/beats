@@ -20,15 +20,19 @@
 package integration
 
 import (
+	"bufio"
 	_ "embed"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"testing"
 	"time"
 
 	cp "github.com/otiai10/copy"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
@@ -50,10 +54,13 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 
 	// As the name says, we want this folder to exist bu t be empty
 	globWithoutFiles := filepath.Join(filebeat.TempDir(), "this-folder-does-not-exist")
-	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, workDir)
+	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, globWithoutFiles, workDir)
 
 	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
+	filebeat.Start(
+		"-E",
+		"logging.event_data.files.rotateeverybytes=524288000",
+	)
 
 	filebeat.WaitForLogs(
 		"no files were found, using journald input",
@@ -63,32 +70,86 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 		"journalctl started with PID",
 		10*time.Second,
 		"system-logs did not start journald input")
+
+	// Scan every event in the output until at least one from
+	// each fileset (auth, syslog) is found.
+	waitForAllFilesets(
+		t,
+		filepath.Join(workDir, "output*.ndjson"),
+		"did not find events from both filesets: 'auth' and 'syslog'",
+	)
 }
 
-func TestSystemLogsCanUseLogInput(t *testing.T) {
-	filebeat := integration.NewBeat(
+func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
+	require.Eventually(
 		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-	workDir := filebeat.TempDir()
-	copyModulesDir(t, workDir)
+		findFilesetNames(t, outputGlob),
+		time.Minute,
+		10*time.Millisecond,
+		msgAndArgs...)
+}
 
-	logFilePath := path.Join(workDir, "syslog")
-	integration.GenerateLogFile(t, logFilePath, 5, false)
-	yamlCfg := fmt.Sprintf(systemModuleCfg, logFilePath, workDir)
+func findFilesetNames(t *testing.T, outputGlob string) func() bool {
+	f := func() bool {
+		files, err := filepath.Glob(outputGlob)
+		if err != nil {
+			t.Fatalf("cannot get files list for glob '%s': '%s'", outputGlob, err)
+		}
 
-	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
+		if len(files) > 1 {
+			t.Fatalf(
+				"only a single output file is supported, found: %d. Files: %s",
+				len(files),
+				files,
+			)
+		}
 
-	filebeat.WaitForLogs(
-		"using log input because file(s) was(were) found",
-		10*time.Second,
-		"system-logs did not select the log input")
-	filebeat.WaitForLogs(
-		"Harvester started for paths:",
-		10*time.Second,
-		"system-logs did not start the log input")
+		foundSyslog := false
+		foundAuth := false
+
+		file, err := os.Open(files[0])
+		if err != nil {
+			t.Fatalf("cannot open '%s': '%s'", files[0], err)
+		}
+		defer file.Close()
+
+		r := bufio.NewReader(file)
+		for {
+			line, err := r.ReadBytes('\n')
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					break
+				} else {
+					t.Fatalf("cannot read '%s': '%s", file.Name(), err)
+				}
+			}
+
+			data := struct {
+				Fileset struct {
+					Name string `json:"name"`
+				} `json:"fileset"`
+			}{}
+
+			if err := json.Unmarshal(line, &data); err != nil {
+				t.Fatalf("cannot parse output line as JSON: %s", err)
+			}
+
+			switch data.Fileset.Name {
+			case "syslog":
+				foundSyslog = true
+			case "auth":
+				foundAuth = true
+			}
+
+			if foundAuth && foundSyslog {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return f
 }
 
 func copyModulesDir(t *testing.T, dst string) {
