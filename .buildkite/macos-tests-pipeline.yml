@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+env:
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
+  ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_PYTHON_VERSION: 3.10.9
+
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
+steps:
+  - label: ":mac: Auditbeat: macOS x86_64 Unit Tests"
+    command: echo "test!"
+    retry:
+      automatic:
+        - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+    agents:
+      provider: "orka"
+      imagePrefix: "${IMAGE_MACOS_X86_64}"
+    artifact_paths:
+      - "auditbeat/build/*.xml"
+      - "auditbeat/build/*.json"
