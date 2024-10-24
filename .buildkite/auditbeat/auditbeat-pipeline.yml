@@ -280,6 +280,8 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
           mage build unitTest
+        concurrency_group: "orka-concurrency-group"
+        concurrency: 1
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -306,6 +308,8 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
           mage build unitTest
+        concurrency_group: "orka-concurrency-group"
+        concurrency: 1
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
