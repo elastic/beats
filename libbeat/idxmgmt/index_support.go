@@ -21,10 +21,10 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -314,7 +314,7 @@ func (m *indexManager) setupWithILM() (bool, error) {
 		}
 		if withILM {
 			// mark ILM as enabled in indexState
-			m.support.st.withILM.CAS(false, true)
+			m.support.st.withILM.CompareAndSwap(false, true)
 		}
 	}
 	return withILM, nil
