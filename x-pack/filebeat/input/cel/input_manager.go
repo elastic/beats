@@ -34,16 +34,18 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 }
 
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	src := &source{cfg: defaultConfig()}
-	if err := cfg.Unpack(&src.cfg); err != nil {
+	src := &Source{Config: DefaultConfig()}
+	if err := cfg.Unpack(&src.Config); err != nil {
 		return nil, nil, err
 	}
-	return []inputcursor.Source{src}, input{}, nil
+	return []inputcursor.Source{src}, Input{}, nil
 }
 
-type source struct{ cfg config }
+// Source is the CEL input implementation of inputcursor.Source. It is an internal
+// type that is only exported to allow use by the httpjson package.
+type Source struct{ Config Config }
 
-func (s *source) Name() string { return s.cfg.Resource.URL.String() }
+func (s *Source) Name() string { return s.Config.Resource.URL.String() }
 
 // Init initializes both wrapped input managers.
 func (m InputManager) Init(grp unison.Group) error {
@@ -52,7 +54,7 @@ func (m InputManager) Init(grp unison.Group) error {
 
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
-	config := defaultConfig()
+	config := DefaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}

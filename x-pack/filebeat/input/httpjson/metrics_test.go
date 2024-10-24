@@ -126,12 +126,11 @@ func TestMetrics(t *testing.T) {
 			t.Cleanup(cancel)
 
 			reg, unreg := inputmon.NewInputRegistry("httpjson-test", ctx.ID, nil)
-			t.Cleanup(unreg)
 
 			var g errgroup.Group
 			g.Go(func() error {
 				pub := statelessPublisher{wrapped: chanClient}
-				return run(ctx, conf, pub, nil, reg)
+				return run(ctx, conf, pub, nil, reg, unreg)
 			})
 
 			timeout := time.NewTimer(5 * time.Second)

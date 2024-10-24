@@ -8,6 +8,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -24,6 +25,7 @@ func statelessConfigure(cfg *conf.C) (stateless.Input, error) {
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
+	conf.ucfg = cfg
 	return newStatelessInput(conf), nil
 }
 
@@ -32,6 +34,9 @@ func newStatelessInput(config config) *statelessInput {
 }
 
 func (in *statelessInput) Test(v2.TestContext) error {
+	if in.config.CEL != nil {
+		return cel.Input{}.Test(&cel.Source{Config: *in.config.CEL}, v2.TestContext{})
+	}
 	return test(in.config.Request.URL.URL)
 }
 

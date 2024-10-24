@@ -1710,7 +1710,7 @@ func TestInput(t *testing.T) {
 
 			cfg := conf.MustNewConfigFrom(test.config)
 
-			conf := defaultConfig()
+			conf := DefaultConfig()
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
@@ -1726,12 +1726,12 @@ func TestInput(t *testing.T) {
 				conf.Resource.Tracer.Filename = filepath.Join(tempDir, conf.Resource.Tracer.Filename)
 			}
 
-			name := input{}.Name()
+			name := Input{}.Name()
 			if name != "cel" {
 				t.Errorf(`unexpected input name: got:%q want:"cel"`, name)
 			}
-			src := &source{conf}
-			err = input{}.Test(src, v2.TestContext{})
+			src := &Source{conf}
+			err = Input{}.Test(src, v2.TestContext{})
 			if err != nil {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
@@ -1752,7 +1752,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
+			err = Input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}

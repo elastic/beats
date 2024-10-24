@@ -80,22 +80,26 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-type input struct {
+var _ inputcursor.Input = Input{}
+
+// Input is the CEL input implementation of inputcursor.Input. It is an internal
+// type that is only exported to allow use by the httpjson package.
+type Input struct {
 	time func() time.Time
 }
 
 // now is time.Now with a modifiable time source.
-func (i input) now() time.Time {
+func (i Input) now() time.Time {
 	if i.time == nil {
 		return time.Now()
 	}
 	return i.time()
 }
 
-func (input) Name() string { return inputName }
+func (Input) Name() string { return inputName }
 
-func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg
+func (Input) Test(src inputcursor.Source, _ v2.TestContext) error {
+	cfg := src.(*Source).Config
 	if !wantClient(cfg) {
 		return nil
 	}
@@ -104,10 +108,13 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
-func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
+func (Input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	var cursor map[string]interface{}
 	env.UpdateStatus(status.Starting, "")
-	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
+
+	// I can't believe this is necessary.
+	crsrIsValid := crsr != inputcursor.Cursor{}
+	if crsrIsValid && !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
 		err := crsr.Unpack(&cursor)
 		if err != nil {
 			env.UpdateStatus(status.Failed, "failed to unpack cursor: "+err.Error())
@@ -115,7 +122,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 		}
 	}
 
-	err := input{}.run(env, src.(*source), cursor, pub)
+	err := Input{}.run(env, src.(*Source), cursor, pub)
 	if err != nil {
 		env.UpdateStatus(status.Failed, "failed to run: "+err.Error())
 		return err
@@ -133,8 +140,8 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
-	cfg := src.cfg
+func (i Input) run(env v2.Context, src *Source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+	cfg := src.Config
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
 	metrics, reg := newInputMetrics(env.ID)
@@ -727,7 +734,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 // https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
 const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
+func newClient(ctx context.Context, cfg Config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
 		return nil, nil, err
@@ -822,7 +829,7 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 	return c, trace, nil
 }
 
-func wantClient(cfg config) bool {
+func wantClient(cfg Config) bool {
 	switch scheme, _, _ := strings.Cut(cfg.Resource.URL.Scheme, "+"); scheme {
 	case "http", "https":
 		return true
@@ -952,7 +959,7 @@ func newRateLimiterFromConfig(cfg *ResourceConfig) *rate.Limiter {
 	return rate.NewLimiter(r, b)
 }
 
-func regexpsFromConfig(cfg config) (map[string]*regexp.Regexp, error) {
+func regexpsFromConfig(cfg Config) (map[string]*regexp.Regexp, error) {
 	if len(cfg.Regexps) == 0 {
 		return nil, nil
 	}

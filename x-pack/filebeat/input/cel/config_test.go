@@ -40,7 +40,7 @@ func TestGetProviderIsCanonical(t *testing.T) {
 }
 
 func TestRegexpConfig(t *testing.T) {
-	cfg := config{
+	cfg := Config{
 		Interval: time.Minute,
 		Program:  `{}`,
 		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
@@ -144,7 +144,7 @@ func TestConfigMustFailWithInvalidResource(t *testing.T) {
 			"resource.url": test.val,
 		}
 		cfg := conf.MustNewConfigFrom(m)
-		conf := defaultConfig()
+		conf := DefaultConfig()
 		conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
 		conf.Redact = &redact{} // Make sure we pass the redact requirement.
 		err := cfg.Unpack(&conf)
@@ -604,7 +604,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 
 			test.input["resource.url"] = "localhost"
 			cfg := conf.MustNewConfigFrom(test.input)
-			conf := defaultConfig()
+			conf := DefaultConfig()
 			conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
@@ -656,7 +656,7 @@ func TestKeepAliveSetting(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			test.input["resource.url"] = "localhost"
 			cfg := conf.MustNewConfigFrom(test.input)
-			conf := defaultConfig()
+			conf := DefaultConfig()
 			conf.Program = "{}"     // Provide an empty program to avoid validation error from that.
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)

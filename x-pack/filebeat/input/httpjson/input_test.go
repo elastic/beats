@@ -1428,6 +1428,39 @@ var testCases = []struct {
 			},
 		}.String()},
 	},
+
+	{
+		name:        "cel_trampoline",
+		setupServer: newCELTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"cel": map[string]interface{}{
+				"interval": 1,
+				"program":  `{"events":[{"message":"{\"calling\":[{\"from\":\"inside\"},{\"the\":[{\"house\":\"!\"}]}]}"}]}`,
+				"state":    nil,
+				"resource": map[string]interface{}{},
+			},
+		},
+		handler:  defaultHandler(http.MethodGet, "", ""),
+		expected: []string{`{"calling":[{"from":"inside"},{"the":[{"house":"!"}]}]}`},
+	},
+	{
+		name:        "cel_trampoline_get",
+		setupServer: newCELTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"cel": map[string]interface{}{
+				"interval": 1,
+				"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+				"state":    nil,
+				"resource": map[string]interface{}{},
+			},
+		},
+		handler:  defaultHandler(http.MethodGet, "", ""),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
 }
 
 func TestInput(t *testing.T) {
@@ -1445,6 +1478,7 @@ func TestInput(t *testing.T) {
 
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
+			conf.ucfg = cfg
 
 			var tempDir string
 			if conf.Request.Tracer != nil {
@@ -1588,6 +1622,26 @@ func newTestServer(
 	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["request.url"] = server.URL
+		t.Cleanup(server.Close)
+	}
+}
+
+func newCELTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		server := newServer(h)
+		config["cel.resource.url"] = server.URL
+
+		// This is purely here to keep ucfg validation quiet.
+		// It is required because the default config has a
+		// requestConfig, so the validation fires. The upshot
+		// is that this needs to be put in place, unless the
+		// config validation is all done manually. This is the
+		// (marginally) less painful path. The method is not
+		// required to be added as it is defaulted to GET.
+		config["request.url"] = server.URL
+
 		t.Cleanup(server.Close)
 	}
 }
