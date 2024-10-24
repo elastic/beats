@@ -34,7 +34,7 @@ func makeTestStore(data map[string]interface{}) *statestore.Store {
 
 type stateStore struct{}
 
-func (stateStore) Access() (*statestore.Store, error) {
+func (stateStore) Access(_ string) (*statestore.Store, error) {
 	return makeTestStore(map[string]interface{}{"hello": "world"}), nil
 }
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }

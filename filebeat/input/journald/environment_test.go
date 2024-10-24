@@ -139,7 +139,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access() (*statestore.Store, error) {
+func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
