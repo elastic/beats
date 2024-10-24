@@ -62,7 +62,7 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 }
 
 func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
-	totalRSS, ok := myRawStat.Stats.MemoryStats.Stats["total_rss"]
+	totalRSS, rssOK := myRawStat.Stats.MemoryStats.Stats["total_rss"]
 
 	// Emulate newer docker releases and exclude cache values from memory usage
 	// See here for a little more context. usage - cache won't work, as it includes shared mappings that can't be dropped
@@ -94,7 +94,8 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 		CommitPeak:        myRawStat.Stats.MemoryStats.CommitPeak,
 		PrivateWorkingSet: myRawStat.Stats.MemoryStats.PrivateWorkingSet,
 	}
-	if ok {
+	// the RSS metrics are cgv1 only.
+	if rssOK {
 		memData.TotalRss = opt.UintWith(totalRSS)
 		if myRawStat.Stats.MemoryStats.Limit != 0 {
 			memData.TotalRssP = opt.FloatWith(float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit))
