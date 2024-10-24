@@ -58,7 +58,8 @@
                 }
             },
             "fstype": "local",
-            "name": "LocalDS_0"
+            "name": "LocalDS_0",
+            "id": "datastore-0"
         }
     }
 }
