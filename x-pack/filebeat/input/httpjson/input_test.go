@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -331,7 +330,8 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count += 1
 	}
 }
