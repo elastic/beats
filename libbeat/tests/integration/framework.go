@@ -313,10 +313,10 @@ func (b *BeatProc) stopNonsynced() {
 	defer b.waitingMutex.Unlock()
 	ps, err := b.Process.Wait()
 	if err != nil {
-		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+		b.t.Logf("[WARN] got an error waiting %s to top: %v", b.beatName, err)
 	}
 	if !ps.Success() {
-		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
+		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
 	}
 }
 
