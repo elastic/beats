@@ -7,12 +7,7 @@ package httpjson
 import (
 	"context"
 	"fmt"
-<<<<<<< HEAD
 	"io/ioutil"
-	"math/rand"
-=======
-	"io"
->>>>>>> 794b832932 (x-pack/filebeat/input/{cel,httpjson}: fix flaky test (#41358))
 	"net/http"
 	"net/http/httptest"
 	"testing"
