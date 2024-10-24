@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"sync"
@@ -111,7 +112,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}
 		overwritePipelines = config.OverwritePipelines
 		b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
-			esClient, err := eslegclient.NewConnectedClient(esConfig, "Packetbeat")
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat")
 			if err != nil {
 				return err
 			}

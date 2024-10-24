@@ -20,6 +20,7 @@
 package lifecycle
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -141,7 +142,9 @@ func newRawESClient(t *testing.T) ESClient {
 		t.Fatal(err)
 	}
 
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 

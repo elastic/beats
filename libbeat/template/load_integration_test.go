@@ -20,6 +20,7 @@
 package template
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -66,7 +67,9 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
 	client := getTestingElasticsearch(t)
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatal(err)
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
@@ -554,7 +557,9 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
@@ -586,7 +591,9 @@ func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int,
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	})
 	require.NoError(t, err)
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	require.NoError(t, err)
 	return conn
 }
