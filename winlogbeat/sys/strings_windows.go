@@ -29,8 +29,11 @@ func init() {
 	ansiCP := windows.GetACP()
 	for _, enc := range charmap.All {
 		cm, ok := enc.(*charmap.Charmap)
+		if !ok {
+			continue
+		}
 		cmID, _ := cm.ID()
-		if !ok || uint32(cmID) != ansiCP {
+		if uint32(cmID) != ansiCP {
 			continue
 		}
 		ansiDecoder = cm.NewDecoder()
