@@ -2863,6 +2863,19 @@ processors:
           }
           ctx.winlog.event_data.remove("ProcessId");
         }
+        if (ctx?.winlog?.event_data?.CallerProcessId != null) {
+          if (ctx?.process == null) {
+            HashMap hm = new HashMap();
+            ctx.put("process", hm);
+          }
+          if (ctx.winlog.event_data.CallerProcessId instanceof String) {
+            Long pid = Long.decode(ctx.winlog.event_data.CallerProcessId);
+            ctx.process.put("pid", pid.longValue());
+          } else {
+            ctx.process.put("pid", ctx.winlog.event_data.CallerProcessId);
+          }
+          ctx.winlog.event_data.remove("CallerProcessId");
+        }
         if (ctx?.winlog?.event_data?.ProcessName != null) {
           if (ctx?.process == null) {
             HashMap hm = new HashMap();
@@ -2870,6 +2883,14 @@ processors:
           }
           ctx.process.put("executable", ctx.winlog.event_data.ProcessName);
           ctx.winlog.event_data.remove("ProcessName");
+        }
+        if (ctx?.winlog?.event_data?.CallerProcessName!= null) {
+          if (ctx?.process == null) {
+            HashMap hm = new HashMap();
+            ctx.put("process", hm);
+          }
+          ctx.process.put("executable", ctx.winlog.event_data.CallerProcessName);
+          ctx.winlog.event_data.remove("CallerProcessName");
         }
         if (ctx?.winlog?.event_data?.IpAddress != null &&
             ctx.winlog.event_data.IpAddress != "-") {
