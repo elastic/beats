@@ -421,7 +421,7 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	pid := exit.PIDs.Tgid
 	process, ok := db.processes[pid]
 	if !ok {
-		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+		db.logger.Debugf("could not insert exit, pid %v not found in db", pid)
 		return
 	}
 	process.ExitCode = exit.ExitCode

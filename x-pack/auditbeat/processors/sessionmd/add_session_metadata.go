@@ -174,7 +174,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		proc, err := p.provider.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 		fullProcess = *proc
@@ -182,7 +182,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 	}
