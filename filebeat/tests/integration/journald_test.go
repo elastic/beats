@@ -75,7 +75,7 @@ func generateJournaldLogs(t *testing.T, ctx context.Context, syslogID string, ma
 //go:embed testdata/filebeat_journald.yml
 var journaldInputCfg string
 
-func TestJournaldInput(t *testing.T) {
+func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -90,9 +90,12 @@ func TestJournaldInput(t *testing.T) {
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
+	// On a normal execution we run journalclt twice, the first time to read all messages from the
+	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
+	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
-	pidLine := filebeat.GetLogLine("journalctl started with PID")
+	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
 	logEntry := struct{ Message string }{}
 	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
 		t.Errorf("could not parse PID log entry as JSON: %s", err)
@@ -105,7 +108,7 @@ func TestJournaldInput(t *testing.T) {
 
 	// Kill journalctl
 	if err := syscall.Kill(pid, syscall.SIGKILL); err != nil {
-		t.Fatalf("coluld  not kill journalctl with PID %d: %s", pid, err)
+		t.Fatalf("coluld not kill journalctl with PID %d: %s", pid, err)
 	}
 
 	go generateJournaldLogs(t, context.Background(), syslogID, 5)
