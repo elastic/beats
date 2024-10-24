@@ -60,6 +60,12 @@ https://github.com/elastic/beats/compare/v8.15.1\...v8.15.2[View commits]
 
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
+==== Known issues
+
+*Affecting all Beats*
+
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -111,6 +117,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
+=======
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. 
+>>>>>>> 1aa9ef69d3 ([main](backport #41379) Document 8.15 memory usage regression as a known issue. (#41380))
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
