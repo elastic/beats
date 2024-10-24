@@ -68,7 +68,7 @@ func (p prvdr) Sync(ev *beat.Event, pid uint32) error {
 			pe.Env = procInfo.Env
 			pe.Filename = procInfo.Filename
 		} else {
-			p.logger.Warnw("couldn't get process info from proc for pid", "pid", pid, "error", err)
+			p.logger.Debugw("couldn't get process info from proc for pid", "pid", pid, "error", err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
 			pe.PIDs.Tgid = pid
