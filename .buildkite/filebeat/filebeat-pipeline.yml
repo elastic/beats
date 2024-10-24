@@ -111,6 +111,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
