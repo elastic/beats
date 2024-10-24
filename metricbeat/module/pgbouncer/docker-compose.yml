@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  postgresql:
+    image: postgres:15
+    hostname: postgresql
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=test
+      - POSTGRES_DB=test
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      - POSTGRES_INITDB_ARGS=--auth=md5
+
+  pgbouncer:
+    build:
+      context: ./_meta
+      dockerfile: Dockerfile
+    hostname: pgbouncer
+    ports:
+      - 6432:6432
+    healthcheck:
+      test: ['CMD-SHELL', 'psql -h localhost -p 6432 -U test -d pgbouncer -c "SHOW STATS"']
+      interval: 15s
+      timeout: 30s
+      retries: 5
+      start_period: 15s
+
+  elasticsearch:
+    hostname: elasticsearch
+    extends:
+      file: ../../../testing/environments/latest.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
+    ports:
+      - 9200:9200
+
+  kibana:
+    extends:
+      file: ../../../testing/environments/latest.yml
+      service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
+    ports:
+      - 5601:5601
