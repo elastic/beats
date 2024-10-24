@@ -168,6 +168,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed failed job handling and removed false-positive error logs in the GCS input. {pull}41142[41142]
 - Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
+- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
+- Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 
 *Heartbeat*
 
