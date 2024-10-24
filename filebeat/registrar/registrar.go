@@ -55,7 +55,7 @@ type successLogger interface {
 }
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	Access(typ string) (*statestore.Store, error)
 }
 
 var (
@@ -72,7 +72,7 @@ const fileStatePrefix = "filebeat::logs::"
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
 func New(stateStore StateStore, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (r *Registrar) GetStates() []file.State {
 // loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) loadStates() error {
-	states, err := readStatesFrom(r.store)
+	states, err := r.readStatesFrom(r.store)
 	if err != nil {
 		return fmt.Errorf("can not load filebeat registry state: %w", err)
 	}
@@ -266,7 +266,7 @@ func (r *Registrar) processEventStates(states []file.State) {
 	}
 }
 
-func readStatesFrom(store *statestore.Store) ([]file.State, error) {
+func (r *Registrar) readStatesFrom(store *statestore.Store) ([]file.State, error) {
 	var states []file.State
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {

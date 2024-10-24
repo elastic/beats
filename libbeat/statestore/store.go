@@ -61,6 +61,10 @@ func newStore(shared *sharedStore) *Store {
 	}
 }
 
+func (s *Store) SetID(id string) {
+	s.shared.backend.SetID(id)
+}
+
 // Close deactivates the current store. No new transacation can be generated.
 // Already active transaction will continue to function until Closed.
 // The backing store will be closed once all stores and active transactions have been closed.
