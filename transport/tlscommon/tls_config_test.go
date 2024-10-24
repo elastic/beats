@@ -71,14 +71,14 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			expectedCallback: true,
 			expectedError:    x509.CertificateInvalidError{Cert: testCerts["expired"], Reason: x509.Expired},
 		},
-		"default verification with certificates when required with incorrect server name in cert": {
+		"default verification with certificates when required do not verify hostname": {
 			verificationMode: VerifyFull,
 			clientAuth:       tls.RequireAndVerifyClientCert,
 			certAuthorities:  certPool,
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
-			serverName:       "bad.example.com",
+			serverName:       "some.example.com",
 			expectedCallback: true,
-			expectedError:    x509.HostnameError{Certificate: testCerts["correct"], Host: "bad.example.com"},
+			expectedError:    nil,
 		},
 		"default verification with certificates when required with correct cert": {
 			verificationMode: VerifyFull,
@@ -257,6 +257,7 @@ func TestTrustRootCA(t *testing.T) {
 
 				// we want to know the number of certificates in the CertPool (RootCAs), as it is not
 				// directly available, we use this workaround of reading the number of subjects in the pool.
+				//nolint:staticcheck // we do not expect the system root CAs.
 				if got, expected := len(cfg.RootCAs.Subjects()), tc.expectedRootCAsLen; got != expected {
 					t.Fatalf("expecting cfg.RootCAs to have %d element, got %d instead", expected, got)
 				}
@@ -763,10 +764,11 @@ func genTestCerts(t *testing.T) map[string]*x509.Certificate {
 		// We write the certificate to disk, so if the test fails the certs can
 		// be inspected/reused
 		certPEM := new(bytes.Buffer)
-		pem.Encode(certPEM, &pem.Block{
+		err = pem.Encode(certPEM, &pem.Block{
 			Type:  "CERTIFICATE",
 			Bytes: cert.Leaf.Raw,
 		})
+		require.NoErrorf(t, err, "failed to encode certificste to PEM")
 
 		serverCertFile, err := os.Create(filepath.Join(tmpDir, certName+".crt"))
 		if err != nil {

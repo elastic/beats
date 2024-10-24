@@ -113,7 +113,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		Certificates:       c.Certificates,
 		RootCAs:            c.RootCAs,
 		ClientCAs:          c.ClientCAs,
-		InsecureSkipVerify: insecure, //nolint: gosec // we are using our own verification for now
+		InsecureSkipVerify: insecure, //nolint:gosec // we are using our own verification for now
 		CipherSuites:       convCipherSuites(c.CipherSuites),
 		CurvePreferences:   c.CurvePreferences,
 		Renegotiation:      c.Renegotiation,
@@ -123,13 +123,13 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	}
 }
 
-// BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
+// BuildModuleClientConfig takes the TLSConfig and transform it into a `tls.Config`.
 func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
 		return &tls.Config{
 			ServerName:         host,
-			InsecureSkipVerify: true, //nolint: gosec // we are using our own verification for now
+			InsecureSkipVerify: true, //nolint:gosec // we are using our own verification for now
 			VerifyConnection: makeVerifyConnection(&TLSConfig{
 				Verification: VerifyFull,
 				ServerName:   host,
@@ -154,15 +154,16 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	return config
 }
 
-// BuildServerConfig takes the TLSConfig and transform it into a `tls.Config` for server side objects.
+// BuildServerConfig takes the TLSConfig and transform it into a `tls.Config`
+// for server side connections.
 func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	if c == nil {
 		// use default TLS settings, if config is empty.
 		return &tls.Config{
 			ServerName:         host,
-			InsecureSkipVerify: true, //nolint: gosec // we are using our own verification for now
+			InsecureSkipVerify: true, //nolint:gosec // we are using our own verification for now
 			VerifyConnection: makeVerifyServerConnection(&TLSConfig{
-				Verification: VerifyFull,
+				Verification: VerifyCertificate,
 				ServerName:   host,
 			}),
 		}
@@ -285,27 +286,13 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 
 func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
-	case VerifyFull:
-		return func(cs tls.ConnectionState) error {
-			if len(cs.PeerCertificates) == 0 {
-				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
-					return ErrMissingPeerCertificate
-				}
-				return nil
-			}
 
-			opts := x509.VerifyOptions{
-				Roots:         cfg.ClientCAs,
-				Intermediates: x509.NewCertPool(),
-				KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
-			}
-			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
-			if err != nil {
-				return err
-			}
-			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
-		}
-	case VerifyCertificate:
+	// VerifyFull would attempt to match 'host' (c.ServerName) that is the host
+	// the client is trying to connect to with a DNS, IP or the CN from the
+	// client's certificate. Such validation, besides making no sense on the
+	// server side also causes errors as the client certificate usually does not
+	// contain a DNS, IP or CN matching the server's hostname.
+	case VerifyFull, VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
 			if len(cs.PeerCertificates) == 0 {
 				if cfg.ClientAuth == tls.RequireAndVerifyClientCert {
@@ -331,7 +318,6 @@ func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error 
 	}
 
 	return nil
-
 }
 
 func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509.VerifyOptions) error {
