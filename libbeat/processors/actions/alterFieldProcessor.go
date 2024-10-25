@@ -97,7 +97,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 
 	// Delete the exisiting value
 	if strings.ContainsRune(field, '.') && a.FullPath {
-		// In case of full_path set to true, we need to make sure to modify the all keys in the chain
+		// In case of full_path set to true, we need to make sure to modify all the keys in the chain
 		firstField := field[:strings.Index(field, ".")]
 		if err := event.Delete(firstField); err != nil {
 			return fmt.Errorf("could not delete key: %s, Error: %v", field, err)
