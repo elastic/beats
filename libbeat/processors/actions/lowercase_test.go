@@ -19,10 +19,10 @@ func TestNewLowerCaseProcessor(t *testing.T) {
 		},
 	)
 
-	procInt, err := NewLowerCaseKeyProcessor(c)
+	procInt, err := NewLowerCaseProcessor(c)
 	assert.NoError(t, err)
 
-	processor, ok := procInt.(*changeFieldProcessor)
+	processor, ok := procInt.(*alterFieldProcessor)
 	assert.True(t, ok)
 	assert.Equal(t, []string{"field1", "field2"}, processor.Fields)
 	assert.True(t, processor.IgnoreMissing)
@@ -35,6 +35,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 		Fields        []string
 		IgnoreMissing bool
 		FailOnError   bool
+		FullPath      bool
 		Input         mapstr.M
 		Output        mapstr.M
 		Error         bool
@@ -44,6 +45,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field1"},
 			IgnoreMissing: false,
 			FailOnError:   true,
+			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -59,6 +61,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field1.Field2"},
 			IgnoreMissing: false,
 			FailOnError:   true,
+			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -70,10 +73,27 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Error: false,
 		},
 		{
+			Name:          "Lowercase nested field when full path is true",
+			Fields:        []string{"Field1.Field2"},
+			IgnoreMissing: true,
+			FailOnError:   false,
+			FullPath:      true,
+			Input: mapstr.M{
+				"Field1": mapstr.M{"Field2": "Value"},
+				"Field3": "Value",
+			},
+			Output: mapstr.M{
+				"field1": mapstr.M{"field2": "Value"},
+				"Field3": "Value",
+			},
+			Error: false,
+		},
+		{
 			Name:          "Ignore Missing Key Error",
 			Fields:        []string{"Field4"},
 			IgnoreMissing: true,
 			FailOnError:   true,
+			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -89,6 +109,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field4"},
 			IgnoreMissing: false,
 			FailOnError:   false,
+			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -104,6 +125,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field4"},
 			IgnoreMissing: false,
 			FailOnError:   true,
+			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -119,11 +141,12 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			p := &changeFieldProcessor{
+			p := &alterFieldProcessor{
 				Fields:        test.Fields,
 				IgnoreMissing: test.IgnoreMissing,
 				FailOnError:   test.FailOnError,
-				changeFunc:    lowerCaseKey,
+				FullPath:      test.FullPath,
+				alterFunc:     lowerCase,
 			}
 
 			event, err := p.Run(&beat.Event{Fields: test.Input})
@@ -134,7 +157,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 				assert.Error(t, err)
 			}
 
-			assert.True(t, reflect.DeepEqual(event.Fields, test.Output))
+			assert.True(t, reflect.DeepEqual(event.Fields, test.Output), event.Fields)
 		})
 	}
 }

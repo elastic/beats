@@ -18,10 +18,8 @@
 package actions
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -29,9 +27,9 @@ import (
 
 func init() {
 	processors.RegisterPlugin(
-		"lowercase_keys",
+		"lowercase",
 		checks.ConfigChecked(
-			NewLowerCaseKeyProcessor,
+			NewLowerCaseProcessor,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "when", "ignore_missing", "fail_on_error"),
 		),
@@ -39,34 +37,10 @@ func init() {
 }
 
 // NewLowerCaseKeyProcessor converts event keys matching the provided fields to lowercase
-func NewLowerCaseKeyProcessor(c *conf.C) (processors.Processor, error) {
-	return NewChangeFieldProcessor(c, "lower", lowerCaseKey)
+func NewLowerCaseProcessor(c *conf.C) (processors.Processor, error) {
+	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
 }
 
-func lowerCaseKey(event *beat.Event, field string) error {
-
-	value, err := event.GetValue(field)
-	if err != nil {
-		return err
-	}
-
-	if err := event.Delete(field); err != nil {
-		return fmt.Errorf("could not delete key: %s, Error: %v", field, err)
-	}
-
-	var lower string
-	if strings.ContainsRune(field, '.') {
-		// In case of nested fields provided, we need to make sure to only modify the latest field in the chain
-		lastIndexRuneFunc := func(r rune) bool { return r == '.' }
-		idx := strings.LastIndexFunc(field, lastIndexRuneFunc)
-		lower = field[:idx+1] + strings.ToLower(field[idx+1:])
-	} else {
-		lower = strings.ToLower(field)
-	}
-
-	if _, err := event.PutValue(lower, value); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, Error: %v", lower, value, err)
-	}
-
-	return nil
+func lowerCase(field string) string {
+	return strings.ToLower(field)
 }
