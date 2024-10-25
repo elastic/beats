@@ -1,5 +1,5 @@
 [[lowercase]]
-=== Lowercase from events
+=== Lowercase fields in events
 
 ++++
 <titleabbrev>lowercase</titleabbrev>
