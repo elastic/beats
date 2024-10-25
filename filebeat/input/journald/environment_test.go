@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -107,7 +107,7 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	e.t.Helper()
 	msg := strings.Builder{}
 	fmt.Fprintf(&msg, "did not find the expected %d events", count)
-	assert.Eventually(e.t, func() bool {
+	require.Eventually(e.t, func() bool {
 		sum := len(e.pipeline.GetAllEvents())
 		if sum == count {
 			return true
