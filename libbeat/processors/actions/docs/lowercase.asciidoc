@@ -59,7 +59,7 @@ The `lowercase_keys` processor has the following configuration settings:
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
-`full_path`:: (Optional) If set to `true`, all keys leading to the most nested key in the chain is lowercased. Default is `false` which means only the latest key is modified.
+`full_path`:: (Optional) If set to `true`, all keys leading to the most nested key in the chain get lowercased. Default is `false` which means only the latest key is modified.
                                   
 
 See <<conditions>> for a list of supported conditions.
