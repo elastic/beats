@@ -22,6 +22,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd auditbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -44,6 +46,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd auditbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -60,19 +64,16 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "Filebeat macOS Tests"
     steps:
     - label: ":mac: Filebeat: macOS x86_64 Unit Tests"
-      key: "macos-unit-tests-extended"
-      if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd filebeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -90,13 +91,13 @@ steps:
             debug: true
 
     - label: ":mac: Filebeat: macOS arm64 Unit Tests"
-      key: "macos-arm64-unit-tests-extended"
-      if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd filebeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -113,18 +114,16 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "Heartbeat macOS Tests"
     steps:
     - label: ":mac: Heartbeat: macOS x86_64 Unit Tests"
-      key: "macos-extended"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd heartbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -136,12 +135,13 @@ steps:
         - "metricbeat/build/*.json"
 
     - label: ":mac: Heartbeat: macOS arm64 Unit Tests"
-      key: "macos-arm-extended"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd heartbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -155,12 +155,13 @@ steps:
   - group: "Metricbeat macOS Tests"
     steps:
     - label: ":mac: Metricbeat: macOS x64_64 Unit Tests"
-      key: "extended-macos-x64-64-unit-tests"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd metricbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -178,7 +179,6 @@ steps:
             debug: true
 
     - label: ":mac: Metricbeat: macOS arm64 Unit Tests"
-      key: "extended-macos-arm64-unit-tests"
       skip: "Skipping due to elastic/beats#33035"
       # https://github.com/elastic/beats/issues/33035
       command: |
@@ -186,6 +186,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd metricbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -202,18 +204,16 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "Packetbeat macOS Tests"
     steps:
     - label: ":mac: Packetbeat: macOS x86_64 Unit Tests"
-      key: "macos-x86-64-unit-tests-extended"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd packetbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -231,12 +231,13 @@ steps:
             debug: true
 
     - label: ":mac: Packetbeat: macOS arm64 Unit Tests"
-      key: "macos-arm64-unit-tests-extended"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd packetbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -253,9 +254,6 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/auditbeat macOS Tests"
     steps:
     - label: ":mac: x-pack/auditbeat: macOS x86_64 Unit Tests"
@@ -264,6 +262,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/auditbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -286,6 +286,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/auditbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -302,9 +304,6 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/filebeat macOS Tests"
     steps:
     - label: ":mac: x-pack/filebeat: macOS x86_64 Unit Tests"
@@ -313,6 +312,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/filebeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -335,6 +336,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/filebeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -351,9 +354,6 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/heartbeat macOS Tests"
     steps:
     - label: ":mac: x-pack/heartbeat: macOS x86_64 Unit Tests"
@@ -364,6 +364,8 @@ steps:
         installNodeJsDependencies
         cd x-pack/heartbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -388,6 +390,8 @@ steps:
         installNodeJsDependencies
         cd x-pack/heartbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -404,9 +408,6 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/metricbeat macOS Tests"
     steps:
     - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
@@ -415,6 +416,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/metricbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -439,6 +442,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/metricbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -455,9 +460,6 @@ steps:
             branches: "main"
             debug: true
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/osquerybeat macOS Tests"
     steps:
     - label: ":mac: x-pack/osquerybeat: macOS x86_64 Unit Tests"
@@ -466,6 +468,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/osquerybeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -482,6 +486,8 @@ steps:
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/osquerybeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -492,18 +498,16 @@ steps:
         - "x-pack/osquerybeat/build/*.xml"
         - "x-pack/osquerybeat/build/*.json"
 
-  - wait: ~
-    continue_on_failure: true
-
   - group: "x-pack/packetbeat macOS Tests"
     steps:
     - label: ":mac: x-pack/packetbeat: macOS x86_64 Unit Tests"
-      key: "extended-macos-unit-tests"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/packetbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -521,12 +525,13 @@ steps:
             debug: true
 
     - label: ":mac: x-pack/packetbeat: macOS arm64 Unit Tests"
-      key: "macos-arm64-unit-tests-extended"
       command: |
         set -euo pipefail
         source .buildkite/scripts/install_macos_tools.sh
         cd x-pack/packetbeat
         mage build unitTest
+      concurrency_group: "orka-concurrency-group"
+      concurrency: 10
       retry:
         automatic:
           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
