@@ -180,7 +180,7 @@ func TestMemoryMath(t *testing.T) {
 	assert.Equal(t, float64(800), rawStats[0].UsageP) // 5000-900 /5
 }
 
-func getMemoryStats(read time.Time, number uint64, rssExits bool) container.StatsResponse {
+func getMemoryStats(read time.Time, number uint64, rssExists bool) container.StatsResponse {
 
 	myMemoryStats := container.StatsResponse{
 		Stats: container.Stats{
@@ -195,7 +195,7 @@ func getMemoryStats(read time.Time, number uint64, rssExits bool) container.Stat
 		},
 	}
 
-	if rssExits {
+	if rssExists {
 		myMemoryStats.MemoryStats.Stats["total_rss"] = number * 5
 	}
 
