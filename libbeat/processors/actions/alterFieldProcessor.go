@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// alterFieldNameFunc defines how fields must be processed
+// alterFieldFunc defines how fields must be processed
 type alterFieldFunc func(field string) string
 
 type alterFieldProcessor struct {
