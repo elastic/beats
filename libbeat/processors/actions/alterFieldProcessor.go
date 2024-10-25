@@ -56,7 +56,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		FailOnError:   config.FailOnError,
 		FullPath:      config.FullPath,
 		processorName: processorName,
-		alterFunc:     changeFunc,
+		alterFunc:     alterFunc,
 	}, nil
 
 }
