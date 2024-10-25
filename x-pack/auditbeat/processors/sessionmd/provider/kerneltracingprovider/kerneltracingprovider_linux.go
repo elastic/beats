@@ -211,7 +211,7 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 func (p *prvdr) handleBackoff(now time.Time) {
 	if p.inBackoff {
 		if now.Sub(p.backoffStart) > backoffDuration {
-			p.logger.Warnw("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
+			p.logger.Infow("ended backoff, skipped processes", "backoffSkipped", p.backoffSkipped)
 			p.inBackoff = false
 			p.combinedWait = 0 * time.Millisecond
 		} else {
@@ -220,7 +220,7 @@ func (p *prvdr) handleBackoff(now time.Time) {
 		}
 	} else {
 		if p.combinedWait > combinedWaitLimit {
-			p.logger.Warn("starting backoff")
+			p.logger.Info("starting backoff")
 			p.inBackoff = true
 			p.backoffStart = now
 			p.backoffSkipped = 0
