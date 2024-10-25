@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+
 package journalctl
 
 import (
@@ -311,7 +313,7 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 			// We recreate the backoff so r.backoff.Last().IsZero()
 			// will return true next time it's called making us to
 			// wait in case jouranlctl crashes in less than 5s.
-			if !r.backoff.Last().IsZero() && time.Now().Sub(r.backoff.Last()) > 5*time.Second {
+			if !r.backoff.Last().IsZero() && time.Since(r.backoff.Last()) > 5*time.Second {
 				r.backoff = backoff.NewExpBackoff(cancel.Done(), 100*time.Millisecond, 2*time.Second)
 			} else {
 				r.backoff.Wait()
