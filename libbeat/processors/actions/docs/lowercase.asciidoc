@@ -1,0 +1,65 @@
+[[lowercase]]
+=== Lowercase from events
+
+++++
+<titleabbrev>lowercase</titleabbrev>
+++++
+
+The `lowercase` processor specifies a list of fields that must be lowercased. This applies only to keys that match the given fields. The default behaviour of the processor is to modify the most nested key in the chain. Use `full_path` to lowercase all keys in the nested chain.
+
+
+
+==== Examples: 
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "a.B"
+      ignore_missing: false
+      fail_on_error: true
+      full_path: false
+----
+
+1. For above config
+
+[source,json]
+----
+{
+  "A.B": {"c.D"}  // Input
+}
+
+{
+  "A.b": {"c.D"}  // output
+}
+----
+
+[start=2]
+2. If `full_path` is set to true
+
+[source,json]
+----
+{
+  "a.B": {"c.D"}  // Input
+}
+
+{
+  "a.b": {"c.D"}  // output
+}
+----
+
+
+==== Configuration:
+
+The `lowercase_keys` processor has the following configuration settings:
+
+`fields`:: The fields to lowercase.
+`ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
+                    The default is `false`, which will fail processing of an event if a field is missing.
+`fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
+                    If set to `false`, processing continues if an error occurs. Default is `true`.
+`full_path`:: (Optional) If set to `true`, all keys leading to the most nested key in the chain is lowercased. Default is `false` which means only the latest key is modified.
+                                  
+
+See <<conditions>> for a list of supported conditions.
