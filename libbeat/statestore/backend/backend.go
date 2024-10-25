@@ -69,7 +69,7 @@ type Store interface {
 	// The loop shall return if fn returns an error or false.
 	Each(fn func(string, ValueDecoder) (bool, error)) error
 
-	// Sets the store ID when the full input configuration is aquired
+	// Sets the store ID when the full input configuration is acquired
 	// This is needed in order to support Elasticsearch state store naming convention based on the input ID
 	SetID(id string)
 }

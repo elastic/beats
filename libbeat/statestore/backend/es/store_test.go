@@ -32,7 +32,7 @@ import (
 func TestStore(t *testing.T) {
 	// This just a convenience test for store development
 	// REMOVE: before the opening PR
-	//t.Skip()
+	t.Skip()
 
 	ctx, cn := context.WithCancel(context.Background())
 	defer cn()
