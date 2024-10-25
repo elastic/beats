@@ -24,7 +24,7 @@ type alterFieldProcessor struct {
 	alterFunc     alterFieldFunc
 }
 
-// NewAlterFieldNameProcessor is an umbrella method for processing events based on provided fields. Such as converting event keys to uppercase/lowercase
+// NewAlterFieldProcessor is an umbrella method for processing events based on provided fields. Such as converting event keys to uppercase/lowercase
 func NewAlterFieldProcessor(c *conf.C, processorName string, changeFunc alterFieldFunc) (processors.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
