@@ -177,7 +177,6 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
 	github.com/apache/arrow/go/v14 v14.0.2
-	github.com/aws/aws-sdk-go v1.54.19
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8
