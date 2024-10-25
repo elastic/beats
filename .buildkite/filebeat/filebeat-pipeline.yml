@@ -111,6 +111,7 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
@@ -122,61 +123,6 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests"
-
-      - label: ":ubuntu: Filebeat: Go Integration Tests - as ROOT"
-        command: |
-          cd filebeat
-          mage buildSystemTestBinary
-          sudo go test -v -count=1 -tags=integration -run=TestSystemLogsCanUseJournald ./tests/integration
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "filebeat: Go Integration Tests"
-
-      - label: ":ubuntu: Filebeat: Can we run journalclt"
-        command: |
-          cd filebeat
-          journalctl --utc --output=json --no-pager --facility 0 --facility 1 --facility 2 --facility 3 --facility 5 --facility 6 --facility 7 --facility 8 --facility 9 --facility 11 --facility 12 --facility 15 --no-tail -n 5 > ./build/integration-tests/syslog.out
-          journalctl --utc --output=json --no-pager --facility 4 --facility 10 --no-tail -n 5 > ./build/integration-tests/auth.out
-          groups > ./build/integration-tests/groups.out
-          sudo echo "I am root" > ./build/integration-tests/isRoot.out
-          whoami > ./build/integration-tests/whoami.out
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/integration-tests/*.out"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "filebeat: Go Integration Tests"
-
 
       - label: ":ubuntu: Filebeat: Python Integration Tests"
         command: |
