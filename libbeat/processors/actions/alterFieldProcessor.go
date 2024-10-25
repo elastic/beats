@@ -30,7 +30,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`
 		FailOnError   bool     `config:"fail_on_error"`
-		FullPath      bool     `config:"fail_path"`
+		FullPath      bool     `config:"full_path"`
 	}{
 		IgnoreMissing: false,
 		FailOnError:   true,
