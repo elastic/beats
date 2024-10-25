@@ -18,14 +18,14 @@
 package sys
 
 import (
+	"sync"
+
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 )
 
-var ansiDecoder *encoding.Decoder
-
-func init() {
+func initANSIDecoder() *encoding.Decoder {
 	ansiCP := windows.GetACP()
 	for _, enc := range charmap.All {
 		cm, ok := enc.(*charmap.Charmap)
@@ -36,13 +36,13 @@ func init() {
 		if uint32(cmID) != ansiCP {
 			continue
 		}
-		ansiDecoder = cm.NewDecoder()
-		return
+		return cm.NewDecoder()
 	}
-	ansiDecoder = charmap.Windows1250.NewDecoder()
+	return charmap.Windows1250.NewDecoder()
 }
 
 func ANSIBytesToString(enc []byte) (string, error) {
-	out, err := ansiDecoder.Bytes(enc)
+	getAnsiDecoder := sync.OnceValue(initANSIDecoder)
+	out, err := getAnsiDecoder().Bytes(enc)
 	return string(out), err
 }
