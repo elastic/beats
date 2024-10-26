@@ -36,7 +36,7 @@ func init() {
 	)
 }
 
-// NewLowerCaseKeyProcessor converts event keys matching the provided fields to lowercase
+// NewLowerCaseProcessor converts event keys matching the provided fields to lowercase
 func NewLowerCaseProcessor(c *conf.C) (processors.Processor, error) {
 	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
 }
