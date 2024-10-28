@@ -117,7 +117,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	return nil
 }
 
-func getcaseInsensitiveValue(event mapstr.M, field string) (fi string, va interface{}) {
+func getcaseInsensitiveValue(event mapstr.M, field string) (key string, value interface{}) {
 
 	// Fast path, key is present as is.
 	if v, err := event.GetValue(field); err == nil {
@@ -125,30 +125,31 @@ func getcaseInsensitiveValue(event mapstr.M, field string) (fi string, va interf
 	}
 
 	// iterate through the map for case insensitive search
-	subkey := strings.Split(field, ".")
+	fieldList := strings.Split(field, ".")
 	data := event
 
-	// outer function goes through all the processor fields seperated by '.'
-	for i, key := range subkey {
+	// outer function goes through the field keyword seperated by '.'
+	for i, subKey := range fieldList {
 		keyfound := false
+		// Traversing event graph at each level
 		for jsonKey, jsonValue := range data {
-			if strings.EqualFold(jsonKey, key) {
+			if strings.EqualFold(jsonKey, subKey) {
 				keyfound = true
-				va = jsonValue
-				subkey[i] = jsonKey
+				value = jsonValue
+				fieldList[i] = jsonKey
 				break
 			}
 		}
 
 		if keyfound {
 			keyfound = false
-			data, _ = toMapStr(va)
+			data, _ = toMapStr(value)
 		} else {
 			return field, nil
 		}
 	}
 
-	return strings.Join(subkey, "."), va
+	return strings.Join(fieldList, "."), value
 }
 
 // toMapStr performs a type assertion on v and returns a MapStr. v can be either
