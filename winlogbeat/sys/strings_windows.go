@@ -25,6 +25,8 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
+var getCachedANSIDecoder = sync.OnceValue(initANSIDecoder)
+
 func initANSIDecoder() *encoding.Decoder {
 	ansiCP := windows.GetACP()
 	for _, enc := range charmap.All {
@@ -42,7 +44,6 @@ func initANSIDecoder() *encoding.Decoder {
 }
 
 func ANSIBytesToString(enc []byte) (string, error) {
-	getAnsiDecoder := sync.OnceValue(initANSIDecoder)
-	out, err := getAnsiDecoder().Bytes(enc)
+	out, err := getCachedANSIDecoder().Bytes(enc)
 	return string(out), err
 }
