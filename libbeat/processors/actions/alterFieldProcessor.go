@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
 
 // alterFieldFunc defines how fields must be processed
@@ -18,7 +17,6 @@ type alterFieldProcessor struct {
 	Fields        []string
 	IgnoreMissing bool
 	FailOnError   bool
-	FullPath      bool
 
 	processorName string
 	alterFunc     alterFieldFunc
@@ -54,7 +52,6 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		Fields:        config.Fields,
 		IgnoreMissing: config.IgnoreMissing,
 		FailOnError:   config.FailOnError,
-		FullPath:      config.FullPath,
 		processorName: processorName,
 		alterFunc:     alterFunc,
 	}, nil
@@ -87,36 +84,29 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	// Get the value of the field to alter
-	value, err := event.GetValue(field)
-	if err != nil {
-		if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+
+	key, value := getcaseInsensitiveValue(event.Fields, field)
+	if value == nil {
+		if a.IgnoreMissing {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, mapstr.ErrKeyNotFound)
 	}
 
 	// Delete the exisiting value
-	if strings.ContainsRune(field, '.') && a.FullPath {
-		// In case of full_path set to true, we need to make sure to modify all the keys in the chain
-		firstField := field[:strings.Index(field, ".")]
-		if err := event.Delete(firstField); err != nil {
-			return fmt.Errorf("could not delete key: %s, Error: %v", field, err)
-		}
-	} else {
-		if err := event.Delete(field); err != nil {
-			return fmt.Errorf("could not delete key: %s, Error: %v", field, err)
-		}
+	if err := event.Delete(key); err != nil {
+		return fmt.Errorf("could not delete key: %s, Error: %v", key, err)
 	}
 
 	// Alter the field
 	var alterString string
-	if strings.ContainsRune(field, '.') && !a.FullPath {
+	if strings.ContainsRune(key, '.') {
 		// In case of nested fields provided, we need to make sure to only modify the latest key in the chain
 		lastIndexRuneFunc := func(r rune) bool { return r == '.' }
-		idx := strings.LastIndexFunc(field, lastIndexRuneFunc)
-		alterString = field[:idx+1] + a.alterFunc(field[idx+1:])
+		idx := strings.LastIndexFunc(key, lastIndexRuneFunc)
+		alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
 	} else {
-		alterString = a.alterFunc(field)
+		alterString = a.alterFunc(key)
 	}
 
 	// Put the field back
@@ -125,4 +115,60 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	}
 
 	return nil
+}
+
+func getcaseInsensitiveValue(event mapstr.M, field string) (fi string, va interface{}) {
+
+	// Fast path, key is present as is.
+	if v, err := event.GetValue(field); err == nil {
+		return field, v
+	}
+
+	// iterate through the map for case insensitive search
+	subkey := strings.Split(field, ".")
+	data := event
+
+	// outer function goes through all the processor fields seperated by '.'
+	for i, key := range subkey {
+		keyfound := false
+		for jsonKey, jsonValue := range data {
+			if strings.EqualFold(jsonKey, key) {
+				keyfound = true
+				va = jsonValue
+				subkey[i] = jsonKey
+				break
+			}
+		}
+
+		if keyfound {
+			keyfound = false
+			data, _ = toMapStr(va)
+		} else {
+			return field, nil
+		}
+	}
+
+	return strings.Join(subkey, "."), va
+}
+
+// toMapStr performs a type assertion on v and returns a MapStr. v can be either
+// a MapStr or a map[string]interface{}. If it's any other type or nil then
+// an error is returned.
+func toMapStr(v interface{}) (mapstr.M, error) {
+	m, ok := tryToMapStr(v)
+	if !ok {
+		return nil, fmt.Errorf("expected map but type is %T", v)
+	}
+	return m, nil
+}
+
+func tryToMapStr(v interface{}) (mapstr.M, bool) {
+	switch m := v.(type) {
+	case mapstr.M:
+		return m, true
+	case map[string]interface{}:
+		return mapstr.M(m), true
+	default:
+		return nil, false
+	}
 }

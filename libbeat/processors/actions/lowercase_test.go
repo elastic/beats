@@ -42,17 +42,27 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 	}{
 		{
 			Name:          "Lowercase Fields",
-			Fields:        []string{"Field1"},
+			Fields:        []string{"a.b.c", "Field1"},
 			IgnoreMissing: false,
 			FailOnError:   true,
 			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
 			},
 			Output: mapstr.M{
-				"field1": mapstr.M{"Field2": "Value"},
+				"field1": mapstr.M{"Field2": "Value"}, // field1 is lowercased
 				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"c": "D", // c is lowercased
+					},
+				},
 			},
 			Error: false,
 		},
@@ -63,23 +73,7 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			FailOnError:   true,
 			FullPath:      false,
 			Input: mapstr.M{
-				"Field1": mapstr.M{"Field2": "Value"},
-				"Field3": "Value",
-			},
-			Output: mapstr.M{
-				"Field1": mapstr.M{"field2": "Value"},
-				"Field3": "Value",
-			},
-			Error: false,
-		},
-		{
-			Name:          "Lowercase nested field when full path is true",
-			Fields:        []string{"Field1.Field2"},
-			IgnoreMissing: true,
-			FailOnError:   false,
-			FullPath:      true,
-			Input: mapstr.M{
-				"Field1": mapstr.M{"Field2": "Value"},
+				"field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
 			},
 			Output: mapstr.M{
@@ -145,7 +139,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 				Fields:        test.Fields,
 				IgnoreMissing: test.IgnoreMissing,
 				FailOnError:   test.FailOnError,
-				FullPath:      test.FullPath,
 				alterFunc:     lowerCase,
 			}
 
