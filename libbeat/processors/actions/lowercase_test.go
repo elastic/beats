@@ -35,17 +35,15 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 		Fields        []string
 		IgnoreMissing bool
 		FailOnError   bool
-		FullPath      bool
 		Input         mapstr.M
 		Output        mapstr.M
 		Error         bool
 	}{
 		{
 			Name:          "Lowercase Fields",
-			Fields:        []string{"a.b.c", "Field1"},
+			Fields:        []string{"a.'b.c'", "Field1"},
 			IgnoreMissing: false,
 			FailOnError:   true,
-			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -67,18 +65,47 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Error: false,
 		},
 		{
-			Name:          "Lowercase Nested Fields",
-			Fields:        []string{"Field1.Field2"},
+			Name:          "Lowercase Fields with multiple matching keys",
+			Fields:        []string{"a.b.c"},
 			IgnoreMissing: false,
 			FailOnError:   true,
-			FullPath:      false,
 			Input: mapstr.M{
-				"field1": mapstr.M{"Field2": "Value"},
-				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"c": "first",
+					},
+				},
+				"A": mapstr.M{
+					"B": mapstr.M{
+						"C": "second",
+					},
+				},
 			},
 			Output: mapstr.M{
-				"field1": mapstr.M{"field2": "Value"},
-				"Field3": "Value",
+				"A": mapstr.M{
+					"B": mapstr.M{
+						"c": "second", // c is lowercased
+					},
+				},
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"c": "first",
+					},
+				},
+			},
+			Error: false,
+		},
+		{
+			Name:          "Lowercase Fields with colliding keys", // preserver the value of the last match
+			Fields:        []string{"ab"},
+			IgnoreMissing: false,
+			FailOnError:   true,
+			Input: mapstr.M{
+				"ab": "first",
+				"Ab": "second",
+			},
+			Output: mapstr.M{
+				"ab": "second",
 			},
 			Error: false,
 		},
@@ -87,7 +114,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field4"},
 			IgnoreMissing: true,
 			FailOnError:   true,
-			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -103,7 +129,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field4"},
 			IgnoreMissing: false,
 			FailOnError:   false,
-			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
@@ -119,7 +144,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Fields:        []string{"Field4"},
 			IgnoreMissing: false,
 			FailOnError:   true,
-			FullPath:      false,
 			Input: mapstr.M{
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",

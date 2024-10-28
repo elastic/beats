@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/pkg/errors"
 )
 
 // alterFieldFunc defines how fields must be processed
@@ -28,11 +29,9 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`
 		FailOnError   bool     `config:"fail_on_error"`
-		FullPath      bool     `config:"full_path"`
 	}{
 		IgnoreMissing: false,
 		FailOnError:   true,
-		FullPath:      false,
 	}
 
 	if err := c.Unpack(&config); err != nil {
@@ -83,93 +82,56 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
-	// Get the value of the field to alter
 
-	key, value := getcaseInsensitiveValue(event.Fields, field)
-	if value == nil {
+	// Get the value of the field to alter
+	allMatchingKeys := getCaseInsensitiveKeys(event.Fields, field)
+	if allMatchingKeys == nil {
 		if a.IgnoreMissing {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, mapstr.ErrKeyNotFound)
 	}
 
-	// Delete the exisiting value
-	if err := event.Delete(key); err != nil {
-		return fmt.Errorf("could not delete key: %s, Error: %v", key, err)
-	}
+	for _, key := range allMatchingKeys {
+		value, err := event.GetValue(key)
+		if err != nil {
+			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+				return nil
+			}
+			return fmt.Errorf("could not fetch value for key: %s, Error: %v", key, err)
+		}
+		// Delete the exisiting value
+		if err := event.Delete(key); err != nil {
+			return fmt.Errorf("could not delete field: %s, Error: %v", key, err)
+		}
 
-	// Alter the field
-	var alterString string
-	if strings.ContainsRune(key, '.') {
-		// In case of nested fields provided, we need to make sure to only modify the latest key in the chain
-		lastIndexRuneFunc := func(r rune) bool { return r == '.' }
-		idx := strings.LastIndexFunc(key, lastIndexRuneFunc)
-		alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
-	} else {
-		alterString = a.alterFunc(key)
-	}
+		// Alter the field
+		var alterString string
+		if strings.ContainsRune(key, '.') {
+			// In case of nested fields provided, we need to make sure to only modify the latest field in the chain
+			lastIndexRuneFunc := func(r rune) bool { return r == '.' }
+			idx := strings.LastIndexFunc(key, lastIndexRuneFunc)
+			alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
 
-	// Put the field back
-	if _, err := event.PutValue(alterString, value); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
+		} else {
+			alterString = a.alterFunc(key)
+		}
+
+		if _, err := event.PutValue(alterString, value); err != nil {
+			return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
+		}
 	}
 
 	return nil
 }
 
-func getcaseInsensitiveValue(event mapstr.M, field string) (key string, value interface{}) {
+func getCaseInsensitiveKeys(event mapstr.M, field string) (key []string) {
+	keys := event.FlattenKeys()
 
-	// Fast path, key is present as is.
-	if v, err := event.GetValue(field); err == nil {
-		return field, v
-	}
-
-	// iterate through the map for case insensitive search
-	fieldList := strings.Split(field, ".")
-	data := event
-
-	// outer function goes through the field keyword seperated by '.'
-	for i, subKey := range fieldList {
-		keyfound := false
-		// Traversing event graph at each level
-		for jsonKey, jsonValue := range data {
-			if strings.EqualFold(jsonKey, subKey) {
-				keyfound = true
-				value = jsonValue
-				fieldList[i] = jsonKey
-				break
-			}
-		}
-
-		if keyfound {
-			keyfound = false
-			data, _ = toMapStr(value)
-		} else {
-			return field, nil
+	for _, k := range *keys {
+		if strings.EqualFold(k, field) {
+			key = append(key, k)
 		}
 	}
-
-	return strings.Join(fieldList, "."), value
-}
-
-// toMapStr performs a type assertion on v and returns a MapStr. v can be either
-// a MapStr or a map[string]interface{}. If it's any other type or nil then
-// an error is returned.
-func toMapStr(v interface{}) (mapstr.M, error) {
-	m, ok := tryToMapStr(v)
-	if !ok {
-		return nil, fmt.Errorf("expected map but type is %T", v)
-	}
-	return m, nil
-}
-
-func tryToMapStr(v interface{}) (mapstr.M, bool) {
-	switch m := v.(type) {
-	case mapstr.M:
-		return m, true
-	case map[string]interface{}:
-		return mapstr.M(m), true
-	default:
-		return nil, false
-	}
+	return key
 }

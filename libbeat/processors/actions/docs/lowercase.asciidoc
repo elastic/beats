@@ -5,47 +5,63 @@
 <titleabbrev>lowercase</titleabbrev>
 ++++
 
-The `lowercase` processor specifies a list of fields that must be lowercased. This applies only to keys that match the given fields. The default behaviour of the processor is to modify the most nested key in the chain. Use `full_path` to lowercase all keys in the nested chain.
+The `lowercase` processor specifies a list of fields that must be lowercased. This applies only to keys that match the given fields. The default behaviour of the processor is to modify the most nested key in the chain. It does not support keys with dot notation
 
 
 
 ==== Examples: 
+
+1. Default scenario
 
 [source,yaml]
 ----
 processors:
   - rename:
       fields:
-        - "a.b.c.d"
+        - "abcd"
       ignore_missing: false
       fail_on_error: true
-      full_path: false
 ----
-
-1. For above config
-
 [source,json]
 ----
+// Input
 {
-  "A.B": {"C.D":"data"}  // Input
+  "AB": {"CD":"data"},
+  "aB": {"cD":"data"} 
 }
 
+
+// output
 {
-  "A.B": {"C.d":"data"}  // output
+  "AB": {"Cd":"data"},
+  "aB": {"cd":"data"} 
 }
 ----
 
 [start=2]
-2. If `full_path` is set to true
+2. In case there is key collison, the value of last element in the input is preserved
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "ab"
+      ignore_missing: false
+      fail_on_error: true
+----
 
 [source,json]
 ----
+// Input
 {
-  "A.B": {"C.D":"data"}  // Input
+  "ab": "first",
+  "aB": "second"
 }
 
+// Input
 {
-  "a.b": {"c.d":"data"}  // output
+  "ab": "second",
 }
 ----
 
@@ -59,7 +75,7 @@ The `lowercase` processor has the following configuration settings:
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
-`full_path`:: (Optional) If set to `true`, all keys leading to the most nested key in the chain get lowercased. Default is `false` which means only the latest key is modified.
+
                                   
 
 See <<conditions>> for a list of supported conditions.
