@@ -23,6 +23,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -68,6 +69,9 @@ func (in *eventHubInputV1) Run(
 ) error {
 	var err error
 
+	// Update the status to starting
+	inputContext.UpdateStatus(status.Starting, "")
+
 	// Create pipelineClient for publishing events.
 	in.pipelineClient, err = createPipelineClient(pipeline)
 	if err != nil {
@@ -105,9 +109,11 @@ func (in *eventHubInputV1) Run(
 	err = in.run(ctx)
 	if err != nil {
 		in.log.Errorw("error running input", "error", err)
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return err
 	}
 
+	inputContext.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
