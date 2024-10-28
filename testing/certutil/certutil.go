@@ -41,11 +41,20 @@ type Pair struct {
 }
 
 type configs struct {
-	cnPrefix string
-	dnsNames []string
+	cnPrefix   string
+	dnsNames   []string
+	clientCert bool
 }
 
 type Option func(opt *configs)
+
+// WithClientCert generates a client certificate, without any IP or SAN/DNS.
+// It overrides any other IP or name set by other means.
+func WithClientCert(clientCert bool) Option {
+	return func(opt *configs) {
+		opt.clientCert = clientCert
+	}
+}
 
 // WithCNPrefix adds cnPrefix as prefix for the CN.
 func WithCNPrefix(cnPrefix string) Option {
@@ -175,9 +184,9 @@ func GenerateGenericChildCert(
 	if cfg.cnPrefix != "" {
 		cn = fmt.Sprintf("[%s] %s", cfg.cnPrefix, cn)
 	}
-	dnsNames := append([]string{name}, cfg.dnsNames...)
-	notBefore, notAfter := makeNotBeforeAndAfter()
 
+	dnsNames := append(cfg.dnsNames, name)
+	notBefore, notAfter := makeNotBeforeAndAfter()
 	certTemplate := &x509.Certificate{
 		DNSNames:     dnsNames,
 		IPAddresses:  ips,
@@ -189,9 +198,16 @@ func GenerateGenericChildCert(
 		},
 		NotBefore: notBefore,
 		NotAfter:  notAfter,
-		KeyUsage:  x509.KeyUsageDigitalSignature,
+		KeyUsage: x509.KeyUsageDigitalSignature |
+			x509.KeyUsageKeyEncipherment |
+			x509.KeyUsageKeyAgreement,
 		ExtKeyUsage: []x509.ExtKeyUsage{
 			x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+	}
+
+	if cfg.clientCert {
+		certTemplate.IPAddresses = nil
+		certTemplate.DNSNames = nil
 	}
 
 	certRawBytes, err := x509.CreateCertificate(
@@ -269,6 +285,38 @@ func NewRSARootAndChildCerts() (Pair, Pair, error) {
 
 	childPair, err := defaultChildCert(rootKey, priv, &priv.PublicKey, rootCACert)
 	return rootPair, childPair, err
+}
+
+// EncryptKey accepts a *ecdsa.PrivateKey or *rsa.PrivateKey, it encrypts it
+// and returns the encrypted key in PEM format.
+func EncryptKey(key crypto.PrivateKey, passphrase string) ([]byte, error) {
+	keyDER, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		return nil, fmt.Errorf("error converting private key to DER: %w", err)
+	}
+
+	var blockType string
+	switch key.(type) {
+	case *rsa.PrivateKey:
+		blockType = "RSA PRIVATE KEY"
+	case *ecdsa.PrivateKey:
+		blockType = "EC PRIVATE KEY"
+	default:
+		return nil, fmt.Errorf("unsupported private key type: %T", key)
+	}
+
+	encPem, err := x509.EncryptPEMBlock( //nolint:staticcheck // we need to drop support for this, but while we don't, it needs to be tested.
+		rand.Reader,
+		blockType,
+		keyDER,
+		[]byte(passphrase),
+		x509.PEMCipherAES128)
+	if err != nil {
+		return nil, fmt.Errorf("failed encrypting certificate key: %w", err)
+	}
+
+	certKeyEnc := pem.EncodeToMemory(encPem)
+	return certKeyEnc, nil
 }
 
 // newRootCert creates a new self-signed root certificate using the provided
@@ -398,6 +446,6 @@ func keyBlockType(priv crypto.PrivateKey) string {
 func makeNotBeforeAndAfter() (time.Time, time.Time) {
 	now := time.Now()
 	notBefore := now.Add(-1 * time.Minute)
-	notAfter := now.Add(7 * 24 * time.Hour)
+	notAfter := now.Add(30 * 24 * time.Hour)
 	return notBefore, notAfter
 }

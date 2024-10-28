@@ -26,7 +26,6 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/pem"
 	"flag"
 	"fmt"
 	"net"
@@ -39,17 +38,22 @@ import (
 )
 
 func main() {
-	var caPath, caKeyPath, dest, name, ipList, prefix, pass string
-	var rsaflag bool
+	var caPath, caKeyPath, dest, name, names, ipList, prefix, pass string
+	var client, rsaflag, noip bool
 	flag.StringVar(&caPath, "ca", "",
 		"File path for CA in PEM format")
 	flag.StringVar(&caKeyPath, "ca-key", "",
 		"File path for the CA key in PEM format")
-	flag.BoolVar(&rsaflag, "rsaflag", false,
-		"")
-	// TODO: accept multiple DNS names
+	flag.BoolVar(&rsaflag, "rsa", false,
+		"generate a RSA with a 2048-bit key certificate")
+	flag.BoolVar(&client, "client", false,
+		"generates a client certificate without any IP or SAN/DNS")
 	flag.StringVar(&name, "name", "localhost",
-		"used as \"distinguished name\" and \"Subject Alternate Name values\" for the child certificate")
+		"a single \"Subject Alternate Name values\" for the child certificate. It's added to 'names' if set")
+	flag.StringVar(&names, "names", "",
+		"a comma separated list of \"Subject Alternate Name values\" for the child certificate")
+	flag.BoolVar(&noip, "noip", false,
+		"generate a certificate with no IP. It overrides -ips.")
 	flag.StringVar(&ipList, "ips", "127.0.0.1",
 		"a comma separated list of IP addresses for the child certificate")
 	flag.StringVar(&prefix, "prefix", "current timestamp",
@@ -76,10 +80,17 @@ func main() {
 	}
 	fmt.Println("files will be witten to:", wd)
 
-	ips := strings.Split(ipList, ",")
 	var netIPs []net.IP
-	for _, ip := range ips {
-		netIPs = append(netIPs, net.ParseIP(ip))
+	if !noip {
+		ips := strings.Split(ipList, ",")
+		for _, ip := range ips {
+			netIPs = append(netIPs, net.ParseIP(ip))
+		}
+	}
+
+	var dnsNames []string
+	if names != "" {
+		dnsNames = strings.Split(names, ",")
 	}
 
 	rootCert, rootKey := getCA(rsaflag, caPath, caKeyPath, dest, prefix)
@@ -92,48 +103,35 @@ func main() {
 		pub,
 		rootKey,
 		rootCert,
-		certutil.WithCNPrefix(prefix))
+		certutil.WithCNPrefix(prefix),
+		certutil.WithDNSNames(dnsNames...),
+		certutil.WithClientCert(client))
 	if err != nil {
 		panic(fmt.Errorf("error generating child certificate: %w", err))
 	}
 
+	if client {
+		name = "client"
+	}
 	savePair(dest, filePrefix+name, childPair)
 
-	if pass == "" {
-		return
-	}
+	if pass != "" {
+		fmt.Printf("passphrase present, encrypting \"%s\" certificate key\n",
+			name)
+		err = os.WriteFile(filePrefix+name+"-passphrase", []byte(pass), 0o600)
+		if err != nil {
+			panic(fmt.Errorf("error writing passphrase file: %w", err))
+		}
 
-	fmt.Printf("passphrase present, encrypting \"%s\" certificate key\n",
-		name)
-	err = os.WriteFile(filePrefix+name+"-passphrase", []byte(pass), 0o600)
-	if err != nil {
-		panic(fmt.Errorf("error writing passphrase file: %w", err))
-	}
+		certKeyEnc, err := certutil.EncryptKey(childCert.PrivateKey, pass)
+		if err != nil {
+			panic(err)
+		}
 
-	key, err := x509.MarshalPKCS8PrivateKey(childCert.PrivateKey)
-	if err != nil {
-		panic(fmt.Errorf("error getting ecdh.PrivateKey from the child's private key: %w", err))
-	}
-
-	blockType := "EC PRIVATE KEY"
-	if rsaflag {
-		blockType = "RSA PRIVATE KEY"
-	}
-	encPem, err := x509.EncryptPEMBlock( //nolint:staticcheck // we need to drop support for this, but while we don't, it needs to be tested.
-		rand.Reader,
-		blockType,
-		key,
-		[]byte(pass),
-		x509.PEMCipherAES128)
-	if err != nil {
-		panic(fmt.Errorf("failed encrypting agent child certificate key block: %v", err))
-	}
-
-	certKeyEnc := pem.EncodeToMemory(encPem)
-
-	err = os.WriteFile(filepath.Join(dest, filePrefix+name+"_enc-key.pem"), certKeyEnc, 0o600)
-	if err != nil {
-		panic(fmt.Errorf("could not save %s certificate encrypted key: %w", filePrefix+name+"_enc-key.pem", err))
+		err = os.WriteFile(filepath.Join(dest, filePrefix+name+"_enc-key.pem"), certKeyEnc, 0o600)
+		if err != nil {
+			panic(fmt.Errorf("could not save %s certificate encrypted key: %w", filePrefix+name+"_enc-key.pem", err))
+		}
 	}
 }
 
