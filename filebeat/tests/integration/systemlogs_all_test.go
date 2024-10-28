@@ -52,6 +52,7 @@ func copyModulesDir(t *testing.T, dst string) {
 	}
 }
 
+//nolint:unused,nolintlint // necessary on Linux
 func skipOnBuildKite(t *testing.T) {
 	val, isSet := os.LookupEnv("BUILDKITE")
 	if !isSet {
@@ -77,6 +78,7 @@ func skipOnBuildKite(t *testing.T) {
 	}
 }
 
+//nolint:unused,nolintlint // necessary on Linux
 func writeToFile(t *testing.T, data []byte, name string) {
 	if err := os.MkdirAll(filepath.Join("../", "../", "build", "integration-tests"), 0750); err != nil {
 		t.Errorf("cannot create dirs: %s", err)
@@ -94,6 +96,7 @@ func writeToFile(t *testing.T, data []byte, name string) {
 	}
 }
 
+//nolint:unused,nolintlint // necessary on Linux
 func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
 	require.Eventually(
 		t,
@@ -103,6 +106,7 @@ func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
 		msgAndArgs...)
 }
 
+//nolint:unused,nolintlint // necessary on Linux
 func findFilesetNames(t *testing.T, outputGlob string) func() bool {
 	f := func() bool {
 		files, err := filepath.Glob(outputGlob)
