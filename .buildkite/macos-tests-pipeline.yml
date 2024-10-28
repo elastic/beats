@@ -13,6 +13,11 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
+
 steps:
   - group: "Auditbeat macOS Tests"
     steps:
@@ -22,8 +27,9 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
           mage build unitTest
-        concurrency_group: "orka-concurrency-group"
-        concurrency: 10
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: ${CONCURRENCY_COUNT}
+        concurrency_method: eager
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
