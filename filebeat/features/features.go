@@ -24,6 +24,7 @@ type void struct{}
 // List of input types Elasticsearch state store is enabled for
 var esTypesEnabled = map[string]void{
 	"httpjson": {},
+	"cel":      {},
 }
 
 var isESEnabled bool

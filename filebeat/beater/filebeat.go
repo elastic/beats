@@ -305,6 +305,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
 			outCfg := conf.Namespace{}
 			if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+				logp.Err("Failed to unpack the output config: %v", err)
 				return nil
 			}
 
@@ -314,7 +315,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			// agentless-state-<input id>, for example httpjson-okta.system-028ecf4b-babe-44c6-939e-9e3096af6959
 			apiKey := os.Getenv("AGENTLESS_ELASTICSEARCH_APIKEY")
 			if apiKey != "" {
-				outCfg.Config().SetString("api_key", -1, apiKey)
+				err := outCfg.Config().SetString("api_key", -1, apiKey)
+				if err != nil {
+					return fmt.Errorf("failed to overwrite api_key: %w", err)
+				}
 			}
 
 			stateStore.notifier.NotifyConfigUpdate(outCfg.Config())
@@ -602,9 +606,4 @@ func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
 	}
 
 	return inputs, nil
-}
-
-func useElasticsearchStorage() bool {
-	s := os.Getenv("AGENTLESS_ELASTICSEARCH_STATE_STORE")
-	return s != ""
 }

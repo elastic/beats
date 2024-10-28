@@ -251,7 +251,7 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
-				store, _ := env.stateStore.Access(_ string)
+				store, _ := env.stateStore.Access("")
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)
