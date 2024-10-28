@@ -31,7 +31,7 @@ processors:
 }
 
 {
-  "A.b": {"c.D"}  // output
+  "A.B": {"C.d":"data"}  // output
 }
 ----
 
