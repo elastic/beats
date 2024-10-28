@@ -126,11 +126,12 @@ steps:
 
       - label: ":ubuntu: Filebeat: Integration tests as Root"
         command: |
+          sudo su
           source /opt/buildkite-agent/hooks/pre-command
           source .buildkite/hooks/pre-command || echo "No pre-command hook found"
           cd filebeat
-          sudo go test -v -count=1 -tags=integration -run=TestSystemLogs ./tests/integration
-          sudo go test -v -count=1 -tags=integration -run=TestDebugBuildKite ./tests/integration
+          go test -v -count=1 -tags=integration -run=TestSystemLogs ./tests/integration
+          go go test -v -count=1 -tags=integration -run=TestDebugBuildKite ./tests/integration
         retry:
           automatic:
             - limit: 1
