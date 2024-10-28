@@ -13,7 +13,6 @@ import (
 	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
@@ -27,8 +26,10 @@ import (
 )
 
 const (
-	processorName = "add_session_metadata"
-	logName       = "processor." + processorName
+	processorName     = "add_session_metadata"
+	logName           = "processor." + processorName
+	procfsType        = "procfs"
+	kernelTracingType = "kernel_tracing"
 )
 
 // InitializeModule initializes this module.
@@ -37,17 +38,17 @@ func InitializeModule() {
 }
 
 type addSessionMetadata struct {
-	ctx      context.Context
-	cancel   context.CancelFunc
-	config   config
-	logger   *logp.Logger
-	db       *processdb.DB
-	provider provider.Provider
-	backend  string
+	ctx          context.Context
+	cancel       context.CancelFunc
+	config       config
+	logger       *logp.Logger
+	db           *processdb.DB
+	provider     provider.Provider
+	backend      string
+	providerType string
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
-	cfgwarn.Beta("add_session_metadata processor is a beta feature.")
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -63,51 +64,56 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("failed to create DB: %w", err)
 	}
 
-	if c.Backend != "kernel_tracing" {
-		backfilledPIDs := db.ScrapeProcfs()
-		logger.Infof("backfilled %d processes", len(backfilledPIDs))
-	}
-
 	var p provider.Provider
+	var pType string
 
 	switch c.Backend {
 	case "auto":
 		p, err = kerneltracingprovider.NewProvider(ctx, logger)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
+			backfilledPIDs := db.ScrapeProcfs()
+			logger.Infof("backfilled %d processes", len(backfilledPIDs))
 			p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
 				cancel()
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
 			logger.Info("backend=auto using procfs")
+			pType = procfsType
 		} else {
 			logger.Info("backend=auto using kernel_tracing")
+			pType = kernelTracingType
 		}
 	case "procfs":
+		backfilledPIDs := db.ScrapeProcfs()
+		logger.Infof("backfilled %d processes", len(backfilledPIDs))
 		p, err = procfsprovider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
 			cancel()
 			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}
+		pType = procfsType
 	case "kernel_tracing":
 		p, err = kerneltracingprovider.NewProvider(ctx, logger)
 		if err != nil {
 			cancel()
 			return nil, fmt.Errorf("failed to create kernel_tracing provider: %w", err)
 		}
+		pType = kernelTracingType
 	default:
 		cancel()
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
 	return &addSessionMetadata{
-		ctx:      ctx,
-		cancel:   cancel,
-		config:   c,
-		logger:   logger,
-		db:       db,
-		provider: p,
-		backend:  c.Backend,
+		ctx:          ctx,
+		cancel:       cancel,
+		config:       c,
+		logger:       logger,
+		db:           db,
+		provider:     p,
+		backend:      c.Backend,
+		providerType: pType,
 	}, nil
 }
 
@@ -129,7 +135,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
 	}
 
-	err = p.provider.SyncDB(ev, pid)
+	err = p.provider.Sync(ev, pid)
 	if err != nil {
 		return ev, err
 	}
@@ -163,12 +169,12 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	}
 
 	var fullProcess types.Process
-	if p.backend == "kernel_tracing" {
+	if p.providerType == kernelTracingType {
 		// kernel_tracing doesn't enrich with the processor DB;  process info is taken directly from quark cache
 		proc, err := p.provider.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 		fullProcess = *proc
@@ -176,7 +182,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Warnw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
 			return nil, e
 		}
 	}
