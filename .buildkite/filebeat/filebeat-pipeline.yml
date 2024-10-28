@@ -126,6 +126,8 @@ steps:
 
       - label: ":ubuntu: Filebeat: Try Root"
         command: |
+          source /opt/buildkite-agent/hooks/pre-command
+          source .buildkite/hooks/pre-command || echo "No pre-command hook found"
           cd filebeat
           sudo -E env "PATH=$PATH" go test -v -count=1 -tags=integration -run=TestSystemLogsCanUseJournald ./tests/integration
           sudo -E env "PATH=$PATH" go test -v -count=1 -tags=integration -run=TestDebugBuildKite ./tests/integration

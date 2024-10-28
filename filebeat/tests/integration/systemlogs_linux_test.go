@@ -29,6 +29,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 
@@ -45,6 +46,7 @@ var systemModuleCfg string
 // correctly choose and start a journald input when the globs defined in
 // var.paths do not resolve to any file.
 func TestSystemLogsCanUseJournaldInput(t *testing.T) {
+	skipOnBuildKite(t)
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -233,5 +235,30 @@ func copyModulesDir(t *testing.T, dst string) {
 	}
 	if err := cp.Copy(localModulesD, filepath.Join(dst, "modules.d")); err != nil {
 		t.Fatalf("cannot copy 'modules.d' folder to test folder: %s", err)
+	}
+}
+
+func skipOnBuildKite(t *testing.T) {
+	val, isSet := os.LookupEnv("BUILDKITE")
+	if !isSet {
+		// if the envvar BUILDKITE is not set, we're not on BuildKite,
+		// so return false (do not skip any test)
+		return
+	}
+
+	buildkite, err := strconv.ParseBool(val)
+	if err != nil {
+		t.Fatalf("cannot parse '%s' as bool: %s", val, err)
+	}
+
+	if !buildkite {
+		// We're not on BuildKite, do not  skip any test
+		return
+	}
+
+	// os.Geteuid() == 0 means we're root.
+	// If we're not root, skip the test
+	if os.Geteuid() != 0 {
+		t.Skip("this test can only run on BuildKite as root")
 	}
 }
