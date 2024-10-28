@@ -16,7 +16,7 @@ The `lowercase` processor specifies a list of fields that must be lowercased. Th
 processors:
   - rename:
       fields:
-        - "a.B"
+        - "a.b.c.d"
       ignore_missing: false
       fail_on_error: true
       full_path: false
