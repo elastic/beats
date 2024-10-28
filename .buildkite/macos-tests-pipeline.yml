@@ -14,7 +14,7 @@ env:
   TEST_COVERAGE: "true"
 
   # Concurrency definition
-  concurrency_group: "${CONCURRENCY_GROUP}"
+  concurrency_group: "orka-concurrency-group"
   CONCURRENCY_COUNT: 10
   CONCURRENCY_METHOD: eager
 
