@@ -41,7 +41,7 @@ processors:
 [source,json]
 ----
 {
-  "a.B": {"c.D"}  // Input
+  "A.B": {"C.D":"data"}  // Input
 }
 
 {
