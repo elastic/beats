@@ -115,9 +115,8 @@ type Reader struct {
 	jctl        Jctl
 	jctlFactory JctlFactory
 
-	backoff  backoff.Backoff
-	seekMode SeekMode
-	state    readerState
+	backoff backoff.Backoff
+	state   readerState
 }
 
 // handleSeekAndCursor returns the correct arguments for seek and cursor.
