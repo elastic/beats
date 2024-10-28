@@ -52,7 +52,7 @@ processors:
 
 ==== Configuration:
 
-The `lowercase_keys` processor has the following configuration settings:
+The `lowercase` processor has the following configuration settings:
 
 `fields`:: The fields to lowercase.
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
