@@ -83,7 +83,7 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 
-	// Get the value of the field to alter
+	// Get all matching keys
 	allMatchingKeys := getCaseInsensitiveKeys(event.Fields, field)
 	if allMatchingKeys == nil {
 		if a.IgnoreMissing {
@@ -93,6 +93,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	}
 
 	for _, key := range allMatchingKeys {
+		// Get the value the matching key
 		value, err := event.GetValue(key)
 		if err != nil {
 			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
@@ -100,6 +101,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 			}
 			return fmt.Errorf("could not fetch value for key: %s, Error: %v", key, err)
 		}
+
 		// Delete the exisiting value
 		if err := event.Delete(key); err != nil {
 			return fmt.Errorf("could not delete field: %s, Error: %v", key, err)
@@ -117,6 +119,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 			alterString = a.alterFunc(key)
 		}
 
+		// Put the value back
 		if _, err := event.PutValue(alterString, value); err != nil {
 			return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
 		}
@@ -127,7 +130,6 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 
 func getCaseInsensitiveKeys(event mapstr.M, field string) (key []string) {
 	keys := event.FlattenKeys()
-
 	for _, k := range *keys {
 		if strings.EqualFold(k, field) {
 			key = append(key, k)

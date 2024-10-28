@@ -39,7 +39,7 @@ processors:
 ----
 
 [start=2]
-2. In case there is key collison, the value of last element in the input is preserved
+2. In case of key collison, the value of last element in the input is preserved
 
 [source,yaml]
 ----
