@@ -328,6 +328,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 - Improved Azure Blob Storage input documentation. {pull}41252[41252]
 - Make ETW input GA. {pull}41389[41389]
+- Add support for Okta entity analytics provider to collect role and factor data for users. {pull}41460[41460]
 
 *Auditbeat*
 
