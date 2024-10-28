@@ -32,6 +32,13 @@ func TestEventMapping(t *testing.T) {
 	var m MetricSet
 
 	VirtualMachineTest := mo.VirtualMachine{
+		ManagedEntity: mo.ManagedEntity{
+			ExtensibleManagedObject: mo.ExtensibleManagedObject{
+				Self: types.ManagedObjectReference{
+					Value: "VM_0",
+				},
+			},
+		},
 		Summary: types.VirtualMachineSummary{
 			OverallStatus: types.ManagedEntityStatus("green"),
 			Config: types.VirtualMachineConfigSummary{
@@ -83,6 +90,7 @@ func TestEventMapping(t *testing.T) {
 	expectedEvent := mapstr.M{
 		"name":   "localhost.localdomain",
 		"os":     "otherGuest",
+		"id":     "VM_0",
 		"uptime": int32(10),
 		"status": types.ManagedEntityStatus("green"),
 		"cpu": mapstr.M{
