@@ -91,7 +91,7 @@ func newAsyncClient(
 	}
 
 	c.connect = func() error {
-		err := c.Client.Connect()
+		err := c.Client.ConnectContext(context.Background())
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
@@ -116,7 +116,7 @@ func makeClientFactory(
 	}
 }
 
-func (c *asyncClient) Connect() error {
+func (c *asyncClient) Connect(ctx context.Context) error {
 	c.log.Debug("connect")
 	return c.connect()
 }

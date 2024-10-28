@@ -110,7 +110,7 @@ file_selectors:
 func makeTestConfigSQS(queueURL string) *conf.C {
 	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 queue_url: %s
-max_number_of_messages: 1
+number_of_workers: 1
 visibility_timeout: 30s
 region: us-east-1
 file_selectors:

@@ -5224,7 +5224,7 @@ Runtime CPU metrics.
 *`awsfargate.task_stats.cpu.kernel.pct`*::
 +
 --
-Percentage of time in kernel space.
+Percentage of time in kernel space, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5236,7 +5236,7 @@ format: percent
 *`awsfargate.task_stats.cpu.kernel.norm.pct`*::
 +
 --
-Percentage of time in kernel space normalized by the number of CPU cores.
+Percentage of time in kernel space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5258,7 +5258,7 @@ type: long
 *`awsfargate.task_stats.cpu.system.pct`*::
 +
 --
-Percentage of total CPU time in the system.
+Percentage of total CPU time in the system, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5270,7 +5270,7 @@ format: percent
 *`awsfargate.task_stats.cpu.system.norm.pct`*::
 +
 --
-Percentage of total CPU time in the system normalized by the number of CPU cores.
+Percentage of total CPU time in the system normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5292,7 +5292,7 @@ type: long
 *`awsfargate.task_stats.cpu.user.pct`*::
 +
 --
-Percentage of time in user space.
+Percentage of time in user space, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5304,7 +5304,7 @@ format: percent
 *`awsfargate.task_stats.cpu.user.norm.pct`*::
 +
 --
-Percentage of time in user space normalized by the number of CPU cores.
+Percentage of time in user space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5326,7 +5326,7 @@ type: long
 *`awsfargate.task_stats.cpu.total.pct`*::
 +
 --
-Total CPU usage.
+Total CPU usage, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5338,7 +5338,7 @@ format: percent
 *`awsfargate.task_stats.cpu.total.norm.pct`*::
 +
 --
-Total CPU usage normalized by the number of CPU cores.
+Total CPU usage normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -5702,7 +5702,7 @@ format: bytes
 *`awsfargate.task_stats.memory.rss.pct`*::
 +
 --
-Memory resident set size percentage.
+Memory resident set size percentage, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -12042,7 +12042,7 @@ type: double
 *`containerd.cpu.usage.total.pct`*::
 +
 --
-Percentage of total CPU time normalized by the number of CPU cores
+Percentage of total CPU time normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -12054,7 +12054,7 @@ format: percent
 *`containerd.cpu.usage.kernel.pct`*::
 +
 --
-Percentage of time in kernel space normalized by the number of CPU cores.
+Percentage of time in kernel space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -12066,7 +12066,7 @@ format: percent
 *`containerd.cpu.usage.user.pct`*::
 +
 --
-Percentage of time in user space normalized by the number of CPU cores.
+Percentage of time in user space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13632,7 +13632,7 @@ Runtime CPU metrics.
 *`docker.cpu.kernel.pct`*::
 +
 --
-Percentage of time in kernel space.
+Percentage of time in kernel space, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13644,7 +13644,7 @@ format: percent
 *`docker.cpu.kernel.norm.pct`*::
 +
 --
-Percentage of time in kernel space normalized by the number of CPU cores.
+Percentage of time in kernel space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13666,7 +13666,7 @@ type: long
 *`docker.cpu.system.pct`*::
 +
 --
-Percentage of total CPU time in the system.
+Percentage of total CPU time in the system, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13678,7 +13678,7 @@ format: percent
 *`docker.cpu.system.norm.pct`*::
 +
 --
-Percentage of total CPU time in the system normalized by the number of CPU cores.
+Percentage of total CPU time in the system normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13700,7 +13700,7 @@ type: long
 *`docker.cpu.user.pct`*::
 +
 --
-Percentage of time in user space.
+Percentage of time in user space, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13712,7 +13712,7 @@ format: percent
 *`docker.cpu.user.norm.pct`*::
 +
 --
-Percentage of time in user space normalized by the number of CPU cores.
+Percentage of time in user space normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -13758,7 +13758,7 @@ format: percent
 *`docker.cpu.core.*.pct`*::
 +
 --
-Percentage of CPU time in this core.
+Percentage of CPU time in this core, expressed as a value between 0 and 1.
 
 
 type: object
@@ -13770,7 +13770,7 @@ format: percent
 *`docker.cpu.core.*.norm.pct`*::
 +
 --
-Percentage of CPU time in this core, normalized by the number of CPU cores.
+Percentage of CPU time in this core normalized by the number of CPU cores, expressed as a value between 0 and 1.
 
 
 type: object
@@ -14431,7 +14431,7 @@ format: bytes
 *`docker.memory.rss.pct`*::
 +
 --
-Memory resident set size percentage.
+Memory resident set size percentage, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -14462,7 +14462,7 @@ format: bytes
 *`docker.memory.usage.pct`*::
 +
 --
-Memory usage percentage.
+Memory usage percentage, expressed as a value between 0 and 1.
 
 
 type: scaled_float
@@ -67120,10 +67120,10 @@ type: keyword
 
 --
 
-*`vsphere.cluster.triggerd_alarms.*`*::
+*`vsphere.cluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67283,10 +67283,10 @@ type: keyword
 
 --
 
-*`vsphere.datastore.triggerd_alarms.*`*::
+*`vsphere.datastore.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67386,10 +67386,10 @@ type: long
 
 --
 
-*`vsphere.datastorecluster.triggerd_alarms.*`*::
+*`vsphere.datastorecluster.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67753,10 +67753,10 @@ type: keyword
 
 --
 
-*`vsphere.host.triggerd_alarms.*`*::
+*`vsphere.host.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -67892,10 +67892,10 @@ type: long
 
 --
 
-*`vsphere.network.triggerd_alarms.*`*::
+*`vsphere.network.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68128,10 +68128,10 @@ type: keyword
 
 --
 
-*`vsphere.resourcepool.triggerd_alarms.*`*::
+*`vsphere.resourcepool.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object
@@ -68365,10 +68365,10 @@ type: long
 
 --
 
-*`vsphere.virtualmachine.triggerd_alarms.*`*::
+*`vsphere.virtualmachine.triggered_alarms.*`*::
 +
 --
-List of all the triggerd alarms.
+List of all the triggered alarms.
 
 
 type: object

@@ -150,7 +150,7 @@ ifdef::docker_platform[]
 
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-docker run {dockerimage} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run --rm {dockerimage} setup --index-management{disable_logstash} -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----------------------------------------------------------------------
 endif::docker_platform[]
 
@@ -354,4 +354,3 @@ endif::win_only[]
 PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/{beatname_lc}-{version}
 ----
 endif::win_os[]
-

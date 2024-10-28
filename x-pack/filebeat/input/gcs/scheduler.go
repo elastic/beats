@@ -6,7 +6,10 @@ package gcs
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -181,41 +184,19 @@ func (s *scheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterato
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	var latestJobs []*job
-	jobsToReturn := make([]*job, 0)
-	counter := 0
-	flag := false
-	ignore := false
+	cp := s.state.checkpoint()
+	jobs = slices.DeleteFunc(jobs, func(j *job) bool {
+		return !(j.Timestamp().After(cp.LatestEntryTime) || j.Name() > cp.ObjectName)
+	})
 
-	for _, job := range jobs {
-		switch {
-		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
-			latestJobs = append(latestJobs, job)
-		case job.Name() == s.state.checkpoint().ObjectName:
-			flag = true
-		case job.Name() > s.state.checkpoint().ObjectName:
-			flag = true
-			counter--
-		case job.Name() <= s.state.checkpoint().ObjectName && (!ignore):
-			ignore = true
-		}
-		counter++
-	}
-
-	if flag && (counter < len(jobs)-1) {
-		jobsToReturn = jobs[counter+1:]
-	} else if !flag && !ignore {
-		jobsToReturn = jobs
-	}
-
-	// in a senario where there are some jobs which have a later time stamp
+	// In a scenario where there are some jobs which have a greater timestamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint object name, then we append the latest jobs
-	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
-		jobsToReturn = append(latestJobs, jobsToReturn...)
-	}
-
-	return jobsToReturn
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint
+	// timestamp.
+	sort.SliceStable(jobs, func(i, _ int) bool {
+		return jobs[i].Timestamp().After(cp.LatestEntryTime)
+	})
+	return jobs
 }
 
 func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
@@ -232,7 +213,16 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
-				s.log.Errorf("adding failed job %s to job list caused an error: %v", name, err)
+				if errors.Is(err, storage.ErrObjectNotExist) {
+					// if the object is not found in the bucket, then remove it from the failed job list
+					s.state.deleteFailedJob(name)
+					s.log.Debugf("scheduler: failed job %s not found in bucket %s", name, s.src.BucketName)
+				} else {
+					// if there is an error while validating the object,
+					// then update the failed job retry count and work towards natural removal
+					s.state.updateFailedJobs(name)
+					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
+				}
 				continue
 			}
 
