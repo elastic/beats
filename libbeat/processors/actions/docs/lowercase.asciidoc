@@ -54,7 +54,7 @@ processors:
 
 The `lowercase` processor has the following configuration settings:
 
-`fields`:: The fields to lowercase.
+`fields`:: The fields to lowercase. The match is case-insensitive, e.g. `a.b.c.d` would match `A.b.C.d` or `A.B.C.D`.
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
