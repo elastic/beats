@@ -15,7 +15,7 @@ import (
 type alterFieldFunc func(field string) string
 
 type alterFieldProcessor struct {
-	Fields        []string
+	Fields        map[string]struct{}
 	IgnoreMissing bool
 	FailOnError   bool
 
@@ -47,8 +47,14 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		}
 	}
 
+	var afield = make(map[string]struct{})
+
+	for _, field := range config.Fields {
+		afield[strings.ToLower(field)] = struct{}{}
+	}
+
 	return &alterFieldProcessor{
-		Fields:        config.Fields,
+		Fields:        afield,
 		IgnoreMissing: config.IgnoreMissing,
 		FailOnError:   config.FailOnError,
 		processorName: processorName,
@@ -67,13 +73,19 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		backup = event.Clone()
 	}
 
-	for _, field := range a.Fields {
-		err := a.alter(event, field)
-		if err != nil {
-			if a.FailOnError {
-				event = backup
-				event.PutValue("error.message", err.Error())
-				return event, err
+	flattenKeys := *event.Fields.FlattenKeys()
+
+	for _, i := range flattenKeys {
+		j := strings.ToLower(i)
+		_, matched := a.Fields[j]
+		if matched {
+			err := a.alter(event, i)
+			if err != nil {
+				if a.FailOnError {
+					event = backup
+					event.PutValue("error.message", err.Error())
+					return event, err
+				}
 			}
 		}
 	}
@@ -81,59 +93,38 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
+func (a *alterFieldProcessor) alter(event *beat.Event, key string) error {
 
-	// Get all matching keys
-	allMatchingKeys := getCaseInsensitiveKeys(event.Fields, field)
-	if allMatchingKeys == nil {
-		if a.IgnoreMissing {
+	// Get the value matching the key
+	value, err := event.GetValue(key)
+	if err != nil {
+		if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, mapstr.ErrKeyNotFound)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %v", key, err)
 	}
 
-	for _, key := range allMatchingKeys {
-		// Get the value the matching key
-		value, err := event.GetValue(key)
-		if err != nil {
-			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
-				return nil
-			}
-			return fmt.Errorf("could not fetch value for key: %s, Error: %v", key, err)
-		}
+	// Delete the exisiting value
+	if err := event.Delete(key); err != nil {
+		return fmt.Errorf("could not delete field: %s, Error: %v", key, err)
+	}
 
-		// Delete the exisiting value
-		if err := event.Delete(key); err != nil {
-			return fmt.Errorf("could not delete field: %s, Error: %v", key, err)
-		}
+	// Alter the field
+	var alterString string
+	if strings.ContainsRune(key, '.') {
+		// In case of nested fields provided, we need to make sure to only modify the latest field in the chain
+		lastIndexRuneFunc := func(r rune) bool { return r == '.' }
+		idx := strings.LastIndexFunc(key, lastIndexRuneFunc)
+		alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
 
-		// Alter the field
-		var alterString string
-		if strings.ContainsRune(key, '.') {
-			// In case of nested fields provided, we need to make sure to only modify the latest field in the chain
-			lastIndexRuneFunc := func(r rune) bool { return r == '.' }
-			idx := strings.LastIndexFunc(key, lastIndexRuneFunc)
-			alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
+	} else {
+		alterString = a.alterFunc(key)
+	}
 
-		} else {
-			alterString = a.alterFunc(key)
-		}
-
-		// Put the value back
-		if _, err := event.PutValue(alterString, value); err != nil {
-			return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
-		}
+	// Put the value back
+	if _, err := event.PutValue(alterString, value); err != nil {
+		return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
 	}
 
 	return nil
-}
-
-func getCaseInsensitiveKeys(event mapstr.M, field string) (key []string) {
-	keys := event.FlattenKeys()
-	for _, k := range *keys {
-		if strings.EqualFold(k, field) {
-			key = append(key, k)
-		}
-	}
-	return key
 }
