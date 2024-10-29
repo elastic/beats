@@ -101,8 +101,9 @@ steps:
         command: |
           sudo usermod -a -G systemd-journal $$USER
           cd filebeat
-          groups > /build/integration-tests/groups-from-script
-          whoami > /build/integration-tests/whoami-from-script
+          mkdir -p ./build/integration-tests/
+          groups | tee ./build/integration-tests/groups-from-script
+          whoami | tee ./build/integration-tests/whoami-from-script
           sudo su $$USER -c "mage goIntegTest"
         retry:
           automatic:
