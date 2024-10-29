@@ -99,14 +99,8 @@ steps:
 
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
-          sudo usermod -a -G systemd-journal $$USER
           cd filebeat
-          mkdir -p ./build/integration-tests/
-          sudo su $$USER -c "groups | tee ./build/integration-tests/groups-from-script"
-          sudo su $$USER -c "whoami | tee ./build/integration-tests/whoami-from-script"
-          sudo su $$USER -c 'source /opt/buildkite-agent/hooks/pre-command'
-          sudo su $$USER -c 'source .buildkite/hooks/pre-command || echo "No pre-command hook found"'
-          sudo su $$USER -c "mage goIntegTest"
+          ./integ-test-buildkite.sh
         retry:
           automatic:
             - limit: 1
