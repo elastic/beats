@@ -41,6 +41,10 @@ const (
 var (
 	// ErrKeyNotFound indicates that the specified key was not found.
 	ErrKeyNotFound = errors.New("key not found")
+	// ErrKeyCollision indicates that during the case-insensitive search multiple keys matched
+	ErrKeyCollision = errors.New("key collision")
+	// ErrNotMapType indicates that the given value is not map type
+	ErrNotMapType = errors.New("value is not a map")
 )
 
 // EventMetadata contains fields and tags that can be added to an event via
@@ -172,6 +176,62 @@ func (m M) HasKey(key string) (bool, error) {
 	return hasKey, err
 }
 
+// FindFold accepts a key and traverses the map trying to match every key segment
+// using `strings.FindFold` (case-insensitive match) and returns the actual
+// key of the map that matched the given key and the value stored under this key.
+// Returns `ErrKeyCollision` if multiple keys match the same request.
+// Returns `ErrNotMapType` when one of the values on the path is not a map and cannot be traversed.
+func (m M) FindFold(key string) (matchedKey string, value interface{}, err error) {
+	path := strings.Split(key, ".")
+	// the initial value must be `true` for the first iteration to work
+	found := true
+	// start with the root
+	current := m
+	// allocate only once
+	var mapType bool
+
+	for i, segment := range path {
+		if !found {
+			return "", nil, ErrKeyNotFound
+		}
+		found = false
+
+		// we have to go through the list of all key on each level to detect case-insensitive collisions
+		for k := range current {
+			if !strings.EqualFold(segment, k) {
+				continue
+			}
+			// if already found on this level, it's a collision
+			if found {
+				return "", nil, fmt.Errorf("key collision on the same path %q, previous match - %q, another subkey - %q: %w", key, matchedKey, k, ErrKeyCollision)
+			}
+
+			// mark for collision detection
+			found = true
+
+			// build the result with the currently matched segment
+			matchedKey += k
+			value = current[k]
+
+			// if it's the last segment, we don't need to go deeper
+			if i == len(path)-1 {
+				continue
+			}
+
+			// if it's not the last segment we put the separator dot
+			matchedKey += "."
+
+			// go one level deeper
+			current, mapType = tryToMapStr(current[k])
+			if !mapType {
+				return "", nil, fmt.Errorf("cannot continue path %q (full: %q), next element is not a map: %w", matchedKey, key, ErrNotMapType)
+			}
+		}
+	}
+
+	return matchedKey, value, nil
+}
+
 // GetValue gets a value from the map. If the key does not exist then an error
 // is returned.
 func (m M) GetValue(key string) (interface{}, error) {
@@ -266,10 +326,12 @@ func (m M) Format(f fmt.State, c rune) {
 // Flatten flattens the given M and returns a flat M.
 //
 // Example:
-//   "hello": M{"world": "test" }
+//
+//	"hello": M{"world": "test" }
 //
 // This is converted to:
-//   "hello.world": "test"
+//
+//	"hello.world": "test"
 //
 // This can be useful for testing or logging.
 func (m M) Flatten() M {
@@ -299,10 +361,12 @@ func flatten(prefix string, in, out M) M {
 // FlattenKeys flattens given MapStr keys and returns a containing array pointer
 //
 // Example:
-//   "hello": MapStr{"world": "test" }
+//
+//	"hello": MapStr{"world": "test" }
 //
 // This is converted to:
-//   ["hello.world"]
+//
+//	["hello.world"]
 func (m M) FlattenKeys() *[]string {
 	out := make([]string, 0)
 	flattenKeys("", m, &out)

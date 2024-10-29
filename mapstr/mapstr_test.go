@@ -1107,3 +1107,106 @@ func TestFormat(t *testing.T) {
 		})
 	}
 }
+
+func TestFindFold(t *testing.T) {
+	field1level2 := M{
+		"level3_Field1": "value2",
+	}
+	field1level1 := M{
+		"non_map":       "value1",
+		"level2_Field1": field1level2,
+	}
+
+	input := M{
+		// baseline
+		"level1_Field1": field1level1,
+		// fold equal testing
+		"Level1_fielD2": M{
+			"lEvel2_fiEld2": M{
+				"levEl3_fIeld2": "value3",
+			},
+		},
+		// collision testing
+		"level1_field2": M{
+			"level2_field2": M{
+				"level3_field2": "value4",
+			},
+		},
+	}
+
+	cases := []struct {
+		name   string
+		key    string
+		expKey string
+		expVal interface{}
+		expErr string
+	}{
+		{
+			name:   "returns normal key, full match",
+			key:    "level1_Field1.level2_Field1.level3_Field1",
+			expKey: "level1_Field1.level2_Field1.level3_Field1",
+			expVal: "value2",
+		},
+		{
+			name:   "returns normal key, partial match",
+			key:    "level1_Field1.level2_Field1",
+			expKey: "level1_Field1.level2_Field1",
+			expVal: field1level2,
+		},
+		{
+			name:   "returns normal key, one level",
+			key:    "level1_Field1",
+			expKey: "level1_Field1",
+			expVal: field1level1,
+		},
+		{
+			name:   "returns case-insensitive full match",
+			key:    "level1_field1.level2_field1.level3_field1",
+			expKey: "level1_Field1.level2_Field1.level3_Field1",
+			expVal: "value2",
+		},
+		{
+			name:   "returns case-insensitive partial match",
+			key:    "level1_field1.level2_field1",
+			expKey: "level1_Field1.level2_Field1",
+			expVal: field1level2,
+		},
+		{
+			name:   "returns case-insensitive one-level match",
+			key:    "level1_field1",
+			expKey: "level1_Field1",
+			expVal: field1level1,
+		},
+		{
+			name:   "returns collision error",
+			key:    "level1_field2.level2_field2.level3_field2",
+			expErr: "collision",
+		},
+		{
+			name:   "returns non-map error",
+			key:    "level1_field1.non_map.some_key",
+			expErr: "next element is not a map",
+		},
+		{
+			name:   "returns non-found error",
+			key:    "level1_field1.not_exists.some_key",
+			expErr: "key not found",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			key, val, err := input.FindFold(tc.key)
+			if tc.expErr != "" {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.expErr)
+				assert.Nil(t, val)
+				assert.Empty(t, key)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.expKey, key)
+			assert.Equal(t, tc.expVal, val)
+		})
+	}
+}
