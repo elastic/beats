@@ -83,6 +83,8 @@ examples for each of the supported providers.
 
 _AWS_
 
+Metadata given below are extracted from https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.html[instance identity document],
+
 [source,json]
 -------------------------------------------------------------------------------
 {
@@ -97,6 +99,22 @@ _AWS_
   }
 }
 -------------------------------------------------------------------------------
+
+If the EC2 instance has IMDS enabled and if tags are allowed through IMDS endpoint, the processor will further append tags in metadata.
+Please refer official documentation on https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html[IMDS endpoint] for further details.
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "ec2": {
+    "tag": {
+      "org" : "myOrg",
+      "owner": "userID"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
 
 _Digital Ocean_
 

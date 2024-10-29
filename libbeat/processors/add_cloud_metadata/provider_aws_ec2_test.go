@@ -360,24 +360,8 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 		{
 			testName:                "if enabled, extract tags from IMDS endpoint",
 			mockGetInstanceIdentity: genericInstanceIDResponse,
-			mockMetadata: func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
-				if input.Path == tagsCategory {
-					// tag category request
-					return &imds.GetMetadataOutput{
-						Content: io.NopCloser(strings.NewReader(customTagKey)),
-					}, nil
-				}
-
-				if strings.HasSuffix(input.Path, customTagKey) {
-					// customTagKey request
-					return &imds.GetMetadataOutput{
-						Content: io.NopCloser(strings.NewReader(customTagValue)),
-					}, nil
-				}
-
-				return nil, errors.New("invalid request")
-			},
-			mockEc2Tags: nil, // could be nil as IMDS response fulfills tag
+			mockMetadata:            genericImdsGet,
+			mockEc2Tags:             nil, // could be nil as IMDS response fulfills tag
 			expectedEvent: mapstr.M{
 				"cloud": mapstr.M{
 					"provider":          "aws",
@@ -389,9 +373,16 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"availability_zone": availabilityZoneDoc1,
 					"service":           mapstr.M{"name": "EC2"},
 				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+					},
+				},
 				"ec2": mapstr.M{
 					"tag": mapstr.M{
-						customTagKey: customTagValue,
+						eksClusterNameTagKey: clusterNameValue,
+						customTagKey:         customTagValue,
 					},
 				},
 			},
