@@ -33,7 +33,6 @@ import (
 // correctly choose and start a journald input when the globs defined in
 // var.paths do not resolve to any file.
 func TestSystemLogsCanUseJournaldInput(t *testing.T) {
-	skipOnBuildKite(t)
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",

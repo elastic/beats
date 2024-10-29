@@ -99,6 +99,7 @@ steps:
 
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
+          sudo usermod -a -G systemd-journal $$USER
           cd filebeat
           mage goIntegTest
         retry:
@@ -111,36 +112,6 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "filebeat: Go Integration Tests"
-
-      - label: ":ubuntu: Filebeat: Integration tests as Root"
-        command: |
-          sudo usermod -a -G systemd-journal $$USER
-          cd filebeat
-          go test -v -count=1 -tags=integration -run=TestSystemLogs ./tests/integration
-          go go test -v -count=1 -tags=integration -run=TestDebugBuildKite ./tests/integration
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-          - "filebeat/build/integration-tests/*"
           - "filebeat/build/integration-tests/Test*/*"
           - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
