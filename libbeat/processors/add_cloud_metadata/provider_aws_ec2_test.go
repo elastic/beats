@@ -70,6 +70,69 @@ type MockEC2Client struct {
 func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
 	return e.DescribeTagsFunc(ctx, params, optFns...)
 }
+
+var (
+	// not the best way to use a response template
+	// but this should serve until we need to test
+	// documents containing very different values
+	accountIDDoc1        = "111111111111111"
+	regionDoc1           = "us-east-1"
+	availabilityZoneDoc1 = "us-east-1c"
+	imageIDDoc1          = "ami-abcd1234"
+	instanceTypeDoc1     = "t2.medium"
+	instanceIDDoc2       = "i-22222222"
+	clusterNameKey       = eksClusterNameTagKey
+	clusterNameValue     = "test"
+	instanceIDDoc1       = "i-11111111"
+	customTagKey         = "organization"
+	customTagValue       = "orgName"
+)
+
+// generic getTagFunc implementation with IMDS disabled error to avoid IMDS response
+var disabledIMDS getMetaFunc = func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
+	return nil, errors.New("IMDS disabled mock error")
+}
+
+// set up a generic getTagFunc implementation with valid tags
+var genericImdsGet getMetaFunc = func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
+	tagKeys := fmt.Sprintf("%s\n%s", customTagKey, eksClusterNameTagKey)
+
+	if input.Path == tagsCategory {
+		// tag category request
+		return &imds.GetMetadataOutput{
+			Content: io.NopCloser(strings.NewReader(tagKeys)),
+		}, nil
+	}
+
+	// tag request
+	if strings.HasSuffix(input.Path, customTagKey) {
+		return &imds.GetMetadataOutput{
+			Content: io.NopCloser(strings.NewReader(customTagValue)),
+		}, nil
+	}
+
+	if strings.HasSuffix(input.Path, eksClusterNameTagKey) {
+		return &imds.GetMetadataOutput{
+			Content: io.NopCloser(strings.NewReader(clusterNameValue)),
+		}, nil
+	}
+	return nil, errors.New("invalid request")
+}
+
+// generic getInstanceIDFunc implementation with known response values and no error
+var genericInstanceIDResponse getInstanceIDFunc = func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+	return &imds.GetInstanceIdentityDocumentOutput{
+		InstanceIdentityDocument: imds.InstanceIdentityDocument{
+			AvailabilityZone: availabilityZoneDoc1,
+			Region:           regionDoc1,
+			InstanceID:       instanceIDDoc1,
+			InstanceType:     instanceTypeDoc1,
+			AccountID:        accountIDDoc1,
+			ImageID:          imageIDDoc1,
+		},
+	}, nil
+}
+
 func TestMain(m *testing.M) {
 	logp.TestingSetup()
 	code := m.Run()
@@ -77,61 +140,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestRetrieveAWSMetadataEC2(t *testing.T) {
-	var (
-		// not the best way to use a response template
-		// but this should serve until we need to test
-		// documents containing very different values
-		accountIDDoc1        = "111111111111111"
-		regionDoc1           = "us-east-1"
-		availabilityZoneDoc1 = "us-east-1c"
-		imageIDDoc1          = "ami-abcd1234"
-		instanceTypeDoc1     = "t2.medium"
-		instanceIDDoc2       = "i-22222222"
-		clusterNameKey       = eksClusterNameTagKey
-		clusterNameValue     = "test"
-		instanceIDDoc1       = "i-11111111"
-		customTagKey         = "organization"
-		customTagValue       = "orgName"
-	)
-
-	// generic getTagFunc implementation with IMDS disabled error to avoid IMDS response
-	var disabledIMDS getMetaFunc = func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
-		return nil, errors.New("IMDS disabled mock error")
-	}
-
-	// set up a generic getTagFunc implementation with valid tags
-	var enabledIMDS getMetaFunc = func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
-		if input.Path == tagsCategory {
-			// tag category request
-			return &imds.GetMetadataOutput{
-				Content: io.NopCloser(strings.NewReader(customTagKey)),
-			}, nil
-		}
-
-		if strings.HasSuffix(input.Path, customTagKey) {
-			// customTagKey request
-			return &imds.GetMetadataOutput{
-				Content: io.NopCloser(strings.NewReader(customTagValue)),
-			}, nil
-		}
-
-		return nil, errors.New("invalid request")
-	}
-
-	// generic getInstanceIDFunc implementation with known response values and no error
-	var genericInstanceIDResponse getInstanceIDFunc = func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
-		return &imds.GetInstanceIdentityDocumentOutput{
-			InstanceIdentityDocument: imds.InstanceIdentityDocument{
-				AvailabilityZone: availabilityZoneDoc1,
-				Region:           regionDoc1,
-				InstanceID:       instanceIDDoc1,
-				InstanceType:     instanceTypeDoc1,
-				AccountID:        accountIDDoc1,
-				ImageID:          imageIDDoc1,
-			},
-		}, nil
-	}
-
 	var tests = []struct {
 		testName                string
 		mockGetInstanceIdentity getInstanceIDFunc
@@ -352,8 +360,24 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 		{
 			testName:                "if enabled, extract tags from IMDS endpoint",
 			mockGetInstanceIdentity: genericInstanceIDResponse,
-			mockMetadata:            enabledIMDS,
-			mockEc2Tags:             nil, // could be nil as IMDS response fulfills tag
+			mockMetadata: func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
+				if input.Path == tagsCategory {
+					// tag category request
+					return &imds.GetMetadataOutput{
+						Content: io.NopCloser(strings.NewReader(customTagKey)),
+					}, nil
+				}
+
+				if strings.HasSuffix(input.Path, customTagKey) {
+					// customTagKey request
+					return &imds.GetMetadataOutput{
+						Content: io.NopCloser(strings.NewReader(customTagValue)),
+					}, nil
+				}
+
+				return nil, errors.New("invalid request")
+			},
+			mockEc2Tags: nil, // could be nil as IMDS response fulfills tag
 			expectedEvent: mapstr.M{
 				"cloud": mapstr.M{
 					"provider":          "aws",
@@ -409,6 +433,69 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				t.Fatalf("error running processor: %s", err.Error())
 			}
 			assert.Equal(t, tc.expectedEvent, actual.Fields)
+		})
+	}
+}
+
+func Test_getTags(t *testing.T) {
+	ctx := context.Background()
+	instanceId := "ami-abcd1234"
+	logger := logp.NewLogger("add_cloud_metadata test logger")
+
+	tests := []struct {
+		name       string
+		imdsClient IMDSClient
+		ec2Client  EC2Client
+		want       map[string]string
+	}{
+		{
+			name: "tags extracted from IMDS if possible",
+			imdsClient: &MockIMDSClient{
+				GetMetadataFunc: genericImdsGet,
+			},
+			want: map[string]string{
+				customTagKey:         customTagValue,
+				eksClusterNameTagKey: clusterNameValue,
+			},
+		},
+		{
+			name: "tag extraction fallback to DescribeTag if IMDS fetch results in an error",
+			imdsClient: &MockIMDSClient{
+				GetMetadataFunc: disabledIMDS,
+			},
+			ec2Client: &MockEC2Client{
+				DescribeTagsFunc: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+					return &ec2.DescribeTagsOutput{
+						Tags: []types.TagDescription{
+							{
+								Key:          &clusterNameKey,
+								ResourceId:   &instanceId,
+								ResourceType: "instance",
+								Value:        &clusterNameValue,
+							},
+						},
+					}, nil
+				}},
+			want: map[string]string{
+				eksClusterNameTagKey: clusterNameValue,
+			},
+		},
+		{
+			name: "empty tags if all methods failed",
+			imdsClient: &MockIMDSClient{
+				GetMetadataFunc: disabledIMDS,
+			},
+			ec2Client: &MockEC2Client{
+				DescribeTagsFunc: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+					return nil, errors.New("some error from DescribeTag")
+				}},
+			want: map[string]string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tags := getTags(ctx, tt.imdsClient, tt.ec2Client, instanceId, logger)
+			assert.Equal(t, tags, tt.want)
 		})
 	}
 }
