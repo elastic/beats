@@ -337,6 +337,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Libbeat*
 
+- enrich events with EC2 tags in add_cloud_metadata processor {pull}41477[41477]
 
 
 *Heartbeat*
