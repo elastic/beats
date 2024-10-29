@@ -29,7 +29,7 @@ steps:
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
         concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: eager
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -54,7 +54,7 @@ steps:
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
         concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: eager
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -81,7 +81,7 @@ steps:
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
         concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: eager
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -105,8 +105,8 @@ steps:
           cd filebeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -132,8 +132,8 @@ steps:
           cd heartbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -151,8 +151,8 @@ steps:
           cd heartbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -172,8 +172,8 @@ steps:
           cd metricbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -199,8 +199,8 @@ steps:
           cd metricbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -226,8 +226,8 @@ steps:
           cd packetbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -251,8 +251,8 @@ steps:
           cd packetbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -278,8 +278,8 @@ steps:
           cd x-pack/auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -303,8 +303,8 @@ steps:
           cd x-pack/auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -330,8 +330,8 @@ steps:
           cd x-pack/filebeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -355,8 +355,8 @@ steps:
           cd x-pack/filebeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -384,8 +384,8 @@ steps:
           cd x-pack/heartbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -411,8 +411,8 @@ steps:
           cd x-pack/heartbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -438,8 +438,8 @@ steps:
           cd x-pack/metricbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -465,8 +465,8 @@ steps:
           cd x-pack/metricbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -492,8 +492,8 @@ steps:
           cd x-pack/osquerybeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -511,8 +511,8 @@ steps:
           cd x-pack/osquerybeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -532,8 +532,8 @@ steps:
           cd x-pack/packetbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -557,8 +557,8 @@ steps:
           cd x-pack/packetbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
-        concurrency_method: eager
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
