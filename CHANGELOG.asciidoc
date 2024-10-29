@@ -3,6 +3,54 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.15.3]]
+=== Beats version 8.15.3
+https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
+
+==== Known issues
+
+*Affecting all Beats*
+
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
+==== Breaking changes
+
+*Filebeat*
+
+- Change `log.file.path` field in awscloudwatch input to nested object. {pull}41099[41099]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Allow port number 0 in the community ID flowhash processor. {pull}40259[40259]
+- The journald input now restarts if there is an error/crash. {issue}32782[32782] {pull}40558[40558]
+
+*Filebeat*
+
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
+
+*Metricbeat*
+
+- Use namespace for GetListMetrics when it exists in AWS. {pull}41022[41022]
+
+*Packetbeat*
+
+- Fix upload of bundled ingest pipelines on Windows. {pull}41110[41110]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.8. {pull}41139[41139]
+- Add kafka compression support for ZSTD.
+
+*Metricbeat*
+
+- Restore `docker.network.in.*` and `docker.network.out.*` fields in docker module. {pull}40968[40968]
+
+
 [[release-notes-8.15.2]]
 === Beats version 8.15.2
 https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
@@ -12,6 +60,12 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 *Affecting all Beats*
 
 - Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+
+==== Known issues
+
+*Affecting all Beats*
+
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
 ==== Bugfixes
 
@@ -31,7 +85,9 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
 *Affecting all Beats*
 
-- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. {issue}41118[41118]
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file. 
+- Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
 ==== Bugfixes
 
@@ -88,6 +144,7 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 *Filebeat*
 
 - The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.
+- Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
 ==== Breaking changes
 
@@ -423,7 +480,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 
 *Affecting all Beats*
 
-- Update Go version to 1.21.9. {pulk}38727[38727]
+- Update Go version to 1.21.9. {pull}38727[38727]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers. {pull}38669[38669]
 
 *Auditbeat*
@@ -433,7 +490,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 
 *Metricbeat*
 
-- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover.{pull}38471[38471]
+- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover. {pull}38471[38471]
 
 
 [[release-notes-8.13.2]]

@@ -52,6 +52,10 @@
       description: >
         Sum of disk read and write rates each second in bytes.
       format: bytes
+    - name: id
+      type: keyword
+      description: >
+        Unique host ID.
     - name: memory.free.bytes
       type: long
       description: >
