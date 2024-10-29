@@ -46,3 +46,36 @@ The `translate_guid` processor has the following configuration settings:
 |======
 
 &#42; Also see <<configuration-ssl>> for a full description of the `ldap_ssl` options.
+
+If the searches are slow or you expect a high amount of GUID's to be found, consider using a cache processor to speed processing:
+
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+  - cache:
+      backend:
+        memory:
+          id: ldapguids
+      get:
+        key_field: guid.cn
+        target_field: winlog.common_name
+      ignore_missing: true
+  - if:
+      not:
+        - has_fields: winlog.common_name
+    then:
+      - translate_guid:
+          field: winlog.event_data.ObjectGuid
+          target_field: winlog.common_name
+          ldap_address: "ldap://"
+          ldap_base_dn: "dc=example,dc=com"
+      - cache:
+          backend:
+            memory:
+              id: ldapguids
+            capacity: 10000
+          put:
+            key_field: guid.cn
+            value_field: winlog.common_name
+-------------------------------------------------------------------------------
