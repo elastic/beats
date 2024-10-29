@@ -28,7 +28,7 @@ steps:
           cd auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
+        concurrency: "${CONCURRENCY_COUNT}"
         concurrency_method: eager
         retry:
           automatic:
@@ -53,7 +53,7 @@ steps:
           cd auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
+        concurrency: "${CONCURRENCY_COUNT}"
         concurrency_method: eager
         retry:
           automatic:
@@ -80,7 +80,7 @@ steps:
           cd filebeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: 10
+        concurrency: "${CONCURRENCY_COUNT}"
         concurrency_method: eager
         retry:
           automatic:
