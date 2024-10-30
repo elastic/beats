@@ -107,7 +107,7 @@ The `lowercase` processor has the following configuration settings:
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
-`full_path`:: (Optional) This flag enables case-insensitive matching against the entire key path. If set to false, only the final part of the key path is matched case-insensitively. Default is `true`.            
+`full_path`:: (Optional) Enables case-insensitive matching for the entire key path. If set to false, only the last part of a nested key path is matched case-insensitively. For single-element keys, matching is always case-insensitive. Default is true.           
 
                                   
 

@@ -109,9 +109,9 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 
 	// Get the value matching the key
 	// searches full path 'case insensitively'
-	if a.FullPath {
+	if a.FullPath || (!a.FullPath && !strings.ContainsRune(field, '.')) {
 		key, value, err = event.Fields.FindFold(field)
-	} else if strings.ContainsRune(field, '.') {
+	} else {
 		// searches for only the most nested key 'case insensitively'
 		idx := lastIndexDot(field)
 		value, err = event.Fields.GetValue(field[:idx])
@@ -129,9 +129,6 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 		}
 		key, value, err = current.FindFold(field[idx+1:])
 		key = field[:idx+1] + key
-	} else {
-		value, err = event.Fields.GetValue(field)
-		key = field
 	}
 
 	// If err is not nil for any of the above case

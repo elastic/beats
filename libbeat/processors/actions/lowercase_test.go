@@ -149,8 +149,9 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 				"Ab": "second",
 			},
 			Output: mapstr.M{
-				"ab": "first",
-				"Ab": "second",
+				"ab":    "first",
+				"Ab":    "second",
+				"error": mapstr.M{"message": "could not fetch value for key: ab, Error: key collision on the same path \"ab\", previous match - \"ab\", another subkey - \"Ab\": key collision"},
 			},
 			Error: false,
 		},
