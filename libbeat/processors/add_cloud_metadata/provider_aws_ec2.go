@@ -153,7 +153,7 @@ func getTags(ctx context.Context, imdsClient IMDSClient, ec2Client EC2Client, in
 	logger.Info("Tag extraction from IMDS failed, fallback to DescribeTags API to obtain EKS cluster name.")
 	clusterName, err := clusterNameFromDescribeTag(ctx, ec2Client, instanceId)
 	if err != nil {
-		logger.Warnf("error obtaining cluster name: %s.", err)
+		logger.Warnf("error obtaining cluster name: %v.", err)
 		return tags
 	}
 
@@ -169,36 +169,52 @@ func getTags(ctx context.Context, imdsClient IMDSClient, ec2Client EC2Client, in
 func getTagsFromIMDS(ctx context.Context, client IMDSClient, logger *logp.Logger) (tags map[string]string, ok bool) {
 	tags = make(map[string]string)
 
-	metadata, err := client.GetMetadata(ctx, &imds.GetMetadataInput{Path: tagsCategory})
+	b, err := getMetadataHelper(ctx, client, tagsCategory, logger)
 	if err != nil {
-		logger.Warnf("error from IMDS tags category request: %s", err)
-		return tags, false
-	}
-
-	b, err := io.ReadAll(metadata.Content)
-	if err != nil {
-		logger.Warnf("error extracting tags category payload: %s", err)
+		logger.Warnf("error obtaining tags category: %v", err)
 		return tags, false
 	}
 
 	for _, tag := range strings.Split(string(b), "\n") {
 		tagPath := fmt.Sprintf("%s/%s", tagsCategory, tag)
-		metadata, err := client.GetMetadata(ctx, &imds.GetMetadataInput{Path: tagPath})
+		b, err := getMetadataHelper(ctx, client, tagPath, logger)
 		if err != nil {
-			logger.Warnf("error from IMDS tag request: %s", err)
+			logger.Warnf("error extracting tag value of %s: %v", tag, err)
 			return tags, false
 		}
 
-		b, err := io.ReadAll(metadata.Content)
-		if err != nil {
-			logger.Warnf("error extracting tag value payload: %s", err)
-			return tags, false
+		tagValue := string(b)
+		if tagValue == "" {
+			logger.Infof("Ignoring tag key %s as value is empty", tag)
+			continue
 		}
 
-		tags[tag] = string(b)
+		tags[tag] = tagValue
 	}
 
 	return tags, true
+}
+
+// getMetadataHelper performs the IMDS call for the given path and returns the response content after closing the underlying content reader.
+func getMetadataHelper(ctx context.Context, client IMDSClient, path string, logger *logp.Logger) (content []byte, err error) {
+	metadata, err := client.GetMetadata(ctx, &imds.GetMetadataInput{Path: path})
+	if err != nil {
+		return nil, fmt.Errorf("error from IMDS metadata request: %w", err)
+	}
+
+	defer func(Content io.ReadCloser) {
+		err := Content.Close()
+		if err != nil {
+			logger.Warnf("error closing IMDS metadata response body: %v", err)
+		}
+	}(metadata.Content)
+
+	content, err = io.ReadAll(metadata.Content)
+	if err != nil {
+		return nil, fmt.Errorf("error extracting metadata from the IMDS response: %w", err)
+	}
+
+	return content, nil
 }
 
 // clusterNameFromDescribeTag is a helper to extract EKS cluster name using DescribeTag.

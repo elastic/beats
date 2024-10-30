@@ -482,6 +482,33 @@ func Test_getTags(t *testing.T) {
 				}},
 			want: map[string]string{},
 		},
+		{
+			name: "Empty tags values are ignored",
+			imdsClient: &MockIMDSClient{
+				GetMetadataFunc: func(ctx context.Context, input *imds.GetMetadataInput, f ...func(*imds.Options)) (*imds.GetMetadataOutput, error) {
+					if input.Path == tagsCategory {
+						// tag category request
+						return &imds.GetMetadataOutput{
+							Content: io.NopCloser(strings.NewReader(customTagKey)),
+						}, nil
+					}
+
+					// tag request
+					if strings.HasSuffix(input.Path, customTagKey) {
+						return &imds.GetMetadataOutput{
+							Content: io.NopCloser(strings.NewReader("")),
+						}, nil
+					}
+
+					return nil, errors.New("invalid request")
+				},
+			},
+			ec2Client: &MockEC2Client{
+				DescribeTagsFunc: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+					return nil, errors.New("some error from DescribeTag")
+				}},
+			want: map[string]string{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
