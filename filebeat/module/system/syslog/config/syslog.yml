@@ -1,4 +1,5 @@
 type: system-logs
+id: system-syslog
 
 {{ if .use_journald }}
 use_journald: true
