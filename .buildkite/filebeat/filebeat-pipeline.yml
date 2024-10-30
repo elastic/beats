@@ -100,7 +100,8 @@ steps:
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
           cd filebeat
-          newgrp systemd-journal <<EOF
+          sudo -E bash <<EOF
+          PATH=/opt/buildkite-agent/.asdf/shims:/opt/buildkite-agent/.asdf/bin:$PATH;
           mage goIntegTest
           EOF
         retry:
