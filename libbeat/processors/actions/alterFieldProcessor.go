@@ -108,7 +108,9 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	var err error
 
 	// Get the value matching the key
-	// searches full path 'case insensitively'
+	// match this case when
+	// 1. when full_path is true
+	// 2. when full_path is false and field is a single-element key
 	if a.FullPath || (!a.FullPath && !strings.ContainsRune(field, '.')) {
 		key, value, err = event.Fields.FindFold(field)
 	} else {
