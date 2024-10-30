@@ -5,8 +5,7 @@
 <titleabbrev>lowercase</titleabbrev>
 ++++
 
-The `lowercase` processor specifies a list of fields that must be lowercased. This applies only to keys that match the given fields. The default behaviour of the processor is to modify the most nested key in the chain. It does not support keys with dot notation
-
+The `lowercase` processor specifies a list of fields that should be converted to lowercase. This transformation applies to keys that match the specified fields. By default, matching is case-insensitive for the entire key path. For additional options, see the `full_path` flag. If a nested key is specified, only the final part of the key path is lowercased.
 
 
 ==== Examples: 
@@ -18,28 +17,29 @@ The `lowercase` processor specifies a list of fields that must be lowercased. Th
 processors:
   - rename:
       fields:
-        - "abcd"
+        - "ab.cd"
       ignore_missing: false
       fail_on_error: true
+      full_path: true
 ----
 [source,json]
 ----
 // Input
 {
   "AB": {"CD":"data"},
-  "aB": {"cD":"data"} 
+  "CD": {"ef":"data"} 
 }
 
 
 // output
 {
-  "AB": {"Cd":"data"},
-  "aB": {"cd":"data"} 
+  "AB": {"cd":"data"},  // cd is lowercased
+  "CD": {"ef":"data"}  
 }
 ----
 
 [start=2]
-2. In case of key collison, the value of last element in the input is preserved
+2. In case of non unique path to the key and `full_path` is true
 
 [source,yaml]
 ----
@@ -49,6 +49,7 @@ processors:
         - "ab"
       ignore_missing: false
       fail_on_error: true
+      full_path: true
 ----
 
 [source,json]
@@ -59,12 +60,43 @@ processors:
   "aB": "second"
 }
 
-// Input
+// Output
 {
-  "ab": "second",
+  "ab": "first",
+  "aB": "second",
+  "err": "... Error: key collision on the same path"
 }
 ----
 
+[start=3]
+3. When `full_path` is false
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "ab.cd"
+      ignore_missing: false
+      fail_on_error: true
+      full_path: false
+----
+
+[source,json]
+----
+// Input
+{
+  "ab": {"CD":"data"},
+  "AB": {"ef":"data"} 
+}
+
+
+// Output
+{
+  "ab": {"cd":"data"},  // Only the last part of the key is matched in a case-insensitive manner and converted to lowercase
+  "AB": {"ef":"data"} 
+}
+----
 
 ==== Configuration:
 
@@ -75,6 +107,7 @@ The `lowercase` processor has the following configuration settings:
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
+`full_path`:: (Optional) This flag enables case-insensitive matching against the entire key path. If set to false, only the final part of the key path is matched case-insensitively. Default is `true`.            
 
                                   
 
