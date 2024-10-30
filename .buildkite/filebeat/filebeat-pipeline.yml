@@ -100,7 +100,9 @@ steps:
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
           cd filebeat
-          ./integ-test-buildkite.sh
+          newgrp systemd-journal <<EOF
+          mage goIntegTest
+          EOF
         retry:
           automatic:
             - limit: 1
