@@ -45,10 +45,7 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, globWithoutFiles, workDir)
 
 	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start(
-		"-E",
-		"logging.event_data.files.rotateeverybytes=524288000",
-	)
+	filebeat.Start()
 
 	filebeat.WaitForLogs(
 		"no files were found, using journald input",
