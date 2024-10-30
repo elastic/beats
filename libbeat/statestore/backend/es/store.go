@@ -246,17 +246,9 @@ type searchResult struct {
 }
 
 func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error {
-	// Can't wait here for when the connection is configured.
-	// Currently Each method is being called for each plugin with store (input-logfile, input-cursor) as well as the registrar
-	// from filebeat::Run. All these pieces have to be initialized before the libbeat Manager starts and gets a chance to connect
-	// to the Agent and get the configuration.
-	//
-	// At this point it's not clear how to hook up the elasticsearch storage or if it's even possible without some major rewrite.
-	//
-	// Commented for now:
-	// if err := s.waitReady(); err != nil {
-	// 	return err
-	// }
+	if err := s.waitReady(); err != nil {
+		return err
+	}
 
 	s.mx.Lock()
 	defer s.mx.Unlock()
