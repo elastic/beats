@@ -15,46 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build integration
 
-package journalctl
+package integration
 
 import (
+	"fmt"
+	"path"
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func TestMode_Unpack(t *testing.T) {
-	t.Run("ok", func(t *testing.T) {
-		tests := map[string]SeekMode{
-			"head":  SeekHead,
-			"tail":  SeekTail,
-			"since": SeekSince,
-		}
+func TestSystemLogsCanUseLogInput(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	copyModulesDir(t, workDir)
 
-		for str, want := range tests {
-			t.Run(str, func(t *testing.T) {
-				var m SeekMode
-				if err := m.Unpack(str); err != nil {
-					t.Fatal(err)
-				}
+	logFilePath := path.Join(workDir, "syslog")
+	integration.GenerateLogFile(t, logFilePath, 5, false)
+	yamlCfg := fmt.Sprintf(systemModuleCfg, logFilePath, logFilePath, workDir)
 
-				if m != want {
-					t.Errorf("wrong mode, expected %v, got %v", want, m)
-				}
-			})
-		}
-	})
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
 
-	t.Run("failing", func(t *testing.T) {
-		cases := []string{"invalid", "", "unknown"}
-
-		for _, str := range cases {
-			t.Run(str, func(t *testing.T) {
-				var m SeekMode
-				if err := m.Unpack(str); err == nil {
-					t.Errorf("an error was expected, got %v", m)
-				}
-			})
-		}
-	})
+	filebeat.WaitForLogs(
+		"using log input because file(s) was(were) found",
+		10*time.Second,
+		"system-logs did not select the log input")
+	filebeat.WaitForLogs(
+		"Harvester started for paths:",
+		10*time.Second,
+		"system-logs did not start the log input")
 }

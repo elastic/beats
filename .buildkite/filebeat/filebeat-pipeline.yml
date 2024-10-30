@@ -105,6 +105,18 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+<<<<<<< HEAD
+=======
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+>>>>>>> b1c7478458 (Fix system module with both filesets enabled (#41381))
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests"
