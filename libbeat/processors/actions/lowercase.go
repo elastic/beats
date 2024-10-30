@@ -20,6 +20,7 @@ package actions
 import (
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -37,7 +38,7 @@ func init() {
 }
 
 // NewLowerCaseProcessor converts event keys matching the provided fields to lowercase
-func NewLowerCaseProcessor(c *conf.C) (processors.Processor, error) {
+func NewLowerCaseProcessor(c *conf.C) (beat.Processor, error) {
 	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
 }
 
