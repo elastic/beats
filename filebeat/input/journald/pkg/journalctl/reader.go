@@ -407,10 +407,6 @@ func (r *Reader) handleMessage(msg []byte) (JournalEntry, error) {
 	// Update our cursor so we can restart journalctl if needed
 	r.cursor = cursor
 
-	fieldsJSON, err := json.Marshal(fields)
-	debugMsg := fmt.Sprintf("Event: '%s', error: %s", string(fieldsJSON), err)
-	r.logger.Debugw(debugMsg, logp.TypeKey, logp.EventType)
-
 	return JournalEntry{
 		Fields:             fields,
 		RealtimeTimestamp:  unixTS,

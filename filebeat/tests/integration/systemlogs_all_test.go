@@ -52,24 +52,6 @@ func copyModulesDir(t *testing.T, dst string) {
 }
 
 //nolint:unused,nolintlint // necessary on Linux
-func writeToFile(t *testing.T, data []byte, name string) {
-	if err := os.MkdirAll(filepath.Join("../", "../", "build", "integration-tests"), 0750); err != nil {
-		t.Errorf("cannot create dirs: %s", err)
-		return
-	}
-	f, err := os.Create(filepath.Join("../", "../", "build", "integration-tests", name))
-	if err != nil {
-		t.Errorf("cannot create '%s': %s", name, err)
-	}
-
-	defer f.Close()
-
-	if _, err := f.Write(data); err != nil {
-		t.Errorf("cannot write to '%s': '%s'", name, err)
-	}
-}
-
-//nolint:unused,nolintlint // necessary on Linux
 func waitForAllFilesets(t *testing.T, outputGlob string, msgAndArgs ...any) {
 	require.Eventually(
 		t,

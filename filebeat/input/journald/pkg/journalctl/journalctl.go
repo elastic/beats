@@ -97,10 +97,8 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 		defer close(jctl.dataChan)
 		reader := bufio.NewReader(jctl.stdout)
 		for {
-			logger.Debug("stdout Gorutine waiting for data")
 			data, err := reader.ReadBytes('\n')
 			if err != nil {
-				logger.Debug("stdout Gorutine got error:", err)
 				if !errors.Is(err, io.EOF) {
 					var logError = false
 					var pathError *fs.PathError
@@ -133,10 +131,8 @@ func Factory(canceller input.Canceler, logger *logp.Logger, binary string, args 
 
 			select {
 			case <-jctl.canceler.Done():
-				logger.Debug("stdout Goroutine canceller done")
 				return
 			case jctl.dataChan <- data:
-				logger.Debug("stdout Goroutine sent data, len:", len(data))
 			}
 		}
 	}()
@@ -174,13 +170,10 @@ func (j *journalctl) Kill() error {
 // exited unexpectedly, then `err` is non-nil, `finished` is false and an empty
 // byte array is returned.
 func (j *journalctl) Next(cancel input.Canceler) ([]byte, bool, error) {
-	j.logger.Debug("Next called")
 	select {
 	case <-cancel.Done():
-		j.logger.Debug("Next: done")
 		return []byte{}, false, ErrCancelled
 	case d, open := <-j.dataChan:
-		j.logger.Debug("Next: got data, open?", open)
 		if !open {
 			// Wait for the process to exit, so we can read the exit code.
 			j.waitDone.Wait()

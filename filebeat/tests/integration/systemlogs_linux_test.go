@@ -21,7 +21,6 @@ package integration
 
 import (
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
@@ -67,54 +66,4 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 		filepath.Join(workDir, "output*.ndjson"),
 		"did not find events from both filesets: 'auth' and 'syslog'",
 	)
-}
-
-func TestDebugBuildKite(t *testing.T) {
-	jctlSyslog := exec.Command("journalctl",
-		"--utc",
-		"--output", "json",
-		"--no-pager",
-		"--facility", "0",
-		"--facility", "1",
-		"--facility", "2",
-		"--facility", "3",
-		"--facility", "5",
-		"--facility", "6",
-		"--facility", "7",
-		"--facility", "8",
-		"--facility", "9",
-		"--facility", "11",
-		"--facility", "12",
-		"--facility", "15",
-		"-n", "5")
-
-	syslogOut, err := jctlSyslog.CombinedOutput()
-	if err != nil {
-		t.Errorf("cannot run journalctl for syslog: %s", err)
-	}
-	writeToFile(t, syslogOut, "syslogOut")
-
-	jctlAuth := exec.Command("journalctl",
-		"--utc",
-		"--output", "json",
-		"--no-pager",
-		"--facility", "4",
-		"--facility", "10",
-		"-n", "5")
-	authOut, err := jctlAuth.CombinedOutput()
-	if err != nil {
-		t.Errorf("cannot run journalctl for auth: %s", err)
-	}
-	writeToFile(t, authOut, "authOut")
-
-	cmds := []string{"whoami", "groups"}
-	for _, cmd := range cmds {
-		c := exec.Command(cmd)
-		out, err := c.CombinedOutput()
-		if err != nil {
-			t.Errorf("cannot execute '%s': '%s'", cmd, err)
-			continue
-		}
-		writeToFile(t, out, cmd)
-	}
 }
