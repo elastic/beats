@@ -1,6 +1,6 @@
 module github.com/elastic/elastic-agent-system-metrics
 
-go 1.21
+go 1.22.8
 
 require (
 	github.com/docker/docker v26.1.5+incompatible
