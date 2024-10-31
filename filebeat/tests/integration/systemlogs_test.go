@@ -39,7 +39,8 @@ var systemModuleCfg string
 // TestSystemLogsCanUseJournald aims to ensure the system-logs input can
 // correctly choose and start a journald input when the globs defined in
 // var.paths do not resolve to any file.
-func TestSystemLogsCanUseJournaldInput(t *testing.T) {
+func TestSystemModuleCanUseJournaldInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -66,6 +67,7 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 }
 
 func TestSystemLogsCanUseLogInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
