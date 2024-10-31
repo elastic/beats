@@ -26,6 +26,10 @@
               type: long
               description: >
                 The static CPU resource entitlement for a virtual machine.
+    - name: id
+      type: keyword
+      description: >
+        Unique resource pool ID.
     - name: memory
       type: group
       fields:
@@ -112,3 +116,8 @@
           type: keyword
           description: >
             Names of virtual machines on the resource pool.
+    - name: triggered_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggered alarms.

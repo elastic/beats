@@ -22,6 +22,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -56,10 +58,15 @@ func TestAPIKeyEncoding(t *testing.T) {
 
 type mockClient struct {
 	Req *http.Request
+	Res *http.Response
 }
 
 func (c *mockClient) Do(req *http.Request) (*http.Response, error) {
 	c.Req = req
+
+	if c.Res != nil {
+		return c.Res, nil
+	}
 
 	r := bytes.NewReader([]byte("HTTP/1.1 200 OK\n\nHello, world"))
 	return http.ReadResponse(bufio.NewReader(r), req)
@@ -155,59 +162,73 @@ func TestUserAgentHeader(t *testing.T) {
 			testCase.connSettings.URL = server.URL
 			conn, err := NewConnection(testCase.connSettings)
 			require.NoError(t, err)
-			require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			require.NoError(t, conn.Connect(ctx), "conn.Connect must not return an error")
 		})
 	}
 }
 
 func BenchmarkExecHTTPRequest(b *testing.B) {
-	for _, td := range []struct {
-		input    map[string]string
-		expected map[string][]string
-	}{
-		{
-			input: map[string]string{
-				"Accept":             "application/vnd.elasticsearch+json;compatible-with=7",
-				"Content-Type":       "application/vnd.elasticsearch+json;compatible-with=7",
-				productorigin.Header: "elastic-product",
-				"X-My-Header":        "true",
-			},
-			expected: map[string][]string{
-				"Accept":             {"application/vnd.elasticsearch+json;compatible-with=7"},
-				"Content-Type":       {"application/vnd.elasticsearch+json;compatible-with=7"},
-				productorigin.Header: {"elastic-product"},
-				"X-My-Header":        {"true"},
-			},
-		},
-		{
-			input: map[string]string{
-				"X-My-Header": "true",
-			},
-			expected: map[string][]string{
-				"Accept":             {"application/json"},
-				productorigin.Header: {productorigin.Beats},
-				"X-My-Header":        {"true"},
-			},
-		},
-	} {
-		conn, err := NewConnection(ConnectionSettings{
-			Headers: td.input,
+	sizes := []int{
+		100,             // 100 bytes
+		10 * 1024,       // 10KB
+		100 * 1024,      // 100KB
+		1 * 1024 * 1024, // 1MB
+	}
+	for _, size := range sizes {
+		b.Run(fmt.Sprintf("size %d", size), func(b *testing.B) {
+			generated := bytes.Repeat([]byte{'a'}, size)
+			content := bytes.NewReader(generated)
+
+			cases := []struct {
+				name string
+				resp *http.Response
+			}{
+				{
+					name: "unknown length",
+					resp: &http.Response{
+						ContentLength: -1,
+						Body:          io.NopCloser(content),
+					},
+				},
+				{
+					name: "known length",
+					resp: &http.Response{
+						ContentLength: int64(size),
+						Body:          io.NopCloser(content),
+					},
+				},
+			}
+
+			for _, tc := range cases {
+				b.Run(tc.name, func(b *testing.B) {
+					conn, err := NewConnection(ConnectionSettings{
+						Headers: map[string]string{
+							"Accept":       "application/vnd.elasticsearch+json;compatible-with=7",
+							"Content-Type": "application/vnd.elasticsearch+json;compatible-with=7",
+						},
+					})
+					require.NoError(b, err)
+
+					httpClient := newMockClient()
+					httpClient.Res = tc.resp
+					conn.HTTP = httpClient
+
+					var bb []byte
+					b.ReportAllocs()
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						_, err = content.Seek(0, io.SeekStart)
+						require.NoError(b, err)
+						req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
+						require.NoError(b, err)
+						_, bb, err = conn.execHTTPRequest(req)
+						require.NoError(b, err)
+						require.Equal(b, generated, bb)
+					}
+				})
+			}
 		})
-		require.NoError(b, err)
-
-		httpClient := newMockClient()
-		conn.HTTP = httpClient
-
-		var bb []byte
-		b.ReportAllocs()
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
-			require.NoError(b, err)
-			_, bb, err = conn.execHTTPRequest(req)
-			require.NoError(b, err)
-			require.Equal(b, req.Header, http.Header(td.expected))
-			require.NotEmpty(b, bb)
-		}
 	}
 }

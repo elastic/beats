@@ -1063,7 +1063,7 @@ spec:
         build_pull_requests: false
         build_tags: false
         filter_condition: >-
-          build.branch =~ /^[0-9]+\.[0-9]+$$/ || build.branch == "main"
+          build.branch =~ /^[0-9]+\.[0-9x]+$$/ || build.branch == "main"
         filter_enabled: true
         trigger_mode: code
       env:

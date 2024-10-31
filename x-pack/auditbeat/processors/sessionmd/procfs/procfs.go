@@ -8,7 +8,6 @@ package procfs
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/prometheus/procfs"
@@ -19,12 +18,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func MajorTTY(ttyNr uint32) uint16 {
-	return uint16((ttyNr >> 8) & 0xff)
+func MajorTTY(ttyNr uint32) uint32 {
+	return (ttyNr >> 8) & 0xff
 }
 
-func MinorTTY(ttyNr uint32) uint16 {
-	return uint16(((ttyNr & 0xfff00000) >> 20) | (ttyNr & 0xff))
+func MinorTTY(ttyNr uint32) uint32 {
+	return ((ttyNr >> 12) & 0xfff00) | (ttyNr & 0xff)
 }
 
 // this interface exists so that we can inject a mock procfs reader for deterministic testing
@@ -62,35 +61,13 @@ func credsFromProc(proc procfs.Proc) (types.CredInfo, error) {
 		return types.CredInfo{}, err
 	}
 
-	ruid, err := strconv.Atoi(status.UIDs[0])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
+	ruid := status.UIDs[0]
+	euid := status.UIDs[1]
+	suid := status.UIDs[2]
 
-	euid, err := strconv.Atoi(status.UIDs[1])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	suid, err := strconv.Atoi(status.UIDs[2])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	rgid, err := strconv.Atoi(status.GIDs[0])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	egid, err := strconv.Atoi(status.GIDs[1])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
-
-	sgid, err := strconv.Atoi(status.GIDs[2])
-	if err != nil {
-		return types.CredInfo{}, err
-	}
+	rgid := status.GIDs[0]
+	egid := status.GIDs[1]
+	sgid := status.GIDs[2]
 
 	// procfs library doesn't grab CapEff or CapPrm, make the direct syscall
 	hdr := unix.CapUserHeader{
@@ -219,7 +196,7 @@ func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
 	for _, proc := range procs {
 		process_info, err := r.getProcessInfo(proc)
 		if err != nil {
-			r.logger.Warnf("failed to read process info for %v", proc.PID)
+			r.logger.Debugf("failed to read process info for %v", proc.PID)
 		}
 		ret = append(ret, process_info)
 	}

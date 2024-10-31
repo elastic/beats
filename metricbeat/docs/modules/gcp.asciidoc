@@ -52,6 +52,8 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 
 * *period*: A single time duration specified for this module collection frequency.
 
+* *endpoint*: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
+
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone
@@ -334,6 +336,7 @@ metricbeat.modules:
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
 ----

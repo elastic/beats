@@ -21,7 +21,18 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Input configuration (advanced). Any input configuration option
+    # Force using journald to collect system logs
+    #var.use_journald: true|false
+
+    # Force using log files to collect system logs
+    #var.use_files: true|false
+
+    # If use_journald and use_files are false, then
+    # Filebeat will autodetect whether use to journald
+    # to collect system logs.
+
+    # Input configuration (advanced).
+    # Any input configuration option
     # can be added under this section.
     #input:
 
@@ -32,6 +43,23 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Force using journald to collect system logs
+    #var.use_journald: true|false
+
+    # Force using log files to collect system logs
+    #var.use_files: true|false
+
+    # If use_journald and use_files are false, then
+    # Filebeat will autodetect whether use to journald
+    # to collect system logs.
+
+    # A list of tags to include in events. Including 'forwarded'
+    # indicates that the events did not originate on this host and
+    # causes host.name to not be added to events. Include
+    # 'preserve_orginal_event' causes the pipeline to retain the raw log
+    # in event.original. Defaults to [].
+    #var.tags: []
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -1218,6 +1246,30 @@ filebeat.inputs:
 #            - type: container
 #              paths:
 #                - /var/log/containers/*.log
+
+#Example: for kubernetes container logs autodiscovery
+#  filebeat.autodiscover:
+#    providers:
+#      - type: kubernetes
+#        node: ${NODE_NAME}
+#        hints.enabled: true
+#        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#        use_kubeadm: true
+#        hints.default_config:
+#          type: filestream
+#          id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
+#          paths:
+#          - /var/log/containers/*-${data.kubernetes.container.id}.log
+#          parsers:
+#          - container: ~
+#          prospector:
+#            scanner:
+#              fingerprint.enabled: true
+#              symlinks: true
+#          file_identity.fingerprint: ~
+
+#By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#  use_kubeadm: true
 
 # ========================== Filebeat global options ===========================
 

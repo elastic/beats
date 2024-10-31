@@ -50,6 +50,7 @@ type journald struct {
 	Units              []string
 	Transports         []string
 	Identifiers        []string
+	Facilities         []int
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 	Journalctl         bool
@@ -79,7 +80,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 			Logger:     log,
 			StateStore: store,
 			Type:       pluginName,
-			Configure:  configure,
+			Configure:  Configure,
 		},
 	}
 }
@@ -90,7 +91,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -113,6 +114,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
+		Facilities:         config.Facilities,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -128,10 +130,12 @@ func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		journalctl.SeekHead,
 		"",
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return err
@@ -157,10 +161,12 @@ func (inp *journald) Run(
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		mode,
 		pos,
 		inp.Since,
 		src.Name(),
+		journalctl.Factory,
 	)
 	if err != nil {
 		return fmt.Errorf("could not start journal reader: %w", err)
@@ -179,12 +185,17 @@ func (inp *journald) Run(
 	for {
 		entry, err := parser.Next()
 		if err != nil {
+			switch {
 			// The input has been cancelled, gracefully return
-			if errors.Is(err, journalctl.ErrCancelled) {
+			case errors.Is(err, journalctl.ErrCancelled):
 				return nil
+				// Journalctl is restarting, do ignore the empty event
+			case errors.Is(err, journalctl.ErrRestarting):
+				continue
+			default:
+				logger.Errorf("could not read event: %s", err)
+				return err
 			}
-			logger.Errorf("could not read event: %s", err)
-			return err
 		}
 
 		event := entry.ToEvent()

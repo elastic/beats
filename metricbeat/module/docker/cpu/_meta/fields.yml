@@ -8,12 +8,12 @@
       type: scaled_float
       format: percent
       description: >
-        Percentage of time in kernel space.
+        Percentage of time in kernel space, expressed as a value between 0 and 1.
     - name: kernel.norm.pct
       type: scaled_float
       format: percent
       description: >
-        Percentage of time in kernel space normalized by the number of CPU cores.
+        Percentage of time in kernel space normalized by the number of CPU cores, expressed as a value between 0 and 1.
     - name: kernel.ticks
       type: long
       description: >
@@ -22,12 +22,12 @@
       type: scaled_float
       format: percent
       description: >
-        Percentage of total CPU time in the system.
+        Percentage of total CPU time in the system, expressed as a value between 0 and 1.
     - name: system.norm.pct
       type: scaled_float
       format: percent
       description: >
-        Percentage of total CPU time in the system normalized by the number of CPU cores.
+        Percentage of total CPU time in the system normalized by the number of CPU cores, expressed as a value between 0 and 1.
     - name: system.ticks
       type: long
       description: >
@@ -36,12 +36,12 @@
       type: scaled_float
       format: percent
       description: >
-        Percentage of time in user space.
+        Percentage of time in user space, expressed as a value between 0 and 1.
     - name: user.norm.pct
       type: scaled_float
       format: percent
       description: >
-        Percentage of time in user space normalized by the number of CPU cores.
+        Percentage of time in user space normalized by the number of CPU cores, expressed as a value between 0 and 1.
     - name: user.ticks
       type: long
       description: >
@@ -61,13 +61,13 @@
       object_type: scaled_float
       format: percent
       description: >
-        Percentage of CPU time in this core.
+        Percentage of CPU time in this core, expressed as a value between 0 and 1.
     - name: core.*.norm.pct
       type: object
       object_type: scaled_float
       format: percent
       description: >
-        Percentage of CPU time in this core, normalized by the number of CPU cores.
+        Percentage of CPU time in this core normalized by the number of CPU cores, expressed as a value between 0 and 1.
     - name: core.*.ticks
       type: object
       object_type: long
