@@ -66,7 +66,7 @@ processors:
   - add_fields:
       fields: 
         guid: '%s'
-  - translate_guid:
+  - translate_ldap_attribute:
       field: fields.guid
       target_field: fields.common_name
       ldap_address: 'ldap://localhost:1389'
