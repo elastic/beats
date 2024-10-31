@@ -30,6 +30,9 @@ issues:
     - text: "imported and not used"
       linters:
         - typecheck
+    - text: "previous case"
+      linters:
+        - typecheck
     # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
       linters: forbidigo
