@@ -15,35 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beater
+//go:build integration
+
+package integration
 
 import (
-	"context"
+	"fmt"
+	"path"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func TestMakeESClient(t *testing.T) {
-	t.Run("should not modify the timeout setting from original config", func(t *testing.T) {
-		origTimeout := 90
-		origCfg, _ := conf.NewConfigFrom(map[interface{}]interface{}{
-			"hosts":    []string{"http://localhost:9200"},
-			"username": "anyuser",
-			"password": "anypwd",
-			"timeout":  origTimeout,
-		})
-		anyAttempt := 1
-		anyDuration := 1 * time.Second
+func TestSystemLogsCanUseLogInput(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	copyModulesDir(t, workDir)
 
-		_, _ = makeESClient(context.Background(), origCfg, anyAttempt, anyDuration)
+	logFilePath := path.Join(workDir, "syslog")
+	integration.GenerateLogFile(t, logFilePath, 5, false)
+	yamlCfg := fmt.Sprintf(systemModuleCfg, logFilePath, logFilePath, workDir)
 
-		timeout, err := origCfg.Int("timeout", -1)
-		require.NoError(t, err)
-		assert.EqualValues(t, origTimeout, timeout)
-	})
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+
+	filebeat.WaitForLogs(
+		"using log input because file(s) was(were) found",
+		10*time.Second,
+		"system-logs did not select the log input")
+	filebeat.WaitForLogs(
+		"Harvester started for paths:",
+		10*time.Second,
+		"system-logs did not start the log input")
 }
