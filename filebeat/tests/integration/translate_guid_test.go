@@ -73,7 +73,7 @@ processors:
       ldap_base_dn: 'dc=example,dc=org'
       ldap_bind_user: 'cn=admin,dc=example,dc=org'
       ldap_bind_password: 'adminpassword'
-      ldap_guid_attribute: 'entryUUID'
+      ldap_search_attribute: 'entryUUID'
 `
 
 func TestTranslateGUIDWithLDAP(t *testing.T) {
