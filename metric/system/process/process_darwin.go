@@ -219,6 +219,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 	delim := []byte{61} // "=" for key value pairs
 
 	envVars := mapstr.M{}
+	var envErr error
 	for {
 		line, err := bbuf.ReadBytes(0)
 		if err == io.EOF || line[0] == 0 {
@@ -230,7 +231,9 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 		pair := bytes.SplitN(stripNullByteRaw(line), delim, 2)
 
 		if len(pair) != 2 {
-			return argv, exeName, nil, fmt.Errorf("error reading process information from KERN_PROCARGS2: %w", err)
+			// invalid k-v pair encountered, return non-fatal error so that we can continue
+			err := fmt.Errorf("error reading process information from KERN_PROCARGS2: encountered invalid env pair for pid %d", pid)
+			envErr = errors.Join(envErr, NonFatalErr{Err: err})
 		}
 		eKey := string(pair[0])
 		if filter == nil || filter(eKey) {
@@ -239,7 +242,7 @@ func getProcArgs(pid int, filter func(string) bool) ([]string, string, mapstr.M,
 
 	}
 
-	return argv, exeName, envVars, nil
+	return argv, exeName, envVars, envErr
 }
 
 func sysctl(mib []C.int, old *byte, oldlen *uintptr,
