@@ -280,17 +280,22 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 		if err != nil {
 			return err
 		}
+
 		var e entry
 		err = json.Unmarshal(sres.Source.Value, &e.value)
 		if err != nil {
 			return err
 		}
+
 		key, err := url.QueryUnescape(sres.ID)
 		if err != nil {
 			return err
 		}
 
-		fn(key, e)
+		cont, err := fn(key, e)
+		if !cont || err != nil {
+			return err
+		}
 	}
 
 	return nil

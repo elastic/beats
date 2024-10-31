@@ -20,7 +20,6 @@ package es
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -74,7 +73,6 @@ func TestStore(t *testing.T) {
 		if err != nil {
 			return false, err
 		}
-		fmt.Printf("%v :: %v\n", s, v)
 		return true, nil
 	})
 
@@ -153,7 +151,6 @@ func TestStore(t *testing.T) {
 		if err != nil {
 			return false, err
 		}
-		fmt.Printf("%v :: %v\n", s, v)
 		return true, nil
 	})
 
