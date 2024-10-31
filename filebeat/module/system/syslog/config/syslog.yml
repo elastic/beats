@@ -1,45 +1,23 @@
+<<<<<<< HEAD
 type: system-logs
 id: system-syslog
 
 {{ if .use_journald }}
 use_journald: true
+=======
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+>>>>>>> 00d7161a1d (Revert system module support for journald (#41489))
 {{ end }}
-
-{{ if .use_files }}
-use_files: true
-{{ end }}
-
+exclude_files: [".gz$"]
+multiline:
+  pattern: "^\\s"
+  match: after
 processors:
   - add_locale: ~
   - add_fields:
       target: ''
       fields:
         ecs.version: 1.12.0
-
-journald:
-  id: system-syslog
-  facilities:
-    - 0
-    - 1
-    - 2
-    - 3
-    - 5
-    - 6
-    - 7
-    - 8
-    - 9
-    - 11
-    - 12
-    - 15
-
-files:
-  id: system-syslog
-  paths:
-  {{ range $i, $path := .paths }}
-    - {{$path}}
-  {{ end }}
-
-  exclude_files: [".gz$"]
-  multiline:
-    pattern: "^\\s"
-    match: after

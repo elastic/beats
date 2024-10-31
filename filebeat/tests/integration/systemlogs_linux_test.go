@@ -31,7 +31,8 @@ import (
 // TestSystemLogsCanUseJournald aims to ensure the system-logs input can
 // correctly choose and start a journald input when the globs defined in
 // var.paths do not resolve to any file.
-func TestSystemLogsCanUseJournaldInput(t *testing.T) {
+func TestSystemModuleCanUseJournaldInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -56,9 +57,15 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 		10*time.Second,
 		"system-logs did not start journald input")
 
+<<<<<<< HEAD:filebeat/tests/integration/systemlogs_linux_test.go
 	// Scan every event in the output until at least one from
 	// each fileset (auth, syslog) is found.
 	waitForAllFilesets(
+=======
+func TestSystemLogsCanUseLogInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
+	filebeat := integration.NewBeat(
+>>>>>>> 00d7161a1d (Revert system module support for journald (#41489)):filebeat/tests/integration/systemlogs_test.go
 		t,
 		filepath.Join(workDir, "output*.ndjson"),
 		"did not find events from both filesets: 'auth' and 'syslog'",
