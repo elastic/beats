@@ -26,8 +26,10 @@ type config struct {
 	TargetField         string            `config:"target_field"`
 	LDAPAddress         string            `config:"ldap_address" validate:"required"`
 	LDAPBaseDN          string            `config:"ldap_base_dn" validate:"required"`
-	LDAPUser            string            `config:"ldap_user"`
-	LDAPPassword        string            `config:"ldap_password"`
+	LDAPBindUser        string            `config:"ldap_bind_user"`
+	LDAPBindPassword    string            `config:"ldap_bind_password"`
+	LDAPGUIDAttribute   string            `config:"ldap_guid_attribute" validate:"required"`
+	LDAPMappedAttribute string            `config:"ldap_mapped_attribute" validate:"required"`
 	LDAPSearchTimeLimit int               `config:"ldap_search_time_limit"`
 	LDAPTLS             *tlscommon.Config `config:"ldap_ssl"`
 
@@ -36,5 +38,8 @@ type config struct {
 }
 
 func defaultConfig() config {
-	return config{LDAPSearchTimeLimit: 30}
+	return config{
+		LDAPGUIDAttribute:   "objectGUID",
+		LDAPMappedAttribute: "cn",
+		LDAPSearchTimeLimit: 30}
 }

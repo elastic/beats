@@ -60,8 +60,10 @@ func newFromConfig(c config) (*processor, error) {
 	ldapConfig := &ldapConfig{
 		address:         c.LDAPAddress,
 		baseDN:          c.LDAPBaseDN,
-		username:        c.LDAPUser,
-		password:        c.LDAPPassword,
+		username:        c.LDAPBindUser,
+		password:        c.LDAPBindPassword,
+		guidAttr:        c.LDAPGUIDAttribute,
+		mappedAttr:      c.LDAPMappedAttribute,
 		searchTimeLimit: c.LDAPSearchTimeLimit,
 	}
 	if c.LDAPTLS != nil {
@@ -83,8 +85,8 @@ func newFromConfig(c config) (*processor, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("translate_guid=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_user=%s]",
-		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPUser)
+	return fmt.Sprintf("translate_guid=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_guid_attribute=%s, ldap_mapped_attribute=%s]",
+		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPGUIDAttribute, p.LDAPMappedAttribute)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
@@ -106,7 +108,6 @@ func (p *processor) translateGUID(event *beat.Event) error {
 		return errInvalidType
 	}
 
-	// XXX: May want to introduce an in-memory cache if the lookups are time consuming.
 	cn, err := p.client.findObjectByGUID(guidString)
 	if err != nil {
 		return err

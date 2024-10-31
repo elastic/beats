@@ -20,7 +20,6 @@ package translate_guid
 import (
 	"crypto/tls"
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/go-ldap/ldap/v3"
@@ -38,6 +37,8 @@ type ldapConfig struct {
 	baseDN          string
 	username        string
 	password        string
+	guidAttr        string
+	mappedAttr      string
 	searchTimeLimit int
 	tlsConfig       *tls.Config
 }
@@ -60,13 +61,11 @@ func (client *ldapClient) connect() error {
 	defer client.mu.Unlock()
 
 	// Connect with or without TLS based on configuration
-	var conn *ldap.Conn
-	var err error
+	var opts []ldap.DialOpt
 	if client.tlsConfig != nil {
-		conn, err = ldap.DialTLS("tcp", client.address, client.tlsConfig)
-	} else {
-		conn, err = ldap.Dial("tcp", client.address)
+		opts = append(opts, ldap.DialWithTLSConfig(client.tlsConfig))
 	}
+	conn, err := ldap.DialURL(client.address, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to dial LDAP server: %v", err)
 	}
@@ -99,40 +98,35 @@ func (client *ldapClient) reconnect() error {
 }
 
 // findObjectByGUID searches for an AD object by GUID and returns its Common Name (CN)
-func (client *ldapClient) findObjectByGUID(objectGUID string) (string, error) {
+func (client *ldapClient) findObjectByGUID(objectGUID string) ([]string, error) {
 	// Ensure the connection is alive or reconnect if necessary
 	if err := client.reconnect(); err != nil {
-		return "", fmt.Errorf("failed to reconnect: %v", err)
+		return nil, fmt.Errorf("failed to reconnect: %v", err)
 	}
 
 	client.mu.Lock()
 	defer client.mu.Unlock()
 
 	// Format the GUID filter and perform the search
-	filter := fmt.Sprintf("(objectGUID=%s)", encodeGUID(objectGUID))
+	filter := fmt.Sprintf("(%s=%s)", client.guidAttr, objectGUID)
 	searchRequest := ldap.NewSearchRequest(
 		client.baseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 1, client.searchTimeLimit, false,
-		filter, []string{"cn"}, nil,
+		filter, []string{client.mappedAttr}, nil,
 	)
 
 	// Execute search
 	result, err := client.conn.Search(searchRequest)
 	if err != nil {
-		return "", fmt.Errorf("search failed: %v", err)
+		return nil, fmt.Errorf("search failed: %v", err)
 	}
 	if len(result.Entries) == 0 {
-		return "", fmt.Errorf("no entries found for GUID %s", objectGUID)
+		return nil, fmt.Errorf("no entries found for GUID %s", objectGUID)
 	}
 
 	// Retrieve the CN attribute
-	cn := result.Entries[0].GetAttributeValue("cn")
+	cn := result.Entries[0].GetAttributeValues(client.mappedAttr)
 	return cn, nil
-}
-
-// encodeGUID converts a GUID into LDAP filter format
-func encodeGUID(guid string) string {
-	return fmt.Sprintf("\\%s", strings.Trim(guid, "{}"))
 }
 
 // close closes the LDAP connection
