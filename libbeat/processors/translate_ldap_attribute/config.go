@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package translate_guid
+package translate_ldap_attribute
 
 import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -28,7 +28,7 @@ type config struct {
 	LDAPBaseDN          string            `config:"ldap_base_dn" validate:"required"`
 	LDAPBindUser        string            `config:"ldap_bind_user"`
 	LDAPBindPassword    string            `config:"ldap_bind_password"`
-	LDAPGUIDAttribute   string            `config:"ldap_guid_attribute" validate:"required"`
+	LDAPSearchAttribute string            `config:"ldap_search_attribute" validate:"required"`
 	LDAPMappedAttribute string            `config:"ldap_mapped_attribute" validate:"required"`
 	LDAPSearchTimeLimit int               `config:"ldap_search_time_limit"`
 	LDAPTLS             *tlscommon.Config `config:"ldap_ssl"`
@@ -39,7 +39,7 @@ type config struct {
 
 func defaultConfig() config {
 	return config{
-		LDAPGUIDAttribute:   "objectGUID",
+		LDAPSearchAttribute: "objectGUID",
 		LDAPMappedAttribute: "cn",
 		LDAPSearchTimeLimit: 30}
 }

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package translate_guid
+package translate_ldap_attribute
 
 import (
 	"crypto/tls"
@@ -37,7 +37,7 @@ type ldapConfig struct {
 	baseDN          string
 	username        string
 	password        string
-	guidAttr        string
+	searchAttr      string
 	mappedAttr      string
 	searchTimeLimit int
 	tlsConfig       *tls.Config
@@ -97,8 +97,8 @@ func (client *ldapClient) reconnect() error {
 	return nil
 }
 
-// findObjectByGUID searches for an AD object by GUID and returns its Common Name (CN)
-func (client *ldapClient) findObjectByGUID(objectGUID string) ([]string, error) {
+// findObjectBy searches for an object and returns its mapped values.
+func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	// Ensure the connection is alive or reconnect if necessary
 	if err := client.reconnect(); err != nil {
 		return nil, fmt.Errorf("failed to reconnect: %v", err)
@@ -107,8 +107,8 @@ func (client *ldapClient) findObjectByGUID(objectGUID string) ([]string, error) 
 	client.mu.Lock()
 	defer client.mu.Unlock()
 
-	// Format the GUID filter and perform the search
-	filter := fmt.Sprintf("(%s=%s)", client.guidAttr, objectGUID)
+	// Format the filter and perform the search
+	filter := fmt.Sprintf("(%s=%s)", client.searchAttr, searchBy)
 	searchRequest := ldap.NewSearchRequest(
 		client.baseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 1, client.searchTimeLimit, false,
@@ -121,7 +121,7 @@ func (client *ldapClient) findObjectByGUID(objectGUID string) ([]string, error) 
 		return nil, fmt.Errorf("search failed: %v", err)
 	}
 	if len(result.Entries) == 0 {
-		return nil, fmt.Errorf("no entries found for GUID %s", objectGUID)
+		return nil, fmt.Errorf("no entries found for search attribute %s", searchBy)
 	}
 
 	// Retrieve the CN attribute

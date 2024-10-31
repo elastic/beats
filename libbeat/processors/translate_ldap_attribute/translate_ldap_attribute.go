@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package translate_guid
+package translate_ldap_attribute
 
 import (
 	"errors"
@@ -30,13 +30,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-const logName = "processor.translate_guid"
+const logName = "processor.translate_ldap_attribute"
 
-var errInvalidType = errors.New("GUID field value is not a string")
+var errInvalidType = errors.New("search attribute field value is not a string")
 
 func init() {
-	processors.RegisterPlugin("translate_guid", New)
-	jsprocessor.RegisterPlugin("TranslateGUID", New)
+	processors.RegisterPlugin("translate_ldap_attribute", New)
+	jsprocessor.RegisterPlugin("TranslateLDAPAttribute", New)
 }
 
 type processor struct {
@@ -45,12 +45,10 @@ type processor struct {
 	log    *logp.Logger
 }
 
-// New returns a new translate_guid processor for converting windows GUID values
-// to object names.
 func New(cfg *conf.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("fail to unpack the translate_guid configuration: %w", err)
+		return nil, fmt.Errorf("fail to unpack the translate_ldap_attribute configuration: %w", err)
 	}
 
 	return newFromConfig(c)
@@ -62,7 +60,7 @@ func newFromConfig(c config) (*processor, error) {
 		baseDN:          c.LDAPBaseDN,
 		username:        c.LDAPBindUser,
 		password:        c.LDAPBindPassword,
-		guidAttr:        c.LDAPGUIDAttribute,
+		searchAttr:      c.LDAPSearchAttribute,
 		mappedAttr:      c.LDAPMappedAttribute,
 		searchTimeLimit: c.LDAPSearchTimeLimit,
 	}
@@ -85,19 +83,19 @@ func newFromConfig(c config) (*processor, error) {
 }
 
 func (p *processor) String() string {
-	return fmt.Sprintf("translate_guid=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_guid_attribute=%s, ldap_mapped_attribute=%s]",
-		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPGUIDAttribute, p.LDAPMappedAttribute)
+	return fmt.Sprintf("translate_ldap_attribute=[field=%s, ldap_address=%s, ldap_base_dn=%s, ldap_bind_user=%s, ldap_search_attribute=%s, ldap_mapped_attribute=%s]",
+		p.Field, p.LDAPAddress, p.LDAPBaseDN, p.LDAPBindUser, p.LDAPSearchAttribute, p.LDAPMappedAttribute)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
-	err := p.translateGUID(event)
+	err := p.translateLDAPAttr(event)
 	if err == nil || p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
 		return event, nil
 	}
 	return event, err
 }
 
-func (p *processor) translateGUID(event *beat.Event) error {
+func (p *processor) translateLDAPAttr(event *beat.Event) error {
 	v, err := event.GetValue(p.Field)
 	if err != nil {
 		return err
@@ -108,7 +106,7 @@ func (p *processor) translateGUID(event *beat.Event) error {
 		return errInvalidType
 	}
 
-	cn, err := p.client.findObjectByGUID(guidString)
+	cn, err := p.client.findObjectBy(guidString)
 	if err != nil {
 		return err
 	}

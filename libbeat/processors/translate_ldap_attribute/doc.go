@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package translate_guid provides a Beat processor for converting Windows
+// Package translate_ldap_attribute provides a Beat processor for converting
+// LDAP attributes from one to another. It is typically used for converting Windows
 // Global Unique Identifiers (GUIDs) to object names.
-package translate_guid
+package translate_ldap_attribute
