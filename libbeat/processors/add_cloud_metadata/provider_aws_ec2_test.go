@@ -208,8 +208,8 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
-				"ec2": mapstr.M{
-					"tag": mapstr.M{
+				"aws": mapstr.M{
+					"tags": mapstr.M{
 						eksClusterNameTagKey: clusterNameValue,
 					},
 				},
@@ -247,8 +247,8 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
-				"ec2": mapstr.M{
-					"tag": mapstr.M{
+				"aws": mapstr.M{
+					"tags": mapstr.M{
 						eksClusterNameTagKey: clusterNameValue,
 					},
 				},
@@ -295,8 +295,8 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
-				"ec2": mapstr.M{
-					"tag": mapstr.M{
+				"aws": mapstr.M{
+					"tags": mapstr.M{
 						eksClusterNameTagKey: clusterNameValue,
 					},
 				},
@@ -379,8 +379,8 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
-				"ec2": mapstr.M{
-					"tag": mapstr.M{
+				"aws": mapstr.M{
+					"tags": mapstr.M{
 						eksClusterNameTagKey: clusterNameValue,
 						customTagKey:         customTagValue,
 					},

@@ -106,8 +106,8 @@ Please refer official documentation on https://docs.aws.amazon.com/AWSEC2/latest
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "ec2": {
-    "tag": {
+  "aws": {
+    "tags": {
       "org" : "myOrg",
       "owner": "userID"
     }

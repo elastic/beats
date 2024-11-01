@@ -41,7 +41,7 @@ import (
 const (
 	eksClusterNameTagKey = "eks:cluster-name"
 	tagsCategory         = "tags/instance"
-	tagPrefix            = "ec2.tag"
+	tagPrefix            = "aws.tags"
 )
 
 type IMDSClient interface {
