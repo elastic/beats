@@ -8,14 +8,6 @@ var:
     os.darwin:
       - /var/log/system.log*
     os.windows: []
-  - name: use_journald
-    default: false
-  - name: use_files
-    default: false
 
-ingest_pipeline:
-  - ingest/entrypoint.yml
-  - ingest/files.yml
-  - ingest/journald.yml
-
+ingest_pipeline: ingest/pipeline.yml
 input: config/syslog.yml

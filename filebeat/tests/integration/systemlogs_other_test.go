@@ -29,6 +29,7 @@ import (
 )
 
 func TestSystemLogsCanUseLogInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
