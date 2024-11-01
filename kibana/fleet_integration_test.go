@@ -417,6 +417,57 @@ func TestListFleetServerHosts(t *testing.T) {
 	require.NotEmpty(t, resp.Items)
 }
 
+func TestCreateFleetServerHosts(t *testing.T) {
+	cfg := mustGetEnv(t)
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
+	client, err := NewClientWithConfig(&cfg, "", "", "", "")
+	require.NoError(t, err)
+
+	id := uuid.Must(uuid.NewV4()).String()
+	req := ListFleetServerHostsRequest{
+		ID:        "CreateFleetServerHosts" + id,
+		Name:      "CreateFleetServerHosts" + id,
+		HostURLs:  []string{"https://fleet.elastic.co"},
+		IsDefault: false,
+	}
+	got, err := client.CreateFleetServerHosts(ctx, req)
+	require.NoError(t, err, "error creating new fleet host")
+
+	require.Equal(t, req.ID, got.Item.ID)
+	require.Equal(t, req.HostURLs, got.Item.HostUrls)
+}
+
+func TestCreateFleetProxy(t *testing.T) {
+	cfg := mustGetEnv(t)
+	ctx, cn := context.WithCancel(context.Background())
+	defer cn()
+
+	client, err := NewClientWithConfig(&cfg, "", "", "", "")
+	require.NoError(t, err)
+
+	id := uuid.Must(uuid.NewV4()).String()
+	req := ProxiesRequest{
+		ID:                     "CreateFleetServerHosts" + id,
+		Name:                   "CreateFleetServerHosts" + id,
+		URL:                    "https://proxy.elastic.co",
+		CertificateAuthorities: "some CA",
+		Certificate:            "some certificate",
+		CertificateKey:         "some certificate key",
+		IsPreconfigured:        true,
+		ProxyHeaders: map[string]string{
+			"h1": "v1",
+			"h2": "v2",
+		},
+	}
+	got, err := client.CreateFleetProxy(ctx, req)
+	require.NoError(t, err, "error creating new fleet host")
+
+	require.Equal(t, req.ID, got.Item.ID)
+	require.Equal(t, req, got.Item)
+}
+
 func TestGetFleetServerHost(t *testing.T) {
 	cfg := mustGetEnv(t)
 

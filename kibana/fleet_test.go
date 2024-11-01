@@ -169,8 +169,8 @@ func TestFleetUpdatePolicy(t *testing.T) {
 	require.Equal(t, id, resp.ID)
 	require.Equal(t, policyName, resp.Name)
 	require.Equal(t, "default", resp.Namespace)
-	//require.Equal(t, "active", resp.Status)
-	//require.Equal(t, false, resp.IsManaged)
+	// require.Equal(t, "active", resp.Status)
+	// require.Equal(t, false, resp.IsManaged)
 	require.Equal(t, []MonitoringEnabledOption{MonitoringEnabledLogs, MonitoringEnabledMetrics}, resp.MonitoringEnabled)
 	require.Equal(t, agentFeatures, resp.AgentFeatures)
 }
@@ -361,7 +361,7 @@ func TestFleetGetFleetServerHost(t *testing.T) {
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case fmt.Sprintf(fleetFleetServerHostAPI, id):
+		case fleetFleetServerHostsAPI + "/" + id:
 			_, _ = w.Write(fleetGetFleetServerHostResponse)
 		}
 	}
