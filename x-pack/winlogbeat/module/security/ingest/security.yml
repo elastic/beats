@@ -637,6 +637,20 @@ processors:
             - group
             - info
           action: user-member-enumerated
+        "4800":
+          category:
+            - authentication
+            - session
+          type:
+            - end
+          action: workstation-locked
+        "4801":
+          category:
+            - authentication
+            - session
+          type:
+            - start
+          action: workstation-unlocked          
         "4817":
           category:
             - iam
@@ -2530,7 +2544,7 @@ processors:
             !["4727", "4728", "4729", "4730", "4731", "4732", "4733", "4734", "4735",
               "4737", "4744", "4745", "4746", "4747", "4748", "4749", "4750", "4751",
               "4752", "4753", "4754", "4755", "4756", "4757", "4758", "4759", "4760",
-              "4761", "4762", "4763", "4764", "4799"].contains(ctx.event.code)) {
+              "4761", "4762", "4763", "4764", "4799", "4800", "4801"].contains(ctx.event.code)) {
           return;
         }
         if (ctx?.winlog?.event_data?.MemberName != null) {
@@ -2642,7 +2656,7 @@ processors:
       field: winlog.logon.id
       copy_from: winlog.event_data.TargetLogonId
       ignore_failure: false
-      if: ctx?.event?.code != null && ["4634", "4647", "4964"].contains(ctx.event.code)
+      if: ctx?.event?.code != null && ["4634", "4647", "4800", "4801", "4964"].contains(ctx.event.code)
 
   - script:
       lang: painless
