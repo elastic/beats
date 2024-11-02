@@ -60,6 +60,10 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 	if config.User != "" && config.Password != "" {
 		clientPolicy.User = config.User
 		clientPolicy.Password = config.Password
+	} else if config.User != "" {
+		return nil, fmt.Errorf("if username is set, password should be set too")
+	} else if config.Password != "" {
+		return nil, fmt.Errorf("if password is set, username should be set too")
 	}
 
 	switch config.AuthMode {

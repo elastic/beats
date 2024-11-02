@@ -179,7 +179,7 @@ func TestParseClientPolicy(t *testing.T) {
 				User: sampleUser,
 			},
 			expectedClientPolicy: as.NewClientPolicy(),
-			expectedErr:          nil,
+			expectedErr:          fmt.Errorf("if username is set, password should be set too"),
 		},
 		{
 			Name: "Password is set and user is not set",
@@ -187,7 +187,7 @@ func TestParseClientPolicy(t *testing.T) {
 				Password: samplePassword,
 			},
 			expectedClientPolicy: as.NewClientPolicy(),
-			expectedErr:          nil,
+			expectedErr:          fmt.Errorf("if password is set, username should be set too"),
 		},
 		{
 			Name: "TLS and Basic Auth",
