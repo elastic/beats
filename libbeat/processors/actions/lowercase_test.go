@@ -19,13 +19,13 @@ package actions
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewLowerCaseProcessor(t *testing.T) {
@@ -77,8 +77,8 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 				"field1": mapstr.M{"Field2": "Value"}, // field1 is lowercased
 				"Field3": "Value",
 				"a": mapstr.M{
-					"B": mapstr.M{
-						"c": "D", // c is lowercased
+					"b": mapstr.M{
+						"c": "D",
 					},
 				},
 			},
@@ -86,35 +86,23 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 		},
 		{
 			Name:          "Lowercase Fields when full_path is false", // searches only the most nested key 'case insensitively'
-			Fields:        []string{"a.B.c", "field1"},
+			Fields:        []string{"a.B.c"},
 			IgnoreMissing: false,
 			FailOnError:   true,
 			FullPath:      false,
 			Input: mapstr.M{
-				"field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
 				"a": mapstr.M{
 					"B": mapstr.M{
-						"C": "D",
-					},
-				},
-				"A": mapstr.M{
-					"b": mapstr.M{
 						"C": "D",
 					},
 				},
 			},
 			Output: mapstr.M{
-				"field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
 				"a": mapstr.M{
 					"B": mapstr.M{
-						"c": "D", // c is lowercased
-					},
-				},
-				"A": mapstr.M{
-					"b": mapstr.M{
-						"C": "D",
+						"c": "D", // only c is lowercased
 					},
 				},
 			},
@@ -134,26 +122,28 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Output: mapstr.M{
 				"ab":    "first",
 				"Ab":    "second",
-				"error": mapstr.M{"message": "could not fetch value for key: ab, Error: key collision on the same path \"ab\", previous match - \"ab\", another subkey - \"Ab\": key collision"},
+				"error": mapstr.M{"message": "multiple keys match \"Ab\" on the same level of the path \"ab\": key collision"},
 			},
 			Error: true,
 		},
 		{
-			Name:          "Lowercase Fields when full_path is false",
-			Fields:        []string{"ab"},
+			Name:          "Revert to original map on error",
+			Fields:        []string{"Field1", "ab"},
 			IgnoreMissing: false,
 			FailOnError:   true,
-			FullPath:      false,
+			FullPath:      true,
 			Input: mapstr.M{
-				"ab": "first",
-				"Ab": "second",
+				"Field1": "value1",
+				"ab":     "first",
+				"Ab":     "second",
 			},
 			Output: mapstr.M{
-				"ab":    "first",
-				"Ab":    "second",
-				"error": mapstr.M{"message": "could not fetch value for key: ab, Error: key collision on the same path \"ab\", previous match - \"ab\", another subkey - \"Ab\": key collision"},
+				"Field1": "value1",
+				"ab":     "first",
+				"Ab":     "second",
+				"error":  mapstr.M{"message": "multiple keys match \"Ab\" on the same level of the path \"ab\": key collision"},
 			},
-			Error: false,
+			Error: true,
 		},
 		{
 			Name:          "Ignore Missing Key Error",
@@ -209,22 +199,22 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
 			p := &alterFieldProcessor{
-				Fields:        test.Fields,
-				IgnoreMissing: test.IgnoreMissing,
-				FailOnError:   test.FailOnError,
-				FullPath:      test.FullPath,
-				alterFunc:     lowerCase,
+				Fields:         test.Fields,
+				IgnoreMissing:  test.IgnoreMissing,
+				FailOnError:    test.FailOnError,
+				AlterFullField: test.FullPath,
+				alterFunc:      lowerCase,
 			}
 
 			event, err := p.Run(&beat.Event{Fields: test.Input})
 
 			if !test.Error {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			} else {
-				assert.Error(t, err)
+				require.Error(t, err)
 			}
 
-			assert.True(t, reflect.DeepEqual(event.Fields, test.Output), event.Fields)
+			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
 }
@@ -256,11 +246,11 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 	for _, tt := range tests {
 		b.Run(tt.Name, func(b *testing.B) {
 			p := &alterFieldProcessor{
-				Fields:        []string{"level1field1.level1field2.level3.field3"},
-				alterFunc:     lowerCase,
-				FullPath:      true,
-				IgnoreMissing: false,
-				FailOnError:   true,
+				Fields:         []string{"level1field1.level1field2.level3.field3"},
+				alterFunc:      lowerCase,
+				AlterFullField: true,
+				IgnoreMissing:  false,
+				FailOnError:    true,
 			}
 			for i := 0; i < b.N; i++ {
 				//Run the function with the input

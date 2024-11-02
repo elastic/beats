@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -25,33 +26,29 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/pkg/errors"
 )
 
-// alterFieldFunc defines how fields must be processed
-type alterFieldFunc func(field string) string
-
 type alterFieldProcessor struct {
-	Fields        []string
-	IgnoreMissing bool
-	FailOnError   bool
-	FullPath      bool
+	Fields         []string
+	IgnoreMissing  bool
+	FailOnError    bool
+	AlterFullField bool
 
 	processorName string
-	alterFunc     alterFieldFunc
+	alterFunc     mapstr.AlterFunc
 }
 
 // NewAlterFieldProcessor is an umbrella method for processing events based on provided fields. Such as converting event keys to uppercase/lowercase
-func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFieldFunc) (beat.Processor, error) {
+func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.AlterFunc) (beat.Processor, error) {
 	config := struct {
-		Fields        []string `config:"fields"`
-		IgnoreMissing bool     `config:"ignore_missing"`
-		FailOnError   bool     `config:"fail_on_error"`
-		FullPath      bool     `config:"full_path"`
+		Fields         []string `config:"fields"`
+		IgnoreMissing  bool     `config:"ignore_missing"`
+		FailOnError    bool     `config:"fail_on_error"`
+		AlterFullField bool     `config:"alter_full_field"`
 	}{
-		IgnoreMissing: false,
-		FailOnError:   true,
-		FullPath:      true,
+		IgnoreMissing:  false,
+		FailOnError:    true,
+		AlterFullField: true,
 	}
 
 	if err := c.Unpack(&config); err != nil {
@@ -67,12 +64,12 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc alterFiel
 		}
 	}
 	return &alterFieldProcessor{
-		Fields:        config.Fields,
-		IgnoreMissing: config.IgnoreMissing,
-		FailOnError:   config.FailOnError,
-		processorName: processorName,
-		FullPath:      config.FullPath,
-		alterFunc:     alterFunc,
+		Fields:         config.Fields,
+		IgnoreMissing:  config.IgnoreMissing,
+		FailOnError:    config.FailOnError,
+		processorName:  processorName,
+		AlterFullField: config.AlterFullField,
+		alterFunc:      alterFunc,
 	}, nil
 
 }
@@ -90,6 +87,9 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range a.Fields {
 		err := a.alter(event, field)
 		if err != nil {
+			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+				continue
+			}
 			if a.FailOnError {
 				event = backup
 				event.PutValue("error.message", err.Error())
@@ -103,88 +103,40 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 
 func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 
-	var key string
-	var value interface{}
-	var err error
-
-	// Get the value matching the key
-	// match this case when
-	// 1. when full_path is true
-	// 2. when full_path is false and field is a single-element key
-	if a.FullPath || (!a.FullPath && !strings.ContainsRune(field, '.')) {
-		key, value, err = event.Fields.FindFold(field)
-	} else {
-		// searches for only the most nested key 'case insensitively'
-		idx := lastIndexDot(field)
-		value, err = event.Fields.GetValue(field[:idx])
+	// modify all segments of the key
+	if a.AlterFullField {
+		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, a.alterFunc)
 		if err != nil {
-			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+			return err
+		}
+	} else {
+		// modify only the last segment
+		segmentCount := strings.Count(field, ".") + 1
+		event.Fields.Traverse(field, mapstr.CaseInsensitiveMode, func(level mapstr.M, key string) error {
+			segmentCount--
+			if segmentCount == 0 {
+				val := level[key]
+				newKey, err := a.alterFunc(key)
+				if err != nil {
+					return fmt.Errorf("failed to apply a change to %q: %w", key, err)
+				}
+				if newKey == "" {
+					return fmt.Errorf("replacement key for %q cannot be empty", key)
+				}
+				if newKey != key {
+					_, exists := level[newKey]
+					if exists {
+						return fmt.Errorf("replacement key %q already exists: %w", newKey, mapstr.ErrKeyCollision)
+					}
+					delete(level, key)
+					level[newKey] = val
+				}
+
 				return nil
 			}
-			return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, err)
-		}
-
-		current, mapType := tryToMapStr(value)
-		if !mapType {
-			return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, mapstr.ErrKeyNotFound)
-
-		}
-		key, value, err = current.FindFold(field[idx+1:])
-		key = field[:idx+1] + key
-	}
-
-	// If err is not nil for any of the above case
-	if err != nil {
-		if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
-		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", field, err)
-	}
-
-	// Delete the existing value
-	if err := event.Delete(key); err != nil {
-		return fmt.Errorf("could not delete field: %s, Error: %v", key, err)
-	}
-
-	// Alter the field
-	var alterString string
-	if strings.ContainsRune(key, '.') {
-		// In case of nested fields provided, we need to make sure to only modify the last field segment in the chain
-		idx := lastIndexDot(key)
-		alterString = key[:idx+1] + a.alterFunc(key[idx+1:])
-	} else {
-		alterString = a.alterFunc(key)
-	}
-
-	// Put the value back
-	if _, err := event.PutValue(alterString, value); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, Error: %v", alterString, value, err)
+		})
 	}
 
 	return nil
-}
-
-func lastIndexDot(key string) (idx int) {
-	lastIndexRuneFunc := func(r rune) bool { return r == '.' }
-	idx = strings.LastIndexFunc(key, lastIndexRuneFunc)
-	return idx
-}
-
-func toMapStr(v interface{}) (mapstr.M, error) {
-	m, ok := tryToMapStr(v)
-	if !ok {
-		return nil, fmt.Errorf("expected map but type is %T", v)
-	}
-	return m, nil
-}
-
-func tryToMapStr(v interface{}) (mapstr.M, bool) {
-	switch m := v.(type) {
-	case mapstr.M:
-		return m, true
-	case map[string]interface{}:
-		return mapstr.M(m), true
-	default:
-		return nil, false
-	}
 }

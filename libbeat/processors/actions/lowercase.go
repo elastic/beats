@@ -32,7 +32,7 @@ func init() {
 		checks.ConfigChecked(
 			NewLowerCaseProcessor,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when", "ignore_missing", "fail_on_error", "full_path"),
+			checks.AllowedFields("fields", "when", "ignore_missing", "fail_on_error", "alter_full_field"),
 		),
 	)
 }
@@ -42,6 +42,6 @@ func NewLowerCaseProcessor(c *conf.C) (beat.Processor, error) {
 	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
 }
 
-func lowerCase(field string) string {
-	return strings.ToLower(field)
+func lowerCase(field string) (string, error) {
+	return strings.ToLower(field), nil
 }
