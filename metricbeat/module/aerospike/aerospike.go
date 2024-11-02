@@ -57,7 +57,7 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 		clientPolicy.TlsConfig = tlsconfig.ToConfig()
 	}
 
-	if len(config.User) > 0 && len(config.Password) > 0 {
+	if config.User != "" && config.Password != "" {
 		clientPolicy.User = config.User
 		clientPolicy.Password = config.Password
 	}
