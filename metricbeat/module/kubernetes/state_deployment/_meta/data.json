@@ -1,28 +1,33 @@
 {
-  "@timestamp": "2017-05-10T16:44:27.915Z",
-  "beat": {
-    "hostname": "X1",
-    "name": "X1",
-    "version": "6.0.0-alpha1"
-  },
-  "kubernetes": {
-    "deployment": {
-      "name": "wise-lynx-jenkins",
-      "paused": false,
-      "replicas": {
-        "available": 1,
-        "desired": 1,
-        "unavailable": 0,
-        "updated": 1
-      }
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.deployment",
+        "duration": 115000,
+        "module": "kubernetes"
     },
-    "namespace": "jenkins"
-  },
-  "metricset": {
-    "host": "192.168.99.100:18080",
-    "module": "kubernetes",
-    "name": "state_deployment",
-    "namespace": "deployment",
-    "rtt": 198882
-  }
+    "kubernetes": {
+        "deployment": {
+            "name": "kube-state-metrics",
+            "paused": false,
+            "replicas": {
+                "available": 1,
+                "desired": 1,
+                "unavailable": 0,
+                "updated": 1
+            },
+            "status": {
+                "available": "true",
+                "progressing": "true"
+            }
+        },
+        "namespace": "kube-system"
+    },
+    "metricset": {
+        "name": "state_deployment",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
 }

@@ -27,7 +27,7 @@ import (
 type amqpMethod func(*amqpMessage, []byte) (bool, bool)
 
 const (
-	transactionsHashSize = 2 ^ 16
+	transactionsHashSize = 1 << 16
 	transactionTimeout   = 10 * 1e9
 )
 

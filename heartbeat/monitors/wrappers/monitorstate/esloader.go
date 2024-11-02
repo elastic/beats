@@ -30,6 +30,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
+var DefaultDataStreams = "synthetics-*,heartbeat-*"
+
+type LoaderError struct {
+	err   error
+	Retry bool
+}
+
+func (e LoaderError) Error() string {
+	return e.err.Error()
+}
+
 func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation *config.LocationWithID) StateLoader {
 	if indexPattern == "" {
 		// Should never happen, but if we ever make a coding error...
@@ -37,6 +48,10 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		return NilStateLoader
 	}
 	return func(sf stdfields.StdMonitorFields) (*State, error) {
+		var runFromID string
+		if sf.RunFrom != nil {
+			runFromID = sf.RunFrom.ID
+		}
 		queryMustClauses := []mapstr.M{
 			{
 				"match": mapstr.M{"monitor.id": sf.ID},
@@ -54,9 +69,9 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 			},
 		}
 
-		if sf.RunFrom != nil {
+		if runFromID != "" {
 			queryMustClauses = append(queryMustClauses, mapstr.M{
-				"match": mapstr.M{"observer.name": sf.RunFrom.ID},
+				"match": mapstr.M{"observer.name": runFromID},
 			})
 		}
 		reqBody := mapstr.M{
@@ -67,10 +82,11 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 				},
 			},
 		}
-
 		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
 		if err != nil || status > 299 {
-			return nil, fmt.Errorf("error executing state search for %s: %w", sf.ID, err)
+			sErr := fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err)
+			retry := shouldRetry(status)
+			return nil, LoaderError{err: sErr, Retry: retry}
 		}
 
 		type stateHits struct {
@@ -87,11 +103,12 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		sh := stateHits{}
 		err = json.Unmarshal(body, &sh)
 		if err != nil {
-			return nil, fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
+			sErr := fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
+			return nil, LoaderError{err: sErr, Retry: false}
 		}
 
 		if len(sh.Hits.Hits) == 0 {
-			logp.L().Infof("no previous state found for monitor %s", sf.ID)
+			logp.L().Infof("no previous state found for monitor %s in Elasticsearch (loc=%s)", sf.ID, runFromID)
 			return nil, nil
 		}
 
@@ -99,4 +116,8 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 
 		return state, nil
 	}
+}
+
+func shouldRetry(status int) bool {
+	return status >= 500
 }

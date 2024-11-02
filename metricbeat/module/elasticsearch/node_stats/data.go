@@ -46,6 +46,11 @@ var (
 						"pct":   c.Int("heap_used_percent"),
 					},
 				},
+				"pools": c.Dict("pools", s.Schema{
+					"young":    c.Dict("young", poolSchema),
+					"survivor": c.Dict("survivor", poolSchema),
+					"old":      c.Dict("old", poolSchema),
+				}),
 			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
@@ -112,9 +117,15 @@ var (
 					"count": c.Int("query_total"),
 				},
 			}),
+			"shard_stats": c.Dict("shard_stats", s.Schema{
+				"total_count": c.Int("total_count"),
+			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
 				"size": s.Object{
 					"bytes": c.Int("size_in_bytes"),
+				},
+				"total_data_set_size": s.Object{
+					"bytes": c.Int("total_data_set_size_in_bytes", s.Optional),
 				},
 			}),
 			"segments": c.Dict("segments", s.Schema{
@@ -253,11 +264,12 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":   c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"index":  c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":  c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"get":    c.Dict("get", threadPoolStatsSchema),
-			"search": c.Dict("search", threadPoolStatsSchema),
+			"bulk":        c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"force_merge": c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
+			"index":       c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"write":       c.Dict("write", threadPoolStatsSchema, c.DictOptional),
+			"get":         c.Dict("get", threadPoolStatsSchema),
+			"search":      c.Dict("search", threadPoolStatsSchema),
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
 			"memory": c.Dict("memory", s.Schema{
@@ -298,6 +310,21 @@ var (
 		},
 		"combined_coordinating_and_primary": s.Object{
 			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
+	}
+
+	poolSchema = s.Schema{
+		"used": s.Object{
+			"bytes": c.Int("used_in_bytes"),
+		},
+		"max": s.Object{
+			"bytes": c.Int("max_in_bytes"),
+		},
+		"peak": s.Object{
+			"bytes": c.Int("peak_used_in_bytes"),
+		},
+		"peak_max": s.Object{
+			"bytes": c.Int("peak_max_in_bytes"),
 		},
 	}
 
@@ -367,11 +394,20 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 			continue
 		}
 
+		if transportAddress, hasTransportAddress := node["transport_address"]; hasTransportAddress {
+			if transportAddress, ok := transportAddress.(string); ok {
+				event.Host = transportAddress
+			}
+		}
+
+		roles := node["roles"]
+
 		event.ModuleFields = mapstr.M{
 			"node": mapstr.M{
 				"id":       nodeID,
 				"mlockall": mlockall,
 				"master":   isMaster,
+				"roles":    roles,
 			},
 			"cluster": mapstr.M{
 				"name": info.ClusterName,

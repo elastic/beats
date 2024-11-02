@@ -56,7 +56,7 @@ func (c *DialerChain) Clone() *DialerChain {
 func (c *DialerChain) Build(event *beat.Event) (d transport.Dialer, err error) {
 	d, err = c.Net.build(event)
 	if err != nil {
-		return
+		return d, err
 	}
 
 	for _, layer := range c.Layers {

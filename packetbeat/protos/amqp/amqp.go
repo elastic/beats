@@ -50,7 +50,7 @@ type amqpPlugin struct {
 	transactions              *common.Cache
 	transactionTimeout        time.Duration
 	results                   protos.Reporter
-	watcher                   procs.ProcessesWatcher
+	watcher                   *procs.ProcessesWatcher
 
 	// map containing functions associated with different method numbers
 	methodMap map[codeClass]map[codeMethod]amqpMethod
@@ -68,7 +68,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &amqpPlugin{}
@@ -85,7 +85,7 @@ func New(
 	return p, nil
 }
 
-func (amqp *amqpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *amqpConfig) error {
+func (amqp *amqpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *amqpConfig) error {
 	amqp.initMethodMap()
 	amqp.setFromConfig(config)
 
@@ -198,7 +198,6 @@ func (amqp *amqpPlugin) ConnectionTimeout() time.Duration {
 func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseAmqp exception")
 	detailedf("Parse method triggered")
 
 	priv := amqpPrivateData{}

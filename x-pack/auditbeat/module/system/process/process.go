@@ -14,10 +14,12 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
@@ -29,7 +31,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "process"
 	namespace     = "system.audit.process"
 
@@ -80,7 +81,7 @@ func (action eventAction) Type() string {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -101,18 +102,22 @@ type MetricSet struct {
 
 // Process represents information about a process.
 type Process struct {
-	Info     types.ProcessInfo
-	UserInfo *types.UserInfo
-	User     *user.User
-	Group    *user.Group
-	Hashes   map[hasher.HashType]hasher.Digest
-	Error    error
+	Info         types.ProcessInfo
+	UserInfo     *types.UserInfo
+	User         *user.User
+	Group        *user.Group
+	CapEffective []string
+	CapPermitted []string
+	Hashes       map[hasher.HashType]hasher.Digest
+	Error        error
 }
 
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
 	h := xxhash.New()
+	//nolint:errcheck // always return nil err
 	h.WriteString(strconv.Itoa(p.Info.PID))
+	//nolint:errcheck // always return nil err
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
 }
@@ -136,18 +141,20 @@ func (p Process) toMapStr() mapstr.M {
 func (p Process) entityID(hostID string) string {
 	h := system.NewEntityHash()
 	h.Write([]byte(hostID))
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
+	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
 	return h.Sum()
 }
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -376,6 +383,13 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 		event.RootFields.Put("user.group.name", process.Group.Name)
 	}
 
+	if len(process.CapEffective) > 0 {
+		event.RootFields.Put("process.thread.capabilities.effective", process.CapEffective)
+	}
+	if len(process.CapPermitted) > 0 {
+		event.RootFields.Put("process.thread.capabilities.permitted", process.CapPermitted)
+	}
+
 	if process.Hashes != nil {
 		for hashType, digest := range process.Hashes {
 			fieldName := "process.hash." + string(hashType)
@@ -435,13 +449,12 @@ func convertToCacheable(processes []*Process) []cache.Cacheable {
 }
 
 func (ms *MetricSet) getProcesses() ([]*Process, error) {
-	var processes []*Process
-
 	sysinfoProcs, err := sysinfo.Processes()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch processes: %w", err)
 	}
 
+	processes := make([]*Process, 0, len(sysinfoProcs))
 	for _, sysinfoProc := range sysinfoProcs {
 		var process *Process
 
@@ -489,8 +502,20 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 		}
 
 		// Exclude Linux kernel processes, they are not very interesting.
-		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
-			continue
+		if runtime.GOOS == "linux" {
+			if userInfo.UID == "0" && process.Info.Exe == "" {
+				continue
+			}
+
+			// Fetch Effective and Permitted capabilities
+			process.CapEffective, err = capabilities.FromPid(capabilities.Effective, pInfo.PID)
+			if err != nil && process.Error == nil {
+				process.Error = err
+			}
+			process.CapPermitted, err = capabilities.FromPid(capabilities.Permitted, pInfo.PID)
+			if err != nil && process.Error == nil {
+				process.Error = err
+			}
 		}
 
 		processes = append(processes, process)

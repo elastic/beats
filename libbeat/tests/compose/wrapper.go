@@ -34,11 +34,12 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -81,6 +82,9 @@ func (c *wrapperContainer) Running() bool {
 
 var statusOldRe = regexp.MustCompile(`(\d+) (minute|hour)s?`)
 
+// Old returns true when info.Status indicates that container is more than
+// 3 minutes old.
+// Else, it returns false even when status is not in the expected format.
 func (c *wrapperContainer) Old() bool {
 	match := statusOldRe.FindStringSubmatch(c.info.Status)
 	if len(match) < 3 {
@@ -149,12 +153,16 @@ func (d *wrapperDriver) LockFile() string {
 }
 
 func (d *wrapperDriver) Close() error {
-	return errors.Wrap(d.client.Close(), "failed to close wrapper driver")
+	err := d.client.Close()
+	if err != nil {
+		return fmt.Errorf("failed to close wrapper driver: %w", err)
+	}
+	return nil
 }
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
-	var args []string
-	args = append(args, "--no-ansi", "--project-name", d.Name)
+	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
+	args = append(args, "--ansi", "never", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
@@ -192,7 +200,7 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	pull.Stdout = nil
 	pull.Stderr = &stderr
 	if err := pull.Run(); err != nil {
-		return errors.Wrapf(err, "failed to pull images using docker-compose: %s", stderr.String())
+		return fmt.Errorf("failed to pull images using docker-compose: %s: %w", stderr.String(), err)
 	}
 
 	err := d.cmd(ctx, "up", args...).Run()
@@ -219,19 +227,19 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 		ChangeTime: now,
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to write tar header")
+		return fmt.Errorf("failed to write tar header: %w", err)
 	}
 	if _, err := tw.Write([]byte(content)); err != nil {
-		return errors.Wrap(err, "failed to write tar file")
+		return fmt.Errorf("failed to write tar file: %w", err)
 	}
 	if err := tw.Close(); err != nil {
-		return errors.Wrap(err, "failed to close tar")
+		return fmt.Errorf("failed to close tar: %w", err)
 	}
 
 	opts := types.CopyToContainerOptions{}
 	err = cli.CopyToContainer(ctx, id, filepath.Dir(filename), bytes.NewReader(buf.Bytes()), opts)
 	if err != nil {
-		return errors.Wrapf(err, "failed to copy environment to container %s", id)
+		return fmt.Errorf("failed to copy environment to container %s: %w", id, err)
 	}
 	return nil
 }
@@ -242,10 +250,10 @@ func writeToContainer(ctx context.Context, cli *client.Client, id, filename, con
 func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string, port int) error {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, service)
 	if err != nil {
-		return errors.Wrap(err, "setupAdvertisedHost")
+		return fmt.Errorf("setupAdvertisedHost: %w", err)
 	}
 	if len(containers) == 0 {
-		return errors.Errorf("no containers for service %s", service)
+		return fmt.Errorf("no containers for service %s", service)
 	}
 
 	for _, c := range containers {
@@ -260,6 +268,10 @@ func (d *wrapperDriver) setupAdvertisedHost(ctx context.Context, service string,
 	return nil
 }
 
+// Kill force stops the service containers based on the SIGNAL provided.
+// If SIGKILL is used, then termination happens immediately whereas SIGTERM
+// is used for graceful termination.
+// See: https://docs.docker.com/engine/reference/commandline/compose_kill/
 func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string) error {
 	var args []string
 
@@ -274,10 +286,27 @@ func (d *wrapperDriver) Kill(ctx context.Context, signal string, service string)
 	return d.cmd(ctx, "kill", args...).Run()
 }
 
+// Remove removes the stopped service containers. Removal of the containers can be forced as
+// well where no confirmation of removal is required.
+// See: https://docs.docker.com/engine/reference/commandline/compose_rm/
+func (d *wrapperDriver) Remove(ctx context.Context, service string, force bool) error {
+	var args []string
+
+	if force {
+		args = append(args, "-f")
+	}
+
+	if service != "" {
+		args = append(args, service)
+	}
+
+	return d.cmd(ctx, "rm", args...).Run()
+}
+
 func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error) {
 	containers, err := d.containers(ctx, Filter{State: AnyState}, filter...)
 	if err != nil {
-		return nil, errors.Wrap(err, "ps")
+		return nil, fmt.Errorf("ps: %w", err)
 	}
 
 	ps := make([]ContainerStatus, len(containers))
@@ -290,7 +319,7 @@ func (d *wrapperDriver) Ps(ctx context.Context, filter ...string) ([]ContainerSt
 func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, filter ...string) ([]string, error) {
 	containers, err := d.containers(ctx, projectFilter, filter...)
 	if err != nil {
-		return nil, errors.Wrap(err, "containers")
+		return nil, fmt.Errorf("containers: %w", err)
 	}
 
 	ids := make([]string, len(containers))
@@ -314,17 +343,17 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 	serviceNames, err := d.serviceNames(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get container list")
+		return nil, fmt.Errorf("failed to get container list: %w", err)
 	}
 
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, container.ListOptions{
 			All:     true,
 			Filters: f,
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get container list")
+			return nil, fmt.Errorf("failed to get container list: %w", err)
 		}
 		for _, container := range list {
 			serviceName, ok := container.Labels[labelComposeService]
@@ -341,12 +370,19 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 // KillOld is a workaround for issues in CI with heavy load caused by having too many
 // running containers.
-// It kills all containers not related to services in `except`.
+// It kills and removes all containers except the excluded services in 'except'.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		return errors.Wrap(err, "listing containers to be killed")
+		return fmt.Errorf("listing containers to be killed: %w", err)
 	}
+
+	rmOpts := container.RemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+		RemoveLinks:   true,
+	}
+
 	for _, container := range list {
 		container := wrapperContainer{info: container}
 		serviceName, ok := container.info.Labels[labelComposeService]
@@ -355,9 +391,13 @@ func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
 		}
 
 		if container.Running() && container.Old() {
-			d.client.ContainerKill(ctx, container.info.ID, "KILL")
+			err = d.client.ContainerRemove(ctx, container.info.ID, rmOpts)
+			if err != nil {
+				logp.Err("container remove: %v", err)
+			}
 		}
 	}
+
 	return nil
 }
 
@@ -367,16 +407,16 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 	cmd.Stdout = &stdout
 	err := cmd.Run()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get list of service names")
+		return nil, fmt.Errorf("failed to get list of service names: %w", err)
 	}
 	return strings.Fields(stdout.String()), nil
 }
 
 // Inspect a container.
 func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		return "", errors.Wrap(err, "listing containers to be inspected")
+		return "", fmt.Errorf("listing containers to be inspected: %w", err)
 	}
 
 	var found bool
@@ -391,19 +431,19 @@ func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string
 	}
 
 	if !found {
-		return "", errors.Errorf("container not found for service '%s'", serviceName)
+		return "", fmt.Errorf("container not found for service '%s'", serviceName)
 	}
 
 	inspect, err := d.client.ContainerInspect(ctx, c.ID)
 	if err != nil {
-		return "", errors.Wrap(err, "container failed inspection")
+		return "", fmt.Errorf("container failed inspection: %w", err)
 	} else if inspect.State == nil {
 		return "empty container state", nil
 	}
 
 	state, err := json.Marshal(inspect.State)
 	if err != nil {
-		return "", errors.Wrap(err, "container inspection failed")
+		return "", fmt.Errorf("container inspection failed: %w", err)
 	}
 
 	return string(state), nil

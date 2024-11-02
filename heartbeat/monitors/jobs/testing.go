@@ -25,6 +25,7 @@ import (
 
 // ExecJobsAndConts recursively executes multiple jobs.
 func ExecJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
+	t.Helper()
 	var results []*beat.Event
 	for _, j := range jobs {
 		resultEvents, err := ExecJobAndConts(t, j)
@@ -39,21 +40,17 @@ func ExecJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
 
 // ExecJobAndConts will recursively execute a job and gather its results
 func ExecJobAndConts(t *testing.T, j Job) ([]*beat.Event, error) {
+	t.Helper()
 	var results []*beat.Event
 	event := &beat.Event{}
 	results = append(results, event)
 	cont, err := j(event)
-	if err != nil {
-		return nil, err
-	}
 
 	for _, cj := range cont {
-		cjResults, err := ExecJobAndConts(t, cj)
-		if err != nil {
-			return nil, err
-		}
+		var cjResults []*beat.Event
+		cjResults, err = ExecJobAndConts(t, cj)
 		results = append(results, cjResults...)
 	}
 
-	return results, nil
+	return results, err
 }

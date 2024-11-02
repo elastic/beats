@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -78,6 +79,7 @@ type Input struct {
 	meta                map[string]string
 	stopOnce            sync.Once
 	fileStateIdentifier file.StateIdentifier
+	getStatusReporter   input.GetStatusReporter
 }
 
 // NewInput instantiates a new Log
@@ -93,7 +95,9 @@ func NewInput(
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
-			f()
+			if err := f(); err != nil {
+				logp.L().Named("input.log").Errorf("clean up function returned an error: %w", err)
+			}
 		}
 	}
 
@@ -103,10 +107,10 @@ func NewInput(
 		return nil, err
 	}
 	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %v", err)
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err)
 	}
 	if err := inputConfig.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %v", err)
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err)
 	}
 
 	if len(inputConfig.Paths) == 0 {
@@ -115,7 +119,7 @@ func NewInput(
 
 	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize file identity generator: %+v", err)
+		return nil, fmt.Errorf("failed to initialize file identity generator: %w", err)
 	}
 
 	// Note: underlying output.
@@ -155,7 +159,10 @@ func NewInput(
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
+		getStatusReporter:   context.GetStatusReporter,
 	}
+
+	p.updateStatus(status.Starting, "starting the log input")
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
@@ -192,7 +199,10 @@ func (p *Input) loadStates(states []file.State) error {
 
 			// In case a input is tried to be started with an unfinished state matching the glob pattern
 			if !state.Finished {
-				return &common.ErrInputNotFinished{State: state.String()}
+				return &common.ErrInputNotFinished{
+					State: state.String(),
+					File:  state.Fileinfo.Name(),
+				}
 			}
 
 			// Convert state to current identifier if different
@@ -219,6 +229,9 @@ func (p *Input) loadStates(states []file.State) error {
 
 // Run runs the input
 func (p *Input) Run() {
+	// Mark it Running for now.
+	// Any errors encountered in this loop will change state to degraded
+	p.updateStatus(status.Running, "")
 	logger := p.logger
 	logger.Debug("Start next scan")
 
@@ -466,7 +479,7 @@ func getFileState(path string, info os.FileInfo, p *Input) (file.State, error) {
 	var absolutePath string
 	absolutePath, err = filepath.Abs(path)
 	if err != nil {
-		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %s", absolutePath, err)
+		return file.State{}, fmt.Errorf("could not fetch abs path for file %s: %w", absolutePath, err)
 	}
 	p.logger.Debugf("Check file for harvesting: %s", absolutePath)
 	// Create new state for comparison
@@ -548,11 +561,12 @@ func (p *Input) scan() {
 		if isNewState {
 			logger.Debugf("Start harvester for new file: %s", newState.Source)
 			err := p.startHarvester(logger, newState, 0)
-			if err == errHarvesterLimit {
+			if errors.Is(err, errHarvesterLimit) {
 				logger.Debugf(harvesterErrMsg, newState.Source, err)
 				continue
 			}
 			if err != nil {
+				p.updateStatus(status.Degraded, fmt.Sprintf(harvesterErrMsg, newState.Source, err))
 				logger.Errorf(harvesterErrMsg, newState.Source, err)
 			}
 		} else {
@@ -578,6 +592,7 @@ func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, ol
 		logger.Debugf("Resuming harvesting of file: %s, offset: %d, new size: %d", newState.Source, oldState.Offset, newState.Fileinfo.Size())
 		err := p.startHarvester(logger, newState, oldState.Offset)
 		if err != nil {
+			p.updateStatus(status.Degraded, fmt.Sprintf("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err))
 			logger.Errorf("Harvester could not be started on existing file: %s, Err: %s", newState.Source, err)
 		}
 		return
@@ -588,6 +603,7 @@ func (p *Input) harvestExistingFile(logger *logp.Logger, newState file.State, ol
 		logger.Debugf("Old file was truncated. Starting from the beginning: %s, offset: %d, new size: %d ", newState.Source, newState.Offset, newState.Fileinfo.Size())
 		err := p.startHarvester(logger, newState, 0)
 		if err != nil {
+			p.updateStatus(status.Degraded, fmt.Sprintf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err))
 			logger.Errorf("Harvester could not be started on truncated file: %s, Err: %s", newState.Source, err)
 		}
 
@@ -673,11 +689,7 @@ func (p *Input) isIgnoreOlder(state file.State) bool {
 	}
 
 	modTime := state.Fileinfo.ModTime()
-	if time.Since(modTime) > p.config.IgnoreOlder {
-		return true
-	}
-
-	return false
+	return time.Since(modTime) > p.config.IgnoreOlder
 }
 
 // isCleanInactive checks if the given state false under clean_inactive
@@ -688,11 +700,7 @@ func (p *Input) isCleanInactive(state file.State) bool {
 	}
 
 	modTime := state.Fileinfo.ModTime()
-	if time.Since(modTime) > p.config.CleanInactive {
-		return true
-	}
-
-	return false
+	return time.Since(modTime) > p.config.CleanInactive
 }
 
 // subOutletWrap returns a factory method that will wrap the passed outlet
@@ -748,7 +756,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	err = h.Setup()
 	if err != nil {
 		p.numHarvesters.Dec()
-		return fmt.Errorf("error setting up harvester: %s", err)
+		return fmt.Errorf("error setting up harvester: %w", err)
 	}
 
 	// Update state before staring harvester
@@ -783,7 +791,7 @@ func (p *Input) updateState(state file.State) error {
 		stateToRemove := file.State{Id: state.PrevId, TTL: 0, Finished: true, Meta: nil}
 		err := p.doUpdate(stateToRemove)
 		if err != nil {
-			return fmt.Errorf("failed to remove outdated states based on prev_id: %v", err)
+			return fmt.Errorf("failed to remove outdated states based on prev_id: %w", err)
 		}
 	}
 
@@ -835,4 +843,13 @@ func (p *Input) stopWhenDone() {
 	}
 
 	p.Wait()
+}
+
+func (p *Input) updateStatus(status status.Status, msg string) {
+	if p.getStatusReporter == nil {
+		return
+	}
+	if reporter := p.getStatusReporter(); reporter != nil {
+		reporter.UpdateStatus(status, msg)
+	}
 }

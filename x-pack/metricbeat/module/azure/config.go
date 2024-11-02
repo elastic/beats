@@ -5,9 +5,8 @@
 package azure
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -35,6 +34,7 @@ type Config struct {
 	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
 	Period                  time.Duration `config:"period" validate:"nonzero,required"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
+	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
 	// specific to resource metrics
 	Resources           []ResourceConfig `config:"resources"`
@@ -81,17 +81,17 @@ func (conf *Config) Validate() error {
 	if conf.ActiveDirectoryEndpoint == "" {
 		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
 		if err != nil {
-			return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+			return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 		}
 		if ok {
 			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
 			if err != nil {
-				return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+				return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 			}
 			conf.ActiveDirectoryEndpoint = add.(string)
 		}
 		if conf.ActiveDirectoryEndpoint == "" {
-			return errors.New("no active directory endpoint has been configured")
+			return fmt.Errorf("no active directory endpoint has been configured")
 		}
 	}
 	return nil

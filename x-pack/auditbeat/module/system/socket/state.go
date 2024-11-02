@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -21,12 +20,12 @@ import (
 	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
@@ -309,8 +308,12 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 		}
 	}
 	var list []dns.Transaction
+	var ok bool
 	if prev := dt.transactionByClient.Get(clientAddr); prev != nil {
-		list = prev.([]dns.Transaction)
+		list, ok = prev.([]dns.Transaction)
+		if !ok {
+			return
+		}
 	}
 	list = append(list, tr)
 	dt.transactionByClient.Put(clientAddr, list)
@@ -333,7 +336,11 @@ func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
 	key := addr.String()
 	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {
-		list := listIf.([]dns.Transaction)
+		list, ok := listIf.([]dns.Transaction)
+		if !ok {
+			return
+		}
+
 		for _, tr := range list {
 			proc.addTransaction(tr)
 		}
@@ -576,6 +583,13 @@ func (s *state) TerminateProcess(pid uint32) error {
 	defer s.Unlock()
 	delete(s.processes, pid)
 	return nil
+}
+
+func (s *state) processExists(pid uint32) bool {
+	s.Lock()
+	defer s.Unlock()
+	_, ok := s.processes[pid]
+	return ok
 }
 
 func (s *state) getProcess(pid uint32) *process {

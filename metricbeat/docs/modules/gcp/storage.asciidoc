@@ -8,8 +8,6 @@ This file is generated! See scripts/mage/docs_collector.go
 [role="xpack"]
 === Google Cloud Platform storage metricset
 
-beta[]
-
 include::../../../../x-pack/metricbeat/module/gcp/storage/_meta/docs.asciidoc[]
 
 

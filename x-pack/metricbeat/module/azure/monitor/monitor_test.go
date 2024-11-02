@@ -24,7 +24,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 	}
 
 	resourceConfig = mapstr.M{
@@ -34,7 +34,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 		"resources": []mapstr.M{
 			{
 				"resource_id": "test",

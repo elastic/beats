@@ -18,7 +18,7 @@
 package ksm
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -62,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	ksmData, err := fetchKSMStats(m.mod.ResolveHostFS("/sys/kernel/mm/ksm"))
 	if err != nil {
-		return errors.Wrap(err, "error fetching KSM stats")
+		return fmt.Errorf("error fetching KSM stats: %w", err)
 	}
 
 	report.Event(mb.Event{

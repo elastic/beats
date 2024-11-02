@@ -22,6 +22,9 @@
         "oracle.database_audit.length": 228,
         "oracle.database_audit.status": "0",
         "process.pid": "13448",
+        "related.user": [
+            "oracle"
+        ],
         "server.user.name": "/",
         "service.type": "oracle",
         "tags": [

@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Proofpoint module
 
+deprecated::[8.12.0,"This module is deprecated. Use the https://docs.elastic.co/integrations/proofpoint_tap[Proofpoint TAP] Elastic integration instead."]
+
 experimental[]
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]

@@ -99,7 +99,7 @@ func (u moveFields) String() string {
 	return "move_fields"
 }
 
-func NewMoveFields(c *config.C) (processors.Processor, error) {
+func NewMoveFields(c *config.C) (beat.Processor, error) {
 	fc := moveFieldsConfig{}
 	err := c.Unpack(&fc)
 	if err != nil {

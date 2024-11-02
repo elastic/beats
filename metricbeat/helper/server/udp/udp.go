@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -78,7 +76,7 @@ func (g *UdpServer) GetHost() string {
 func (g *UdpServer) Start() error {
 	listener, err := net.ListenUDP("udp", g.udpaddr)
 	if err != nil {
-		return errors.Wrap(err, "failed to start UDP server")
+		return fmt.Errorf("failed to start UDP server: %w", err)
 	}
 
 	logp.Info("Started listening for UDP on: %s", g.udpaddr.String())

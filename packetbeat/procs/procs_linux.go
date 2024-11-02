@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package procs
 
@@ -137,14 +136,14 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			logp.Debug("procs", err.Error())
+			logp.Debug("procs", "%s", err.Error())
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseInt(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				logp.Debug("procs", err.Error())
+				logp.Debug("procs", "%s", err.Error())
 				continue
 			}
 

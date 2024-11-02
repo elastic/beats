@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
@@ -334,6 +335,7 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 	resource.cursorMeta = meta
 
 	s.writeState(resource)
+	resource.Release()
 	return nil
 }
 
@@ -369,7 +371,7 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
-	typeconv.Convert(&r.cursor, cur) //nolint: errcheck // not changing behaviour on this commit
+	typeconv.Convert(&r.cursor, cur) //nolint:errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
@@ -383,6 +385,7 @@ func (s *store) remove(key string) error {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
 	s.UpdateTTL(resource, 0)
+	resource.Release()
 	return nil
 }
 
@@ -539,7 +542,8 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // pendingCursor returns the current published cursor state not yet ACKed.
 //
 // Note: The stateMutex must be locked when calling pendingCursor.
-//nolint: errcheck // not changing behaviour on this commit
+//
+//nolint:errcheck // not changing behaviour on this commit
 func (r *resource) pendingCursor() interface{} {
 	if r.pendingUpdate != nil {
 		var tmp interface{}

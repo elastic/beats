@@ -6,9 +6,10 @@ package health
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -125,7 +126,7 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 
 	event.MetricSetFields, err = schema.Apply(data)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "failure to apply health schema"))
+		errs = append(errs, fmt.Errorf("failure to apply health schema: %w", err))
 	} else {
 		report.Event(event)
 	}

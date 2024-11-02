@@ -6,11 +6,11 @@ package v9
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"log"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -18,23 +18,28 @@ import (
 )
 
 const (
-	ProtocolName                 = "v9"
-	LogPrefix                    = "[netflow-v9] "
-	ProtocolID            uint16 = 9
-	MaxSequenceDifference        = 1000
+	ProtocolName                      = "v9"
+	LogPrefix                         = "[netflow-v9] "
+	ProtocolID                 uint16 = 9
+	MaxSequenceDifference             = 1000
+	cacheCleanupInterval              = 30 * time.Second
+	cacheCleanupEntryThreshold        = 10 * time.Second
 )
 
 type NetflowV9Protocol struct {
-	decoder     Decoder
-	logger      *log.Logger
-	Session     SessionMap
-	timeout     time.Duration
-	done        chan struct{}
-	detectReset bool
+	ctx            context.Context
+	cancel         context.CancelFunc
+	decoder        Decoder
+	logger         *log.Logger
+	Session        SessionMap
+	timeout        time.Duration
+	cache          *pendingTemplatesCache
+	detectReset    bool
+	shareTemplates bool
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	_ = protocol.Registry.Register(ProtocolName, New)
 }
 
 func New(config config.Config) protocol.Protocol {
@@ -43,13 +48,22 @@ func New(config config.Config) protocol.Protocol {
 }
 
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
-	return &NetflowV9Protocol{
+	ctx, cancel := context.WithCancel(context.Background())
+	pd := &NetflowV9Protocol{
+		ctx:         ctx,
+		cancel:      cancel,
 		decoder:     decoder,
-		Session:     NewSessionMap(logger),
 		logger:      logger,
+		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
 		timeout:     config.ExpirationTimeout(),
 		detectReset: config.SequenceResetEnabled(),
 	}
+
+	if config.Cache() {
+		pd.cache = newPendingTemplatesCache()
+	}
+
+	return pd
 }
 
 func (*NetflowV9Protocol) Version() uint16 {
@@ -57,16 +71,21 @@ func (*NetflowV9Protocol) Version() uint16 {
 }
 
 func (p *NetflowV9Protocol) Start() error {
-	p.done = make(chan struct{})
 	if p.timeout != time.Duration(0) {
-		go p.Session.CleanupLoop(p.timeout, p.done)
+		go p.Session.CleanupLoop(p.timeout, p.ctx.Done())
 	}
+
+	if p.cache != nil {
+		p.cache.start(p.ctx.Done(), cacheCleanupInterval, cacheCleanupEntryThreshold)
+	}
+
 	return nil
 }
 
 func (p *NetflowV9Protocol) Stop() error {
-	if p.done != nil {
-		close(p.done)
+	p.cancel()
+	if p.cache != nil {
+		p.cache.wait()
 	}
 	return nil
 }
@@ -75,11 +94,13 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	header, payload, numFlowSets, err := p.decoder.ReadPacketHeader(buf)
 	if err != nil {
 		p.logger.Printf("Unable to read V9 header: %v", err)
-		return nil, errors.Wrapf(err, "error reading header")
+		return nil, fmt.Errorf("error reading header: %w", err)
 	}
 	buf = payload
 
-	session := p.Session.GetOrCreate(MakeSessionKey(source, header.SourceID))
+	sessionKey := MakeSessionKey(source, header.SourceID, p.shareTemplates)
+
+	session := p.Session.GetOrCreate(sessionKey)
 	remote := source.String()
 
 	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
@@ -101,10 +122,10 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 		body := bytes.NewBuffer(buf.Next(set.BodyLength()))
 		p.logger.Printf("FlowSet ID %d length %d", set.SetID, set.BodyLength())
 
-		f, err := p.parseSet(set.SetID, session, body)
+		f, err := p.parseSet(set.SetID, sessionKey, session, body)
 		if err != nil {
 			p.logger.Printf("Error parsing set %d: %v", set.SetID, err)
-			return nil, errors.Wrapf(err, "error parsing set")
+			return nil, fmt.Errorf("error parsing set: %w", err)
 		}
 		flows = append(flows, f...)
 	}
@@ -118,16 +139,24 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 
 func (p *NetflowV9Protocol) parseSet(
 	setID uint16,
+	key SessionKey,
 	session *SessionState,
 	buf *bytes.Buffer) (flows []record.Record, err error,
 ) {
 	if setID >= 256 {
 		// Flow of Options record, lookup template and generate flows
-		if template := session.GetTemplate(setID); template != nil {
-			return template.Apply(buf, 0)
+		template := session.GetTemplate(setID)
+
+		if template == nil {
+			if p.cache != nil {
+				p.cache.Add(key, buf)
+			} else {
+				p.logger.Printf("No template for ID %d", setID)
+			}
+			return nil, nil
 		}
-		p.logger.Printf("No template for ID %d", setID)
-		return nil, nil
+
+		return template.Apply(buf, 0)
 	}
 
 	// Template sets
@@ -137,6 +166,19 @@ func (p *NetflowV9Protocol) parseSet(
 	}
 	for _, template := range templates {
 		session.AddTemplate(template)
+
+		if p.cache == nil {
+			continue
+		}
+		events := p.cache.GetAndRemove(key)
+		for _, e := range events {
+			f, err := template.Apply(e, 0)
+			if err != nil {
+				continue
+			}
+			flows = append(flows, f...)
+		}
 	}
+
 	return flows, nil
 }

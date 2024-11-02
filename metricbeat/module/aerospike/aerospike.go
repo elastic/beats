@@ -18,22 +18,49 @@
 package aerospike
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	as "github.com/aerospike/aerospike-client-go"
 )
 
+type Config struct {
+	ClusterName string            `config:"cluster_name"`
+	TLS         *tlscommon.Config `config:"ssl"`
+}
+
+// DefaultConfig return default config for the aerospike module.
+func DefaultConfig() Config {
+	return Config{}
+}
+
+func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
+	clientPolicy := as.NewClientPolicy()
+	if config.TLS.IsEnabled() {
+		tlsconfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
+		}
+		clientPolicy.TlsConfig = tlsconfig.ToConfig()
+	}
+
+	if config.ClusterName != "" {
+		clientPolicy.ClusterName = config.ClusterName
+	}
+	return clientPolicy, nil
+}
+
 func ParseHost(host string) (*as.Host, error) {
 	pieces := strings.Split(host, ":")
 	if len(pieces) != 2 {
-		return nil, errors.Errorf("Can't parse host %s", host)
+		return nil, fmt.Errorf("Can't parse host %s", host)
 	}
 	port, err := strconv.Atoi(pieces[1])
 	if err != nil {
-		return nil, errors.Wrapf(err, "Can't parse port")
+		return nil, fmt.Errorf("Can't parse port: %w", err)
 	}
 	return as.NewHost(pieces[0], port), nil
 }

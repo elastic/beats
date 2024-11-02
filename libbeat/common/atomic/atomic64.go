@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build amd64 || arm64 || ppc64 || ppc64le || mips64 || mips64le || s390x
-// +build amd64 arm64 ppc64 ppc64le mips64 mips64le s390x
 
 package atomic
 

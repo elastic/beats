@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -27,8 +26,6 @@ import (
 	"math/rand"
 	"strconv"
 	"testing"
-
-	"golang.org/x/sys/windows/svc/eventlog"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -44,7 +41,8 @@ var (
 // different batch sizes.
 //
 // Recommended usage:
-//   go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
+//
+//	go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
 func TestBenchmarkRead(t *testing.T) {
 	if !*benchTest {
 		t.Skip("-benchtest not enabled")
@@ -57,7 +55,7 @@ func TestBenchmarkRead(t *testing.T) {
 
 	// Publish test messages:
 	for i := 0; i < *injectAmount; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(rand.Int63()%1000), []string{strconv.Itoa(i) + " " + randomSentence(256)})
+		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i)+" "+randomSentence(256))
 	}
 
 	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {

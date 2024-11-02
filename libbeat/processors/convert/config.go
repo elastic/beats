@@ -18,10 +18,9 @@
 package convert
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 func defaultConfig() config {
@@ -98,7 +97,7 @@ func (dt *dataType) Unpack(s string) error {
 			return nil
 		}
 	}
-	return errors.Errorf("invalid data type: %v", s)
+	return fmt.Errorf("invalid data type: %v", s)
 }
 
 type mode uint8
@@ -130,5 +129,5 @@ func (m *mode) Unpack(s string) error {
 			return nil
 		}
 	}
-	return errors.Errorf("invalid mode: %v", s)
+	return fmt.Errorf("invalid mode: %v", s)
 }

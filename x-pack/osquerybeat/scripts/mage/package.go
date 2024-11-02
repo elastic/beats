@@ -34,18 +34,25 @@ func CustomizePackaging() {
 			Mode:   mode,
 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), distFile),
 		}
-		args.Spec.Files[distFile] = packFile
 
-		// Skip packaging certs.pem for darwin
-		if args.OS == "darwin" {
-			continue
+		// If macOS bundle osquery.app, preserve the directories and files permissions
+		if distFile == distro.OsquerydDarwinApp() {
+			packFile.PreserveMode = true
 		}
+
+		args.Spec.Files[distFile] = packFile
 
 		// Certs
 		certsFile := devtools.PackageFile{
 			Mode:   0640,
 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), "certs", "certs.pem"),
 		}
+
 		args.Spec.Files[filepath.Join("certs", "certs.pem")] = certsFile
+
+		// Augeas lenses are not available for Windows
+		if args.OS != "windows" {
+			args.Spec.Files["lenses"] = devtools.PackageFile{Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), "lenses")}
+		}
 	}
 }

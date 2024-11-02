@@ -92,12 +92,12 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	xpackEnabledMetricSets := []string{
 		"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
-func GetVersion(http *helper.HTTP, currentPath string) (*version.V, error) {
-	content, err := fetchPath(http, currentPath, StatusPath)
+func GetVersion(http *helper.HTTP, currentPath string, apiKey string) (*version.V, error) {
+	content, err := fetchPath(http, currentPath, StatusPath, apiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func IsUsageExcludable(currentKibanaVersion *version.V) bool {
 		v7_0_1.LessThanOrEqual(false, currentKibanaVersion)
 }
 
-func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
+func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
 	currentURI := http.GetURI()
 	defer http.SetURI(currentURI) // Reset after this request
 
@@ -159,5 +159,8 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
 
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
+	if apiKey != "" {
+		http.SetHeader("Authorization", "ApiKey "+apiKey)
+	}
 	return http.FetchContent()
 }

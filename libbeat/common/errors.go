@@ -24,6 +24,7 @@ import (
 // ErrInputNotFinished struct for reporting errors related to not finished inputs
 type ErrInputNotFinished struct {
 	State string
+	File  string
 }
 
 // Error method of ErrInputNotFinished

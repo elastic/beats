@@ -112,29 +112,12 @@ reading additional event log records.
 ==== `event_logs.name`
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
-have a `name` field, except for those which use a custom XML query. You can
-get a list of available event logs by running `Get-EventLog *` in PowerShell.
-Here is a sample of the output from the command:
-
-[source,sh]
---------------------------------------------------------------------------------
-PS C:\Users\vagrant> Get-EventLog *
-
-  Max(K) Retain OverflowAction        Entries Log
-  ------ ------ --------------        ------- ---
-  20,480      0 OverwriteAsNeeded          75 Application
-  20,480      0 OverwriteAsNeeded           0 HardwareEvents
-     512      7 OverwriteOlder              0 Internet Explorer
-  20,480      0 OverwriteAsNeeded           0 Key Management Service
-  20,480      0 OverwriteAsNeeded       1,609 Security
-  20,480      0 OverwriteAsNeeded       1,184 System
-  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
---------------------------------------------------------------------------------
-
-Channel names can also be specified if running on Windows Vista or newer. A
-channel is a named stream of events that transports events from an event source
-to an event log. Most channels are tied to specific event publishers. Here is an
-example showing how to list all channels using PowerShell.
+have a `name` field, except for those which use a custom XML query.
+A channel is a named stream of events that transports events from an event
+source to an event log. Most channels are tied to specific event publishers.
+You can get a list of available event logs by using the PowerShell
+https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent[`Get-WinEvent`] cmdlet
+on Windows Vista or newer. Here is a sample of the output from the command:
 
 [source,sh]
 --------------------------------------------------------------------------------
@@ -152,6 +135,24 @@ LogName : Microsoft-Rdms-UI/Admin
 LogName : Microsoft-Rdms-UI/Operational
 LogName : Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 ...
+--------------------------------------------------------------------------------
+
+If `Get-WinEvent` is not available, the https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog[`Get-EventLog`] cmdlet can be used in its
+place.
+
+[source,sh]
+--------------------------------------------------------------------------------
+PS C:\Users\vagrant> Get-EventLog *
+
+  Max(K) Retain OverflowAction        Entries Log
+  ------ ------ --------------        ------- ---
+  20,480      0 OverwriteAsNeeded          75 Application
+  20,480      0 OverwriteAsNeeded           0 HardwareEvents
+     512      7 OverwriteOlder              0 Internet Explorer
+  20,480      0 OverwriteAsNeeded           0 Key Management Service
+  20,480      0 OverwriteAsNeeded       1,609 Security
+  20,480      0 OverwriteAsNeeded       1,184 System
+  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
 --------------------------------------------------------------------------------
 
 You must specify the full name of the channel in the configuration file.
@@ -241,17 +242,20 @@ winlogbeat.event_logs:
 
 [WARNING]
 =======================================
-If you specify more that 22 event IDs to include or 22 event IDs to exclude,
-Windows will prevent {beatname_uc} from reading the event log because it limits the
-number of conditions that can be used in an event log query. If this occurs a similar
-warning as shown below will be logged by {beatname_uc}, and it will continue
-processing data from other event logs. For more information, see
-https://support.microsoft.com/en-us/kb/970453.
+If you specify more than 22 query conditions (event IDs or event ID ranges), some
+versions of Windows will prevent {beatname_uc} from reading the event log due to
+limits in the query system. If this occurs a similar warning as shown below will
+be logged by {beatname_uc}, and it will continue processing data from other event
+logs.
 
 `WARN EventLog[Application] Open() error. No events will be read from this
 source. The specified query is invalid.`
 
-If you have more than 22 event IDs, you can workaround this Windows limitation
+In some cases, the limit may be lower than 22 conditions. For instance, using a
+mixture of ranges and single event IDs, along with an additional parameter such
+as `ignore older`, results in a limit of 21 conditions.
+
+If you have more than 22 conditions, you can workaround this Windows limitation
 by using a drop_event[drop-event] processor to do the filtering after
 {beatname_uc} has received the events from Windows. The filter shown below is
 equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22

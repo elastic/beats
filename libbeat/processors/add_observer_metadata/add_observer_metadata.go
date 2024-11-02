@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -55,10 +53,10 @@ const (
 )
 
 // New creates a new instance of the add_observer_metadata processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	p := &observerMetadata{
@@ -66,7 +64,7 @@ func New(cfg *config.C) (processors.Processor, error) {
 		data:   mapstr.NewPointer(nil),
 		logger: logp.NewLogger("add_observer_metadata"),
 	}
-	p.loadData()
+	_ = p.loadData()
 
 	if config.Geo != nil {
 		geoFields, err := util.GeoConfigToMap(*config.Geo)
@@ -91,7 +89,7 @@ func (p *observerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	if p.config.Overwrite || !keyExists {
 		if p.config.Overwrite {
-			event.Fields.Delete("observer")
+			_ = event.Fields.Delete("observer")
 		}
 		event.Fields.DeepUpdate(p.data.Get().Clone())
 
@@ -142,10 +140,10 @@ func (p *observerMetadata) loadData() error {
 		}
 
 		if len(ipList) > 0 {
-			data.Put("observer.ip", ipList)
+			_, _ = data.Put("observer.ip", ipList)
 		}
 		if len(hwList) > 0 {
-			data.Put("observer.mac", hwList)
+			_, _ = data.Put("observer.mac", hwList)
 		}
 	}
 

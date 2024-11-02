@@ -51,7 +51,7 @@ type pgsqlPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcp *common.TCPTuple,
@@ -139,7 +139,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
@@ -156,7 +156,7 @@ func New(
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *pgsqlConfig) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
 	pgsql.log = logp.NewLogger("pgsql")
@@ -240,8 +240,6 @@ func (pgsql *pgsqlPlugin) ConnectionTimeout() time.Duration {
 func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParsePgsql exception")
-
 	priv := pgsqlPrivateData{}
 	if private != nil {
 		var ok bool
@@ -334,8 +332,6 @@ func messageHasEnoughData(msg *pgsqlMessage) bool {
 func (pgsql *pgsqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInPgsqlStream exception")
-
 	if private == nil {
 		return private, false
 	}

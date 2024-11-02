@@ -18,9 +18,9 @@
 package cpu
 
 import (
+	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
@@ -59,7 +59,7 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 		case ticks:
 			opts.Ticks = true
 		default:
-			return opts, errors.Errorf("invalid cpu.metrics value '%v' (valid "+
+			return opts, fmt.Errorf("invalid cpu.metrics value '%v' (valid "+
 				"options are %v, %v, and %v)", metric, percentages,
 				normalizedPercentages, ticks)
 		}

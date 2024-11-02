@@ -1,6 +1,6 @@
 - name: storage
   description: Google Cloud Storage metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: api.request.count

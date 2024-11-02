@@ -19,8 +19,7 @@ package routes
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -45,20 +44,20 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Nats routes API response")
+		return fmt.Errorf("failure parsing Nats routes API response: %w", err)
 	}
 	metricSetFields, err := routesSchema.Apply(inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure applying routes schema")
+		return fmt.Errorf("failure applying routes schema: %w", err)
 	}
 
 	moduleFields, err := moduleSchema.Apply(inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure applying module schema")
+		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 	timestamp, err := util.GetNatsTimestamp(moduleFields)
 	if err != nil {
-		errors.Wrap(err, "failure parsing server timestamp")
+		return fmt.Errorf("failure parsing server timestamp: %w", err)
 	}
 	event := mb.Event{
 		MetricSetFields: metricSetFields,

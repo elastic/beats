@@ -51,7 +51,7 @@ func init() {
 	jsprocessor.RegisterPlugin("DropFields", newDropFields)
 }
 
-func newDropFields(c *conf.C) (processors.Processor, error) {
+func newDropFields(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Fields        []string `config:"fields"`
 		IgnoreMissing bool     `config:"ignore_missing"`

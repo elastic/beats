@@ -5,7 +5,12 @@
 <titleabbrev>copy_fields</titleabbrev>
 ++++
 
-The `copy_fields` processor copies a field to another one.
+The `copy_fields` processor takes the value of a field and copies it to a new
+field.
+
+You cannot use this processor to replace an existing field. If the target
+field already exists, you must <<drop-fields,drop>> or <<rename-fields,rename>>
+the field before using `copy_fields`.
 
 `fields`:: List of `from` and `to` pairs to copy from and to. It's supported to use `@metadata.` prefix for `from` and `to` and copy values not just in/from/to the event fields but also in/from/to the event metadata.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original is returned. If set to `false`,

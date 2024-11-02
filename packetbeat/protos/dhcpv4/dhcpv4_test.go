@@ -82,8 +82,8 @@ var (
 )
 
 func TestParseDHCPRequest(t *testing.T) {
-	_ = logp.TestingSetup()
-	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
+	logp.TestingSetup()
+	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +169,7 @@ func TestParseDHCPRequest(t *testing.T) {
 }
 
 func TestParseDHCPACK(t *testing.T) {
-	p, err := newPlugin(true, nil, procs.ProcessesWatcher{}, nil)
+	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

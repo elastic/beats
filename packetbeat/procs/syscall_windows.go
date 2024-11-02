@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 //nolint:structcheck // Struct fields reflect Windows layout.
 package procs

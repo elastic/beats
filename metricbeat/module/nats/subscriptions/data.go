@@ -19,8 +19,7 @@ package subscriptions
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -50,12 +49,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Nats subscriptions API response")
+		return fmt.Errorf("failure parsing Nats subscriptions API response: %w", err)
 
 	}
 	event.MetricSetFields, err = subscriptionsSchema.Apply(inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure applying subscriptions schema")
+		return fmt.Errorf("failure applying subscriptions schema: %w", err)
 	}
 
 	r.Event(event)

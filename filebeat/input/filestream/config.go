@@ -33,16 +33,20 @@ import (
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	Paths          []string           `config:"paths"`
-	Close          closerConfig       `config:"close"`
-	FileWatcher    *conf.Namespace    `config:"prospector"`
-	FileIdentity   *conf.Namespace    `config:"file_identity"`
-	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	ID           string          `config:"id"`
+	Paths        []string        `config:"paths"`
+	Close        closerConfig    `config:"close"`
+	FileWatcher  *conf.Namespace `config:"prospector"`
+	FileIdentity *conf.Namespace `config:"file_identity"`
+
+	// -1 means that registry will never be cleaned
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
+	TakeOver       bool               `config:"take_over"`
 }
 
 type closerConfig struct {
@@ -96,7 +100,7 @@ func defaultConfig() config {
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
-		CleanInactive:  0,
+		CleanInactive:  -1,
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
@@ -108,7 +112,7 @@ func defaultCloserConfig() closerConfig {
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
 			Removed:       true, // TODO check clean_removed option
-			Inactive:      0 * time.Second,
+			Inactive:      5 * time.Minute,
 			Renamed:       false,
 		},
 		Reader: readerCloserConfig{

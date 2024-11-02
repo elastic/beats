@@ -8,6 +8,19 @@ class Test(BaseTest):
 
     @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/22809')
     def test_udp(self):
+        """
+        Test UDP input with it binding to 127.0.0.1 (default).
+        """
+        self.send_events_with_bind()
+
+    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/22809')
+    def test_udp_with_wildcard_address(self):
+        """
+        Test UDP input with it binding to the wildcard address 0.0.0.0.
+        """
+        self.send_events_with_bind(bind="0.0.0.0")
+
+    def send_events_with_bind(self, bind="127.0.0.1"):
 
         host = "127.0.0.1"
         port = 8080
@@ -17,7 +30,7 @@ class Test(BaseTest):
   enabled: true
 """
 
-        input_raw = input_raw.format(host, port)
+        input_raw = input_raw.format(bind, port)
 
         self.render_config_template(
             input_raw=input_raw,

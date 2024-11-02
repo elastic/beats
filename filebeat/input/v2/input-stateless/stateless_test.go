@@ -107,6 +107,9 @@ func TestStateless_Run(t *testing.T) {
 			},
 		}), nil)
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
 		// connector creates a client the blocks forever until the shutdown signal is received
 		var publishCalls atomic.Int
 		connector := pubtest.FakeConnector{
@@ -114,14 +117,12 @@ func TestStateless_Run(t *testing.T) {
 				return &pubtest.FakeClient{
 					PublishFunc: func(event beat.Event) {
 						publishCalls.Inc()
-						<-config.CloseRef.Done()
+						// Unlock Publish once the input has been cancelled
+						<-ctx.Done()
 					},
 				}, nil
 			},
 		}
-
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
 
 		var wg sync.WaitGroup
 		var err error

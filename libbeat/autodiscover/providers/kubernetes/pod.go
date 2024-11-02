@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !aix
-// +build !aix
 
 package kubernetes
 
@@ -25,7 +24,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -39,14 +40,16 @@ import (
 )
 
 type pod struct {
-	uuid             uuid.UUID
-	config           *Config
-	metagen          metadata.MetaGen
-	logger           *logp.Logger
-	publishFunc      func([]bus.Event)
-	watcher          kubernetes.Watcher
-	nodeWatcher      kubernetes.Watcher
-	namespaceWatcher kubernetes.Watcher
+	uuid              uuid.UUID
+	config            *Config
+	metagen           metadata.MetaGen
+	logger            *logp.Logger
+	publishFunc       func([]bus.Event)
+	watcher           kubernetes.Watcher
+	nodeWatcher       kubernetes.Watcher
+	namespaceWatcher  kubernetes.Watcher
+	replicasetWatcher kubernetes.Watcher
+	jobWatcher        kubernetes.Watcher
 
 	// Mutex used by configuration updates not triggered by the main watcher,
 	// to avoid race conditions between cross updates and deletions.
@@ -57,6 +60,8 @@ type pod struct {
 // NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
+
+	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -93,45 +98,101 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
-	options := kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		Namespace:   config.Namespace,
+	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
 	}
 
-	metaConf := config.AddResourceMetadata
-	nodeWatcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+	if metaConf.Node.Enabled() || config.Hints.Enabled() {
+		options := kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Node:         config.Node,
+			HonorReSyncs: true,
+		}
+		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
 	}
-	namespaceWatcher, err := kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
+		}, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
 	}
-	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, metaConf)
+
+	// Resource is Pod, so we need to create watchers for Replicasets and Jobs that it might belong to
+	// in order to be able to retrieve 2nd layer Owner metadata like in case of:
+	// Deployment -> Replicaset -> Pod
+	// CronJob -> job -> Pod
+	if metaConf.Deployment {
+		metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+		if err != nil {
+			logger.Errorf("Error creating metadata client due to error %+v", err)
+		}
+		replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+			"resource_metadata_enricher_rs",
+			client,
+			metadataClient,
+			schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+			kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			},
+			nil,
+			metadata.RemoveUnnecessaryReplicaSetData,
+		)
+		if err != nil {
+			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
+		}
+	}
+	if metaConf.CronJob {
+		jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
+		}, nil)
+		if err != nil {
+			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
+		}
+	}
+
+	metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
 	p := &pod{
-		config:           config,
-		uuid:             uuid,
-		publishFunc:      publish,
-		metagen:          metaGen,
-		logger:           logger,
-		watcher:          watcher,
-		nodeWatcher:      nodeWatcher,
-		namespaceWatcher: namespaceWatcher,
+		config:            config,
+		uuid:              uuid,
+		publishFunc:       publish,
+		metagen:           metaGen,
+		logger:            logger,
+		watcher:           watcher,
+		nodeWatcher:       nodeWatcher,
+		namespaceWatcher:  namespaceWatcher,
+		replicasetWatcher: replicaSetWatcher,
+		jobWatcher:        jobWatcher,
 	}
 
 	watcher.AddEventHandler(p)
 
 	if nodeWatcher != nil && (config.Hints.Enabled() || metaConf.Node.Enabled()) {
-		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), p.nodeWatcher, &p.crossUpdate)
 		nodeWatcher.AddEventHandler(updater)
 	}
 
 	if namespaceWatcher != nil && (config.Hints.Enabled() || metaConf.Namespace.Enabled()) {
-		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), p.namespaceWatcher, &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}
 
@@ -178,23 +239,26 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta, container mapstr.M
 
 	annotations := make(mapstr.M, 0)
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(mapstr.M)
-			if len(anns) != 0 {
-				annotations = anns.Clone()
+	rawMeta, found := event["kubernetes"]
+	if found {
+		kubeMetaMap, ok := rawMeta.(mapstr.M)
+		if ok {
+			kubeMeta = kubeMetaMap
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				anns, _ := rawAnn.(mapstr.M)
+				if len(anns) != 0 {
+					annotations = anns.Clone()
+				}
 			}
-		}
 
-		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
-			if len(namespaceAnnotations) != 0 {
-				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+			// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+			if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+				namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
+				if len(namespaceAnnotations) != 0 {
+					annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+				}
 			}
 		}
 	}
@@ -208,18 +272,24 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(mapstr.M)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
+	if rawCont, found := kubeMeta["container"]; found {
+		if containerMap, ok := rawCont.(mapstr.M); ok {
+			container = containerMap
+			// This would end up adding a runtime entry into the event. This would make sure
+			// that there is not an attempt to spin up a docker input for a rkt container and when a
+			// rkt input exists it would be natively supported.
+			e["container"] = container
+		}
 	}
 
 	cname := utils.GetContainerName(container)
 
 	// Generate hints based on the cumulative of both namespace and pod annotations.
-	hints := utils.GenerateHints(annotations, cname, p.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, cname, p.config.Prefix, true, AllSupportedHints)
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	for _, value := range incorrecthints {
+		p.logger.Debugf("provided hint: %s/%s is not in the supported list", p.config.Prefix, value)
+	}
 	p.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -245,6 +315,20 @@ func (p *pod) Start() error {
 		}
 	}
 
+	if p.replicasetWatcher != nil {
+		err := p.replicasetWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
+	if p.jobWatcher != nil {
+		err := p.jobWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
 	return p.watcher.Start()
 }
 
@@ -258,6 +342,14 @@ func (p *pod) Stop() {
 
 	if p.nodeWatcher != nil {
 		p.nodeWatcher.Stop()
+	}
+
+	if p.replicasetWatcher != nil {
+		p.replicasetWatcher.Stop()
+	}
+
+	if p.jobWatcher != nil {
+		p.jobWatcher.Stop()
 	}
 }
 
@@ -358,7 +450,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 		ports = []kubernetes.ContainerPort{{ContainerPort: 0}}
 	}
 
-	var events []bus.Event
+	events := []bus.Event{}
 	portsMap := mapstr.M{}
 
 	ShouldPut(meta, "container", cmeta, p.logger)

@@ -39,7 +39,7 @@
         ]
     },
     {
-        "@timestamp": "2023-03-08T07:46:54.000-02:00",
+        "@timestamp": "2024-03-08T07:46:54.000-02:00",
         "cyberarkpas.audit.action": "Security warning - The Signature Hash Algorithm of the Vault certificate is SHA1.",
         "cyberarkpas.audit.desc": "Security warning - The Signature Hash Algorithm of the Vault certificate is SHA1.",
         "cyberarkpas.audit.issuer": "Builtin",

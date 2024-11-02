@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -39,9 +40,10 @@ type Loader interface {
 
 // ESLoader implements Loader interface for loading templates to Elasticsearch.
 type ESLoader struct {
-	client  ESClient
-	builder *templateBuilder
-	log     *logp.Logger
+	client          ESClient
+	lifecycleClient lifecycle.ClientHandler
+	builder         *templateBuilder
+	log             *logp.Logger
 }
 
 // ESClient is a subset of the Elasticsearch client API capable of
@@ -49,6 +51,7 @@ type ESLoader struct {
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() version.V
+	IsServerless() bool
 }
 
 // FileLoader implements Loader interface for loading templates to a File.
@@ -69,30 +72,34 @@ type StatusError struct {
 }
 
 type templateBuilder struct {
-	log *logp.Logger
+	log          *logp.Logger
+	isServerless bool
 }
 
 // NewESLoader creates a new template loader for ES
-func NewESLoader(client ESClient) *ESLoader {
-	return &ESLoader{client: client, builder: newTemplateBuilder(), log: logp.NewLogger("template_loader")}
+func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler) (*ESLoader, error) {
+	if client == nil {
+		return nil, errors.New("can not load template without active Elasticsearch client")
+	}
+	return &ESLoader{client: client, lifecycleClient: lifecycleClient,
+		builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}, nil
 }
 
 // NewFileLoader creates a new template loader for the given file.
-func NewFileLoader(c FileClient) *FileLoader {
-	return &FileLoader{client: c, builder: newTemplateBuilder(), log: logp.NewLogger("file_template_loader")}
+func NewFileLoader(c FileClient, isServerless bool) *FileLoader {
+	// other components of the file loader will fail if both ILM and DSL are set,
+	// so at this point it's fairly safe to just pass cfg.DSL.Enabled
+	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless), log: logp.NewLogger("file_template_loader")}
 }
 
-func newTemplateBuilder() *templateBuilder {
-	return &templateBuilder{log: logp.NewLogger("template")}
+func newTemplateBuilder(serverlessMode bool) *templateBuilder {
+	return &templateBuilder{log: logp.NewLogger("template"), isServerless: serverlessMode}
 }
 
 // Load checks if the index mapping template should be loaded.
 // In case the template is not already loaded or overwriting is enabled, the
 // template is built and written to index.
 func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, migration bool) error {
-	if l.client == nil {
-		return errors.New("can not load template without active Elasticsearch client")
-	}
 
 	// build template from config
 	tmpl, err := l.builder.template(config, info, l.client.GetVersion(), migration)
@@ -141,6 +148,17 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 	if dataStreamExist {
 		l.log.Infof("Data stream with name %q already exists.", templateName)
+		// for serverless, we can update the lifecycle policy safely
+		// Note that updating the lifecycle will delete older documents
+		// if the policy requires it; i.e, changing the data_retention from 10d to 7d
+		// will delete the documents older than 7 days.
+		if l.client.IsServerless() {
+			l.log.Infof("overwriting lifecycle policy")
+			err = l.lifecycleClient.CreatePolicyFromConfig()
+			if err != nil {
+				return fmt.Errorf("error updating lifecycle policy: %w", err)
+			}
+		}
 		return nil
 	}
 
@@ -233,7 +251,7 @@ func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVers
 		b.log.Info("template config not enabled")
 		return nil, nil
 	}
-	tmpl, err := New(info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
+	tmpl, err := New(b.isServerless, info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template instance: %w", err)
 	}

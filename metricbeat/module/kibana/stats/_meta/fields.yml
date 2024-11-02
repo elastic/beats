@@ -72,6 +72,20 @@
               type: long
             - name: used_in_bytes
               type: long
+        - name: cpuacct
+          type: group
+          fields:
+            - name: control_group
+              type: keyword
+            - name: usage_nanos
+              type: long
+        - name: cgroup_memory
+          type: group
+          fields:
+            - name: current_in_bytes
+              type: long
+            - name: swap_current_in_bytes
+              type: long
         - name: load
           type: group
           fields:
@@ -92,12 +106,33 @@
       fields:
       - name: memory.resident_set_size.bytes
         type: long
+      - name: memory.array_buffers.bytes
+        type: long
+      - name: memory.external.bytes
+        type: long
       - name: uptime.ms
         type: long
       - name: event_loop_delay.ms
         type: scaled_float
         description: >
           Event loop delay in milliseconds
+      - name: event_loop_utilization
+        type: group
+        description: >
+          The ratio of time the event loop is not idling in the event provider to the total time the event loop is running.
+        fields:
+        - name: active
+          type: scaled_float
+          description: >
+            Duration of time event loop has been active since last measurement.
+        - name: idle
+          type: scaled_float
+          description: >
+            Duration of time event loop has been idle since last measurement.
+        - name: utilization
+          type: scaled_float
+          description: >
+            Computed utilization value representing ratio of active to idle time since last measurement.
       - name: memory.heap
         type: group
         description: >

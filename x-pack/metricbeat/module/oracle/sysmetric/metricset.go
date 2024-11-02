@@ -67,7 +67,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-//Load takes the events and sends them to Elasticsearch.
+// Load takes the events and sends them to Elasticsearch.
 func (m *MetricSet) Load(ctx context.Context, events []mb.Event, reporter mb.ReporterV2) {
 	for _, event := range events {
 		if reported := reporter.Event(event); !reported {

@@ -18,7 +18,7 @@
 package raid
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -62,7 +62,7 @@ func blockto1024(b int64) int64 {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	devices, err := blockinfo.ListAll(m.mod.ResolveHostFS("/sys/block"))
 	if err != nil {
-		return errors.Wrap(err, "failed to parse sysfs")
+		return fmt.Errorf("failed to parse sysfs: %w", err)
 	}
 
 	for _, blockDev := range devices {

@@ -20,6 +20,7 @@ package procs
 import (
 	"net"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -40,6 +41,7 @@ var (
 
 // ProcessWatcher implements process enrichment for network traffic.
 type ProcessesWatcher struct {
+	mu           sync.Mutex
 	portProcMap  map[applayer.Transport]map[endpoint]portProcMapping
 	localAddrs   []net.IP         // localAddrs lists IP addresses that are to be treated as local.
 	processCache map[int]*process // processCache is a time-expiration cache of process details keyed on PID.
@@ -182,11 +184,9 @@ func (proc *ProcessesWatcher) isLocalIP(ip net.IP) bool {
 }
 
 func (proc *ProcessesWatcher) findProc(address net.IP, port uint16, transport applayer.Transport) *process {
-	// This should not be necessary; none of the
-	// dependency code panics in normal operation.
-	defer logp.Recover("FindProc exception")
-
+	proc.mu.Lock()
 	procMap, ok := proc.portProcMap[transport]
+	proc.mu.Unlock()
 	if !ok {
 		return nil
 	}
@@ -254,6 +254,8 @@ func (proc *ProcessesWatcher) expireProcessCache() {
 }
 
 func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e endpoint, pid int) {
+	proc.mu.Lock()
+	defer proc.mu.Unlock()
 	prev, ok := proc.portProcMap[transport][e]
 	if ok && prev.pid == pid {
 		// This port->pid mapping already exists

@@ -11,11 +11,11 @@ import (
 )
 
 type cursor struct {
-	log *logp.Logger
-
 	cfg cursorConfig
 
 	state mapstr.M
+
+	log *logp.Logger
 }
 
 func newCursor(cfg cursorConfig, log *logp.Logger) *cursor {
@@ -50,7 +50,7 @@ func (c *cursor) update(trCtx *transformContext) {
 	}
 
 	for k, cfg := range c.cfg {
-		v, _ := cfg.Value.Execute(trCtx, transformable{}, "", cfg.Default, c.log)
+		v, _ := cfg.Value.Execute(trCtx, transformable{}, k, cfg.Default, c.log)
 		if v != "" || !cfg.mustIgnoreEmptyValue() {
 			_, _ = c.state.Put(k, v)
 			c.log.Debugf("cursor.%s stored with %s", k, v)

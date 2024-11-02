@@ -19,25 +19,48 @@ package memqueue
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
-	Events         int           `config:"events" validate:"min=32"`
-	FlushMinEvents int           `config:"flush.min_events" validate:"min=0"`
-	FlushTimeout   time.Duration `config:"flush.timeout"`
+	Events int `config:"events" validate:"min=32"`
+	// This field is named MaxGetRequest because its logical effect is to give
+	// a maximum on the number of events a Get request can return, but the
+	// user-exposed name is "flush.min_events" for backwards compatibility,
+	// since it used to control buffer size in the internal buffer chain.
+	MaxGetRequest int           `config:"flush.min_events" validate:"min=0"`
+	FlushTimeout  time.Duration `config:"flush.timeout"`
 }
 
 var defaultConfig = config{
-	Events:         4 * 1024,
-	FlushMinEvents: 2 * 1024,
-	FlushTimeout:   1 * time.Second,
+	Events:        3200,
+	MaxGetRequest: 1600,
+	FlushTimeout:  10 * time.Second,
 }
 
 func (c *config) Validate() error {
-	if c.FlushMinEvents > c.Events {
+	if c.MaxGetRequest > c.Events {
 		return errors.New("flush.min_events must be less events")
 	}
-
 	return nil
+}
+
+// SettingsForUserConfig unpacks a ucfg config from a Beats queue
+// configuration and returns the equivalent memqueue.Settings object.
+func SettingsForUserConfig(cfg *c.C) (Settings, error) {
+	config := defaultConfig
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
+		}
+	}
+	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
+	return Settings{
+		Events:        config.Events,
+		MaxGetRequest: config.MaxGetRequest,
+		FlushTimeout:  config.FlushTimeout,
+	}, nil
 }

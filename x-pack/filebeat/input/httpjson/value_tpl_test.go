@@ -19,6 +19,8 @@ import (
 )
 
 func TestValueTpl(t *testing.T) {
+	logp.TestingSetup()
+
 	cases := []struct {
 		name          string
 		value         string
@@ -136,6 +138,41 @@ func TestValueTpl(t *testing.T) {
 		{
 			name:        "func parseDate with custom layout",
 			value:       `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006") ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 12:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with RFC3339Nano and timezone offset",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32.1234567Z" "-0700" "RFC3339Nano" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 19:25:32.1234567 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ defaults to RFC3339 with implicit offset and timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32+04:00" "-0700" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 19:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ defaults to RFC3339 with IANA timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32Z" "America/New_York" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 17:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with custom layout and timezone name",
+			value:       `[[ parseDateInTZ "Thu Nov  5 12:25:32 2020" "Europe/Paris" "Mon Jan _2 15:04:05 2006" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 11:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with invalid timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32Z" "Invalid/Timezone" ]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "2020-11-05 12:25:32 +0000 UTC",
@@ -302,6 +339,24 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "https://example.com/default",
 		},
 		{
+			name:  "func getRFC5988Link no space link parameters",
+			value: `[[ getRFC5988Link "next" .last_response.header.Link ]]`,
+			paramCtx: &transformContext{
+				firstEvent: &mapstr.M{},
+				lastEvent:  &mapstr.M{},
+				lastResponse: newTestResponse(
+					nil,
+					http.Header{"Link": []string{
+						`<https://example.com/api/v1/users?before=00ubfjQEMYBLRUWIEDKK>;title="Page 1";rel="previous",
+						<https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK>;title="Page 3";rel="next"`,
+					}},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "https://example.com/api/v1/users?after=00ubfjQEMYBLRUWIEDKK",
+		},
+		{
 			name:        "can execute functions pipeline",
 			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
@@ -337,6 +392,76 @@ func TestValueTpl(t *testing.T) {
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "4",
+		},
+		{
+			name:        "func min int",
+			value:       `[[min 4 1]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1",
+		},
+		{
+			name:        "func max int",
+			value:       `[[max 4 1]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4",
+		},
+		{
+			name:        "func max float",
+			value:       `[[max 1.23 4.666]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4.666",
+		},
+		{
+			name:        "func min float",
+			value:       `[[min 1.23 4.666]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1.23",
+		},
+		{
+			name:        "func min string",
+			value:       `[[min "a" "b"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "a",
+		},
+		{
+			name:        "func max string",
+			value:       `[[max "a" "b"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "b",
+		},
+		{
+			name:        "func min int64 unix seconds",
+			value:       `[[ min (now.Unix) 1689771139 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1689771139",
+		},
+		{
+			name:        "func min int year",
+			value:       `[[ min (now.Year) 2020 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020",
+		},
+		{
+			name:        "func max duration",
+			value:       `[[ max (parseDuration "59m") (parseDuration "1h") ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1h0m0s",
+		},
+		{
+			name:        "func min int ",
+			value:       `[[ min (now.Year) 2020 ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020",
 		},
 		{
 			name:        "func sha1 hmac Hex",
@@ -676,7 +801,7 @@ func TestValueTpl(t *testing.T) {
 				assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
 			}
 
-			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, "", defTpl, logp.NewLogger(""))
+			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, tc.name, defTpl, logp.NewLogger(""))
 			assert.Equal(t, tc.expectedVal, got)
 			if tc.expectedError == "" {
 				assert.NoError(t, err)

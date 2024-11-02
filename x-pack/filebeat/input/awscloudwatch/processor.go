@@ -11,7 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -20,7 +19,6 @@ type logProcessor struct {
 	log       *logp.Logger
 	metrics   *inputMetrics
 	publisher beat.Client
-	ack       *awscommon.EventACKTracker
 }
 
 func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
@@ -31,41 +29,33 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 		log:       log,
 		metrics:   metrics,
 		publisher: publisher,
-		ack:       awscommon.NewEventACKTracker(ctx),
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroup string, regionName string) {
+func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroupId string, regionName string) {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, logGroup, regionName)
-		p.publish(p.ack, &event)
+		event := createEvent(logEvent, logGroupId, regionName)
+		p.metrics.cloudwatchEventsCreatedTotal.Inc()
+		p.publisher.Publish(event)
 	}
 }
 
-func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
-	ack.Add()
-	event.Private = ack
-	p.metrics.cloudwatchEventsCreatedTotal.Inc()
-	p.publisher.Publish(*event)
-}
-
-func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {
+func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
 		Fields: mapstr.M{
-			"message":       *logEvent.Message,
-			"log.file.path": logGroup + "/" + *logEvent.LogStreamName,
+			"message": *logEvent.Message,
+			"log": mapstr.M{
+				"file": mapstr.M{
+					"path": logGroupId + "/" + *logEvent.LogStreamName,
+				},
+			},
 			"event": mapstr.M{
 				"id":       *logEvent.EventId,
 				"ingested": time.Now(),
 			},
-			"awscloudwatch": mapstr.M{
-				"log_group":      logGroup,
-				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
-			},
 			"aws.cloudwatch": mapstr.M{
-				"log_group":      logGroup,
+				"log_group":      logGroupId,
 				"log_stream":     *logEvent.LogStreamName,
 				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
 			},

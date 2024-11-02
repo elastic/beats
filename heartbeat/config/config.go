@@ -21,9 +21,16 @@
 package config
 
 import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type LocationWithID struct {
@@ -34,12 +41,14 @@ type LocationWithID struct {
 // Config defines the structure of heartbeat.yml.
 type Config struct {
 	RunOnce        bool                 `config:"run_once"`
+	PublishTimeout time.Duration        `config:"publish_timeout"`
 	Monitors       []*conf.C            `config:"monitors"`
 	ConfigMonitors *conf.C              `config:"config.monitors"`
 	Scheduler      Scheduler            `config:"scheduler"`
 	Autodiscover   *autodiscover.Config `config:"autodiscover"`
 	Jobs           map[string]*JobLimit `config:"jobs"`
 	RunFrom        *LocationWithID      `config:"run_from"`
+	SocketTrace    *SocketTrace         `config:"socket_trace"`
 }
 
 type JobLimit struct {
@@ -53,10 +62,33 @@ type Scheduler struct {
 }
 
 // DefaultConfig is the canonical instantiation of Config.
-var DefaultConfig = Config{
-	Jobs: map[string]*JobLimit{
-		"browser": {
-			Limit: 2,
-		},
-	},
+func DefaultConfig() *Config {
+	limits := map[string]*JobLimit{
+		"browser": {Limit: 2},
+	}
+
+	// Read the env key SYNTHETICS_LIMIT_{TYPE} for each type of monitor to set scaling limits
+	// hard coded list of types to avoid cycles in current plugin system.
+	// TODO: refactor plugin system to DRY this up
+	for _, t := range []string{"http", "tcp", "icmp", "browser"} {
+		envKey := fmt.Sprintf("SYNTHETICS_LIMIT_%s", strings.ToUpper(t))
+		if limitStr := os.Getenv(envKey); limitStr != "" {
+			tLimitVal, err := strconv.ParseInt(limitStr, 10, 64)
+			if err != nil {
+				logp.L().Warnf("Could not parse job limit env var %s with value '%s' as integer", envKey, limitStr)
+				continue
+			}
+
+			limits[t] = &JobLimit{Limit: tLimitVal}
+		}
+	}
+
+	return &Config{
+		Jobs: limits,
+	}
+}
+
+type SocketTrace struct {
+	Path string        `config:"path"`
+	Wait time.Duration `config:"wait"`
 }

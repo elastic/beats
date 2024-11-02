@@ -19,6 +19,9 @@ package tcp
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -57,7 +60,7 @@ type TCP struct {
 }
 
 // Creates and returns a new Tcp.
-func NewTCP(p protos.Protocols, id, device string) (*TCP, error) {
+func NewTCP(p protos.Protocols, id, device string, idx int) (*TCP, error) {
 	isDebug = logp.IsDebug("tcp")
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
@@ -68,7 +71,7 @@ func NewTCP(p protos.Protocols, id, device string) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
-		metrics:   newInputMetrics(id, device),
+		metrics:   newInputMetrics(fmt.Sprintf("%s_%d", id, idx), device, portMap),
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,
@@ -95,11 +98,9 @@ func (tcp *TCP) removalListener(_ common.Key, value common.Value) {
 }
 
 func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet) {
-	// This Recover should catch all exceptions in
-	// protocol modules.
-	defer logp.Recover("Process tcp exception")
-
 	tcp.expiredConns.notifyAll()
+
+	tcp.metrics.logFlags(tcphdr)
 
 	stream, created := tcp.getStream(pkt)
 	if stream.conn == nil {
@@ -393,6 +394,11 @@ type inputMetrics struct {
 
 	lastPacket time.Time
 
+	// TCP flag counts.
+	fin, syn, rst, psh, ack, urg, ece, cwr, ns *monitoring.Uint
+	// Total number of headers, including zero length packets.
+	headers *monitoring.Uint
+
 	device         *monitoring.String // name of the device being monitored
 	packets        *monitoring.Uint   // number of packets processed
 	bytes          *monitoring.Uint   // number of bytes processed
@@ -404,20 +410,31 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the TCP processor. If id or
 // device is empty a nil inputMetric is returned.
-func newInputMetrics(id, device string) *inputMetrics {
+func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *inputMetrics {
 	if id == "" || device == "" {
 		// An empty id signals to not record metrics,
 		// while an empty device means we are reading
 		// from a pcap file and no metrics are needed.
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry("tcp", id+"::"+device, nil)
+	devID := fmt.Sprintf("%s-tcp%s::%s", id, portList(ports), device)
+	reg, unreg := inputmon.NewInputRegistry("tcp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),
 		packets:        monitoring.NewUint(reg, "received_events_total"),
 		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
 		overlapped:     monitoring.NewUint(reg, "tcp_overlaps"),
+		fin:            monitoring.NewUint(reg, "fin_flags_total"),
+		syn:            monitoring.NewUint(reg, "syn_flags_total"),
+		rst:            monitoring.NewUint(reg, "rst_flags_total"),
+		psh:            monitoring.NewUint(reg, "psh_flags_total"),
+		ack:            monitoring.NewUint(reg, "ack_flags_total"),
+		urg:            monitoring.NewUint(reg, "urg_flags_total"),
+		ece:            monitoring.NewUint(reg, "ece_flags_total"),
+		cwr:            monitoring.NewUint(reg, "cwr_flags_total"),
+		ns:             monitoring.NewUint(reg, "ns_flags_total"),
+		headers:        monitoring.NewUint(reg, "received_headers_total"),
 		dropped:        monitoring.NewInt(reg, "tcp.dropped_because_of_gaps"), // Name and type retained for compatibility.
 		arrivalPeriod:  metrics.NewUniformSample(1024),
 		processingTime: metrics.NewUniformSample(1024),
@@ -430,6 +447,59 @@ func newInputMetrics(id, device string) *inputMetrics {
 	out.device.Set(device)
 
 	return out
+}
+
+// portList returns a dash-separated list of port numbers sorted ascending. A leading
+// dash is prepended to the list if it is not empty.
+func portList(m map[uint16]protos.Protocol) string {
+	if len(m) == 0 {
+		return ""
+	}
+	ports := make([]int, 0, len(m))
+	for p := range m {
+		ports = append(ports, int(p))
+	}
+	sort.Ints(ports)
+	s := make([]string, len(ports)+1)
+	for i, p := range ports {
+		s[i+1] = strconv.FormatInt(int64(p), 10)
+	}
+	return strings.Join(s, "-")
+}
+
+// logFlags logs flag metric for the given packet header.
+func (m *inputMetrics) logFlags(hdr *layers.TCP) {
+	if m == nil {
+		return
+	}
+	m.headers.Add(1)
+	if hdr.FIN {
+		m.fin.Add(1)
+	}
+	if hdr.SYN {
+		m.syn.Add(1)
+	}
+	if hdr.RST {
+		m.rst.Add(1)
+	}
+	if hdr.PSH {
+		m.psh.Add(1)
+	}
+	if hdr.ACK {
+		m.ack.Add(1)
+	}
+	if hdr.URG {
+		m.urg.Add(1)
+	}
+	if hdr.ECE {
+		m.ece.Add(1)
+	}
+	if hdr.CWR {
+		m.cwr.Add(1)
+	}
+	if hdr.NS {
+		m.ns.Add(1)
+	}
 }
 
 // log logs metric for the given packet.

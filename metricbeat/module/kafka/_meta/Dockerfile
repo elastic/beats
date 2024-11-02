@@ -8,7 +8,12 @@ ENV KAFKA_LOGS_DIR="/kafka-logs"
 ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
-RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat dnsutils
+# TODO: use newer base
+RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list \
+    && sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list \
+    && sed -i '/stretch-updates/d' /etc/apt/sources.list
+
+RUN apt-get update && apt-get install -y curl openjdk-8-jre-headless netcat-openbsd dnsutils
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
     curl -J -L -s -f -o - https://github.com/kadwanev/retry/releases/download/1.0.1/retry-1.0.1.tar.gz | tar xfz - -C /usr/local/bin && \

@@ -47,6 +47,18 @@ def build(
         default_registry(docker_registry)
         print("Docker registry: {}".format(docker_registry))
 
+    if k8s_env == "aws":
+        # In order to push to AWS you need to run:
+        #   aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin XXXXX.dkr.ecr.us-east-2.amazonaws.com/metricbeat-debug
+        #
+        # More info at https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html
+        docker_registry = "XXXXX.dkr.ecr.us-east-2.amazonaws.com".format(
+            docker_image)
+
+        default_registry(docker_registry)
+        print("Docker registry: {}".format(docker_registry))
+
+
     print("Docker image: {}".format(docker_image))
 
     docker_file = '{}/Dockerfile.{}'.format(beat, mode)
@@ -125,7 +137,7 @@ def k8s_expose(
 # `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
 # `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
 # `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
-# `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
+# `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP, `aws` to use a docker repo on AWS
 # `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
 #       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node. One of the workers (eg. worker1)
 #       should have a taint and a label (for node affinity) to make sure that only the debugger runs on that node. You need to run the following commands:
@@ -149,7 +161,7 @@ def beat(
     if arch not in ["arm64", "amd64"]:
         print("Invalid arch: {}".format(arch))
         exit(-1)
-    if k8s_env not in ["kind", "gcp"]:
+    if k8s_env not in ["kind", "gcp", "aws"]:
         print("Invalid k8s_env: {}".format(k8s_env))
         exit(-1)
     if k8s_cluster not in ["single", "multi"]:
@@ -191,9 +203,19 @@ def beat(
     k8s_expose(beat=beat, mode=mode, k8s_cluster=k8s_cluster)
 
 
-beat(beat="heartbeat",
+# Note: Select only one of the following examples or modify one with the parameters you want to use
+
+# Run metricbeat in run mode against a single node k8s cluster with a docker repo on AWS
+# beat(beat="metricbeat",
+#      mode="run",
+#      arch="amd64",
+#      k8s_env="aws",
+#      k8s_cluster="single",
+#      )
+
+# Run on Mac M1 against a single node k8s cluster
+beat(beat="metricbeat",
      mode="debug",
-    #  mode="run",
      arch="arm64",
      k8s_env="kind",
      k8s_cluster="single",

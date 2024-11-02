@@ -3,14 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (!linux || !cgo) && !windows
-// +build !linux !cgo
-// +build !windows
 
 package pkg
 
 import "errors"
 
-func listRPMPackages() ([]*Package, error) {
+func listRPMPackages(_ bool) ([]*Package, error) {
 	return nil, errors.New("listing RPM packages is only supported on Linux")
 }
 

@@ -82,6 +82,16 @@ processors:
             - process
           type:
             - change
+        "8":
+          category:
+            - process
+          type:
+            - change
+        "9":
+          category:
+            - process
+          type:
+            - access
         "10":
           category:
             - process
@@ -130,6 +140,21 @@ processors:
             - file
           type:
             - access
+        "19":
+          category:
+            - process
+          type:
+            - creation
+        "20":
+          category:
+            - process
+          type:
+            - creation
+        "21":
+          category:
+            - process
+          type:
+            - access
         "22":
           category:
             - network
@@ -155,6 +180,23 @@ processors:
             - file
           type:
             - deletion
+        "27":
+          category:
+            - file
+          type:
+            - creation
+            - denied
+        "28":
+          category:
+            - file
+          type:
+            - deletion
+            - denied
+        "255":
+          category:
+            - process
+          type:
+            - error
       tag: Add ECS categorization fields
       source: |-
         if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
@@ -740,15 +782,20 @@ processors:
 
           if (answer.startsWith("type:")) {
             def parts = /\s+/.split(answer);
-            if (parts.length != 3) {
+            if (parts.length < 2) {
               throw new Exception("unexpected QueryResult format");
             }
-
-            answers.add([
-              "type": params[parts[1]],
-              "data": parts[2]
-            ]);
-            relatedHosts.add(parts[2]);
+            if (parts.length == 3) {
+              answers.add([
+                "type": params[parts[1]],
+                "data": parts[2]
+              ]);
+              relatedHosts.add(parts[2]);
+            } else {
+              answers.add([
+                "type": params[parts[1]]
+              ]);
+            }
           } else {
             answer = answer.replace("::ffff:", "");
             ips.add(answer);

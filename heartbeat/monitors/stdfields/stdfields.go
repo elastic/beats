@@ -33,16 +33,17 @@ type ServiceFields struct {
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID                       string              `config:"id"`
-	Name                     string              `config:"name"`
-	Type                     string              `config:"type" validate:"required"`
-	Schedule                 *schedule.Schedule  `config:"schedule" validate:"required"`
+	ID                string             `config:"id"`
+	Name              string             `config:"name"`
+	Type              string             `config:"type" validate:"required"`
+	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	MaintenanceWindows       []maintwin.MaintWin `config:"maintenance_windows" `
 	ParsedMaintenanceWindows []maintwin.ParsedMaintWin
-	Timeout                  time.Duration `config:"timeout"`
-	Service                  ServiceFields `config:"service"`
-	Origin                   string        `config:"origin"`
-	LegacyServiceName        string        `config:"service_name"`
+	Timeout           time.Duration      `config:"timeout"`
+	Service           ServiceFields      `config:"service"`
+	Origin            string             `config:"origin"`
+	LegacyServiceName string             `config:"service_name"`
+	MaxAttempts       uint16             `config:"max_attempts"`
 	// Used by zip_url and local monitors
 	// kibana originating monitors only run one journey at a time
 	// and just use the `fields` syntax / manually set monitor IDs
@@ -54,10 +55,13 @@ type StdMonitorFields struct {
 		Local  *config.C `config:"local"`
 	} `config:"source"`
 	RunFrom *hbconfig.LocationWithID `config:"run_from"`
+	// Set to true by monitor.go if monitor configuration is unrunnable
+	// Maybe there's a more elegant way to handle this
+	BadConfig bool
 }
 
 func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
-	sFields := StdMonitorFields{Enabled: true}
+	sFields := StdMonitorFields{Enabled: true, MaxAttempts: 1}
 
 	if err := conf.Unpack(&sFields); err != nil {
 		return sFields, fmt.Errorf("error unpacking monitor plugin config: %w", err)

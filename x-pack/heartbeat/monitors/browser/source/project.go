@@ -1,8 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
-// +build linux darwin
+//go:build linux || darwin || synthetics
 
 package source
 
@@ -18,13 +17,18 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
+	"syscall"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type ProjectSource struct {
 	Content         string `config:"content" json:"content"`
 	TargetDirectory string
+	fetched         bool
+	mtx             sync.Mutex
 }
 
 var ErrNoContent = fmt.Errorf("no 'content' value specified for project monitor source")
@@ -38,6 +42,14 @@ func (p *ProjectSource) Validate() error {
 }
 
 func (p *ProjectSource) Fetch() error {
+	// We only need to unzip the source exactly once
+	p.mtx.Lock()
+	defer p.mtx.Unlock()
+	if p.fetched {
+		logp.L().Debugf("browser project: re-use already unpacked source: %s", p.Workdir())
+		return nil
+	}
+
 	decodedBytes, err := base64.StdEncoding.DecodeString(p.Content)
 	if err != nil {
 		return err
@@ -60,6 +72,13 @@ func (p *ProjectSource) Fetch() error {
 		return fmt.Errorf("could not make temp dir for unzipping project source: %w", err)
 	}
 
+	logp.L().Debugf("browser project: unpack source: %s", p.Workdir())
+
+	err = os.Chmod(p.TargetDirectory, defaultMod)
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to temp dir: %w", defaultMod, err)
+	}
+
 	err = unzip(tf, p.Workdir(), "")
 	if err != nil {
 		p.Close()
@@ -76,6 +95,8 @@ func (p *ProjectSource) Fetch() error {
 		}
 	}
 
+	// We've succeeded, mark the fetch as a success
+	p.fetched = true
 	return nil
 }
 
@@ -111,13 +132,25 @@ func setupProjectDir(workdir string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, 0755)
+	err = ioutil.WriteFile(filepath.Join(workdir, "package.json"), pkgJsonContent, defaultMod)
 	if err != nil {
 		return err
 	}
+	err = os.Chmod(filepath.Join(workdir, "package.json"), defaultMod) // Double tap because of umask
+	if err != nil {
+		return fmt.Errorf("failed assigning default mode %s to package.json: %w", defaultMod, err)
+	}
 
 	// setup the project linking to the global synthetics library
-	return runSimpleCommand(exec.Command("npm", "install"), workdir)
+	return runSimpleCommand(
+		exec.Command(
+			"npm", "install",
+			"--no-audit",           // Prevent audit checks that require internet
+			"--no-update-notifier", // Prevent update checks that require internet
+			"--no-fund",            // No need for package funding messages here
+			"--package-lock=false", // no need to write package lock here
+			"--progress=false",     // no need to display progress
+		), workdir)
 }
 
 func (p *ProjectSource) Workdir() string {
@@ -125,8 +158,18 @@ func (p *ProjectSource) Workdir() string {
 }
 
 func (p *ProjectSource) Close() error {
+	logp.L().Debugf("browser project: close project source: %s", p.Workdir())
+
 	if p.TargetDirectory != "" {
 		return os.RemoveAll(p.TargetDirectory)
 	}
 	return nil
+}
+
+func runSimpleCommand(cmd *exec.Cmd, dir string) error {
+	cmd.Dir = dir
+	logp.L().Infof("Running %s in %s", cmd, dir)
+	output, err := cmd.CombinedOutput()
+	logp.L().Infof("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+	return err
 }

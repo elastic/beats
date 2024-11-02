@@ -33,7 +33,7 @@ func init() {
 
 var dropEventsSingleton = (*dropEvent)(nil)
 
-func newDropEvent(c *conf.C) (processors.Processor, error) {
+func newDropEvent(c *conf.C) (beat.Processor, error) {
 	return dropEventsSingleton, nil
 }
 

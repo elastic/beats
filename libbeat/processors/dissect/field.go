@@ -114,6 +114,7 @@ func (f baseField) String() string {
 // dissect: %{key}
 // message: hello
 // result:
+//
 //	key: hello
 type normalField struct {
 	baseField
@@ -129,6 +130,7 @@ func (f normalField) Apply(b string, m Map) {
 // dissect: %{} %{key}
 // message: hello world
 // result:
+//
 //	key: world
 type skipField struct {
 	baseField
@@ -147,6 +149,7 @@ func (f skipField) IsSaveable() bool {
 // dissect: %{?key} %{&key}
 // message: hello world
 // result:
+//
 //	hello: world
 //
 // Deprecated: see pointerField
@@ -182,6 +185,7 @@ func (f pointerField) IsSaveable() bool {
 // dissect: %{?key} %{&key}
 // message: hello world
 // result:
+//
 //	hello: world
 type indirectField struct {
 	baseField
@@ -201,11 +205,13 @@ func (f indirectField) Apply(b string, m Map) {
 // dissect: %{+key} %{+key}
 // message: hello world
 // result:
+//
 //	key: hello world
 //
 // dissect: %{+key/2} %{+key/1}
 // message: hello world
 // result:
+//
 //	key: world hello
 type appendField struct {
 	baseField

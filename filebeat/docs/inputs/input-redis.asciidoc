@@ -40,6 +40,12 @@ The list of Redis hosts to connect to.
 The password to use when connecting to Redis.
 
 [float]
+[[redis-username]]
+===== `username`
+
+The username to use when connecting to Redis.
+
+[float]
 [[redis-scan_frequency]]
 ===== `scan_frequency`
 
@@ -79,3 +85,10 @@ include::../inputs/input-common-options.asciidoc[]
 
 :type!:
 
+[float]
+[[redis-ssl]]
+===== `ssl`
+
+Configuration options for SSL parameters like the certificate, key and the certificate authorities to use.
+
+See <<configuration-ssl>> for more information.

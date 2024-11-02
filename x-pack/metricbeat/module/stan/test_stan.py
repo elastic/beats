@@ -7,6 +7,7 @@ from xpack_metricbeat import XPackTest, metricbeat
 STAN_FIELDS = metricbeat.COMMON_FIELDS + ["stan"]
 
 
+@unittest.skip("tests failing: https://github.com/elastic/beats/issues/34844")
 class TestStan(XPackTest):
 
     COMPOSE_SERVICES = ['stan']

@@ -25,6 +25,14 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - add_locale: ~
+
+{{ if .timezone_offset }}
+  - add_fields:
+      target: _temp_
+      fields:
+        timezone_offset: "{{ .timezone_offset }}"
+{{ end }}
+
 {{ if .external_zones }}
   - add_fields:
       target: _temp_

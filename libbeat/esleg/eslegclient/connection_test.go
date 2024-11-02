@@ -20,13 +20,19 @@ package eslegclient
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
+	"fmt"
+	"io"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -41,7 +47,7 @@ func TestAPIKeyEncoding(t *testing.T) {
 	httpClient := newMockClient()
 	conn.HTTP = httpClient
 
-	req, err := http.NewRequest("GET", "http://fakehost/some/path", nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 	require.NoError(t, err)
 
 	_, _, err = conn.execHTTPRequest(req)
@@ -52,10 +58,15 @@ func TestAPIKeyEncoding(t *testing.T) {
 
 type mockClient struct {
 	Req *http.Request
+	Res *http.Response
 }
 
 func (c *mockClient) Do(req *http.Request) (*http.Response, error) {
 	c.Req = req
+
+	if c.Res != nil {
+		return c.Res, nil
+	}
 
 	r := bytes.NewReader([]byte("HTTP/1.1 200 OK\n\nHello, world"))
 	return http.ReadResponse(bufio.NewReader(r), req)
@@ -97,11 +108,127 @@ func TestHeaders(t *testing.T) {
 		httpClient := newMockClient()
 		conn.HTTP = httpClient
 
-		req, err := http.NewRequest("GET", "http://fakehost/some/path", nil)
+		req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
 		require.NoError(t, err)
 		_, _, err = conn.execHTTPRequest(req)
 		require.NoError(t, err)
 
 		require.Equal(t, req.Header, http.Header(td.expected))
+
+	}
+}
+
+func TestUserAgentHeader(t *testing.T) {
+
+	// remove some randomness from this test
+	version.SetPackageVersion("8.15")
+
+	cases := []struct {
+		connSettings ConnectionSettings
+		expectedUA   string
+		name         string
+	}{
+		{
+			name: "test-ua-set",
+			connSettings: ConnectionSettings{
+				Beatname:  "testbeat",
+				UserAgent: "Agent/8.15",
+			},
+			expectedUA: "Agent/8.15",
+		},
+		{
+			name: "beatname-fallback",
+			connSettings: ConnectionSettings{
+				Beatname: "testbeat",
+			},
+			expectedUA: "testbeat/8.15",
+		},
+		{
+			name:         "libbeat-fallback",
+			connSettings: ConnectionSettings{},
+			expectedUA:   "Libbeat/8.15",
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if !strings.Contains(r.UserAgent(), testCase.expectedUA) {
+					t.Errorf("User-Agent must be '%s', got '%s'", testCase.expectedUA, r.UserAgent())
+				}
+				_, _ = w.Write([]byte("{}"))
+			}))
+			defer server.Close()
+			testCase.connSettings.URL = server.URL
+			conn, err := NewConnection(testCase.connSettings)
+			require.NoError(t, err)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			require.NoError(t, conn.Connect(ctx), "conn.Connect must not return an error")
+		})
+	}
+}
+
+func BenchmarkExecHTTPRequest(b *testing.B) {
+	sizes := []int{
+		100,             // 100 bytes
+		10 * 1024,       // 10KB
+		100 * 1024,      // 100KB
+		1 * 1024 * 1024, // 1MB
+	}
+	for _, size := range sizes {
+		b.Run(fmt.Sprintf("size %d", size), func(b *testing.B) {
+			generated := bytes.Repeat([]byte{'a'}, size)
+			content := bytes.NewReader(generated)
+
+			cases := []struct {
+				name string
+				resp *http.Response
+			}{
+				{
+					name: "unknown length",
+					resp: &http.Response{
+						ContentLength: -1,
+						Body:          io.NopCloser(content),
+					},
+				},
+				{
+					name: "known length",
+					resp: &http.Response{
+						ContentLength: int64(size),
+						Body:          io.NopCloser(content),
+					},
+				},
+			}
+
+			for _, tc := range cases {
+				b.Run(tc.name, func(b *testing.B) {
+					conn, err := NewConnection(ConnectionSettings{
+						Headers: map[string]string{
+							"Accept":       "application/vnd.elasticsearch+json;compatible-with=7",
+							"Content-Type": "application/vnd.elasticsearch+json;compatible-with=7",
+						},
+					})
+					require.NoError(b, err)
+
+					httpClient := newMockClient()
+					httpClient.Res = tc.resp
+					conn.HTTP = httpClient
+
+					var bb []byte
+					b.ReportAllocs()
+					b.ResetTimer()
+					for i := 0; i < b.N; i++ {
+						_, err = content.Seek(0, io.SeekStart)
+						require.NoError(b, err)
+						req, err := http.NewRequestWithContext(context.Background(), "GET", "http://fakehost/some/path", nil)
+						require.NoError(b, err)
+						_, bb, err = conn.execHTTPRequest(req)
+						require.NoError(b, err)
+						require.Equal(b, generated, bb)
+					}
+				})
+			}
+		})
 	}
 }

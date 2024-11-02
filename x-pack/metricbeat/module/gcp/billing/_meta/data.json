@@ -16,7 +16,18 @@
             "invoice_month": "202106",
             "project_id": "containerlib-prod-12763",
             "project_name": "elastic-containerlib-prod",
-            "total": 4717.170681
+            "total": 4717.170681,
+            "sku_id": "0D56-2F80-52A5",
+            "service_id": "6F81-5844-456A",
+            "sku_description": "Network Inter Region Ingress from Jakarta to Americas",
+            "service_description": "Compute Engine",
+            "effective_price": 0.00292353,
+            "tags": [
+                {
+                    "key": "size",
+                    "value": "standard"
+                }
+            ]
         }
     },
     "metricset": {

@@ -15,47 +15,50 @@ func getNamespace(provider string) string {
 	return namespace + "." + provider + ".functions"
 }
 
-// Feature creates a new Provider feature to be added to the global registry.
+// newFeature creates a new Provider feature to be added to the global registry.
 // The namespace will be 'functionbeat.provider' in the registry.
-func Feature(name string, factory Factory, details feature.Details) *feature.Feature {
-	return feature.New(namespace, name, factory, details)
+func newFeature(name string, factory Factory) *feature.Feature {
+	return feature.New(namespace, name, factory)
 }
 
-// FunctionFeature Feature creates a new function feature to be added to the global registry
+// newFunctionFeature Feature creates a new function feature to be added to the global registry
 // The namespace will be 'functionbeat.provider.local' in the registry.
-func FunctionFeature(
+func newFunctionFeature(
 	provider, name string,
 	factory FunctionFactory,
-	details feature.Details,
 ) *feature.Feature {
-	return feature.New(getNamespace(provider), name, factory, details)
+	return feature.New(getNamespace(provider), name, factory)
 }
 
-// Builder is used to have a fluent interface to build a set of function for a specific provider, it
+// builder is used to have a fluent interface to build a set of function for a specific provider, it
 // provides a fluent interface to the developper of provider and functions, it wraps the Feature
 // functions to make sure the namespace are correctly configured.
-type Builder struct {
-	name   string
-	bundle *feature.Bundle
+type builder struct {
+	name     string
+	features []feature.Featurable
 }
 
-// MustCreate creates a new provider builder, it is used to define a provider and the function
+// Builder creates a new provider builder, it is used to define a provider and the function
 // it supports.
-func MustCreate(name string, factory Factory, details feature.Details) *Builder {
-	return &Builder{name: name, bundle: feature.NewBundle(Feature(name, factory, details))}
+func Builder(name string, factory Factory, details feature.Details) *builder {
+	return &builder{
+		name: name,
+		features: []feature.Featurable{
+			newFeature(name, factory),
+		},
+	}
 }
 
-// Bundle transforms the provider and the functions into a bundle feature.
-func (b *Builder) Bundle() *feature.Bundle {
-	return b.bundle
+func (b *builder) Features() []feature.Featurable {
+	return b.features
 }
 
-// MustAddFunction adds a new function type to the provider and return the builder.
-func (b *Builder) MustAddFunction(
+// AddFunction adds a new function type to the provider and return the builder.
+func (b *builder) AddFunction(
 	name string,
 	factory FunctionFactory,
 	details feature.Details,
-) *Builder {
-	b.bundle = feature.MustBundle(b.bundle, FunctionFeature(b.name, name, factory, details))
+) *builder {
+	b.features = append(b.features, newFunctionFeature(b.name, name, factory))
 	return b
 }

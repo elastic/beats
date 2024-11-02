@@ -59,6 +59,7 @@ func getTestEvent() event {
 		second:     15,
 		nanosecond: 3000000,
 		message:    "'su root' failed for lonvick on /dev/pts/8",
+		loc:        time.UTC,
 	}
 }
 
@@ -130,6 +131,7 @@ func CreateStructuredDataWithMsg(msg string, data EventData) event {
 		second:     15,
 		nanosecond: 3000000,
 		message:    msg,
+		loc:        time.UTC,
 		data:       data,
 	}
 }
@@ -258,6 +260,7 @@ func createVersionTestRule(v int, success bool) testRule {
 			second:     15,
 			nanosecond: 3000000,
 			message:    "'su root' failed for lonvick on /dev/pts/8",
+			loc:        time.UTC,
 		},
 	}
 
@@ -287,6 +290,7 @@ func createPriorityTestRule(v int, success bool) testRule {
 			minute:     14,
 			second:     15,
 			message:    "'su root' failed for lonvick on /dev/pts/8",
+			loc:        time.UTC,
 			nanosecond: 3000000,
 		},
 	}

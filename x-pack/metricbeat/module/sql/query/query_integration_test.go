@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package query
 
@@ -228,6 +227,7 @@ func TestPostgreSQL(t *testing.T) {
 }
 
 func TestOracle(t *testing.T) {
+	t.Skip("Flaky test: test containers fail over attempt to bind port 5500 https://github.com/elastic/beats/issues/35105")
 	service := compose.EnsureUp(t, "oracle")
 	host, port, _ := net.SplitHostPort(service.Host())
 	cfg := testFetchConfig{

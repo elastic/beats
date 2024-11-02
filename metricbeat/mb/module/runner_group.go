@@ -20,20 +20,32 @@ package module
 import (
 	"strings"
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type runnerGroup struct {
-	runners []Runner
+	runners []cfgfile.Runner
 
 	startOnce sync.Once
 	stopOnce  sync.Once
 }
 
-var _ Runner = new(runnerGroup)
+var _ cfgfile.Runner = new(runnerGroup)
 
-func newRunnerGroup(runners []Runner) Runner {
+func newRunnerGroup(runners []cfgfile.Runner) cfgfile.Runner {
 	return &runnerGroup{
 		runners: runners,
+	}
+}
+
+func (rg *runnerGroup) SetStatusReporter(reporter status.StatusReporter) {
+	for _, runner := range rg.runners {
+		if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
+			runnerWithStatus.SetStatusReporter(reporter)
+		}
 	}
 }
 
@@ -54,9 +66,23 @@ func (rg *runnerGroup) Stop() {
 }
 
 func (rg *runnerGroup) String() string {
-	var entries []string
+	entries := make([]string, 0, len(rg.runners))
 	for _, runner := range rg.runners {
 		entries = append(entries, runner.String())
 	}
 	return "RunnerGroup{" + strings.Join(entries, ", ") + "}"
+}
+
+// Diagnostics, like the rest of the runner group methods, merely
+// calls all the "client" runners and combines the results
+func (rg *runnerGroup) Diagnostics() []diagnostics.DiagnosticSetup {
+	results := []diagnostics.DiagnosticSetup{}
+	for _, runner := range rg.runners {
+		if diagHandler, ok := runner.(diagnostics.DiagnosticReporter); ok {
+			diags := diagHandler.Diagnostics()
+			results = append(results, diags...)
+		}
+
+	}
+	return results
 }

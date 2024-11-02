@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -77,7 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Pod{}, mod.GetMetricsRepo(), true),
+		enricher:      util.NewResourceMetadataEnricher(base, mod.GetMetricsRepo(), mod.GetResourceWatchers(), true),
 		mod:           mod,
 	}, nil
 }
@@ -86,7 +85,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
-	m.enricher.Start()
+	m.enricher.Start(m.mod.GetResourceWatchers())
 
 	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {
@@ -134,6 +133,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 // Close stops this metricset
 func (m *MetricSet) Close() error {
-	m.enricher.Stop()
+	m.enricher.Stop(m.mod.GetResourceWatchers())
 	return nil
 }

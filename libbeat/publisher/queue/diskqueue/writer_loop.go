@@ -96,7 +96,10 @@ type writerLoop struct {
 	buffer *bytes.Buffer
 }
 
-func newWriterLoop(logger *logp.Logger, settings Settings) *writerLoop {
+func newWriterLoop(
+	logger *logp.Logger,
+	settings Settings,
+) *writerLoop {
 	buffer := &bytes.Buffer{}
 	return &writerLoop{
 		logger:   logger,
@@ -233,11 +236,6 @@ outerLoop:
 	}
 	// Try to sync the written data to disk.
 	_ = wl.outputFile.Sync()
-
-	// If the queue has an ACK listener, notify it the frames were written.
-	if wl.settings.WriteToDiskListener != nil {
-		wl.settings.WriteToDiskListener.OnACK(totalACKCount)
-	}
 
 	// Notify any producers with ACK listeners that their frames were written.
 	for producer, ackCount := range producerACKCounts {

@@ -91,7 +91,7 @@ func newAsyncClient(
 	}
 
 	c.connect = func() error {
-		err := c.Client.Connect()
+		err := c.Client.ConnectContext(context.Background())
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}
@@ -116,7 +116,7 @@ func makeClientFactory(
 	}
 }
 
-func (c *asyncClient) Connect() error {
+func (c *asyncClient) Connect(ctx context.Context) error {
 	c.log.Debug("connect")
 	return c.connect()
 }
@@ -238,7 +238,7 @@ func (r *msgRef) callback(seq uint32, err error) {
 }
 
 func (r *msgRef) done(n uint32) {
-	r.client.observer.Acked(int(n))
+	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
 	if r.win != nil {
 		r.win.tryGrowWindow(r.batchSize)
@@ -255,7 +255,7 @@ func (r *msgRef) fail(n uint32, err error) {
 		r.win.shrinkWindow()
 	}
 
-	r.client.observer.Acked(int(n))
+	r.client.observer.AckedEvents(int(n))
 
 	r.dec()
 }
@@ -267,7 +267,7 @@ func (r *msgRef) dec() {
 	}
 
 	if L := len(r.slice); L > 0 {
-		r.client.observer.Failed(L)
+		r.client.observer.RetryableErrors(L)
 	}
 
 	err := r.err

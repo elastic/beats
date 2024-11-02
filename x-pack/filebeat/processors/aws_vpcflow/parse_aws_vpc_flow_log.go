@@ -24,7 +24,8 @@ const (
 	logName  = "processor." + procName
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	processors.RegisterPlugin(procName, New)
 	jsprocessor.RegisterPlugin("ParseAWSVPCFlowLog", New)
 }
@@ -40,7 +41,7 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the "+procName+" processor configuration: %w", err)

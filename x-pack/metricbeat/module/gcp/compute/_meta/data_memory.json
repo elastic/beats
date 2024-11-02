@@ -12,10 +12,10 @@
         "machine": {
             "type": "e2-micro"
         },
-        "provider": "gcp"
+        "provider": "gcp",
+        "availability_zone": "us-central1-a",
+        "region": "us-central1"
     },
-    "cloud.availability_zone": "us-central1-a",
-    "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,

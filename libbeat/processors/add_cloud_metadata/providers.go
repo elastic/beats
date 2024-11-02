@@ -19,11 +19,12 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -65,7 +66,8 @@ var cloudMetaProviders = map[string]provider{
 	"nova-ssl":      openstackNovaSSLMetadataFetcher,
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
-	"huawei":        huaweiMetadataFetcher,
+	"huawei":        openstackNovaMetadataFetcher,
+	"hetzner":       hetznerMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -73,6 +75,21 @@ func selectProviders(configList providerList, providers map[string]provider) map
 }
 
 func providersFilter(configList providerList, allProviders map[string]provider) func(string) bool {
+	if v, ok := os.LookupEnv("BEATS_ADD_CLOUD_METADATA_PROVIDERS"); ok {
+		// We allow users to override the config and defaults with
+		// this environment variable as a workaround in case the
+		// configured/default providers misbehave.
+		configList = nil
+		for _, name := range strings.Split(v, ",") {
+			configList = append(configList, strings.TrimSpace(name))
+		}
+		if len(configList) == 0 {
+			// User explicitly disabled all providers.
+			return func(string) bool {
+				return false
+			}
+		}
+	}
 	if len(configList) == 0 {
 		return func(name string) bool {
 			ff, ok := allProviders[name]
@@ -101,7 +118,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
-	// Iterate over all providers and create an unique meta-data fetcher per provider type.
+	// Iterate over all providers and create a unique meta-data fetcher per provider type.
 	// Some providers might appear twice in the set of providers to support aliases on provider names.
 	// For example aws and ec2 both use the same provider.
 	// The loop tracks already seen providers in the `visited` set, to ensure that we do not create
@@ -114,7 +131,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 
 		fetcher, err := ff.Create(name, c)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to initialize the %v fetcher", name)
+			return nil, fmt.Errorf("failed to initialize the %v fetcher: %w", name, err)
 		}
 
 		mf = append(mf, fetcher)
@@ -123,7 +140,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 }
 
 // fetchMetadata attempts to fetch metadata in parallel from each of the
-// hosting providers supported by this processor. It wait for the results to
+// hosting providers supported by this processor. It will wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
 func (p *addCloudMetadata) fetchMetadata() *result {
@@ -169,6 +186,8 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 			// Bail out on first success.
 			if result.err == nil && result.metadata != nil {
 				return &result
+			} else if result.err != nil {
+				p.logger.Errorf("add_cloud_metadata: received error %v", result.err)
 			}
 		case <-ctx.Done():
 			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")

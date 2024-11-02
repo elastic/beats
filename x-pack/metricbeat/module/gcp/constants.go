@@ -4,7 +4,7 @@
 
 package gcp
 
-import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+import "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 const (
 	// ModuleName in Metricbeat
@@ -48,9 +48,9 @@ const (
 
 	ECSCloudRegion = "region"
 
-	ECSCloudAccount     = "account"
-	ECSCloudAccountID   = "id"
-	ECSCloudAccountName = "name"
+	ECSCloudAccount = "account"
+	ECSCloudID      = "id"
+	ECSCloudName    = "name"
 
 	ECSCloudInstance        = "instance"
 	ECSCloudInstanceKey     = ECSCloud + "." + ECSCloudInstance
@@ -63,6 +63,7 @@ const (
 	ECSCloudMachineKey     = ECSCloud + "." + ECSCloudMachine
 	ECSCloudMachineType    = "type"
 	ECSCloudMachineTypeKey = ECSCloudMachineKey + "." + ECSCloudMachineType
+	ECSCloudProject        = "project"
 )
 
 // Metadata keys used for events. They follow GCP structure.

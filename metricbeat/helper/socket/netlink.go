@@ -16,15 +16,13 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package socket
 
 import (
+	"fmt"
 	"os"
 	"sync/atomic"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/gosigar/sys/linux"
 )
@@ -49,7 +47,7 @@ func (session *NetlinkSession) GetSocketList() ([]*linux.InetDiagMsg, error) {
 	req.Header.Seq = atomic.AddUint32(&session.seq, 1)
 	sockets, err := linux.NetlinkInetDiagWithBuf(req, session.readBuffer, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed requesting socket dump")
+		return nil, fmt.Errorf("failed requesting socket dump: %w", err)
 	}
 	return sockets, nil
 }

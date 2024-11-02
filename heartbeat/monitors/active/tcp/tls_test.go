@@ -20,13 +20,11 @@ package tcp
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"runtime"
 	"strconv"
 	"testing"
 
@@ -49,9 +47,6 @@ import (
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
 func TestTLSSANIPConnection(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()
 
@@ -62,7 +57,7 @@ func TestTLSSANIPConnection(t *testing.T) {
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "ssl", ip, port),
 		)),
 		event.Fields,
@@ -82,7 +77,7 @@ func TestTLSHostname(t *testing.T) {
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "ssl", hostname, port),
 			hbtest.ResolveChecks(ip),
 		)),
@@ -108,7 +103,7 @@ func TestTLSInvalidCert(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", mismatchedHostname, port),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
@@ -142,7 +137,7 @@ func TestTLSExpiredCert(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", host, port),
 			hbtest.ResolveChecks(ip),
 			hbtest.ExpiredCertChecks(cert),

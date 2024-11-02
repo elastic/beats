@@ -18,9 +18,18 @@
 package input_logfile
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const testPluginName = "my_test_plugin"
@@ -70,7 +79,7 @@ func TestSourceIdentifier_ID(t *testing.T) {
 	}
 }
 
-func TestSourceIdentifier_MachesInput(t *testing.T) {
+func TestSourceIdentifier_MatchesInput(t *testing.T) {
 	testCases := map[string]struct {
 		userID      string
 		matchingIDs []string
@@ -108,7 +117,7 @@ func TestSourceIdentifier_MachesInput(t *testing.T) {
 	}
 }
 
-func TestSourceIdentifier_NotMachesInput(t *testing.T) {
+func TestSourceIdentifier_NotMatchesInput(t *testing.T) {
 	testCases := map[string]struct {
 		userID         string
 		notMatchingIDs []string
@@ -152,4 +161,52 @@ func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
 	assert.NotEqual(t, noIDIdentifier.ID(src), withIDIdentifier.ID(src))
 	assert.False(t, noIDIdentifier.MatchesInput(withIDIdentifier.ID(src)))
 	assert.False(t, withIDIdentifier.MatchesInput(noIDIdentifier.ID(src)))
+}
+
+func TestInputManager_Create(t *testing.T) {
+	t.Run("Checking config does not print duplicated id warning",
+		func(t *testing.T) {
+			storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+			testStore, err := storeReg.Get("test")
+			require.NoError(t, err)
+
+			log, buff := newBufferLogger()
+
+			cim := &InputManager{
+				Logger:     log,
+				StateStore: testStateStore{Store: testStore},
+				Configure: func(_ *config.C) (Prospector, Harvester, error) {
+					return nil, nil, nil
+				}}
+			cfg, err := config.NewConfigFrom("id: my-id")
+			require.NoError(t, err)
+
+			_, err = cim.Create(cfg)
+			require.ErrorIs(t, err, errNoInputRunner)
+			err = cim.Delete(cfg)
+			require.NoError(t, err)
+
+			// Create again to ensure now warning regarding duplicated ID will
+			// be logged.
+			_, err = cim.Create(cfg)
+			require.ErrorIs(t, err, errNoInputRunner)
+			err = cim.Delete(cfg)
+			require.NoError(t, err)
+
+			assert.NotContains(t, buff.String(),
+				"filestream input with ID")
+			assert.NotContains(t, buff.String(),
+				"already exists")
+		})
+}
+
+func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
+	buf := &bytes.Buffer{}
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+	writeSyncer := zapcore.AddSync(buf)
+	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
+		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
+	}))
+	return log, buf
 }

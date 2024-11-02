@@ -34,5 +34,5 @@ while True:
     randomString = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
     log_message = timestamp + " " + str(count) + " " + str(uuid.uuid4()) + " " + randomString
     my_logger.debug(log_message)
-    count = count + 1
+    count += 1
     time.sleep(sleepTime)

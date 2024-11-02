@@ -21,12 +21,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -192,10 +191,10 @@ func (l *Listener) handleConnection(conn net.Conn) {
 
 	// Track number of clients.
 	l.clientsCount.Inc()
-	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
+	log.Debugw("New client connection", "active_clients", l.clientsCount.Load())
 	defer func() {
 		l.clientsCount.Dec()
-		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
+		log.Debugw("Client disconnected", "active_clients", l.clientsCount.Load())
 	}()
 
 	handler := l.handlerFactory(*l.config)

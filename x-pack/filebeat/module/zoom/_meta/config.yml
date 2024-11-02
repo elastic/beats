@@ -15,5 +15,11 @@
     # The header Zoom uses to send its secret token, defaults to "Authorization"
     #secret.header: Authorization
 
-    # The secret token value created by Zoom
-    #secret.value: ZOOMTOKEN
+    # The custom secret token value created when configuring the Zoom webhook
+    #secret.value: my-custom-value
+
+    # Enable the CRC webhook validation
+    #crc.enabled: false
+
+    # The secret token value provided by Zoom for CRC validation
+    #crc.secret: ZOOMSECRETTOKEN

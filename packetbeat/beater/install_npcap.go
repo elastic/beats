@@ -23,16 +23,23 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const installTimeout = 120 * time.Second
 
-func installNpcap(b *beat.Beat) error {
+// muInstall protects use of npcap.Installer. The only writes to npcap.Installer
+// are here and during init in x-pack/packetbeat/npcap/npcap_windows.go
+var muInstall sync.Mutex
+
+func installNpcap(b *beat.Beat, cfg *conf.C) error {
 	if !b.Info.ElasticLicensed {
 		return nil
 	}
@@ -54,11 +61,29 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
+	log := logp.NewLogger("npcap_install")
+	// Only check whether we have been requested to never_install if there
+	// is already an Npcap installation present. This should not be necessary,
+	// but the start-up logic of packetbeat is tightly coupled to the presence
+	// of a backing sniffer. This should really not be necessary, but the changes
+	// to modify this behaviour are non-trivial, so just avoid the issue.
+	isInstalled := strings.HasPrefix(npcap.Version(), "Npcap version")
+	if isInstalled {
+		canInstall, err := canInstallNpcap(b, cfg, log)
+		if err != nil {
+			return err
+		}
+		if !canInstall {
+			log.Warn("npcap installation/upgrade disabled by user")
+			return nil
+		}
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 
-	log := logp.NewLogger("npcap_install")
-
+	muInstall.Lock()
+	defer muInstall.Unlock()
 	if npcap.Installer == nil {
 		return nil
 	}
@@ -80,4 +105,51 @@ func installNpcap(b *beat.Beat) error {
 		return fmt.Errorf("could not create installation temporary file: %w", err)
 	}
 	return npcap.Install(ctx, log, installerPath, "", false)
+}
+
+// canInstallNpcap returns whether the Npcap DLL installation can proceed or has been
+// blocked by the user. This needs special consideration because we have not yet had
+// configurations from agent normalised to the internal packetbeat format by this point.
+// In the case that the beat is managed, any data stream that has npcap.never_install
+// set to true will result in a block on the installation.
+func canInstallNpcap(b *beat.Beat, rawcfg *conf.C, log *logp.Logger) (bool, error) {
+	type npcapInstallCfg struct {
+		Type         string `config:"type"`
+		NeverInstall bool   `config:"npcap.never_install"`
+	}
+
+	// Agent managed case.
+	if b.Manager.Enabled() {
+		var cfg struct {
+			Streams []npcapInstallCfg `config:"streams"`
+		}
+		err := rawcfg.Unpack(&cfg)
+		if err != nil {
+			return false, fmt.Errorf("failed to unpack npcap config from agent configuration: %w", err)
+		}
+		if len(cfg.Streams) == 0 {
+			// We have no stream to monitor, so we don't need to install
+			// anything. We may be in the middle of a config check.
+			log.Debug("cannot install because no configured stream")
+			return false, nil
+		}
+		for _, c := range cfg.Streams {
+			if c.NeverInstall {
+				log.Debugf("cannot install because %s has never_install set to true", c.Type)
+				return false, nil
+			}
+		}
+		return true, nil
+	}
+
+	// Packetbeat case.
+	var cfg npcapInstallCfg
+	err := rawcfg.Unpack(&cfg)
+	if err != nil {
+		return false, fmt.Errorf("failed to unpack npcap config from packetbeat configuration: %w", err)
+	}
+	if cfg.NeverInstall {
+		log.Debugf("cannot install because %s has never_install set to true", cfg.Type)
+	}
+	return !cfg.NeverInstall, err
 }

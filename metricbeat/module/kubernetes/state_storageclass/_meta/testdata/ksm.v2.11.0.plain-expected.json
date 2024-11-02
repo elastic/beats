@@ -1,0 +1,26 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.storageclass",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "storageclass": {
+                "created": "2024-04-23T08:49:46.000Z",
+                "name": "standard",
+                "provisioner": "rancher.io/local-path",
+                "reclaim_policy": "Delete",
+                "volume_binding_mode": "WaitForFirstConsumer"
+            }
+        },
+        "metricset": {
+            "name": "state_storageclass",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

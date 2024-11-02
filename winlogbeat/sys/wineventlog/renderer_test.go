@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -31,8 +30,6 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -41,7 +38,7 @@ import (
 )
 
 func TestRenderer(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Bad linter! Never returns a non-nil error when called without options.
+	logp.TestingSetup()
 
 	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
 		log := openLog(t, sysmon9File)
@@ -209,9 +206,9 @@ func BenchmarkRenderer(b *testing.B) {
 	defer teardown()
 
 	const totalEvents = 1000000
-	msg := []string{strings.Repeat("Hello world! ", 21)}
+	msg := strings.Repeat("Hello world! ", 21)
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(b, writer, eventlog.Info, 10, msg)
+		safeWriteEvent(b, writer, 10, msg)
 	}
 
 	setup := func() (*EventIterator, *Renderer) {

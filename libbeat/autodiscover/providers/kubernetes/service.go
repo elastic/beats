@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !aix
-// +build !aix
 
 package kubernetes
 
@@ -26,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -71,16 +70,24 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceMeta metadata.MetaGen
 	var namespaceWatcher kubernetes.Watcher
 
-	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	}, nil)
+	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
 	}
 
-	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
+		}, nil)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
+		}
+		namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+	}
 
 	p := &service{
 		config:           config,
@@ -156,7 +163,11 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := utils.GenerateHints(annotations, "", s.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, "", s.config.Prefix, true, AllSupportedHints)
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	for _, value := range incorrecthints {
+		s.logger.Debugf("provided hint: %s/%s is not in the supported list", s.config.Prefix, value)
+	}
 	s.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -221,7 +232,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		}
 	}
 
-	var events []bus.Event
+	events := []bus.Event{}
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
 			"provider":   s.uuid,

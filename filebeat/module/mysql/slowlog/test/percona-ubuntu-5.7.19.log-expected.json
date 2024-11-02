@@ -40,6 +40,9 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 1,
         "mysql.thread_id": 1098148226,
+        "related.user": [
+            "check"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "check"
@@ -92,6 +95,12 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 1101779094,
+        "related.ip": [
+            "192.168.123.123"
+        ],
+        "related.user": [
+            "select"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.123.123",
         "user.name": "select"
@@ -137,6 +146,9 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 14366748,
+        "related.user": [
+            "exporter"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "exporter"
@@ -184,6 +196,12 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 14349788,
+        "related.ip": [
+            "192.168.123.123"
+        ],
+        "related.user": [
+            "test"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.123.123",
         "user.name": "test"
@@ -229,6 +247,9 @@
         "mysql.slowlog.tmp_table_sizes": 114688,
         "mysql.slowlog.tmp_tables": 111,
         "mysql.thread_id": 14367106,
+        "related.user": [
+            "exporter"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "exporter"
@@ -274,6 +295,9 @@
         "mysql.slowlog.tmp_table_sizes": 606208,
         "mysql.slowlog.tmp_tables": 376,
         "mysql.thread_id": 14367293,
+        "related.user": [
+            "exporter"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "exporter"
@@ -326,6 +350,12 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 14360213,
+        "related.ip": [
+            "192.168.123.123"
+        ],
+        "related.user": [
+            "test"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.123.123",
         "user.name": "test"
@@ -379,6 +409,12 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 14370752,
+        "related.ip": [
+            "192.168.123.123"
+        ],
+        "related.user": [
+            "test"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.123.123",
         "user.name": "test"

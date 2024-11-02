@@ -18,9 +18,9 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,8 +31,8 @@ import (
 	"time"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
-	"golang.org/x/tools/go/vcs"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -85,6 +85,8 @@ var (
 	versionQualified bool
 	versionQualifier string
 
+	caser = cases.Title(language.English, cases.NoLower)
+
 	FuncMap = map[string]interface{}{
 		"beat_doc_branch":   BeatDocBranch,
 		"beat_version":      BeatQualifiedVersion,
@@ -94,7 +96,7 @@ var (
 		"elastic_beats_dir": ElasticBeatsDir,
 		"go_version":        GoVersion,
 		"repo":              GetProjectRepoInfo,
-		"title":             strings.Title,
+		"title":             caser.String,
 		"tolower":           strings.ToLower,
 		"contains":          strings.Contains,
 	}
@@ -108,22 +110,22 @@ func init() {
 	var err error
 	RaceDetector, err = strconv.ParseBool(EnvOr("RACE_DETECTOR", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse RACE_DETECTOR env value"))
+		panic(fmt.Errorf("failed to parse RACE_DETECTOR env value: %w", err))
 	}
 
 	TestCoverage, err = strconv.ParseBool(EnvOr("TEST_COVERAGE", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse TEST_COVERAGE env value"))
+		panic(fmt.Errorf("failed to parse TEST_COVERAGE env value: %w", err))
 	}
 
 	Snapshot, err = strconv.ParseBool(EnvOr("SNAPSHOT", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse SNAPSHOT env value"))
+		panic(fmt.Errorf("failed to parse SNAPSHOT env value: %w", err))
 	}
 
 	DevBuild, err = strconv.ParseBool(EnvOr("DEV", "false"))
 	if err != nil {
-		panic(errors.Wrap(err, "failed to parse DEV env value"))
+		panic(fmt.Errorf("failed to parse DEV env value: %w", err))
 	}
 
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
@@ -448,7 +450,7 @@ func getBuildVariableSources() *BuildVariableSources {
 		return buildVariableSources
 	}
 
-	panic(errors.Errorf("magefile must call devtools.SetBuildVariableSources() "+
+	panic(fmt.Errorf("magefile must call devtools.SetBuildVariableSources() "+
 		"because it is not an elastic beat (repo=%+v)", repo.RootImportPath))
 }
 
@@ -491,9 +493,9 @@ func (s *BuildVariableSources) GetBeatVersion() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read beat version file=%v", file)
+		return "", fmt.Errorf("failed to read beat version file=%v: %w", file, err)
 	}
 
 	if s.BeatVersionParser == nil {
@@ -509,9 +511,9 @@ func (s *BuildVariableSources) GetGoVersion() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read go version file=%v", file)
+		return "", fmt.Errorf("failed to read go version file=%v: %w", file, err)
 	}
 
 	if s.GoVersionParser == nil {
@@ -527,9 +529,9 @@ func (s *BuildVariableSources) GetDocBranch() (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read doc branch file=%v", file)
+		return "", fmt.Errorf("failed to read doc branch file=%v: %w", file, err)
 	}
 
 	if s.DocBranchParser == nil {
@@ -645,7 +647,7 @@ func getProjectRepoInfoWithModules() (*ProjectRepoInfo, error) {
 	}
 
 	if rootDir == "" {
-		return nil, errors.Errorf("failed to find root dir of module file: %v", errs)
+		return nil, fmt.Errorf("failed to find root dir of module file: %v", errs)
 	}
 
 	rootImportPath, err := gotool.GetModuleName()
@@ -688,7 +690,7 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	}
 
 	for _, srcDir := range srcDirs {
-		_, root, err := vcs.FromDir(cwd, srcDir)
+		root, err := fromDir(cwd, srcDir)
 		if err != nil {
 			// Try the next gopath.
 			errs = append(errs, err.Error())
@@ -699,12 +701,12 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	}
 
 	if rootDir == "" {
-		return nil, errors.Errorf("error while determining root directory: %v", errs)
+		return nil, fmt.Errorf("error while determining root directory: %v", errs)
 	}
 
 	subDir, err := filepath.Rel(rootDir, cwd)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get relative path to repo root")
+		return nil, fmt.Errorf("failed to get relative path to repo root: %w", err)
 	}
 
 	rootImportPath, err := gotool.GetModuleName()
@@ -721,6 +723,66 @@ func getProjectRepoInfoUnderGopath() (*ProjectRepoInfo, error) {
 	}, nil
 }
 
+var vcsList = []string{
+	"hg",
+	"git",
+	"svn",
+	"bzr",
+}
+
+// this method has been adapted from vcs.FromDir from golang.org/x/tools/go/vcs
+//
+// the body of the method was kept as is but the extra return value
+// has been removed since it was unused.
+func fromDir(dir, srcRoot string) (root string, err error) {
+	// Clean and double-check that dir is in (a subdirectory of) srcRoot.
+	dir = filepath.Clean(dir)
+	srcRoot = filepath.Clean(srcRoot)
+	if len(dir) <= len(srcRoot) || dir[len(srcRoot)] != filepath.Separator {
+		return "", fmt.Errorf("directory %q is outside source root %q", dir, srcRoot)
+	}
+
+	var vcsRet string
+	var rootRet string
+
+	origDir := dir
+	for len(dir) > len(srcRoot) {
+		for _, vcs := range vcsList {
+			if _, err := os.Stat(filepath.Join(dir, "."+vcs)); err == nil {
+				root := filepath.ToSlash(dir[len(srcRoot)+1:])
+				// Record first VCS we find, but keep looking,
+				// to detect mistakes like one kind of VCS inside another.
+				if vcsRet == "" {
+					vcsRet = vcs
+					rootRet = root
+					continue
+				}
+				// Allow .git inside .git, which can arise due to submodules.
+				if vcsRet == vcs && vcs == "git" {
+					continue
+				}
+				// Otherwise, we have one VCS inside a different VCS.
+				return "", fmt.Errorf("directory %q uses %s, but parent %q uses %s",
+					filepath.Join(srcRoot, rootRet), vcsRet, filepath.Join(srcRoot, root), vcs)
+			}
+		}
+
+		// Move to parent.
+		ndir := filepath.Dir(dir)
+		if len(ndir) >= len(dir) {
+			// Shouldn't happen, but just in case, stop.
+			break
+		}
+		dir = ndir
+	}
+
+	if vcsRet != "" {
+		return rootRet, nil
+	}
+
+	return "", fmt.Errorf("directory %q is not using a known version control system", origDir)
+}
+
 func extractCanonicalRootImportPath(rootImportPath string) string {
 	// In order to be compatible with go modules, the root import
 	// path of any module at major version v2 or higher must include
@@ -734,12 +796,14 @@ func extractCanonicalRootImportPath(rootImportPath string) string {
 }
 
 func listSrcGOPATHs() ([]string, error) {
+	gopaths := filepath.SplitList(build.Default.GOPATH)
+
 	var (
-		cwd     = CWD()
-		errs    []string
-		srcDirs []string
+		cwd  = CWD()
+		errs []string
 	)
-	for _, gopath := range filepath.SplitList(build.Default.GOPATH) {
+	srcDirs := make([]string, 0, len(gopaths))
+	for _, gopath := range gopaths {
 		gopath = filepath.Clean(gopath)
 
 		if !strings.HasPrefix(cwd, gopath) {
@@ -756,7 +820,7 @@ func listSrcGOPATHs() ([]string, error) {
 	}
 
 	if len(srcDirs) == 0 {
-		return srcDirs, errors.Errorf("failed to find any GOPATH %v", errs)
+		return srcDirs, fmt.Errorf("failed to find any GOPATH %v", errs)
 	}
 
 	return srcDirs, nil

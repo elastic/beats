@@ -16410,7 +16410,28 @@ type: keyword
 
 --
 
+*`winlog.event_data.CallTrace`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.ClientInfo`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.Company`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.Configuration`*::
 +
 --
 type: keyword
@@ -16515,6 +16536,20 @@ type: keyword
 
 --
 
+*`winlog.event_data.EventType`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.EventNamespace`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.ExtraInfo`*::
 +
 --
@@ -16544,6 +16579,13 @@ type: keyword
 --
 
 *`winlog.event_data.FinalStatus`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.GrantedAccess`*::
 +
 --
 type: keyword
@@ -16704,6 +16746,13 @@ type: keyword
 
 --
 
+*`winlog.event_data.Name`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.NewProcessId`*::
 +
 --
@@ -16719,6 +16768,13 @@ type: keyword
 --
 
 *`winlog.event_data.NewSchemeGuid`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.NewThreadId`*::
 +
 --
 type: keyword
@@ -16754,6 +16810,13 @@ type: keyword
 --
 
 *`winlog.event_data.OldTime`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.Operation`*::
 +
 --
 type: keyword
@@ -16858,6 +16921,13 @@ type: keyword
 
 --
 
+*`winlog.event_data.Query`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.Reason`*::
 +
 --
@@ -16887,6 +16957,13 @@ type: keyword
 --
 
 *`winlog.event_data.ServiceVersion`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.Session`*::
 +
 --
 type: keyword
@@ -16929,6 +17006,27 @@ type: keyword
 --
 
 *`winlog.event_data.Signed`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.StartAddress`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.StartFunction`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.StartModule`*::
 +
 --
 type: keyword
@@ -17005,6 +17103,13 @@ type: keyword
 
 --
 
+*`winlog.event_data.TargetImage`*::
++
+--
+type: keyword
+
+--
+
 *`winlog.event_data.TargetInfo`*::
 +
 --
@@ -17020,6 +17125,20 @@ type: keyword
 --
 
 *`winlog.event_data.TargetLogonId`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.TargetProcessGUID`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.TargetProcessId`*::
 +
 --
 type: keyword
@@ -17062,6 +17181,13 @@ type: keyword
 --
 
 *`winlog.event_data.TransmittedServices`*::
++
+--
+type: keyword
+
+--
+
+*`winlog.event_data.Type`*::
 +
 --
 type: keyword

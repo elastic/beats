@@ -34,24 +34,24 @@ import (
 //
 // The fields populated by exeObjParser are:
 //
-//  {elf,macho,pe}:
-//    sections:
-//      - name
-//        physical_size
-//        virtual_size
-//        entropy
-//        var_entropy
-//    import_hash
-//    imphash
-//    symhash
-//    imports
-//    imports_names_entropy
-//    imports_names_var_entropy
-//    go_import_hash
-//    go_imports
-//    go_imports_names_entropy
-//    go_imports_names_var_entropy
-//    go_stripped
+//	{elf,macho,pe}:
+//	  sections:
+//	    - name
+//	      physical_size
+//	      virtual_size
+//	      entropy
+//	      var_entropy
+//	  import_hash
+//	  imphash
+//	  symhash
+//	  imports
+//	  imports_names_entropy
+//	  imports_names_var_entropy
+//	  go_import_hash
+//	  go_imports
+//	  go_imports_names_entropy
+//	  go_imports_names_var_entropy
+//	  go_stripped
 type exeObjParser map[string]bool
 
 func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {

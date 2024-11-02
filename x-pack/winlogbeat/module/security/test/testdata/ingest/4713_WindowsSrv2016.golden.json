@@ -10,7 +10,6 @@
         "configuration"
       ],
       "code": "4713",
-      "ingested": "2022-06-08T06:21:07.921167700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

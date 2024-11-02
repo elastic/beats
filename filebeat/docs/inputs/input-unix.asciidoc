@@ -29,6 +29,23 @@ The `unix` input supports the following configuration options plus the
 
 include::../inputs/input-common-unix-options.asciidoc[]
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                         | Description
+| `path`                         | Path of the unix socket.
+| `received_events_total`        | Total number of packets (events) that have been received.
+| `received_bytes_total`         | Total number of bytes received.
+| `arrival_period`               | Histogram of the time between successive packets in nanoseconds.
+| `processing_time`              | Histogram of the time taken to process packets in nanoseconds.
+|=======
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
 

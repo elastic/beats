@@ -1,0 +1,24 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"capacity": {
+				"bytes": 2048
+			},
+			"name": "task-pv-volume",
+			"phase": "Bound",
+			"storage_class": "generic"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.persistentvolume",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

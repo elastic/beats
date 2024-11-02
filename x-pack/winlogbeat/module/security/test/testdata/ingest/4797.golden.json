@@ -1,0 +1,372 @@
+[
+  {
+    "@timestamp": "2023-01-17T22:10:41.555Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "query-existence-of-blank-password",
+      "category": [
+        "iam"
+      ],
+      "code": "4797",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "HOSTNAME.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "Guest"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "Guest"
+      }
+    },
+    "winlog": {
+      "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
+      "channel": "Security",
+      "computer_name": "HOSTNAME.contoso.com",
+      "event_data": {
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x61ccd940",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetDomainName": "HOSTNAME",
+        "TargetUserName": "Guest",
+        "Workstation": "HOSTNAME"
+      },
+      "event_id": "4797",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x61ccd940"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 868,
+        "thread": {
+          "id": 12248
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "39956816",
+      "time_created": "2023-01-17T22:10:41.5550438Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:10:41.532Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "query-existence-of-blank-password",
+      "category": [
+        "iam"
+      ],
+      "code": "4797",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "HOSTNAME.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "WDAGUtilityAccount"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "WDAGUtilityAccount"
+      }
+    },
+    "winlog": {
+      "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
+      "channel": "Security",
+      "computer_name": "HOSTNAME.contoso.com",
+      "event_data": {
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x61ccd940",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetDomainName": "HOSTNAME",
+        "TargetUserName": "WDAGUtilityAccount",
+        "Workstation": "HOSTNAME"
+      },
+      "event_id": "4797",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x61ccd940"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 868,
+        "thread": {
+          "id": 12248
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "39956815",
+      "time_created": "2023-01-17T22:10:41.5328919Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:10:41.512Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "query-existence-of-blank-password",
+      "category": [
+        "iam"
+      ],
+      "code": "4797",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "HOSTNAME.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "DefaultAccount"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "DefaultAccount"
+      }
+    },
+    "winlog": {
+      "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
+      "channel": "Security",
+      "computer_name": "HOSTNAME.contoso.com",
+      "event_data": {
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x61ccd940",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetDomainName": "HOSTNAME",
+        "TargetUserName": "DefaultAccount",
+        "Workstation": "HOSTNAME"
+      },
+      "event_id": "4797",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x61ccd940"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 868,
+        "thread": {
+          "id": 65356
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "39956814",
+      "time_created": "2023-01-17T22:10:41.5127873Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:10:41.490Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "query-existence-of-blank-password",
+      "category": [
+        "iam"
+      ],
+      "code": "4797",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "HOSTNAME.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "contoso"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "contoso"
+      }
+    },
+    "winlog": {
+      "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
+      "channel": "Security",
+      "computer_name": "HOSTNAME.contoso.com",
+      "event_data": {
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x61ccd940",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetDomainName": "HOSTNAME",
+        "TargetUserName": "contoso",
+        "Workstation": "HOSTNAME"
+      },
+      "event_id": "4797",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x61ccd940"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 868,
+        "thread": {
+          "id": 12248
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "39956813",
+      "time_created": "2023-01-17T22:10:41.4905578Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:10:41.468Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "query-existence-of-blank-password",
+      "category": [
+        "iam"
+      ],
+      "code": "4797",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "user",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "HOSTNAME.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "user1",
+        "Administrator"
+      ]
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "id": "S-1-5-21-000000000-000000000-000000000-00000",
+      "name": "user1",
+      "target": {
+        "domain": "HOSTNAME",
+        "name": "Administrator"
+      }
+    },
+    "winlog": {
+      "activity_id": "{a895d499-2626-0001-2ad5-95a82626d901}",
+      "channel": "Security",
+      "computer_name": "HOSTNAME.contoso.com",
+      "event_data": {
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x61ccd940",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000",
+        "TargetDomainName": "HOSTNAME",
+        "TargetUserName": "Administrator",
+        "Workstation": "HOSTNAME"
+      },
+      "event_id": "4797",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x61ccd940"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 868,
+        "thread": {
+          "id": 12248
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "39956812",
+      "time_created": "2023-01-17T22:10:41.4680297Z"
+    }
+  }
+]

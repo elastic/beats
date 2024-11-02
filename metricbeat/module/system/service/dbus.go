@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package service
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"os"
@@ -29,8 +29,7 @@ import (
 	"strings"
 
 	"github.com/coreos/go-systemd/v22/dbus"
-	dbusRaw "github.com/godbus/dbus"
-	"github.com/pkg/errors"
+	dbusRaw "github.com/godbus/dbus/v5"
 )
 
 type unitFetcher func(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error)
@@ -42,18 +41,18 @@ func instrospectForUnitMethods() (unitFetcher, error) {
 	//setup a dbus connection
 	conn, err := dbusRaw.SystemBusPrivate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting connection to system bus")
+		return nil, fmt.Errorf("error getting connection to system bus: %w", err)
 	}
 
 	auth := dbusRaw.AuthExternal(strconv.Itoa(os.Getuid()))
 	err = conn.Auth([]dbusRaw.Auth{auth})
 	if err != nil {
-		return nil, errors.Wrap(err, "error authenticating")
+		return nil, fmt.Errorf("error authenticating: %w", err)
 	}
 
 	err = conn.Hello()
 	if err != nil {
-		return nil, errors.Wrap(err, "error in Hello")
+		return nil, fmt.Errorf("error in Hello: %w", err)
 	}
 
 	var props string
@@ -62,12 +61,12 @@ func instrospectForUnitMethods() (unitFetcher, error) {
 	obj := conn.Object("org.freedesktop.systemd1", dbusRaw.ObjectPath("/org/freedesktop/systemd1"))
 	err = obj.Call("org.freedesktop.DBus.Introspectable.Introspect", 0).Store(&props)
 	if err != nil {
-		return nil, errors.Wrap(err, "error calling dbus")
+		return nil, fmt.Errorf("error calling dbus: %w", err)
 	}
 
 	unitMap, err := parseXMLAndReturnMethods(props)
 	if err != nil {
-		return nil, errors.Wrap(err, "error handling XML")
+		return nil, fmt.Errorf("error handling XML: %w", err)
 	}
 
 	//return a function callback ordered by desirability
@@ -101,11 +100,11 @@ func parseXMLAndReturnMethods(str string) (map[string]bool, error) {
 
 	err := xml.Unmarshal([]byte(str), &methods)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unmarshalling XML")
+		return nil, fmt.Errorf("error unmarshalling XML: %w", err)
 	}
 
 	if len(methods.Interface) == 0 {
-		return nil, errors.Wrap(err, "no methods found on introspect")
+		return nil, fmt.Errorf("no methods found on introspect: %w", err)
 	}
 	methodMap := make(map[string]bool)
 	for _, iface := range methods.Interface {
@@ -121,14 +120,14 @@ func parseXMLAndReturnMethods(str string) (map[string]bool, error) {
 
 // listUnitsByPatternWrapper is a bare wrapper for the unitFetcher type
 func listUnitsByPatternWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	return conn.ListUnitsByPatterns(states, patterns)
+	return conn.ListUnitsByPatternsContext(context.Background(), states, patterns)
 }
 
-//listUnitsFilteredWrapper wraps the dbus ListUnitsFiltered method
+// listUnitsFilteredWrapper wraps the dbus ListUnitsFiltered method
 func listUnitsFilteredWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	units, err := conn.ListUnitsFiltered(states)
+	units, err := conn.ListUnitsFilteredContext(context.Background(), states)
 	if err != nil {
-		return nil, errors.Wrap(err, "ListUnitsFiltered error")
+		return nil, fmt.Errorf("ListUnitsFiltered error: %w", err)
 	}
 
 	return matchUnitPatterns(patterns, units)
@@ -136,14 +135,14 @@ func listUnitsFilteredWrapper(conn *dbus.Conn, states, patterns []string) ([]dbu
 
 // listUnitsWrapper wraps the dbus ListUnits method
 func listUnitsWrapper(conn *dbus.Conn, states, patterns []string) ([]dbus.UnitStatus, error) {
-	units, err := conn.ListUnits()
+	units, err := conn.ListUnitsContext(context.Background())
 	if err != nil {
-		return nil, errors.Wrap(err, "ListUnits error")
+		return nil, fmt.Errorf("ListUnits error: %w", err)
 	}
 
 	units, err = matchUnitPatterns(patterns, units)
 	if err != nil {
-		return nil, errors.Wrap(err, "error matching unit patterns")
+		return nil, fmt.Errorf("error matching unit patterns: %w", err)
 	}
 
 	finalUnits := matchUnitState(states, units)
@@ -181,7 +180,7 @@ func matchUnitPatterns(patterns []string, units []dbus.UnitStatus) ([]dbus.UnitS
 		for _, pattern := range patterns {
 			match, err := filepath.Match(pattern, unit.Name)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error matching with pattern %s", pattern)
+				return nil, fmt.Errorf("error matching with pattern %s: %w", pattern, err)
 			}
 			if match {
 				matchUnits = append(matchUnits, unit)

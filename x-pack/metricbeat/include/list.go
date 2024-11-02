@@ -7,10 +7,11 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/airflow"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/awshealth"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
@@ -36,6 +37,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/billing"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/carbon"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/ibmmq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
@@ -46,6 +48,8 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/mesh"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/mixer"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/pilot"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/meraki/device_health"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/performance"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/transaction_log"
@@ -53,6 +57,11 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle/performance"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle/sysmetric"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle/tablespace"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panw"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panw/interfaces"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panw/routing"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panw/system"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/panw/vpn"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/collector"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/prometheus/remote_write"

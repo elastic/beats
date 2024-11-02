@@ -20,58 +20,20 @@ package management
 import (
 	"sync"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Status describes the current status of the beat.
-type Status int
-
-//go:generate stringer -type=Status
-const (
-	// Unknown is initial status when none has been reported.
-	Unknown Status = iota
-	// Starting is status describing application is starting.
-	Starting
-	// Configuring is status describing application is configuring.
-	Configuring
-	// Running is status describing application is running.
-	Running
-	// Degraded is status describing application is degraded.
-	Degraded
-	// Failed is status describing application is failed. This status should
-	// only be used in the case the beat should stop running as the failure
-	// cannot be recovered.
-	Failed
-	// Stopping is status describing application is stopping.
-	Stopping
-	// Stopped is status describing application is stopped.
-	Stopped
-)
-
-// Namespace is the feature namespace for queue definition.
-var Namespace = "libbeat.management"
-
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
-
-var centralMgmtKey = "x-pack-cm"
-
-// StatusReporter provides a method to update current status of the beat.
-type StatusReporter interface {
-	// UpdateStatus called when the status of the beat has changed.
-	UpdateStatus(status Status, msg string)
-}
 
 // Manager interacts with the beat to provide status updates and to receive
 // configurations.
 type Manager interface {
-	StatusReporter
+	status.StatusReporter
 
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
@@ -90,8 +52,11 @@ type Manager interface {
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
-	// Note: Stop will not call 'UnregisterAction()' automaticallty.
+	// Note: Stop will not call 'UnregisterAction()' automatically.
 	Stop()
+
+	// AgentInfo returns the information of the agent to which the manager is connected.
+	AgentInfo() client.AgentInfo
 
 	// SetStopCallback accepts a function that need to be called when the manager want to shutdown the
 	// beats. This is needed when you want your beats to be gracefully shutdown remotely by the Elastic Agent
@@ -109,73 +74,61 @@ type Manager interface {
 
 	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
+
+	// RegisterDiagnosticHook registers a callback for elastic-agent diagnostics
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
 }
 
-// PluginFunc for creating FactoryFunc if it matches a config
-type PluginFunc func(*config.C) FactoryFunc
+// ManagerFactory is the factory type for creating a config manager
+type ManagerFactory func(*config.C, *reload.Registry) (Manager, error)
 
-// FactoryFunc for creating a config manager
-type FactoryFunc func(*config.C, *reload.Registry, uuid.UUID) (Manager, error)
+// If managerFactory is non-nil, NewManager will use it to create the
+// beats manager. managerFactoryLock must be held to access managerFactory.
+var managerFactory ManagerFactory
+var managerFactoryLock sync.Mutex
 
-// Register a config manager
-func Register(name string, fn PluginFunc, stability feature.Stability) {
-	f := feature.New(Namespace, name, fn, feature.MakeDetails(name, "", stability))
-	feature.MustRegister(f)
-}
-
-// Factory retrieves config manager constructor. If no one is registered
-// it will create a nil manager
-func Factory(cfg *config.C) FactoryFunc {
-	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
-	if err != nil {
-		return nilFactory
-	}
-
-	for _, f := range factories {
-		if plugin, ok := f.Factory().(PluginFunc); ok {
-			if factory := plugin(cfg); factory != nil {
-				return factory
-			}
+// NewManager creates the beats manager based on the given configuration
+// and registry. If management and x-pack are enabled this calls
+// NewV2AgentManager (see x-pack/libbeat/management/managerV2.go), otherwise
+// it returns a placeholder.
+// Tests can call SetManagerFactory to instead use a mocked manager,
+// see x-pack/libbeat/management/tests/init.go.
+func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
+	if cfg.Enabled() {
+		managerFactoryLock.Lock()
+		defer managerFactoryLock.Unlock()
+		if managerFactory != nil {
+			return managerFactory(cfg, registry)
 		}
 	}
-
-	return nilFactory
-}
-
-type modeConfig struct {
-	Mode string `config:"mode" yaml:"mode"`
-}
-
-func defaultModeConfig() *modeConfig {
-	return &modeConfig{
-		Mode: centralMgmtKey,
-	}
-}
-
-// nilManager, fallback when no manager is present
-type nilManager struct {
-	logger   *logp.Logger
-	lock     sync.Mutex
-	status   Status
-	msg      string
-	stopFunc func()
-}
-
-func nilFactory(*config.C, *reload.Registry, uuid.UUID) (Manager, error) {
-	log := logp.NewLogger("mgmt")
-	return &nilManager{
-		logger: log,
-		status: Unknown,
+	return &fallbackManager{
+		logger: logp.NewLogger("mgmt"),
+		status: status.Unknown,
 		msg:    "",
 	}, nil
 }
 
-func (*nilManager) SetStopCallback(func())             {}
-func (*nilManager) Enabled() bool                      { return false }
-func (*nilManager) Start() error                       { return nil }
-func (*nilManager) Stop()                              {}
-func (*nilManager) CheckRawConfig(cfg *config.C) error { return nil }
-func (n *nilManager) UpdateStatus(status Status, msg string) {
+// SetManagerFactory tells NewManager to use the given factory when management
+// is enabled. It is only called by Agent V2 initialization
+// (x-pack/libbeat/management/managerV2.go) and by tests that need a mocked
+// manager.
+func SetManagerFactory(factory ManagerFactory) {
+	managerFactoryLock.Lock()
+	defer managerFactoryLock.Unlock()
+	managerFactory = factory
+}
+
+// fallbackManager, fallback when no manager is present
+type fallbackManager struct {
+	logger   *logp.Logger
+	lock     sync.Mutex
+	status   status.Status
+	msg      string
+	stopFunc func()
+	stopOnce sync.Once
+}
+
+func (n *fallbackManager) UpdateStatus(status status.Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.status != status || n.msg != msg {
@@ -185,8 +138,36 @@ func (n *nilManager) UpdateStatus(status Status, msg string) {
 	}
 }
 
-func (n *nilManager) RegisterAction(action client.Action) {}
+func (n *fallbackManager) SetStopCallback(f func()) {
+	n.lock.Lock()
+	n.stopFunc = f
+	n.lock.Unlock()
+}
 
-func (n *nilManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) Stop() {
+	n.lock.Lock()
+	defer n.lock.Unlock()
+	if n.stopFunc != nil {
+		// I'm not sure we really need the sync.Once here, but
+		// because different Beats can have different requirements
+		// for their stop function, it's better to make sure it will
+		// only be called once.
+		n.stopOnce.Do(func() {
+			n.stopFunc()
+		})
+	}
+}
 
-func (n *nilManager) SetPayload(map[string]interface{}) {}
+// Enabled returns false because management is disabled.
+// the nilManager is still used for shutdown on some cases,
+// but that does not mean the Beat is being managed externally,
+// hence it will always return false.
+func (n *fallbackManager) Enabled() bool                         { return false }
+func (n *fallbackManager) AgentInfo() client.AgentInfo           { return client.AgentInfo{} }
+func (n *fallbackManager) Start() error                          { return nil }
+func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
+func (n *fallbackManager) RegisterAction(action client.Action)   {}
+func (n *fallbackManager) UnregisterAction(action client.Action) {}
+func (n *fallbackManager) SetPayload(map[string]interface{})     {}
+func (n *fallbackManager) RegisterDiagnosticHook(_ string, _ string, _ string, _ string, _ client.DiagnosticHook) {
+}

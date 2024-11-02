@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package users
 
@@ -25,8 +24,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/godbus/dbus"
-	"github.com/pkg/errors"
+	"github.com/godbus/dbus/v5"
 )
 
 const (
@@ -60,19 +58,19 @@ type loginSession struct {
 func initDbusConnection() (*dbus.Conn, error) {
 	conn, err := dbus.SystemBusPrivate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting connection to system bus")
+		return nil, fmt.Errorf("error getting connection to system bus: %w", err)
 	}
 
 	auth := dbus.AuthExternal(strconv.Itoa(os.Getuid()))
 
 	err = conn.Auth([]dbus.Auth{auth})
 	if err != nil {
-		return nil, errors.Wrap(err, "error authenticating")
+		return nil, fmt.Errorf("error authenticating: %w", err)
 	}
 
 	err = conn.Hello()
 	if err != nil {
-		return nil, errors.Wrap(err, "error in Hello")
+		return nil, fmt.Errorf("error in Hello: %w", err)
 	}
 
 	return conn, nil
@@ -86,7 +84,7 @@ func getSessionProps(conn *dbus.Conn, path dbus.ObjectPath) (sessionInfo, error)
 
 	err := busObj.Call(getAll, 0, "").Store(&props)
 	if err != nil {
-		return sessionInfo{}, errors.Wrap(err, "error calling DBus")
+		return sessionInfo{}, fmt.Errorf("error calling DBus: %w", err)
 	}
 
 	return formatSessionProps(props)
@@ -157,7 +155,7 @@ func listSessions(conn *dbus.Conn) ([]loginSession, error) {
 	var props [][]dbus.Variant
 
 	if err := busObj.Call(sessionList, 0).Store(&props); err != nil {
-		return nil, errors.Wrap(err, "error calling dbus")
+		return nil, fmt.Errorf("error calling dbus: %w", err)
 	}
 	return formatSessionList(props)
 }

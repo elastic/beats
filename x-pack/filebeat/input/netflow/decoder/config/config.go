@@ -6,26 +6,35 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
+type ActiveSessionsMetric interface {
+	Inc()
+	Dec()
+}
+
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
-	protocols   []string
-	logOutput   io.Writer
-	expiration  time.Duration
-	detectReset bool
-	fields      fields.FieldDict
+	protocols            []string
+	logOutput            io.Writer
+	expiration           time.Duration
+	detectReset          bool
+	fields               fields.FieldDict
+	sharedTemplates      bool
+	withCache            bool
+	activeSessionsMetric ActiveSessionsMetric
 }
 
 var defaultCfg = Config{
-	protocols:   []string{},
-	logOutput:   ioutil.Discard,
-	expiration:  time.Hour,
-	detectReset: true,
+	protocols:       []string{},
+	logOutput:       io.Discard,
+	expiration:      time.Hour,
+	detectReset:     true,
+	sharedTemplates: false,
+	withCache:       false,
 }
 
 // Defaults returns a configuration object with defaults settings:
@@ -56,6 +65,17 @@ func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	return c
 }
 
+// WithCache toggles the packet cache.
+func (c *Config) WithCache(enabled bool) *Config {
+	c.withCache = enabled
+	return c
+}
+
+// Cache returns if the packet cache is enabled.
+func (c *Config) Cache() bool {
+	return c.withCache
+}
+
 // WithSequenceResetEnabled allows to toggle the detection of reset sequences,
 // which mean that an Exporter has restarted. This will cause the session to be
 // reset (all templates expired). A value of true enables this behavior.
@@ -78,6 +98,20 @@ func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
 	for _, dict := range dicts {
 		c.fields.Merge(dict)
 	}
+	return c
+}
+
+// WithSharedTemplates allows to toggle the sharing of templates within
+// a v9 neflow or ipfix session. If it is not enabled, the source address
+// must match the address of the source of the template.
+func (c *Config) WithSharedTemplates(enabled bool) *Config {
+	c.sharedTemplates = enabled
+	return c
+}
+
+// WithActiveSessionsMetric configures the metric used to report active sessions.
+func (c *Config) WithActiveSessionsMetric(metric ActiveSessionsMetric) *Config {
+	c.activeSessionsMetric = metric
 	return c
 }
 
@@ -108,4 +142,13 @@ func (c *Config) Fields() fields.FieldDict {
 		return fields.GlobalFields
 	}
 	return c.fields
+}
+
+// ActiveSessionsMetric returns the configured metric to track active sessions.
+func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
+	if c == nil {
+		return nil
+	}
+
+	return c.activeSessionsMetric
 }

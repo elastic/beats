@@ -91,6 +91,12 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 	// errors and may relate to outages on the server side. This will catch
 	// invalid response codes as well, like 0 and 999.
 	if resp.StatusCode == 0 || (resp.StatusCode >= 500 && resp.StatusCode != 501) {
+		defer func() {
+			if resp.Body != nil {
+				_, _ = io.Copy(io.Discard, resp.Body)
+				resp.Body.Close()
+			}
+		}()
 		return true, nil
 	}
 

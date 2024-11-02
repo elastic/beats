@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package procs
 
@@ -30,7 +29,7 @@ import (
 )
 
 func TestFindSocketsOfPid(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	proc := []testProcFile{
 		{path: "/proc/766/fd/0", isLink: true, contents: "/dev/null"},

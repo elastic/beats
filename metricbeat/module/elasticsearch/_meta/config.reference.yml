@@ -5,14 +5,17 @@
     #- index
     #- index_recovery
     #- index_summary
+    #- ingest_pipeline
     #- shard
     #- ml_job
   period: 10s
   hosts: ["http://localhost:9200"]
   #username: "elastic"
   #password: "changeme"
+  #api_key: "foo:bar"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
+  #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node

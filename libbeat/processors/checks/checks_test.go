@@ -21,13 +21,12 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type mockProcessor struct{}
 
-func newMock(c *conf.C) (processors.Processor, error) {
+func newMock(c *conf.C) (beat.Processor, error) {
 	return &mockProcessor{}, nil
 }
 

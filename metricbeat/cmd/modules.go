@@ -18,9 +18,8 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -33,16 +32,16 @@ func BuildModulesManager(beat *beat.Beat) (cmd.ModulesManager, error) {
 
 	glob, err := config.String("config.modules.path", -1)
 	if err != nil {
-		return nil, errors.Errorf("modules management requires 'metricbeat.config.modules.path' setting")
+		return nil, fmt.Errorf("modules management requires 'metricbeat.config.modules.path' setting")
 	}
 
 	if !strings.HasSuffix(glob, "*.yml") {
-		return nil, errors.Errorf("wrong settings for config.modules.path, it is expected to end with *.yml. Got: %s", glob)
+		return nil, fmt.Errorf("wrong settings for config.modules.path, it is expected to end with *.yml. Got: %s", glob)
 	}
 
 	modulesManager, err := cfgfile.NewGlobManager(glob, ".yml", ".disabled")
 	if err != nil {
-		return nil, errors.Wrap(err, "initialization error")
+		return nil, fmt.Errorf("initialization error: %w", err)
 	}
 	return modulesManager, nil
 }

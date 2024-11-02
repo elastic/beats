@@ -1,0 +1,330 @@
+[
+    {
+        "activity_id": 0,
+        "activity_name": "",
+        "category_name": "Network Activity",
+        "category_uid": 4,
+        "class_name": "Network Activity",
+        "class_uid": 4001,
+        "cloud": {
+            "account_uid": "unknown",
+            "provider": "AWS",
+            "region": "us-east-1",
+            "zone": "use1-az3"
+        },
+        "connection_info": {
+            "boundary": "Unknown",
+            "boundary_id": 0,
+            "direction": "-",
+            "direction_id": 0,
+            "protocol_num": null,
+            "protocol_ver": "-",
+            "tcp_flags": null
+        },
+        "dst_endpoint": {
+            "instance_uid": null,
+            "interface_uid": null,
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": null,
+            "svc_name": "-",
+            "vpc_uid": null
+        },
+        "end_time": 1680171303000,
+        "metadata": {
+            "product": {
+                "feature": {
+                    "name": "Flowlogs"
+                },
+                "name": "Amazon VPC",
+                "vendor_name": "AWS",
+                "version": "5"
+            },
+            "profiles": [
+                "cloud"
+            ],
+            "version": "0.39.0"
+        },
+        "severity": "Other",
+        "severity_id": -1,
+        "src_endpoint": {
+            "instance_uid": "-",
+            "interface_uid": "eni-0a5df14ccfec68e31",
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": "subnet-73bd7642",
+            "svc_name": "-",
+            "vpc_uid": "vpc-d514c4a8"
+        },
+        "start_time": 1680171259000,
+        "time": 1680171259000,
+        "traffic": {
+            "bytes": null,
+            "packets": null
+        },
+        "type_name": "Network Activity: Unknown",
+        "type_uid": 400100,
+        "unmapped": [
+            {
+                "key": "log_status",
+                "value": "NODATA"
+            },
+            {
+                "key": "sublocation_id",
+                "value": "-"
+            },
+            {
+                "key": "sublocation_type",
+                "value": "-"
+            }
+        ]
+    },
+    {
+        "activity_id": 0,
+        "activity_name": "",
+        "category_name": "Network Activity",
+        "category_uid": 4,
+        "class_name": "Network Activity",
+        "class_uid": 4001,
+        "cloud": {
+            "account_uid": "unknown",
+            "provider": "AWS",
+            "region": "us-east-1",
+            "zone": "use1-az5"
+        },
+        "connection_info": {
+            "boundary": "Unknown",
+            "boundary_id": 0,
+            "direction": "-",
+            "direction_id": 0,
+            "protocol_num": null,
+            "protocol_ver": "-",
+            "tcp_flags": null
+        },
+        "dst_endpoint": {
+            "instance_uid": null,
+            "interface_uid": null,
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": null,
+            "svc_name": "-",
+            "vpc_uid": null
+        },
+        "end_time": 1680171323000,
+        "metadata": {
+            "product": {
+                "feature": {
+                    "name": "Flowlogs"
+                },
+                "name": "Amazon VPC",
+                "vendor_name": "AWS",
+                "version": "5"
+            },
+            "profiles": [
+                "cloud"
+            ],
+            "version": "0.39.0"
+        },
+        "severity": "Other",
+        "severity_id": -1,
+        "src_endpoint": {
+            "instance_uid": "-",
+            "interface_uid": "eni-04ec237a893668df7",
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": "subnet-89dda387",
+            "svc_name": "-",
+            "vpc_uid": "vpc-d514c4a8"
+        },
+        "start_time": 1680171291000,
+        "time": 1680171291000,
+        "traffic": {
+            "bytes": null,
+            "packets": null
+        },
+        "type_name": "Network Activity: Unknown",
+        "type_uid": 400100,
+        "unmapped": [
+            {
+                "key": "log_status",
+                "value": "NODATA"
+            },
+            {
+                "key": "sublocation_id",
+                "value": "-"
+            },
+            {
+                "key": "sublocation_type",
+                "value": "-"
+            }
+        ]
+    },
+    {
+        "activity_id": 0,
+        "activity_name": "",
+        "category_name": "Network Activity",
+        "category_uid": 4,
+        "class_name": "Network Activity",
+        "class_uid": 4001,
+        "cloud": {
+            "account_uid": "unknown",
+            "provider": "AWS",
+            "region": "us-east-1",
+            "zone": "use1-az4"
+        },
+        "connection_info": {
+            "boundary": "Unknown",
+            "boundary_id": 0,
+            "direction": "-",
+            "direction_id": 0,
+            "protocol_num": null,
+            "protocol_ver": "-",
+            "tcp_flags": null
+        },
+        "dst_endpoint": {
+            "instance_uid": null,
+            "interface_uid": null,
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": null,
+            "svc_name": "-",
+            "vpc_uid": null
+        },
+        "end_time": 1680171314000,
+        "metadata": {
+            "product": {
+                "feature": {
+                    "name": "Flowlogs"
+                },
+                "name": "Amazon VPC",
+                "vendor_name": "AWS",
+                "version": "5"
+            },
+            "profiles": [
+                "cloud"
+            ],
+            "version": "0.39.0"
+        },
+        "severity": "Other",
+        "severity_id": -1,
+        "src_endpoint": {
+            "instance_uid": "-",
+            "interface_uid": "eni-08bb1f5c30966d3bf",
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": "subnet-bae9bdf7",
+            "svc_name": "-",
+            "vpc_uid": "vpc-d514c4a8"
+        },
+        "start_time": 1680171294000,
+        "time": 1680171294000,
+        "traffic": {
+            "bytes": null,
+            "packets": null
+        },
+        "type_name": "Network Activity: Unknown",
+        "type_uid": 400100,
+        "unmapped": [
+            {
+                "key": "log_status",
+                "value": "NODATA"
+            },
+            {
+                "key": "sublocation_id",
+                "value": "-"
+            },
+            {
+                "key": "sublocation_type",
+                "value": "-"
+            }
+        ]
+    },
+    {
+        "activity_id": 0,
+        "activity_name": "",
+        "category_name": "Network Activity",
+        "category_uid": 4,
+        "class_name": "Network Activity",
+        "class_uid": 4001,
+        "cloud": {
+            "account_uid": "unknown",
+            "provider": "AWS",
+            "region": "us-east-1",
+            "zone": "use1-az3"
+        },
+        "connection_info": {
+            "boundary": "Unknown",
+            "boundary_id": 0,
+            "direction": "-",
+            "direction_id": 0,
+            "protocol_num": null,
+            "protocol_ver": "-",
+            "tcp_flags": null
+        },
+        "dst_endpoint": {
+            "instance_uid": null,
+            "interface_uid": null,
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": null,
+            "svc_name": "-",
+            "vpc_uid": null
+        },
+        "end_time": 1680171363000,
+        "metadata": {
+            "product": {
+                "feature": {
+                    "name": "Flowlogs"
+                },
+                "name": "Amazon VPC",
+                "vendor_name": "AWS",
+                "version": "5"
+            },
+            "profiles": [
+                "cloud"
+            ],
+            "version": "0.39.0"
+        },
+        "severity": "Other",
+        "severity_id": -1,
+        "src_endpoint": {
+            "instance_uid": "-",
+            "interface_uid": "eni-0a5df14ccfec68e31",
+            "intermediate_ips": null,
+            "ip": "-",
+            "port": null,
+            "subnet_uid": "subnet-73bd7642",
+            "svc_name": "-",
+            "vpc_uid": "vpc-d514c4a8"
+        },
+        "start_time": 1680171319000,
+        "time": 1680171319000,
+        "traffic": {
+            "bytes": null,
+            "packets": null
+        },
+        "type_name": "Network Activity: Unknown",
+        "type_uid": 400100,
+        "unmapped": [
+            {
+                "key": "log_status",
+                "value": "NODATA"
+            },
+            {
+                "key": "sublocation_id",
+                "value": "-"
+            },
+            {
+                "key": "sublocation_type",
+                "value": "-"
+            }
+        ]
+    }
+]

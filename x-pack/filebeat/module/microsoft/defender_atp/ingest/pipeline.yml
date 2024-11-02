@@ -1,6 +1,8 @@
 ---
 description: Pipeline for parsing microsoft atp logs
 processors:
+- drop:
+    if: ctx.json?.value != null && ctx.json.value.isEmpty()
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'

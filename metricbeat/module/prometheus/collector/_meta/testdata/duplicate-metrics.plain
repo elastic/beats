@@ -1,0 +1,6 @@
+# TYPE base_gc_total_total counter
+# HELP base_gc_total_total Displays the total number of collections that have occurred. This attribute lists -1 if the collection count is undefined for this collector.
+base_gc_total_total{name="PS MarkSweep"} 4
+# TYPE base_gc_total_total counter
+# HELP base_gc_total_total Displays the total number of collections that have occurred. This attribute lists -1 if the collection count is undefined for this collector.
+base_gc_total_total{name="PS Scavenge"} 34

@@ -18,10 +18,9 @@
 package timestamp
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -48,10 +47,10 @@ type processor struct {
 
 // New constructs a new timestamp processor for parsing time strings into
 // time.Time values.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack the timestamp configuration")
+		return nil, fmt.Errorf("failed to unpack the timestamp configuration: %w", err)
 	}
 
 	return newFromConfig(c)
@@ -72,7 +71,7 @@ func newFromConfig(c config) (*processor, error) {
 	for _, test := range c.TestTimestamps {
 		ts, err := p.parseValue(test)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to parse test timestamp")
+			return nil, fmt.Errorf("failed to parse test timestamp: %w", err)
 		}
 		p.log.Debugf("Test timestamp [%v] parsed as [%v].", test, ts.UTC())
 	}
@@ -92,7 +91,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure || (p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound)) {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "failed to get time field %v", p.Field)
+		return event, fmt.Errorf("failed to get time field %v: %w", p.Field, err)
 	}
 
 	// Try to convert the value to a time.Time.
@@ -135,11 +134,10 @@ func (p *processor) parseValue(v interface{}) (time.Time, error) {
 		if err == nil {
 			return ts, nil
 		}
-
-		switch e := err.(type) {
-		case *time.ParseError:
-			detailedErr.causes = append(detailedErr.causes, &parseErrorCause{e})
-		default:
+		var parseError *time.ParseError
+		if errors.As(err, &parseError) {
+			detailedErr.causes = append(detailedErr.causes, &parseErrorCause{parseError})
+		} else {
 			detailedErr.causes = append(detailedErr.causes, err)
 		}
 	}
@@ -176,7 +174,7 @@ func (p *processor) parseValueByLayout(v interface{}, layout string) (time.Time,
 	default:
 		str, ok := v.(string)
 		if !ok {
-			return time.Time{}, errors.Errorf("unexpected type %T for time field", v)
+			return time.Time{}, fmt.Errorf("unexpected type %T for time field", v)
 		}
 
 		ts, err := time.ParseInLocation(layout, str, p.tz)

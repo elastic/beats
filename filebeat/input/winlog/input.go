@@ -18,6 +18,7 @@
 package winlog
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"time"
@@ -25,6 +26,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
@@ -37,6 +39,10 @@ import (
 type eventlogRunner struct{}
 
 const pluginName = "winlog"
+
+const channelNotFoundError = "Encountered channel not found error when opening Windows Event Log"
+const eventLogReadingError = "Error occurred while reading from Windows Event Log"
+const resetError = "Error resetting Windows Event Log handle"
 
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
@@ -60,7 +66,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	//       as is common for other inputs?
 	eventLog, err := eventlog.New(cfg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to create new event log. %v", err)
+		return nil, nil, fmt.Errorf("failed to create new event log. %w", err)
 	}
 
 	sources := []cursor.Source{eventLog}
@@ -73,7 +79,7 @@ func (eventlogRunner) Test(source cursor.Source, ctx input.TestContext) error {
 	api := source.(eventlog.EventLog)
 	err := api.Open(checkpoint.EventLogState{})
 	if err != nil {
-		return fmt.Errorf("Failed to open '%v': %v", api.Name(), err)
+		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
 	}
 	return api.Close()
 }
@@ -84,63 +90,95 @@ func (eventlogRunner) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	log := ctx.Logger.With("eventlog", source.Name())
 	api := source.(eventlog.EventLog)
+	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
 	cancelCtx, cancelFn := ctxtool.WithFunc(ctx.Cancelation, func() {
 		if err := api.Close(); err != nil {
-			log.Errorf("Error while closing Windows Eventlog Access: %v", err)
+			log.Errorw("Error while closing Windows Event Log access", "error", err)
 		}
 	})
 	defer cancelFn()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+	ctx.UpdateStatus(status.Running, "")
+
 runLoop:
 	for {
+		//nolint:nilerr // only log error if we are not shutting down
 		if cancelCtx.Err() != nil {
 			return nil
 		}
 
 		evtCheckpoint := initCheckpoint(log, cursor)
 		openErr := api.Open(evtCheckpoint)
-		if eventlog.IsRecoverable(openErr) {
-			log.Errorf("Encountered recoverable error when opening Windows Event Log: %v", openErr)
-			timed.Wait(cancelCtx, 5*time.Second)
+		// Mark the input running.
+		// Status will be changed to "Degraded" if any error are encountered during opening/reading
+		ctx.UpdateStatus(status.Running, "")
+
+		switch {
+		case eventlog.IsRecoverable(openErr):
+			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
+			_ = timed.Wait(cancelCtx, 5*time.Second)
 			continue
-		} else if openErr != nil {
-			return fmt.Errorf("failed to open windows event log: %v", openErr)
+		case !api.IsFile() && eventlog.IsChannelNotFound(openErr):
+			if !channelNotFoundErrDetected {
+				log.Errorw(channelNotFoundError, "error", openErr)
+			} else {
+				log.Debugw(channelNotFoundError, "error", openErr)
+			}
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", channelNotFoundError, openErr))
+			channelNotFoundErrDetected = true
+			_ = timed.Wait(cancelCtx, 5*time.Second)
+			continue
+		case openErr != nil:
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("failed to open Windows Event Log channel %q: %v", api.Channel(), openErr))
+			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
-		log.Debugf("Windows Event Log '%s' opened successfully", source.Name())
+		channelNotFoundErrDetected = false
+
+		log.Debug("Windows Event Log opened successfully")
 
 		// read loop
 		for cancelCtx.Err() == nil {
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
-				log.Errorf("Encountered recoverable error when reading from Windows Event Log: %v", err)
-				if closeErr := api.Close(); closeErr != nil {
-					log.Errorf("Error closing Windows Event Log handle: %v", closeErr)
+				log.Errorw("Encountered recoverable error when reading from Windows Event Log", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					log.Errorw(resetError, "error", resetErr)
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", resetError, resetErr))
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-				break
-			case io.EOF:
-				log.Debugf("End of Winlog event stream reached: %v", err)
-				return nil
-			default:
-				// only log error if we are not shutting down
+			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+				log.Errorw("Encountered channel not found error when reading from Windows Event Log", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					log.Errorw(resetError, "error", resetErr)
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", resetError, resetErr))
+				}
+				continue runLoop
+			}
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					log.Debugw("End of Winlog event stream reached", "error", err)
+					return nil
+				}
+
+				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil
 				}
 
-				log.Errorf("Error occured while reading from Windows Event Log '%v': %v", source.Name(), err)
+				log.Errorw(eventLogReadingError, "error", err)
+				ctx.UpdateStatus(status.Degraded, fmt.Sprintf("%s: %v", eventLogReadingError, err))
 				return err
 			}
-
 			if len(records) == 0 {
-				timed.Wait(cancelCtx, time.Second)
+				_ = timed.Wait(cancelCtx, time.Second)
 				continue
 			}
 
@@ -149,6 +187,7 @@ runLoop:
 				if err := publisher.Publish(event, record.Offset); err != nil {
 					// Publisher indicates disconnect when returning an error.
 					// stop trying to publish records and quit
+					ctx.UpdateStatus(status.Degraded, fmt.Sprintf("Error occurred while publishing from winlog: %v", err))
 					return err
 				}
 			}

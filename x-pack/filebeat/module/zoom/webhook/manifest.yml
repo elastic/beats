@@ -24,6 +24,10 @@ var:
     default:
       header: Authorization
       value: ""
+  - name: crc
+    default:
+      enabled: false
+      secret: ""
 
   - name: tags
     default: [zoom-webhook, forwarded]

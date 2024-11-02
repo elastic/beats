@@ -29,7 +29,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-libs/kibana"
@@ -64,15 +63,15 @@ func Export(client *kibana.Client, id string) ([]byte, error) {
 func ExportAllFromYml(client *kibana.Client, ymlPath string) ([][]byte, ListYML, error) {
 	b, err := ioutil.ReadFile(ymlPath)
 	if err != nil {
-		return nil, ListYML{}, errors.Wrap(err, "error opening the list of dashboards")
+		return nil, ListYML{}, fmt.Errorf("error opening the list of dashboards: %w", err)
 	}
 	var list ListYML
 	err = yaml.Unmarshal(b, &list)
 	if err != nil {
-		return nil, ListYML{}, errors.Wrap(err, "error reading the list of dashboards")
+		return nil, ListYML{}, fmt.Errorf("error reading the list of dashboards: %w", err)
 	}
 	if len(list.Dashboards) == 0 {
-		return nil, ListYML{}, errors.Errorf("dashboards list is empty in file %v", ymlPath)
+		return nil, ListYML{}, fmt.Errorf("dashboards list is empty in file %v", ymlPath)
 	}
 
 	results, err := ExportAll(client, list)
@@ -86,7 +85,7 @@ func ExportAll(client *kibana.Client, list ListYML) ([][]byte, error) {
 	for _, e := range list.Dashboards {
 		result, err := Export(client, e.ID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed exporting id=%v", e.ID)
+			return nil, fmt.Errorf("failed exporting id=%v: %w", e.ID, err)
 		}
 		results = append(results, result)
 	}

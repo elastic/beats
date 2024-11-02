@@ -50,11 +50,11 @@ In Metricbeat, run the command from within a module like this: `go test --tags i
 
 A note about tags: the `--data` flag is a custom flag added by Metricbeat and Packetbeat frameworks. It will not be present in case tags do not match, as the relevant code will not be run and silently skipped (without the tag the test file is ignored by Go compiler so the framework doesn't load). This may happen if there are different tags in the build tags of the metricset under test (i.e. the GCP billing metricset requires the `billing` tag too).
 
-==== Running Python Tests
+==== Running System (integration) Tests (Python and Go)
 
-Python system tests are defined in the `tests/system` directory. They require a testing binary to be available and the python environment to be set up.
+The system tests are defined in the `tests/system` (for legacy Python test) and on `tests/integration` (for Go tests) directory. They require a testing binary to be available and the python environment to be set up.
 
-To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To setup the testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment[virtualenv documentation].
+To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To set up the Python testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment[virtualenv documentation].
 
 To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using https://docs.docker.com/compose/[docker-compose] and run all integration tests. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
 
@@ -62,12 +62,16 @@ To run the system and integration tests use the `mage pythonIntegTest` target, w
 ----
 # Create and activate the system test virtual environment (assumes a Unix system).
 source $(mage pythonVirtualEnv)/bin/activate
+
 # Pull and build the containers. Only needs to be done once unless you change the containers.
 mage docker:composeBuild
+
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
+
 # Run all system and integration tests.
 INTEGRATION_TESTS=1 pytest ./tests/system
+
 # Stop all started containers.
 mage docker:composeDown
 ----

@@ -46,14 +46,13 @@ var gotestHelperMode = os.Getenv(envGoTestHelper) == "1"
 // TestGoTest_CaptureOutput sets the `GOTEST_WANT_HELPER` environment variable when it executes the tests.
 // each test helper must check if it is driven by this function or not:
 //
-//         func TestGoTest_Helper_X(t *testing.T) {
-//           if !gotestHelperMode {
-//             return
-//           }
+//	func TestGoTest_Helper_X(t *testing.T) {
+//	  if !gotestHelperMode {
+//	    return
+//	  }
 //
-//           // sample test
-//         }
-//
+//	  // sample test
+//	}
 func TestGoTest_CaptureOutput(t *testing.T) {
 	errNonZero := "go test returned a non-zero value"
 	makeArgs := func(test string) GoTestArgs {
@@ -211,41 +210,41 @@ var wantTestAssertOutput = `(?sm:
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/assert_fails.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/assert_fails .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/assert_with_message .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/assert_with_message.*
         	Messages:   	My message.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/assert_with_message .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/assert_with_messagef .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/assert_with_messagef.*
         	Messages:   	My message with arguments: 42.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/assert_with_messagef .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/require_fails .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/require_fails.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/require_fails .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/require_with_message .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/require_with_message.*
         	Messages:   	My message.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/require_with_message .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/require_with_messagef .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
         	Error:      	Should be true.*
         	Test:       	TestGoTest_Helper_AssertOutput/require_with_messagef.*
         	Messages:   	My message with arguments: 42.*
-    --- FAIL: TestGoTest_Helper_AssertOutput/require_with_messagef .*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_AssertOutput/equals_map .*
     gotest_test.go:\d+:.*
         	Error Trace:	gotest_test.go:\d+.*
@@ -307,17 +306,17 @@ var wantTestLogOutput = `(?sm:
     gotest_test.go:\d+: printf style log message: 42.*
     gotest_test.go:\d+: Log should fail.*
     gotest_test.go:\d+: Log should fail with printf style log: 23.*
-    --- FAIL: TestGoTest_Helper_LogOutput/on_error.*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_LogOutput/on_fatal.*
     gotest_test.go:\d+: Log message should be printed.*
     gotest_test.go:\d+: printf style log message: 42.*
     gotest_test.go:\d+: Log should fail.*
-    --- FAIL: TestGoTest_Helper_LogOutput/on_fatal.*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_LogOutput/on_fatalf.*
     gotest_test.go:\d+: Log message should be printed.*
     gotest_test.go:\d+: printf style log message: 42.*
     gotest_test.go:\d+: Log should fail with printf style log: 42.*
-    --- FAIL: TestGoTest_Helper_LogOutput/on_fatalf.*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_LogOutput/with_newlines.*
     gotest_test.go:\d+: Log.*
         message.*
@@ -337,7 +336,7 @@ var wantTestLogOutput = `(?sm:
         style.*
         log:.*
         42.*
-    --- FAIL: TestGoTest_Helper_LogOutput/with_newlines.*
+
 === FAIL: dev-tools/mage TestGoTest_Helper_LogOutput.*
 DONE 5 tests, 5 failures in.*
 )`

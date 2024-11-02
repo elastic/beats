@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -27,12 +26,12 @@ type MockV2Handler struct {
 }
 
 // NewMockServer returns a mocked elastic-agent V2 controller
-func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitExpectedConfig, outPath string) MockV2Handler {
+func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.UnitExpectedConfig, outPath string) MockV2Handler {
 	unitOneID := mock.NewID()
 	unitOutID := mock.NewID()
 
 	token := mock.NewID()
-	//var gotConfig bool
+	// var gotConfig bool
 
 	var mut sync.Mutex
 
@@ -57,8 +56,6 @@ func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitE
 		}),
 	}
 
-	start := time.Now()
-
 	stopping := false
 	srv := mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
@@ -69,8 +66,8 @@ func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitE
 				if !stopping && (len(observed.Units) == 0 || observed.Units[0].State == proto.State_STARTING) {
 					return sendUnitsWithState(proto.State_HEALTHY, inputConfig, logOutputStream, unitOneID, unitOutID, 1)
 				} else if !stopping && checkUnitStateHealthy(observed.Units) {
-					if time.Since(start) > runtime {
-						// remove the units once they've been healthy for a given period of time
+					if canStop(outPath) {
+						// remove the units once the callback says we can
 						stopping = true
 						return sendUnitsWithState(proto.State_STOPPED, inputConfig, logOutputStream, unitOneID, unitOutID, 1)
 					}
@@ -101,12 +98,11 @@ func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitE
 	require.NoError(t, err)
 
 	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), token, client.VersionInfo{
-		Name:    "program",
-		Version: "v1.0.0",
+		Name: "program",
 		Meta: map[string]string{
 			"key": "value",
 		},
-	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	return MockV2Handler{Srv: srv, Client: client}
 }
@@ -114,7 +110,7 @@ func NewMockServer(t *testing.T, runtime time.Duration, inputConfig *proto.UnitE
 // helper to wrap the CheckinExpected config we need with every refresh of the mock server
 func sendUnitsWithState(state proto.State, input, output *proto.UnitExpectedConfig, inId, outId string, stateIndex uint64) *proto.CheckinExpected {
 	return &proto.CheckinExpected{
-		AgentInfo: &proto.CheckinAgentInfo{
+		AgentInfo: &proto.AgentInfo{
 			Id:       "test-agent",
 			Version:  "8.4.0",
 			Snapshot: true,
@@ -151,7 +147,7 @@ func checkUnitStateHealthy(units []*proto.UnitObserved) bool {
 	return true
 }
 
-//RequireNewStruct converts a mapstr to a protobuf struct
+// RequireNewStruct converts a mapstr to a protobuf struct
 func RequireNewStruct(v map[string]interface{}) *structpb.Struct {
 	str, err := structpb.NewStruct(v)
 	if err != nil {

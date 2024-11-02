@@ -91,7 +91,7 @@ func TestWhenProcessor(t *testing.T) {
 		}
 
 		cf := &countFilter{}
-		filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
+		filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
 			return cf, nil
 		})(config)
 		if err != nil {
@@ -116,7 +116,7 @@ func TestWhenProcessor(t *testing.T) {
 
 func TestConditionRuleInitErrorPropagates(t *testing.T) {
 	testErr := errors.New("test")
-	filter, err := NewConditional(func(_ *conf.C) (Processor, error) {
+	filter, err := NewConditional(func(_ *conf.C) (beat.Processor, error) {
 		return nil, testErr
 	})(conf.NewConfig())
 

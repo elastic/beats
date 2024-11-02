@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package ml_job
 
@@ -81,13 +80,5 @@ func TestData(t *testing.T) {
 	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL))
 	if err := mbtest.WriteEventsReporterV2Error(ms, t, ""); err != nil {
 		t.Fatal("error trying to write event:", err)
-	}
-}
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     elasticsearch.ModuleName,
-		"metricsets": []string{"ml_job"},
-		"hosts":      []string{host},
 	}
 }

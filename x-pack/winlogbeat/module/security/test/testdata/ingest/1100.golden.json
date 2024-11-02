@@ -10,7 +10,6 @@
         "process"
       ],
       "code": "1100",
-      "ingested": "2022-06-08T06:21:07.784686200Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

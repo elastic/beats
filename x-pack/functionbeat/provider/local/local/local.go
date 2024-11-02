@@ -21,16 +21,16 @@ import (
 
 const stdinName = "stdin"
 
-// Bundle exposes the local provider and the STDIN function.
-var Bundle = provider.MustCreate(
+// Features exposes the local provider and the STDIN function.
+var Features = provider.Builder(
 	"local",
 	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
 	feature.MakeDetails("local events", "allows to trigger events locally.", feature.Experimental),
-).MustAddFunction(
+).AddFunction(
 	stdinName,
 	NewStdinFunction,
 	feature.MakeDetails(stdinName, "read events from stdin", feature.Experimental),
-).Bundle()
+).Features()
 
 // StdinFunction reads events from STIN and terminates when stdin is completed.
 type StdinFunction struct{}

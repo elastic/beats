@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -37,7 +36,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.71"
+	NpcapVersion = "1.80"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 
@@ -48,6 +47,7 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+	packetbeat.SelectLogic = devtools.XPackProject
 }
 
 // Update updates the generated files.
@@ -102,7 +102,7 @@ func CrossBuild() error {
 			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 				return image, nil
 			}
-			if platform == "windows/amd64" || platform == "windows/386" {
+			if platform == "windows/amd64" {
 				image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
 				image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
 			}
@@ -165,11 +165,20 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+	// Buildkite (CI) images have preinstalled npcap
+	if os.Getenv("CI") == "true" {
+		mg.SerialDeps(devtools.BuildSystemTestBinary)
+	} else {
+		mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+	}
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
 	return devtools.GoTest(ctx, args)
+}
+
+func getBucketName() string {
+	return "ingest-buildkite-ci"
 }
 
 // getNpcapInstaller gets the installer from the Google Cloud Storage service.
@@ -198,7 +207,8 @@ func getNpcapInstaller() error {
 			return err
 		}
 	}
+	ciBucketName := getBucketName()
 
 	fmt.Printf("getting %s from private cache\n", installer)
-	return sh.RunV("gsutil", "cp", "gs://obs-ci-cache/private/"+installer, dstPath)
+	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }

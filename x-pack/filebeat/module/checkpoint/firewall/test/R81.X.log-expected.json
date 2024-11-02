@@ -18,7 +18,7 @@
         "event.module": "checkpoint",
         "event.sequence": 8,
         "event.start": "1657997472",
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 0,

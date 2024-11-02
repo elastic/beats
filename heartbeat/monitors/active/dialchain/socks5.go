@@ -30,11 +30,11 @@ import (
 //
 // The layer will update the active event with:
 //
-//  {
-//    "socks5": {
-//        "rtt": { "connect": { "us": ... }}
-//    }
-//  }
+//	{
+//	  "socks5": {
+//	      "rtt": { "connect": { "us": ... }}
+//	  }
+//	}
 func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer

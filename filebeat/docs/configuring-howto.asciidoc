@@ -23,11 +23,11 @@ include::{libbeat-dir}/shared/configuring-intro.asciidoc[]
 * <<filtering-and-enhancing-data>>
 * <<configuration-autodiscover>>
 * <<configuring-internal-queue>>
-* <<load-balancing>>
 * <<configuration-logging>>
 * <<http-endpoint>>
 * <<regexp-support>>
 * <<configuration-instrumentation>>
+* <<configuration-feature-flags>>
 * <<{beatname_lc}-reference-yml>>
 
 --
@@ -63,8 +63,6 @@ include::{libbeat-dir}/shared-autodiscover.asciidoc[]
 
 include::{libbeat-dir}/queueconfig.asciidoc[]
 
-include::./load-balancing.asciidoc[]
-
 include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
@@ -72,5 +70,7 @@ include::{libbeat-dir}/http-endpoint.asciidoc[]
 include::{libbeat-dir}/regexp.asciidoc[]
 
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
+
+include::{libbeat-dir}/shared-feature-flags.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]

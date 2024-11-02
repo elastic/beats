@@ -18,10 +18,11 @@
 package collector
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -43,7 +44,7 @@ var (
 	}.Build()
 
 	upMetricName          = "up"
-	upMetricType          = dto.MetricType_GAUGE
+	upMetricType          = model.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
 	upMetricJobValue      = "prometheus"
@@ -63,7 +64,7 @@ type PromEventsGenerator interface {
 	Start()
 
 	// GeneratePromEvents converts a Prometheus metric family into a list of PromEvents
-	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
+	GeneratePromEvents(mf *p.MetricFamily) []PromEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
@@ -82,6 +83,8 @@ type MetricSet struct {
 	promEventsGen   PromEventsGenerator
 	host            string
 	eventGenStarted bool
+	metricsCount    bool
+	xPack           bool
 }
 
 // MetricSetBuilder returns a builder function for a new Prometheus metricset using
@@ -102,22 +105,32 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 			return nil, err
 		}
 
+		// NOTE: We need to know if the generator is is of type *promEventGenerator
+		// to know if it is xpack or not. If it is promEventsGen is of type *promEventGenerator
+		// then it is not xpack. Else, it is xpack.
+		// This is required because how data is nested in x-pack and non-xpack if
+		// use_types is used in the former.
+		_, nonXPack := promEventsGen.(*promEventGenerator)
+
 		ms := &MetricSet{
 			BaseMetricSet:   base,
 			prometheus:      prometheus,
 			namespace:       namespace,
 			promEventsGen:   promEventsGen,
 			eventGenStarted: false,
+			metricsCount:    config.MetricsCount,
+			xPack:           !nonXPack,
 		}
+
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+			return nil, fmt.Errorf("unable to compile exclude patterns: %w", err)
 		}
 		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile include patterns")
+			return nil, fmt.Errorf("unable to compile include patterns: %w", err)
 		}
 
 		return ms, nil
@@ -138,7 +151,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		families = append(families, m.upMetricFamily(0.0))
 
 		// set the error to report it after sending the up event
-		err = errors.Wrap(err, "unable to decode response from prometheus endpoint")
+		err = fmt.Errorf("unable to decode response from prometheus endpoint: %w", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
@@ -151,18 +164,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		promEvents := m.promEventsGen.GeneratePromEvents(family)
 
 		for _, promEvent := range promEvents {
+			// Add default instance label if not already there
+			if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
+				_, _ = promEvent.Labels.Put(upMetricInstanceLabel, m.host)
+			}
+			// Add default job label if not already there
+			if exists, _ := promEvent.Labels.HasKey("job"); !exists {
+				_, _ = promEvent.Labels.Put("job", m.Module().Name())
+			}
+			// Calculate labels hash after adding all relevant labels
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
 				eventList[labelsHash] = mapstr.M{}
-
-				// Add default instance label if not already there
-				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
-				}
-				// Add default job label if not already there
-				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
-					promEvent.Labels.Put("job", m.Module().Name())
-				}
 				// Add labels
 				if len(promEvent.Labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.Labels
@@ -176,9 +189,48 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Report events
 	for _, e := range eventList {
-		isOpen := reporter.Event(mb.Event{
-			RootFields: mapstr.M{m.namespace: e},
-		})
+		event := mb.Event{RootFields: mapstr.M{m.namespace: e}}
+
+		if m.metricsCount {
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each metric because histograms and summaries are special.
+			// For example, if you notice histogram's implementation in data.go, then you'd notice single PromEvent holds 2 metrics. Here:
+			//
+			//	 PromEvent{
+			//	 	Data: mapstr.M{
+			//	 		"metrics": mapstr.M{
+			//	 			name + "_sum":   histogram.GetSampleSum(),
+			//	 			name + "_count": histogram.GetSampleCount(),
+			//	 		},
+			//	 	},
+			//	 	Labels: labels,
+			// 	}
+			//
+			// Here, name +  "_sum" and name + "_count" are the 2 metrics.
+			//
+			// So, len(v) will be 2 in the above example.
+			// Similarly, it will happen for x-pack prometheus module too. Please see
+			// the unit tests for the same.
+			switch m.xPack {
+			case true:
+				// As, metrics are nested under the "prometheus" key in case of x-pack,
+				// labels is also nested under the "prometheus" key. So, we need to
+				// make sure we subtract 1 in case the e["labels"]
+				// also exists.
+				if _, hasLabels := e["labels"].(mapstr.M); hasLabels {
+					event.RootFields.Put("metrics_count", len(e)-1)
+				} else {
+					event.RootFields.Put("metrics_count", len(e))
+				}
+			default:
+				if v, ok := e["metrics"].(mapstr.M); ok {
+					event.RootFields.Put("metrics_count", len(v))
+				}
+			}
+		}
+
+		isOpen := reporter.Event(event)
 		if !isOpen {
 			break
 		}
@@ -195,30 +247,30 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) upMetricFamily(value float64) *dto.MetricFamily {
-	gauge := dto.Gauge{
+func (m *MetricSet) upMetricFamily(value float64) *p.MetricFamily {
+	gauge := p.Gauge{
 		Value: &value,
 	}
-	label1 := dto.LabelPair{
-		Name:  &upMetricInstanceLabel,
-		Value: &m.host,
+	label1 := labels.Label{
+		Name:  upMetricInstanceLabel,
+		Value: m.host,
 	}
-	label2 := dto.LabelPair{
-		Name:  &upMetricJobLabel,
-		Value: &upMetricJobValue,
+	label2 := labels.Label{
+		Name:  upMetricJobLabel,
+		Value: upMetricJobValue,
 	}
-	metric := dto.Metric{
+	metric := p.OpenMetric{
 		Gauge: &gauge,
-		Label: []*dto.LabelPair{&label1, &label2},
+		Label: []*labels.Label{&label1, &label2},
 	}
-	return &dto.MetricFamily{
+	return &p.MetricFamily{
 		Name:   &upMetricName,
-		Type:   &upMetricType,
-		Metric: []*dto.Metric{&metric},
+		Type:   upMetricType,
+		Metric: []*p.OpenMetric{&metric},
 	}
 }
 
-func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+func (m *MetricSet) skipFamily(family *p.MetricFamily) bool {
 	if family == nil {
 		return false
 	}

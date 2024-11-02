@@ -16,12 +16,11 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package iostat
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -72,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	IOstats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
-		return errors.Wrap(err, "disk io counters")
+		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
@@ -90,7 +89,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		result, err := m.stats.CalcIOStatistics(counters)
 		if err != nil {
-			return errors.Wrap(err, "error calculating iostat")
+			return fmt.Errorf("error calculating iostat: %w", err)
 		}
 		IOstats := AddLinuxIOStat(result)
 		event.DeepUpdate(IOstats)

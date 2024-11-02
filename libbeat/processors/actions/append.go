@@ -53,7 +53,7 @@ func init() {
 }
 
 // NewAppendProcessor returns a new append processor.
-func NewAppendProcessor(c *conf.C) (processors.Processor, error) {
+func NewAppendProcessor(c *conf.C) (beat.Processor, error) {
 	config := appendProcessorConfig{
 		IgnoreMissing:     false,
 		IgnoreEmptyValues: false,
@@ -81,7 +81,8 @@ func (f *appendProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	err := f.appendValues(f.config.TargetField, f.config.Fields, f.config.Values, event)
 	if err != nil {
 		errMsg := fmt.Errorf("failed to append fields in append processor: %w", err)
-		f.logger.Debug(errMsg.Error())
+		f.logger.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 		if f.config.FailOnError {
 			event = backup
 			if _, err := event.PutValue("error.message", errMsg.Error()); err != nil {

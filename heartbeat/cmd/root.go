@@ -18,12 +18,11 @@
 package cmd
 
 import (
-
-	// include all heartbeat specific autodiscovery builders
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
+	"github.com/elastic/beats/v7/heartbeat/include"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -33,6 +32,9 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+
+	// include all heartbeat specific autodiscovery builders
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 )
 
 const (
@@ -54,8 +56,9 @@ var withECSVersion = processing.WithFields(mapstr.M{
 func HeartbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
+		Initialize:    []func(){include.InitializeModule},
 	}
 }
 
@@ -79,6 +82,7 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 `
 	setup.ResetFlags()
 	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
+	cfgfile.AddAllowedBackwardsCompatibleFlag(cmd.IndexManagementKey)
 
 	return rootCmd
 }

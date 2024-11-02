@@ -16,6 +16,7 @@ Learn how to perform common {beatname_uc} configuration tasks.
 * <<using-environ-vars>>
 * <<yaml-tips>>
 * <<migrate-to-filestream>>
+* <<migrate-from-deprecated-module>>
 
 
 --
@@ -46,4 +47,5 @@ include::{libbeat-dir}/yaml.asciidoc[]
 
 include::migrate-to-filestream.asciidoc[]
 
+include::migrate-from-deprecated-module.asciidoc[]
 

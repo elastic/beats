@@ -16,19 +16,19 @@
 // under the License.
 
 //go:build !linux
-// +build !linux
 
 package auditd
 
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(metricsetName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(metricsetName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),
 	)

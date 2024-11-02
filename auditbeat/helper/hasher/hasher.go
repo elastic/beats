@@ -199,7 +199,7 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 		}
 	}
 
-	var hashes []hash.Hash
+	var hashes []hash.Hash //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, hashType := range hasher.config.HashTypes {
 		h, valid := validHashes[hashType]
 		if !valid {

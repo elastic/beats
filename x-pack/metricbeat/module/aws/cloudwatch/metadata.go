@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/ec2"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/rds"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/sqs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // AWS namespaces
@@ -23,10 +24,10 @@ const (
 )
 
 // addMetadata adds metadata to the given events map based on namespace
-func addMetadata(namespace string, regionName string, awsConfig awssdk.Config, fipsEnabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+func addMetadata(logger *logp.Logger, namespace string, regionName string, awsConfig awssdk.Config, fipsEnabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	switch namespace {
 	case namespaceEC2:
-		events, err := ec2.AddMetadata(regionName, awsConfig, fipsEnabled, events)
+		events, err := ec2.AddMetadata(logger, regionName, awsConfig, fipsEnabled, events)
 		if err != nil {
 			return events, fmt.Errorf("error adding metadata to ec2: %w", err)
 		}

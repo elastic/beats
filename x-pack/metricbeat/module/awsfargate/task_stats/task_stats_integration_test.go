@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package task_stats
 
@@ -52,6 +51,11 @@ func TestFetch(t *testing.T) {
 	// The goal here is to make sure every element inside the
 	// event has a matching field ("no field left behind").
 	mbtest.TestMetricsetFieldsDocumented(t, metricSet, []mb.Event{event})
+
+	t.Cleanup(func() {
+		taskStatsResp.Body.Close()
+		byteTaskResp.Body.Close()
+	})
 }
 
 func TestData(t *testing.T) {
@@ -86,6 +90,11 @@ func TestData(t *testing.T) {
 	standardizeEvent := m.StandardizeEvent(event)
 
 	mbtest.WriteEventToDataJSON(t, standardizeEvent, "")
+
+	t.Cleanup(func() {
+		taskStatsResp.Body.Close()
+		byteTaskResp.Body.Close()
+	})
 }
 
 // buildResponse is a test helper that loads the content of `filename` and returns

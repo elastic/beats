@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package flows
 
@@ -43,7 +42,7 @@ func (f *flowsChan) PublishFlows(events []beat.Event) {
 }
 
 func TestFlowsCounting(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	mac1 := []byte{1, 2, 3, 4, 5, 6}
 	mac2 := []byte{6, 5, 4, 3, 2, 1}
@@ -52,7 +51,7 @@ func TestFlowsCounting(t *testing.T) {
 	port1 := []byte{0, 1}
 	port2 := []byte{0, 2}
 
-	module, err := NewFlows(nil, procs.ProcessesWatcher{}, &config.Flows{})
+	module, err := NewFlows(nil, &procs.ProcessesWatcher{}, &config.Flows{})
 	assert.NoError(t, err)
 
 	uint1, err := module.NewUint("uint1")
@@ -72,6 +71,7 @@ func TestFlowsCounting(t *testing.T) {
 
 	processor := &flowsProcessor{
 		table:    module.table,
+		watcher:  &procs.ProcessesWatcher{},
 		counters: module.counterReg,
 		timeout:  20 * time.Millisecond,
 	}

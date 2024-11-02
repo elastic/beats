@@ -33,7 +33,7 @@ import (
 )
 
 var addResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
-var metagen = metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
+var metagen = metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, nil, nil, addResourceMetadata)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = config.NewConfig()
@@ -91,7 +91,7 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = config.NewConfig()
 
-	metaGenWithPodUID := metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, addResourceMetadata)
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(config.NewConfig(), nil, nil, nil, nil, nil, nil, addResourceMetadata)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.NoError(t, err)
@@ -302,7 +302,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, addResourceMetadata)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil, nil, addResourceMetadata)
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.NoError(t, err)
@@ -339,7 +339,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, addResourceMetadata)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil, nil, addResourceMetadata)
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.NoError(t, err)

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
-// +build linux dragonfly freebsd netbsd openbsd solaris aix
 
 package memlog
 

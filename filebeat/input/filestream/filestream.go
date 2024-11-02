@@ -67,7 +67,7 @@ func newFileReader(
 	config readerConfig,
 	closerConfig closerConfig,
 ) (*logFile, error) {
-	offset, err := f.Seek(0, os.SEEK_CUR)
+	offset, err := f.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return nil, err
 	}
@@ -137,17 +137,23 @@ func (f *logFile) Read(buf []byte) (int, error) {
 
 func (f *logFile) startFileMonitoringIfNeeded() {
 	if f.closeInactive > 0 || f.closeRemoved || f.closeRenamed {
-		f.tg.Go(func(ctx context.Context) error {
+		err := f.tg.Go(func(ctx context.Context) error {
 			f.periodicStateCheck(ctx)
 			return nil
 		})
+		if err != nil {
+			f.log.Errorf("failed to start file monitoring: %w", err)
+		}
 	}
 
 	if f.closeAfterInterval > 0 {
-		f.tg.Go(func(ctx context.Context) error {
+		err := f.tg.Go(func(ctx context.Context) error {
 			f.closeIfTimeout(ctx)
 			return nil
 		})
+		if err != nil {
+			f.log.Errorf("failed to schedule a file close: %w", err)
+		}
 	}
 }
 
@@ -158,12 +164,17 @@ func (f *logFile) closeIfTimeout(ctx unison.Canceler) {
 }
 
 func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
-	timed.Periodic(ctx, f.checkInterval, func() error {
+	err := timed.Periodic(ctx, f.checkInterval, func() error {
 		if f.shouldBeClosed() {
 			f.readerCtx.Cancel()
 		}
 		return nil
 	})
+	if err != nil {
+		if !errors.Is(err, context.Canceled) {
+			f.log.Errorf("failed to schedule a periodic state check: %s", err)
+		}
+	}
 }
 
 func (f *logFile) shouldBeClosed() bool {
@@ -221,7 +232,7 @@ func isSameFile(path string, info os.FileInfo) bool {
 // errorChecks determines the cause for EOF errors, and how the EOF event should be handled
 // based on the config options.
 func (f *logFile) errorChecks(err error) error {
-	if err != io.EOF {
+	if !errors.Is(err, io.EOF) {
 		f.log.Error("Unexpected state reading from %s; error: %s", f.file.Name(), err)
 		return err
 	}
@@ -256,6 +267,6 @@ func (f *logFile) handleEOF() error {
 func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
 	err := f.file.Close()
-	f.tg.Stop() // Wait until all resources are released for sure.
+	_ = f.tg.Stop() // Wait until all resources are released for sure.
 	return err
 }

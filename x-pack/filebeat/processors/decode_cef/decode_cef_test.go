@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pmezard/go-difflib/difflib"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -57,6 +57,64 @@ func TestProcessorRun(t *testing.T) {
 				"observer.version": "1.2.3",
 				"source.ip":        "10.52.116.160",
 				"source.user.name": "admin",
+			},
+		},
+		"empty_field_values": {
+			config: func() config {
+				c := defaultConfig()
+				c.TargetField = ""
+				c.IgnoreEmptyValues = true
+				return c
+			},
+			message: "CEF:1|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src= suser= target=admin msg=User signed in from 2001:db8::5",
+			fields: mapstr.M{
+				"version":               "1",
+				"device.event_class_id": "600",
+				"device.product":        "Deep Security Manager",
+				"device.vendor":         "Trend Micro",
+				"device.version":        "1.2.3",
+				"name":                  "User Signed In",
+				"severity":              "3",
+				"event.severity":        3,
+				"extensions.message":    "User signed in from 2001:db8::5",
+				"extensions.target":     "admin",
+				// ECS
+				"event.code":       "600",
+				"message":          "User signed in from 2001:db8::5",
+				"observer.product": "Deep Security Manager",
+				"observer.vendor":  "Trend Micro",
+				"observer.version": "1.2.3",
+			},
+		},
+		"key_with_dash": {
+			config: func() config {
+				c := defaultConfig()
+				c.TargetField = ""
+				c.IgnoreEmptyValues = true
+				return c
+			},
+			message: "CEF:0|Palo Alto Networks|LF|2.0|TRAFFIC|end|3|src=127.0.0.1 dst=0.0.0.0 PanOSX-Forwarded-ForIP=0.0.0.0 ",
+			fields: mapstr.M{
+				"version":                           "0",
+				"device.event_class_id":             "TRAFFIC",
+				"device.product":                    "LF",
+				"device.vendor":                     "Palo Alto Networks",
+				"device.version":                    "2.0",
+				"severity":                          "3",
+				"event.severity":                    3,
+				"extensions.sourceAddress":          "127.0.0.1",
+				"extensions.destinationAddress":     "0.0.0.0",
+				"extensions.PanOSX-Forwarded-ForIP": "0.0.0.0",
+				"name":                              "end",
+
+				// ECS
+				"event.code":       "TRAFFIC",
+				"destination.ip":   "0.0.0.0",
+				"message":          "end",
+				"observer.product": "LF",
+				"observer.vendor":  "Palo Alto Networks",
+				"observer.version": "2.0",
+				"source.ip":        "127.0.0.1",
 			},
 		},
 		"parse_errors": {
@@ -226,7 +284,7 @@ func readCEFSamples(t testing.TB, source string) []mapstr.M {
 		t.Fatal(err)
 	}
 
-	var samples []mapstr.M
+	var samples []mapstr.M //nolint:prealloc // size is unknown and it's a test
 	s := bufio.NewScanner(f)
 	for s.Scan() {
 		data := s.Bytes()
@@ -315,14 +373,8 @@ func assertEqual(t testing.TB, expected, actual interface{}) bool {
 	expJSON, _ := json.MarshalIndent(expected, "", "  ")
 	actJSON, _ := json.MarshalIndent(actual, "", "  ")
 
-	diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-		A:        difflib.SplitLines(string(expJSON)),
-		B:        difflib.SplitLines(string(actJSON)),
-		FromFile: "Expected",
-		ToFile:   "Actual",
-		Context:  1,
-	})
-	t.Errorf("Expected and actual are different:\n%s", diff)
+	t.Errorf("Expected and actual are different:\n%s",
+		cmp.Diff(string(expJSON), string(actJSON)))
 	return false
 }
 

@@ -22,15 +22,15 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/packetbeat/beater"
+	"github.com/elastic/beats/v7/packetbeat/include"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	// Register fields and protocol modules.
-	_ "github.com/elastic/beats/v7/packetbeat/include"
 )
 
 const (
@@ -49,20 +49,26 @@ var withECSVersion = processing.WithFields(mapstr.M{
 var RootCmd *cmd.BeatsRootCmd
 
 // PacketbeatSettings contains the default settings for packetbeat
-func PacketbeatSettings() instance.Settings {
+func PacketbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("I")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("t")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("O"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("O")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("l")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("dump")
 
 	return instance.Settings{
 		RunFlags:       runFlags,
 		Name:           Name,
 		HasDashboards:  true,
-		Processing:     processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:     processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		InputQueueSize: 400,
+		Initialize:     []func(){include.InitializeModule},
 	}
 }
 
@@ -74,5 +80,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(PacketbeatSettings())
+	RootCmd = Initialize(PacketbeatSettings(nil))
 }

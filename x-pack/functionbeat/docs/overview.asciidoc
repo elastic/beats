@@ -2,6 +2,9 @@
 [role="xpack"]
 == {beatname_uc} overview
 
+IMPORTANT: Beginning with version 8.10.4 the {beatname_uc} documentation is no longer being updated.
+We recommend instead to use {esf-ref}[{esf}] to ships logs from your AWS environment to Elastic.
+
 {beatname_uc} is an Elastic https://www.elastic.co/beats[Beat] that you
 deploy as a function in your serverless environment to collect data from cloud
 services and ship it to the {stack}.

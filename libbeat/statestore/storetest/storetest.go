@@ -35,7 +35,8 @@ import (
 // will be initialized lazily if it has not been setup upfront.
 //
 // Example: Create store for testing:
-//    store := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+//
+//	store := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 type MemoryStore struct {
 	Stores map[string]*MapStore
 	mu     sync.Mutex

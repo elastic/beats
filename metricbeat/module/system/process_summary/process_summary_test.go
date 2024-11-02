@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows
-// +build darwin freebsd linux windows
 
 package process_summary
 
@@ -43,29 +42,31 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	err := logp.DevelopmentSetup()
-	require.NoError(t, err)
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	require.Empty(t, errs)
+	for _, err := range errs {
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		event.StringToPrint())
 
-	_, err = event.GetValue("system.process.summary")
+	_, err := event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
 }
 
 func TestStateNames(t *testing.T) {
-	err := logp.DevelopmentSetup()
-	require.NoError(t, err)
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	require.Empty(t, errs)
+	for _, err := range errs {
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+	}
 	require.NotEmpty(t, events)
 	event := events[0].BeatEvent("system", "process_summary").Fields
 

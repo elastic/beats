@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -15,6 +14,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"go.uber.org/multierr"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -59,7 +60,10 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return devtools.GolangCrossBuild(args)
+	return multierr.Combine(
+		devtools.GolangCrossBuild(args),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -230,6 +234,10 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -242,6 +250,10 @@ func GoIntegTest(ctx context.Context) error {
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -252,6 +264,9 @@ func PythonIntegTest(ctx context.Context) error {
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
 		// On Windows 32-bit converage is not enabled.
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"

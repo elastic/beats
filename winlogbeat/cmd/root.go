@@ -52,7 +52,7 @@ func WinlogbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
 		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 	}
 }
 

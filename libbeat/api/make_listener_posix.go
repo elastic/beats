@@ -16,16 +16,14 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
@@ -54,10 +52,9 @@ func makeListener(cfg Config) (net.Listener, error) {
 	if network == "unix" {
 		if _, err := os.Stat(path); !os.IsNotExist(err) {
 			if err := os.Remove(path); err != nil {
-				return nil, errors.Wrapf(
-					err,
-					"cannot remove existing unix socket file at location %s",
-					path,
+				return nil, fmt.Errorf(
+					"cannot remove existing unix socket file at location %s: %w",
+					path, err,
 				)
 			}
 		}
@@ -71,11 +68,11 @@ func makeListener(cfg Config) (net.Listener, error) {
 	// Ensure file mode
 	if network == "unix" {
 		if err := os.Chmod(path, socketFileMode); err != nil {
-			return nil, errors.Wrapf(
-				err,
-				"could not set mode %d for unix socket file at location %s",
+			return nil, fmt.Errorf(
+				"could not set mode %d for unix socket file at location %s: %w",
 				socketFileMode,
 				path,
+				err,
 			)
 		}
 	}

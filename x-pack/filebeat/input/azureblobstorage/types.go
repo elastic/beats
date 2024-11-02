@@ -8,16 +8,21 @@ package azureblobstorage
 import (
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 )
 
 // Source, it is the cursor source
 type Source struct {
-	ContainerName string
-	AccountName   string
-	MaxWorkers    int
-	Poll          bool
-	PollInterval  time.Duration
+	ContainerName            string
+	AccountName              string
+	MaxWorkers               int
+	Poll                     bool
+	PollInterval             time.Duration
+	TimeStampEpoch           *int64
+	FileSelectors            []fileSelectorConfig
+	ReaderConfig             readerConfig
+	ExpandEventListFromField string
 }
 
 func (s *Source) Name() string {
@@ -27,6 +32,7 @@ func (s *Source) Name() string {
 const (
 	sharedKeyType        = "sharedKeyType"
 	connectionStringType = "connectionStringType"
+	oauth2Type           = "oauth2Type"
 	jsonType             = "application/json"
 	octetType            = "application/octet-stream"
 	ndJsonType           = "application/x-ndjson"
@@ -36,6 +42,7 @@ const (
 
 // currently only shared key & connection string types of credentials are supported
 type serviceCredentials struct {
+	oauth2Creds        *azidentity.ClientSecretCredential
 	sharedKeyCreds     *azblob.SharedKeyCredential
 	connectionStrCreds string
 	cType              string

@@ -29,7 +29,6 @@ import (
 	"text/template"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/dev-tools/mage"
@@ -61,12 +60,12 @@ type metricsetData struct {
 func writeTemplate(filename string, t *template.Template, args interface{}) error {
 	fd, err := os.Create(filename)
 	if err != nil {
-		return errors.Wrapf(err, "error opening file at %s", filename)
+		return fmt.Errorf("error opening file at %s: %w", filename, err)
 	}
 	defer fd.Close()
 	err = t.Execute(fd, args)
 	if err != nil {
-		return errors.Wrap(err, "error executing template")
+		return fmt.Errorf("error executing template: %w", err)
 	}
 	return nil
 }
@@ -150,7 +149,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 	for _, dir := range runpaths {
 		rawMap, err := sh.OutCmd("go", append(cmd, dir)...)()
 		if err != nil {
-			return nil, errors.Wrap(err, "Error running subcommand to get metricsets")
+			return nil, fmt.Errorf("Error running subcommand to get metricsets: %w", err)
 		}
 		var msetMap = make(map[string][]string)
 		err = json.Unmarshal([]byte(rawMap), &msetMap)
@@ -169,7 +168,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 func loadModuleFields(file string) (moduleData, error) {
 	fd, err := ioutil.ReadFile(file)
 	if err != nil {
-		return moduleData{}, errors.Wrap(err, "failed to read from spec file")
+		return moduleData{}, fmt.Errorf("failed to read from spec file: %w", err)
 	}
 	// Cheat and use the same struct.
 	var mod []moduleData
@@ -180,7 +179,7 @@ func loadModuleFields(file string) (moduleData, error) {
 
 	rel, err := getRelease(module.Release)
 	if err != nil {
-		return mod[0], errors.Wrapf(err, "file %s is missing a release string", file)
+		return mod[0], fmt.Errorf("file %s is missing a release string: %w", file, err)
 	}
 	module.Release = rel
 
@@ -191,7 +190,7 @@ func loadModuleFields(file string) (moduleData, error) {
 func getReleaseState(metricsetPath string) (string, error) {
 	raw, err := ioutil.ReadFile(metricsetPath)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to read from spec file")
+		return "", fmt.Errorf("failed to read from spec file: %w", err)
 	}
 
 	type metricset struct {
@@ -204,7 +203,7 @@ func getReleaseState(metricsetPath string) (string, error) {
 
 	relString, err := getRelease(rel[0].Release)
 	if err != nil {
-		return "", errors.Wrapf(err, "metricset %s is missing a release tag", metricsetPath)
+		return "", fmt.Errorf("metricset %s is missing a release tag: %w", metricsetPath, err)
 	}
 	return relString, nil
 }
@@ -298,7 +297,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 func gatherData(modules []string) ([]moduleData, error) {
 	defmset, err := getDefaultMetricsets()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting default metricsets")
+		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
 	//iterate over all the modules, checking to make sure we have an asciidoc file
@@ -377,7 +376,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 			filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.asciidoc", metricset.Title))
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
-				return errors.Wrapf(err, "error opening file at %s", filename)
+				return fmt.Errorf("error opening file at %s: %w", filename, err)
 			}
 		} // end metricset loop
 	} // end module loop
@@ -403,25 +402,25 @@ func writeDocs(modules []moduleData) error {
 	tmplList := template.New("moduleList").Option("missingkey=error").Funcs(funcMap)
 	beatPath, err := mage.ElasticBeatsDir()
 	if err != nil {
-		return errors.Wrap(err, "error finding beats dir")
+		return fmt.Errorf("error finding beats dir: %w", err)
 	}
 	tmplList, err = tmplList.ParseGlob(path.Join(beatPath, "metricbeat/scripts/mage/template/*.tmpl"))
 	if err != nil {
-		return errors.Wrap(err, "error parsing template files")
+		return fmt.Errorf("error parsing template files: %w", err)
 	}
 
 	err = writeModuleDocs(modules, tmplList)
 	if err != nil {
-		return errors.Wrap(err, "error writing module docs")
+		return fmt.Errorf("error writing module docs: %w", err)
 	}
 	err = writeMetricsetDocs(modules, tmplList)
 	if err != nil {
-		return errors.Wrap(err, "error writing metricset docs")
+		return fmt.Errorf("error writing metricset docs: %w", err)
 	}
 
 	err = writeModuleList(modules, tmplList)
 	if err != nil {
-		return errors.Wrap(err, "error writing module list")
+		return fmt.Errorf("error writing module list: %w", err)
 	}
 
 	return nil

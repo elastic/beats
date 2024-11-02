@@ -9,8 +9,9 @@ must execute Heartbeat with elevated permissions to perform ICMP pings.
 
 On Linux, regular users may perform pings if the right file capabilities are set. Run
 `sudo setcap cap_net_raw+eip /path/to/heartbeat` to  grant {beatname_uc} ping capabilities on Linux.
-Alternatively, one may grant ping permissions to the user {beatname_uc} runs as. To grant ping permissions
-in this way, run `sudo sysctl -w net.ipv4.ping_group_range='myuserid myuserid'`.
+
+The binary has the correct capabilities already set on the container image, however your container runtime
+must allow the use of these privileges for them to be used. On docker this can be achieved with `--cap-add=NET_RAW`.
 
 Other platforms may require {beatname_uc} to run as root or administrator to execute pings.
 

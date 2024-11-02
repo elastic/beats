@@ -22,15 +22,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 // ListAll lists all the multi-disk devices in a RAID array
 func ListAll(path string) ([]MDDevice, error) {
 	dir, err := ioutil.ReadDir(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not read directory")
+		return nil, fmt.Errorf("could not read directory: %w", err)
 	}
 	var mds []MDDevice
 	for _, item := range dir {
@@ -40,7 +38,7 @@ func ListAll(path string) ([]MDDevice, error) {
 		}
 		dev, err := getMDDevice(testpath)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not get device info")
+			return nil, fmt.Errorf("could not get device info: %w", err)
 		}
 		mds = append(mds, dev)
 	}
@@ -56,7 +54,7 @@ func ListAll(path string) ([]MDDevice, error) {
 func getMDDevice(path string) (MDDevice, error) {
 	_, err := os.Stat(path)
 	if err != nil {
-		return MDDevice{}, errors.Wrap(err, "path does not exist")
+		return MDDevice{}, fmt.Errorf("path does not exist: %w", err)
 	}
 
 	//This is the best heuristic I've found so far for identifying an md device.
@@ -66,9 +64,9 @@ func getMDDevice(path string) (MDDevice, error) {
 	return newMD(path)
 }
 
-//check if a block device directory looks like an MD device
-//I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
-//Right now, we're doing this by looking for an `md` directory in the device dir.
+// check if a block device directory looks like an MD device
+// I'm not convinced that using /sys/block/md* is a reliable glob, as you should be able to make those whatever you want.
+// Right now, we're doing this by looking for an `md` directory in the device dir.
 func isMD(path string) bool {
 	_, err := os.Stat(filepath.Join(path, "md"))
 	if err != nil {

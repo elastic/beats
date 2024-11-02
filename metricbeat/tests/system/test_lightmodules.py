@@ -46,7 +46,7 @@ class Test(metricbeat.BaseTest):
 
 @contextmanager
 def http_test_server():
-    server = http.server.HTTPServer(('localhost', 0), TestHTTPHandler)
+    server = http.server.HTTPServer(('localhost', 0), HTTPHandlerForTest)
     child = threading.Thread(target=server.serve_forever)
     child.start()
     yield server
@@ -54,7 +54,7 @@ def http_test_server():
     child.join()
 
 
-class TestHTTPHandler(http.server.BaseHTTPRequestHandler):
+class HTTPHandlerForTest(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")

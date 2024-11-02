@@ -68,7 +68,7 @@ type decoder interface {
 }
 
 // New constructs a new decode_xml processor.
-func New(c *conf.C) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	config := defaultConfig()
 
 	if err := c.Unpack(&config); err != nil {
@@ -78,7 +78,7 @@ func New(c *conf.C) (processors.Processor, error) {
 	return newProcessor(config)
 }
 
-func newProcessor(config config) (processors.Processor, error) {
+func newProcessor(config config) (beat.Processor, error) {
 	cfgwarn.Experimental("The " + procName + " processor is experimental.")
 
 	return &processor{
@@ -91,7 +91,7 @@ func newProcessor(config config) (processors.Processor, error) {
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := p.run(event); err != nil && !p.IgnoreFailure {
 		err = fmt.Errorf("failed in decode_xml_wineventlog on the %q field: %w", p.Field, err)
-		event.PutValue("error.message", err.Error())
+		_, _ = event.PutValue("error.message", err.Error())
 		return event, err
 	}
 	return event, nil
@@ -100,7 +100,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	data, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreMissing && err == mapstr.ErrKeyNotFound {
+		if p.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
 		return err
@@ -142,9 +142,9 @@ func fields(evt winevent.Event) (mapstr.M, mapstr.M) {
 	ecs := mapstr.M{}
 
 	eventCode, _ := win.GetValue("event_id")
-	ecs.Put("event.code", eventCode)
-	ecs.Put("event.kind", "event")
-	ecs.Put("event.provider", evt.Provider.Name)
+	_, _ = ecs.Put("event.code", eventCode)
+	_, _ = ecs.Put("event.kind", "event")
+	_, _ = ecs.Put("event.provider", evt.Provider.Name)
 	winevent.AddOptional(ecs, "event.action", evt.Task)
 	winevent.AddOptional(ecs, "host.name", evt.Computer)
 	winevent.AddOptional(ecs, "event.outcome", getValue(win, "outcome"))

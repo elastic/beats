@@ -18,13 +18,13 @@
 package ratelimit
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strconv"
 
 	"github.com/jonboulle/clockwork"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -58,14 +58,14 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *c.C) (processors.Processor, error) {
+func new(cfg *c.C) (beat.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "could not unpack processor configuration")
+		return nil, fmt.Errorf("could not unpack processor configuration: %w", err)
 	}
 
 	if err := config.setDefaults(); err != nil {
-		return nil, errors.Wrap(err, "could not set default configuration")
+		return nil, fmt.Errorf("could not set default configuration: %w", err)
 	}
 
 	algoConfig := algoConfig{
@@ -74,7 +74,7 @@ func new(cfg *c.C) (processors.Processor, error) {
 	}
 	algo, err := factory(config.Algorithm.Name(), algoConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct rate limiting algorithm")
+		return nil, fmt.Errorf("could not construct rate limiting algorithm: %w", err)
 	}
 
 	// Logging and metrics (each processor instance has a unique ID).
@@ -103,7 +103,7 @@ func new(cfg *c.C) (processors.Processor, error) {
 func (p *rateLimit) Run(event *beat.Event) (*beat.Event, error) {
 	key, err := p.makeKey(event)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not make key")
+		return nil, fmt.Errorf("could not make key: %w", err)
 	}
 
 	if p.algorithm.IsAllowed(key) {
@@ -132,8 +132,8 @@ func (p *rateLimit) makeKey(event *beat.Event) (uint64, error) {
 	for _, field := range p.config.Fields {
 		value, err := event.GetValue(field)
 		if err != nil {
-			if err != mapstr.ErrKeyNotFound {
-				return 0, errors.Wrapf(err, "error getting value of field: %v", field)
+			if !errors.Is(err, mapstr.ErrKeyNotFound) {
+				return 0, fmt.Errorf("error getting value of field '%v': %w", field, err)
 			}
 
 			value = ""

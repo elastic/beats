@@ -20,14 +20,13 @@ package http
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -102,7 +101,7 @@ type httpPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 var (
@@ -117,7 +116,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &httpPlugin{}
@@ -135,7 +134,7 @@ func New(
 }
 
 // Init initializes the HTTP protocol analyser.
-func (http *httpPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *httpConfig) error {
+func (http *httpPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *httpConfig) error {
 	http.setFromConfig(config)
 
 	isDebug = logp.IsDebug("http")
@@ -261,8 +260,6 @@ func (http *httpPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseHttp exception")
-
 	conn := ensureHTTPConnection(private)
 	conn = http.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {
@@ -401,8 +398,6 @@ func (http *httpPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (http *httpPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(http) exception")
-
 	conn := getHTTPConnection(private)
 	if conn == nil {
 		return private, false
@@ -712,7 +707,7 @@ func decodeBody(body []byte, encodings []string, maxSize int) (result []byte, er
 			if idx != 0 {
 				body = nil
 			}
-			return body, errors.Wrapf(err, "unable to decode body using %s encoding", format)
+			return body, fmt.Errorf("unable to decode body using %s encoding: %w", format, err)
 		}
 	}
 	return body, nil
@@ -741,20 +736,29 @@ func parseCookieValue(raw string) string {
 }
 
 func extractHostHeader(header string) (host string, port int) {
-	if len(header) == 0 || net.ParseIP(header) != nil {
+	if header == "" || net.ParseIP(header) != nil {
 		return header, port
 	}
-	// Split :port trailer
-	if pos := strings.LastIndexByte(header, ':'); pos != -1 {
-		if num, err := strconv.Atoi(header[pos+1:]); err == nil && num > 0 && num < 65536 {
-			header, port = header[:pos], num
+	host, ps, err := net.SplitHostPort(header)
+	if err != nil {
+		var addrError *net.AddrError
+		if errors.As(err, &addrError) && addrError.Err == "missing port in address" {
+			return trimSquareBracket(header), port
 		}
 	}
-	// Remove square bracket boxing of IPv6 address.
-	if last := len(header) - 1; header[0] == '[' && header[last] == ']' && net.ParseIP(header[1:last]) != nil {
-		header = header[1:last]
+	pi, err := strconv.ParseInt(ps, 10, 16)
+	if err != nil || pi == 0 {
+		return header, port
 	}
-	return header, port
+	return trimSquareBracket(host), int(pi)
+}
+
+func trimSquareBracket(s string) string {
+	s, ok := strings.CutPrefix(s, "[")
+	if !ok {
+		return s
+	}
+	return strings.TrimSuffix(s, "]")
 }
 
 func (http *httpPlugin) hideHeaders(m *message) {
