@@ -461,7 +461,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 
 *Affecting all Beats*
 
-- Update Go version to 1.21.9. {pulk}38727[38727]
+- Update Go version to 1.21.9. {pull}38727[38727]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers. {pull}38669[38669]
 
 *Auditbeat*
@@ -471,7 +471,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 
 *Metricbeat*
 
-- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover.{pull}38471[38471]
+- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover. {pull}38471[38471]
 
 
 [[release-notes-8.13.2]]

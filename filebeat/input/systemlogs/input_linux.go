@@ -47,3 +47,44 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 
 	return journald.Configure(journaldCfg)
 }
+
+func toJournaldConfig(cfg *conf.C) (*conf.C, error) {
+	newCfg, err := cfg.Child("journald", -1)
+	if err != nil {
+		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
+	}
+
+	if _, err := cfg.Remove("journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("type", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("files", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_journald", -1); err != nil {
+		return nil, err
+	}
+
+	if _, err := cfg.Remove("use_files", -1); err != nil {
+		return nil, err
+	}
+
+	if err := newCfg.Merge(cfg); err != nil {
+		return nil, err
+	}
+
+	if err := newCfg.SetString("type", -1, "journald"); err != nil {
+		return nil, fmt.Errorf("cannot set 'type': %w", err)
+	}
+
+	if err := cfg.SetString("type", -1, pluginName); err != nil {
+		return nil, fmt.Errorf("cannot set type back to '%s': %w", pluginName, err)
+	}
+
+	return newCfg, nil
+}
