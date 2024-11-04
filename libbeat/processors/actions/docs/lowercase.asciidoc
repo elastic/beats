@@ -63,7 +63,7 @@ processors:
 
 // output
 {
-  "AB": {"cd":"data"},  // only cd is lowercased
+  "AB": {"cd":"data"},  // `AB.CD` -> `AB.cd` (only `cd` is lowercased)
   "CD": {"ef":"data"}  
 }
 ----
