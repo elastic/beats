@@ -248,7 +248,11 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 	}
-	if c.AWSConfig.Endpoint != "" {
+	// Apply slightly different endpoint resolvers depending on whether we're in S3 or SQS mode.
+	if c.NonAWSBucketName != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
+		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
+	} else if c.QueueURL != "" && c.AWSConfig.Endpoint != "" {
 		//nolint:staticcheck // haven't migrated to the new interface yet
 		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
