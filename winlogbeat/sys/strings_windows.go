@@ -40,6 +40,10 @@ func initANSIDecoder() *encoding.Decoder {
 		}
 		return cm.NewDecoder()
 	}
+	// This should never be reached.
+	// If the ANSI Code Page is not found, we will default to
+	// Windows1252 Code Page, which is default for ANSI in
+	// many regions and corresponds to Western European languages.
 	return charmap.Windows1250.NewDecoder()
 }
 

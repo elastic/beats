@@ -25,8 +25,6 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-var _ unsafe.Pointer
-
 var (
 	modkernel = windows.NewLazySystemDLL("Kernel32.dll")
 
