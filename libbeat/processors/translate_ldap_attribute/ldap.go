@@ -67,7 +67,7 @@ func (client *ldapClient) connect() error {
 	}
 	conn, err := ldap.DialURL(client.address, opts...)
 	if err != nil {
-		return fmt.Errorf("failed to dial LDAP server: %v", err)
+		return fmt.Errorf("failed to dial LDAP server: %w", err)
 	}
 
 	if client.password != "" {
@@ -78,7 +78,7 @@ func (client *ldapClient) connect() error {
 
 	if err != nil {
 		conn.Close()
-		return fmt.Errorf("failed to bind to LDAP server: %v", err)
+		return fmt.Errorf("failed to bind to LDAP server: %w", err)
 	}
 
 	client.conn = conn
@@ -101,7 +101,7 @@ func (client *ldapClient) reconnect() error {
 func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	// Ensure the connection is alive or reconnect if necessary
 	if err := client.reconnect(); err != nil {
-		return nil, fmt.Errorf("failed to reconnect: %v", err)
+		return nil, fmt.Errorf("failed to reconnect: %w", err)
 	}
 
 	client.mu.Lock()
@@ -118,7 +118,7 @@ func (client *ldapClient) findObjectBy(searchBy string) ([]string, error) {
 	// Execute search
 	result, err := client.conn.Search(searchRequest)
 	if err != nil {
-		return nil, fmt.Errorf("search failed: %v", err)
+		return nil, fmt.Errorf("search failed: %w", err)
 	}
 	if len(result.Entries) == 0 {
 		return nil, fmt.Errorf("no entries found for search attribute %s", searchBy)

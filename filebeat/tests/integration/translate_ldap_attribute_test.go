@@ -138,7 +138,9 @@ func startOpenldapContainer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	io.Copy(os.Stdout, reader)
+	if _, err = io.Copy(os.Stdout, reader); err != nil {
+		t.Fatal(err)
+	}
 	reader.Close()
 
 	resp, err := c.ContainerCreate(ctx,
