@@ -29,7 +29,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || \
-  "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+  "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" ]]; then
   echo "--- Prepare BK test analytics token :vault:"
   BUILDKITE_ANALYTICS_TOKEN=$(vault kv get -field token kv/ci-shared/platform-ingest/buildkite_beats_analytics_token)
   export BUILDKITE_ANALYTICS_TOKEN
