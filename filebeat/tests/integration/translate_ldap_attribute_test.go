@@ -83,10 +83,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 	require.Eventually(t, func() bool {
 		var err error
 		entryUUID, err = getLDAPUserEntryUUID()
-		if err != nil {
-			return false
-		}
-		return true
+		return err == nil
 	}, 10*time.Second, time.Second)
 
 	filebeat := integration.NewBeat(
@@ -186,13 +183,13 @@ func getLDAPUserEntryUUID() (string, error) {
 	// Connect to the LDAP server
 	l, err := ldap.DialURL("ldap://localhost:1389")
 	if err != nil {
-		return "", fmt.Errorf("failed to connect to LDAP server: %v", err)
+		return "", fmt.Errorf("failed to connect to LDAP server: %w", err)
 	}
 	defer l.Close()
 
 	err = l.Bind("cn=admin,dc=example,dc=org", "adminpassword")
 	if err != nil {
-		return "", fmt.Errorf("failed to bind to LDAP server: %v", err)
+		return "", fmt.Errorf("failed to bind to LDAP server: %w", err)
 	}
 
 	searchRequest := ldap.NewSearchRequest(
@@ -203,7 +200,7 @@ func getLDAPUserEntryUUID() (string, error) {
 
 	sr, err := l.Search(searchRequest)
 	if err != nil {
-		return "", fmt.Errorf("failed to execute search: %v", err)
+		return "", fmt.Errorf("failed to execute search: %w", err)
 	}
 
 	// Process search results
