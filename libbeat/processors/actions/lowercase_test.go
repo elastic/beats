@@ -246,7 +246,7 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 	for _, tt := range tests {
 		b.Run(tt.Name, func(b *testing.B) {
 			p := &alterFieldProcessor{
-				Fields:         []string{"level1field1.level1field2.level3.field3"},
+				Fields:         []string{"level1field1.level2field1.level3field1"},
 				alterFunc:      lowerCase,
 				AlterFullField: true,
 				IgnoreMissing:  false,
@@ -255,7 +255,8 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				//Run the function with the input
 				for _, e := range tt.Events {
-					p.Run(&e)
+					_, err := p.Run(&e)
+					require.NoError(b, err)
 				}
 
 			}
@@ -285,7 +286,7 @@ func generateFields(event *beat.Event, fieldsPerLevel, depth int, withCollisions
 			key += "."
 		}
 		if withCollisions {
-			key = fmt.Sprintf("Level%dField%d", depth, j) // Creating a collision (Level is capitalized)
+			key += fmt.Sprintf("Level%dField%d", depth, j) // Creating a collision (Level is capitalized)
 		} else {
 			key += fmt.Sprintf("level%dfield%d", depth, j)
 		}

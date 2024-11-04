@@ -52,7 +52,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 	}
 
 	if err := c.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %s fields configuration: %s", processorName, err)
+		return nil, fmt.Errorf("failed to unpack the %s fields configuration: %w", processorName, err)
 	}
 
 	// Skip mandatory fields
@@ -92,7 +92,7 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			}
 			if a.FailOnError {
 				event = backup
-				event.PutValue("error.message", err.Error())
+				_, _ = event.PutValue("error.message", err.Error())
 				return event, err
 			}
 		}
@@ -112,7 +112,7 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	} else {
 		// modify only the last segment
 		segmentCount := strings.Count(field, ".") + 1
-		event.Fields.Traverse(field, mapstr.CaseInsensitiveMode, func(level mapstr.M, key string) error {
+		err := event.Fields.Traverse(field, mapstr.CaseInsensitiveMode, func(level mapstr.M, key string) error {
 			segmentCount--
 			if segmentCount == 0 {
 				val := level[key]
@@ -136,6 +136,9 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 			}
 			return nil
 		})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
