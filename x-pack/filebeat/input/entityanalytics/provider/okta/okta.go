@@ -533,7 +533,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
-			su.Roles = append(su.Roles, roles...)
+			su.Roles = roles
 		}
 	}
 	return su
