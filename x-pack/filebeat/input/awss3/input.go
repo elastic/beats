@@ -6,6 +6,8 @@ package awss3
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
@@ -48,15 +50,32 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
+	// The awsConfig now contains the region from the credential profile or default region
+	// if the region is explicitly set in the config, then it wins
+	if config.RegionName != "" {
+		awsConfig.Region = config.RegionName
+	}
+
 	if config.AWSConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:   "aws",
-				URL:           config.AWSConfig.Endpoint,
-				SigningRegion: awsConfig.Region,
-			}, nil
-		})
+		// Parse a URL for the host regardless of it missing the scheme
+		endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse endpoint: %w", err)
+		}
+
+		// For backwards compat:
+		// If the endpoint does not start with S3, we will use the endpoint resolver to make all SDK requests use the specified endpoint
+		// If the endpoint does start with S3, we will use the default resolver uses the endpoint field but can replace s3 with the desired service name like sqs
+		if !strings.HasPrefix(endpointUri.Hostname(), "s3") {
+			awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+				return awssdk.Endpoint{
+					PartitionID:   "aws",
+					Source:        awssdk.EndpointSourceCustom,
+					URL:           config.AWSConfig.Endpoint,
+					SigningRegion: awsConfig.Region,
+				}, nil
+			})
+		}
 	}
 
 	if config.QueueURL != "" {

@@ -245,13 +245,12 @@ func (c config) getBucketARN() string {
 // options struct.
 // Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
-	if c.NonAWSBucketName != "" {
-		//nolint:staticcheck // haven't migrated to the new interface yet
-		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
-	}
-
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
+		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
 	o.UsePathStyle = c.PathStyle
 
@@ -268,6 +267,9 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	if c.AWSConfig.Endpoint != "" {
+		o.EndpointResolver = sqs.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
 }
 

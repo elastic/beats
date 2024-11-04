@@ -88,14 +88,18 @@ func (in *sqsReaderInput) setup(
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 	in.pipeline = pipeline
 
-	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-	if in.config.RegionName != "" {
-		in.awsConfig.Region = in.config.RegionName
-	} else if in.detectedRegion != "" {
-		in.awsConfig.Region = in.detectedRegion
-	} else {
-		// If we can't get a region from the config or the URL, return an error.
-		return fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
+	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL)
+	if in.config.RegionName == "" {
+		if in.detectedRegion != "" {
+			// Only use detected region if there is no explicit region configured.
+			in.awsConfig.Region = in.detectedRegion
+		} else if in.config.AWSConfig.DefaultRegion != "" {
+			// If we can't find anything else, fall back on the default.
+			in.awsConfig.Region = in.config.AWSConfig.DefaultRegion
+		} else {
+			// If we can't find a usable region, return an error
+			return fmt.Errorf("region not specified and failed to get AWS region from queue_url: %w", errBadQueueURL)
+		}
 	}
 
 	in.sqs = &awsSQSAPI{
