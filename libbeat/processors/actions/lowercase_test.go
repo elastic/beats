@@ -255,7 +255,8 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				//Run the function with the input
 				for _, e := range tt.Events {
-					_, err := p.Run(&e)
+					ev := e
+					_, err := p.Run(&ev)
 					require.NoError(b, err)
 				}
 
