@@ -54,7 +54,7 @@ func NewFailoverClient(clients []NetworkClient) NetworkClient {
 	}
 }
 
-func (f *failoverClient) Connect() error {
+func (f *failoverClient) Connect(ctx context.Context) error {
 	var (
 		next   int
 		active = f.active
@@ -82,7 +82,7 @@ func (f *failoverClient) Connect() error {
 
 	client := f.clients[next]
 	f.active = next
-	return client.Connect()
+	return client.Connect(ctx)
 }
 
 func (f *failoverClient) Close() error {
