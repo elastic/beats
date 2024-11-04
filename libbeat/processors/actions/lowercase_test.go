@@ -32,7 +32,7 @@ import (
 func TestNewLowerCaseProcessor(t *testing.T) {
 	c := conf.MustNewConfigFrom(
 		mapstr.M{
-			"fields":         []string{"field1", "type", "field2"},
+			"fields":         []string{"field1", "type", "field2", "TypeInput"}, // "type" is our mandatory field
 			"ignore_missing": true,
 			"fail_on_error":  false,
 		},
@@ -43,7 +43,7 @@ func TestNewLowerCaseProcessor(t *testing.T) {
 
 	processor, ok := procInt.(*alterFieldProcessor)
 	assert.True(t, ok)
-	assert.Equal(t, []string{"field1", "field2"}, processor.Fields)
+	assert.Equal(t, []string{"field1", "field2"}, processor.Fields) // we discard both "type" and "typeInput" as mandatory fields
 	assert.True(t, processor.IgnoreMissing)
 	assert.False(t, processor.FailOnError)
 }
@@ -59,6 +59,33 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 		Output        mapstr.M
 		Error         bool
 	}{
+		{
+			Name:          "Lowercase Fields",
+			Fields:        []string{"a.b.c", "Field1"},
+			IgnoreMissing: false,
+			FailOnError:   true,
+			FullPath:      true,
+			Input: mapstr.M{
+				"Type":   "type",
+				"Field1": mapstr.M{"Field2": "Value"},
+				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
+			},
+			Output: mapstr.M{
+				"field1": mapstr.M{"Field2": "Value"}, // field1 is lowercased
+				"Field3": "Value",
+				"a": mapstr.M{
+					"b": mapstr.M{
+						"c": "D",
+					},
+				},
+			},
+			Error: false,
+		},
 		{
 			Name:          "Lowercase Fields",
 			Fields:        []string{"a.b.c", "Field1"},
