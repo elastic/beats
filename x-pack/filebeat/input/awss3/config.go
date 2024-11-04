@@ -7,6 +7,7 @@ package awss3
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -105,6 +106,13 @@ func (c *config) Validate() error {
 	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
 		return errors.New("provider can only be overridden when polling non-AWS S3 services")
+	}
+	if c.AWSConfig.Endpoint != "" {
+		// Make sure the given endpoint can be parsed
+		_, err := url.Parse(c.AWSConfig.Endpoint)
+		if err != nil {
+			return fmt.Errorf("failed to parse endpoint: %w", err)
+		}
 	}
 	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
 		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
@@ -249,12 +257,13 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 	}
 	// Apply slightly different endpoint resolvers depending on whether we're in S3 or SQS mode.
-	if c.NonAWSBucketName != "" {
+	if c.AWSConfig.Endpoint != "" {
 		//nolint:staticcheck // haven't migrated to the new interface yet
-		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
-	} else if c.QueueURL != "" && c.AWSConfig.Endpoint != "" {
-		//nolint:staticcheck // haven't migrated to the new interface yet
-		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint)
+		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint,
+			func(e *awssdk.Endpoint) {
+				// The S3 hostname is immutable in bucket polling mode, mutable otherwise.
+				e.HostnameImmutable = (c.getBucketARN() != "")
+			})
 	}
 	o.UsePathStyle = c.PathStyle
 
