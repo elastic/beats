@@ -7,6 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/teambition/rrule-go"
+
 )
 
 func TestMaintWin(t *testing.T) {
@@ -19,19 +21,25 @@ func TestMaintWin(t *testing.T) {
 		{
 			"Every sunday at midnight to 1 AM",
 			MaintWin{
-				Zone:     "UTC",
-				Start:    "0 0 * * SUN *",
-				Duration: mustParseDuration("1h"),
+				Freq:     3,
+				Dtstart:  time.Now().Format(time.RFC3339),
+				Duration: mustParseDuration("2h"),
+				Byweekday: []string{"SU", "MO", "TU", "WE", "TH", "FR", "SA"},
+				Count:   10,
 			},
-			[]string{"2023-01-15T00:00:00+00:00", "2023-01-15T00:00:01+00:00", "2023-01-15T01:00:00+00:00"},
-			[]string{"2023-01-15T01:00:01+00:00", "2023-01-19T02:00:32+00:00"},
+			// add 30 minutes, 1 hour, 1 hour 30 minutes to the start time
+			[]string{time.Now().Add(30 * time.Minute).Format(time.RFC3339), time.Now().Add(60 * time.Minute).Format(time.RFC3339), time.Now().Add(90 * time.Minute).Format(time.RFC3339)},
+			[]string{time.Now().Add(180 * time.Minute).Format(time.RFC3339), time.Now().Add(540 * time.Minute).Format(time.RFC3339)},
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			pmw, err := c.mw.Parse()
+			rules := []*rrule.RRule{}
+			r, err := c.mw.Parse()
 			require.NoError(t, err)
+			rules = append(rules, r)
+			pmw := ParsedMaintWin{Rules: rules}
 			for _, m := range c.positiveMatches {
 				t.Run(fmt.Sprintf("does match %s", m), func(t *testing.T) {
 					pt, err := time.Parse(time.RFC3339, m)

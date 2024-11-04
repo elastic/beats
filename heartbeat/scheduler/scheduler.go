@@ -162,11 +162,11 @@ func (s *Scheduler) WaitForRunOnce() {
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
-type AddTask func(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error)
+type AddTask func(sched Schedule, pmw maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
 	if errors.Is(s.ctx.Err(), context.Canceled) {
 		return nil, ErrAlreadyStopped
 	}
@@ -191,22 +191,22 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
 
 		inMaintWin := false
-		for _, pmw := range pmws {
-			if pmw.IsActive(now) {
-				inMaintWin = true
-			}
+		if pmw.IsActive(now) {
+			inMaintWin = true
 		}
+		
 		var lastRanAt time.Time
 		if !inMaintWin {
 			lastRanAt = sj.run()
 		} else {
+			logp.L().Infof("Job '%s' is in maintenance window, skipping", id)
 			lastRanAt = now
 		}
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {
 			if !inMaintWin {
-				waitForPublish()
+				// waitForPublish()
 			}
 			s.runOnceWg.Done()
 		} else {

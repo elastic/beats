@@ -51,7 +51,7 @@ const (
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
 	stdFields          stdfields.StdMonitorFields
-	parsedMaintWindows []maintwin.ParsedMaintWin
+	parsedMaintWindow  maintwin.ParsedMaintWin
 	pluginName         string
 	config             *conf.C
 	addTask            scheduler.AddTask

@@ -22,9 +22,10 @@ import (
 	"time"
 
 	hbconfig "github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
+	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/teambition/rrule-go"
 )
 
 type ServiceFields struct {
@@ -38,7 +39,7 @@ type StdMonitorFields struct {
 	Type              string             `config:"type" validate:"required"`
 	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
 	MaintenanceWindows       []maintwin.MaintWin `config:"maintenance_windows" `
-	ParsedMaintenanceWindows []maintwin.ParsedMaintWin
+	ParsedMaintenanceWindow maintwin.ParsedMaintWin
 	Timeout           time.Duration      `config:"timeout"`
 	Service           ServiceFields      `config:"service"`
 	Origin            string             `config:"origin"`
@@ -79,14 +80,15 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 	if sFields.Source.Local != nil || sFields.Source.ZipUrl != nil {
 		sFields.IsLegacyBrowserSource = true
 	}
-
+	rules := []*rrule.RRule{}
 	for _, mw := range sFields.MaintenanceWindows {
 		parsed, err := mw.Parse()
 		if err != nil {
 			return StdMonitorFields{}, fmt.Errorf("could not parse maintenance window for monitor (id:%s name:%s): %w", sFields.ID, sFields.Name, err)
 		}
-		sFields.ParsedMaintenanceWindows = append(sFields.ParsedMaintenanceWindows, parsed)
+		rules = append(rules, parsed)
 	}
+	sFields.ParsedMaintenanceWindow = maintwin.ParsedMaintWin{Rules: rules}
 
 	return sFields, nil
 }
