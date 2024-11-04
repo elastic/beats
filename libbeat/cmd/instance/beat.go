@@ -388,7 +388,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info(paths.Paths.String())
+	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
@@ -603,7 +603,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			logp.Info("Output is configured through Central Management")
 		} else {
 			msg := "no outputs are defined, please define one under the output section"
-			logp.Info(msg)
+			logp.Info("%s", msg)
 			return nil, errors.New(msg)
 		}
 	}
@@ -898,7 +898,9 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if !isElasticsearchOutput(outCfg.Name()) {
 				return fmt.Errorf("index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}
@@ -974,9 +976,11 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-// handleFlags parses the command line flags. It invokes the HandleFlags
-// callback if implemented by the Beat.
+// handleFlags converts -flag to --flags, parses the command line
+// flags, and it invokes the HandleFlags callback if implemented by
+// the Beat.
 func (b *Beat) handleFlags() error {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	flag.Parse()
 	return cfgfile.HandleFlags()
 }
@@ -1055,7 +1059,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info(paths.Paths.String())
+	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
