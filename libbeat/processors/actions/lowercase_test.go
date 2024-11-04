@@ -32,7 +32,7 @@ import (
 func TestNewLowerCaseProcessor(t *testing.T) {
 	c := conf.MustNewConfigFrom(
 		mapstr.M{
-			"fields":         []string{"field1", "type", "field2", "TypeInput"}, // "type" is our mandatory field
+			"fields":         []string{"field1", "type", "field2", "type.value.key"}, // "type" is our mandatory field
 			"ignore_missing": true,
 			"fail_on_error":  false,
 		},
