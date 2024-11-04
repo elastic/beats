@@ -107,7 +107,7 @@ The `lowercase` processor has the following configuration settings:
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
-`alter_full_path`:: (Optional) If set to `true`, the entire key path is lowercased. If set to `false` only the final part of the key path is lowercased. Default is true    
+`alter_full_field`:: (Optional) If set to `true`, the entire key path is lowercased. If set to `false` only the final part of the key path is lowercased. Default is true    
 
                                   
 
