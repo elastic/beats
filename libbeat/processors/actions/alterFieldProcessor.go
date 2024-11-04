@@ -59,10 +59,13 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 	var configFields []string
 	for _, readOnly := range processors.MandatoryExportedFields {
 		readOnly = strings.ToLower(readOnly)
-		for i, field := range config.Fields {
-			if !strings.HasPrefix(strings.ToLower(field), readOnly) {
-				configFields = append(configFields, config.Fields[i])
+		for _, field := range config.Fields {
+			// Skip fields that match "readOnly" or start with "readOnly."
+			if strings.HasPrefix(strings.ToLower(field), readOnly+".") || strings.ToLower(field) == readOnly {
+				continue
 			}
+			// Add fields that do not match "readOnly" criteria
+			configFields = append(configFields, field)
 		}
 	}
 	return &alterFieldProcessor{

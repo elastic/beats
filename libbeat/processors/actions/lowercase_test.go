@@ -32,7 +32,7 @@ import (
 func TestNewLowerCaseProcessor(t *testing.T) {
 	c := conf.MustNewConfigFrom(
 		mapstr.M{
-			"fields":         []string{"field1", "type", "field2", "type.value.key"}, // "type" is our mandatory field
+			"fields":         []string{"field1", "type", "field2", "type.value.key", "typeKey"}, // "type" is our mandatory field
 			"ignore_missing": true,
 			"fail_on_error":  false,
 		},
@@ -43,7 +43,7 @@ func TestNewLowerCaseProcessor(t *testing.T) {
 
 	processor, ok := procInt.(*alterFieldProcessor)
 	assert.True(t, ok)
-	assert.Equal(t, []string{"field1", "field2"}, processor.Fields) // we discard both "type" and "typeInput" as mandatory fields
+	assert.Equal(t, []string{"field1", "field2", "typeKey"}, processor.Fields) // we discard both "type" and "type.value.key" as mandatory fields
 	assert.True(t, processor.IgnoreMissing)
 	assert.False(t, processor.FailOnError)
 }
