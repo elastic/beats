@@ -111,30 +111,13 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 		}
 	} else {
 		// modify only the last segment
-		segmentCount := strings.Count(field, ".") + 1
-		err := event.Fields.Traverse(field, mapstr.CaseInsensitiveMode, func(level mapstr.M, key string) error {
-			segmentCount--
-			if segmentCount == 0 {
-				val := level[key]
-				newKey, err := a.alterFunc(key)
-				if err != nil {
-					return fmt.Errorf("failed to apply a change to %q: %w", key, err)
-				}
-				if newKey == "" {
-					return fmt.Errorf("replacement key for %q cannot be empty", key)
-				}
-				if newKey != key {
-					_, exists := level[newKey]
-					if exists {
-						return fmt.Errorf("replacement key %q already exists: %w", newKey, mapstr.ErrKeyCollision)
-					}
-					delete(level, key)
-					level[newKey] = val
-				}
-
-				return nil
+		segmentCount := strings.Count(field, ".")
+		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, func(key string) (string, error) {
+			if segmentCount > 0 {
+				segmentCount--
+				return key, nil
 			}
-			return nil
+			return a.alterFunc(key)
 		})
 		if err != nil {
 			return err
