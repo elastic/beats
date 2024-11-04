@@ -959,6 +959,7 @@ Example configuration:
   id: okta-1
   provider: okta
   dataset: "all"
+  enrich_with: ["groups", "roles"]
   sync_interval: "12h"
   update_interval: "30m"
   okta_domain: "OKTA_DOMAIN"
@@ -991,6 +992,13 @@ The datasets to collect from the API. This can be one of "all", "users" or "devi
 or may be left empty for the default behavior which is to collect all entities.
 When the `dataset` is set to "devices", some user entity data is collected in order
 to populate the registered users and registered owner fields for each device.
+
+[float]
+===== `enrich_with`
+
+The metadata to enrich users with. This is an array of values that may contain
+"groups", "roles" and "factors", or "none". If the array only contains "none", no
+metadata is collected for users. The default behavior is to collect "groups".
 
 [float]
 ===== `sync_interval`
