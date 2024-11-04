@@ -51,7 +51,7 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		state:     state,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
-		metrics:   newInputMetrics(src.BucketName),
+		metrics:   newInputMetrics(src.BucketName, nil),
 	}
 	s.metrics.url.Set("gs://" + s.src.BucketName)
 	s.metrics.errorsTotal.Set(0)
@@ -60,6 +60,8 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule(ctx context.Context) error {
+	defer s.metrics.Close()
+
 	if !s.src.Poll {
 		return s.scheduleOnce(ctx)
 	}
@@ -93,10 +95,8 @@ func (l *limiter) release() {
 	l.wg.Done()
 }
 
-//nolint:gosec // value is always positive and within bounds, no scenario of overflow
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
-	s.metrics.gcsObjectsRequestedTotal.Add(uint64(s.src.MaxWorkers))
 	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
 	var numObs, numJobs int
 	for {
@@ -175,7 +175,7 @@ func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger)
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
+		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -224,19 +224,19 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 			if err != nil {
 				if errors.Is(err, storage.ErrObjectNotExist) {
 					// if the object is not found in the bucket, then remove it from the failed job list
-					s.state.deleteFailedJob(name)
+					s.state.deleteFailedJob(name, s.metrics)
 					s.log.Debugf("scheduler: failed job %s not found in bucket %s", name, s.src.BucketName)
 				} else {
 					// if there is an error while validating the object,
 					// then update the failed job retry count and work towards natural removal
-					s.state.updateFailedJobs(name)
+					s.state.updateFailedJobs(name, s.metrics)
 					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
 				}
 				continue
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
+			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, s.log, true)
 			jobs = append(jobs, job)
 			s.log.Debugf("scheduler: adding failed job number %d with name %s to job current list", fj, job.Name())
 			fj++
