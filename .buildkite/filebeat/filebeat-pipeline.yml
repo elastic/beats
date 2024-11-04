@@ -105,6 +105,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests"
