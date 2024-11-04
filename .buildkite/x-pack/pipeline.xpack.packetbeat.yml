@@ -19,6 +19,8 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -38,15 +40,25 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: check/update"
+
+      - label: "x-pack/packetbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -66,7 +78,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -74,6 +86,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 Unit Tests"
@@ -85,7 +103,7 @@ steps:
           mage systemTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -93,6 +111,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
@@ -104,7 +128,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -112,6 +136,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: RHEL9 Unit Tests"
@@ -123,7 +153,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -133,6 +163,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2016 Unit Tests"
@@ -144,7 +180,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -154,6 +190,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 Unit Tests"
@@ -166,7 +208,7 @@ steps:
           mage systemTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -176,6 +218,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 System Tests"
@@ -192,7 +240,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -202,6 +250,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 Unit Tests"
@@ -213,7 +267,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -223,6 +277,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 11 Unit Tests"
@@ -234,7 +294,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -244,6 +304,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2019 Unit Tests"
@@ -256,7 +322,7 @@ steps:
           mage systemTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -266,6 +332,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 System Tests"
@@ -283,7 +355,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -291,6 +363,12 @@ steps:
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu arm64 Unit Tests"
@@ -305,13 +383,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: macOS x86_64 Unit Tests"
@@ -326,13 +410,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: macOS arm64 Unit Tests"
@@ -354,7 +444,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -376,7 +466,7 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"

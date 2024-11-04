@@ -19,6 +19,7 @@ package eslegclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -62,6 +63,10 @@ type Connection struct {
 	responseBuffer   *bytes.Buffer
 
 	isServerless bool
+
+	// requests will share the same cancellable context
+	// so they can be aborted on Close()
+	reqsContext context.Context
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -76,7 +81,7 @@ type ConnectionSettings struct {
 
 	Kerberos *kerberos.Config
 
-	OnConnectCallback func() error
+	OnConnectCallback func(*Connection) error
 	Observer          transport.IOStatser
 
 	Parameters       map[string]string
@@ -103,7 +108,7 @@ type ESVersionData struct {
 	BuildFlavor string `json:"build_flavor"`
 }
 
-// NewConnection returns a new Elasticsearch client
+// NewConnection returns a new Elasticsearch client.
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
 
@@ -246,7 +251,7 @@ func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 }
 
 // NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
-func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
+func NewConnectedClient(ctx context.Context, cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err
@@ -255,7 +260,7 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	errors := []string{}
 
 	for _, client := range clients {
-		err = client.Connect()
+		err = client.Connect(ctx)
 		if err != nil {
 			const errMsg = "error connecting to Elasticsearch at %v: %v"
 			client.log.Errorf(errMsg, client.URL, err)
@@ -270,17 +275,22 @@ func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 
 // Connect connects the client. It runs a GET request against the root URL of
 // the configured host, updates the known Elasticsearch version and calls
-// globally configured handlers.
-func (conn *Connection) Connect() error {
+// globally configured handlers. The context is used to control the lifecycle
+// of the HTTP requests/connections, the caller is responsible for cancelling
+// the context to stop any in-flight requests.
+func (conn *Connection) Connect(ctx context.Context) error {
 	if conn.log == nil {
 		conn.log = logp.NewLogger("esclientleg")
 	}
+
+	conn.reqsContext = ctx
+
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
 	if conn.OnConnectCallback != nil {
-		if err := conn.OnConnectCallback(); err != nil {
+		if err := conn.OnConnectCallback(conn); err != nil {
 			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}
@@ -314,7 +324,7 @@ func (conn *Connection) Ping() (ESPingData, error) {
 	return response, nil
 }
 
-// Close closes a connection.
+// Close closes any idle connections from the HTTP client.
 func (conn *Connection) Close() error {
 	conn.HTTP.CloseIdleConnections()
 	return nil
@@ -349,7 +359,9 @@ func (conn *Connection) Test(d testing.Driver) {
 			})
 		}
 
-		err = conn.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		err = conn.Connect(ctx)
 		d.Fatal("talk to server", err)
 		version := conn.GetVersion()
 		d.Info("version", version.String())
@@ -391,7 +403,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
+	req, err := http.NewRequestWithContext(conn.reqsContext, method, url, body)
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err

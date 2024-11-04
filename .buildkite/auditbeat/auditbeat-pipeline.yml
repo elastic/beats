@@ -3,7 +3,6 @@ name: "beats-auditbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
@@ -12,12 +11,19 @@ env:
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
+  IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  IMAGE_UBUNTU_2204_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
+  IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -38,15 +44,25 @@ steps:
           make check-no-changes
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
               context: "auditbeat: check/update"
+
+      - label: "Auditbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "auditbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -66,14 +82,20 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Unit Tests"
@@ -85,7 +107,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -93,6 +115,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: RHEL9 Unit Tests"
@@ -103,7 +131,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -113,6 +141,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2016 Unit Tests"
@@ -123,7 +157,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -133,6 +167,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2022 Unit Tests"
@@ -142,10 +182,10 @@ steps:
           make -C auditbeat crosscompile
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
@@ -156,7 +196,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
 
     steps:
-      - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Integration Tests"
+      - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -165,19 +205,31 @@ steps:
           mage build integTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_2004_X86_64}"
+              - "${IMAGE_UBUNTU_2204_X86_64}"
+              - "${IMAGE_UBUNTU_2404_X86_64}"
 
-      - label: ":ubuntu: Auditbeat: Ubuntu arm64 Integration Tests"
+      - label: ":ubuntu: Auditbeat: Ubuntu arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
@@ -186,17 +238,29 @@ steps:
           mage build integTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "{{matrix.image}}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Integration Tests"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_2004_ARM64}"
+              - "${IMAGE_UBUNTU_2204_ARM64}"
+              - "${IMAGE_UBUNTU_2404_ARM64}"
 
       - label: ":ubuntu: Auditbeat: Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
@@ -207,14 +271,20 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${IMAGE_UBUNTU_2204_ARM64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Unit Tests"
@@ -228,13 +298,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: macOS x86_64 Unit Tests"
@@ -248,13 +324,19 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: macOS arm64 Unit Tests"
@@ -271,7 +353,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -281,6 +363,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2019 Unit Tests"
@@ -292,7 +380,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -302,6 +390,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 10 Unit Tests"
@@ -313,7 +407,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -323,6 +417,12 @@ steps:
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "auditbeat: Win 11 Unit Tests"
@@ -348,11 +448,11 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
@@ -369,11 +469,11 @@ steps:
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${IMAGE_UBUNTU_2204_ARM64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:

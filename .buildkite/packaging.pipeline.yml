@@ -17,14 +17,14 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: start-gate-snapshot
 
   - name: Start of concurrency group for DRA Staging
-    if: build.branch =~ /^\d+\.\d+$$/
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
     command: echo "--> Start of concurrency gate dra-staging"
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -36,7 +36,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -58,7 +58,7 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: build.branch =~ /^\d+\.\d+$$/
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -80,7 +80,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -88,7 +88,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -122,7 +123,8 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -152,7 +154,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
@@ -169,7 +172,7 @@ steps:
     key: packaging-staging
     depends_on: start-gate-staging
     ## Only for release
-    if: build.branch =~ /^\d+\.\d+$$/
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -257,7 +260,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -276,7 +279,7 @@ steps:
 
       - label: DRA Staging
         ## Only for release branches
-        if: build.branch =~ /^\d+\.\d+$$/
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -296,13 +299,13 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-    if: build.branch =~ /^\d+\.\d+$$/
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging

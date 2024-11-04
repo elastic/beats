@@ -170,6 +170,13 @@ Valid transports:
 * kernel: messages from the kernel
 
 [float]
+[id="{beatname_lc}-input-{type}-facilities"]
+==== `facilities`
+
+Filter entries by facilities, facilities must be specified using their
+numeric code.
+
+[float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 
@@ -284,7 +291,8 @@ available:
 `CONTAINER_ID_FULL`::         `container.id`
 `CONTAINER_NAME`::            `container.name`
 `CONTAINER_PARTIAL_MESSAGE`:: `container.partial`
-`CONTAINER_TAG`::             `container.image.tag`
+`CONTAINER_TAG`::             `container.log.tag`
+`IMAGE_NAME`::		      `container.image.name`
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

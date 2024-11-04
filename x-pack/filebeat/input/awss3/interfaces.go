@@ -17,7 +17,6 @@ import (
 	"github.com/aws/smithy-go/middleware"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -41,25 +40,9 @@ import (
 const s3RequestURLMetadataKey = `x-beat-s3-request-url`
 
 type sqsAPI interface {
-	sqsReceiver
-	sqsDeleter
-	sqsVisibilityChanger
-	sqsAttributeGetter
-}
-
-type sqsReceiver interface {
 	ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error)
-}
-
-type sqsDeleter interface {
 	DeleteMessage(ctx context.Context, msg *types.Message) error
-}
-
-type sqsVisibilityChanger interface {
 	ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error
-}
-
-type sqsAttributeGetter interface {
 	GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error)
 }
 
@@ -68,7 +51,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message) error
+	ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(e beat.Event)) sqsProcessingResult
 }
 
 // ------
@@ -103,25 +86,18 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
-	// publishes them. It returns when processing finishes or when it encounters
-	// an unrecoverable error. It does not wait for the events to be ACKed by
-	// the publisher before returning (use eventACKTracker's Wait() method to
-	// determine this).
-	ProcessS3Object() error
+	// passes to the given callback. It returns when processing finishes or
+	// when it encounters an unrecoverable error.
+	ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
 	// batch is finished.
 	FinalizeS3Object() error
-
-	// Wait waits for every event published by ProcessS3Object() to be ACKed
-	// by the publisher before returning. Internally it uses the
-	// s3ObjectHandler eventACKTracker's Wait() method
-	Wait()
 }
 
 // ------
@@ -305,7 +281,7 @@ func (a *awsS3API) clientFor(region string) *s3.Client {
 	// Conditionally replace the client if the region of
 	// the request does not match the pre-prepared client.
 	opts := a.client.Options()
-	if opts.Region == region {
+	if region == "" || opts.Region == region {
 		return a.client
 	}
 	// Use a cached client if we have already seen this region.

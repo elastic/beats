@@ -6,7 +6,6 @@ package jamf
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -18,8 +17,8 @@ import (
 
 	_ "embed"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf/internal/jamf"
@@ -38,14 +37,12 @@ func TestJamfDoFetch(t *testing.T) {
 		testCleanupStore(store, dbFilename)
 	})
 
-	var (
-		wantComputers []*Computer
-		rawComputers  jamf.Computers
-	)
+	var rawComputers jamf.Computers
 	err := json.Unmarshal(computers, &rawComputers)
 	if err != nil {
 		t.Fatalf("failed to unmarshal device data: %v", err)
 	}
+	wantComputers := make([]*Computer, 0, len(rawComputers.Results))
 	for _, c := range rawComputers.Results {
 		wantComputers = append(wantComputers, &Computer{
 			Computer: c,
@@ -109,16 +106,18 @@ func testContext() (tenant string, username string, password string, client *htt
 		if !ok || user != username || pass != password {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ ]\n}"))
 			return
 		}
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 			return
 		}
-		tok.Token = uuid.New().String()
+		tok.Token = uuid.Must(uuid.NewV4()).String()
 		tok.Expires = time.Now().In(time.UTC).Add(time.Hour)
 		fmt.Fprintf(w, "{\n  \"token\" : \"%s\",\n  \"expires\" : \"%s\"\n}", tok.Token, tok.Expires.Format(time.RFC3339))
 	}))
@@ -126,15 +125,18 @@ func testContext() (tenant string, username string, password string, client *htt
 		if r.Header.Get("Authorization") != "Bearer "+tok.Token || !tok.IsValidFor(0) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ {\n    \"code\" : \"INVALID_TOKEN\",\n    \"description\" : \"Unauthorized\",\n    \"id\" : \"0\",\n    \"field\" : null\n  } ]\n}"))
 			return
 		}
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			w.Header().Set("content-type", "application/json;charset=UTF-8")
+			//nolint:errcheck // ignore
 			w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 			return
 		}
+		//nolint:errcheck // ignore
 		w.Write(computers)
 	}))
 
@@ -146,13 +148,7 @@ func testContext() (tenant string, username string, password string, client *htt
 	}
 	tenant = u.Host
 
-	cli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		},
-	}
+	cli := srv.Client()
 
 	return tenant, username, password, cli, srv.Close, nil
 }

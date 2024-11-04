@@ -45,8 +45,8 @@ func WithBackoff(client NetworkClient, init, max time.Duration) NetworkClient {
 	}
 }
 
-func (b *backoffClient) Connect() error {
-	err := b.client.Connect()
+func (b *backoffClient) Connect(ctx context.Context) error {
+	err := b.client.Connect(ctx)
 	backoff.WaitOnError(b.backoff, err)
 	return err
 }

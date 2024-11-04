@@ -41,18 +41,7 @@ func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 		l := logger.Named("ebpf")
 		l.Info("selected backend: ebpf")
 
-		paths := make(map[string]struct{})
-		for _, p := range c.Paths {
-			paths[p] = struct{}{}
-		}
-
-		return &ebpfReader{
-			config:  c,
-			log:     l,
-			parsers: FileParsers(c),
-			paths:   paths,
-			eventC:  make(chan Event),
-		}, nil
+		return newEBPFReader(c, l)
 	}
 
 	if c.Backend == BackendKprobes {

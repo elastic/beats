@@ -24,7 +24,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -97,6 +99,15 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	}
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
+	err = metaConf.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+	}
 
 	if metaConf.Node.Enabled() || config.Hints.Enabled() {
 		options := kubernetes.WatchOptions{
@@ -126,11 +137,23 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 	// Deployment -> Replicaset -> Pod
 	// CronJob -> job -> Pod
 	if metaConf.Deployment {
-		replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-			SyncTimeout:  config.SyncPeriod,
-			Namespace:    config.Namespace,
-			HonorReSyncs: true,
-		}, nil)
+		metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+		if err != nil {
+			logger.Errorf("Error creating metadata client due to error %+v", err)
+		}
+		replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+			"resource_metadata_enricher_rs",
+			client,
+			metadataClient,
+			schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+			kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			},
+			nil,
+			metadata.RemoveUnnecessaryReplicaSetData,
+		)
 		if err != nil {
 			logger.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 		}
@@ -216,23 +239,26 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	var kubeMeta, container mapstr.M
 
 	annotations := make(mapstr.M, 0)
-	rawMeta, ok := event["kubernetes"]
-	if ok {
-		kubeMeta = rawMeta.(mapstr.M)
-		// The builder base config can configure any of the field values of kubernetes if need be.
-		e["kubernetes"] = kubeMeta
-		if rawAnn, ok := kubeMeta["annotations"]; ok {
-			anns, _ := rawAnn.(mapstr.M)
-			if len(anns) != 0 {
-				annotations = anns.Clone()
+	rawMeta, found := event["kubernetes"]
+	if found {
+		kubeMetaMap, ok := rawMeta.(mapstr.M)
+		if ok {
+			kubeMeta = kubeMetaMap
+			// The builder base config can configure any of the field values of kubernetes if need be.
+			e["kubernetes"] = kubeMeta
+			if rawAnn, ok := kubeMeta["annotations"]; ok {
+				anns, _ := rawAnn.(mapstr.M)
+				if len(anns) != 0 {
+					annotations = anns.Clone()
+				}
 			}
-		}
 
-		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
-			if len(namespaceAnnotations) != 0 {
-				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+			// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
+			if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+				namespaceAnnotations, _ := rawNsAnn.(mapstr.M)
+				if len(namespaceAnnotations) != 0 {
+					annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
+				}
 			}
 		}
 	}
@@ -246,12 +272,14 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 
-	if rawCont, ok := kubeMeta["container"]; ok {
-		container = rawCont.(mapstr.M)
-		// This would end up adding a runtime entry into the event. This would make sure
-		// that there is not an attempt to spin up a docker input for a rkt container and when a
-		// rkt input exists it would be natively supported.
-		e["container"] = container
+	if rawCont, found := kubeMeta["container"]; found {
+		if containerMap, ok := rawCont.(mapstr.M); ok {
+			container = containerMap
+			// This would end up adding a runtime entry into the event. This would make sure
+			// that there is not an attempt to spin up a docker input for a rkt container and when a
+			// rkt input exists it would be natively supported.
+			e["container"] = container
+		}
 	}
 
 	cname := utils.GetContainerName(container)

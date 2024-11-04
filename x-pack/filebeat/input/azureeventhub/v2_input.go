@@ -108,13 +108,18 @@ func (in *eventHubInputV2) Run(
 
 // setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
+	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)
+	if err != nil {
+		return fmt.Errorf("failed to create sanitizers: %w", err)
+	}
 
 	// Decode the messages from event hub into
 	// a `[]string`.
 	in.messageDecoder = messageDecoder{
-		config:  in.config,
-		log:     in.log,
-		metrics: in.metrics,
+		config:     in.config,
+		log:        in.log,
+		metrics:    in.metrics,
+		sanitizers: sanitizers,
 	}
 
 	containerClient, err := container.NewClientFromConnectionString(
@@ -388,7 +393,7 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 		go func() {
 			in.log.Infow(
 				"starting a partition worker",
-				"partition", partitionID,
+				"partition_id", partitionID,
 			)
 
 			if err := in.processEventsForPartition(ctx, processorPartitionClient); err != nil {
@@ -397,13 +402,13 @@ func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhu
 				in.log.Infow(
 					"stopping processing events for partition",
 					"reason", err,
-					"partition", partitionID,
+					"partition_id", partitionID,
 				)
 			}
 
 			in.log.Infow(
 				"partition worker exited",
-				"partition", partitionID,
+				"partition_id", partitionID,
 			)
 		}()
 	}
@@ -428,7 +433,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 		// 3/3 [END] Do cleanup here, like shutting down database clients
 		// or other resources used for processing this partition.
 		shutdownPartitionResources(ctx, partitionClient, pipelineClient)
-		in.log.Debugw("partition resources cleaned up", "partition", partitionID)
+		in.log.Debugw(
+			"partition resources cleaned up",
+			"partition_id", partitionID,
+		)
 	}()
 
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
@@ -444,7 +452,7 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 			if errors.As(err, &eventHubError) && eventHubError.Code == azeventhubs.ErrorCodeOwnershipLost {
 				in.log.Infow(
 					"ownership lost for partition, stopping processing",
-					"partition", partitionID,
+					"partition_id", partitionID,
 				)
 
 				return nil
@@ -454,6 +462,10 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 		}
 
 		if len(events) == 0 {
+			in.log.Debugw(
+				"no events received",
+				"partition_id", partitionID,
+			)
 			continue
 		}
 
@@ -467,30 +479,32 @@ func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partit
 // processReceivedEvents
 func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData, partitionID string, pipelineClient beat.Client) error {
 	processingStartTime := time.Now()
-	eventHubMetadata := mapstr.M{
-		"partition_id":   partitionID,
-		"eventhub":       in.config.EventHubName,
-		"consumer_group": in.config.ConsumerGroup,
-	}
 
 	for _, receivedEventData := range receivedEvents {
+		eventHubMetadata := mapstr.M{
+			"partition_id":   partitionID,
+			"eventhub":       in.config.EventHubName,
+			"consumer_group": in.config.ConsumerGroup,
+		}
+
 		// Update input metrics.
 		in.metrics.receivedMessages.Inc()
 		in.metrics.receivedBytes.Add(uint64(len(receivedEventData.Body)))
+
+		_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
+		_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
+		_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
+
+		// The partition key is optional.
+		if receivedEventData.PartitionKey != nil {
+			_, _ = eventHubMetadata.Put("partition_key", *receivedEventData.PartitionKey)
+		}
 
 		// A single event can contain multiple records.
 		// We create a new event for each record.
 		records := in.messageDecoder.Decode(receivedEventData.Body)
 
 		for _, record := range records {
-			_, _ = eventHubMetadata.Put("offset", receivedEventData.Offset)
-			_, _ = eventHubMetadata.Put("sequence_number", receivedEventData.SequenceNumber)
-			_, _ = eventHubMetadata.Put("enqueued_time", receivedEventData.EnqueuedTime)
-
-			// The partition key is optional.
-			if receivedEventData.PartitionKey != nil {
-				_, _ = eventHubMetadata.Put("partition_key", *receivedEventData.PartitionKey)
-			}
 
 			event := beat.Event{
 				// this is the default value for the @timestamp field; usually the ingest
@@ -537,7 +551,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 			if !ok {
 				log.Errorw(
 					"error updating checkpoint",
-					"partition", partitionClient.PartitionID(),
+					"partition_id", partitionClient.PartitionID(),
 					"acked", acked,
 					"error", "invalid data type",
 					"type", fmt.Sprintf("%T", data),
@@ -555,7 +569,7 @@ func initializePartitionResources(ctx context.Context, partitionClient *azeventh
 
 			log.Debugw(
 				"checkpoint updated",
-				"partition", partitionClient.PartitionID(),
+				"partition_id", partitionClient.PartitionID(),
 				"acked", acked,
 				"sequence_number", receivedEventData.SequenceNumber,
 				"offset", receivedEventData.Offset,

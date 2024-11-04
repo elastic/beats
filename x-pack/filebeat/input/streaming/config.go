@@ -6,14 +6,21 @@ package streaming
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type config struct {
+	// Type is the type of the stream being followed. The
+	// zero value indicates websocket.
+	Type string `config:"stream_type"`
+
 	// URLProgram is the CEL program to be run once before to prep the url.
 	URLProgram string `config:"url_program"`
 	// Program is the CEL program to be run for each polling.
@@ -32,6 +39,15 @@ type config struct {
 	URL *urlConfig `config:"url" validate:"required"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
+	// Retry is the configuration for retrying failed connections.
+	Retry *retry `config:"retry"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+
+	// CrowdstrikeAppID is the value used to set the
+	// appId request parameter in the FalconHose stream
+	// discovery request.
+	CrowdstrikeAppID string `config:"crowdstrike_app_id"`
 }
 
 type redact struct {
@@ -43,6 +59,12 @@ type redact struct {
 	Delete bool `config:"delete"`
 }
 
+type retry struct {
+	MaxAttempts int           `config:"max_attempts"`
+	WaitMin     time.Duration `config:"wait_min"`
+	WaitMax     time.Duration `config:"wait_max"`
+}
+
 type authConfig struct {
 	// Custom auth config to use for authentication.
 	CustomAuth *customAuthConfig `config:"custom"`
@@ -50,6 +72,8 @@ type authConfig struct {
 	BearerToken string `config:"bearer_token"`
 	// Basic auth token to use for authentication.
 	BasicToken string `config:"basic_token"`
+
+	OAuth2 oAuth2Config `config:",inline"`
 }
 
 type customAuthConfig struct {
@@ -57,6 +81,16 @@ type customAuthConfig struct {
 	Header string `config:"header"`
 	Value  string `config:"value"`
 }
+
+type oAuth2Config struct {
+	// common oauth fields
+	ClientID       string              `config:"client_id"`
+	ClientSecret   string              `config:"client_secret"`
+	EndpointParams map[string][]string `config:"endpoint_params"`
+	Scopes         []string            `config:"scopes"`
+	TokenURL       string              `config:"token_url"`
+}
+
 type urlConfig struct {
 	*url.URL
 }
@@ -71,6 +105,12 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c config) Validate() error {
+	switch c.Type {
+	case "", "websocket", "crowdstrike":
+	default:
+		return fmt.Errorf("unknown stream type: %s", c.Type)
+	}
+
 	if c.Redact == nil {
 		logp.L().Named("input.websocket").Warn("missing recommended 'redact' configuration: " +
 			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
@@ -90,18 +130,39 @@ func (c config) Validate() error {
 			return fmt.Errorf("failed to check program: %w", err)
 		}
 	}
-	err = checkURLScheme(c.URL)
+	err = checkURLScheme(c)
 	if err != nil {
 		return err
+	}
+
+	if c.Retry != nil {
+		switch {
+		case c.Retry.MaxAttempts <= 0:
+			return errors.New("max_attempts must be greater than zero")
+		case c.Retry.WaitMin > c.Retry.WaitMax:
+			return errors.New("wait_min must be less than or equal to wait_max")
+		}
 	}
 	return nil
 }
 
-func checkURLScheme(url *urlConfig) error {
-	switch url.Scheme {
-	case "ws", "wss":
-		return nil
+func checkURLScheme(c config) error {
+	switch c.Type {
+	case "", "websocket":
+		switch c.URL.Scheme {
+		case "ws", "wss":
+			return nil
+		default:
+			return fmt.Errorf("unsupported scheme: %s", c.URL.Scheme)
+		}
+	case "crowdstrike":
+		switch c.URL.Scheme {
+		case "http", "https":
+			return nil
+		default:
+			return fmt.Errorf("unsupported scheme: %s", c.URL.Scheme)
+		}
 	default:
-		return fmt.Errorf("unsupported scheme: %s", url.Scheme)
+		return fmt.Errorf("unknown stream type: %s", c.Type)
 	}
 }
