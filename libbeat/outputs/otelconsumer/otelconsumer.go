@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
@@ -63,7 +64,7 @@ func (out *otelConsumer) Close() error {
 	return nil
 }
 
-// Publish converts Beat events to Otel format and send to the next otel consumer
+// Publish converts Beat events to Otel format and sends them to the Otel collector
 func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) error {
 	switch {
 	case out.logsConsumer != nil:
@@ -73,8 +74,7 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	}
 }
 
-func (out *otelConsumer) logsPublish(_ context.Context, batch publisher.Batch) error {
-	defer batch.ACK()
+func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
@@ -97,10 +97,26 @@ func (out *otelConsumer) logsPublish(_ context.Context, batch publisher.Batch) e
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
 	}
 
-	if err := out.logsConsumer.ConsumeLogs(context.TODO(), pLogs); err != nil {
-		return fmt.Errorf("error otel log consumer: %w", err)
+	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	if err != nil {
+		// Permanent errors shouldn't be retried. This tipically means
+		// the data cannot be serialized by the exporter that is attached
+		// to the pipeline or when the destination refuses the data because
+		// it cannot decode it. Retrying in this case is useless.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
+		if consumererror.IsPermanent(err) {
+			st.PermanentErrors(len(events))
+			batch.Drop()
+		} else {
+			st.RetryableErrors(len(events))
+			batch.Retry()
+		}
+
+		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
 	}
 
+	batch.ACK()
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
