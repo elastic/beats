@@ -273,7 +273,6 @@ func GenerateEvents(numEvents, fieldsPerLevel, depth int, withCollisions bool) [
 	return events
 }
 
-// generateFields recursively generates fields for the event
 func generateFields(event *beat.Event, fieldsPerLevel, depth int, withCollisions bool) {
 	if depth == 0 {
 		return
