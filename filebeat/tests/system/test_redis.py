@@ -48,6 +48,8 @@ class Test(BaseTest):
         assert output["input.type"] == "redis"
         assert "redis.slowlog.cmd" in output
         assert "redis.slowlog.role" in output
+        assert "redis.slowlog.clientAddr" in output
+        assert "redis.slowlog.clientName" in output
 
     def get_host(self):
         return os.getenv('REDIS_HOST', 'localhost')
