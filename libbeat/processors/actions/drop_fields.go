@@ -61,13 +61,14 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the drop_fields configuration: %w", err)
 	}
 
-	/* remove read only fields */
-	// TODO: Is this implementation used? If so, there's a fix needed in removal of exported fields
+	// Do not drop manadatory fields
+	var configFields []string
 	for _, readOnly := range processors.MandatoryExportedFields {
-		for i, field := range config.Fields {
-			if readOnly == field {
-				config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
+		for _, field := range config.Fields {
+			if readOnly == field || strings.HasPrefix(field, readOnly+".") {
+				continue
 			}
+			configFields = append(configFields, field)
 		}
 	}
 
@@ -87,7 +88,7 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 		}
 	}
 
-	f := &dropFields{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
+	f := &dropFields{Fields: configFields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
 	return f, nil
 }
 

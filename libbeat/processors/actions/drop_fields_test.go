@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	config2 "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
@@ -48,6 +49,20 @@ func TestDropFieldRun(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, mapstr.M{}, newEvent.Fields)
 		assert.Equal(t, event.Meta, newEvent.Meta)
+	})
+
+	t.Run("Do not drop mandatory fields", func(t *testing.T) {
+		c := conf.MustNewConfigFrom(
+			mapstr.M{
+				"fields":         []string{"field1", "type", "type.value.key", "typeKey"},
+				"ignore_missing": true,
+			},
+		)
+
+		p, err := newDropFields(c)
+		process := p.(*dropFields)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"field1", "typeKey"}, process.Fields)
 	})
 
 	t.Run("supports a metadata field", func(t *testing.T) {
