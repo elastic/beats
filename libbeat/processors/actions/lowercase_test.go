@@ -137,38 +137,19 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Error: false,
 		},
 		{
-			Name:          "Lowercase Fields with colliding keys",
-			Fields:        []string{"ab"},
-			IgnoreMissing: false,
-			FailOnError:   true,
-			FullPath:      true,
-			Input: mapstr.M{
-				"ab": "first",
-				"Ab": "second",
-			},
-			Output: mapstr.M{
-				"ab":    "first",
-				"Ab":    "second",
-				"error": mapstr.M{"message": "multiple keys match \"Ab\" on the same level of the path \"ab\": key collision"},
-			},
-			Error: true,
-		},
-		{
 			Name:          "Revert to original map on error",
-			Fields:        []string{"Field1", "ab"},
+			Fields:        []string{"Field1", "abcbd"},
 			IgnoreMissing: false,
 			FailOnError:   true,
 			FullPath:      true,
 			Input: mapstr.M{
 				"Field1": "value1",
 				"ab":     "first",
-				"Ab":     "second",
 			},
 			Output: mapstr.M{
 				"Field1": "value1",
 				"ab":     "first",
-				"Ab":     "second",
-				"error":  mapstr.M{"message": "multiple keys match \"Ab\" on the same level of the path \"ab\": key collision"},
+				"error":  mapstr.M{"message": "could not fetch value for key: abcbd, Error: key not found"},
 			},
 			Error: true,
 		},
@@ -244,6 +225,27 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			assert.Equal(t, test.Output, event.Fields)
 		})
 	}
+
+	t.Run("test key collison", func(t *testing.T) {
+		Input :=
+			mapstr.M{
+				"ab": "first",
+				"Ab": "second",
+			}
+
+		p := &alterFieldProcessor{
+			Fields:         []string{"ab"},
+			IgnoreMissing:  false,
+			FailOnError:    true,
+			AlterFullField: true,
+			alterFunc:      lowerCase,
+		}
+
+		_, err := p.Run(&beat.Event{Fields: Input})
+		require.Error(t, err)
+		assert.ErrorIs(t, err, mapstr.ErrKeyCollision)
+
+	})
 }
 
 func BenchmarkLowerCaseProcessorRun(b *testing.B) {
