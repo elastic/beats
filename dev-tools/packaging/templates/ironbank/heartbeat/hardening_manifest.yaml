@@ -52,9 +52,6 @@ resources:
 
 # List of project maintainers
 maintainers:
-  - email: "nassim.kammah@elastic.co"
-    name: "Nassim Kammah"
-    username: "nassim.kammah"
   - email: "julien.lind@elastic.co"
     name: "Julien lind"
     username: "julien.lind"
