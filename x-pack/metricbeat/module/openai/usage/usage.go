@@ -155,7 +155,7 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 }
 
 func (m *MetricSet) createRequest(dateStr, apiKey string) (*http.Request, error) {
-	req, err := http.NewRequest(http.MethodGet, m.config.APIURL, nil)
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, m.config.APIURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}

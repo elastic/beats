@@ -12,8 +12,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
@@ -166,7 +167,7 @@ func initServer(endpoint string, api_key string) *httptest.Server {
 		// Validate the endpoint
 		if r.URL.Path == endpoint {
 			w.WriteHeader(http.StatusOK)
-			w.Write(data)
+			_ = w.Write(data)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
