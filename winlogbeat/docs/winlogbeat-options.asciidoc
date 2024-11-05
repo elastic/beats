@@ -514,8 +514,6 @@ winlogbeat.event_logs:
 
 There are a few notable differences in the events:
 
-* Events that contained data under `winlog.user_data` will now have it under
-  `winlog.event_data`.
 * Setting `include_xml: true` has no effect.
 
 
