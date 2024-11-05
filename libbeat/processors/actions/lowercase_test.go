@@ -66,7 +66,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			FailOnError:   true,
 			FullPath:      true,
 			Input: mapstr.M{
-				"Type":   "type",
 				"Field1": mapstr.M{"Field2": "Value"},
 				"Field3": "Value",
 				"a": mapstr.M{
