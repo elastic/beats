@@ -42,7 +42,7 @@ The `translate_ldap_attribute` processor has the following configuration setting
 |======
 | Name                     | Required | Default      | Description
 | `field`                  | yes      |              | Source field containing a GUID.
-| `target_field`           | no       |              | Target field for the common name. If not set it will be replaced in place.
+| `target_field`           | no       |              | Target field for the mapped attribute value. If not set it will be replaced in place.
 | `ldap_address`           | yes      |              | LDAP server address. eg: `ldap://ds.example.com:389`
 | `ldap_base_dn`           | yes      |              | LDAP base DN. eg: `dc=example,dc=com`
 | `ldap_bind_user`         | no       |              | LDAP user.
