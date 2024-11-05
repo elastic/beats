@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package usage
 
 import (
@@ -61,8 +65,8 @@ func (c *Config) Validate() error {
 	case c.Timeout <= 0:
 		return fmt.Errorf("timeout must be greater than 0")
 
-	case c.Collection.LookbackDays <= 0:
-		return fmt.Errorf("lookback_days must be greater than 0")
+	case c.Collection.LookbackDays < 0:
+		return fmt.Errorf("lookback_days must be >= 0")
 	}
 
 	// API keys validation in a separate loop since it needs iteration

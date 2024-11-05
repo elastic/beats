@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package usage
 
 import (
@@ -196,13 +200,14 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 }
 
 func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
+
 	for _, usage := range data {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"data": mapstr.M{
 					"organization_id":               usage.OrganizationID,
 					"organization_name":             usage.OrganizationName,
-					"aggregation_timestamp":         usage.AggregationTimestamp,
+					"aggregation_timestamp":         time.Unix(usage.AggregationTimestamp, 0),
 					"n_requests":                    usage.NRequests,
 					"operation":                     usage.Operation,
 					"snapshot_id":                   usage.SnapshotID,
@@ -230,7 +235,7 @@ func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"dalle": mapstr.M{
-					"timestamp":         dalle.Timestamp,
+					"timestamp":         time.Unix(dalle.Timestamp, 0),
 					"num_images":        dalle.NumImages,
 					"num_requests":      dalle.NumRequests,
 					"image_size":        dalle.ImageSize,
@@ -258,7 +263,7 @@ func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"whisper": mapstr.M{
-					"timestamp":         whisper.Timestamp,
+					"timestamp":         time.Unix(whisper.Timestamp, 0),
 					"model_id":          whisper.ModelID,
 					"num_seconds":       whisper.NumSeconds,
 					"num_requests":      whisper.NumRequests,
@@ -284,7 +289,7 @@ func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"tts": mapstr.M{
-					"timestamp":         tts.Timestamp,
+					"timestamp":         time.Unix(tts.Timestamp, 0),
 					"model_id":          tts.ModelID,
 					"num_characters":    tts.NumCharacters,
 					"num_requests":      tts.NumRequests,
