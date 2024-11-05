@@ -21,10 +21,10 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	config2 "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -52,7 +52,7 @@ func TestDropFieldRun(t *testing.T) {
 	})
 
 	t.Run("Do not drop mandatory fields", func(t *testing.T) {
-		c := conf.MustNewConfigFrom(
+		c := config2.MustNewConfigFrom(
 			mapstr.M{
 				"fields":         []string{"field1", "type", "type.value.key", "typeKey"},
 				"ignore_missing": true,
@@ -60,7 +60,9 @@ func TestDropFieldRun(t *testing.T) {
 		)
 
 		p, err := newDropFields(c)
-		process := p.(*dropFields)
+		require.NoError(t, err)
+		process, ok := p.(*dropFields)
+		assert.True(t, ok)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{"field1", "typeKey"}, process.Fields)
 	})
