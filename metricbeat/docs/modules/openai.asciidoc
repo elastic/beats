@@ -1,0 +1,68 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: openai
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/openai/_meta/docs.asciidoc
+
+
+[[metricbeat-module-openai]]
+[role="xpack"]
+== openai module
+
+beta[]
+
+This is the openai module.
+
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The openai module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: openai
+  metricsets: ["usage"]
+  enabled: false
+  period: 1h
+
+  # # Project API Keys - Multiple API keys can be specified for different projects
+  # api_keys:
+  # - key: "api_key1"
+  # - key: "api_key2"
+
+  # # API Configuration
+  # ## Base URL for the OpenAI usage API endpoint
+  # api_url: "https://api.openai.com/v1/usage"
+  # ## Custom headers to be included in API requests
+  # headers:
+  # - "k1: v1"
+  # - "k2: v2"
+  ## Rate Limiting Configuration
+  # rate_limit:
+  #   limit: 60 # requests per second
+  #   burst: 5  # burst size
+  # ## Request timeout duration
+  # timeout: 30s
+
+  # # Data Collection Configuration
+  # collection:
+  #   ## Number of days to look back when collecting usage data
+  #   lookback_days: 30----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-openai-usage,usage>>
+
+include::openai/usage.asciidoc[]
+
+:edit_url!:

@@ -67,6 +67,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
 * <<exported-fields-nginx>>
+* <<exported-fields-openai>>
 * <<exported-fields-openmetrics>>
 * <<exported-fields-oracle>>
 * <<exported-fields-panw>>
@@ -56651,6 +56652,36 @@ The current number of idle client connections waiting for a request.
 
 
 type: long
+
+--
+
+[[exported-fields-openai]]
+== openai fields
+
+openai module
+
+
+
+[float]
+=== openai
+
+
+
+
+[float]
+=== usage
+
+usage
+
+
+
+*`openai.usage.example`*::
++
+--
+Example field
+
+
+type: keyword
 
 --
 

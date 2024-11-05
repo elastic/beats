@@ -7,14 +7,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
-	"golang.org/x/time/rate"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -51,7 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	st, err := newStateStore(paths.Resolve(paths.Data, base.Name()))
+	st, err := newStateStore(paths.Resolve(paths.Data, path.Join(base.Module().Name(), base.Name())))
 	if err != nil {
 		return nil, fmt.Errorf("creating state store: %w", err)
 	}

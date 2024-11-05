@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 )
 
 // stateStore handles persistence of state markers using the filesystem
 type stateStore struct {
-	Dir string // Base directory for storing state files
+	Dir          string // Base directory for storing state files
+	sync.RWMutex        // Protects access to the state store
 }
 
 // newStateStore creates a new state store instance at the specified path
@@ -28,6 +30,9 @@ func (s *stateStore) getStatePath(name string) string {
 
 // Put creates a state marker file for the given key
 func (s *stateStore) Put(key string) error {
+	s.Lock()
+	defer s.Unlock()
+
 	filePath := s.getStatePath(key)
 	f, err := os.Create(filePath)
 	if err != nil {
@@ -38,6 +43,9 @@ func (s *stateStore) Put(key string) error {
 
 // Has checks if a state exists for the given key
 func (s *stateStore) Has(key string) bool {
+	s.RLock()
+	defer s.RUnlock()
+
 	filePath := s.getStatePath(key)
 	_, err := os.Stat(filePath)
 	return err == nil
@@ -45,6 +53,9 @@ func (s *stateStore) Has(key string) bool {
 
 // Remove deletes the state marker file for the given key
 func (s *stateStore) Remove(key string) error {
+	s.Lock()
+	defer s.Unlock()
+
 	filePath := s.getStatePath(key)
 	if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("removing state file: %w", err)
@@ -54,6 +65,9 @@ func (s *stateStore) Remove(key string) error {
 
 // Clear removes all state markers by deleting and recreating the state directory
 func (s *stateStore) Clear() error {
+	s.Lock()
+	defer s.Unlock()
+
 	if err := os.RemoveAll(s.Dir); err != nil {
 		return fmt.Errorf("clearing state directory: %w", err)
 	}

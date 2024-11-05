@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/time/rate"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // RLHTTPClient implements a rate-limited HTTP client that wraps the standard http.Client
