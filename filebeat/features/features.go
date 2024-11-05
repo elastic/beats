@@ -17,20 +17,36 @@
 
 package features
 
-import "os"
+import (
+	"os"
+	"strings"
+)
+
+const (
+	envAgentlessElasticsearchStateStoreEnabled    = "AGENTLESS_ELASTICSEARCH_STATE_STORE_ENABLED"
+	envAgentlessElasticsearchStateStoreInputTypes = "AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES"
+)
 
 type void struct{}
 
 // List of input types Elasticsearch state store is enabled for
-var esTypesEnabled = map[string]void{
-	"httpjson": {},
-	"cel":      {},
-}
+var esTypesEnabled map[string]void
 
 var isESEnabled bool
 
 func init() {
-	isESEnabled = (os.Getenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_ENABLED") != "")
+	isESEnabled = (os.Getenv(envAgentlessElasticsearchStateStoreEnabled) != "")
+
+	esTypesEnabled = make(map[string]void)
+
+	s := os.Getenv(envAgentlessElasticsearchStateStoreInputTypes)
+	arr := strings.Split(s, ",")
+	for _, e := range arr {
+		k := strings.TrimSpace(e)
+		if k != "" {
+			esTypesEnabled[k] = void{}
+		}
+	}
 }
 
 // IsElasticsearchStateStoreEnabled returns true if feature is enabled for agentless
