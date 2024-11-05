@@ -27,7 +27,7 @@
                     "enabled": true,
                     "id": "2",
                     "params": {
-                        "field": "coredns.query.name",
+                        "field": "coredns.question.name",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
