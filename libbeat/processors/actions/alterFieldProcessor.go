@@ -30,6 +30,7 @@ import (
 
 type alterFieldProcessor struct {
 	Fields         []string
+	Values         []string
 	IgnoreMissing  bool
 	FailOnError    bool
 	AlterFullField bool
@@ -45,6 +46,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 		IgnoreMissing  bool     `config:"ignore_missing"`
 		FailOnError    bool     `config:"fail_on_error"`
 		AlterFullField bool     `config:"alter_full_field"`
+		Values         []string `config:"values"`
 	}{
 		IgnoreMissing:  false,
 		FailOnError:    true,
@@ -77,6 +79,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 		processorName:  processorName,
 		AlterFullField: config.AlterFullField,
 		alterFunc:      alterFunc,
+		Values:         config.Values,
 	}, nil
 
 }
@@ -92,7 +95,7 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range a.Fields {
-		err := a.alter(event, field)
+		err := a.alterField(event, field)
 		if err != nil {
 			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 				continue
@@ -105,10 +108,23 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
+	for _, value := range a.Values {
+		err := a.alterValue(event, value)
+		if err != nil {
+			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+				continue
+			}
+			if a.FailOnError {
+				event = backup
+				_, _ = event.PutValue("error.message", err.Error())
+				return event, err
+			}
+		}
+	}
 	return event, nil
 }
 
-func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
+func (a *alterFieldProcessor) alterField(event *beat.Event, field string) error {
 
 	// modify all segments of the key
 	if a.AlterFullField {
@@ -132,4 +148,23 @@ func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
 	}
 
 	return nil
+}
+
+func (a *alterFieldProcessor) alterValue(event *beat.Event, value string) error {
+	segmentCount := strings.Count(value, ".")
+	err := event.Fields.Traverse(value, mapstr.CaseSensitiveMode, func(level mapstr.M, key string) error {
+		if segmentCount == 0 {
+			matchedValue := level[key]
+			if v, ok := matchedValue.(string); ok {
+				lowerValue, _ := a.alterFunc(v)
+				level[key] = lowerValue
+				return nil
+			}
+			return fmt.Errorf("value of key %q is not a string", value)
+		}
+		segmentCount--
+		return nil
+	})
+
+	return err
 }

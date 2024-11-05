@@ -248,6 +248,115 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 	})
 }
 
+func TestLowerCaseProcessorValues(t *testing.T) {
+	tests := []struct {
+		Name          string
+		Values        []string
+		IgnoreMissing bool
+		FailOnError   bool
+		FullPath      bool
+		Input         mapstr.M
+		Output        mapstr.M
+		Error         bool
+	}{
+		{
+			Name:          "Lowercase Values",
+			Values:        []string{"a.b.c"},
+			IgnoreMissing: false,
+			FailOnError:   true,
+			FullPath:      true,
+			Input: mapstr.M{
+				"a": mapstr.M{
+					"b": mapstr.M{
+						"c": "D",
+					},
+				},
+			},
+			Output: mapstr.M{
+				"a": mapstr.M{
+					"b": mapstr.M{
+						"c": "d", // d is lowercased
+					},
+				},
+			},
+			Error: false,
+		},
+		{
+			Name:          "Fail if given path to value is not a string",
+			Values:        []string{"a.B"},
+			IgnoreMissing: false,
+			FailOnError:   true,
+			FullPath:      true,
+			Input: mapstr.M{
+				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
+			},
+			Output: mapstr.M{
+				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
+				"error": mapstr.M{"message": "error visiting key \"B\" of the path \"a.B\": value of key \"a.B\" is not a string"},
+			},
+
+			Error: true,
+		},
+		{
+			Name:          "Fail On Missing Key Error",
+			Values:        []string{"a.B.c"},
+			IgnoreMissing: false,
+			FailOnError:   true,
+			FullPath:      true,
+			Input: mapstr.M{
+				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
+			},
+			Output: mapstr.M{
+				"Field3": "Value",
+				"a": mapstr.M{
+					"B": mapstr.M{
+						"C": "D",
+					},
+				},
+				"error": mapstr.M{"message": "could not fetch value for key: a.B.c, Error: key not found"},
+			},
+
+			Error: true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			p := &alterFieldProcessor{
+				Values:         test.Values,
+				IgnoreMissing:  test.IgnoreMissing,
+				FailOnError:    test.FailOnError,
+				AlterFullField: test.FullPath,
+				alterFunc:      lowerCase,
+			}
+
+			event, err := p.Run(&beat.Event{Fields: test.Input})
+
+			if !test.Error {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+
+			assert.Equal(t, test.Output, event.Fields)
+		})
+	}
+}
 func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 	tests := []struct {
 		Name   string
