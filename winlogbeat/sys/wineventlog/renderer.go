@@ -342,6 +342,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 		return "param" + strconv.Itoa(idx)
 	}
 
+	pairs := make([]winevent.KeyValue, len(values))
 	for i, v := range values {
 		var strVal string
 		switch t := v.(type) {
@@ -353,10 +354,16 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 			strVal = fmt.Sprintf("%v", v)
 		}
 
-		event.EventData.Pairs = append(event.EventData.Pairs, winevent.KeyValue{
+		pairs[i] = winevent.KeyValue{
 			Key:   paramName(i),
 			Value: strVal,
-		})
+		}
+	}
+
+	if evtMeta.HasUserData {
+		event.UserData.Pairs = pairs
+	} else {
+		event.EventData.Pairs = pairs
 	}
 }
 

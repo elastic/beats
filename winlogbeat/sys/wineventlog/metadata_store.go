@@ -284,6 +284,7 @@ type EventMetadata struct {
 	MsgStatic   string             // Used when the message has no parameters.
 	MsgTemplate *template.Template `json:"-"` // Template that expects an array of values as its data.
 	EventData   []EventData        // Names of parameters from XML template.
+	HasUserData bool               // Event has a UserData section or not.
 }
 
 // newEventMetadataFromEventHandle collects metadata about an event type using
@@ -310,6 +311,7 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 			em.EventData = append(em.EventData, EventData{Name: pair.Key})
 		}
 	} else {
+		em.HasUserData = true
 		for _, pair := range event.UserData.Pairs {
 			em.EventData = append(em.EventData, EventData{Name: pair.Key})
 		}
