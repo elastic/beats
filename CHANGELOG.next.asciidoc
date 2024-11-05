@@ -245,7 +245,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 
 *Auditbeat*
-
+- Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
 
 *Auditbeat*
 
@@ -328,6 +328,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 - Improved Azure Blob Storage input documentation. {pull}41252[41252]
 - Make ETW input GA. {pull}41389[41389]
+- Add support for Okta entity analytics provider to collect role and factor data for users. {pull}41460[41460]
 
 *Auditbeat*
 
