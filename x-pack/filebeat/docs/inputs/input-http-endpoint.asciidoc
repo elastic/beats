@@ -332,7 +332,7 @@ For example, `["content-type"]` will become `["Content-Type"]` when the filebeat
 [float]
 ==== `preserve_original_event`
 
-This option copies the raw unmodified body of the incoming request to the event.original field as a string before sending the event to Elasticsearch.
+This option includes the JSON representation of the incoming request in the `event.original` field as a string before sending the event to Elasticsearch. The representation may not be a verbatim copy of the original message, but is guaranteed to be an [RFC7493](https://datatracker.ietf.org/doc/html/rfc7493) compliant message.
 
 [float]
 ==== `crc.provider`
