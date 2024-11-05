@@ -13654,11 +13654,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.11.4-0.20241031124010-e71e01dfe79f
+Version: v0.11.4-0.20241105160224-154856214241
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.11.4-0.20241031124010-e71e01dfe79f/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.11.4-0.20241105160224-154856214241/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004

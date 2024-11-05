@@ -192,7 +192,7 @@ require (
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
 	github.com/elastic/elastic-agent-libs v0.17.1
-	github.com/elastic/elastic-agent-system-metrics v0.11.4-0.20241031124010-e71e01dfe79f
+	github.com/elastic/elastic-agent-system-metrics v0.11.4-0.20241105160224-154856214241
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
