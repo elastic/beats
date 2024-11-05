@@ -2,6 +2,8 @@ package usage
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"golang.org/x/time/rate"
 )
 
@@ -28,9 +31,10 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	logger *logp.Logger
-	config Config
-	report mb.ReporterV2
+	logger     *logp.Logger
+	config     Config
+	report     mb.ReporterV2
+	stateStore *stateStore
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -47,10 +51,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	st, err := newStateStore(paths.Resolve(paths.Data, base.Name()))
+	if err != nil {
+		return nil, fmt.Errorf("creating state store: %w", err)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		logger:        logp.NewLogger("openai.usage"),
 		config:        config,
+		stateStore:    st,
 	}, nil
 }
 
@@ -77,13 +87,43 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
-	for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
-		dateStr := d.Format("2006-01-02")
-		for _, apiKey := range m.config.APIKeys {
+	for _, apiKey := range m.config.APIKeys {
+		// SHA-256 produces a fixed-length (64 characters) hexadecimal string
+		// that is safe for filenames across all major platforms. Hex encoding
+		// ensures that the hash is safe for use in file paths as it uses only
+		// alphanumeric characters.
+		//
+		// Also, SHA-256 is a strong cryptographic hash function that is
+		// deterministic, meaning that the same input will always produce
+		// the same output and it is an one-way function, meaning that it is
+		// computationally infeasible to reverse the hash to obtain the
+		// original.
+		hasher := sha256.New()
+		hasher.Write([]byte(apiKey.Key))
+		hashedKey := hex.EncodeToString(hasher.Sum(nil))
+		stateKey := "state_" + hashedKey
+
+		// If state exists, only fetch current day
+		if m.stateStore.Has(stateKey) {
+			currentDay := endDate.Format("2006-01-02")
+			if err := m.fetchSingleDay(currentDay, apiKey.Key, httpClient); err != nil {
+				m.logger.Errorf("Error fetching data for date %s: %v", currentDay, err)
+			}
+			continue
+		}
+
+		// First run for this API key - fetch historical data
+		for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+			dateStr := d.Format("2006-01-02")
 			if err := m.fetchSingleDay(dateStr, apiKey.Key, httpClient); err != nil {
 				m.logger.Errorf("Error fetching data for date %s: %v", dateStr, err)
 				continue
 			}
+		}
+
+		// Mark this API key as processed
+		if err := m.stateStore.Put(stateKey); err != nil {
+			m.logger.Errorf("Error storing state for API key: %v", err)
 		}
 	}
 	return nil
@@ -156,11 +196,11 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 	for _, usage := range data {
 		event := mb.Event{
-			Timestamp: time.Unix(usage.AggregationTimestamp, 0),
 			MetricSetFields: mapstr.M{
 				"data": mapstr.M{
 					"organization_id":               usage.OrganizationID,
 					"organization_name":             usage.OrganizationName,
+					"aggregation_timestamp":         usage.AggregationTimestamp,
 					"n_requests":                    usage.NRequests,
 					"operation":                     usage.Operation,
 					"snapshot_id":                   usage.SnapshotID,
@@ -186,9 +226,9 @@ func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 	for _, dalle := range data {
 		event := mb.Event{
-			Timestamp: time.Unix(dalle.Timestamp, 0),
 			MetricSetFields: mapstr.M{
 				"dalle": mapstr.M{
+					"timestamp":         dalle.Timestamp,
 					"num_images":        dalle.NumImages,
 					"num_requests":      dalle.NumRequests,
 					"image_size":        dalle.ImageSize,
@@ -214,9 +254,9 @@ func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 	for _, whisper := range data {
 		event := mb.Event{
-			Timestamp: time.Unix(whisper.Timestamp, 0),
 			MetricSetFields: mapstr.M{
 				"whisper": mapstr.M{
+					"timestamp":         whisper.Timestamp,
 					"model_id":          whisper.ModelID,
 					"num_seconds":       whisper.NumSeconds,
 					"num_requests":      whisper.NumRequests,
@@ -240,9 +280,9 @@ func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 	for _, tts := range data {
 		event := mb.Event{
-			Timestamp: time.Unix(tts.Timestamp, 0),
 			MetricSetFields: mapstr.M{
 				"tts": mapstr.M{
+					"timestamp":         tts.Timestamp,
 					"model_id":          tts.ModelID,
 					"num_characters":    tts.NumCharacters,
 					"num_requests":      tts.NumRequests,
