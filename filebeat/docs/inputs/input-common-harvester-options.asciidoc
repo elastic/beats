@@ -146,7 +146,7 @@ The default is 16384.
 ===== `max_bytes`
 
 The maximum number of bytes that a single log message can have. All bytes after
-`max_bytes` are discarded and not sent. This setting is especially useful for
+`max_bytes` are discarded and not sent. (Please note that up to 4 times the `max_bytes` will be buffered in memory.) This setting is especially useful for
 multiline log messages, which can get large. The default is 10MB (10485760).
 
 [float]
