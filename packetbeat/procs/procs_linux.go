@@ -65,7 +65,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	if err = pids.Get(); err != nil {
 		return nil, err
 	}
-	logp.Debug("procs", "getLocalPortsToPIDs()")
+	logp.Debug("procs", "GetLocalPortToPIDMapping()")
 	ipv4socks, err := socketsFromProc(sourceFiles.ipv4, false)
 	if err != nil {
 		logp.Err("GetLocalPortToPIDMapping: parsing '%s': %s", sourceFiles.ipv4, err)
@@ -94,7 +94,7 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 
 	ports = make(map[endpoint]int)
 	for _, pid := range pids.List {
-		inodes, err := findSocketsOfPid("", pid)
+		inodes, err := findSocketsOfPid(proc.hostfs, pid)
 		if err != nil {
 			if os.IsNotExist(err) {
 				logp.Info("FindSocketsOfPid: %s", err)
@@ -112,6 +112,97 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	}
 
 	return ports, nil
+}
+
+// GetSingleLocalPortToPIDMapping fetches a PID that corresponds to a given address:port combination.
+// It returns the pid, a bool indicating if a matching PID was found, and an error.
+// Because we're only searching for a single PID, this employs a number of optimizations that are not present in GetLocalPortToPIDMapping,
+// and should be preferred if we only care about locating a single PID.
+func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error) {
+	// look up socket connections and check for a match before we do anything.
+	sourceFiles, ok := procFiles[transport]
+	if !ok {
+		return 0, false, fmt.Errorf("unsupported transport protocol id: %d", transport)
+	}
+	var socketList []*socketInfo
+	var err error
+	// fetch list of current sockets
+	if address.To4() != nil {
+		socketList, err = socketsFromProc(filepath.Join(proc.hostfs, sourceFiles.ipv4), false)
+	} else {
+		socketList, err = socketsFromProc(filepath.Join(proc.hostfs, sourceFiles.ipv6), true)
+	}
+	if err != nil {
+		logp.Err("GetLocalPortToPIDMapping: error parsing: %s", err)
+		return 0, false, err
+	}
+
+	// if no current socket that matches our request is found in /proc/net, bail early, as it won't show up in in /proc/[pid]/fd
+	var foundInode uint64
+	for _, sock := range socketList {
+		if (address.Equal(sock.dstIP) && port == sock.dstPort) || (address.Equal(sock.srcIP)) && port == sock.srcPort {
+			foundInode = sock.inode
+		}
+	}
+	// emulate the behavior of lookupMapping(). If there's no matching port, but there
+	// is a match when using INADDR_ANY, revert to that
+	if foundInode == 0 {
+		nullAddr := net.IPv4zero
+		if address.To4() == nil {
+			nullAddr = net.IPv6unspecified
+		}
+		for _, sock := range socketList {
+			if (sock.dstIP.Equal(nullAddr) && port == sock.dstPort) || (sock.srcIP.Equal(nullAddr)) && port == sock.srcPort {
+				foundInode = sock.inode
+				break
+			}
+		}
+
+	}
+	// connection can no longer be found
+	if foundInode == 0 {
+		return 0, false, nil
+	}
+
+	// now search for the process
+	dir, err := os.Open(filepath.Join(proc.hostfs, "/proc"))
+	if err != nil {
+		return 0, false, fmt.Errorf("error opening proc directory: %w", err)
+	}
+	defer dir.Close()
+
+	names, err := dir.Readdirnames(-1)
+	if err != nil {
+		return 0, false, fmt.Errorf("error reading dir names in proc directory: %w", err)
+	}
+
+	// 'creative' optimization
+	// if we're asked to get an unknown process, there's a good chance it's actually a new PID, so traverse the list backwards,
+	// from high PID to low PID,
+	// as all the symlink resolve operations can actually take up a non-trivial amount of CPU time
+	for i := len(names) - 1; i >= 0; i-- {
+		if names[i][0] < '0' || names[i][0] > '9' {
+			continue
+		}
+		pid, err := strconv.Atoi(names[i])
+		if err != nil {
+			continue
+		}
+		inodes, err := findSocketsOfPid(proc.hostfs, pid)
+		if err != nil {
+			if !os.IsNotExist(err) {
+				logp.Err("FindSocketsOfPid: %s", err)
+			}
+			continue
+		}
+		for _, inode := range inodes {
+			if inode == foundInode {
+				return pid, true, nil
+			}
+		}
+	}
+
+	return 0, false, nil
 }
 
 var procFiles = map[applayer.Transport]struct {
@@ -176,10 +267,10 @@ func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
 
 // Parses the /proc/net/(tcp|udp)6? file
 func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
-	var (
-		sockets []*socketInfo
-		err     error
-	)
+
+	sockets := []*socketInfo{}
+	var err error
+
 	sc := bufio.NewScanner(input)
 	for sc.Scan() {
 		words := bytes.Fields(sc.Bytes())
