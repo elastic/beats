@@ -54,7 +54,8 @@ metricbeat.modules:
   # # Data Collection Configuration
   # collection:
   #   ## Number of days to look back when collecting usage data
-  #   lookback_days: 30----
+  #   lookback_days: 30
+----
 
 [float]
 === Metricsets

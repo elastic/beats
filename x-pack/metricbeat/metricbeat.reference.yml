@@ -1286,6 +1286,7 @@ metricbeat.modules:
   # collection:
   #   ## Number of days to look back when collecting usage data
   #   lookback_days: 30
+
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
   metricsets: ['collector']
