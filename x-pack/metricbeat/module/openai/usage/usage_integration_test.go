@@ -167,7 +167,7 @@ func initServer(endpoint string, api_key string) *httptest.Server {
 		// Validate the endpoint
 		if r.URL.Path == endpoint {
 			w.WriteHeader(http.StatusOK)
-			_ = w.Write(data)
+			_, _ = w.Write(data)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
