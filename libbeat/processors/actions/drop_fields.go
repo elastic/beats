@@ -74,10 +74,10 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 
 	// Parse regexp containing fields and removes them from initial config
 	regexpFields := make([]match.Matcher, 0)
-	for i := len(config.Fields) - 1; i >= 0; i-- {
-		field := config.Fields[i]
+	for i := len(configFields) - 1; i >= 0; i-- {
+		field := configFields[i]
 		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
-			config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
+			configFields = append(configFields[:i], configFields[i+1:]...)
 
 			matcher, err := match.Compile(field[1 : len(field)-1])
 			if err != nil {
