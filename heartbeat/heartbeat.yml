@@ -36,6 +36,7 @@ heartbeat.monitors:
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
   #service.name: my-apm-service-name
+  
 # Experimental: Set this to true to run heartbeat monitors exactly once at startup
 #heartbeat.run_once: true
 
