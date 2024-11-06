@@ -75,6 +75,7 @@ func (in *eventHubInputV1) Run(
 	// Create pipelineClient for publishing events.
 	in.pipelineClient, err = createPipelineClient(pipeline)
 	if err != nil {
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
 	}
 	defer in.pipelineClient.Close()
@@ -86,6 +87,7 @@ func (in *eventHubInputV1) Run(
 	// Set up new and legacy sanitizers, if any.
 	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)
 	if err != nil {
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("failed to create sanitizers: %w", err)
 	}
 
@@ -102,6 +104,8 @@ func (in *eventHubInputV1) Run(
 	// in preparation for the main run loop.
 	err = in.setup(ctx)
 	if err != nil {
+		in.log.Errorw("error setting up input", "error", err)
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return err
 	}
 
@@ -113,7 +117,7 @@ func (in *eventHubInputV1) Run(
 		return err
 	}
 
-	inputContext.UpdateStatus(status.Stopped, "")
+	inputContext.UpdateStatus(status.Stopping, "")
 	return nil
 }
 
