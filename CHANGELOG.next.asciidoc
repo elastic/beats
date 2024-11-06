@@ -168,7 +168,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
-- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
 
 *Heartbeat*
