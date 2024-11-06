@@ -41,8 +41,12 @@ type scheduler struct {
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
-	state *state, log *logp.Logger,
+	state *state, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics("", nil)
+	}
 	return &scheduler{
 		publisher: publisher,
 		bucket:    bucket,
@@ -51,14 +55,12 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		state:     state,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
-		metrics:   newInputMetrics(src.BucketName, nil),
+		metrics:   metrics,
 	}
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule(ctx context.Context) error {
-	defer s.metrics.Close()
-
 	if !s.src.Poll {
 		return s.scheduleOnce(ctx)
 	}

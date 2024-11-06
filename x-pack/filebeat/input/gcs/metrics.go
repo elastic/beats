@@ -70,13 +70,9 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 	adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
-	// set the URL of the input resource. Id is the bucket name.
-	out.url.Set("gs://" + id)
-
 	return out
 }
 
 func (m *inputMetrics) Close() {
-	m.url.Clear()
 	m.unregister()
 }
