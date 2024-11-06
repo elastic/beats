@@ -44,7 +44,7 @@ func newState() *state {
 // and returns an unlock function, done. The caller must call done when
 // s and cp are no longer needed in a locked state. done may not be called
 // more than once.
-func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint, done func()) {
+func (s *state) saveForTx(name string, lastModifiedOn time.Time, metrics *inputMetrics) (cp *Checkpoint, done func()) {
 	s.mu.Lock()
 	if _, ok := s.cp.FailedJobs[name]; !ok {
 		if len(s.cp.ObjectName) == 0 {
@@ -61,6 +61,8 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint
 	} else {
 		// clear entry if this is a failed job
 		delete(s.cp.FailedJobs, name)
+		metrics.gcsFailedJobsTotal.Dec()
+		metrics.currentStateObjectsTotal.Dec()
 	}
 	return s.cp, func() { s.mu.Unlock() }
 }
@@ -72,10 +74,16 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint
 // entry is removed from the map
 func (s *state) updateFailedJobs(jobName string, metrics *inputMetrics) {
 	s.mu.Lock()
+	if _, ok := s.cp.FailedJobs[jobName]; !ok {
+		// increment stored state object count & failed job count
+		metrics.currentStateObjectsTotal.Inc()
+		metrics.gcsFailedJobsTotal.Inc()
+	}
 	s.cp.FailedJobs[jobName]++
 	if s.cp.FailedJobs[jobName] > maxFailedJobRetries {
 		delete(s.cp.FailedJobs, jobName)
 		metrics.gcsExpiredFailedJobsTotal.Inc()
+		metrics.currentStateObjectsTotal.Dec()
 	}
 	s.mu.Unlock()
 }
@@ -86,6 +94,7 @@ func (s *state) deleteFailedJob(jobName string, metrics *inputMetrics) {
 	s.mu.Lock()
 	delete(s.cp.FailedJobs, jobName)
 	metrics.gcsExpiredFailedJobsTotal.Inc()
+	metrics.currentStateObjectsTotal.Dec()
 	s.mu.Unlock()
 }
 

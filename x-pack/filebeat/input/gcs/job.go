@@ -124,7 +124,7 @@ func (j *job) do(ctx context.Context, id string) {
 		}
 		event.SetID(objectID(j.hash, 0))
 		// locks while data is being saved and published to avoid concurrent map read/writes
-		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
 		if err := j.publisher.Publish(event, cp); err != nil {
 			j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			j.metrics.errorsTotal.Inc()
@@ -161,6 +161,9 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 			j.log.Errorw("failed to close reader for object", "objectName", j.object.Name, "error", err)
 		}
 	}()
+
+	// update the source lag time metric
+	j.metrics.sourceLagTime.Update(time.Since(j.object.Updated).Milliseconds())
 
 	// calculate number of decode errors
 	if err := j.decode(ctx, reader, id); err != nil {
@@ -301,7 +304,7 @@ func (j *job) readJsonAndPublish(ctx context.Context, r io.Reader, id string) er
 func (j *job) publish(evt beat.Event, last bool, id string) {
 	if last {
 		// if this is the last object, then perform a complete state save
-		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+		cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
 		if err := j.publisher.Publish(evt, cp); err != nil {
 			j.metrics.errorsTotal.Inc()
 			j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
@@ -358,7 +361,7 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 
 		if !dec.More() {
 			// if this is the last object, then perform a complete state save
-			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated)
+			cp, done := j.state.saveForTx(j.object.Name, j.object.Updated, j.metrics)
 			if err := j.publisher.Publish(evt, cp); err != nil {
 				j.metrics.errorsTotal.Inc()
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)

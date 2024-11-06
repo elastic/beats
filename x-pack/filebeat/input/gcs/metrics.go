@@ -15,10 +15,11 @@ import (
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
 	unregister        func()
-	url               *monitoring.String // URL of the input resource
-	errorsTotal       *monitoring.Uint   // number of errors encountered
-	decodeErrorsTotal *monitoring.Uint   // number of decode errors encountered
+	url               *monitoring.String // URL of the input resource.
+	errorsTotal       *monitoring.Uint   // Number of errors encountered.
+	decodeErrorsTotal *monitoring.Uint   // Number of decode errors encountered.
 
+	currentStateObjectsTotal        *monitoring.Uint // Number of objects currently tracked in the state registry.
 	gcsObjectsRequestedTotal        *monitoring.Uint // Number of GCS objects downloaded.
 	gcsObjectsPublishedTotal        *monitoring.Uint // Number of GCS objects processed that were published.
 	gcsObjectsListedTotal           *monitoring.Uint // Number of GCS objects returned by list operations.
@@ -28,9 +29,10 @@ type inputMetrics struct {
 	gcsExpiredFailedJobsTotal       *monitoring.Uint // Number of expired failed jobs that could not be recovered.
 	gcsObjectsInflight              *monitoring.Uint // Number of GCS objects inflight (gauge).
 	gcsObjectProcessingTime         metrics.Sample   // Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
-	gcsObjectSizeInBytes            metrics.Sample   // Histogram of processed GCS object size in bytes
-	gcsEventsPerObject              metrics.Sample   // Histogram of events in an individual GCS object
+	gcsObjectSizeInBytes            metrics.Sample   // Histogram of processed GCS object size in bytes.
+	gcsEventsPerObject              metrics.Sample   // Histogram of events in an individual GCS object.
 	gcsJobsScheduledAfterValidation metrics.Sample   // Number of jobs scheduled after validation.
+	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the object was read.
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
@@ -41,6 +43,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
 		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
 
+		currentStateObjectsTotal:        monitoring.NewUint(reg, "current_state_objects_total"),
 		gcsObjectsRequestedTotal:        monitoring.NewUint(reg, "gcs_objects_requested_total"),
 		gcsObjectsPublishedTotal:        monitoring.NewUint(reg, "gcs_objects_published_total"),
 		gcsObjectsListedTotal:           monitoring.NewUint(reg, "gcs_objects_listed_total"),
@@ -48,11 +51,12 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		gcsEventsCreatedTotal:           monitoring.NewUint(reg, "gcs_events_created_total"),
 		gcsFailedJobsTotal:              monitoring.NewUint(reg, "gcs_failed_jobs_total"),
 		gcsExpiredFailedJobsTotal:       monitoring.NewUint(reg, "gcs_expired_failed_jobs_total"),
-		gcsObjectsInflight:              monitoring.NewUint(reg, "gcs_objects_inflight"),
+		gcsObjectsInflight:              monitoring.NewUint(reg, "gcs_objects_inflight_gauge"),
 		gcsObjectProcessingTime:         metrics.NewUniformSample(1024),
 		gcsObjectSizeInBytes:            metrics.NewUniformSample(1024),
 		gcsEventsPerObject:              metrics.NewUniformSample(1024),
 		gcsJobsScheduledAfterValidation: metrics.NewUniformSample(1024),
+		sourceLagTime:                   metrics.NewUniformSample(1024),
 	}
 
 	adapter.NewGoMetrics(reg, "gcs_object_processing_time", adapter.Accept).
@@ -63,6 +67,13 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		Register("histogram", metrics.NewHistogram(out.gcsEventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "gcs_jobs_scheduled_after_validation", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.gcsJobsScheduledAfterValidation)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.sourceLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+
+	// set the URL of the input resource. Id is the bucket name.
+	if id != "" {
+		out.url.Set("gs://" + id)
+	}
 
 	return out
 }

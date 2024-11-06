@@ -43,7 +43,7 @@ type scheduler struct {
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
 	state *state, log *logp.Logger,
 ) *scheduler {
-	s := scheduler{
+	return &scheduler{
 		publisher: publisher,
 		bucket:    bucket,
 		src:       src,
@@ -53,9 +53,6 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 		metrics:   newInputMetrics(src.BucketName, nil),
 	}
-	s.metrics.url.Set("gs://" + s.src.BucketName)
-	s.metrics.errorsTotal.Set(0)
-	return &s
 }
 
 // Schedule, is responsible for fetching & scheduling jobs using the workerpool model
