@@ -127,27 +127,22 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 func (a *alterFieldProcessor) alterField(event *beat.Event, field string) error {
 
 	// modify all segments of the key
+	var err error
 	if a.AlterFullField {
-		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, a.alterFunc)
-		if err != nil {
-			return err
-		}
+		err = event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, a.alterFunc)
 	} else {
 		// modify only the last segment
 		segmentCount := strings.Count(field, ".")
-		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, func(key string) (string, error) {
+		err = event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, func(key string) (string, error) {
 			if segmentCount > 0 {
 				segmentCount--
 				return key, nil
 			}
 			return a.alterFunc(key)
 		})
-		if err != nil {
-			return err
-		}
 	}
 
-	return nil
+	return err
 }
 
 func (a *alterFieldProcessor) alterValue(event *beat.Event, valueKey string) error {
@@ -162,10 +157,14 @@ func (a *alterFieldProcessor) alterValue(event *beat.Event, valueKey string) err
 			return fmt.Errorf("could not delete key: %s,  %w", v, err)
 		}
 
-		v, _ = a.alterFunc(v)
+		v, err = a.alterFunc(v)
+		if err != nil {
+			return fmt.Errorf("could not alter %s successfully, %w", v, err)
+		}
+
 		_, err = event.PutValue(valueKey, v)
 		if err != nil {
-			return fmt.Errorf("could not put value: %s: %v, %w", v, value, err)
+			return fmt.Errorf("could not put value: %s: %v, %w", valueKey, v, err)
 		}
 	} else {
 		return fmt.Errorf("value of key %q is not a string", valueKey)
