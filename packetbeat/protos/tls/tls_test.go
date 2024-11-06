@@ -422,9 +422,6 @@ func TestOCSPStatus(t *testing.T) {
 
 	got := results.events[0].Fields
 	require.Equal(t, want, got)
-	// if !cmp.Equal(got, want) {
-	// 	t.Errorf("unexpected result: %s", cmp.Diff(got, want))
-	// }
 }
 
 func TestFragmentedHandshake(t *testing.T) {
