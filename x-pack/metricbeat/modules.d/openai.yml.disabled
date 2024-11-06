@@ -29,3 +29,9 @@
   # collection:
   #   ## Number of days to look back when collecting usage data
   #   lookback_days: 30
+  #   ## Whether to collect usage data in realtime. Defaults to false as how
+  #   # OpenAI usage data is collected will end up adding duplicate data to ES
+  #   # and also making it harder to do analytics. Best approach is to avoid
+  #   # realtime collection and collect only upto last day (in UTC). So, there's
+  #   # at most 24h delay.
+  #   realtime: false

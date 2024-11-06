@@ -28,7 +28,8 @@ type apiKeyConfig struct {
 }
 
 type collectionConfig struct {
-	LookbackDays int `config:"lookback_days"`
+	LookbackDays int  `config:"lookback_days"`
+	Realtime     bool `config:"realtime"`
 }
 
 func defaultConfig() Config {
@@ -40,7 +41,8 @@ func defaultConfig() Config {
 			Burst: ptr(5),
 		},
 		Collection: collectionConfig{
-			LookbackDays: 5, // 5 days
+			LookbackDays: 0,     // 0 days
+			Realtime:     false, // avoid realtime collection by default
 		},
 	}
 }

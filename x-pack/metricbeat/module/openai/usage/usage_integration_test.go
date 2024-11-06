@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,7 +19,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	apiKey := "most_secure_token"
+	apiKey := time.Now().String() // to generate a unique API key everytime
 	usagePath := "/usage"
 	server := initServer(usagePath, apiKey)
 	defer server.Close()
@@ -35,7 +36,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	apiKey := "most_secure_token"
+	apiKey := time.Now().String() // to generate a unique API key everytime
 	usagePath := "/usage"
 	server := initServer(usagePath, apiKey)
 	defer server.Close()

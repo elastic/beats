@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-// stateStore handles persistence of state markers using the filesystem
+// stateStore handles persistence of key-value pairs using the filesystem
 type stateStore struct {
 	Dir          string // Base directory for storing state files
 	sync.RWMutex        // Protects access to the state store
@@ -32,17 +32,38 @@ func (s *stateStore) getStatePath(name string) string {
 	return path.Join(s.Dir, name)
 }
 
-// Put creates a state marker file for the given key
-func (s *stateStore) Put(key string) error {
+// Put stores a value in a file named by the key
+func (s *stateStore) Put(key string, value string) error {
 	s.Lock()
 	defer s.Unlock()
 
 	filePath := s.getStatePath(key)
+
+	// In case the file already exists, file is truncated.
 	f, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("creating state file: %w", err)
 	}
-	return f.Close()
+	defer f.Close()
+
+	_, err = f.WriteString(value)
+	if err != nil {
+		return fmt.Errorf("writing value to state file: %w", err)
+	}
+	return nil
+}
+
+// Get retrieves the value stored in the file named by the key
+func (s *stateStore) Get(key string) (string, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	filePath := s.getStatePath(key)
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("reading state file: %w", err)
+	}
+	return string(data), nil
 }
 
 // Has checks if a state exists for the given key
@@ -55,7 +76,7 @@ func (s *stateStore) Has(key string) bool {
 	return err == nil
 }
 
-// Remove deletes the state marker file for the given key
+// Remove deletes the state file for the given key
 func (s *stateStore) Remove(key string) error {
 	s.Lock()
 	defer s.Unlock()
@@ -67,7 +88,7 @@ func (s *stateStore) Remove(key string) error {
 	return nil
 }
 
-// Clear removes all state markers by deleting and recreating the state directory
+// Clear removes all state files by deleting and recreating the state directory
 func (s *stateStore) Clear() error {
 	s.Lock()
 	defer s.Unlock()

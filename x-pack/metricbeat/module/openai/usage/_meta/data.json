@@ -12,7 +12,7 @@
     "openai": {
         "usage": {
             "data": {
-                "aggregation_timestamp": 1730696460,
+                "aggregation_timestamp": "2024-11-04T05:01:00Z",
                 "api_key_id": null,
                 "api_key_name": null,
                 "api_key_redacted": null,

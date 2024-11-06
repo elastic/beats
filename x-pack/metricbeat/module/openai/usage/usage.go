@@ -73,6 +73,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch method implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
+//
+//  1. Creates a rate-limited HTTP client with configured timeout and burst settings
+//  2. Sets up the time range for data collection:
+//     i.	End date is current UTC time for realtime collection
+//     ii.	End date is previous day for non-realtime collection
+//     iii. Start date is calculated based on configured lookback days
+//  3. Fetches usage data for each day in the date range
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	httpClient := newClient(
 		context.TODO(),
@@ -87,38 +94,61 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	m.report = report
 
 	endDate := time.Now().UTC()
+
+	if !m.config.Collection.Realtime {
+		// If we're not collecting realtime data, then just pull until
+		// yesterday (in UTC).
+		endDate = endDate.AddDate(0, 0, -1)
+	}
+
 	startDate := endDate.AddDate(0, 0, -m.config.Collection.LookbackDays)
 
 	return m.fetchDateRange(startDate, endDate, httpClient)
 }
 
+// fetchDateRange retrieves OpenAI API usage data for each configured API key within a specified date range.
+//
+// For each API key:
+// 1. Generates a secure SHA-256 hash of the key for state tracking
+// 2. Checks the state store for the last processed date
+// 3. Adjusts start date if previous state exists to avoid duplicate collection
+// 4. Iterates through each day in the range, collecting usage data
+// 5. Updates state store with the latest processed date
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
-		// SHA-256 produces a fixed-length (64 characters) hexadecimal string
-		// that is safe for filenames across all major platforms. Hex encoding
-		// ensures that the hash is safe for use in file paths as it uses only
-		// alphanumeric characters.
+		// SHA-256 is a cryptographic hash function that generates a 256-bit (32-byte) digest,
+		// represented as a 64-character hexadecimal string. The hash function is deterministic,
+		// ensuring the same input consistently produces identical output, while being computationally
+		// infeasible to reverse. Its strong collision resistance makes it highly suitable for
+		// secure key storage.
 		//
-		// Also, SHA-256 is a strong cryptographic hash function that is
-		// deterministic, meaning that the same input will always produce
-		// the same output and it is an one-way function, meaning that it is
-		// computationally infeasible to reverse the hash to obtain the
-		// original.
+		// The hexadecimal representation uses only alphanumeric characters [0-9a-f], making it
+		// ideal for cross-platform filename compatibility. The fixed-length output provides
+		// predictable storage requirements and consistent behavior across different systems.
 		hasher := sha256.New()
 		hasher.Write([]byte(apiKey.Key))
 		hashedKey := hex.EncodeToString(hasher.Sum(nil))
 		stateKey := "state_" + hashedKey
 
-		// If state exists, only fetch current day
 		if m.stateStore.Has(stateKey) {
-			currentDay := endDate.Format("2006-01-02")
-			if err := m.fetchSingleDay(currentDay, apiKey.Key, httpClient); err != nil {
-				m.logger.Errorf("Error fetching data for date %s: %v", currentDay, err)
+			lastProcessedDate, err := m.stateStore.Get(stateKey)
+			if err != nil {
+				m.logger.Errorf("Error reading state for API key: %v", err)
+				continue
 			}
-			continue
+
+			lastDate, err := time.Parse("2006-01-02", lastProcessedDate)
+			if err != nil {
+				m.logger.Errorf("Error parsing last processed date: %v", err)
+				continue
+			}
+
+			startDate = lastDate.AddDate(0, 0, 1)
+			if startDate.After(endDate) {
+				continue
+			}
 		}
 
-		// First run for this API key - fetch historical data
 		for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
 			dateStr := d.Format("2006-01-02")
 			if err := m.fetchSingleDay(dateStr, apiKey.Key, httpClient); err != nil {
@@ -127,8 +157,7 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 			}
 		}
 
-		// Mark this API key as processed
-		if err := m.stateStore.Put(stateKey); err != nil {
+		if err := m.stateStore.Put(stateKey, endDate.Format("2006-01-02")); err != nil {
 			m.logger.Errorf("Error storing state for API key: %v", err)
 		}
 	}
@@ -207,7 +236,7 @@ func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 				"data": mapstr.M{
 					"organization_id":               usage.OrganizationID,
 					"organization_name":             usage.OrganizationName,
-					"aggregation_timestamp":         time.Unix(usage.AggregationTimestamp, 0),
+					"aggregation_timestamp":         time.Unix(usage.AggregationTimestamp, 0).UTC(), // epoch time to time.Time (UTC)
 					"n_requests":                    usage.NRequests,
 					"operation":                     usage.Operation,
 					"snapshot_id":                   usage.SnapshotID,
@@ -235,7 +264,7 @@ func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"dalle": mapstr.M{
-					"timestamp":         time.Unix(dalle.Timestamp, 0),
+					"timestamp":         time.Unix(dalle.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 					"num_images":        dalle.NumImages,
 					"num_requests":      dalle.NumRequests,
 					"image_size":        dalle.ImageSize,
@@ -263,7 +292,7 @@ func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"whisper": mapstr.M{
-					"timestamp":         time.Unix(whisper.Timestamp, 0),
+					"timestamp":         time.Unix(whisper.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 					"model_id":          whisper.ModelID,
 					"num_seconds":       whisper.NumSeconds,
 					"num_requests":      whisper.NumRequests,
@@ -289,7 +318,7 @@ func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
 				"tts": mapstr.M{
-					"timestamp":         time.Unix(tts.Timestamp, 0),
+					"timestamp":         time.Unix(tts.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 					"model_id":          tts.ModelID,
 					"num_characters":    tts.NumCharacters,
 					"num_requests":      tts.NumRequests,
