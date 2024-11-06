@@ -639,7 +639,7 @@ func certToMap(cert *x509.Certificate) mapstr.M {
 	certMap := mapstr.M{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		"serial_number":        cert.SerialNumber.Text(16),
+		"serial_number":        strings.ToUpper(cert.SerialNumber.Text(16)),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,

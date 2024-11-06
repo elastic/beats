@@ -312,7 +312,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_after":            time.Date(2035, 3, 4, 9, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "1121e97d5d37348c572c555a3a59b7b65d2b",
+						"serial_number":        "1121E97D5D37348C572C555A3A59B7B65D2B",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices PKI TV LAB CA",
@@ -335,7 +335,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_before":           time.Date(2020, 3, 2, 17, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "112151567790fb40c755010ca9169cf4b498",
+						"serial_number":        "112151567790FB40C755010CA9169CF4B498",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
@@ -402,7 +402,7 @@ func TestOCSPStatus(t *testing.T) {
 					"not_before":           time.Date(2021, 6, 3, 13, 38, 16, 0, time.UTC),
 					"public_key_algorithm": "ECDSA",
 					"public_key_size":      256,
-					"serial_number":        "213e825a875eb349390d11117c6c14f894135fe3",
+					"serial_number":        "213E825A875EB349390D11117C6C14F894135FE3",
 					"signature_algorithm":  "SHA256-RSA",
 					"subject": mapstr.M{
 						"common_name":         "server2 test PKI TV LAB",
