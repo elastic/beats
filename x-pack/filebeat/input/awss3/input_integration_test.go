@@ -267,6 +267,174 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
+func TestInputRunSQSWithConfig(t *testing.T) {
+	tests := []struct {
+		name           string
+		queue_url      string
+		endpoint       string
+		region         string
+		default_region string
+		want           string
+		wantErr        error
+	}{
+		{
+			name:      "no region",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			want:      "us-east-1",
+		},
+		{
+			name:      "no region but with long endpoint",
+			queue_url: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint:  "https://s3.us-east-1.abc.xyz",
+			want:      "us-east-1",
+		},
+		{
+			name:      "no region but with short endpoint",
+			queue_url: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint:  "https://abc.xyz",
+			want:      "us-east-1",
+		},
+		{
+			name:      "no region custom queue domain",
+			queue_url: "https://sqs.us-east-1.xyz.abc/627959692251/test-s3-logs",
+			wantErr:   errBadQueueURL,
+		},
+		{
+			name:      "region",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:    "us-west-2",
+			want:      "us-west-2",
+		},
+		{
+			name:           "default_region",
+			queue_url:      "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			default_region: "us-west-2",
+			want:           "us-west-2",
+		},
+		{
+			name:           "region and default_region",
+			queue_url:      "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:         "us-east-2",
+			default_region: "us-east-3",
+			want:           "us-east-2",
+		},
+		{
+			name:      "short_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			endpoint:  "https://amazonaws.com",
+			want:      "us-east-1",
+		},
+		{
+			name:      "long_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			endpoint:  "https://s3.us-east-1.amazonaws.com",
+			want:      "us-east-1",
+		},
+		{
+			name:      "region and custom short_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:    "us-west-2",
+			endpoint:  "https://.elastic.co",
+			want:      "us-west-2",
+		},
+		{
+			name:      "region and custom long_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:    "us-west-2",
+			endpoint:  "https://s3.us-east-1.elastic.co",
+			want:      "us-west-2",
+		},
+		{
+			name:      "region and short_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:    "us-west-2",
+			endpoint:  "https://amazonaws.com",
+			want:      "us-west-2",
+		},
+		{
+			name:      "region and long_endpoint",
+			queue_url: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:    "us-west-2",
+			endpoint:  "https://s3.us-east-1.amazonaws.com",
+			want:      "us-west-2",
+		},
+		{
+			name:           "region and default region and short_endpoint",
+			queue_url:      "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:         "us-west-2",
+			default_region: "us-east-1",
+			endpoint:       "https://amazonaws.com",
+			want:           "us-west-2",
+		},
+		{
+			name:           "region and default region and long_endpoint",
+			queue_url:      "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			region:         "us-west-2",
+			default_region: "us-east-1",
+			endpoint:       "https://s3.us-east-1.amazonaws.com",
+			want:           "us-west-2",
+		},
+	}
+
+	for _, test := range tests {
+		logp.TestingSetup()
+
+		// Create a filebeat config using the provided test parameters
+		config := ""
+		if test.queue_url != "" {
+			config += fmt.Sprintf("queue_url: %s \n", test.queue_url)
+		}
+		if test.region != "" {
+			config += fmt.Sprintf("region: %s \n", test.region)
+		}
+		if test.default_region != "" {
+			config += fmt.Sprintf("default_region: %s \n", test.default_region)
+		}
+		if test.endpoint != "" {
+			config += fmt.Sprintf("endpoint: %s \n", test.endpoint)
+		}
+
+		s3Input := createInput(t, conf.MustNewConfigFrom(config))
+
+		inputCtx, cancel := newV2Context()
+		t.Cleanup(cancel)
+		time.AfterFunc(5*time.Second, func() {
+			cancel()
+		})
+
+		var errGroup errgroup.Group
+		errGroup.Go(func() error {
+			return s3Input.Run(inputCtx, &fakePipeline{})
+		})
+
+		if err := errGroup.Wait(); err != nil {
+			// assert that err == test.wantErr
+			if test.wantErr != nil {
+				continue
+			}
+			// Print the test name to help identify the failing test
+			t.Fatal(test.name, err)
+		}
+
+		// If the endpoint starts with s3, the endpoint resolver should be null at this point
+		// If the endpoint does not start with s3, the endpointresolverwithoptions should be set
+		// If the endpoint is not set, the endpoint resolver should be null
+		if test.endpoint == "" {
+			assert.Nil(t, s3Input.awsConfig.EndpointResolver, test.name)
+			assert.Nil(t, s3Input.awsConfig.EndpointResolverWithOptions, test.name)
+		} else if strings.HasPrefix(test.endpoint, "https://s3") {
+			// S3 resolvers are added later in the code than this integration test covers
+			assert.Nil(t, s3Input.awsConfig.EndpointResolver, test.name)
+			assert.Nil(t, s3Input.awsConfig.EndpointResolverWithOptions, test.name)
+		} else { // If the endpoint is specified but is not s3
+			assert.Nil(t, s3Input.awsConfig.EndpointResolver, test.name)
+			assert.NotNil(t, s3Input.awsConfig.EndpointResolverWithOptions, test.name)
+		}
+
+		assert.EqualValues(t, test.want, s3Input.awsConfig.Region, test.name)
+	}
+}
+
 func TestInputRunSQS(t *testing.T) {
 	logp.TestingSetup()
 
