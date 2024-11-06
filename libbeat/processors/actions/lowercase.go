@@ -32,7 +32,7 @@ func init() {
 		checks.ConfigChecked(
 			NewLowerCaseProcessor,
 			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when", "ignore_missing", "fail_on_error", "alter_full_field"),
+			checks.AllowedFields("fields", "ignore_missing", "fail_on_error", "alter_full_field", "values"),
 		),
 	)
 }
