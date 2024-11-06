@@ -110,12 +110,3 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 	return "unknown"
 }
-
-type nonAWSBucketResolver struct {
-	endpoint string
-}
-
-func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
-	//nolint:staticcheck // haven't migrated to the new interface yet
-	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
-}
