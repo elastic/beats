@@ -66,7 +66,15 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	}
 
 	// check if refresh interval has been set and if it has expired
+	client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
 	if !client.ResourceConfigurations.Expired() {
+		go func() {
+			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+			for _, metrics := range groupMetricsDefinitionsByResourceId(client.ResourceConfigurations.Metrics) {
+				client.Log.Infof("MetricDefinitionsChan are not expired. Writing metrics to MetricDefinitionsChan")
+				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
+			}
+		}()
 		return nil
 	}
 
@@ -264,7 +272,6 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			timeGrain: timeGrain,
 			timestamp: referenceTime,
 		})
-
 		for i, currentMetric := range client.ResourceConfigurations.Metrics {
 			if matchMetrics(currentMetric, metric) {
 				// Map the metric values from the API response.

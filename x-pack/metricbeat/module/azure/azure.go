@@ -118,26 +118,30 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
-
-	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
-		// error message is previously logged in the InitResources,
-		// no error event should be created
-		return nil
-	}
+	m.Client.Log.Infof("Fetch called at %s", referenceTime)
+	// if len(m.Client.ResourceConfigurations.Metrics) == 0 {
+	// 	// error message is previously logged in the InitResources,
+	// 	// no error event should be created
+	// 	return nil
+	// }
 
 	// Group metric definitions by cloud resource ID.
 	//
 	// We group the metric definitions by resource ID to fetch
 	// metric values for each cloud resource in one API call.
-	metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
 
-	for _, metricsDefinition := range metricsByResourceId {
-		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
-
-		// Turns metric values into events and sends them to Elasticsearch.
-		if err := mapToEvents(metricValues, m.Client, report); err != nil {
-			return fmt.Errorf("error mapping metrics to events: %w", err)
+	for resMetricDefinition := range m.Client.ResourceConfigurations.MetricDefinitionsChan {
+		m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
+		metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
+		m.Client.ResourceConfigurations.Metrics = append(m.Client.ResourceConfigurations.Metrics, resMetricDefinition...)
+		for _, metricsDefinition := range metricsByResourceId {
+			// Fetch metric values for each resource.
+			metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+			m.Client.Log.Infof("metricValues received at %s", referenceTime)
+			// Turns metric values into events and sends them to Elasticsearch.
+			if err := mapToEvents(metricValues, m.Client, report); err != nil {
+				return fmt.Errorf("error mapping metrics to events: %w", err)
+			}
 		}
 	}
 

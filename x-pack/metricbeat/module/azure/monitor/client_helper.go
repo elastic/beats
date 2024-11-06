@@ -20,26 +20,29 @@ const missingMetricDefinitions = "no metric definitions were found for resource 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
+	go func() {
+		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+		for _, resource := range resources {
+			res, _ := getMappedResourceDefinitions(client, *resource.ID, resourceConfig)
+			client.ResourceConfigurations.MetricDefinitionsChan <- res
+		}
+	}()
 
-	for _, resource := range resources {
+	return metrics, nil
+}
 
-		// We use this map to avoid calling the metrics definition function for the same namespace and same resource
-		// multiple times.
-		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
+func getMappedResourceDefinitions(client *azure.Client, resourceId string, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 
-		for _, metric := range resourceConfig.Metrics {
+	var metrics []azure.Metric
+	// We use this map to avoid calling the metrics definition function for the same namespace and same resource
+	// multiple times.
+	namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
 
-			var err error
+	for _, metric := range resourceConfig.Metrics {
 
-			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
-			if !exists {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
-				if err != nil {
-					return nil, err
-				}
-				namespaceMetrics[metric.Namespace] = metricDefinitions
-			}
+		var err error
 
+<<<<<<< HEAD
 			if len(metricDefinitions.Value) == 0 {
 				if metric.IgnoreUnsupported {
 					client.Log.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
@@ -51,33 +54,52 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 
 			// validate metric names and filter on the supported metrics
 			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
+=======
+		metricDefinitions, exists := namespaceMetrics[metric.Namespace]
+		if !exists {
+			metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceId, metric.Namespace)
+>>>>>>> b23205ce03 (Use concurrency in metricsdefinition collection)
 			if err != nil {
 				return nil, err
 			}
+			namespaceMetrics[metric.Namespace] = metricDefinitions
+		}
 
-			//validate aggregations and filter on supported aggregations
-			metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, metricDefinitions.Value)
-			if err != nil {
-				return nil, err
+		if len(metricDefinitions.Value) == 0 {
+			if metric.IgnoreUnsupported {
+				client.Log.Infof(missingNamespace, resourceId, metric.Namespace)
+				continue
 			}
+			return nil, fmt.Errorf("%s %s %s", missingNamespace, resourceId, metric.Namespace)
+		}
 
-			// map dimensions
-			var dim []azure.Dimension
-			if len(metric.Dimensions) > 0 {
-				for _, dimension := range metric.Dimensions {
-					dim = append(dim, azure.Dimension(dimension))
-				}
-			}
-			for key, metricGroup := range metricGroups {
-				var metricNames []string
-				for _, metricName := range metricGroup {
-					metricNames = append(metricNames, *metricName.Name.Value)
-				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+		// validate metric names and filter on the supported metrics
+		supportedMetricNames, err := filterMetricNames(resourceId, metric, metricDefinitions.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		//validate aggregations and filter on supported aggregations
+		metricGroups, err := filterOnSupportedAggregations(supportedMetricNames, metric, metricDefinitions.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		// map dimensions
+		var dim []azure.Dimension
+		if len(metric.Dimensions) > 0 {
+			for _, dimension := range metric.Dimensions {
+				dim = append(dim, azure.Dimension(dimension))
 			}
 		}
+		for key, metricGroup := range metricGroups {
+			var metricNames []string
+			for _, metricName := range metricGroup {
+				metricNames = append(metricNames, *metricName.Name.Value)
+			}
+			metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+		}
 	}
-
 	return metrics, nil
 }
 
