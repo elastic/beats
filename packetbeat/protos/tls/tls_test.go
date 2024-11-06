@@ -26,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -312,7 +312,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_after":            time.Date(2035, 3, 4, 9, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "1492448539999078269498416841973088004758827",
+						"serial_number":        "1121e97d5d37348c572c555a3a59b7b65d2b",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices PKI TV LAB CA",
@@ -335,7 +335,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_before":           time.Date(2020, 3, 2, 17, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "1492246295378596931754418352553114016724120",
+						"serial_number":        "112151567790fb40c755010ca9169cf4b498",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
@@ -402,7 +402,7 @@ func TestOCSPStatus(t *testing.T) {
 					"not_before":           time.Date(2021, 6, 3, 13, 38, 16, 0, time.UTC),
 					"public_key_algorithm": "ECDSA",
 					"public_key_size":      256,
-					"serial_number":        "189790697042017246339292011338547986350262673379",
+					"serial_number":        "213e825a875eb349390d11117c6c14f894135fe3",
 					"signature_algorithm":  "SHA256-RSA",
 					"subject": mapstr.M{
 						"common_name":         "server2 test PKI TV LAB",
@@ -421,9 +421,10 @@ func TestOCSPStatus(t *testing.T) {
 	}
 
 	got := results.events[0].Fields
-	if !cmp.Equal(got, want) {
-		t.Errorf("unexpected result: %s", cmp.Diff(got, want))
-	}
+	require.Equal(t, want, got)
+	// if !cmp.Equal(got, want) {
+	// 	t.Errorf("unexpected result: %s", cmp.Diff(got, want))
+	// }
 }
 
 func TestFragmentedHandshake(t *testing.T) {
