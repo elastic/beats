@@ -474,7 +474,7 @@ observe the activity of the input.
 | Metric                                | Description
 | `url`                                 | URL of the input resource.
 | `errors_total`                        | Total number of errors encountered by the input.
-|	`decode_errors_total`                 | Total number of decode errors encountered by the input.
+| `decode_errors_total`                 | Total number of decode errors encountered by the input.
 | `current_state_objects_total`         | Number of objects currently tracked in the state registry.
 | `gcs_objects_requested_total`         | Number of GCS objects downloaded.
 | `gcs_objects_published_total`         | Number of GCS objects processed that were published.
