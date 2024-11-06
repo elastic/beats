@@ -30,6 +30,7 @@ import (
 
 type alterFieldProcessor struct {
 	Fields         []string
+	Values         []string
 	IgnoreMissing  bool
 	FailOnError    bool
 	AlterFullField bool
@@ -45,6 +46,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 		IgnoreMissing  bool     `config:"ignore_missing"`
 		FailOnError    bool     `config:"fail_on_error"`
 		AlterFullField bool     `config:"alter_full_field"`
+		Values         []string `config:"values"`
 	}{
 		IgnoreMissing:  false,
 		FailOnError:    true,
@@ -77,6 +79,7 @@ func NewAlterFieldProcessor(c *conf.C, processorName string, alterFunc mapstr.Al
 		processorName:  processorName,
 		AlterFullField: config.AlterFullField,
 		alterFunc:      alterFunc,
+		Values:         config.Values,
 	}, nil
 
 }
@@ -92,7 +95,7 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range a.Fields {
-		err := a.alter(event, field)
+		err := a.alterField(event, field)
 		if err != nil {
 			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 				continue
@@ -105,30 +108,66 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
+	for _, valueKey := range a.Values {
+		err := a.alterValue(event, valueKey)
+		if err != nil {
+			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+				continue
+			}
+			if a.FailOnError {
+				event = backup
+				_, _ = event.PutValue("error.message", err.Error())
+				return event, err
+			}
+		}
+	}
 	return event, nil
 }
 
-func (a *alterFieldProcessor) alter(event *beat.Event, field string) error {
+func (a *alterFieldProcessor) alterField(event *beat.Event, field string) error {
 
 	// modify all segments of the key
+	var err error
 	if a.AlterFullField {
-		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, a.alterFunc)
-		if err != nil {
-			return err
-		}
+		err = event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, a.alterFunc)
 	} else {
 		// modify only the last segment
 		segmentCount := strings.Count(field, ".")
-		err := event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, func(key string) (string, error) {
+		err = event.Fields.AlterPath(field, mapstr.CaseInsensitiveMode, func(key string) (string, error) {
 			if segmentCount > 0 {
 				segmentCount--
 				return key, nil
 			}
 			return a.alterFunc(key)
 		})
+	}
+
+	return err
+}
+
+func (a *alterFieldProcessor) alterValue(event *beat.Event, valueKey string) error {
+	value, err := event.GetValue(valueKey)
+	if err != nil {
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", valueKey, err)
+	}
+
+	if v, ok := value.(string); ok {
+		err = event.Delete(valueKey)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not delete key: %s,  %w", v, err)
 		}
+
+		v, err = a.alterFunc(v)
+		if err != nil {
+			return fmt.Errorf("could not alter %s successfully, %w", v, err)
+		}
+
+		_, err = event.PutValue(valueKey, v)
+		if err != nil {
+			return fmt.Errorf("could not put value: %s: %v, %w", valueKey, v, err)
+		}
+	} else {
+		return fmt.Errorf("value of key %q is not a string", valueKey)
 	}
 
 	return nil
