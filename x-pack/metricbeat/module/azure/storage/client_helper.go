@@ -17,8 +17,8 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
-	var metrics []azure.Metric
+func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) {
+
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}
 	// if serviceType is configured, add only the selected serviceType namespaces
@@ -31,49 +31,67 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			namespaces = append(namespaces, fmt.Sprintf("%s%s", defaultStorageAccountNamespace, service))
 		}
 	}
-	for _, resource := range resources {
-		for _, namespace := range namespaces {
-			// resourceID will be different for a  serviceType namespace, format will be resourceID/service/default
-			var resourceID = *resource.ID
-
-			if i := retrieveServiceNamespace(namespace); i != "" {
-				resourceID += i + resourceIDExtension
-			}
-
-			// get all metric definitions supported by the namespace provided
-			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceID, namespace)
+	go func() {
+		defer close(client.ResourceConfigurations.ErrorChan)
+		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+		for _, resource := range resources {
+			res, err := getStorageMappedResourceDefinitions(client, *resource.ID, namespaces)
 			if err != nil {
-				return nil, err
+				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
+				return
 			}
+			client.ResourceConfigurations.MetricDefinitionsChan <- res
+		}
+		client.ResourceConfigurations.ErrorChan <- nil // Signal successful completion
+	}()
+}
 
-			if len(metricDefinitions.Value) == 0 {
-				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s", resourceID, namespace)
-			}
+func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, namespaces []string) ([]azure.Metric, error) {
 
-			var filteredMetricDefinitions []armmonitor.MetricDefinition
-			for _, metricDefinition := range metricDefinitions.Value {
-				filteredMetricDefinitions = append(filteredMetricDefinitions, *metricDefinition)
-			}
+	var metrics []azure.Metric
 
-			// some metrics do not support the default PT5M timegrain so they will have to be grouped in a different API call, else call will fail
-			groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions)
+	for _, namespace := range namespaces {
+		// resourceID will be different for a  serviceType namespace, format will be resourceID/service/default
+		var resourceID = resourceId
 
-			for time, groupedMetricList := range groupedMetrics {
-				// metrics will have to be grouped by allowed dimensions
-				dimMetrics := groupMetricsByAllowedDimensions(groupedMetricList)
+		if i := retrieveServiceNamespace(namespace); i != "" {
+			resourceID += i + resourceIDExtension
+		}
 
-				for dimension, mets := range dimMetrics {
-					var dimensions []azure.Dimension
+		// get all metric definitions supported by the namespace provided
+		metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceID, namespace)
+		if err != nil {
+			return nil, err
+		}
 
-					if dimension != azure.NoDimension {
-						dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
-					}
+		if len(metricDefinitions.Value) == 0 {
+			return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s", resourceID, namespace)
+		}
 
-					metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, *resource.ID, resourceID, namespace, dimensions, time)...)
+		var filteredMetricDefinitions []armmonitor.MetricDefinition
+		for _, metricDefinition := range metricDefinitions.Value {
+			filteredMetricDefinitions = append(filteredMetricDefinitions, *metricDefinition)
+		}
+
+		// some metrics do not support the default PT5M timegrain so they will have to be grouped in a different API call, else call will fail
+		groupedMetrics := groupOnTimeGrain(filteredMetricDefinitions)
+
+		for time, groupedMetricList := range groupedMetrics {
+			// metrics will have to be grouped by allowed dimensions
+			dimMetrics := groupMetricsByAllowedDimensions(groupedMetricList)
+
+			for dimension, mets := range dimMetrics {
+				var dimensions []azure.Dimension
+
+				if dimension != azure.NoDimension {
+					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 				}
+
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, resourceID, namespace, dimensions, time)...)
 			}
 		}
 	}
+
 	return metrics, nil
 }
 

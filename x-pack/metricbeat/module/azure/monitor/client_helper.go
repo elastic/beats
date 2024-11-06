@@ -18,17 +18,20 @@ import (
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
-	var metrics []azure.Metric
+func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) {
 	go func() {
+		defer close(client.ResourceConfigurations.ErrorChan)
 		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 		for _, resource := range resources {
-			res, _ := getMappedResourceDefinitions(client, *resource.ID, resourceConfig)
+			res, err := getMappedResourceDefinitions(client, *resource.ID, resourceConfig)
+			if err != nil {
+				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
+				return
+			}
 			client.ResourceConfigurations.MetricDefinitionsChan <- res
 		}
+		client.ResourceConfigurations.ErrorChan <- nil // Signal successful completion
 	}()
-
-	return metrics, nil
 }
 
 func getMappedResourceDefinitions(client *azure.Client, resourceId string, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {

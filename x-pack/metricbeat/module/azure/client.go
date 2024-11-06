@@ -35,7 +35,7 @@ type Client struct {
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
+type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig)
 
 // NewClient instantiates the Azure monitoring client
 func NewClient(config Config) (*Client, error) {
@@ -67,9 +67,11 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 	// check if refresh interval has been set and if it has expired
 	client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
+	client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 	if !client.ResourceConfigurations.Expired() {
 		go func() {
 			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+			defer close(client.ResourceConfigurations.ErrorChan)
 			for _, metrics := range groupMetricsDefinitionsByResourceId(client.ResourceConfigurations.Metrics) {
 				client.Log.Infof("MetricDefinitionsChan are not expired. Writing metrics to MetricDefinitionsChan")
 				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
@@ -78,7 +80,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		return nil
 	}
 
-	var metrics []Metric
+	// var metrics []Metric
 	//reset client resources
 	client.Resources = []Resource{}
 	for _, resource := range client.Config.Resources {
@@ -111,19 +113,19 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		}
 
 		// Collects and stores metrics definitions for the cloud resources.
-		resourceMetrics, err := fn(client, resourceList, resource)
-		if err != nil {
-			return err
-		}
+		fn(client, resourceList, resource)
+		// if err != nil {
+		// 	return err
+		// }
 
-		metrics = append(metrics, resourceMetrics...)
+		// metrics = append(metrics, resourceMetrics...)
 	}
-	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
-	// we also log a debug message when absolutely no resources are found
-	if len(metrics) == 0 {
-		client.Log.Debug("no resources were found based on all the configurations options entered")
-	}
-	client.ResourceConfigurations.Metrics = metrics
+	// // users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
+	// // we also log a debug message when absolutely no resources are found
+	// if len(metrics) == 0 {
+	// 	client.Log.Debug("no resources were found based on all the configurations options entered")
+	// }
+	// client.ResourceConfigurations.Metrics = metrics
 
 	return nil
 }

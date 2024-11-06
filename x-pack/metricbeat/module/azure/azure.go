@@ -114,36 +114,79 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// The metricset periodically refreshes the information
 	// after `RefreshListInterval` (default 600s for
 	// most metricsets).
+	m.Client.Log.Infof("Fetch called at %s", referenceTime)
 	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
-	m.Client.Log.Infof("Fetch called at %s", referenceTime)
-	// if len(m.Client.ResourceConfigurations.Metrics) == 0 {
-	// 	// error message is previously logged in the InitResources,
-	// 	// no error event should be created
-	// 	return nil
-	// }
 
 	// Group metric definitions by cloud resource ID.
 	//
 	// We group the metric definitions by resource ID to fetch
 	// metric values for each cloud resource in one API call.
-
-	for resMetricDefinition := range m.Client.ResourceConfigurations.MetricDefinitionsChan {
-		m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
-		metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
-		m.Client.ResourceConfigurations.Metrics = append(m.Client.ResourceConfigurations.Metrics, resMetricDefinition...)
-		for _, metricsDefinition := range metricsByResourceId {
-			// Fetch metric values for each resource.
-			metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
-			m.Client.Log.Infof("metricValues received at %s", referenceTime)
-			// Turns metric values into events and sends them to Elasticsearch.
-			if err := mapToEvents(metricValues, m.Client, report); err != nil {
-				return fmt.Errorf("error mapping metrics to events: %w", err)
+	if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
+		m.Client.Log.Debug("no resources were found based on all the configurations options entered")
+	}
+	for {
+		select {
+		case resMetricDefinition, ok := <-m.Client.ResourceConfigurations.MetricDefinitionsChan:
+			if !ok {
+				// Data channel closed, stop processing further data
+				m.Client.Log.Infof("MetricDefinitionsChan channel closed")
+				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
+			} else {
+				// Process each metric definition as it arrives
+				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
+				metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
+				m.Client.ResourceConfigurations.Metrics = append(m.Client.ResourceConfigurations.Metrics, resMetricDefinition...)
+				for _, metricsDefinition := range metricsByResourceId {
+					// Fetch metric values for each resource.
+					metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+					m.Client.Log.Infof("metricValues received at %s", referenceTime)
+					// Turns metric values into events and sends them to Elasticsearch.
+					if err := mapToEvents(metricValues, m.Client, report); err != nil {
+						return fmt.Errorf("error mapping metrics to events: %w", err)
+					}
+				}
 			}
+		case err, ok := <-m.Client.ResourceConfigurations.ErrorChan:
+			if ok && err != nil {
+				// Handle error received from error channel
+				return err
+			}
+			m.Client.Log.Infof("ErrorChan channel closed")
+			// Error channel is closed, stop error handling
+			m.Client.ResourceConfigurations.ErrorChan = nil
+		}
+
+		// Break the loop when both Data and Error channels are closed
+		if m.Client.ResourceConfigurations.MetricDefinitionsChan == nil && m.Client.ResourceConfigurations.ErrorChan == nil {
+			m.Client.Log.Infof("Both channels closed. breaking")
+			break
 		}
 	}
+
+	// Group metric definitions by cloud resource ID.
+	//
+	// We group the metric definitions by resource ID to fetch
+	// metric values for each cloud resource in one API call.
+	// if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
+	// 	m.Client.Log.Debug("no resources were found based on all the configurations options entered")
+	// }
+	// for resMetricDefinition := range m.Client.ResourceConfigurations.MetricDefinitionsChan {
+	// 	m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
+	// 	metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
+	// 	m.Client.ResourceConfigurations.Metrics = append(m.Client.ResourceConfigurations.Metrics, resMetricDefinition...)
+	// 	for _, metricsDefinition := range metricsByResourceId {
+	// 		// Fetch metric values for each resource.
+	// 		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+	// 		m.Client.Log.Infof("metricValues received at %s", referenceTime)
+	// 		// Turns metric values into events and sends them to Elasticsearch.
+	// 		if err := mapToEvents(metricValues, m.Client, report); err != nil {
+	// 			return fmt.Errorf("error mapping metrics to events: %w", err)
+	// 		}
+	// 	}
+	// }
 
 	return nil
 }

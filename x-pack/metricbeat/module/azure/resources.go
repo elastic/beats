@@ -69,6 +69,7 @@ type ResourceConfiguration struct {
 		sync.Mutex
 	}
 	MetricDefinitionsChan chan []Metric
+	ErrorChan             chan error
 }
 
 // Expired will check for an expiration time and assign a new one
