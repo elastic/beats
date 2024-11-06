@@ -20,6 +20,7 @@ package systemlogs
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -92,7 +93,7 @@ func PluginV2(logger *logp.Logger, store cursor.StateStore) v2.Plugin {
 
 	return v2.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Stable,
+		Stability:  feature.Experimental,
 		Deprecated: false,
 		Info:       "system-logs input",
 		Doc:        "The system-logs input collects system logs on Linux by reading them from journald or traditional log files",
@@ -145,10 +146,20 @@ func useJournald(c *conf.C) (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("cannot resolve glob: %w", err)
 		}
-		if len(paths) != 0 {
-			// We found at least one system log file,
-			// journald will not be used, return early
-			logger.Info(
+
+		for _, p := range paths {
+			stat, err := os.Stat(p)
+			if err != nil {
+				return false, fmt.Errorf("cannot stat '%s': %w", p, err)
+			}
+
+			// Ignore directories
+			if stat.IsDir() {
+				continue
+			}
+
+			// We found one file, return early
+			logger.Infof(
 				"using log input because file(s) was(were) found when testing glob '%s'",
 				g)
 			return false, nil
@@ -156,48 +167,9 @@ func useJournald(c *conf.C) (bool, error) {
 	}
 
 	// if no system log files are found, then use jounrald
+	logger.Info("no files were found, using journald input")
+
 	return true, nil
-}
-
-func toJournaldConfig(cfg *conf.C) (*conf.C, error) { //nolint:unused // It's used on Linux
-	newCfg, err := cfg.Child("journald", -1)
-	if err != nil {
-		return nil, fmt.Errorf("cannot extract 'journald' block: %w", err)
-	}
-
-	if _, err := cfg.Remove("journald", -1); err != nil {
-		return nil, err
-	}
-
-	if _, err := cfg.Remove("type", -1); err != nil {
-		return nil, err
-	}
-
-	if _, err := cfg.Remove("files", -1); err != nil {
-		return nil, err
-	}
-
-	if _, err := cfg.Remove("use_journald", -1); err != nil {
-		return nil, err
-	}
-
-	if _, err := cfg.Remove("use_files", -1); err != nil {
-		return nil, err
-	}
-
-	if err := newCfg.Merge(cfg); err != nil {
-		return nil, err
-	}
-
-	if err := newCfg.SetString("type", -1, "journald"); err != nil {
-		return nil, fmt.Errorf("cannot set 'type': %w", err)
-	}
-
-	if err := cfg.SetString("type", -1, pluginName); err != nil {
-		return nil, fmt.Errorf("cannot set type back to '%s': %w", pluginName, err)
-	}
-
-	return newCfg, nil
 }
 
 func toFilesConfig(cfg *conf.C) (*conf.C, error) {

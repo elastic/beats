@@ -196,7 +196,7 @@ func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
 	for _, proc := range procs {
 		process_info, err := r.getProcessInfo(proc)
 		if err != nil {
-			r.logger.Warnf("failed to read process info for %v", proc.PID)
+			r.logger.Debugf("failed to read process info for %v", proc.PID)
 		}
 		ret = append(ret, process_info)
 	}

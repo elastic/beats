@@ -22,6 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/stretchr/testify/assert"
@@ -71,6 +73,7 @@ func TestWatchOptions(t *testing.T) {
 
 func TestCreateWatcher(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	client := k8sfake.NewSimpleClientset()
 	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
@@ -84,7 +87,16 @@ func TestCreateWatcher(t *testing.T) {
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
 
-	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, metadataClient, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(
+		NamespaceResource,
+		&kubernetes.Node{},
+		*options,
+		client,
+		metadataClient,
+		resourceWatchers,
+		metricsRepo,
+		config.Namespace,
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -94,7 +106,15 @@ func TestCreateWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, metadataClient, resourceWatchers, config.Namespace, true)
+	created, err = createWatcher(
+		NamespaceResource,
+		&kubernetes.Namespace{},
+		*options, client,
+		metadataClient,
+		resourceWatchers,
+		metricsRepo,
+		config.Namespace,
+		true)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -104,7 +124,15 @@ func TestCreateWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, metadataClient, resourceWatchers, config.Namespace, false)
+	created, err = createWatcher(
+		DeploymentResource,
+		&kubernetes.Deployment{},
+		*options, client,
+		metadataClient,
+		resourceWatchers,
+		metricsRepo,
+		config.Namespace,
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -117,6 +145,7 @@ func TestCreateWatcher(t *testing.T) {
 
 func TestAddToMetricsetsUsing(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	client := k8sfake.NewSimpleClientset()
 	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
@@ -131,7 +160,15 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, metadataClient, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(
+		DeploymentResource,
+		&kubernetes.Deployment{},
+		*options, client,
+		metadataClient,
+		resourceWatchers,
+		metricsRepo,
+		config.Namespace,
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -155,6 +192,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 
 func TestRemoveFromMetricsetsUsing(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	client := k8sfake.NewSimpleClientset()
 	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
@@ -169,7 +207,16 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, metadataClient, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(
+		DeploymentResource,
+		&kubernetes.Deployment{},
+		*options,
+		client,
+		metadataClient,
+		resourceWatchers,
+		metricsRepo,
+		config.Namespace,
+		false)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -194,8 +241,141 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 	require.Equal(t, 0, size)
 }
 
+func TestWatcherContainerMetrics(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+
+	containerName := "test"
+	cpuLimit := resource.MustParse("100m")
+	memoryLimit := resource.MustParse("100Mi")
+	pod := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			UID:  types.UID("mockuid"),
+			Name: "enrich",
+			Labels: map[string]string{
+				"label": "value",
+			},
+			Namespace: "default",
+		},
+		Spec: v1.PodSpec{
+			NodeName: "test-node",
+			Containers: []v1.Container{
+				{
+					Name: containerName,
+					Resources: v1.ResourceRequirements{
+						Limits: v1.ResourceList{
+							v1.ResourceCPU:    cpuLimit,
+							v1.ResourceMemory: memoryLimit,
+						},
+					},
+				},
+			},
+		},
+	}
+	podId := NewPodId(pod.Namespace, pod.Name)
+	resourceWatchers.lock.Lock()
+
+	watcher := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:         watcher,
+		started:         false,
+		metricsetsUsing: []string{"pod"},
+		enrichers:       make(map[string]*enricher),
+		metricsRepo:     metricsRepo,
+	}
+	resourceWatchers.metaWatchersMap[PodResource] = metaWatcher
+	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
+	resourceWatchers.lock.Unlock()
+
+	// add Pod and verify container metrics are present and valid
+	watcher.handler.OnAdd(pod)
+
+	containerStore := metricsRepo.GetNodeStore(pod.Spec.NodeName).GetPodStore(podId).GetContainerStore(containerName)
+	metrics := containerStore.GetContainerMetrics()
+	require.NotNil(t, metrics)
+	assert.Equal(t, 0.1, metrics.CoresLimit.Value)
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryLimit.Value)
+
+	// modify the limit and verify the new value is present
+	pod.Spec.Containers[0].Resources.Limits[v1.ResourceCPU] = resource.MustParse("200m")
+	watcher.handler.OnUpdate(pod)
+	metrics = containerStore.GetContainerMetrics()
+	require.NotNil(t, metrics)
+	assert.Equal(t, 0.2, metrics.CoresLimit.Value)
+
+	// delete the pod and verify no metrics are present
+	watcher.handler.OnDelete(pod)
+	containerStore = metricsRepo.GetNodeStore(pod.Spec.NodeName).GetPodStore(podId).GetContainerStore(containerName)
+	metrics = containerStore.GetContainerMetrics()
+	require.NotNil(t, metrics)
+	assert.Nil(t, metrics.CoresLimit)
+	assert.Nil(t, metrics.MemoryLimit)
+}
+
+func TestWatcherNodeMetrics(t *testing.T) {
+	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
+
+	cpuLimit := resource.MustParse("100m")
+	memoryLimit := resource.MustParse("100Mi")
+	node := &v1.Node{
+		ObjectMeta: metav1.ObjectMeta{
+			UID:  types.UID("mockuid"),
+			Name: "enrich",
+			Labels: map[string]string{
+				"label": "value",
+			},
+			Namespace: "default",
+		},
+		Status: v1.NodeStatus{
+			Capacity: v1.ResourceList{
+				v1.ResourceCPU:    cpuLimit,
+				v1.ResourceMemory: memoryLimit,
+			},
+		},
+	}
+	resourceWatchers.lock.Lock()
+
+	watcher := newMockWatcher()
+	metaWatcher := &metaWatcher{
+		watcher:         watcher,
+		started:         false,
+		metricsetsUsing: []string{"pod"},
+		enrichers:       make(map[string]*enricher),
+		metricsRepo:     metricsRepo,
+	}
+	resourceWatchers.metaWatchersMap[NodeResource] = metaWatcher
+	addEventHandlersToWatcher(metaWatcher, resourceWatchers)
+	resourceWatchers.lock.Unlock()
+
+	// add node and verify container metrics are present and valid
+	watcher.handler.OnAdd(node)
+
+	nodeStore := metricsRepo.GetNodeStore(node.Name)
+	metrics := nodeStore.GetNodeMetrics()
+	require.NotNil(t, metrics)
+	assert.Equal(t, 0.1, metrics.CoresAllocatable.Value)
+	assert.Equal(t, 100*1024*1024.0, metrics.MemoryAllocatable.Value)
+
+	// modify the limit and verify the new value is present
+	node.Status.Capacity[v1.ResourceCPU] = resource.MustParse("200m")
+	watcher.handler.OnUpdate(node)
+	metrics = nodeStore.GetNodeMetrics()
+	require.NotNil(t, metrics)
+	assert.Equal(t, 0.2, metrics.CoresAllocatable.Value)
+
+	// delete the node and verify no metrics are present
+	watcher.handler.OnDelete(node)
+	nodeStore = metricsRepo.GetNodeStore(node.Name)
+	metrics = nodeStore.GetNodeMetrics()
+	require.NotNil(t, metrics)
+	assert.Nil(t, metrics.CoresAllocatable)
+	assert.Nil(t, metrics.MemoryAllocatable)
+}
+
 func TestCreateAllWatchers(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	client := k8sfake.NewSimpleClientset()
 	metadataClient := k8smetafake.NewSimpleMetadataClient(k8smetafake.NewTestScheme())
@@ -211,7 +391,16 @@ func TestCreateAllWatchers(t *testing.T) {
 	log := logp.NewLogger("test")
 
 	// Start watchers based on a resource that does not exist should cause an error
-	err := createAllWatchers(client, metadataClient, "does-not-exist", "does-not-exist", false, config, log, resourceWatchers)
+	err := createAllWatchers(
+		client,
+		metadataClient,
+		"does-not-exist",
+		"does-not-exist",
+		false,
+		config,
+		log,
+		resourceWatchers,
+		metricsRepo)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
 	require.Equal(t, 0, len(resourceWatchers.metaWatchersMap))
@@ -220,7 +409,16 @@ func TestCreateAllWatchers(t *testing.T) {
 	// Start watcher for a resource that requires other resources, should start all the watchers
 	metricsetPod := "pod"
 	extras := getExtraWatchers(PodResource, config.AddResourceMetadata)
-	err = createAllWatchers(client, metadataClient, metricsetPod, PodResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(
+		client,
+		metadataClient,
+		metricsetPod,
+		PodResource,
+		false,
+		config,
+		log,
+		resourceWatchers,
+		metricsRepo)
 	require.NoError(t, err)
 
 	// Check that all the required watchers are in the map
@@ -235,6 +433,7 @@ func TestCreateAllWatchers(t *testing.T) {
 
 func TestCreateMetaGen(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	commonMetaConfig := metadata.Config{}
 	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
@@ -259,7 +458,16 @@ func TestCreateMetaGen(t *testing.T) {
 
 	// Create the watchers necessary for the metadata generator
 	metricsetDeployment := "state_deployment"
-	err = createAllWatchers(client, metadataClient, metricsetDeployment, DeploymentResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(
+		client,
+		metadataClient,
+		metricsetDeployment,
+		DeploymentResource,
+		false,
+		config,
+		log,
+		resourceWatchers,
+		metricsRepo)
 	require.NoError(t, err)
 
 	// Create the generators, this time without error
@@ -269,6 +477,7 @@ func TestCreateMetaGen(t *testing.T) {
 
 func TestCreateMetaGenSpecific(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	commonMetaConfig := metadata.Config{}
 	commonConfig, err := conf.NewConfigFrom(&commonMetaConfig)
@@ -302,7 +511,16 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	require.Error(t, err)
 
 	// Create the pod resource + the extras
-	err = createAllWatchers(client, metadataClient, metricsetPod, PodResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(
+		client,
+		metadataClient,
+		metricsetPod,
+		PodResource,
+		false,
+		config,
+		log,
+		resourceWatchers,
+		metricsRepo)
 	require.NoError(t, err)
 
 	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
@@ -315,7 +533,16 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 
 	// Create the service resource + the extras
 	metricsetService := "state_service"
-	err = createAllWatchers(client, metadataClient, metricsetService, ServiceResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(
+		client,
+		metadataClient,
+		metricsetService,
+		ServiceResource,
+		false,
+		config,
+		log,
+		resourceWatchers,
+		metricsRepo)
 	require.NoError(t, err)
 
 	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
@@ -478,6 +705,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	resourceWatchers.lock.Lock()
 	watcher := &metaWatcher{
@@ -485,9 +713,10 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		started:         false,
 		metricsetsUsing: []string{"pod"},
 		enrichers:       make(map[string]*enricher),
+		metricsRepo:     metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[PodResource] = watcher
-	addEventHandlerToWatcher(watcher, resourceWatchers)
+	addEventHandlersToWatcher(watcher, resourceWatchers)
 	resourceWatchers.lock.Unlock()
 
 	funcs := mockFuncs{}
@@ -603,6 +832,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 	resourceWatchers := NewWatchers()
+	metricsRepo := NewMetricsRepo()
 
 	resourceWatchers.lock.Lock()
 	watcher := &metaWatcher{
@@ -612,9 +842,10 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 		started:         false,
 		metricsetsUsing: []string{"replicaset"},
 		enrichers:       make(map[string]*enricher),
+		metricsRepo:     metricsRepo,
 	}
 	resourceWatchers.metaWatchersMap[ReplicaSetResource] = watcher
-	addEventHandlerToWatcher(watcher, resourceWatchers)
+	addEventHandlersToWatcher(watcher, resourceWatchers)
 	resourceWatchers.lock.Unlock()
 
 	isController := true
@@ -655,7 +886,7 @@ func TestBuildMetadataEnricher_PartialMetadata(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	generalMetaGen := metadata.NewResourceMetadataGenerator(commonConfig, client)
 
-	updateFunc := getEventMetadataFunc(log, generalMetaGen, nil, nil)
+	updateFunc := getEventMetadataFunc(log, generalMetaGen, nil)
 
 	deleteFunc := func(r kubernetes.Resource) []string {
 		accessor, _ := meta.Accessor(r)
