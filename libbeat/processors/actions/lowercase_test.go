@@ -302,7 +302,7 @@ func TestLowerCaseProcessorValues(t *testing.T) {
 						"C": "D",
 					},
 				},
-				"error": mapstr.M{"message": "error visiting key \"B\" of the path \"a.B\": value of key \"a.B\" is not a string"},
+				"error": mapstr.M{"message": "value of key \"a.B\" is not a string"},
 			},
 
 			Error: true,

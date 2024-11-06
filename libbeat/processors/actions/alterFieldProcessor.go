@@ -108,8 +108,8 @@ func (a *alterFieldProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 
-	for _, value := range a.Values {
-		err := a.alterValue(event, value)
+	for _, valueKey := range a.Values {
+		err := a.alterValue(event, valueKey)
 		if err != nil {
 			if a.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 				continue
@@ -150,21 +150,26 @@ func (a *alterFieldProcessor) alterField(event *beat.Event, field string) error 
 	return nil
 }
 
-func (a *alterFieldProcessor) alterValue(event *beat.Event, value string) error {
-	segmentCount := strings.Count(value, ".")
-	err := event.Fields.Traverse(value, mapstr.CaseSensitiveMode, func(level mapstr.M, key string) error {
-		if segmentCount == 0 {
-			matchedValue := level[key]
-			if v, ok := matchedValue.(string); ok {
-				lowerValue, _ := a.alterFunc(v)
-				level[key] = lowerValue
-				return nil
-			}
-			return fmt.Errorf("value of key %q is not a string", value)
-		}
-		segmentCount--
-		return nil
-	})
+func (a *alterFieldProcessor) alterValue(event *beat.Event, valueKey string) error {
+	value, err := event.GetValue(valueKey)
+	if err != nil {
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", valueKey, err)
+	}
 
-	return err
+	if v, ok := value.(string); ok {
+		err = event.Delete(valueKey)
+		if err != nil {
+			return fmt.Errorf("could not delete key: %s,  %w", v, err)
+		}
+
+		v, _ = a.alterFunc(v)
+		_, err = event.PutValue(valueKey, v)
+		if err != nil {
+			return fmt.Errorf("could not put value: %s: %v, %w", v, value, err)
+		}
+	} else {
+		return fmt.Errorf("value of key %q is not a string", valueKey)
+	}
+
+	return nil
 }
