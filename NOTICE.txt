@@ -12800,12 +12800,12 @@ Contents of probable licence file $GOMODCACHE/github.com/dolmen-go/contextio@v0.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/andrewkroh/goja
+Dependency : github.com/elastic/goja
 Version: v0.0.0-20190128172624-dd2ac4456e20
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/andrewkroh/goja@v0.0.0-20190128172624-dd2ac4456e20/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/goja@v0.0.0-20190128172624-dd2ac4456e20/LICENSE:
 
 Copyright (c) 2016 Dmitry Panov
 
