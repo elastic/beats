@@ -360,7 +360,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 		}
 	}
 
-	if evtMeta.HasUserData {
+	if evtMeta != nil && evtMeta.HasUserData {
 		event.UserData.Pairs = pairs
 	} else {
 		event.EventData.Pairs = pairs
