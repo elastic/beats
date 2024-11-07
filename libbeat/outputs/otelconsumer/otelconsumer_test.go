@@ -47,6 +47,8 @@ func TestPublish(t *testing.T) {
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
+		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
+
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
 		consumer := &otelConsumer{
