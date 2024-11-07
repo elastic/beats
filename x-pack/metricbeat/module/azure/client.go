@@ -114,18 +114,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 		// Collects and stores metrics definitions for the cloud resources.
 		fn(client, resourceList, resource)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// metrics = append(metrics, resourceMetrics...)
 	}
-	// // users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
-	// // we also log a debug message when absolutely no resources are found
-	// if len(metrics) == 0 {
-	// 	client.Log.Debug("no resources were found based on all the configurations options entered")
-	// }
-	// client.ResourceConfigurations.Metrics = metrics
 
 	return nil
 }
