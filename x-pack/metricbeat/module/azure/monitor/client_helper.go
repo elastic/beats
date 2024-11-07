@@ -42,23 +42,9 @@ func getMappedResourceDefinitions(client *azure.Client, resourceId string, resou
 
 		var err error
 
-<<<<<<< HEAD
-			if len(metricDefinitions.Value) == 0 {
-				if metric.IgnoreUnsupported {
-					client.Log.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
-					continue
-				}
-
-				return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metric.Namespace)
-			}
-
-			// validate metric names and filter on the supported metrics
-			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
-=======
 		metricDefinitions, exists := namespaceMetrics[metric.Namespace]
 		if !exists {
 			metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceId, metric.Namespace)
->>>>>>> b23205ce03 (Use concurrency in metricsdefinition collection)
 			if err != nil {
 				return nil, err
 			}
@@ -67,10 +53,10 @@ func getMappedResourceDefinitions(client *azure.Client, resourceId string, resou
 
 		if len(metricDefinitions.Value) == 0 {
 			if metric.IgnoreUnsupported {
-				client.Log.Infof(missingNamespace, resourceId, metric.Namespace)
+				client.Log.Infof(missingMetricDefinitions, resourceId, metric.Namespace)
 				continue
 			}
-			return nil, fmt.Errorf("%s %s %s", missingNamespace, resourceId, metric.Namespace)
+			return nil, fmt.Errorf(missingMetricDefinitions, resourceId, metric.Namespace)
 		}
 
 		// validate metric names and filter on the supported metrics
