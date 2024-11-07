@@ -360,8 +360,6 @@ FROM
 INNER JOIN sys.database_files AS df ON df.file_id = fs.file_id
 GROUP BY fs.database_id;`
 
-	m.db.Exec("USE %s")
-
 	type ioRow struct {
 		dbName    string
 		avgIOWait *float64
