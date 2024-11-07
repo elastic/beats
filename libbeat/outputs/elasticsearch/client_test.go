@@ -713,6 +713,61 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	}
 }
 
+func BenchmarkCompression(b *testing.B) {
+	requestCount := 0
+
+	// start a mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(b, "testing value", r.Header.Get("X-Test"))
+		// from the documentation: https://golang.org/pkg/net/http/
+		// For incoming requests, the Host header is promoted to the
+		// Request.Host field and removed from the Header map.
+		assert.Equal(b, "myhost.local", r.Host)
+
+		var response string
+		if r.URL.Path == "/" {
+			response = `{ "version": { "number": "7.6.0" } }`
+		} else {
+			response = `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+
+		}
+		fmt.Fprintln(w, response)
+		requestCount++
+	}))
+	defer ts.Close()
+
+	client, err := NewClient(
+		clientSettings{
+			connection: eslegclient.ConnectionSettings{
+				URL: ts.URL,
+				Headers: map[string]string{
+					"host":   "myhost.local",
+					"X-Test": "testing value",
+				},
+				CompressionLevel: 1,
+			},
+		},
+
+		nil,
+	)
+	assert.NoError(b, err)
+
+	event := beat.Event{Fields: mapstr.M{
+		"@timestamp": common.Time(time.Now()),
+		"type":       "libbeat",
+		"message":    "Test message from libbeat",
+	}}
+
+	batch := encodeBatch(client, outest.NewBatch(event, event, event))
+
+	// Indexing to _bulk api
+	// It uses gzip encoder internally for encoding data
+	for i := 0; i < b.N; i++ {
+		err := client.Publish(context.Background(), batch)
+		assert.NoError(b, err)
+	}
+
+}
 func TestClientWithHeaders(t *testing.T) {
 	requestCount := 0
 	// start a mock HTTP server
