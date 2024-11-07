@@ -467,13 +467,12 @@ type FleetServerHost struct {
 }
 
 type ListFleetServerHostsRequest struct {
-	HostURLs        []string `json:"host_urls"`
-	ID              string   `json:"id"`
-	IsDefault       bool     `json:"is_default"`
-	IsInternal      bool     `json:"is_internal"`
-	IsPreconfigured bool     `json:"is_preconfigured"`
-	Name            string   `json:"name"`
-	ProxyID         string   `json:"proxy_id"`
+	HostURLs   []string `json:"host_urls"`
+	ID         string   `json:"id"`
+	IsDefault  bool     `json:"is_default"`
+	IsInternal bool     `json:"is_internal"`
+	Name       string   `json:"name"`
+	ProxyID    string   `json:"proxy_id"`
 }
 
 type ListFleetServerHostsResponse struct {
@@ -519,22 +518,10 @@ func (client *Client) CreateFleetServerHosts(ctx context.Context, req ListFleetS
 		return FleetServerHostsResponse{}, fmt.Errorf("error calling new fleet server hosts API: %w", err)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return FleetServerHostsResponse{}, fmt.Errorf("error creating fleet-server host: unexpected status code: %s", resp.Status)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return FleetServerHostsResponse{}, fmt.Errorf("error reading fleet response: %w", err)
-	}
 
 	var fleetResp FleetServerHostsResponse
-	err = json.Unmarshal(body, &fleetResp)
-	if err != nil {
-		return FleetServerHostsResponse{}, fmt.Errorf("error parsing fleet response: %w", err)
-	}
-
-	return fleetResp, nil
+	err = readJSONResponse(resp, &fleetResp)
+	return fleetResp, err
 }
 
 type GetFleetServerHostRequest struct {
@@ -664,7 +651,6 @@ type ProxiesRequest struct {
 	CertificateAuthorities string            `json:"certificate_authorities"`
 	CertificateKey         string            `json:"certificate_key"`
 	ID                     string            `json:"id"`
-	IsPreconfigured        bool              `json:"is_preconfigured"`
 	Name                   string            `json:"name"`
 	ProxyHeaders           map[string]string `json:"proxy_headers"`
 	URL                    string            `json:"url"`
@@ -685,6 +671,10 @@ type ProxiesResponse struct {
 
 // CreateFleetProxy creates a new proxy
 func (client *Client) CreateFleetProxy(ctx context.Context, req ProxiesRequest) (ProxiesResponse, error) {
+	// if `proxy_headers` is `null` 8.x kibana/Fleet will return a 400 - Bad request
+	if req.ProxyHeaders == nil {
+		req.ProxyHeaders = map[string]string{}
+	}
 	bs, err := json.Marshal(req)
 	if err != nil {
 		return ProxiesResponse{}, fmt.Errorf("could not marshal ListFleetServerHostsRequest: %w", err)
@@ -698,17 +688,10 @@ func (client *Client) CreateFleetProxy(ctx context.Context, req ProxiesRequest) 
 		return ProxiesResponse{}, err
 	}
 	defer r.Body.Close()
-	if r.StatusCode != http.StatusOK {
-		return ProxiesResponse{}, fmt.Errorf("error creating proxy: unexpected status code: %s", r.Status)
-	}
 
 	resp := ProxiesResponse{}
 	err = readJSONResponse(r, &resp)
-	if err != nil {
-		return ProxiesResponse{}, fmt.Errorf("failes parsing response: %w", err)
-	}
-
-	return resp, nil
+	return resp, err
 }
 
 type UninstallTokenResponse struct {

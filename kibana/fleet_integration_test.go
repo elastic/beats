@@ -447,25 +447,49 @@ func TestCreateFleetProxy(t *testing.T) {
 	client, err := NewClientWithConfig(&cfg, "", "", "", "")
 	require.NoError(t, err)
 
-	id := uuid.Must(uuid.NewV4()).String()
-	req := ProxiesRequest{
-		ID:                     "CreateFleetServerHosts" + id,
-		Name:                   "CreateFleetServerHosts" + id,
-		URL:                    "https://proxy.elastic.co",
-		CertificateAuthorities: "some CA",
-		Certificate:            "some certificate",
-		CertificateKey:         "some certificate key",
-		IsPreconfigured:        true,
-		ProxyHeaders: map[string]string{
-			"h1": "v1",
-			"h2": "v2",
+	tcs := []struct {
+		Name string
+		Req  ProxiesRequest
+	}{
+		{
+			Name: "nil ProxyHeaders",
+			Req: ProxiesRequest{
+				ID:                     "CreateFleetServerHosts",
+				Name:                   "CreateFleetServerHosts",
+				URL:                    "https://proxy.elastic.co",
+				CertificateAuthorities: "some CA",
+				Certificate:            "some certificate",
+				CertificateKey:         "some certificate key",
+			},
+		},
+		{
+			Name: "with ProxyHeaders",
+			Req: ProxiesRequest{
+				ID:                     "CreateFleetServerHosts",
+				Name:                   "CreateFleetServerHosts",
+				URL:                    "https://proxy.elastic.co",
+				CertificateAuthorities: "some CA",
+				Certificate:            "some certificate",
+				CertificateKey:         "some certificate key",
+				ProxyHeaders: map[string]string{
+					"h1": "v1",
+					"h2": "v2",
+				},
+			},
 		},
 	}
-	got, err := client.CreateFleetProxy(ctx, req)
-	require.NoError(t, err, "error creating new fleet host")
 
-	require.Equal(t, req.ID, got.Item.ID)
-	require.Equal(t, req, got.Item)
+	for _, tc := range tcs {
+		id := uuid.Must(uuid.NewV4()).String()
+		tc.Req.ID += id
+		tc.Req.Name += id
+
+		got, err := client.CreateFleetProxy(ctx, tc.Req)
+		require.NoError(t, err, "error creating new fleet host")
+
+		require.Equal(t, tc.Req.ID, got.Item.ID)
+		require.Equal(t, tc.Req, got.Item)
+	}
 }
 
 func TestGetFleetServerHost(t *testing.T) {
