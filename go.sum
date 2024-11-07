@@ -59,8 +59,8 @@ github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 h1:ywEEhmNahHBihViHepv3xP
 github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0/go.mod h1:iZDifYGJTIgIIkYRNWPENUnqx6bJ2xnSDFI2tjwZNuY=
 github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1 h1:0f6XnzroY1yCQQwxGf/n/2xlaBF02Qhof2as99dGNsY=
 github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1/go.mod h1:vMGz6NOUGJ9h5ONl2kkyaqq5E0g7s4CHNSrXN5fl8UY=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0 h1:AAIdAyPkFff6XTct2lQCxOWN/+LnA41S7kIkzKaMbyE=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0/go.mod h1:noQIdW75SiQFB3mSFJBr4iRRH83S9skaFiBv4C0uEs0=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0 h1:0nGmzwBv5ougvzfGPCO2ljFRHvun57KpNrVCMrlk0ns=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0/go.mod h1:gYq8wyDgv6JLhGbAU6gg8amCPgQWRE+aCvrV2gyzdfs=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1 h1:ehSLdbLah6kk6HTVc6e/lrbmbz7MMbpNxkOd3OYlhB0=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1/go.mod h1:Am1cUioOk0HdZIsjpXJkQ4RIeQbwYsW6LkNIc5z/5XY=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v1.2.0 h1:+dggnR89/BIIlRlQ6d19dkhhdd/mQUiQbXhyHUFiB4w=
@@ -140,8 +140,6 @@ github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuy
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74 h1:Kk6a4nehpJ3UuJRqlA3JxYxBZEqCeOmATOvrbT4p9RA=
 github.com/alexbrainman/sspi v0.0.0-20210105120005-909beea2cc74/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
-github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20 h1:7rj9qZ63knnVo2ZeepYHvHuRdG76f3tRUTdIQDzRBeI=
-github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:cI59GRkC2FRaFYtgbYEqMlgnnfvAwXzjojyZKXwklNg=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
@@ -342,8 +340,8 @@ github.com/elastic/elastic-agent-autodiscover v0.9.0 h1:+iWIKh0u3e8I+CJa3FfWe9h0
 github.com/elastic/elastic-agent-autodiscover v0.9.0/go.mod h1:5iUxLHhVdaGSWYTveSwfJEY4RqPXTG13LPiFoxcpFd4=
 github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
-github.com/elastic/elastic-agent-libs v0.12.1 h1:5jkxMx15Bna8cq7/Sz/XUIVUXfNWiJ80iSk4ICQ7KJ0=
-github.com/elastic/elastic-agent-libs v0.12.1/go.mod h1:5CR02awPrBr+tfmjBBK+JI+dMmHNQjpVY24J0wjbC7M=
+github.com/elastic/elastic-agent-libs v0.17.1 h1:1MXoc1eHGE8hCdVJ9+qiGiZAGeHzT2QBVVzD/oxwqeU=
+github.com/elastic/elastic-agent-libs v0.17.1/go.mod h1:5CR02awPrBr+tfmjBBK+JI+dMmHNQjpVY24J0wjbC7M=
 github.com/elastic/elastic-agent-system-metrics v0.11.1 h1:BxViQHnqxvvi/65rj3mGwG6Eto6ldFCTnuDTUJnakaU=
 github.com/elastic/elastic-agent-system-metrics v0.11.1/go.mod h1:3QiMu9wTKJFvpCN+5klgGqasTMNKJbgY3xcoN1KQXJk=
 github.com/elastic/elastic-transport-go/v8 v8.6.0 h1:Y2S/FBjx1LlCv5m6pWAF2kDJAHoSjSRSJCApolgfthA=
@@ -381,6 +379,8 @@ github.com/elastic/go-ucfg v0.8.8 h1:54KIF/2zFKfl0MzsSOCGOsZ3O2bnjFQJ0nDJcLhviyk
 github.com/elastic/go-ucfg v0.8.8/go.mod h1:4E8mPOLSUV9hQ7sgLEJ4bvt0KhMuDJa8joDT2QGAEKA=
 github.com/elastic/go-windows v1.0.2 h1:yoLLsAsV5cfg9FLhZ9EXZ2n2sQFKeDYrHenkcivY4vI=
 github.com/elastic/go-windows v1.0.2/go.mod h1:bGcDpBzXgYSqM0Gx3DM4+UxFj300SZLixie9u9ixLM8=
+github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20 h1:bVZ3kDKa8Tqw9qvNrD91MwJMW6alg4Wn31l1TQ6RlTY=
+github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20/go.mod h1:A1DWjF89MFVnxzmzTaMF7CwVy9PDem7DalMkm8RIMoY=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMKozR+R4HhQRT9q1Irm/h13DLtSkejoAJY=
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
