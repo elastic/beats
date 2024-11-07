@@ -38,8 +38,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log *logp.Logger
-	db  *sql.DB
+	log          *logp.Logger
+	db           *sql.DB
+	dbCountLimit int
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -73,10 +74,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("could not create connection to db %w", err)
 	}
 
+	dbCountLimit := 30
+	if limit, ok := rowConfig["dbCountLimit"].(int); ok {
+		dbCountLimit = limit
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		log:           logger,
 		db:            db,
+		dbCountLimit:  dbCountLimit,
 	}, nil
 }
 
@@ -128,22 +135,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.log.Error(fmt.Errorf("error applying disk read write bytes schema %w", err))
 	}
 
-	tableUsedSpaceStrs := m.fetchTableUsedSpace(reporter)
-	err = m.reportEvents(tableUsedSpaceStrs, reporter, tableSpaceSchema)
+	blockCountStrs := m.fetchBlockCount(reporter)
+	err = m.reportEvents(blockCountStrs, reporter, databaseSessionSchema)
 	if err != nil {
-		m.log.Error(fmt.Errorf("error applying table space schema %w", err))
-	}
-
-	dbNetworkBytesStrs := m.fetchDatabaseNetworkBytes(reporter)
-	err = m.reportEvents(dbNetworkBytesStrs, reporter, databaseNetworkSchema)
-	if err != nil {
-		m.log.Error(fmt.Errorf("error applying table space schema %w", err))
-	}
-
-	tableIndexSizeStrs := m.fetchTableIndexSize(reporter)
-	err = m.reportEvents(tableIndexSizeStrs, reporter, tableIndexSchema)
-	if err != nil {
-		m.log.Error(fmt.Errorf("error applying table index schema %w", err))
+		m.log.Error(fmt.Errorf("error applying block count schema %w", err))
 	}
 
 	logSizeStrs := m.fetchLogSize(reporter)
@@ -152,10 +147,38 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.log.Error(fmt.Errorf("error applying table log schema %w", err))
 	}
 
-	blockCountStrs := m.fetchBlockCount(reporter)
-	err = m.reportEvents(blockCountStrs, reporter, databaseSessionSchema)
-	if err != nil {
-		m.log.Error(fmt.Errorf("error applying block count schema %w", err))
+	dbCount := 0
+	allDbs := m.fetchAllDbs(reporter)
+	for dbName := range allDbs {
+		_, err = m.db.Exec(fmt.Sprintf("USE [%s]", dbName))
+		if err != nil {
+			m.log.Errorf("Failed to switch databases: %v", err)
+			continue
+		}
+
+		tableUsedSpaceStrs := m.fetchTableUsedSpace(reporter)
+		err = m.reportEvents(tableUsedSpaceStrs, reporter, tableSpaceSchema)
+		if err != nil {
+			m.log.Error(fmt.Errorf("error applying table space schema %w", err))
+		}
+
+		dbNetworkBytesStrs := m.fetchDatabaseNetworkBytes(reporter)
+		err = m.reportEvents(dbNetworkBytesStrs, reporter, databaseNetworkSchema)
+		if err != nil {
+			m.log.Error(fmt.Errorf("error applying table space schema %w", err))
+		}
+
+		tableIndexSizeStrs := m.fetchTableIndexSize(reporter)
+		err = m.reportEvents(tableIndexSizeStrs, reporter, tableIndexSchema)
+		if err != nil {
+			m.log.Error(fmt.Errorf("error applying table index schema %w", err))
+		}
+
+		dbCount += 1
+		if dbCount > m.dbCountLimit {
+			m.log.Warnf("The number of database switches exceeded the limit count: %d", m.dbCountLimit)
+			break
+		}
 	}
 
 }
@@ -777,7 +800,7 @@ func (m *MetricSet) fetchLogSize(reporter mb.ReporterV2) []mapstr.M {
 --      CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size END) * 8. AS DECIMAL(8,2)) AS row_size_mb,
 --      CAST(SUM(size) * 8. / 1024 AS DECIMAL(8,2)) AS total_size_mb
 FROM sys.master_files WITH(NOWAIT)
-WHERE database_id = DB_ID()
+-- WHERE database_id = DB_ID()
 GROUP BY database_id`
 
 	type logSizeRow struct {
