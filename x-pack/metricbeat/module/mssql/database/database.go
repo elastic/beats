@@ -38,8 +38,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log *logp.Logger
-	db  *sql.DB
+	log          *logp.Logger
+	db           *sql.DB
+	dbCountLimit int
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -73,10 +74,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("could not create connection to db %w", err)
 	}
 
+	dbCountLimit := 30
+	if limit, ok := rowConfig["dbCountLimit"].(int); ok {
+		dbCountLimit = limit
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		log:           logger,
 		db:            db,
+		dbCountLimit:  dbCountLimit,
 	}, nil
 }
 
@@ -140,7 +147,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.log.Error(fmt.Errorf("error applying table log schema %w", err))
 	}
 
-	const DbCount = 50
 	dbCount := 0
 	allDbs := m.fetchAllDbs(reporter)
 	for dbName := range allDbs {
@@ -169,7 +175,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 
 		dbCount += 1
-		if dbCount > DbCount {
+		if dbCount > m.dbCountLimit {
 			break
 		}
 	}
