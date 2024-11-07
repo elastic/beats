@@ -150,14 +150,10 @@ func (s *store) Get(key string, to interface{}) error {
 func (s *store) get(key string, to interface{}) error {
 	status, data, err := s.cli.Request("GET", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, nil)
 
-	if err != nil && status != http.StatusNotFound {
-		return err
-	}
-
-	if status == http.StatusNotFound {
-		return ErrKeyUnknown
-	}
 	if err != nil {
+		if status == http.StatusNotFound {
+			return ErrKeyUnknown
+		}
 		return err
 	}
 
@@ -215,7 +211,7 @@ func (s *store) Set(key string, value interface{}) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	// The advantage of using upsert here is the the seqno doesn't increase if the document is the same
+	// The advantage of using upsert here is that the seqno doesn't increase if the document is the same
 	upsert := renderUpsertRequest(value)
 	_, _, err := s.cli.Request("POST", fmt.Sprintf("/%s/%s/%s", s.index, "_update", url.QueryEscape(key)), "", nil, upsert)
 	if err != nil {
@@ -262,13 +258,12 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 		"query": map[string]any{
 			"match_all": map[string]any{},
 		},
-		"size": 1000, // TODO: we might have to do scroll of there are more than 1000 keys
+		"size": 1000, // TODO: we might have to do scroll if there are more than 1000 keys
 	})
 
 	if err != nil && status != http.StatusNotFound {
 		return err
 	}
-	err = nil
 
 	if result == nil || len(result.Hits.Hits) == 0 {
 		return nil

@@ -98,7 +98,7 @@ func (r *Registrar) GetStates() []file.State {
 // loadStates fetches the previous reading state from the configure RegistryFile file
 // The default file is `registry` in the data path.
 func (r *Registrar) loadStates() error {
-	states, err := r.readStatesFrom(r.store)
+	states, err := readStatesFrom(r.store)
 	if err != nil {
 		return fmt.Errorf("can not load filebeat registry state: %w", err)
 	}
@@ -266,7 +266,7 @@ func (r *Registrar) processEventStates(states []file.State) {
 	}
 }
 
-func (r *Registrar) readStatesFrom(store *statestore.Store) ([]file.State, error) {
+func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 	var states []file.State
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
