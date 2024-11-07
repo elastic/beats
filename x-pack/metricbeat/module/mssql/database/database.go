@@ -176,6 +176,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 		dbCount += 1
 		if dbCount > m.dbCountLimit {
+			m.log.Warnf("The number of database switches exceeded the limit count: %d", m.dbCountLimit)
 			break
 		}
 	}
