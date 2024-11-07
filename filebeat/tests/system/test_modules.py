@@ -204,6 +204,7 @@ class Test(BaseTest):
                 module=module, fileset=fileset, test_file=test_file))
 
         output_path = os.path.join(self.working_dir)
+        print("running: ", module, fileset)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
             output.write(bytes("Command run: ", "utf-8"))
