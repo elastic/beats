@@ -1865,11 +1865,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4
-Version: v4.6.0
+Version: v4.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4@v4.6.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4@v4.8.0/LICENSE.txt:
 
 MIT License
 
