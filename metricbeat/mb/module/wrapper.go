@@ -70,7 +70,10 @@ type metricSetWrapper struct {
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
 
-	periodic bool // Set to true if this metricset is a periodic fetcher
+	periodic         bool // Set to true if this metricset is a periodic fetcher
+	failureThreshold int  // threshold of consecutive errors needed to set the stream as degraded
+
+	consecutiveErrors int // consecutive errors counter
 }
 
 // stats bundles common metricset stats.
@@ -102,15 +105,27 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 		metricSets: make([]*metricSetWrapper, len(metricSets)),
 	}
 
+	//FIXME provide proper struct
+	var hs struct {
+		FailureThreshold int `config:"failureThreshold"`
+	}
+
+	err := module.UnpackConfig(&hs)
+
+	if err != nil {
+		return nil, fmt.Errorf("unpacking raw config: %w", err)
+	}
+
 	for _, applyOption := range options {
 		applyOption(wrapper)
 	}
 
 	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
-			MetricSet: metricSet,
-			module:    wrapper,
-			stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
+			MetricSet:        metricSet,
+			module:           wrapper,
+			stats:            getMetricSetStats(wrapper.Name(), metricSet.Name()),
+			failureThreshold: hs.FailureThreshold,
 		}
 	}
 	return wrapper, nil
@@ -254,35 +269,11 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	case mb.ReportingMetricSetV2Error:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			if errors.As(err, &mb.PartialMetricsError{}) {
-				// mark module as running if metrics are partially available and display the error message
-				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			} else {
-				// mark it as degraded for any other issue encountered
-				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			}
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		} else {
-			msw.module.UpdateStatus(status.Running, "")
-		}
+		msw.handleFetchError(err, reporter.V2())
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			if errors.As(err, &mb.PartialMetricsError{}) {
-				// mark module as running if metrics are partially available and display the error message
-				msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			} else {
-				// mark it as degraded for any other issue encountered
-				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			}
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		} else {
-			msw.module.UpdateStatus(status.Running, "")
-		}
+		msw.handleFetchError(err, reporter.V2())
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
@@ -309,6 +300,27 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 		done := receiveOneEvent(d, events, msw.module.maxStartDelay+5*time.Second)
 		msw.run(done, events)
 	})
+}
+
+func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporterV2) {
+	if err != nil {
+		reporter.Error(err)
+		if errors.As(err, &mb.PartialMetricsError{}) {
+			msw.consecutiveErrors = 0
+			// mark module as running if metrics are partially available and display the error message
+			msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+		} else {
+			msw.consecutiveErrors++
+			if msw.failureThreshold >= 0 && msw.consecutiveErrors > msw.failureThreshold {
+				// mark it as degraded for any other issue encountered
+				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			}
+		}
+		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+	} else {
+		msw.consecutiveErrors = 0
+		msw.module.UpdateStatus(status.Running, "")
+	}
 }
 
 type reporter interface {
