@@ -171,6 +171,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 
 *Heartbeat*
 
