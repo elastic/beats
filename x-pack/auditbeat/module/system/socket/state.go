@@ -580,6 +580,7 @@ func (s *state) TerminateProcess(pid uint32) error {
 	if pid == 0 {
 		return errors.New("can't terminate process with PID 0")
 	}
+	s.log.Debugf("terminating process %d", pid)
 	s.Lock()
 	defer s.Unlock()
 	delete(s.processes, pid)
