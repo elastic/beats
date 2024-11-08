@@ -87,7 +87,7 @@ targets:
     scmid: githubConfig
     kind: file
     spec:
-      content: 'go {{ source "gomod" }}'
+      content: 'go {{ source "latestGoVersion" }}'
       file: go.mod
       matchpattern: 'go \d+.\d+.\d+'
   update-go-version:

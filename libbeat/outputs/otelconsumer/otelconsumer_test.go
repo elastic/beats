@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -46,12 +47,15 @@ func TestPublish(t *testing.T) {
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
+		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
+
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
 		consumer := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beat.Info{},
+			log:          logp.NewLogger("otelconsumer"),
 		}
 		return consumer
 	}
@@ -84,6 +88,33 @@ func TestPublish(t *testing.T) {
 		assert.False(t, consumererror.IsPermanent(err))
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("split batch on entity too large error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("Request Entity Too Large")
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchSplitRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("drop batch if can't split on entity too large error", func(t *testing.T) {
+		batch := outest.NewBatch(event1)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("Request Entity Too Large")
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 2)
+		assert.Equal(t, outest.BatchSplitRetry, batch.Signals[0].Tag)
+		assert.Equal(t, outest.BatchDrop, batch.Signals[1].Tag)
 	})
 
 	t.Run("drop batch on permanent consumer error", func(t *testing.T) {
