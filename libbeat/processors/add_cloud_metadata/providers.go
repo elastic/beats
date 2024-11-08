@@ -34,8 +34,9 @@ type provider struct {
 	// Name contains a long name of provider and service metadata is fetched from.
 	Name string
 
-	// Local Set to true if local IP is accessed only
-	Local bool
+	// DefaultEnabled allows to control whether metadata provider should be enabled by default
+	// Set to true if metadata access is enabled by default for the provider
+	DefaultEnabled bool
 
 	// Create returns an actual metadataFetcher
 	Create func(string, *conf.C) (metadataFetcher, error)
@@ -93,7 +94,7 @@ func providersFilter(configList providerList, allProviders map[string]provider) 
 	if len(configList) == 0 {
 		return func(name string) bool {
 			ff, ok := allProviders[name]
-			return ok && ff.Local
+			return ok && ff.DefaultEnabled
 		}
 	}
 	return func(name string) (ok bool) {
