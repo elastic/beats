@@ -1865,11 +1865,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4
-Version: v4.6.0
+Version: v4.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4@v4.6.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4@v4.8.0/LICENSE.txt:
 
 MIT License
 
@@ -12800,12 +12800,12 @@ Contents of probable licence file $GOMODCACHE/github.com/dolmen-go/contextio@v0.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/andrewkroh/goja
+Dependency : github.com/elastic/goja
 Version: v0.0.0-20190128172624-dd2ac4456e20
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/andrewkroh/goja@v0.0.0-20190128172624-dd2ac4456e20/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/goja@v0.0.0-20190128172624-dd2ac4456e20/LICENSE:
 
 Copyright (c) 2016 Dmitry Panov
 
@@ -13443,11 +13443,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.12.1
+Version: v0.17.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.12.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.17.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
