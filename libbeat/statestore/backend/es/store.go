@@ -33,9 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// TODO: Possibly add in-memory cache, since the operations could have delays
-// for example when the key is deleted, it's still could be searchable until the next refresh
-// the refresh delay is even worse for serverless
 type store struct {
 	ctx      context.Context
 	cn       context.CancelFunc
@@ -53,6 +50,10 @@ type store struct {
 }
 
 const docType = "_doc"
+
+var requestParams = map[string]string{
+	"refresh": "wait_for",
+}
 
 func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Notifier) (*store, error) {
 	ctx, cn := context.WithCancel(ctx)
@@ -213,7 +214,7 @@ func (s *store) Set(key string, value interface{}) error {
 
 	// The advantage of using upsert here is that the seqno doesn't increase if the document is the same
 	upsert := renderUpsertRequest(value)
-	_, _, err := s.cli.Request("POST", fmt.Sprintf("/%s/%s/%s", s.index, "_update", url.QueryEscape(key)), "", nil, upsert)
+	_, _, err := s.cli.Request("POST", fmt.Sprintf("/%s/%s/%s", s.index, "_update", url.QueryEscape(key)), "", requestParams, upsert)
 	if err != nil {
 		return err
 	}
@@ -227,7 +228,7 @@ func (s *store) Remove(key string) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	_, _, err := s.cli.Delete(s.index, docType, url.QueryEscape(key), nil)
+	_, _, err := s.cli.Delete(s.index, docType, url.QueryEscape(key), requestParams)
 	if err != nil {
 		return err
 	}
