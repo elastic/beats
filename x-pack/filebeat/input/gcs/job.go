@@ -163,7 +163,7 @@ func (j *job) processAndPublishData(ctx context.Context, id string) error {
 	}()
 
 	// update the source lag time metric
-	j.metrics.sourceLagTime.Update(time.Since(j.object.Updated).Milliseconds())
+	j.metrics.sourceLagTime.Update(time.Since(j.object.Updated).Nanoseconds())
 
 	// calculate number of decode errors
 	if err := j.decode(ctx, reader, id); err != nil {
@@ -322,14 +322,14 @@ func (j *job) publish(evt beat.Event, last bool, id string) {
 // splitEventList splits the event list into individual events and publishes them
 func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id string) (int, error) {
 	var jsonObject map[string]json.RawMessage
-	var evensPerObject int
+	var eventsPerObject int
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return evensPerObject, fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
+		return eventsPerObject, fmt.Errorf("job with job id %s encountered an unmarshaling error: %w", id, err)
 	}
 
 	raw, found := jsonObject[key]
 	if !found {
-		return evensPerObject, fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
+		return eventsPerObject, fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(raw))
@@ -338,11 +338,11 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 
 	tok, err := dec.Token()
 	if err != nil {
-		return evensPerObject, fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
+		return eventsPerObject, fmt.Errorf("failed to read JSON token for object: %s, with error: %w", j.object.Name, err)
 	}
 	delim, ok := tok.(json.Delim)
 	if !ok || delim != '[' {
-		return evensPerObject, fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
+		return eventsPerObject, fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
 	}
 
 	for dec.More() {
@@ -350,12 +350,12 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
-			return evensPerObject, fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+			return eventsPerObject, fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
 		}
 
 		data, err := item.MarshalJSON()
 		if err != nil {
-			return evensPerObject, fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
+			return eventsPerObject, fmt.Errorf("job with job id %s encountered a marshaling error: %w", id, err)
 		}
 		evt := j.createEvent(data, nil, offset+arrayOffset)
 
@@ -374,10 +374,10 @@ func (j *job) splitEventList(key string, raw json.RawMessage, offset int64, id s
 				j.log.Errorw("job encountered an error while publishing event", "gcs.jobId", id, "error", err)
 			}
 		}
-		evensPerObject++
+		eventsPerObject++
 	}
 
-	return evensPerObject, nil
+	return eventsPerObject, nil
 }
 
 // addGzipDecoderIfNeeded determines whether the given stream of bytes (encapsulated in a buffered reader)

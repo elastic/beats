@@ -61,8 +61,7 @@ func (s *state) saveForTx(name string, lastModifiedOn time.Time, metrics *inputM
 	} else {
 		// clear entry if this is a failed job
 		delete(s.cp.FailedJobs, name)
-		metrics.gcsFailedJobsTotal.Dec()
-		metrics.currentStateObjectsTotal.Dec()
+		metrics.gcsObjectsTracked.Dec()
 	}
 	return s.cp, func() { s.mu.Unlock() }
 }
@@ -76,14 +75,14 @@ func (s *state) updateFailedJobs(jobName string, metrics *inputMetrics) {
 	s.mu.Lock()
 	if _, ok := s.cp.FailedJobs[jobName]; !ok {
 		// increment stored state object count & failed job count
-		metrics.currentStateObjectsTotal.Inc()
+		metrics.gcsObjectsTracked.Inc()
 		metrics.gcsFailedJobsTotal.Inc()
 	}
 	s.cp.FailedJobs[jobName]++
 	if s.cp.FailedJobs[jobName] > maxFailedJobRetries {
 		delete(s.cp.FailedJobs, jobName)
 		metrics.gcsExpiredFailedJobsTotal.Inc()
-		metrics.currentStateObjectsTotal.Dec()
+		metrics.gcsObjectsTracked.Dec()
 	}
 	s.mu.Unlock()
 }
@@ -94,7 +93,7 @@ func (s *state) deleteFailedJob(jobName string, metrics *inputMetrics) {
 	s.mu.Lock()
 	delete(s.cp.FailedJobs, jobName)
 	metrics.gcsExpiredFailedJobsTotal.Inc()
-	metrics.currentStateObjectsTotal.Dec()
+	metrics.gcsObjectsTracked.Dec()
 	s.mu.Unlock()
 }
 

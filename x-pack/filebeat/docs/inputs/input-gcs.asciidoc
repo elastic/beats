@@ -475,7 +475,7 @@ observe the activity of the input.
 | `url`                                 | URL of the input resource.
 | `errors_total`                        | Total number of errors encountered by the input.
 | `decode_errors_total`                 | Total number of decode errors encountered by the input.
-| `current_state_objects_total`         | Number of objects currently tracked in the state registry.
+| `gcs_objects_tracked_gauge`           | Number of objects currently tracked in the state registry.
 | `gcs_objects_requested_total`         | Number of GCS objects downloaded.
 | `gcs_objects_published_total`         | Number of GCS objects processed that were published.
 | `gcs_objects_listed_total`            | Number of GCS objects returned by list operations.
@@ -486,9 +486,9 @@ observe the activity of the input.
 | `gcs_objects_inflight_gauge`          | Number of GCS objects inflight (gauge).
 | `gcs_object_processing_time`          | Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
 | `gcs_object_size_in_bytes`            | Histogram of processed GCS object size in bytes.
-| `gcs_events_per_object`               | Histogram of events in an individual GCS object.
+| `gcs_events_per_object`               | Histogram of event count per GCS object.
 | `gcs_jobs_scheduled_after_validation` | Number of jobs scheduled after validation.
-| `source_lag_time`                     | Histogram of the time between the source (Updated) timestamp and the time the object was read.
+| `source_lag_time`                     | Histogram of the time between the source (Updated) timestamp and the time the object was read, in nanoseconds.
 |=======
 
 ==== Common input options

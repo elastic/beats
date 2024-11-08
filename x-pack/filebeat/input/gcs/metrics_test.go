@@ -36,7 +36,7 @@ func TestNewInputMetricsInstance(t *testing.T) {
 
 	assert.NotNil(t, metrics.errorsTotal,
 		metrics.decodeErrorsTotal,
-		metrics.currentStateObjectsTotal,
+		metrics.gcsObjectsTracked,
 		metrics.gcsObjectsRequestedTotal,
 		metrics.gcsObjectsPublishedTotal,
 		metrics.gcsObjectsListedTotal,
@@ -54,7 +54,7 @@ func TestNewInputMetricsInstance(t *testing.T) {
 
 	assert.Equal(t, uint64(0x0), metrics.errorsTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.decodeErrorsTotal.Get())
-	assert.Equal(t, uint64(0x0), metrics.currentStateObjectsTotal.Get())
+	assert.Equal(t, uint64(0x0), metrics.gcsObjectsTracked.Get())
 	assert.Equal(t, uint64(0x0), metrics.gcsObjectsRequestedTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.gcsObjectsPublishedTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.gcsObjectsListedTotal.Get())

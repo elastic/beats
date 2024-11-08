@@ -19,7 +19,7 @@ type inputMetrics struct {
 	errorsTotal       *monitoring.Uint   // Number of errors encountered.
 	decodeErrorsTotal *monitoring.Uint   // Number of decode errors encountered.
 
-	currentStateObjectsTotal        *monitoring.Uint // Number of objects currently tracked in the state registry.
+	gcsObjectsTracked               *monitoring.Uint // Number of objects currently tracked in the state registry (gauge).
 	gcsObjectsRequestedTotal        *monitoring.Uint // Number of GCS objects downloaded.
 	gcsObjectsPublishedTotal        *monitoring.Uint // Number of GCS objects processed that were published.
 	gcsObjectsListedTotal           *monitoring.Uint // Number of GCS objects returned by list operations.
@@ -30,7 +30,7 @@ type inputMetrics struct {
 	gcsObjectsInflight              *monitoring.Uint // Number of GCS objects inflight (gauge).
 	gcsObjectProcessingTime         metrics.Sample   // Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
 	gcsObjectSizeInBytes            metrics.Sample   // Histogram of processed GCS object size in bytes.
-	gcsEventsPerObject              metrics.Sample   // Histogram of events in an individual GCS object.
+	gcsEventsPerObject              metrics.Sample   // Histogram of event count per GCS object.
 	gcsJobsScheduledAfterValidation metrics.Sample   // Number of jobs scheduled after validation.
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the object was read.
 }
@@ -43,7 +43,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
 		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
 
-		currentStateObjectsTotal:        monitoring.NewUint(reg, "current_state_objects_total"),
+		gcsObjectsTracked:               monitoring.NewUint(reg, "gcs_objects_tracked_gauge"),
 		gcsObjectsRequestedTotal:        monitoring.NewUint(reg, "gcs_objects_requested_total"),
 		gcsObjectsPublishedTotal:        monitoring.NewUint(reg, "gcs_objects_published_total"),
 		gcsObjectsListedTotal:           monitoring.NewUint(reg, "gcs_objects_listed_total"),
