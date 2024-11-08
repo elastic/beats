@@ -147,6 +147,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		m.log.Error(fmt.Errorf("error applying table log schema %w", err))
 	}
 
+	dbNetworkBytesStrs := m.fetchDatabaseNetworkBytes(reporter)
+	err = m.reportEvents(dbNetworkBytesStrs, reporter, databaseNetworkSchema)
+	if err != nil {
+		m.log.Error(fmt.Errorf("error applying table space schema %w", err))
+	}
+
 	dbCount := 0
 	allDbs := m.fetchAllDbs(reporter)
 	for dbName := range allDbs {
@@ -156,19 +162,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			continue
 		}
 
-		tableUsedSpaceStrs := m.fetchTableUsedSpace(reporter)
+		tableUsedSpaceStrs := m.fetchTableUsedSpace(reporter, dbName)
 		err = m.reportEvents(tableUsedSpaceStrs, reporter, tableSpaceSchema)
 		if err != nil {
 			m.log.Error(fmt.Errorf("error applying table space schema %w", err))
 		}
 
-		dbNetworkBytesStrs := m.fetchDatabaseNetworkBytes(reporter)
-		err = m.reportEvents(dbNetworkBytesStrs, reporter, databaseNetworkSchema)
-		if err != nil {
-			m.log.Error(fmt.Errorf("error applying table space schema %w", err))
-		}
-
-		tableIndexSizeStrs := m.fetchTableIndexSize(reporter)
+		tableIndexSizeStrs := m.fetchTableIndexSize(reporter, dbName)
 		err = m.reportEvents(tableIndexSizeStrs, reporter, tableIndexSchema)
 		if err != nil {
 			m.log.Error(fmt.Errorf("error applying table index schema %w", err))
@@ -558,21 +558,7 @@ func (m *MetricSet) fetchMaxConnections(reporter mb.ReporterV2) int64 {
 	return mapStr["maxConnection"].(int64)
 }
 
-func (m *MetricSet) fetchTableUsedSpace(reporter mb.ReporterV2) []mapstr.M {
-
-	allDbs := m.fetchAllDbs(reporter)
-
-	if len(allDbs) == 0 {
-		reporter.Error(fmt.Errorf("cannot access any database"))
-		return []mapstr.M{}
-	}
-
-	dbNames := make([]string, 0, len(allDbs))
-	for dbName := range allDbs {
-		dbNames = append(dbNames, "'"+dbName+"'")
-	}
-	dbNameWhereCond := strings.Join(dbNames, ", ")
-
+func (m *MetricSet) fetchTableUsedSpace(reporter mb.ReporterV2, dbName string) []mapstr.M {
 	query := fmt.Sprintf(`SELECT
     Schemas.TABLE_CATALOG AS 'db_name',
     t.NAME AS 'tb_name',
@@ -580,19 +566,19 @@ func (m *MetricSet) fetchTableUsedSpace(reporter mb.ReporterV2) []mapstr.M {
     SUM(a.used_pages) * 8 AS UsedSpaceKB,
     (SUM(a.total_pages) - SUM(a.used_pages)) * 8 AS UnusedSpaceKB
 FROM
-    sys.tables t
+    [%s].sys.tables t
 INNER JOIN
-    sys.indexes i ON t.OBJECT_ID = i.object_id
+    [%s].sys.indexes i ON t.OBJECT_ID = i.object_id
 INNER JOIN
-    sys.partitions p ON i.object_id = p.OBJECT_ID AND i.index_id = p.index_id
+    [%s].sys.partitions p ON i.object_id = p.OBJECT_ID AND i.index_id = p.index_id
 INNER JOIN
-    sys.allocation_units a ON p.partition_id = a.container_id
+    [%s].sys.allocation_units a ON p.partition_id = a.container_id
 INNER JOIN
-    INFORMATION_SCHEMA.TABLES AS Schemas ON Schemas.TABLE_NAME = t.name
-WHERE
-	Schemas.TABLE_CATALOG IN (%s)
+    [%s].INFORMATION_SCHEMA.TABLES AS Schemas ON Schemas.TABLE_NAME = t.name
+-- WHERE
+-- 	Schemas.TABLE_CATALOG IN ()
 GROUP BY
-    t.Name, p.Rows, Schemas.TABLE_CATALOG`, dbNameWhereCond)
+    t.Name, p.Rows, Schemas.TABLE_CATALOG`, dbName, dbName, dbName, dbName, dbName)
 
 	type tableSpaceRow struct {
 		dbName        string
@@ -710,17 +696,17 @@ func (m *MetricSet) fetchAllDbs(reporter mb.ReporterV2) mapstr.M {
 	return m.fetchRowsWithRowCounter(queryAllDbs, reporter, allDbsCounter)
 }
 
-func (m *MetricSet) fetchTableIndexSize(reporter mb.ReporterV2) []mapstr.M {
-	query := `
+func (m *MetricSet) fetchTableIndexSize(reporter mb.ReporterV2, dbName string) []mapstr.M {
+	query := fmt.Sprintf(`
 ;WITH tbl_page_count AS (
     SELECT
     Scheme.TABLE_CATALOG AS DatabaseName, t.[name] AS TableName, i.[name] AS IndexName, SUM (s.[used_page_count]) AS used_pages_count, SUM (CASE WHEN (i.index_id < 2) THEN in_row_data_page_count + lob_used_page_count + row_overflow_used_page_count
     ELSE lob_used_page_count + row_overflow_used_page_count END) as pages
-    FROM sys.dm_db_partition_stats AS s
-    INNER JOIN sys.indexes AS i ON s.[object_id] = i.[object_id]
+    FROM [%s].sys.dm_db_partition_stats AS s
+    INNER JOIN [%s].sys.indexes AS i ON s.[object_id] = i.[object_id]
     AND s.[index_id] = i.[index_id]
-    JOIN sys.tables AS t ON s.[object_id] = t.[object_id]
-    JOIN INFORMATION_SCHEMA.TABLES AS Scheme ON Scheme.TABLE_NAME = t.name
+    JOIN [%s].sys.tables AS t ON s.[object_id] = t.[object_id]
+    JOIN [%s].INFORMATION_SCHEMA.TABLES AS Scheme ON Scheme.TABLE_NAME = t.name
     GROUP BY i.[name], t.[name], s.partition_id, Scheme.TABLE_CATALOG
     )
  SELECT
@@ -732,7 +718,7 @@ func (m *MetricSet) fetchTableIndexSize(reporter mb.ReporterV2) []mapstr.M {
          THEN tbl_page_count.used_pages_count - tbl_page_count.pages
          ELSE 0
          END) * 8. ) AS int) AS 'index_size'
-FROM tbl_page_count;`
+FROM tbl_page_count;`, dbName, dbName, dbName, dbName)
 
 	type tableIndexRow struct {
 		dbName      string
