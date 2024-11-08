@@ -6,7 +6,6 @@ package gcs
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -51,7 +50,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 	var source cursor.Source
 	var g errgroup.Group
 
-	for i, b := range in.config.Buckets {
+	for _, b := range in.config.Buckets {
 		bucket := tryOverrideOrDefault(in.config, b)
 		source = &Source{
 			ProjectId:                in.config.ProjectId,
@@ -69,8 +68,8 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 
 		st := newState()
 		currentSource := source.(*Source)
-		log := inputCtx.Logger.With("project_id_"+fmt.Sprintf("%d", i), currentSource.ProjectId).With("bucket", currentSource.BucketName)
-		metrics := newInputMetrics(fmt.Sprintf("%s_%d:%s", inputCtx.ID, i, currentSource.BucketName), nil)
+		log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
+		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
 		defer metrics.Close()
 		metrics.url.Set("gs://" + currentSource.BucketName)
 
