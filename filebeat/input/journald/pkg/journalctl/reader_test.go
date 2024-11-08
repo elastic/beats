@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+
 package journalctl
 
 import (
@@ -48,8 +50,8 @@ func TestEventWithNonStringData(t *testing.T) {
 	for idx, rawEvent := range testCases {
 		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
 			mock := JctlMock{
-				NextFunc: func(canceler input.Canceler) ([]byte, error) {
-					return rawEvent, nil
+				NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
+					return rawEvent, false, nil
 				},
 			}
 			r := Reader{
@@ -72,8 +74,8 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 	ctx := context.Background()
 
 	mock := JctlMock{
-		NextFunc: func(canceler input.Canceler) ([]byte, error) {
-			return jdEvent, errors.New("journalctl exited with code 42")
+		NextFunc: func(canceler input.Canceler) ([]byte, bool, error) {
+			return jdEvent, false, errors.New("journalctl exited with code 42")
 		},
 	}
 
@@ -90,14 +92,14 @@ func TestRestartsJournalctlOnError(t *testing.T) {
 
 		// If calls have been made, change the Next function to always succeed
 		// and return it
-		mock.NextFunc = func(canceler input.Canceler) ([]byte, error) {
-			return jdEvent, nil
+		mock.NextFunc = func(canceler input.Canceler) ([]byte, bool, error) {
+			return jdEvent, false, nil
 		}
 
 		return &mock, nil
 	}
 
-	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, SeekHead, "", 0, "", factory)
+	reader, err := New(logp.L(), ctx, nil, nil, nil, journalfield.IncludeMatches{}, []int{}, SeekHead, "", 0, "", factory)
 	if err != nil {
 		t.Fatalf("cannot instantiate journalctl reader: %s", err)
 	}

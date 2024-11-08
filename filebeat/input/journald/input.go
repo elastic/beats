@@ -42,6 +42,7 @@ type journalReader interface {
 }
 
 type journald struct {
+	ID                 string
 	Backoff            time.Duration
 	MaxBackoff         time.Duration
 	Since              time.Duration
@@ -50,6 +51,7 @@ type journald struct {
 	Units              []string
 	Transports         []string
 	Identifiers        []string
+	Facilities         []int
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 	Journalctl         bool
@@ -79,7 +81,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 			Logger:     log,
 			StateStore: store,
 			Type:       pluginName,
-			Configure:  configure,
+			Configure:  Configure,
 		},
 	}
 }
@@ -90,7 +92,7 @@ var cursorVersion = 1
 
 func (p pathSource) Name() string { return string(p) }
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
+func Configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
@@ -107,12 +109,14 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	}
 
 	return sources, &journald{
+		ID:                 config.ID,
 		Since:              config.Since,
 		Seek:               config.Seek,
 		Matches:            journalfield.IncludeMatches(config.Matches),
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
+		Facilities:         config.Facilities,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -122,12 +126,13 @@ func (inp *journald) Name() string { return pluginName }
 
 func (inp *journald) Test(src cursor.Source, ctx input.TestContext) error {
 	reader, err := journalctl.New(
-		ctx.Logger,
+		ctx.Logger.With("input_id", inp.ID),
 		ctx.Cancelation,
 		inp.Units,
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		journalctl.SeekHead,
 		"",
 		inp.Since,
@@ -146,7 +151,9 @@ func (inp *journald) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	logger := ctx.Logger.With("path", src.Name())
+	logger := ctx.Logger.
+		With("path", src.Name()).
+		With("input_id", inp.ID)
 	currentCheckpoint := initCheckpoint(logger, cursor)
 
 	mode := inp.Seek
@@ -158,6 +165,7 @@ func (inp *journald) Run(
 		inp.Identifiers,
 		inp.Transports,
 		inp.Matches,
+		inp.Facilities,
 		mode,
 		pos,
 		inp.Since,

@@ -57,6 +57,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			TimeStampEpoch:           container.TimeStampEpoch,
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
+			ReaderConfig:             container.ReaderConfig,
 		}
 
 		st := newState()

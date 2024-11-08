@@ -10,11 +10,11 @@
         - name: names
           type: keyword
           description: >
-            List of all the Datastore names associated with the cluster.
+            List of all the datastore names associated with the cluster.
         - name: count
           type: long
           description: >
-            Number of Datastores associated with the cluster.
+            Number of datastores associated with the cluster.
     - name: das_config
       type: group
       fields:
@@ -32,11 +32,15 @@
         - name: count
           type: long
           description: >
-            Number of Hosts associated with the cluster.
+            Number of hosts associated with the cluster.
         - name: names
           type: keyword
           description: >
-            List of all the Host names associated with the cluster.
+            List of all the host names associated with the cluster.
+    - name: id
+      type: keyword
+      description: >
+        Unique cluster ID.
     - name: name
       type: keyword
       description: >
@@ -47,8 +51,13 @@
         - name: count
           type: long
           description: >
-            Number of Networks associated with the cluster.
+            Number of networks associated with the cluster.
         - name: names
           type: keyword
           description: >
-            List of all the Network names associated with the cluster.
+            List of all the network names associated with the cluster.
+    - name: triggered_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggered alarms.

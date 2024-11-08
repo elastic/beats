@@ -7,6 +7,7 @@ package awss3
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -24,37 +25,36 @@ import (
 )
 
 type config struct {
-	APITimeout          time.Duration        `config:"api_timeout"`
-	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
-	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url"`
-	RegionName          string               `config:"region"`
-	BucketARN           string               `config:"bucket_arn"`
-	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
-	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
-	BucketListPrefix    string               `config:"bucket_list_prefix"`
-	NumberOfWorkers     int                  `config:"number_of_workers"`
-	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
-	PathStyle           bool                 `config:"path_style"`
-	ProviderOverride    string               `config:"provider"`
-	BackupConfig        backupConfig         `config:",inline"`
+	APITimeout         time.Duration        `config:"api_timeout"`
+	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
+	QueueURL           string               `config:"queue_url"`
+	RegionName         string               `config:"region"`
+	BucketARN          string               `config:"bucket_arn"`
+	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	BucketListInterval time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix   string               `config:"bucket_list_prefix"`
+	NumberOfWorkers    int                  `config:"number_of_workers"`
+	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
+	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	PathStyle          bool                 `config:"path_style"`
+	ProviderOverride   string               `config:"provider"`
+	BackupConfig       backupConfig         `config:",inline"`
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           false,
+		APITimeout:         120 * time.Second,
+		VisibilityTimeout:  300 * time.Second,
+		BucketListInterval: 120 * time.Second,
+		BucketListPrefix:   "",
+		SQSWaitTime:        20 * time.Second,
+		SQSMaxReceiveCount: 5,
+		NumberOfWorkers:    5,
+		PathStyle:          false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -93,11 +93,6 @@ func (c *config) Validate() error {
 			"less than or equal to 20s", c.SQSWaitTime)
 	}
 
-	if c.QueueURL != "" && c.MaxNumberOfMessages <= 0 {
-		return fmt.Errorf("max_number_of_messages <%v> must be greater than 0",
-			c.MaxNumberOfMessages)
-	}
-
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
 		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
 			c.APITimeout, c.SQSWaitTime)
@@ -111,6 +106,13 @@ func (c *config) Validate() error {
 	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
 		return errors.New("provider can only be overridden when polling non-AWS S3 services")
+	}
+	if c.AWSConfig.Endpoint != "" {
+		// Make sure the given endpoint can be parsed
+		_, err := url.Parse(c.AWSConfig.Endpoint)
+		if err != nil {
+			return fmt.Errorf("failed to parse endpoint: %w", err)
+		}
 	}
 	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
 		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
@@ -251,12 +253,17 @@ func (c config) getBucketARN() string {
 // options struct.
 // Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
-	if c.NonAWSBucketName != "" {
-		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
-	}
-
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	// Apply slightly different endpoint resolvers depending on whether we're in S3 or SQS mode.
+	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
+		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint,
+			func(e *awssdk.Endpoint) {
+				// The S3 hostname is immutable in bucket polling mode, mutable otherwise.
+				e.HostnameImmutable = (c.getBucketARN() != "")
+			})
 	}
 	o.UsePathStyle = c.PathStyle
 
@@ -273,6 +280,9 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	if c.AWSConfig.Endpoint != "" {
+		o.EndpointResolver = sqs.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
 }
 

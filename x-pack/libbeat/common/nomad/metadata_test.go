@@ -44,12 +44,10 @@ func newJob(jobID string) *Job {
 						},
 						Services: []*api.Service{
 							{
-								Id:   "service-a",
 								Name: "web",
 								Tags: []string{"tag-a", "tag-b", "${NOMAD_JOB_NAME}"},
 							},
 							{
-								Id:   "service-b",
 								Name: "nginx",
 								Tags: []string{"tag-c", "tag-d"},
 							},

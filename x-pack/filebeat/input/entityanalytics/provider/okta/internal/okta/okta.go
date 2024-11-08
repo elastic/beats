@@ -44,7 +44,7 @@ type User struct {
 	Profile               map[string]any `json:"profile"`
 	Credentials           *Credentials   `json:"credentials,omitempty"`
 	Links                 HAL            `json:"_links,omitempty"` // See https://developer.okta.com/docs/reference/api/users/#links-object for details.
-	Embedded              HAL            `json:"_embedded,omitempty"`
+	Embedded              map[string]any `json:"_embedded,omitempty"`
 }
 
 // Credentials is a redacted Okta user's credential details. Only the credential provider is retained.
@@ -70,6 +70,37 @@ type Provider struct {
 type Group struct {
 	ID      string         `json:"id"`
 	Profile map[string]any `json:"profile"`
+}
+
+// Factor is an Okta identity factor description.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
+type Factor struct {
+	ID          string         `json:"id"`
+	FactorType  string         `json:"factorType"`
+	Provider    string         `json:"provider"`
+	VendorName  string         `json:"vendorName"`
+	Status      string         `json:"status"`
+	Created     time.Time      `json:"created"`
+	LastUpdated time.Time      `json:"lastUpdated"`
+	Profile     map[string]any `json:"profile"`
+	Links       HAL            `json:"_links,omitempty"`
+	Embedded    map[string]any `json:"_embedded,omitempty"`
+}
+
+// Role is an Okta user role description.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentAUser/#tag/RoleAssignmentAUser/operation/listAssignedRolesForUser
+// and https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+type Role struct {
+	ID             string    `json:"id"`
+	Label          string    `json:"label"`
+	Type           string    `json:"type"`
+	Status         string    `json:"status"`
+	Created        time.Time `json:"created"`
+	LastUpdated    time.Time `json:"lastUpdated"`
+	AssignmentType string    `json:"assignmentType"`
+	Links          HAL       `json:"_links"`
 }
 
 // Device is an Okta device's details.
@@ -176,6 +207,48 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window, log)
 }
 
+// GetUserFactors returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
+func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Factor, http.Header, error) {
+	const endpoint = "/api/v1/users"
+
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path.Join(endpoint, user, "factors"),
+	}
+	return getDetails[Factor](ctx, cli, u, key, true, OmitNone, lim, window, log)
+}
+
+// GetUserRoles returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+	const endpoint = "/api/v1/users"
+
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path.Join(endpoint, user, "roles"),
+	}
+	return getDetails[Role](ctx, cli, u, key, true, OmitNone, lim, window, log)
+}
+
 // GetUserGroupDetails returns Okta group details using the users API endpoint. host is the
 // Okta user domain and key is the API token to use for the query. user must not be empty.
 //
@@ -195,6 +268,27 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 		Path:   path.Join(endpoint, user, "groups"),
 	}
 	return getDetails[Group](ctx, cli, u, key, true, OmitNone, lim, window, log)
+}
+
+// GetGroupRoles returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+	const endpoint = "/api/v1/groups"
+
+	if group == "" {
+		return nil, nil, errors.New("no group specified")
+	}
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path.Join(endpoint, group, "roles"),
+	}
+	return getDetails[Role](ctx, cli, u, key, true, OmitNone, lim, window, log)
 }
 
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
@@ -250,7 +344,7 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 
 // entity is an Okta entity analytics entity.
 type entity interface {
-	User | Group | Device | devUser
+	User | Group | Role | Factor | Device | devUser
 }
 
 type devUser struct {

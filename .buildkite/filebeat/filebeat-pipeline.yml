@@ -24,8 +24,8 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
   # Integration Tests
-  K8S_VERSION: "v1.29.0"
-  ASDF_KIND_VERSION: "0.20.0"
+  K8S_VERSION: "v1.31.0"
+  ASDF_KIND_VERSION: "0.24.0"
 
   # Unit tests
   RACE_DETECTOR: "true"
@@ -105,6 +105,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "filebeat: Go Integration Tests"

@@ -9,8 +9,6 @@
 <titleabbrev>ETW</titleabbrev>
 ++++
 
-beta[]
-
 https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal[Event
 Tracing for Windows] is a powerful logging and tracing mechanism built into the
 Windows operating system. It provides a detailed view of application and system
