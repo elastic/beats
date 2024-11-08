@@ -31,7 +31,7 @@ type inputMetrics struct {
 	gcsObjectProcessingTime         metrics.Sample   // Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
 	gcsObjectSizeInBytes            metrics.Sample   // Histogram of processed GCS object size in bytes.
 	gcsEventsPerObject              metrics.Sample   // Histogram of event count per GCS object.
-	gcsJobsScheduledAfterValidation metrics.Sample   // Number of jobs scheduled after validation.
+	gcsJobsScheduledAfterValidation metrics.Sample   // Histogram of number of jobs scheduled after validation.
 	sourceLagTime                   metrics.Sample   // Histogram of the time between the source (Updated) timestamp and the time the object was read.
 }
 
