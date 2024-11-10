@@ -18,7 +18,6 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/time/rate"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
@@ -185,7 +184,7 @@ func TestOktaDoFetch(t *testing.T) {
 					EnrichWith: test.enrichWith,
 				},
 				client: ts.Client(),
-				lim:    rate.NewLimiter(1, 1),
+				lim:    okta.NewRateLimiter(),
 				logger: logp.L(),
 			}
 			if *trace {

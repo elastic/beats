@@ -15,11 +15,8 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 	"strings"
 	"time"
-
-	"golang.org/x/time/rate"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -195,7 +192,7 @@ func (o Response) String() string {
 // https://${yourOktaDomain}/reports/rate-limit.
 //
 // See https://developer.okta.com/docs/reference/api/users/#list-users for details.
-func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
+func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	u := &url.URL{
@@ -213,7 +210,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
-func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Factor, http.Header, error) {
+func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]Factor, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
@@ -234,7 +231,7 @@ func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
-func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
@@ -255,7 +252,7 @@ func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string,
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
-func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Group, http.Header, error) {
+func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]Group, http.Header, error) {
 	const endpoint = "/api/v1/users"
 
 	if user == "" {
@@ -276,7 +273,7 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
-func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
 	const endpoint = "/api/v1/groups"
 
 	if group == "" {
@@ -298,7 +295,7 @@ func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details.
-func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]Device, http.Header, error) {
+func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]Device, http.Header, error) {
 	const endpoint = "/api/v1/devices"
 
 	u := &url.URL{
@@ -317,7 +314,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDeviceUsers for details.
-func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
+func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
 	if device == "" {
 		// No user associated with a null device. Not an error.
 		return nil, nil, nil
@@ -356,7 +353,7 @@ type devUser struct {
 // for the specific user are returned, otherwise a list of all users is returned.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
-func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *rate.Limiter, window time.Duration, log *logp.Logger) ([]E, http.Header, error) {
+func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]E, http.Header, error) {
 	url := u.String()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -380,7 +377,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	err = oktaRateLimit(resp.Header, window, lim, log)
+	err = lim.Update(resp.Header, window, log)
 	if err != nil {
 		io.Copy(io.Discard, resp.Body)
 		return nil, nil, err
@@ -441,59 +438,6 @@ func (e *Error) Error() string {
 		causes[i] = c.Error()
 	}
 	return fmt.Sprintf("%s: %s", summary, strings.Join(causes, ","))
-}
-
-// oktaRateLimit implements the Okta rate limit policy translation.
-//
-// See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
-func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter, log *logp.Logger) error {
-	limit := h.Get("X-Rate-Limit-Limit")
-	remaining := h.Get("X-Rate-Limit-Remaining")
-	reset := h.Get("X-Rate-Limit-Reset")
-	log.Debugw("rate limit header", "X-Rate-Limit-Limit", limit, "X-Rate-Limit-Remaining", remaining, "X-Rate-Limit-Reset", reset)
-	if limit == "" || remaining == "" || reset == "" {
-		return nil
-	}
-
-	lim, err := strconv.ParseFloat(limit, 64)
-	if err != nil {
-		return err
-	}
-	rem, err := strconv.ParseFloat(remaining, 64)
-	if err != nil {
-		return err
-	}
-	rst, err := strconv.ParseInt(reset, 10, 64)
-	if err != nil {
-		return err
-	}
-	resetTime := time.Unix(rst, 0)
-	per := time.Until(resetTime).Seconds()
-
-	// Be conservative here; the docs don't exactly specify burst rates.
-	// Make sure we can make at least one new request, even if we fail
-	// to get a non-zero rate.Limit. We could set to zero for the case
-	// that limit=rate.Inf, but that detail is not important.
-	burst := 1
-
-	rateLimit := rate.Limit(rem / per)
-
-	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if rateLimit <= 0 {
-		waitUntil := resetTime.UTC()
-		// next gives us a sane next window estimate, but the
-		// estimate will be overwritten when we make the next
-		// permissible API request.
-		next := rate.Limit(lim / window.Seconds())
-		limiter.SetLimitAt(waitUntil, next)
-		limiter.SetBurstAt(waitUntil, burst)
-		log.Debugw("rate limit adjust", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
-		return nil
-	}
-	limiter.SetLimit(rateLimit)
-	limiter.SetBurst(burst)
-	log.Debugw("rate limit adjust", "set_rate", rateLimit, "set_burst", burst)
-	return nil
 }
 
 // Next returns the next URL query for a pagination sequence. If no further

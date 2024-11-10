@@ -22,7 +22,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"golang.org/x/time/rate"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -44,8 +43,8 @@ func Test(t *testing.T) {
 		t.Skip("okta tests require ${OKTA_TOKEN} to be set")
 	}
 
-	// Make a global limiter with the capacity to proceed once.
-	limiter := rate.NewLimiter(1, 1)
+	// Make a global limiter
+	limiter := NewRateLimiter()
 
 	// There are a variety of windows, the most conservative is one minute.
 	// The rate limit will be adjusted on the second call to the API if
@@ -263,14 +262,14 @@ var localTests = []struct {
 	name   string
 	msg    string
 	id     string
-	fn     func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) (any, http.Header, error)
+	fn     func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error)
 	mkWant func(string) (any, error)
 }{
 	{
 		// Test case constructed from API-returned value with details anonymised.
 		name: "users",
 		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
-		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window, log)
 		},
 		mkWant: mkWant[User],
@@ -279,7 +278,7 @@ var localTests = []struct {
 		// Test case from https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices
 		name: "devices",
 		msg:  `[{"id":"devid","status":"CREATED","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g4","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/users","hints":{"allow":["GET"]}}}},{"id":"guo4a5u7YAHhjXrMK0g5","status":"ACTIVE","created":"2023-06-21T23:24:02.000Z","lastUpdated":"2023-06-21T23:24:02.000Z","profile":{"displayName":"Example Device name 2","platform":"ANDROID","manufacturer":"Google","model":"Pixel 6","osVersion":"13:2023-05-05","registered":true,"secureHardwarePresent":true,"diskEncryptionType":"USER"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 2","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g5","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/users","hints":{"allow":["GET"]}}}}]`,
-		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetDeviceDetails(context.Background(), cli, host, key, device, query, lim, window, log)
 		},
 		mkWant: mkWant[Device],
@@ -289,7 +288,7 @@ var localTests = []struct {
 		name: "devices_users",
 		msg:  `[{"created":"2023-08-07T21:48:27.000Z","managementStatus":"NOT_MANAGED","user":{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}}]`,
 		id:   "devid",
-		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetDeviceUsers(context.Background(), cli, host, key, device, query, OmitNone, lim, window, log)
 		},
 		mkWant: mkWant[devUser],
@@ -315,9 +314,7 @@ func TestLocal(t *testing.T) {
 
 	for _, test := range localTests {
 		t.Run(test.name, func(t *testing.T) {
-			// Make a global limiter with more capacity than will be set by the mock API.
-			// This will show the burst drop.
-			limiter := rate.NewLimiter(10, 10)
+			limiter := NewRateLimiter()
 
 			// There are a variety of windows, the most conservative is one minute.
 			// The rate limit will be adjusted on the second call to the API if
@@ -377,12 +374,12 @@ func TestLocal(t *testing.T) {
 				t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
 			}
 
-			lim := limiter.Limit()
+			lim := limiter.lim.Limit()
 			if lim < 49.0/60.0 || 50.0/60.0 < lim {
 				t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", lim)
 			}
-			if limiter.Burst() != 1 { // Set in GetUserDetails.
-				t.Errorf("unexpected burst: got:%d want:1", limiter.Burst())
+			if limiter.lim.Burst() != 1 {
+				t.Errorf("unexpected burst: got:%d want:1", limiter.lim.Burst())
 			}
 
 			next, err := Next(h)
