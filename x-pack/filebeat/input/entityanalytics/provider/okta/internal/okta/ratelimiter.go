@@ -7,6 +7,7 @@ package okta
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -15,25 +16,33 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type RateLimiter struct {
-	lim *rate.Limiter
-}
+type RateLimiter map[string]*rate.Limiter
 
 func NewRateLimiter() *RateLimiter {
-	return &RateLimiter{
-		lim: rate.NewLimiter(1, 1), // Allow a single fetch operation to obtain limits from the API
-	}
+	r := make(RateLimiter)
+	return &r
 }
 
-func (r RateLimiter) Wait(ctx context.Context, log *logp.Logger, url string) (err error) {
-	log.Debugw("rate limit", "limit", r.lim.Limit(), "burst", r.lim.Burst(), "url", url)
-	return r.lim.Wait(ctx)
+func (r RateLimiter) get(path string) *rate.Limiter {
+	if existing, ok := r[path]; ok {
+		return existing
+	}
+	initial := rate.NewLimiter(1, 1) // Allow a single fetch operation to obtain limits from the API
+	r[path] = initial
+	return initial
+}
+
+func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
+	limiter := r.get(endpoint)
+	log.Debugw("rate limit", "limit", limiter.Limit(), "burst", limiter.Burst(), "url", url.String())
+	return limiter.Wait(ctx)
 }
 
 // Update implements the Okta rate limit policy translation.
 //
 // See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
-func (r RateLimiter) Update(h http.Header, window time.Duration, log *logp.Logger) error {
+func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration, log *logp.Logger) error {
+	limiter := r.get(endpoint)
 	limit := h.Get("X-Rate-Limit-Limit")
 	remaining := h.Get("X-Rate-Limit-Remaining")
 	reset := h.Get("X-Rate-Limit-Reset")
@@ -72,13 +81,13 @@ func (r RateLimiter) Update(h http.Header, window time.Duration, log *logp.Logge
 		// estimate will be overwritten when we make the next
 		// permissible API request.
 		next := rate.Limit(lim / window.Seconds())
-		r.lim.SetLimitAt(waitUntil, next)
-		r.lim.SetBurstAt(waitUntil, burst)
+		limiter.SetLimitAt(waitUntil, next)
+		limiter.SetBurstAt(waitUntil, burst)
 		log.Debugw("rate limit adjust", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
 		return nil
 	}
-	r.lim.SetLimit(rateLimit)
-	r.lim.SetBurst(burst)
+	limiter.SetLimit(rateLimit)
+	limiter.SetBurst(burst)
 	log.Debugw("rate limit adjust", "set_rate", rateLimit, "set_burst", burst)
 	return nil
 }

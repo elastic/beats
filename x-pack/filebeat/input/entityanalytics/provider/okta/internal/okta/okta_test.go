@@ -22,6 +22,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"golang.org/x/time/rate"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -374,12 +375,21 @@ func TestLocal(t *testing.T) {
 				t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
 			}
 
-			lim := limiter.lim.Limit()
-			if lim < 49.0/60.0 || 50.0/60.0 < lim {
-				t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", lim)
+			var limit rate.Limit
+			var burst int
+			if len(*limiter) != 1 {
+				t.Errorf("unexpected number endpoints track by rate limiter: %d", len(*limiter))
 			}
-			if limiter.lim.Burst() != 1 {
-				t.Errorf("unexpected burst: got:%d want:1", limiter.lim.Burst())
+			for _, l := range *limiter {
+				limit = l.Limit()
+				burst = l.Burst()
+				break
+			}
+			if limit < 49.0/60.0 || 50.0/60.0 < limit {
+				t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", limit)
+			}
+			if burst != 1 {
+				t.Errorf("unexpected burst: got:%d want:1", burst)
 			}
 
 			next, err := Next(h)
