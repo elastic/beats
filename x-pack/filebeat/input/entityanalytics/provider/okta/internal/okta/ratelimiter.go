@@ -25,16 +25,9 @@ func NewRateLimiter() *RateLimiter {
 	}
 }
 
-func (r RateLimiter) Wait(ctx context.Context) (err error) {
+func (r RateLimiter) Wait(ctx context.Context, log *logp.Logger, url string) (err error) {
+	log.Debugw("rate limit", "limit", r.lim.Limit(), "burst", r.lim.Burst(), "url", url)
 	return r.lim.Wait(ctx)
-}
-
-func (r RateLimiter) Limit() rate.Limit {
-	return r.lim.Limit()
-}
-
-func (r RateLimiter) Burst() int {
-	return r.lim.Burst()
 }
 
 // Update implements the Okta rate limit policy translation.

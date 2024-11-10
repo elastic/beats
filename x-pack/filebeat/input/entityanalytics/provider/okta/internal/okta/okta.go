@@ -367,8 +367,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
 
-	log.Debugw("rate limit", "limit", lim.Limit(), "burst", lim.Burst(), "url", url)
-	err = lim.Wait(ctx)
+	err = lim.Wait(ctx, log, url)
 	if err != nil {
 		return nil, nil, err
 	}
