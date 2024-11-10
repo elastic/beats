@@ -382,6 +382,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
 - Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 *Metricbeat*
 
