@@ -271,6 +271,7 @@ func mapToEvents(metrics []Metric, client *Client, reporter mb.ReporterV2) error
 		referencePoint := _points[0]
 
 		// Look up the full cloud resource information in the cache.
+		// FIXME: update to use the new cache.
 		resource := client.LookupResource(referencePoint.ResourceId)
 
 		// Build the event using all the information we have.
@@ -284,7 +285,7 @@ func mapToEvents(metrics []Metric, client *Client, reporter mb.ReporterV2) error
 		//
 		if client.Config.AddCloudMetadata {
 			vm := client.GetVMForMetadata(&resource, referencePoint)
-			addCloudVMMetadata(&event, vm, resource.Subscription)
+			addCloudVMMetadata(&event, vm, resource.SubscriptionID)
 		}
 
 		//
@@ -307,7 +308,7 @@ func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resour
 				"group": resource.Group,
 				"name":  resource.Name,
 			},
-			"subscription_id": resource.Subscription,
+			"subscription_id": resource.SubscriptionID,
 		},
 		MetricSetFields: mapstr.M{},
 		Timestamp:       referencePoint.Timestamp,

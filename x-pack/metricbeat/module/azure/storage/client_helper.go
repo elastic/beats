@@ -6,9 +6,7 @@ package storage
 
 import (
 	"fmt"
-
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -17,7 +15,8 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+// func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func mapMetrics(client *azure.Client, resources *[]azure.Resource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}
@@ -31,26 +30,30 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			namespaces = append(namespaces, fmt.Sprintf("%s%s", defaultStorageAccountNamespace, service))
 		}
 	}
-	for _, resource := range resources {
+	for _, resource := range *resources {
 		for _, namespace := range namespaces {
 			// resourceID will be different for a  serviceType namespace, format will be resourceID/service/default
-			var resourceID = *resource.ID
+			var resourceID = resource.Id
 
 			if i := retrieveServiceNamespace(namespace); i != "" {
 				resourceID += i + resourceIDExtension
 			}
 
 			// get all metric definitions supported by the namespace provided
-			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceID, namespace)
+			metricDefinitions, throttled, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resourceID, namespace)
 			if err != nil {
 				return nil, err
+			}
+
+			if throttled {
+				return metrics, nil
 			}
 
 			if len(metricDefinitions.Value) == 0 {
 				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s", resourceID, namespace)
 			}
 
-			var filteredMetricDefinitions []armmonitor.MetricDefinition
+			var filteredMetricDefinitions []azquery.MetricDefinition
 			for _, metricDefinition := range metricDefinitions.Value {
 				filteredMetricDefinitions = append(filteredMetricDefinitions, *metricDefinition)
 			}
@@ -69,22 +72,32 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 						dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 					}
 
-					metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, *resource.ID, resourceID, namespace, dimensions, time)...)
+					metrics = append(metrics, client.MapMetricByPrimaryAggregation(
+						mets,
+						resource.Id,
+						resource.SubscriptionID,
+						resource.Location,
+						resourceID,
+						namespace,
+						dimensions,
+						time,
+					)...)
 				}
 			}
 		}
 	}
+
 	return metrics, nil
 }
 
 // groupOnTimeGrain - some metrics do not support the default timegrain value so the closest supported timegrain will be selected
-func groupOnTimeGrain(list []armmonitor.MetricDefinition) map[string][]armmonitor.MetricDefinition {
-	var groupedList = make(map[string][]armmonitor.MetricDefinition)
+func groupOnTimeGrain(list []azquery.MetricDefinition) map[string][]azquery.MetricDefinition {
+	var groupedList = make(map[string][]azquery.MetricDefinition)
 
 	for _, metric := range list {
 		timegrain := retrieveSupportedMetricAvailability(metric.MetricAvailabilities)
 		if _, ok := groupedList[timegrain]; !ok {
-			groupedList[timegrain] = make([]armmonitor.MetricDefinition, 0)
+			groupedList[timegrain] = make([]azquery.MetricDefinition, 0)
 		}
 		groupedList[timegrain] = append(groupedList[timegrain], metric)
 	}
@@ -92,7 +105,7 @@ func groupOnTimeGrain(list []armmonitor.MetricDefinition) map[string][]armmonito
 }
 
 // retrieveSupportedMetricAvailability func will return the default timegrain if supported, else will return the next timegrain
-func retrieveSupportedMetricAvailability(availabilities []*armmonitor.MetricAvailability) string {
+func retrieveSupportedMetricAvailability(availabilities []*azquery.MetricAvailability) string {
 	// common case in metrics supported by storage account - one availability
 	if len(availabilities) == 1 {
 		return *availabilities[0].TimeGrain
@@ -121,7 +134,7 @@ func retrieveServiceNamespace(item string) string {
 }
 
 // filterAllowedDimension func will filter out all unallowed dimensions
-func filterAllowedDimension(metric armmonitor.MetricDefinition) []string {
+func filterAllowedDimension(metric azquery.MetricDefinition) []string {
 	if metric.Dimensions == nil {
 		return nil
 	}
@@ -137,19 +150,19 @@ func filterAllowedDimension(metric armmonitor.MetricDefinition) []string {
 }
 
 // groupMetricsByAllowedDimensions will group metrics by dimension names in order to reduce the number of api calls
-func groupMetricsByAllowedDimensions(metrics []armmonitor.MetricDefinition) map[string][]armmonitor.MetricDefinition {
-	var groupedMetrics = make(map[string][]armmonitor.MetricDefinition)
+func groupMetricsByAllowedDimensions(metrics []azquery.MetricDefinition) map[string][]azquery.MetricDefinition {
+	var groupedMetrics = make(map[string][]azquery.MetricDefinition)
 	for _, metric := range metrics {
 		if dimensions := filterAllowedDimension(metric); len(dimensions) > 0 {
 			for _, dimension := range dimensions {
 				if _, ok := groupedMetrics[dimension]; !ok {
-					groupedMetrics[dimension] = make([]armmonitor.MetricDefinition, 0)
+					groupedMetrics[dimension] = make([]azquery.MetricDefinition, 0)
 				}
 				groupedMetrics[dimension] = append(groupedMetrics[dimension], metric)
 			}
 		} else {
 			if _, ok := groupedMetrics[azure.NoDimension]; !ok {
-				groupedMetrics[azure.NoDimension] = make([]armmonitor.MetricDefinition, 0)
+				groupedMetrics[azure.NoDimension] = make([]azquery.MetricDefinition, 0)
 			}
 			groupedMetrics[azure.NoDimension] = append(groupedMetrics[azure.NoDimension], metric)
 		}

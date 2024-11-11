@@ -6,6 +6,7 @@ package azure
 
 import (
 	"errors"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"testing"
 	"time"
 
@@ -321,4 +322,17 @@ func TestBuildBuildTimespan(t *testing.T) {
 		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
 	})
 
+}
+
+// NewMockClient instantiates a new client with the mock azure service
+func NewMockClient() *Client {
+	azureMockService := new(MockService)
+	logger := logp.NewLogger("test azure monitor")
+	client := &Client{
+		AzureMonitorService: azureMockService,
+		Config:              Config{},
+		Log:                 logger,
+		MetricRegistry:      NewMetricRegistry(logger),
+	}
+	return client
 }

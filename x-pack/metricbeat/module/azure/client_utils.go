@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"reflect"
 	"regexp"
 	"strings"
@@ -21,13 +22,15 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
+// func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
 		for _, t := range v.Timeseries {
 			for _, mv := range t.Data {
-				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
+				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
+				if metricIsEmpty(*mv) {
 					continue
 				}
 				//// remove metric values that are not part of the timeline selected
@@ -65,6 +68,52 @@ func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue)
 	return currentMetrics
 }
 
+func mapMetricValues2(metricValues *azmetrics.MetricValues) []MetricValue {
+	var currentMetrics []MetricValue
+	// compare with the previously returned values and filter out any double records
+	for _, v := range metricValues.Values {
+		for _, t := range v.TimeSeries {
+			for _, mv := range t.Data {
+				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
+				if metricIsEmpty2(*mv) {
+					continue
+				}
+				//// remove metric values that are not part of the timeline selected
+				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
+				//	continue
+				//}
+				// define the new metric value and match aggregations values
+				var val MetricValue
+				val.name = *v.Name.Value
+				val.timestamp = *mv.TimeStamp
+				if mv.Minimum != nil {
+					val.min = mv.Minimum
+				}
+				if mv.Maximum != nil {
+					val.max = mv.Maximum
+				}
+				if mv.Average != nil {
+					val.avg = mv.Average
+				}
+				if mv.Total != nil {
+					val.total = mv.Total
+				}
+				if mv.Count != nil {
+					val.count = mv.Count
+				}
+				if t.MetadataValues != nil {
+					for _, dim := range t.MetadataValues {
+						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
+					}
+				}
+				currentMetrics = append(currentMetrics, val)
+			}
+		}
+	}
+
+	return currentMetrics
+}
+
 // metricExists will check if the metric value has been retrieved in the past
 func metricExists(name string, metric armmonitor.MetricValue, metrics []MetricValue) bool {
 	for _, met := range metrics {
@@ -83,6 +132,14 @@ func metricExists(name string, metric armmonitor.MetricValue, metrics []MetricVa
 
 // metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
 func metricIsEmpty(metric armmonitor.MetricValue) bool {
+	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
+		return true
+	}
+	return false
+}
+
+// metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func metricIsEmpty2(metric azmetrics.MetricValue) bool {
 	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
 		return true
 	}

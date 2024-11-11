@@ -225,7 +225,7 @@ func GetResourcesTags(svc resourcegroupstaggingapi.GetResourcesAPIClient, resour
 	var page *resourcegroupstaggingapi.GetResourcesOutput
 	for paginator.HasMorePages() {
 		if page, err = paginator.NextPage(ctx); err != nil {
-			err = fmt.Errorf("error GetResources with Paginator: %w", err)
+			err = fmt.Errorf("error RefreshResources with Paginator: %w", err)
 			return nil, err
 		}
 

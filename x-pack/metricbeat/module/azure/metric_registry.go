@@ -7,6 +7,7 @@ package azure
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -16,6 +17,7 @@ import (
 func NewMetricRegistry(logger *logp.Logger) *MetricRegistry {
 	return &MetricRegistry{
 		logger:          logger,
+		mutex:           &sync.Mutex{},
 		collectionsInfo: make(map[string]MetricCollectionInfo),
 		jitter:          1 * time.Second,
 	}
@@ -28,6 +30,7 @@ func NewMetricRegistry(logger *logp.Logger) *MetricRegistry {
 // when the time grain is larger than the collection interval.
 type MetricRegistry struct {
 	logger          *logp.Logger
+	mutex           *sync.Mutex
 	collectionsInfo map[string]MetricCollectionInfo
 	// The collection period can be jittered by a second.
 	// We introduce a small jitter to avoid skipping collections
@@ -39,12 +42,16 @@ type MetricRegistry struct {
 // Update updates the metric registry with the latest timestamp and
 // time grain for the given metric.
 func (m *MetricRegistry) Update(metric Metric, info MetricCollectionInfo) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	m.collectionsInfo[m.buildMetricKey(metric)] = info
 }
 
 // NeedsUpdate returns true if the metric needs to be collected again
 // for the given `referenceTime`.
 func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) bool {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	// Build a key to store the metric in the registry.
 	// The key is a combination of the namespace,
 	// resource ID and metric names.
@@ -59,38 +66,38 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		timeSinceLastCollection := time.Since(lastCollection.timestamp) + m.jitter
 
 		if timeSinceLastCollection < timeGrainDuration {
-			m.logger.Debugw(
-				"MetricRegistry: Metric does not need an update",
-				"needs_update", false,
-				"reference_time", referenceTime,
-				"last_collection_time", lastCollection.timestamp,
-				"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
-				"time_grain", lastCollection.timeGrain,
-				"time_grain_duration_seconds", timeGrainDuration.Seconds(),
-				"resource_id", metric.ResourceId,
-				"namespace", metric.Namespace,
-				"aggregation", metric.Aggregations,
-				"names", strings.Join(metric.Names, ","),
-			)
+			//m.logger.Debugw(
+			//	"MetricRegistry: Metric does not need an update",
+			//	"needs_update", false,
+			//	"reference_time", referenceTime,
+			//	"last_collection_time", lastCollection.timestamp,
+			//	"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
+			//	"time_grain", lastCollection.timeGrain,
+			//	"time_grain_duration_seconds", timeGrainDuration.Seconds(),
+			//	"resource_id", metric.ResourceId,
+			//	"namespace", metric.Namespace,
+			//	"aggregation", metric.Aggregations,
+			//	"names", strings.Join(metric.Names, ","),
+			//)
 
 			return false
 		}
 
 		// The last collection time is before the start time of the time grain,
 		// it means that the metricset needs to collect the metric values again.
-		m.logger.Debugw(
-			"MetricRegistry: Metric needs an update",
-			"needs_update", true,
-			"reference_time", referenceTime,
-			"last_collection_time", lastCollection.timestamp,
-			"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
-			"time_grain", lastCollection.timeGrain,
-			"time_grain_duration_seconds", timeGrainDuration.Seconds(),
-			"resource_id", metric.ResourceId,
-			"namespace", metric.Namespace,
-			"aggregation", metric.Aggregations,
-			"names", strings.Join(metric.Names, ","),
-		)
+		//m.logger.Debugw(
+		//	"MetricRegistry: Metric needs an update",
+		//	"needs_update", true,
+		//	"reference_time", referenceTime,
+		//	"last_collection_time", lastCollection.timestamp,
+		//	"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
+		//	"time_grain", lastCollection.timeGrain,
+		//	"time_grain_duration_seconds", timeGrainDuration.Seconds(),
+		//	"resource_id", metric.ResourceId,
+		//	"namespace", metric.Namespace,
+		//	"aggregation", metric.Aggregations,
+		//	"names", strings.Join(metric.Names, ","),
+		//)
 
 		return true
 	}

@@ -8,9 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
-
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -18,27 +16,33 @@ import (
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+// func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func mapMetrics(client *azure.Client, resources *[]azure.Resource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 
-	for _, resource := range resources {
+	for _, resource := range *resources {
 
 		// We use this map to avoid calling the metrics definition function for the same namespace and same resource
 		// multiple times.
-		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
+		namespaceMetrics := make(map[string]azquery.MetricDefinitionCollection)
 
 		for _, metric := range resourceConfig.Metrics {
-
 			var err error
 
-			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
-			if !exists {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
+			if _, exists := namespaceMetrics[metric.Namespace]; !exists {
+				metricDefinitions, _, err := client.AzureMonitorService.GetMetricDefinitionsWithRetry(resource.Id, metric.Namespace)
 				if err != nil {
 					return nil, err
 				}
+
+				//if throttled {
+				//	return metrics, nil
+				//}
+
 				namespaceMetrics[metric.Namespace] = metricDefinitions
 			}
+
+			metricDefinitions := namespaceMetrics[metric.Namespace]
 
 			if len(metricDefinitions.Value) == 0 {
 				if metric.IgnoreUnsupported {
@@ -50,7 +54,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			// validate metric names and filter on the supported metrics
-			supportedMetricNames, err := filterMetricNames(*resource.ID, metric, metricDefinitions.Value)
+			supportedMetricNames, err := filterMetricNames(resource.Id, metric, metricDefinitions.Value)
 			if err != nil {
 				return nil, err
 			}
@@ -73,7 +77,17 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 				for _, metricName := range metricGroup {
 					metricNames = append(metricNames, *metricName.Name.Value)
 				}
-				metrics = append(metrics, client.CreateMetric(*resource.ID, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+				metrics = append(metrics, client.CreateMetricDefinition(
+					resource.Id,
+					"",
+					resource.SubscriptionID,
+					resource.Location,
+					metric.Namespace,
+					metricNames,
+					key,
+					dim,
+					metric.Timegrain,
+				))
 			}
 		}
 	}
@@ -82,7 +96,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 }
 
 // filterMetricNames func will verify if the metric names entered are valid and will also return the corresponding list of metrics
-func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []*armmonitor.MetricDefinition) ([]string, error) {
+func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metricDefinitions []*azquery.MetricDefinition) ([]string, error) {
 	var supportedMetricNames []string
 	var unsupportedMetricNames []string
 	// If users selected the wildcard option (*), we add
@@ -106,7 +120,7 @@ func filterMetricNames(resourceId string, metricConfig azure.MetricConfig, metri
 }
 
 // filterConfiguredMetrics will filter out any unsupported metrics based on the namespace selected
-func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.MetricDefinition) ([]string, []string) {
+func filterConfiguredMetrics(selectedRange []string, allRange []*azquery.MetricDefinition) ([]string, []string) {
 	var inRange []string
 	var notInRange []string
 	var allMetrics string
@@ -127,11 +141,11 @@ func filterConfiguredMetrics(selectedRange []string, allRange []*armmonitor.Metr
 func filterOnSupportedAggregations(
 	metricNames []string,
 	metricConfig azure.MetricConfig,
-	metricDefinitions []*armmonitor.MetricDefinition,
-) (map[string][]*armmonitor.MetricDefinition, error) {
+	metricDefinitions []*azquery.MetricDefinition,
+) (map[string][]*azquery.MetricDefinition, error) {
 	var supportedAggregations []string
 	var unsupportedAggregations []string
-	metricGroups := make(map[string][]*armmonitor.MetricDefinition)
+	metricGroups := make(map[string][]*azquery.MetricDefinition)
 	metricDefs := getMetricDefinitionsByNames(metricDefinitions, metricNames)
 
 	if len(metricConfig.Aggregations) == 0 {
@@ -155,7 +169,7 @@ func filterOnSupportedAggregations(
 }
 
 // filterAggregations will filter out any unsupported aggregations based on the metrics selected
-func filterAggregations(selectedRange []string, metrics []*armmonitor.MetricDefinition) ([]string, []string) {
+func filterAggregations(selectedRange []string, metrics []*azquery.MetricDefinition) ([]string, []string) {
 	var difference []string
 	var supported = []string{"Average", "Maximum", "Minimum", "Count", "Total"}
 
@@ -200,8 +214,8 @@ func intersections(supported, selected []string) ([]string, []string) {
 }
 
 // getMetricDefinitionsByNames is a helper method, will compare 2 slices and return their intersection
-func getMetricDefinitionsByNames(metricDefs []*armmonitor.MetricDefinition, names []string) []*armmonitor.MetricDefinition {
-	var metrics []*armmonitor.MetricDefinition
+func getMetricDefinitionsByNames(metricDefs []*azquery.MetricDefinition, names []string) []*azquery.MetricDefinition {
+	var metrics []*azquery.MetricDefinition
 	for _, def := range metricDefs {
 		for _, supportedName := range names {
 			if *def.Name.Value == supportedName {

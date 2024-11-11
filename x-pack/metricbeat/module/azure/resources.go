@@ -11,15 +11,22 @@ import (
 
 // Resource will contain the main azure resource details
 type Resource struct {
-	Id           string
-	Name         string
-	Location     string
-	Group        string
-	Tags         map[string]string
-	Subscription string
-	Type         string
+	Id                        string
+	Name                      string
+	Location                  string
+	Group                     string
+	Tags                      map[string]string
+	SubscriptionID            string
+	Type                      string
+	MetricsDefinitionsUpdated time.Time
 	// will be filled if cloud data is necessary, atm only in case of compute_vm and compute_vm_scaleset
 	Vms []VmResource
+}
+
+type ResourceInfo struct {
+	resource           Resource
+	definitions        []Metric
+	definitionsUpdated time.Time
 }
 
 // VmResource contains details specific to a vm type of resource
@@ -31,13 +38,16 @@ type VmResource struct {
 
 // Metric will contain the main azure metric details
 type Metric struct {
-	Namespace    string
-	Names        []string
-	Aggregations string
-	Dimensions   []Dimension
-	Values       []MetricValue
-	TimeGrain    string
-	ResourceId   string
+	Namespace      string
+	SubscriptionID string
+	Location       string
+	Names          []string
+	Aggregations   string
+	Dimensions     []Dimension
+	//Values         []MetricValue
+	Values     []MetricValue
+	TimeGrain  string
+	ResourceId string
 	// ResourceSubId is used for the metric values api as namespaces can apply to sub resources ex. storage account: container, blob, vm scaleset: vms
 	ResourceSubId string
 }

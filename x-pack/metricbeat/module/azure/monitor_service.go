@@ -8,6 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/azquery"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"net/http"
 	"strings"
 	"time"
@@ -27,9 +29,10 @@ import (
 // MonitorService service wrapper to the azure sdk for go
 type MonitorService struct {
 	metricsClient          *armmonitor.MetricsClient
-	metricDefinitionClient *armmonitor.MetricDefinitionsClient
+	metricDefinitionClient *azquery.MetricsClient
 	metricNamespaceClient  *armmonitor.MetricNamespacesClient
 	resourceClient         *armresources.Client
+	queryResourceClient    *azmetrics.Client
 	context                context.Context
 	log                    *logp.Logger
 }
@@ -75,9 +78,15 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metrics client: %w", err)
 	}
 
-	metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
-		ClientOptions: clientOptions,
-	})
+	//metricsDefinitionClient, err := armmonitor.NewMetricDefinitionsClient(credential, &arm.ClientOptions{
+	//	ClientOptions: clientOptions,
+	//})
+	metricsDefinitionClient, err := azquery.NewMetricsClient(
+		credential,
+		&azquery.MetricsClientOptions{
+			ClientOptions: clientOptions,
+		},
+	)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create metric definitions client: %w", err)
 	}
@@ -96,11 +105,27 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
 	}
 
+	//https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics#NewClient
+	queryResourceClient, err := azmetrics.NewClient(
+		//"global",
+		"https://eastus2.metrics.monitor.azure.com",
+		//"https://westus3.metrics.monitor.azure.com",
+		credential,
+		&azmetrics.ClientOptions{
+			ClientOptions: clientOptions,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create query resources client: %w", err)
+
+	}
+
 	service := &MonitorService{
 		metricDefinitionClient: metricsDefinitionClient,
 		metricsClient:          metricsClient,
 		metricNamespaceClient:  metricNamespaceClient,
 		resourceClient:         resourceClient,
+		queryResourceClient:    queryResourceClient,
 		context:                context.Background(),
 		log:                    logp.NewLogger("azure monitor service"),
 	}
@@ -183,21 +208,44 @@ func (service MonitorService) GetResourceDefinitionById(id string) (armresources
 }
 
 // GetMetricNamespaces will return all supported namespaces based on the resource id and namespace
-func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonitor.MetricNamespaceCollection, error) {
-	pager := service.metricNamespaceClient.NewListPager(resourceId, nil)
+//func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonitor.MetricNamespaceCollection, error) {
+//	pager := service.metricNamespaceClient.NewListPager(resourceId, nil)
+//
+//	metricNamespaceCollection := armmonitor.MetricNamespaceCollection{}
+//
+//	for pager.More() {
+//		nextPage, err := pager.NextPage(service.context)
+//		if err != nil {
+//			return armmonitor.MetricNamespaceCollection{}, err
+//		}
+//
+//		metricNamespaceCollection.Value = append(metricNamespaceCollection.Value, nextPage.Value...)
+//	}
+//
+//	return metricNamespaceCollection, nil
+//}
 
-	metricNamespaceCollection := armmonitor.MetricNamespaceCollection{}
-
-	for pager.More() {
-		nextPage, err := pager.NextPage(service.context)
-		if err != nil {
-			return armmonitor.MetricNamespaceCollection{}, err
-		}
-
-		metricNamespaceCollection.Value = append(metricNamespaceCollection.Value, nextPage.Value...)
+func (service *MonitorService) isThrottle(err error) bool {
+	var respError *azcore.ResponseError
+	ok := errors.As(err, &respError)
+	if !ok {
+		return false
 	}
 
-	return metricNamespaceCollection, nil
+	// Check for TooManyRequests error and retry if it is the case
+	if respError.StatusCode != http.StatusTooManyRequests {
+		return true
+	}
+
+	return false
+}
+
+type ThrottlingError struct {
+	End time.Time
+}
+
+func (e ThrottlingError) Error() string {
+	return fmt.Sprintf("throttling error: start sending new request at %v", e.End)
 }
 
 // sleepIfPossible will check for the error 429 in the azure response, and look for the retry after header.
@@ -227,39 +275,157 @@ func (service *MonitorService) sleepIfPossible(err error, resourceId string, nam
 		return fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
 	}
 
-	service.log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
-	time.Sleep(duration)
-	service.log.Infof("%s, metricbeat finished sleeping and will try again now", errorMsg)
+	//service.log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
+	//time.Sleep(duration)
+	//service.log.Infof("%s, metricbeat finished sleeping and will try again now", errorMsg)
+	return ThrottlingError{
+		End: time.Now().UTC().Add(duration),
+	}
 
-	return nil
+	//return nil
 }
 
 // GetMetricDefinitionsWithRetry will return all supported metrics based on the resource id and namespace
 // It will check for an error when moving the pager to the next page, and retry if possible.
-func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
-	opts := &armmonitor.MetricDefinitionsClientListOptions{}
+func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, namespace string) (azquery.MetricDefinitionCollection, bool, error) {
+	opts := &azquery.MetricsClientListDefinitionsOptions{}
 
 	if namespace != "" {
-		opts.Metricnamespace = &namespace
+		opts.MetricNamespace = &namespace
 	}
 
-	pager := service.metricDefinitionClient.NewListPager(resourceId, opts)
+	//pager := service.metricDefinitionClient.NewListPager(resourceId, opts)
+	pager := service.metricDefinitionClient.NewListDefinitionsPager(resourceId, opts)
 
-	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
+	//metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
+	metricDefinitionCollection := azquery.MetricDefinitionCollection{}
 
 	for pager.More() {
 		nextPage, err := pager.NextPage(service.context)
 		if err != nil {
 			retryError := service.sleepIfPossible(err, resourceId, namespace)
 			if retryError != nil {
-				return armmonitor.MetricDefinitionCollection{}, err
+				return azquery.MetricDefinitionCollection{}, true, err
 			}
 			continue
+			//if service.isThrottle(err) {
+			//	service.log.Warnf("Throttling error while retrieving the metric definitions from the resource %s ", resourceId)
+			//	return azquery.MetricDefinitionCollection{}, true, err
+			//}
 		}
 		metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
 	}
 
-	return metricDefinitionCollection, nil
+	return metricDefinitionCollection, false, nil
+}
+
+func (service *MonitorService) QueryResources(
+	resourceIDs []*string,
+	subscriptionID string,
+	namespace string,
+	timegrain string,
+	//timespan string,
+	startTime string,
+	endTime string,
+	metricNames []string,
+	aggregations string,
+	filter string) ([]*azmetrics.MetricValues, error) {
+
+	var tg *string
+	//var interval string
+
+	if timegrain != "" {
+		tg = &timegrain
+	}
+
+	// orderBy := ""
+	//resultTypeData := azmetrics.ResultTypeData
+
+	// check for limit of requested metrics (20)
+	//var metrics []armmonitor.Metric
+
+	// API fails with bad request if filter value is sent empty.
+	var metricsFilter *string
+	var top int32
+
+	if filter != "" {
+		metricsFilter = &filter
+		top = int32(10)
+	}
+
+	//for i := 0; i < len(metricNames); i += metricNameLimit {
+	//	end := i + metricNameLimit
+	//
+	//	if end > len(metricNames) {
+	//		end = len(metricNames)
+	//	}
+	//
+	//metricNames := strings.Join(metricNames[i:end], ",")
+
+	opts := azmetrics.QueryResourcesOptions{
+		Aggregation: &aggregations,
+		Filter:      metricsFilter,
+		Interval:    tg,
+		//Metricnames: &metricNames,
+		//Timespan:    &timespan,
+		StartTime: &startTime,
+		EndTime:   &endTime,
+
+		Top: &top,
+		// Orderby:         &orderBy,
+		//ResultType: &resultTypeData,
+	}
+
+	//if namespace != "" {
+	//	opts.Metricnamespace = &namespace
+	//}
+
+	resp := []*azmetrics.MetricValues{}
+
+	// len(resourceIDs) 5, 50, 500
+
+	// call the query resources client passing 50 resourceIDs at a time
+	for i := 0; i < len(resourceIDs); i += 50 {
+		end := i + 50
+
+		if end > len(resourceIDs) {
+			end = len(resourceIDs)
+		}
+
+		r, err := service.queryResourceClient.QueryResources(
+			service.context,
+			subscriptionID,
+			namespace,
+			//metricNames[i:end],
+			metricNames,
+			azmetrics.ResourceIDList{
+				ResourceIDs: resourceIDs[i:end],
+			},
+			&opts,
+		)
+
+		// check for applied charges before returning any errors
+		//if resp.Cost != nil && *resp.Cost != 0 {
+		//	service.log.Warnf("Charges amounted to %v are being applied while retrieving the metric values from the resource %s ", *resp.Cost, resourceId)
+		//}
+
+		if err != nil {
+			return nil, err
+		}
+
+		resp = append(resp, r.Values...)
+	}
+
+	//interval = *resp.Interval
+	//for _, v := range resp.Values {
+	//	//metrics = append(metrics, v)
+	//	fmt.Println(v)
+	//}
+	//
+	//}
+	//return metrics, nil
+
+	return resp, nil
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details

@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -88,6 +89,8 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	collectionStartTime := time.Now().UTC()
+
 	// Set the reference time for the current fetch.
 	//
 	// The reference time is used to calculate time intervals
@@ -104,42 +107,129 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// the metric_registry_test.go for more information.
 	referenceTime := time.Now().UTC()
 
-	// Initialize cloud resources and monitor metrics
-	// information.
-	//
-	// The client collects and stores:
-	// - existing cloud resource definitions (e.g. VMs, DBs, etc.)
-	// - metric definitions for the resources (e.g. CPU, memory, etc.)
-	//
-	// The metricset periodically refreshes the information
-	// after `RefreshListInterval` (default 600s for
-	// most metricsets).
-	err := m.Client.InitResources(m.MapMetrics)
+	// execute a function once
+
+	// Refresh the list of cloud resources.
+	resourceRefreshStartTime := time.Now().UTC()
+	err := m.Client.RefreshResources()
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting resources: %w", err)
+	}
+	resourceRefreshEndTime := time.Now().UTC()
+
+	//resourcesIDsWithDefinitions := make(chan string)
+
+	definitionRefreshStartTime := time.Now().UTC()
+	// sort the m.Client.Resources2 map by definition update time
+	r := []*ResourceInfo{}
+	for _, resourceInfo := range m.Client.Resources2 {
+		r = append(r, resourceInfo)
 	}
 
-	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
-		// error message is previously logged in the InitResources,
-		// no error event should be created
-		return nil
-	}
+	sort.Slice(r, func(i, j int) bool {
+		return r[i].definitionsUpdated.Before(r[j].definitionsUpdated)
+	})
 
-	// Group metric definitions by cloud resource ID.
+	//go func() {
+	//defer close(resourcesIDsWithDefinitions)
+	for _, resourceInfo := range r[:min(len(r), 50)] {
+		//s.getResourceMetricsDefinitions(ctx, resourceID)
+		go func(resourceInfo *ResourceInfo) {
+			err := m.Client.RefreshResourceMetricsDefinitions(resourceInfo.resource.Id, m.MapMetrics)
+			if err != nil {
+				m.Client.Log.Errorf("error getting resource metrics definitions: %v", err)
+			}
+		}(resourceInfo)
+
+		//resourcesIDsWithDefinitions <- resourceID
+	}
+	//}()
+	definitionRefreshEndTime := time.Now().UTC()
+
+	metricsDefinitions := m.Client.GetMetricsDefinitions()
+
+	metricsValuesStartTime := time.Now().UTC()
+	//metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinitions, report)
+	metricValues := m.Client.GetMetricValues2(referenceTime, metricsDefinitions, report)
+
+	if err := mapToEvents(metricValues, m.Client, report); err != nil {
+		m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+	}
+	metricsValuesEndTime := time.Now().UTC()
+
+	//var wg sync.WaitGroup
+	//for resourceID := range resourcesIDsWithDefinitions {
+	//	wg.Add(1)
+	//	go func(resourceID string) {
+	//		defer wg.Done()
+	//		metricsDefinitions := m.Client.Resources2[resourceID].definitions
+	//		m.Client.Log.Infow(
+	//			"Getting resource metrics values",
+	//			"resource_id", resourceID,
+	//			"reference_time", referenceTime,
+	//		)
 	//
-	// We group the metric definitions by resource ID to fetch
-	// metric values for each cloud resource in one API call.
-	metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
+	//		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinitions, report)
+	//
+	//		// Turns metric values into events and sends them to Elasticsearch.
+	//		if err := mapToEvents(metricValues, m.Client, report); err != nil {
+	//			m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+	//		}
+	//	}(resourceID)
+	//}
+	//wg.Wait()
 
-	for _, metricsDefinition := range metricsByResourceId {
-		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+	//
+	//// Initialize cloud resources and monitor metrics
+	//// information.
+	////
+	//// The client collects and stores:
+	//// - existing cloud resource definitions (e.g. VMs, DBs, etc.)
+	//// - metric definitions for the resources (e.g. CPU, memory, etc.)
+	////
+	//// The metricset periodically refreshes the information
+	//// after `RefreshListInterval` (default 600s for
+	//// most metricsets).
+	//err = m.Client.InitResources(m.MapMetrics)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//if len(m.Client.ResourceConfigurations.Metrics) == 0 {
+	//	// error message is previously logged in the InitResources,
+	//	// no error event should be created
+	//	return nil
+	//}
+	//
+	//// Group metric definitions by cloud resource ID.
+	////
+	//// We group the metric definitions by resource ID to fetch
+	//// metric values for each cloud resource in one API call.
+	//metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
+	//
+	//for _, metricsDefinition := range metricsByResourceId {
+	//	// Fetch metric values for each resource.
+	//	metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+	//
+	//	// Turns metric values into events and sends them to Elasticsearch.
+	//	if err := mapToEvents(metricValues, m.Client, report); err != nil {
+	//		return fmt.Errorf("error mapping metrics to events: %w", err)
+	//	}
+	//}
 
-		// Turns metric values into events and sends them to Elasticsearch.
-		if err := mapToEvents(metricValues, m.Client, report); err != nil {
-			return fmt.Errorf("error mapping metrics to events: %w", err)
-		}
-	}
+	collectionEndTime := time.Now().UTC()
+
+	// Report the collection time.
+	m.Client.Log.Infow(
+		"Collection completed",
+		"total_duration", collectionEndTime.Sub(collectionStartTime).Milliseconds(),
+		"resources_duration", resourceRefreshEndTime.Sub(resourceRefreshStartTime).Milliseconds(),
+		"definitions_duration", definitionRefreshEndTime.Sub(definitionRefreshStartTime).Milliseconds(),
+		"definitions_available", len(metricsDefinitions),
+		"values_duration", metricsValuesEndTime.Sub(metricsValuesStartTime).Milliseconds(),
+		"resource_count", len(m.Client.Resources2),
+		"throttling_ends_at", m.Client.EndOfMetricsDefinitionThrottling,
+	)
 
 	return nil
 }
