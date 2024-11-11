@@ -398,7 +398,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 	defer resp.Body.Close()
 	err = lim.Update(endpoint, resp.Header, window, log)
 	if err != nil {
-		io.Copy(io.Discard, resp.Body)
+		defer io.Copy(io.Discard, resp.Body)
 		return nil, nil, err
 	}
 

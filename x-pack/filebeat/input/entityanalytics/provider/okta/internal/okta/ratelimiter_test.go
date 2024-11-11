@@ -48,7 +48,10 @@ func TestRateLimiter(t *testing.T) {
 		}
 		window := time.Minute
 
-		r.Update(endpoint, headers, window, logp.L())
+		err := r.Update(endpoint, headers, window, logp.L())
+		if err != nil {
+			t.Errorf("Update returned error: %v", err)
+		}
 		limiter = r.get(endpoint)
 
 		if limiter.Allow() {

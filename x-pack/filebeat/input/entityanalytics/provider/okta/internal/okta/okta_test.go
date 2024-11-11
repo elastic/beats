@@ -444,7 +444,7 @@ var nextTests = []struct {
 func TestNext(t *testing.T) {
 	for i, test := range nextTests {
 		got, err := Next(test.header)
-		if err != test.wantErr {
+		if !errors.Is(err, test.wantErr) {
 			t.Errorf("unexpected ok result for %d: got:%v want:%v", i, err, test.wantErr)
 		}
 		if got.Encode() != test.want {
