@@ -38,8 +38,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type RenderConfig struct {
+	IsForwarded bool
+	Locale      uint32
+}
+
+type EventRenderer interface {
+	Render(handle EvtHandle) (event *winevent.Event, xml string, err error)
+	Close() error
+}
+
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
+	conf          RenderConfig
 	metadataCache *publisherMetadataCache
 	systemContext EvtHandle // Render context for system values.
 	userContext   EvtHandle // Render context for user values (event data).
@@ -47,7 +58,7 @@ type Renderer struct {
 }
 
 // NewRenderer returns a new Renderer.
-func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
+func NewRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	systemContext, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for system context: %w", err)
@@ -61,6 +72,7 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	rlog := log.Named("renderer")
 
 	return &Renderer{
+		conf:          conf,
 		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
 		systemContext: systemContext,
 		userContext:   userContext,
@@ -100,6 +112,10 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 
 	// Associate raw system properties to names (e.g. level=2 to Error).
 	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
+	if event.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		event.Level = EventLevel(event.LevelRaw).String()
+	}
 
 	eventData, fingerprint, err := r.renderUser(handle, event)
 	if err != nil {
@@ -112,7 +128,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	// Associate key names with the event data values.
 	r.addEventData(eventMeta, eventData, event)
 
-	if event.Message, err = r.formatMessage(md, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
+	if event.Message, err = r.formatMessage(md.Metadata, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
 		errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
 	}
 
@@ -324,7 +340,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 }
 
 // formatMessage adds the message to the event.
-func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
+func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
 	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
 	eventID uint16) (string, error,
 ) {
@@ -338,11 +354,13 @@ func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
 
 	// Fallback to the trying EvtFormatMessage mechanism.
 	// This is the path for forwarded events in RenderedText mode where the
-	// local publisher metadata is not present. NOTE that if the local publisher
-	// metadata exists it will be preferred over the RenderedText. A config
-	// option might be desirable to control this behavior.
+	// local publisher metadata is not present.
 	r.log.Debugf("Falling back to EvtFormatMessage for event ID %d.", eventID)
-	return getMessageString(publisherMeta.Metadata, eventHandle, 0, nil)
+	metadata := publisherMeta
+	if r.conf.IsForwarded {
+		metadata = nil
+	}
+	return getMessageString(metadata, eventHandle, 0, nil)
 }
 
 // formatMessageFromTemplate creates the message by executing the stored Go

@@ -44,7 +44,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, sysmon9File)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -62,7 +62,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, security4752File)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -108,7 +108,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, winErrorReportingFile)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -178,9 +178,9 @@ func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMiss
 		func() {
 			defer h.Close()
 
-			evt, err := renderer.Render(h)
+			evt, _, err := renderer.Render(h)
 			if err != nil {
-				md := renderer.metadataCache[evt.Provider.Name]
+				md, _ := renderer.metadataCache.getPublisherStore(evt.Provider.Name)
 				if !ignoreMissingMetadataError || md.Metadata != nil {
 					t.Fatalf("Render failed: %+v", err)
 				}
@@ -220,7 +220,7 @@ func BenchmarkRenderer(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		r, err := NewRenderer(NilHandle, logp.NewLogger("bench"))
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.NewLogger("bench"))
 		if err != nil {
 			log.Close()
 			itr.Close()
@@ -247,7 +247,7 @@ func BenchmarkRenderer(b *testing.B) {
 			}
 
 			// Render it.
-			_, err := r.Render(h)
+			_, _, err := r.Render(h)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -277,7 +277,7 @@ func BenchmarkRenderer(b *testing.B) {
 				}
 
 				// Render it.
-				_, err := r.Render(h)
+				_, _, err := r.Render(h)
 				if err != nil {
 					b.Fatal(err)
 				}
