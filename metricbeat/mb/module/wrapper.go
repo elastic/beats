@@ -308,21 +308,25 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 }
 
 func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporterV2) {
-	if err != nil {
+	switch {
+
+	case errors.As(err, &mb.PartialMetricsError{}):
 		reporter.Error(err)
-		if errors.As(err, &mb.PartialMetricsError{}) {
-			msw.consecutiveErrors = 0
-			// mark module as running if metrics are partially available and display the error message
-			msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-		} else {
-			msw.consecutiveErrors++
-			if msw.failureThreshold > 0 && msw.consecutiveErrors >= msw.failureThreshold {
-				// mark it as degraded for any other issue encountered
-				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
-			}
+		msw.consecutiveErrors = 0
+		// mark module as running if metrics are partially available and display the error message
+		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+
+	case err != nil:
+		reporter.Error(err)
+		msw.consecutiveErrors++
+		if msw.failureThreshold > 0 && msw.consecutiveErrors >= msw.failureThreshold {
+			// mark it as degraded for any other issue encountered
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 		}
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-	} else {
+
+	default:
 		msw.consecutiveErrors = 0
 		msw.module.UpdateStatus(status.Running, "")
 	}
