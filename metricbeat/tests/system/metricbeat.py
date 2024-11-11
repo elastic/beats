@@ -141,6 +141,7 @@ class BaseTest(TestCase):
             if field in event:
                 del event[fields]
 
+
 def supported_versions(path):
     """
     Returns variants information as expected by parameterized_class,
