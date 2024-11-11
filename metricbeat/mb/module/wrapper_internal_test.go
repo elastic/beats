@@ -20,11 +20,8 @@ package module
 import (
 	"context"
 	"errors"
-	"sync"
 	"testing"
-	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -325,92 +322,6 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 		})
 	}
 }
-
-func TestWrapperHandleFetchErrorAsync(t *testing.T) {
-
-	t.Skip("This test runs a mock wrapped metricset asynchronously. Preferring the synchronous test for now")
-
-	// Setup mock push reporter
-	mpr := new(mockPushReporterV2)
-
-	// Setup mock fetcher
-	mrf := new(mockReportingFetcher)
-	//mrf.On("Fetch", mpr).Return(nil)
-
-	//Setup mock reporter
-	mr := new(mockReporter)
-	//mr.On("StartFetchTimer").Return()
-	//mr.On("V2").Return(mpr)
-
-	// assert mocks expectations
-	t.Cleanup(func() {
-		mock.AssertExpectationsForObjects(t, mrf, mr, mpr)
-	})
-
-	// add metricset in registry
-	r := mb.NewRegister()
-	err := r.AddMetricSet(mockModuleName, mockMetricSetName, func(base mb.BaseMetricSet) (mb.MetricSet, error) {
-		mrf.BaseMetricSet = base
-		return mrf, nil
-	})
-	require.NoError(t, err)
-
-	hosts := []string{"testhost"}
-	c := newConfig(t, map[string]interface{}{
-		"module":     mockModuleName,
-		"metricsets": []string{mockMetricSetName},
-		"period":     "100ms",
-		"hosts":      hosts,
-		"health": map[string]interface{}{
-			"enabled":          true,
-			"failureThreshold": 2,
-		},
-	})
-
-	aModule, metricSets, err := mb.NewModule(c, r)
-	require.NoError(t, err)
-
-	mWrapper, err := NewWrapperForMetricSet(aModule, metricSets[0], WithMetricSetInfo())
-	require.NoError(t, err)
-
-	require.Len(t, mWrapper.MetricSets(), 1)
-
-	// run the metricset asynchronously
-	done := make(chan struct{})
-	output := mWrapper.Start(done)
-
-	wg := new(sync.WaitGroup)
-	outputConsumeLoop(t, wg, output, done, func(event beat.Event) {
-		t.Logf("received event: %v", event)
-	})
-	time.Sleep(1 * time.Second)
-
-	close(done)
-	wg.Wait()
-}
-
-func outputConsumeLoop(t *testing.T, wg *sync.WaitGroup, output <-chan beat.Event, done chan struct{}, ehf eventHandlingTestFunc) {
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			select {
-			case e := <-output:
-				ehf(e)
-			case <-done:
-				// finish consuming and return
-				t.Log("test done, consuming remaining events")
-				for e := range output {
-					ehf(e)
-				}
-				t.Log("done consuming events")
-				return
-			}
-		}
-	}()
-}
-
-type eventHandlingTestFunc func(beat.Event)
 
 func newConfig(t testing.TB, moduleConfig interface{}) *conf.C {
 	config, err := conf.NewConfigFrom(moduleConfig)
