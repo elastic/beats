@@ -139,7 +139,8 @@ class BaseTest(TestCase):
     def remove_fields(self, event: object, fields: list):
         for field in fields:
             if field in event:
-                del event[fields]
+                del event[field]
+
 
 
 def supported_versions(path):
