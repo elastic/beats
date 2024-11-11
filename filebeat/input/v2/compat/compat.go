@@ -24,6 +24,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand" // using for better performance
+	"strconv"
 	"sync"
 
 	"github.com/mitchellh/hashstructure"
@@ -73,12 +75,18 @@ func RunnerFactory(
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
-	_, err := f.loader.Configure(cfg)
+	// just check the config, therefore to avoid potential side effects (ID duplication)
+	// change the ID.
+	checkCfg, err := f.generateCheckConfig(cfg)
+	if err != nil {
+		f.log.Warnw(fmt.Sprintf("input V2 factory.CheckConfig failed to clone config before checking it. Original config will be checked, it might trigger an input duplication warning: %v", err), "original_config", conf.DebugString(cfg, true))
+	}
+	_, err = f.loader.Configure(checkCfg)
 	if err != nil {
 		return fmt.Errorf("runner factory could not check config: %w", err)
 	}
 
-	if err = f.loader.Delete(cfg); err != nil {
+	if err = f.loader.Delete(checkCfg); err != nil {
 		return fmt.Errorf(
 			"runner factory failed to delete an input after config check: %w",
 			err)
@@ -175,4 +183,25 @@ func configID(config *conf.C) (string, error) {
 	}
 
 	return fmt.Sprintf("%16X", id), nil
+}
+
+func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
+	testCfg, err := conf.NewConfigFrom(config)
+	if err != nil {
+		return config, fmt.Errorf("failed to create new config: %w", err)
+	}
+
+	// let's try to override the `inputID` field, if it fails, give up
+	inputID, err := testCfg.String("inputID", -1)
+	if err != nil {
+		return config, fmt.Errorf("failed to get 'inputID': %w", err)
+	}
+
+	// using math/rand for performance, generate a 0-9 string
+	err = testCfg.SetString("inputID", -1, inputID+strconv.Itoa(rand.Intn(10)))
+	if err != nil {
+		return config, fmt.Errorf("failed to set 'inputID': %w", err)
+	}
+
+	return testCfg, nil
 }
