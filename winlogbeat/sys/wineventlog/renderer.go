@@ -23,8 +23,9 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
-	"sync"
+	"syscall"
 	"text/template"
 	"time"
 	"unsafe"
@@ -93,11 +94,11 @@ func (r *Renderer) Close() error {
 }
 
 // Render renders the event handle into an Event.
-func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
+func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
 	event := &winevent.Event{}
 
 	if err := r.renderSystem(handle, event); err != nil {
-		return nil, fmt.Errorf("failed to render system properties: %w", err)
+		return nil, "", fmt.Errorf("failed to render system properties: %w", err)
 	}
 
 	// From this point on it will return both the event and any errors. It's
@@ -133,14 +134,9 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	}
 
 	if len(errs) > 0 {
-		return event, multierr.Combine(errs...)
-	}
-	return event, nil
-}
-
-
 		return event, "", multierr.Combine(errs...)
 	}
+	return event, "", nil
 }
 
 // renderSystem writes all the system context properties into the event.
@@ -374,4 +370,115 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 	}
 
 	return string(bb.Bytes()), nil
+}
+
+// XMLRenderer is used for converting event log handles into complete events.
+type XMLRenderer struct {
+	conf          RenderConfig
+	metadataCache *publisherMetadataCache
+	renderBuf     []byte
+	render        func(event EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+
+	log *logp.Logger
+}
+
+// NewXMLRenderer returns a new Renderer.
+func NewXMLRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) *XMLRenderer {
+	const renderBufferSize = 1 << 19 // 512KB, 256K wide characters
+	rlog := log.Named("xml_renderer")
+	r := &XMLRenderer{
+		conf:          conf,
+		renderBuf:     make([]byte, renderBufferSize),
+		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
+		log:           rlog,
+	}
+	// Forwarded events should be rendered using RenderEventXML. It is more
+	// efficient and does not attempt to use local message files for rendering
+	// the event's message.
+	switch conf.IsForwarded {
+	case true:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			return RenderEventXML(event, r.renderBuf, out)
+		}
+	case false:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			get := func(providerName string) EvtHandle {
+				md, _ := r.metadataCache.getPublisherStore(providerName)
+				return md.Metadata.Handle
+			}
+			return RenderEvent(event, conf.Locale, r.renderBuf, get, out)
+		}
+	}
+	return r
+}
+
+// Close closes all handles held by the Renderer.
+func (r *XMLRenderer) Close() error {
+	if r == nil {
+		return errors.New("closing nil renderer")
+	}
+	return r.metadataCache.close()
+}
+
+// Render renders the event handle into an Event.
+func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
+	// From this point on it will return both the event and any errors. It's
+	// critical to not drop data.
+	var errs []error
+
+	bb := sys.NewPooledByteBuffer()
+	defer bb.Free()
+
+	err := r.render(handle, bb)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	event := r.buildEventFromXML(bb.Bytes(), err)
+
+	// This always returns a non-nil value (even on error).
+	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	// Associate raw system properties to names (e.g. level=2 to Error).
+	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
+	if event.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		event.Level = EventLevel(event.LevelRaw).String()
+	}
+
+	if event.Message == "" && !r.conf.IsForwarded {
+		if event.Message, err = getMessageString(md.Metadata, handle, 0, nil); err != nil {
+			errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return event, string(bb.Bytes()), multierr.Combine(errs...)
+	}
+	return event, string(bb.Bytes()), nil
+}
+
+func (r *XMLRenderer) buildEventFromXML(x []byte, recoveredErr error) *winevent.Event {
+	e, err := winevent.UnmarshalXML(x)
+	if err != nil {
+		e.RenderErr = append(e.RenderErr, err.Error())
+	}
+
+	err = winevent.PopulateAccount(&e.User)
+	if err != nil {
+		r.log.Debugf("SID %s account lookup failed. %v",
+			e.User.Identifier, err)
+	}
+
+	if e.RenderErrorCode != 0 {
+		// Convert the render error code to an error message that can be
+		// included in the "error.message" field.
+		e.RenderErr = append(e.RenderErr, syscall.Errno(e.RenderErrorCode).Error())
+	} else if recoveredErr != nil {
+		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
+	}
+
+	return &e
 }
