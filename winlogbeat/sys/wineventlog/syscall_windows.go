@@ -442,10 +442,15 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	switch typ {
 	case EvtVarTypeNull:
 		return nil, nil
-	case EvtVarTypeString:
+	case EvtVarTypeString, EvtVarTypeEvtXml:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
 		s, err := sys.UTF16BytesToString(buf[offset:])
+		return s, err
+	case EvtVarTypeAnsiString:
+		addr := unsafe.Pointer(&buf[0])
+		offset := v.ValueAsUintPtr() - uintptr(addr)
+		s, err := sys.ANSIBytesToString(buf[offset:])
 		return s, err
 	case EvtVarTypeSByte:
 		return int8(v.ValueAsUint8()), nil
@@ -476,14 +481,27 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 			return false, nil
 		}
 		return true, nil
+	case EvtVarTypeBinary:
+		addr := unsafe.Pointer(&buf[0])
+		offset := v.ValueAsUintPtr() - uintptr(addr)
+		return sys.BinaryToString(buf[offset:]), nil
 	case EvtVarTypeGuid:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
 		guid := (*windows.GUID)(unsafe.Pointer(&buf[offset]))
 		copy := *guid
 		return copy, nil
+	case EvtVarTypeSizeT:
+		return v.ValueAsUintPtr(), nil
 	case EvtVarTypeFileTime:
 		ft := (*windows.Filetime)(unsafe.Pointer(&v.Value))
+		return time.Unix(0, ft.Nanoseconds()).UTC(), nil
+	case EvtVarTypeSysTime:
+		st := (*windows.Systemtime)(unsafe.Pointer(&v.Value))
+		var ft windows.Filetime
+		if err := sys.SystemTimeToFileTime(st, &ft); err != nil {
+			return nil, err
+		}
 		return time.Unix(0, ft.Nanoseconds()).UTC(), nil
 	case EvtVarTypeSid:
 		addr := unsafe.Pointer(&buf[0])

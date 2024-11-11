@@ -1175,6 +1175,15 @@ spec:
       cancel_intermediate_builds: false
       provider_settings:
         trigger_mode: none
+      env:
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+      schedules:
+        Weekly main:
+          branch: main
+          cronline: 0 0 * * 0
+          message: Weekly build of macOS tests
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -1220,12 +1229,6 @@ spec:
           message: Daily trigger of Beats AWS tests
           env:
             PIPELINES_TO_TRIGGER: 'beats-aws-tests'
-        Weekly run of macOS tests:
-          branch: main
-          cronline: 0 0 * * 0
-          message: Weekly trigger of Beats macOS tests
-          env:
-            PIPELINES_TO_TRIGGER: 'beats-macos-tests'
       skip_intermediate_builds: true
       provider_settings:
         trigger_mode: none
