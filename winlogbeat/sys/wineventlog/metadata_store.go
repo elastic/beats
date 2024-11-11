@@ -457,6 +457,82 @@ func (em *EventMetadata) equal(other *EventMetadata) bool {
 		eventDataNamesEqual(em.EventData, other.EventData)
 }
 
+type publisherMetadataCache struct {
+	// Mutex to guard the metadataCache. The other members are immutable.
+	mutex sync.RWMutex
+	// Cache of publisher metadata. Maps publisher names to stored metadata.
+	metadataCache map[string]*PublisherMetadataStore
+	locale        uint32
+	session       EvtHandle
+	log           *logp.Logger
+}
+
+func newPublisherMetadataCache(session EvtHandle, locale uint32, log *logp.Logger) *publisherMetadataCache {
+	return &publisherMetadataCache{
+		metadataCache: map[string]*PublisherMetadataStore{},
+		locale:        locale,
+		session:       session,
+		log:           log.Named("publisher_metadata_cache"),
+	}
+}
+
+// getPublisherStore returns a PublisherMetadataStore for the provider. It
+// never returns nil, as if it does not exists it tries to initialise it,
+// but may return an error if it couldn't open a publisher.
+func (c *publisherMetadataCache) getPublisherStore(publisher string) (*PublisherMetadataStore, error) {
+	var err error
+
+	// NOTE: This code uses double-check locking to elevate to a write-lock
+	// when a cache value needs initialized.
+	c.mutex.RLock()
+
+	// Lookup cached value.
+	md, found := c.metadataCache[publisher]
+	if !found {
+		// Elevate to write lock.
+		c.mutex.RUnlock()
+		c.mutex.Lock()
+		defer c.mutex.Unlock()
+
+		// Double-check if the condition changed while upgrading the lock.
+		md, found = c.metadataCache[publisher]
+		if found {
+			return md, nil
+		}
+
+		// Load metadata from the publisher.
+		md, err = NewPublisherMetadataStore(c.session, publisher, c.locale, c.log)
+		if err != nil {
+			// Return an empty store on error (can happen in cases where the
+			// log was forwarded and the provider doesn't exist on collector).
+			md = NewEmptyPublisherMetadataStore(publisher, c.log)
+			err = fmt.Errorf("failed to load publisher metadata for %v "+
+				"(returning an empty metadata store): %w", publisher, err)
+		}
+		c.metadataCache[publisher] = md
+	} else {
+		c.mutex.RUnlock()
+	}
+
+	return md, err
+}
+
+func (c *publisherMetadataCache) close() error {
+	if c == nil {
+		return nil
+	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	errs := []error{}
+	for _, md := range c.metadataCache {
+		if err := md.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return multierr.Combine(errs...)
+}
+
 // --- Template Funcs
 
 // eventParam return an event data value inside a text/template.

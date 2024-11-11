@@ -40,12 +40,7 @@ import (
 
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
-	// Mutex to guard the metadataCache. The other members are immutable.
-	mutex sync.RWMutex
-	// Cache of publisher metadata. Maps publisher names to stored metadata.
-	metadataCache map[string]*PublisherMetadataStore
-
-	session       EvtHandle // Session handle if working with remote log.
+	metadataCache *publisherMetadataCache
 	systemContext EvtHandle // Render context for system values.
 	userContext   EvtHandle // Render context for user values (event data).
 	log           *logp.Logger
@@ -63,12 +58,13 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for user context: %w", err)
 	}
 
+	rlog := log.Named("renderer")
+
 	return &Renderer{
-		metadataCache: map[string]*PublisherMetadataStore{},
-		session:       session,
+		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
 		systemContext: systemContext,
 		userContext:   userContext,
-		log:           log.Named("renderer"),
+		log:           rlog,
 	}, nil
 }
 
@@ -77,16 +73,11 @@ func (r *Renderer) Close() error {
 	if r == nil {
 		return errors.New("closing nil renderer")
 	}
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	errs := []error{r.systemContext.Close(), r.userContext.Close()}
-	for _, md := range r.metadataCache {
-		if err := md.Close(); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return multierr.Combine(errs...)
+	return multierr.Combine(
+		r.metadataCache.close(),
+		r.systemContext.Close(),
+		r.userContext.Close(),
+	)
 }
 
 // Render renders the event handle into an Event.
@@ -102,7 +93,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	var errs []error
 
 	// This always returns a non-nil value (even on error).
-	md, err := r.getPublisherMetadata(event.Provider.Name)
+	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
 	if err != nil {
 		errs = append(errs, err)
 	}
@@ -131,44 +122,9 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	return event, nil
 }
 
-// getPublisherMetadata return a PublisherMetadataStore for the provider. It
-// never returns nil, but may return an error if it couldn't open a publisher.
-func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataStore, error) {
-	var err error
 
-	// NOTE: This code uses double-check locking to elevate to a write-lock
-	// when a cache value needs initialized.
-	r.mutex.RLock()
-
-	// Lookup cached value.
-	md, found := r.metadataCache[publisher]
-	if !found {
-		// Elevate to write lock.
-		r.mutex.RUnlock()
-		r.mutex.Lock()
-		defer r.mutex.Unlock()
-
-		// Double-check if the condition changed while upgrading the lock.
-		md, found = r.metadataCache[publisher]
-		if found {
-			return md, nil
-		}
-
-		// Load metadata from the publisher.
-		md, err = NewPublisherMetadataStore(r.session, publisher, r.log)
-		if err != nil {
-			// Return an empty store on error (can happen in cases where the
-			// log was forwarded and the provider doesn't exist on collector).
-			md = NewEmptyPublisherMetadataStore(publisher, r.log)
-			err = fmt.Errorf("failed to load publisher metadata for %v "+
-				"(returning an empty metadata store): %w", publisher, err)
-		}
-		r.metadataCache[publisher] = md
-	} else {
-		r.mutex.RUnlock()
+		return event, "", multierr.Combine(errs...)
 	}
-
-	return md, err
 }
 
 // renderSystem writes all the system context properties into the event.
