@@ -752,11 +752,35 @@ func BenchmarkCompression(b *testing.B) {
 	)
 	assert.NoError(b, err)
 
-	event := beat.Event{Fields: mapstr.M{
-		"@timestamp": common.Time(time.Now()),
-		"type":       "libbeat",
-		"message":    "Test message from libbeat",
-	}}
+	event := beat.Event{
+		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
+		Meta: mapstr.M{
+			"a.b": "c",
+			"metaLevel0Map": mapstr.M{
+				"metaLevel1Map": mapstr.M{
+					"metaLevel2Value": "metavalue3",
+					"new1":            "newmetavalue1",
+				},
+			},
+			"metaLevel0Value":  "metareplaced1",
+			"metaLevel0Value2": "untouched",
+			"new2":             "newmetavalue2",
+		},
+		Fields: mapstr.M{
+			"a.b": "c",
+			"fieldsLevel0Map": mapstr.M{
+				"fieldsLevel1Map": mapstr.M{
+					"fieldsLevel2Value": "fieldsvalue3",
+					"new3":              "newfieldsvalue1",
+				},
+				"newmap": mapstr.M{
+					"new4": "newfieldsvalue2",
+				},
+			},
+			"fieldsLevel0Value":  "fieldsreplaced1",
+			"fieldsLevel0Value2": "untouched",
+		},
+	}
 
 	batch := encodeBatch(client, outest.NewBatch(event, event, event))
 
