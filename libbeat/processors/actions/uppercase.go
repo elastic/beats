@@ -28,20 +28,20 @@ import (
 
 func init() {
 	processors.RegisterPlugin(
-		"lowercase",
+		"uppercase",
 		checks.ConfigChecked(
-			NewLowerCaseProcessor,
+			NewUpperCaseProcessor,
 			checks.RequireFields("fields"),
 			checks.AllowedFields("fields", "ignore_missing", "fail_on_error", "alter_full_field", "values"),
 		),
 	)
 }
 
-// NewLowerCaseProcessor converts event keys matching the provided fields to lowercase
-func NewLowerCaseProcessor(c *conf.C) (beat.Processor, error) {
-	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
+// NewUpperCaseProcessor converts event keys matching the provided fields to uppercase
+func NewUpperCaseProcessor(c *conf.C) (beat.Processor, error) {
+	return NewAlterFieldProcessor(c, "uppercase", upperCase)
 }
 
-func lowerCase(field string) (string, error) {
-	return strings.ToLower(field), nil
+func upperCase(field string) (string, error) {
+	return strings.ToUpper(field), nil
 }
