@@ -142,7 +142,6 @@ class BaseTest(TestCase):
                 del event[field]
 
 
-
 def supported_versions(path):
     """
     Returns variants information as expected by parameterized_class,
