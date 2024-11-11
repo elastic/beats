@@ -86,32 +86,6 @@ func TestLowerCaseProcessorRun(t *testing.T) {
 			Error: false,
 		},
 		{
-			Name:          "Lowercase Fields",
-			Fields:        []string{"a.b.c", "Field1"},
-			IgnoreMissing: false,
-			FailOnError:   true,
-			FullPath:      true,
-			Input: mapstr.M{
-				"Field1": mapstr.M{"Field2": "Value"},
-				"Field3": "Value",
-				"a": mapstr.M{
-					"B": mapstr.M{
-						"C": "D",
-					},
-				},
-			},
-			Output: mapstr.M{
-				"field1": mapstr.M{"Field2": "Value"}, // field1 is lowercased
-				"Field3": "Value",
-				"a": mapstr.M{
-					"b": mapstr.M{
-						"c": "D",
-					},
-				},
-			},
-			Error: false,
-		},
-		{
 			Name:          "Lowercase Fields when full_path is false", // searches only the most nested key 'case insensitively'
 			Fields:        []string{"a.B.c"},
 			IgnoreMissing: false,

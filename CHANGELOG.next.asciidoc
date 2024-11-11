@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use {pull}41356[41356]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
+- Add `translate_ldap_attribute` processor. {pull}41472[41472]
 
 *Auditbeat*
 
@@ -171,6 +172,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 
 *Heartbeat*
 
@@ -237,7 +240,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
-
+- Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
 *Auditbeat*
 
 - Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
