@@ -76,14 +76,18 @@ func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration
 
 	// Process reset if we need to wait until reset to avoid a request against a zero quota.
 	if rateLimit <= 0 {
-		waitUntil := resetTime.UTC()
+		// Reset limiter to block requests until reset
+		limiter := rate.NewLimiter(0, 0)
+		r[endpoint] = limiter
+
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
 		// permissible API request.
 		next := rate.Limit(lim / window.Seconds())
+		waitUntil := resetTime.UTC()
 		limiter.SetLimitAt(waitUntil, next)
 		limiter.SetBurstAt(waitUntil, burst)
-		log.Debugw("rate limit adjust", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
+		log.Debugw("rate limit reset", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
 		return nil
 	}
 	limiter.SetLimit(rateLimit)
