@@ -169,13 +169,13 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 		},
 		{
-			name: "failureThreshold = 2: status DEGRADED at the 3rd error",
+			name: "failureThreshold = 3: status DEGRADED at the 3rd error",
 			config: newConfig(t, map[string]interface{}{
 				"module":           mockModuleName,
 				"metricsets":       []string{mockMetricSetName},
 				"period":           "100ms",
 				"hosts":            []string{"testhost"},
-				"failureThreshold": 2,
+				"failureThreshold": 3,
 			}),
 			setup: func(t *testing.T, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
 				// fetcher will immediately error out 3 times in a row
@@ -197,13 +197,13 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 		},
 		{
-			name: "failureThreshold = 2: status HEALTHY after 2 errors, 1 success and 2 more errors, DEGRADED at the 3rd consecutive error",
+			name: "failureThreshold = 3: status HEALTHY after 2 errors, 1 success and 2 more errors, DEGRADED at the 3rd consecutive error",
 			config: newConfig(t, map[string]interface{}{
 				"module":           mockModuleName,
 				"metricsets":       []string{mockMetricSetName},
 				"period":           "100ms",
 				"hosts":            []string{"testhost"},
-				"failureThreshold": 2,
+				"failureThreshold": 3,
 			}),
 			setup: func(t *testing.T, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
 				// fetcher will error out 2 times in a row
@@ -235,13 +235,13 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 			},
 		},
 		{
-			name: "failureThreshold = -1: stream status update never become DEGRADED",
+			name: "failureThreshold = 0: stream status update never become DEGRADED",
 			config: newConfig(t, map[string]interface{}{
 				"module":           mockModuleName,
 				"metricsets":       []string{mockMetricSetName},
 				"period":           "100ms",
 				"hosts":            []string{"testhost"},
-				"failureThreshold": -1,
+				"failureThreshold": 0,
 			}),
 			setup: func(t *testing.T, fetcher *mockReportingFetcher, pushReporter *mockPushReporterV2, statusReporter *mockStatusReporter) {
 				// fetcher will error out 9 times in a row

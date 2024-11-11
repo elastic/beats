@@ -71,9 +71,9 @@ type metricSetWrapper struct {
 	stats  *stats   // stats for this MetricSet.
 
 	periodic         bool // Set to true if this metricset is a periodic fetcher
-	failureThreshold int  // threshold of consecutive errors needed to set the stream as degraded
+	failureThreshold uint // threshold of consecutive errors needed to set the stream as degraded
 
-	consecutiveErrors int // consecutive errors counter
+	consecutiveErrors uint // consecutive errors counter
 }
 
 // stats bundles common metricset stats.
@@ -105,19 +105,24 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 		metricSets: make([]*metricSetWrapper, len(metricSets)),
 	}
 
-	//FIXME provide proper struct
-	var hs struct {
-		FailureThreshold int `config:"failureThreshold"`
+	for _, applyOption := range options {
+		applyOption(wrapper)
 	}
 
-	err := module.UnpackConfig(&hs)
+	failureThreshold := uint(1)
+
+	var streamHealthSettings struct {
+		FailureThreshold *uint `config:"failureThreshold"`
+	}
+
+	err := module.UnpackConfig(&streamHealthSettings)
 
 	if err != nil {
 		return nil, fmt.Errorf("unpacking raw config: %w", err)
 	}
 
-	for _, applyOption := range options {
-		applyOption(wrapper)
+	if streamHealthSettings.FailureThreshold != nil {
+		failureThreshold = *streamHealthSettings.FailureThreshold
 	}
 
 	for i, metricSet := range metricSets {
@@ -125,7 +130,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 			MetricSet:        metricSet,
 			module:           wrapper,
 			stats:            getMetricSetStats(wrapper.Name(), metricSet.Name()),
-			failureThreshold: hs.FailureThreshold,
+			failureThreshold: failureThreshold,
 		}
 	}
 	return wrapper, nil
@@ -311,7 +316,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 			msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 		} else {
 			msw.consecutiveErrors++
-			if msw.failureThreshold >= 0 && msw.consecutiveErrors > msw.failureThreshold {
+			if msw.failureThreshold > 0 && msw.consecutiveErrors >= msw.failureThreshold {
 				// mark it as degraded for any other issue encountered
 				msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 			}
