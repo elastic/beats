@@ -713,7 +713,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	}
 }
 
-func BenchmarkCompression(b *testing.B) {
+func BenchmarkPublish(b *testing.B) {
 	requestCount := 0
 
 	// start a mock HTTP server
@@ -735,22 +735,6 @@ func BenchmarkCompression(b *testing.B) {
 		requestCount++
 	}))
 	defer ts.Close()
-
-	client, err := NewClient(
-		clientSettings{
-			connection: eslegclient.ConnectionSettings{
-				URL: ts.URL,
-				Headers: map[string]string{
-					"host":   "myhost.local",
-					"X-Test": "testing value",
-				},
-				CompressionLevel: 1,
-			},
-		},
-
-		nil,
-	)
-	assert.NoError(b, err)
 
 	event := beat.Event{
 		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
@@ -782,16 +766,40 @@ func BenchmarkCompression(b *testing.B) {
 		},
 	}
 
-	batch := encodeBatch(client, outest.NewBatch(event, event, event))
+	levels := []int{1, 4, 7, 9}
 
 	// Indexing to _bulk api
 	// It uses gzip encoder internally for encoding data
-	for i := 0; i < b.N; i++ {
-		err := client.Publish(context.Background(), batch)
-		assert.NoError(b, err)
+	for _, l := range levels {
+		b.Run(fmt.Sprintf("level %d", l), func(b *testing.B) {
+			client, err := NewClient(
+				clientSettings{
+					connection: eslegclient.ConnectionSettings{
+						URL: ts.URL,
+						Headers: map[string]string{
+							"host":   "myhost.local",
+							"X-Test": "testing value",
+						},
+						CompressionLevel: l,
+					},
+				},
+
+				nil,
+			)
+			assert.NoError(b, err)
+			batch := encodeBatch(client, outest.NewBatch(event, event, event))
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				err := client.Publish(context.Background(), batch)
+				assert.NoError(b, err)
+			}
+		})
+
 	}
 
 }
+
 func TestClientWithHeaders(t *testing.T) {
 	requestCount := 0
 	// start a mock HTTP server
