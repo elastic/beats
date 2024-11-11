@@ -59,8 +59,8 @@ type PublisherMetadataStore struct {
 	log   *logp.Logger
 }
 
-func NewPublisherMetadataStore(session EvtHandle, provider string, log *logp.Logger) (*PublisherMetadataStore, error) {
-	md, err := NewPublisherMetadata(session, provider)
+func NewPublisherMetadataStore(session EvtHandle, provider string, locale uint32, log *logp.Logger) (*PublisherMetadataStore, error) {
+	md, err := NewPublisherMetadata(session, provider, locale)
 	if err != nil {
 		return nil, err
 	}
