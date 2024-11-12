@@ -24,7 +24,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand" // using for better performance
+	"math/rand/v2" // using for better performance
 	"strconv"
 	"sync"
 
@@ -198,7 +198,7 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 	}
 
 	// using math/rand for performance, generate a 0-9 string
-	err = testCfg.SetString("id", -1, inputID+strconv.Itoa(rand.Intn(10)))
+	err = testCfg.SetString("id", -1, inputID+strconv.Itoa(rand.IntN(10)))
 	if err != nil {
 		return config, fmt.Errorf("failed to set 'inputID': %w", err)
 	}
