@@ -36,11 +36,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
-// Expvar metric names.
 const (
+	// Expvar metric names.
 	successesKey = "success"
 	failuresKey  = "failures"
 	eventsKey    = "events"
+
+	// Failure threshold config key
+	failureThresholdKey = "failure_threshold"
 )
 
 var (
@@ -112,7 +115,7 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 	failureThreshold := uint(1)
 
 	var streamHealthSettings struct {
-		FailureThreshold *uint `config:"failureThreshold"`
+		FailureThreshold *uint `config:"failure_threshold"`
 	}
 
 	err := module.UnpackConfig(&streamHealthSettings)
