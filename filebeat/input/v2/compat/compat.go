@@ -191,14 +191,14 @@ func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
 		return config, fmt.Errorf("failed to create new config: %w", err)
 	}
 
-	// let's try to override the `inputID` field, if it fails, give up
-	inputID, err := testCfg.String("inputID", -1)
+	// let's try to override the `id` field, if it fails, give up
+	inputID, err := testCfg.String("id", -1)
 	if err != nil {
 		return config, fmt.Errorf("failed to get 'inputID': %w", err)
 	}
 
 	// using math/rand for performance, generate a 0-9 string
-	err = testCfg.SetString("inputID", -1, inputID+strconv.Itoa(rand.Intn(10)))
+	err = testCfg.SetString("id", -1, inputID+strconv.Itoa(rand.Intn(10)))
 	if err != nil {
 		return config, fmt.Errorf("failed to set 'inputID': %w", err)
 	}
