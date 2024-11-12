@@ -32,7 +32,6 @@ import (
 
 const mockModuleName = "MockModule"
 const mockMetricSetName = "MockMetricSet"
-const mockMetricSetWithContextName = "MockMetricSetWithContext"
 
 // mockReportingFetcher
 type mockReportingFetcher struct {
@@ -67,7 +66,7 @@ func (mr *mockReporter) StartFetchTimer() {
 
 func (mr *mockReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
 	args := mr.Called()
-	return args.Get(0).(mb.PushReporter)
+	return args.Get(0).(mb.PushReporter) //nolint:staticcheck // PushReporter is deprecated but not removed
 }
 
 func (mr *mockReporter) V2() mb.PushReporterV2 {
