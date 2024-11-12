@@ -197,7 +197,7 @@ func TestGenerateCheckConfig(t *testing.T) {
 	}{
 		{
 			name:      "id is present",
-			cfg:       conf.MustNewConfigFrom("inputID: some-id"),
+			cfg:       conf.MustNewConfigFrom("id: some-id"),
 			assertCfg: assert.NotEqual,
 		},
 		{
