@@ -16,7 +16,8 @@
         ],
         "process.args_count": 1,
         "process.command_line": "/sbin/init",
-        "process.pid": "1",
+        "process.name": "systemd",
+        "process.pid": 1,
         "related.hosts": [
             "vagrant-debian-12"
         ],
@@ -36,7 +37,6 @@
         "log.syslog.facility.code": 0,
         "log.syslog.priority": 6,
         "message": "Console: switching to colour frame buffer device 160x50",
-        "process.pid": "",
         "related.hosts": [
             "vagrant-debian-12"
         ],
@@ -54,7 +54,6 @@
         "log.syslog.facility.code": 0,
         "log.syslog.priority": 6,
         "message": "thermal_sys: Registered thermal governor 'power_allocator'",
-        "process.pid": "",
         "related.hosts": [
             "bookworm"
         ],

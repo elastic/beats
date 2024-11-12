@@ -6,9 +6,10 @@ processors:
   - set:
       field: "process.pid"
       copy_from: "journald.pid"
+      ignore_failure: true
   - set:
       field: "process.name"
-      value: "{{ journald.process.name }}"
+      copy_from: "journald.process.name"
       ignore_failure: true
   - set:
       field: event.kind
