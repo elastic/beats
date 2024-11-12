@@ -252,6 +252,7 @@ class Test(metricbeat.BaseTest):
             if 'error' not in evt:
                 if "system" in evt:
                     diskio = evt["system"]["diskio"]
+                    self.remove_fields(diskio, ["serial_number"])
                     self.assert_fields_for_platform(SYSTEM_DISKIO, diskio)
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
