@@ -1,11 +1,11 @@
-[[lowercase]]
-=== Lowercase fields in events
+[[uppercase]]
+=== Uppercase fields in events
 
 ++++
-<titleabbrev>lowercase</titleabbrev>
+<titleabbrev>uppercase</titleabbrev>
 ++++
 
-The `lowercase` processor specifies a list of `fields` and `values` to be converted to lowercase. Keys listed in `fields` will be matched case-insensitively and converted to lowercase. For `values`, only exact, case-sensitive matches are transformed to lowercase. This way, keys and values can be selectively converted based on the specified criteria.
+The `uppercase` processor specifies a list of `fields` and `values` to be converted to uppercase. Keys listed in `fields` will be matched case-insensitively and converted to uppercase. For `values`, only exact, case-sensitive matches are transformed to uppercase. This way, keys and values can be selectively converted based on the specified criteria.
 
 
 ==== Examples: 
@@ -28,17 +28,17 @@ processors:
 ----
 // Input
 {
-  "AB": {"CD":"data"},
+  "ab": {"cd":"data"},
   "CD": {"ef":"data"},
-  "testKey": {"TESTVALUE"}   
+  "testKey": {"testvalue"}   
 }
 
 
 // output
 {
-  "ab": {"cd":"data"},  // `AB.CD` -> `ab.cd`
+  "ab": {"cd":"data"},  // `ab.cd` -> `AB.CD`
   "CD": {"ef":"data"},
-  "testKey": {"testvalue"} // `TESTVALUE` -> `testvalue` is lowercased 
+  "testKey": {"TESTVALUE"} // `testvalue` -> `TESTVALUE` is uppercased 
 }
 ----
 
@@ -60,14 +60,14 @@ processors:
 ----
 // Input
 {
-  "AB": {"CD":"data"},
+  "ab": {"cd":"data"},
   "CD": {"ef":"data"}, 
 }
 
 
 // output
 {
-  "AB": {"cd":"data"},  // `AB.CD` -> `AB.cd` (only `cd` is lowercased)
+  "ab": {"CD":"data"},  // `ab.cd` -> `ab.CD` (only `cd` is uppercased)
   "CD": {"ef":"data"}, 
 }
 ----
@@ -104,15 +104,15 @@ processors:
 
 ==== Configuration:
 
-The `lowercase` processor has the following configuration settings:
+The `uppercase` processor has the following configuration settings:
 
-`fields`:: The field names to lowercase. The match is case-insensitive, e.g. `a.b.c.d` would match `A.b.C.d` or `A.B.C.D`.
-`values`:: (Optional) Specifies the exact values to be converted to lowercase. Each entry should include the full path to the value. Key matching is case-sensitive. If the target value is not a string, an error is triggered (`fail_on_error: true`) or the value is skipped (`fail_on_error: false`).
+`fields`:: The field names to uppercase. The match is case-insensitive, e.g. `a.b.c.d` would match `A.b.C.d` or `A.B.C.D`.
+`values`:: (Optional) Specifies the exact values to be converted to uppercase. Each entry should include the full path to the value. Key matching is case-sensitive. If the target value is not a string, an error is triggered (`fail_on_error: true`) or the value is skipped (`fail_on_error: false`).
 `ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
                     The default is `false`, which will fail processing of an event if a field is missing.
 `fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
                     If set to `false`, processing continues if an error occurs. Default is `true`.
-`alter_full_field`:: (Optional) If set to `true`, the entire key path is lowercased. If set to `false` only the final part of the key path is lowercased. Default is true    
+`alter_full_field`:: (Optional) If set to `true`, the entire key path is uppercased. If set to `false` only the final part of the key path is uppercased. Default is true    
 
                                   
 
