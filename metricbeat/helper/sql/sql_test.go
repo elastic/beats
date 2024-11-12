@@ -43,10 +43,10 @@ type mockVariableMode struct {
 }
 
 func (m *mockVariableMode) Scan(dest ...interface{}) error {
-	d1 := dest[0].(*string)
+	d1 := dest[0].(*string) //nolint:errcheck // false positive
 	*d1 = m.results[m.index].k
 
-	d2 := dest[1].(*interface{})
+	d2 := dest[1].(*interface{}) //nolint:errcheck // false positive
 	*d2 = m.results[m.index].v
 
 	m.index++
@@ -73,7 +73,7 @@ type mockTableMode struct {
 
 func (m *mockTableMode) Scan(dest ...interface{}) error {
 	for i, d := range dest {
-		d1 := d.(*interface{})
+		d1 := d.(*interface{}) //nolint:errcheck // false positive
 		*d1 = m.results[i].v
 	}
 
@@ -199,7 +199,7 @@ func checkValue(t *testing.T, res kv, ms mapstr.M) {
 
 // CustomType for testing custom type handling
 type CustomType struct {
-	value string
+	value string //nolint:unused // unused checker is buggy
 }
 
 func TestToDotKeys(t *testing.T) {
