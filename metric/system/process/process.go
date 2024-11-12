@@ -229,7 +229,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// OS-specific entrypoint, get basic info so we can at least run matchProcess
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
-		return status, true, fmt.Errorf("GetInfoForPid: %w", err)
+		return status, true, fmt.Errorf("GetInfoForPid failed for pid %d: %w", pid, err)
 	}
 	if procStats.skipExtended {
 		return status, true, nil
@@ -250,7 +250,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
 		if !errors.Is(err, NonFatalErr{}) {
-			return status, true, fmt.Errorf("FillPidMetrics: %w", err)
+			return status, true, fmt.Errorf("FillPidMetrics failed for PID %d: %w", pid, err)
 		}
 		wrappedErr = errors.Join(wrappedErr, fmt.Errorf("non-fatal error fetching PID metrics for %d, metrics are valid, but partial: %w", pid, err))
 		procStats.logger.Debugf(wrappedErr.Error())
@@ -282,7 +282,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 
 	status, err = FillMetricsRequiringMoreAccess(pid, status)
 	if err != nil {
-		return status, true, fmt.Errorf("FillMetricsRequiringMoreAccess: %w", err)
+		return status, true, fmt.Errorf("FillMetricsRequiringMoreAccess failed for pid %d: %w", pid, err)
 	}
 
 	// Generate `status.Cmdline` here for compatibility because on Windows

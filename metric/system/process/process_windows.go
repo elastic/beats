@@ -102,7 +102,7 @@ func FetchNumThreads(pid int) (int, error) {
 
 	currentProcessHandle, err := syscall.GetCurrentProcess()
 	if err != nil {
-		return 0, fmt.Errorf("GetCurrentProcess failed: %w", err)
+		return 0, fmt.Errorf("GetCurrentProcess failed for PID %d: %w", pid, err)
 	}
 	// The pseudo handle need not be closed when it is no longer
 	// needed, calling CloseHandle has no effect.  Adding here to
@@ -114,7 +114,7 @@ func FetchNumThreads(pid int) (int, error) {
 	var snapshotHandle syscall.Handle
 	err = PssCaptureSnapshot(targetProcessHandle, PSSCaptureThreads, 0, &snapshotHandle)
 	if err != nil {
-		return 0, fmt.Errorf("PssCaptureSnapshot failed: %w", err)
+		return 0, fmt.Errorf("PssCaptureSnapshot failed for PID %d: %w", pid, err)
 	}
 
 	info := PssThreadInformation{}
@@ -189,28 +189,28 @@ func getProcArgs(pid int) ([]string, error) {
 		false,
 		uint32(pid))
 	if err != nil {
-		return nil, fmt.Errorf("OpenProcess failed: %w", err)
+		return nil, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
 	}
 	defer func() {
 		_ = syscall.CloseHandle(handle)
 	}()
 	pbi, err := windows.NtQueryProcessBasicInformation(handle)
 	if err != nil {
-		return nil, fmt.Errorf("NtQueryProcessBasicInformation failed: %w", err)
+		return nil, fmt.Errorf("NtQueryProcessBasicInformation failed for PID %d: %w", pid, err)
 	}
 
 	userProcParams, err := windows.GetUserProcessParams(handle, pbi)
 	if err != nil {
-		return nil, fmt.Errorf("GetUserProcessParams failed: %w", err)
+		return nil, fmt.Errorf("GetUserProcessParams failed for PID %d: %w", pid, err)
 	}
 	argsW, err := windows.ReadProcessUnicodeString(handle, &userProcParams.CommandLine)
 	if err != nil {
-		return nil, fmt.Errorf("ReadProcessUnicodeString failed: %w", err)
+		return nil, fmt.Errorf("ReadProcessUnicodeString failed for PID %d: %w", pid, err)
 	}
 
 	procList, err := windows.ByteSliceToStringSlice(argsW)
 	if err != nil {
-		return nil, fmt.Errorf("ByteSliceToStringSlice failed: %w", err)
+		return nil, fmt.Errorf("ByteSliceToStringSlice failed for PID %d: %w", pid, err)
 	}
 	return procList, nil
 }
