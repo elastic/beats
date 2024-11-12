@@ -83,7 +83,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
-- Fix truncated windows event log message {pull}41327[41327]
 
 *Functionbeat*
 
@@ -243,6 +242,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
 - Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
+
 *Auditbeat*
 
 - Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
@@ -438,6 +438,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
