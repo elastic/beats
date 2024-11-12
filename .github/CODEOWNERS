@@ -68,6 +68,7 @@ CHANGELOG*
 /libbeat/processors/dns/ @elastic/sec-deployment-and-devices
 /libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
 /libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
 /libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
 /libbeat/scripts @elastic/ingest-eng-prod
