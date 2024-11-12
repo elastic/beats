@@ -312,6 +312,9 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 
 func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporterV2) {
 	switch {
+	case err == nil:
+		msw.consecutiveErrors = 0
+		msw.module.UpdateStatus(status.Running, "")
 
 	case errors.As(err, &mb.PartialMetricsError{}):
 		reporter.Error(err)
@@ -320,7 +323,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
-	case err != nil:
+	default:
 		reporter.Error(err)
 		msw.consecutiveErrors++
 		if msw.failureThreshold > 0 && msw.consecutiveErrors >= msw.failureThreshold {
@@ -329,9 +332,6 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		}
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
-	default:
-		msw.consecutiveErrors = 0
-		msw.module.UpdateStatus(status.Running, "")
 	}
 }
 
