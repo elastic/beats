@@ -28,6 +28,11 @@ env:
   # Module Tests
   BEAT_PATH: "filebeat"
 
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
+
 steps:
   - group: "Check/Update"
     key: "filebeat-check-update"
@@ -221,6 +226,9 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd filebeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3
