@@ -28,6 +28,7 @@ import (
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -208,6 +209,11 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		}
 	}
 
+	return priorityResult(responses, p.logger)
+}
+
+// priorityResult is a helper to extract correct result (if multiple exist) based on priorityProviders
+func priorityResult(responses []result, logger *logp.Logger) *result {
 	if len(responses) == 0 {
 		return nil
 	}
@@ -216,7 +222,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		return &responses[0]
 	}
 
-	p.logger.Debugf("add_cloud_metadata: multiple responses were received, filtering based on priority")
+	logger.Debugf("add_cloud_metadata: multiple responses were received, filtering based on priority")
 	var prioritizedResponses []result
 	for _, r := range responses {
 		if slices.Contains(priorityProviders, r.provider) {
@@ -227,7 +233,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 	// simply send the first entry of prioritized response
 	if len(prioritizedResponses) != 0 {
 		pr := prioritizedResponses[0]
-		p.logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", pr.provider)
+		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", pr.provider)
 		return &pr
 	}
 
