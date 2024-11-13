@@ -48,7 +48,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
 - The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
-- System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files. {pull}41061[41061]
 
 - Add kafka compression support for ZSTD.
 
@@ -81,11 +80,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
 
+- Expire source port mappings. {pull}41581[41581]
 
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
-- Fix truncated windows event log message {pull}41327[41327]
 
 *Functionbeat*
 
@@ -113,6 +112,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use {pull}41356[41356]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
+- Add `translate_ldap_attribute` processor. {pull}41472[41472]
 
 *Auditbeat*
 
@@ -174,6 +174,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 
 *Heartbeat*
 
@@ -206,6 +209,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fix http server helper SSL config. {pull}39405[39405]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
+
 
 *Osquerybeat*
 
@@ -237,6 +242,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update to Go 1.22.7. {pull}41018[41018]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
+- Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
+- Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
 
 *Auditbeat*
 
@@ -246,7 +253,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 
 *Auditbeat*
-
 
 *Auditbeat*
 
@@ -326,16 +332,17 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add CSV decoding capacity to gcs input {pull}40979[40979]
 - Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
-- System module now supports reading from jounrald. {pull}41061[41061]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 - Improved Azure Blob Storage input documentation. {pull}41252[41252]
 - Make ETW input GA. {pull}41389[41389]
+- Add support for Okta entity analytics provider to collect role and factor data for users. {pull}41460[41460]
 
 *Auditbeat*
 
 
 *Libbeat*
 
+- enrich events with EC2 tags in add_cloud_metadata processor {pull}41477[41477]
 
 
 *Heartbeat*
@@ -364,6 +371,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset cluster for the vSphere module. {pull}40536[40536]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add AWS Cloudwatch capability to retrieve tags from AWS/ApiGateway resources {pull}40755[40755]
 - Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
@@ -377,7 +385,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
+- Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 *Metricbeat*
 
@@ -389,6 +399,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
+
+- Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
 
 
 *Functionbeat*
@@ -428,6 +440,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
