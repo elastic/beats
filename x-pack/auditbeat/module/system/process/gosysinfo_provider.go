@@ -351,27 +351,12 @@ func putIfNotEmpty(mapstr *mapstr.M, key string, value string) {
 }
 
 func processMessage(process *Process, action eventAction) string {
-	if process.Error != nil {
-		return fmt.Sprintf("ERROR for PID %d: %v", process.Info.PID, process.Error)
-	}
-
-	var actionString string
-	switch action {
-	case eventActionProcessStarted:
-		actionString = "STARTED"
-	case eventActionProcessStopped:
-		actionString = "STOPPED"
-	case eventActionExistingProcess:
-		actionString = "is RUNNING"
-	}
-
-	var userString string
+	var username string
 	if process.User != nil {
-		userString = fmt.Sprintf(" by user %v", process.User.Username)
+		username = process.User.Username
 	}
 
-	return fmt.Sprintf("Process %v (PID: %d)%v %v",
-		process.Info.Name, process.Info.PID, userString, actionString)
+	return makeMessage(process.Info.PID, action, process.Info.Name, username, process.Error)
 }
 
 func convertToCacheable(processes []*Process) []cache.Cacheable {
