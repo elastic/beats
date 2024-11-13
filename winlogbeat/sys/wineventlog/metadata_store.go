@@ -295,7 +295,12 @@ func (s *PublisherMetadataStore) getMessageByID(messageID uint32) string {
 		return message
 	}
 
-	message, err := evtFormatMessage(s.Metadata.Handle, NilHandle, messageID, nil, EvtFormatMessageId)
+	handle := NilHandle
+	if s.Metadata != nil {
+		handle = s.Metadata.Handle
+	}
+
+	message, err := evtFormatMessage(handle, NilHandle, messageID, nil, EvtFormatMessageId)
 	if err != nil {
 		s.log.Debugw("Failed to format message. "+
 			"Will not try to format it anymore",
