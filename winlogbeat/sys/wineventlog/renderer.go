@@ -422,7 +422,10 @@ func NewXMLRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) *XML
 		r.render = func(event EvtHandle, out io.Writer) error {
 			get := func(providerName string) EvtHandle {
 				md, _ := r.metadataCache.getPublisherStore(providerName)
-				return md.Metadata.Handle
+				if md.Metadata != nil {
+					return md.Metadata.Handle
+				}
+				return NilHandle
 			}
 			return RenderEvent(event, conf.Locale, r.renderBuf, get, out)
 		}
