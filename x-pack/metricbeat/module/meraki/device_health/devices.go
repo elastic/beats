@@ -77,11 +77,10 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 
 		val, res, err := client.Appliance.GetDeviceAppliancePerformance(device.details.Serial)
 		if err != nil {
-			if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "Feature not supported") {
-				continue
+			if !(res.StatusCode() != 400 && strings.Contains(string(res.Body()), "Feature not supported")) {
+				logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
 			}
 
-			logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
 			continue
 		}
 
