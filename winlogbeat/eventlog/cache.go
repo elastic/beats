@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
+
 package eventlog
 
 // This component of the eventlog package provides a cache for storing Handles
