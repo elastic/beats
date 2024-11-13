@@ -240,6 +240,19 @@ func isAGlobalService(serviceName string) bool {
 	}
 }
 
+// isAnExistingService returns true if the given service is already an existing service supported by default in GCP module
+func isAnExistingService(serviceName string) bool {
+	switch serviceName {
+	case gcp.ServiceCompute, gcp.ServiceGKE, gcp.ServiceStorage, gcp.ServiceDataproc,
+		gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions,
+		gcp.ServiceFirestore, gcp.ServiceCloudSQL, gcp.ServiceRedis:
+		return true
+	default:
+		return false
+	}
+
+}
+
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
 func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
@@ -250,6 +263,11 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	// to apply any additional filters.
 	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
 		serviceLabel := getServiceLabelFor(serviceName)
+		// For an existing service use the predefined servicelabels. For a new service, if user has added the serviceLabel
+		// config, use that else use the default servicelabel.
+		if r.config.ServiceLabel != "" && !isAnExistingService(serviceName) {
+			serviceLabel = r.config.ServiceLabel
+		}
 		f = r.buildLocationFilter(serviceLabel, f)
 	}
 
