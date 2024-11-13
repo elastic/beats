@@ -120,21 +120,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
-		m.Client.Log.Debug("no resources were found based on all the configurations options entered")
-	}
 	for {
 		select {
 		case resMetricDefinition, ok := <-m.Client.ResourceConfigurations.MetricDefinitionsChan:
 			if !ok {
 				// Data channel closed, stop processing further data
 				m.Client.Log.Infof("MetricDefinitionsChan channel closed")
+				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
+					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
+				}
 				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
 				// Process each metric definition as it arrives
 				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
 				metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
-				m.Client.ResourceConfigurations.Metrics = append(m.Client.ResourceConfigurations.Metrics, resMetricDefinition...)
+				if len(resMetricDefinition) == 0 {
+					return fmt.Errorf("error mapping metrics to events: %w", err)
+				}
+				resId := resMetricDefinition[0].ResourceId
+				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
 				for _, metricsDefinition := range metricsByResourceId {
 					// Group metric definitions by cloud resource ID.
 					// We group the metric definitions by resource ID to fetch

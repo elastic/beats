@@ -62,7 +62,7 @@ type MetricValue struct {
 
 // ResourceConfiguration represents the resource related configuration entered by the user
 type ResourceConfiguration struct {
-	Metrics         []Metric
+	Metrics         map[string][]Metric
 	RefreshInterval time.Duration
 	lastUpdate      struct {
 		time.Time

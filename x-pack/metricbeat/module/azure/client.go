@@ -52,7 +52,7 @@ func NewClient(config Config) (*Client, error) {
 		Log:                 logger,
 		MetricRegistry:      NewMetricRegistry(logger),
 	}
-
+	client.ResourceConfigurations.Metrics = make(map[string][]Metric)
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
 
 	return client, nil
@@ -72,7 +72,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		go func() {
 			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 			defer close(client.ResourceConfigurations.ErrorChan)
-			for _, metrics := range groupMetricsDefinitionsByResourceId(client.ResourceConfigurations.Metrics) {
+			for _, metrics := range client.ResourceConfigurations.Metrics {
 				client.Log.Infof("MetricDefinitionsChan are not expired. Writing metrics to MetricDefinitionsChan")
 				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
 			}
@@ -263,29 +263,32 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			timeGrain: timeGrain,
 			timestamp: referenceTime,
 		})
-		for i, currentMetric := range client.ResourceConfigurations.Metrics {
-			if matchMetrics(currentMetric, metric) {
-				// Map the metric values from the API response.
-				current := mapMetricValues(resp, currentMetric.Values)
-				client.ResourceConfigurations.Metrics[i].Values = current
+		if prevMetrics, ok := client.ResourceConfigurations.Metrics[metric.ResourceId]; ok {
+			for i, currentMetric := range prevMetrics {
+				if matchMetrics(currentMetric, metric) {
+					// Map the metric values from the API response.
+					current := mapMetricValues(resp, currentMetric.Values)
+					prevMetrics[i].Values = current
 
-				// Some predefined metricsets configuration do not have a time grain.
-				// Here is an example:
-				// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
-				//
-				// Predefined metricsets sometimes have long lists of metrics
-				// with no time grains. Or users can configure their own
-				// custom metricsets with no time grain.
-				//
-				// In this case, we track the time grain returned by the API. Azure
-				// provides a default time grain for each metric.
-				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
-					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
+					// Some predefined metricsets configuration do not have a time grain.
+					// Here is an example:
+					// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
+					//
+					// Predefined metricsets sometimes have long lists of metrics
+					// with no time grains. Or users can configure their own
+					// custom metricsets with no time grain.
+					//
+					// In this case, we track the time grain returned by the API. Azure
+					// provides a default time grain for each metric.
+					if prevMetrics[i].TimeGrain == "" {
+						prevMetrics[i].TimeGrain = timeGrain
+					}
+
+					result = append(result, prevMetrics[i])
 				}
-
-				result = append(result, client.ResourceConfigurations.Metrics[i])
 			}
 		}
+
 	}
 
 	return result
@@ -305,10 +308,11 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 		Aggregations:  aggregations,
 		TimeGrain:     timeGrain,
 	}
-
-	for _, prevMet := range client.ResourceConfigurations.Metrics {
-		if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
-			met.Values = prevMet.Values
+	if prevMetrics, ok := client.ResourceConfigurations.Metrics[resourceId]; ok {
+		for _, prevMet := range prevMetrics {
+			if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
+				met.Values = prevMet.Values
+			}
 		}
 	}
 
