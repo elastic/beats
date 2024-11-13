@@ -400,6 +400,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Forwarded events use renderedtext info for experimental api {pull}41525[41525]
 - Language setting is respected for experimental api {pull}41525[41525]
 - Language setting also added to decode xml wineventlog processor {pull}41525[41525]
+- Format embedded messages in the experimental api {pull}41525[41525]
 
 
 *Functionbeat*

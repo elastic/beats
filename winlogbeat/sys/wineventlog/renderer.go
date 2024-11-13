@@ -24,7 +24,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 	"strconv"
+	"strings"
 	"syscall"
 	"text/template"
 	"time"
@@ -118,7 +120,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
 		event.Level = EventLevel(event.LevelRaw).String()
 	}
 
-	eventData, fingerprint, err := r.renderUser(handle, event)
+	eventData, fingerprint, err := r.renderUser(md, handle, event)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("failed to render event data: %w", err))
 	}
@@ -210,7 +212,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user values: %w", err)
@@ -245,9 +247,25 @@ func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values [
 				"error", err,
 			)
 		}
+		if str, ok := values[i].(string); ok {
+			values[i] = expandMessageIDs(mds, str)
+		}
 	}
 
 	return values, argumentHash.Sum64(), nil
+}
+
+var messageIDsRegexp = regexp.MustCompile(`%%\d+`)
+
+func expandMessageIDs(mds *PublisherMetadataStore, v string) string {
+	// Replace each occurrence by finding a message based on its value
+	return messageIDsRegexp.ReplaceAllStringFunc(v, func(match string) string {
+		messageID, err := strconv.Atoi(strings.Trim(match, `%`))
+		if err != nil {
+			return match
+		}
+		return mds.getMessageByID(uint32(messageID))
+	})
 }
 
 // render uses EvtRender to event data. The caller must free() the returned when

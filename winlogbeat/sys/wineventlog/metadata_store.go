@@ -54,6 +54,10 @@ type PublisherMetadataStore struct {
 	// Event ID to map of fingerprints to event metadata. The fingerprint value
 	// is hash of the event data parameters count and types.
 	EventFingerprints map[uint16]map[uint64]*EventMetadata
+	// Stores used messages by their ID. Message can be found in events as references
+	// such as %%1111. This need to be formatted the first time, and they are stored
+	// from that point after.
+	MessagesByID map[uint32]string
 
 	mutex sync.RWMutex
 	log   *logp.Logger
@@ -67,6 +71,7 @@ func NewPublisherMetadataStore(session EvtHandle, provider string, locale uint32
 	store := &PublisherMetadataStore{
 		Metadata:          md,
 		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider),
 	}
 
@@ -98,6 +103,7 @@ func NewEmptyPublisherMetadataStore(provider string, log *logp.Logger) *Publishe
 		},
 		Events:            map[uint16]*EventMetadata{},
 		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider, "empty", true),
 	}
 }
@@ -266,6 +272,40 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 
 	fingerprints[eventDataFingerprint] = em
 	return em
+}
+
+// getMessageByID returns the rendered message from its ID. If it is not cached it will format it.
+// In case of any error this never fails, and will return the original reference instead.
+func (s *PublisherMetadataStore) getMessageByID(messageID uint32) string {
+	// Use a read lock to get a cached value.
+	s.mutex.RLock()
+	message, found := s.MessagesByID[messageID]
+	if found {
+		s.mutex.RUnlock()
+		return message
+	}
+
+	// Elevate to write lock.
+	s.mutex.RUnlock()
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	message, found = s.MessagesByID[messageID]
+	if found {
+		return message
+	}
+
+	message, err := evtFormatMessage(s.Metadata.Handle, NilHandle, messageID, nil, EvtFormatMessageId)
+	if err != nil {
+		s.log.Debugw("Failed to format message. "+
+			"Will not try to format it anymore",
+			"message_id", messageID,
+			"error", err)
+		message = fmt.Sprintf("%%%%%d", messageID)
+	}
+
+	s.MessagesByID[messageID] = message
+	return message
 }
 
 func (s *PublisherMetadataStore) Close() error {
