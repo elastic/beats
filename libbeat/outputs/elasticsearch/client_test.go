@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -714,6 +715,26 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 }
 
 func BenchmarkPublish(b *testing.B) {
+	tests := []struct {
+		Name   string
+		Events []beat.Event
+	}{
+		{
+			Name:   "5 events",
+			Events: testutil.GenerateEvents(50, 5, 3, false),
+		},
+		{
+			Name:   "50 events",
+			Events: testutil.GenerateEvents(500, 5, 3, false),
+		},
+		{
+			Name:   "500 events",
+			Events: testutil.GenerateEvents(500, 5, 3, false),
+		},
+	}
+
+	levels := []int{1, 4, 7, 9}
+
 	requestCount := 0
 
 	// start a mock HTTP server
@@ -736,66 +757,36 @@ func BenchmarkPublish(b *testing.B) {
 	}))
 	defer ts.Close()
 
-	event := beat.Event{
-		Timestamp: time.Date(2017, time.November, 7, 12, 0, 0, 0, time.UTC),
-		Meta: mapstr.M{
-			"a.b": "c",
-			"metaLevel0Map": mapstr.M{
-				"metaLevel1Map": mapstr.M{
-					"metaLevel2Value": "metavalue3",
-					"new1":            "newmetavalue1",
-				},
-			},
-			"metaLevel0Value":  "metareplaced1",
-			"metaLevel0Value2": "untouched",
-			"new2":             "newmetavalue2",
-		},
-		Fields: mapstr.M{
-			"a.b": "c",
-			"fieldsLevel0Map": mapstr.M{
-				"fieldsLevel1Map": mapstr.M{
-					"fieldsLevel2Value": "fieldsvalue3",
-					"new3":              "newfieldsvalue1",
-				},
-				"newmap": mapstr.M{
-					"new4": "newfieldsvalue2",
-				},
-			},
-			"fieldsLevel0Value":  "fieldsreplaced1",
-			"fieldsLevel0Value2": "untouched",
-		},
-	}
-
-	levels := []int{1, 4, 7, 9}
-
 	// Indexing to _bulk api
-	// It uses gzip encoder internally for encoding data
-	for _, l := range levels {
-		b.Run(fmt.Sprintf("level %d", l), func(b *testing.B) {
-			client, err := NewClient(
-				clientSettings{
-					connection: eslegclient.ConnectionSettings{
-						URL: ts.URL,
-						Headers: map[string]string{
-							"host":   "myhost.local",
-							"X-Test": "testing value",
+	for _, test := range tests {
+		for _, l := range levels {
+			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
+				client, err := NewClient(
+					clientSettings{
+						connection: eslegclient.ConnectionSettings{
+							URL: ts.URL,
+							Headers: map[string]string{
+								"host":   "myhost.local",
+								"X-Test": "testing value",
+							},
+							CompressionLevel: l,
 						},
-						CompressionLevel: l,
 					},
-				},
 
-				nil,
-			)
-			assert.NoError(b, err)
-			batch := encodeBatch(client, outest.NewBatch(event, event, event))
-
-			b.ResetTimer()
-			for i := 0; i < b.N; i++ {
-				err := client.Publish(context.Background(), batch)
+					nil,
+				)
 				assert.NoError(b, err)
-			}
-		})
+				batch := encodeBatch(client, outest.NewBatch(test.Events...))
 
+				// It uses gzip encoder internally for encoding data
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := client.Publish(context.Background(), batch)
+					assert.NoError(b, err)
+				}
+			})
+
+		}
 	}
 
 }

@@ -21,9 +21,13 @@ package testutil
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -38,4 +42,36 @@ func SeedPRNG(t *testing.T) {
 
 	t.Logf("reproduce test with `go test ... -seed %v`", seed)
 	rand.Seed(seed)
+}
+
+func GenerateEvents(numEvents, fieldsPerLevel, depth int, withCollisions bool) []beat.Event {
+	events := make([]beat.Event, numEvents)
+	for i := 0; i < numEvents; i++ {
+		event := &beat.Event{Fields: mapstr.M{}}
+		generateFields(event, fieldsPerLevel, depth, withCollisions)
+		events[i] = *event
+	}
+	return events
+}
+
+func generateFields(event *beat.Event, fieldsPerLevel, depth int, withCollisions bool) {
+	if depth == 0 {
+		return
+	}
+
+	for j := 1; j <= fieldsPerLevel; j++ {
+		var key string
+		for d := 1; d < depth; d++ {
+			key += fmt.Sprintf("level%dfield%d", d, j)
+			key += "."
+		}
+		if withCollisions {
+			key += fmt.Sprintf("Level%dField%d", depth, j) // Creating a collision (Level is capitalized)
+		} else {
+			key += fmt.Sprintf("level%dfield%d", depth, j)
+		}
+		event.Fields.Put(key, "value")
+		key = ""
+	}
+
 }
