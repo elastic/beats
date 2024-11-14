@@ -62,7 +62,7 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 
 *Affecting Metricbeat*
 
-- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 11000 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Breaking changes
 
