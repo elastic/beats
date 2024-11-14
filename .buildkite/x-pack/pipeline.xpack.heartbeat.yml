@@ -32,6 +32,11 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
+
 steps:
   - group: "Check/Update"
     key: "x-pack-heartbeat-check-update"
@@ -286,6 +291,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -313,6 +321,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
