@@ -2806,12 +2806,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/aerospike/aerospike-client-go
-Version: v1.27.1-0.20170612174108-0f3b54da6bdc
+Dependency : github.com/aerospike/aerospike-client-go/v7
+Version: v7.7.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aerospike/aerospike-client-go@v1.27.1-0.20170612174108-0f3b54da6bdc/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/aerospike/aerospike-client-go/v7@v7.7.1/LICENSE:
 
 
                                  Apache License
@@ -3002,7 +3002,7 @@ Contents of probable licence file $GOMODCACHE/github.com/aerospike/aerospike-cli
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright 2014-2016 Aerospike, Inc.
+   Copyright 2014-2020 Aerospike, Inc.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -54625,11 +54625,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/yuin/gopher-lua
-Version: v0.0.0-20170403160031-b402f3114ec7
+Version: v1.1.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/yuin/gopher-lua@v0.0.0-20170403160031-b402f3114ec7/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/yuin/gopher-lua@v1.1.1/LICENSE:
 
 The MIT License (MIT)
 
