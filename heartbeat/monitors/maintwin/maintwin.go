@@ -85,14 +85,13 @@ type ParsedMaintWin struct {
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	matched := false
 	for _, r := range pmw.Rules {
-		occurrences := r.All()
-		
-		for _, occ := range occurrences {
-			if tOrig.Equal(occ) || tOrig.After(occ) && tOrig.Before(r.GetUntil()) {
-				matched = true
-				break
-			}
+		nextOccurance := r.After(tOrig, true)
+
+		if tOrig.Equal(nextOccurance) || tOrig.After(nextOccurance) && tOrig.Before(r.GetUntil()) {
+			matched = true
+			break
 		}
+
 	}
 
 	return matched
