@@ -24,10 +24,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand/v2" // using for better performance
-	"strconv"
 	"sync"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/mitchellh/hashstructure"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -80,6 +79,7 @@ func (f *factory) CheckConfig(cfg *conf.C) error {
 	checkCfg, err := f.generateCheckConfig(cfg)
 	if err != nil {
 		f.log.Warnw(fmt.Sprintf("input V2 factory.CheckConfig failed to clone config before checking it. Original config will be checked, it might trigger an input duplication warning: %v", err), "original_config", conf.DebugString(cfg, true))
+		checkCfg = cfg
 	}
 	_, err = f.loader.Configure(checkCfg)
 	if err != nil {
@@ -186,21 +186,25 @@ func configID(config *conf.C) (string, error) {
 }
 
 func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
+	// copy the config so it's safe to change it
 	testCfg, err := conf.NewConfigFrom(config)
 	if err != nil {
-		return config, fmt.Errorf("failed to create new config: %w", err)
+		return nil, fmt.Errorf("failed to create new config: %w", err)
 	}
 
 	// let's try to override the `id` field, if it fails, give up
 	inputID, err := testCfg.String("id", -1)
 	if err != nil {
-		return config, fmt.Errorf("failed to get 'inputID': %w", err)
+		return nil, fmt.Errorf("failed to get 'id': %w", err)
 	}
 
-	// using math/rand for performance, generate a 0-9 string
-	err = testCfg.SetString("id", -1, inputID+strconv.Itoa(rand.IntN(10)))
+	id, err := uuid.NewV4()
 	if err != nil {
-		return config, fmt.Errorf("failed to set 'inputID': %w", err)
+		return nil, fmt.Errorf("failed to generate check congig id: %w", err)
+	}
+	err = testCfg.SetString("id", -1, inputID+"-"+id.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to set 'id': %w", err)
 	}
 
 	return testCfg, nil

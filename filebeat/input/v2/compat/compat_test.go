@@ -201,16 +201,20 @@ func TestGenerateCheckConfig(t *testing.T) {
 			assertCfg: assert.NotEqual,
 		},
 		{
-			name:      "absent id",
-			cfg:       conf.MustNewConfigFrom(""),
-			wantErr:   errors.New("failed to get 'inputID'"),
-			assertCfg: assert.Equal,
+			name:    "absent id",
+			cfg:     conf.MustNewConfigFrom(""),
+			wantErr: errors.New("failed to get 'id'"),
+			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
+				return assert.Nil(t, got, msgAndArgs...)
+			},
 		},
 		{
-			name:      "invalid config",
-			cfg:       nil,
-			wantErr:   errors.New("failed to create new config"),
-			assertCfg: assert.Equal,
+			name:    "invalid config",
+			cfg:     nil,
+			wantErr: errors.New("failed to create new config"),
+			assertCfg: func(t assert.TestingT, _ interface{}, got interface{}, msgAndArgs ...interface{}) bool {
+				return assert.Nil(t, got, msgAndArgs...)
+			},
 		},
 	}
 
