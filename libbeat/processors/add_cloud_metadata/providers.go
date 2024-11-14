@@ -75,7 +75,7 @@ var cloudMetaProviders = map[string]provider{
 
 // priorityProviders contains providers which has priority over others.
 // Metadata of these are derived using cloud provider SDKs, making them valid over metadata derived over well-known IP
-// or other common endpoints. For example, Openstack supports EC2 compliant metadata endpoint. Thus adding possiblity to
+// or other common endpoints. For example, Openstack supports EC2 compliant metadata endpoint. Thus adding possibility to
 // conflict metadata between EC2/AWS and Openstack.
 var priorityProviders = []string{
 	"aws", "ec2", "azure",
