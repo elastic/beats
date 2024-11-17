@@ -251,6 +251,18 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
+	indexTierPreference, err := getIndexTierPreference(clusterState, idx.Index)
+	if err != nil {
+		return fmt.Errorf("failed to get index tier preference from cluster state: %w", err)
+	}
+	idx.TierPreference = indexTierPreference
+
+	indexCreationDate, err := getIndexCreationDate(clusterState, idx.Index)
+	if err != nil {
+		return fmt.Errorf("failed to get index creation date from cluster state: %w", err)
+	}
+	idx.CreationDate = indexCreationDate
+
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
 		return fmt.Errorf("failed to get shards from routing table: %w", err)
@@ -285,6 +297,34 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
 	}
 	return mapstr.M(metric), nil
+}
+
+func getIndexTierPreference(clusterState mapstr.M, index string) ([]string, error) {
+	fieldKey := "metadata.settings.index.routing.allocation.include._tier_preference"
+	value, err := clusterState.GetValue(fieldKey)
+	if err != nil {
+		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	tierPreference, ok := value.([]string)
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return tierPreference, nil
+}
+
+func getIndexCreationDate(clusterState mapstr.M, index string) (int, error) {
+	fieldKey := "metadata.indices." + index + ".creation_date"
+	value, err := clusterState.GetValue(fieldKey)
+	if err != nil {
+		return 0, fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	creationDate, ok := value.(int)
+	if !ok {
+		return 0, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return creationDate, nil
 }
 
 func getIndexStatus(shards map[string]interface{}) (string, error) {
