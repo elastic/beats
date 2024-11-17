@@ -20,6 +20,7 @@ package index
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/joeshaw/multierror"
 
@@ -40,11 +41,11 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index  string           `json:"index"`
-	Status string           `json:"status"`
-	TierPreference []string `json:"tier_preference"`
-	CreationDate int        `json:"creation_date"`
-	Shards shardStats       `json:"shards"`
+	Index  string         `json:"index"`
+	Status string         `json:"status"`
+	TierPreference string `json:"tier_preference"`
+	CreationDate int      `json:"creation_date"`
+	Shards shardStats     `json:"shards"`
 }
 
 type primaries struct {
@@ -251,15 +252,20 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
-	indexTierPreference, err := getIndexTierPreference(clusterState, idx.Index)
+	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
 	if err != nil {
-		return fmt.Errorf("failed to get index tier preference from cluster state: %w", err)
+		return fmt.Errorf("failed to get index metadata from cluster state: %w", err)
+	}
+
+	indexTierPreference, err := getIndexTierPreferenceFromMetadata(indexMetadata)
+	if err != nil {
+		return fmt.Errorf("failed to get index tier preference from metadata: %w", err)
 	}
 	idx.TierPreference = indexTierPreference
 
-	indexCreationDate, err := getIndexCreationDate(clusterState, idx.Index)
+	indexCreationDate, err := getIndexCreationDateFromMetadata(indexMetadata)
 	if err != nil {
-		return fmt.Errorf("failed to get index creation date from cluster state: %w", err)
+		return fmt.Errorf("failed to get index creation date from metadata: %w", err)
 	}
 	idx.CreationDate = indexCreationDate
 
@@ -299,30 +305,30 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 	return mapstr.M(metric), nil
 }
 
-func getIndexTierPreference(clusterState mapstr.M, index string) ([]string, error) {
-	fieldKey := "metadata.indices." + index + ".settings.index.routing.allocation.include._tier_preference"
-	value, err := clusterState.GetValue(fieldKey)
+func getIndexTierPreferenceFromMetadata(indexMetadata mapstr.M) (string, error) {
+	fieldKey := "settings.index.routing.allocation.include._tier_preference"
+	value, err := indexMetadata.GetValue(fieldKey)
 	if err != nil {
-		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
+		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
-	tierPreference, ok := value.([]string)
+	tierPreference, ok := value.(string)
 	if !ok {
-		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+		return "", elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
 	}
 	return tierPreference, nil
 }
 
-func getIndexCreationDate(clusterState mapstr.M, index string) (int, error) {
-	fieldKey := "metadata.indices." + index + ".creation_date"
-	value, err := clusterState.GetValue(fieldKey)
+func getIndexCreationDateFromMetadata(indexMetadata mapstr.M) (int, error) {
+	fieldKey := "settings.index.creation_date"
+	value, err := indexMetadata.GetValue(fieldKey)
 	if err != nil {
 		return 0, fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
-	creationDate, ok := value.(int)
-	if !ok {
-		return 0, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	creationDate, err := strconv.Atoi(value.(string))
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse index creation date: %w", err)
 	}
 	return creationDate, nil
 }
