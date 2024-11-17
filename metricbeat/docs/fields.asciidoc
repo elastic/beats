@@ -32130,6 +32130,20 @@ type: keyword
 
 --
 
+*`elasticsearch.index.tier_preference`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.index.creation_date`*::
++
+--
+type: date
+
+--
+
 *`elasticsearch.index.name`*::
 +
 --
