@@ -300,7 +300,7 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 }
 
 func getIndexTierPreference(clusterState mapstr.M, index string) ([]string, error) {
-	fieldKey := "metadata.settings.index.routing.allocation.include._tier_preference"
+	fieldKey := "metadata.indices." + index + ".settings.index.routing.allocation.include._tier_preference"
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
 		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
