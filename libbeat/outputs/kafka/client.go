@@ -26,7 +26,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/eapache/go-resiliency/breaker"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"

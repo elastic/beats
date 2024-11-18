@@ -20,7 +20,7 @@ package kafka
 import (
 	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 )
