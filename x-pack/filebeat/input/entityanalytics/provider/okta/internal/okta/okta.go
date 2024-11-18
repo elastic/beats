@@ -192,8 +192,7 @@ func (o Response) String() string {
 //
 // See https://developer.okta.com/docs/reference/api/users/#list-users for details.
 func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
-	var endpoint string
-	var path string
+	var endpoint, path string
 	if user == "" {
 		endpoint = "/api/v1/users"
 		path = endpoint

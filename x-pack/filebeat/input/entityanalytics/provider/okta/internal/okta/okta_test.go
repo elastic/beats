@@ -375,16 +375,18 @@ func TestLocal(t *testing.T) {
 				t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
 			}
 
-			var limit rate.Limit
-			var burst int
 			if len(*limiter) != 1 {
 				t.Errorf("unexpected number endpoints track by rate limiter: %d", len(*limiter))
 			}
+			// retrieve the rate.Limiter parameters for the one endpoint
+			var limit rate.Limit
+			var burst int
 			for _, l := range *limiter {
 				limit = l.Limit()
 				burst = l.Burst()
 				break
 			}
+
 			if limit < 49.0/60.0 || 50.0/60.0 < limit {
 				t.Errorf("unexpected rate limit (outside [49/60, 50/60]: %f", limit)
 			}

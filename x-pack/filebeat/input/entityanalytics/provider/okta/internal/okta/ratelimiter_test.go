@@ -50,7 +50,7 @@ func TestRateLimiter(t *testing.T) {
 
 		err := r.Update(endpoint, headers, window, logp.L())
 		if err != nil {
-			t.Errorf("Update returned error: %v", err)
+			t.Errorf("unexpected error from Update(): %v", err)
 		}
 		limiter = r.get(endpoint)
 
