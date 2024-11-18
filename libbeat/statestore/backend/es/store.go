@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -32,6 +33,15 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// The current typical usage of the state storage is such that the consumer
+// of the storage fetches all the keys and caches them at the start of the beat.
+// Then the key value gets updated (Set is called) possibly frequently, so we want these operations to happen fairly fast
+// and not block waiting on Elasticsearch refresh, thus the slight trade-off for performance instead of consistency.
+// The value is not normally retrieved after a modification, so the inconsistency (potential refresh delay) is acceptable for our use cases.
+//
+// If consistency becomes a strict requirement, the storage would need to implement possibly some caching mechanism
+// that would guarantee the consistency between Set/Remove/Get/Each operations at least for a given "in-memory" instance of the storage.
 
 type store struct {
 	ctx      context.Context
@@ -175,12 +185,8 @@ type queryResult struct {
 }
 
 type doc struct {
-	Value any `struct:"v"`
-}
-
-type upsertRequest struct {
-	Doc    doc `struct:"doc"`
-	Upsert doc `struct:"upsert"`
+	Value     any `struct:"v"`
+	UpdatedAt any `struct:"updated_at"`
 }
 
 type entry struct {
@@ -191,13 +197,10 @@ func (e entry) Decode(to interface{}) error {
 	return typeconv.Convert(to, e.value)
 }
 
-func renderUpsertRequest(val interface{}) upsertRequest {
-	d := doc{
-		Value: val,
-	}
-	return upsertRequest{
-		Doc:    d,
-		Upsert: d,
+func renderRequest(val interface{}) doc {
+	return doc{
+		Value:     val,
+		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
 	}
 }
 
@@ -208,9 +211,8 @@ func (s *store) Set(key string, value interface{}) error {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 
-	// The advantage of using upsert here is that the seqno doesn't increase if the document is the same
-	upsert := renderUpsertRequest(value)
-	_, _, err := s.cli.Request("POST", fmt.Sprintf("/%s/%s/%s", s.index, "_update", url.QueryEscape(key)), "", nil, upsert)
+	doc := renderRequest(value)
+	_, _, err := s.cli.Request("PUT", fmt.Sprintf("/%s/%s/%s", s.index, docType, url.QueryEscape(key)), "", nil, doc)
 	if err != nil {
 		return err
 	}
