@@ -315,6 +315,12 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				// run metricset synchronously
 				wrappedMetricSet := moduleWrapper.MetricSets()[0]
+
+				t.Cleanup(func() {
+					// release stats structure across testcases
+					releaseStats(wrappedMetricSet.stats)
+				})
+
 				for i := 0; i < tc.iterations; i++ {
 					wrappedMetricSet.fetch(context.TODO(), mr)
 					if tc.assertIteration != nil {
@@ -537,6 +543,12 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 
 				// run metricset synchronously
 				wrappedMetricSet := moduleWrapper.MetricSets()[0]
+
+				t.Cleanup(func() {
+					// release stats structure across testcases
+					releaseStats(wrappedMetricSet.stats)
+				})
+
 				for i := 0; i < tc.iterations; i++ {
 					wrappedMetricSet.fetch(context.TODO(), mr)
 					if tc.assertIteration != nil {
