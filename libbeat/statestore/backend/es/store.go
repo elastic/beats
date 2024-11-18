@@ -33,9 +33,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// TODO: Possibly add in-memory cache, since the operations could have delays
-// for example when the key is deleted, it's still could be searchable until the next refresh
-// the refresh delay is even worse for serverless
 type store struct {
 	ctx      context.Context
 	cn       context.CancelFunc
