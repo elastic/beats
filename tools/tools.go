@@ -24,7 +24,6 @@ package tools
 
 import (
 	_ "github.com/magefile/mage"
-	_ "github.com/pierrre/gotestcover"
 	_ "github.com/stretchr/testify/assert"
 	_ "github.com/tsg/go-daemon"
 	_ "golang.org/x/tools/cmd/goimports"
