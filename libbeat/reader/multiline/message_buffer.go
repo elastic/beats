@@ -19,6 +19,7 @@ package multiline
 
 import (
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type messageBuffer struct {
@@ -32,6 +33,7 @@ type messageBuffer struct {
 	truncated      int
 	err            error // last seen error
 	message        reader.Message
+	logger         *logp.Logger
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -42,6 +44,7 @@ func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool
 		skipNewline: skipNewline,
 		message:     reader.Message{},
 		err:         nil,
+		logger:      logp.NewLogger("reader_multiline"),
 	}
 }
 
@@ -120,6 +123,7 @@ func (b *messageBuffer) addLine(m reader.Message) {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (b *messageBuffer) finalize() reader.Message {
 	if b.truncated > 0 {
+		b.logger.Warnf("Multiline message is too large, truncated to the limit of %d lines or %d bytes", b.maxLines, b.maxBytes)
 		b.message.AddFlagsWithKey("log.flags", "truncated")
 	}
 
