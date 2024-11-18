@@ -721,15 +721,15 @@ func BenchmarkPublish(b *testing.B) {
 	}{
 		{
 			Name:   "5 events",
-			Events: testutil.GenerateEvents(50, 5, 3, false),
+			Events: testutil.GenerateEvents(50, 5, 3),
 		},
 		{
 			Name:   "50 events",
-			Events: testutil.GenerateEvents(500, 5, 3, false),
+			Events: testutil.GenerateEvents(500, 5, 3),
 		},
 		{
 			Name:   "500 events",
-			Events: testutil.GenerateEvents(500, 5, 3, false),
+			Events: testutil.GenerateEvents(500, 5, 3),
 		},
 	}
 
