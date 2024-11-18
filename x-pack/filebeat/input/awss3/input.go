@@ -6,9 +6,6 @@ package awss3
 
 import (
 	"fmt"
-	"strings"
-
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -50,27 +47,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if config.AccessPointARN != "" {
-		// When using the access point ARN, requests must be directed to the
-		// access point hostname. The access point hostname takes the form
-		// AccessPointName-AccountId.s3-accesspoint.Region.amazonaws.com
-		arnParts := strings.Split(config.AccessPointARN, ":")
-		region := arnParts[3]
-		accountID := arnParts[4]
-		accessPointName := strings.Split(arnParts[5], "/")[1]
-
-		// Construct the endpoint for the Access Point
-		endpoint := fmt.Sprintf("%s-%s.s3-accesspoint.%s.amazonaws.com", accessPointName, accountID, region)
-
-		// Set up a custom endpoint resolver for Access Points
-		//nolint:staticcheck // haven't migrated to the new interface yet
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				URL:               fmt.Sprintf("https://%s", endpoint),
-				SigningRegion:     region,
-				HostnameImmutable: true,
-			}, nil
-		})
-		awsConfig.Region = region
+		configureAccessPointEndpoint(&awsConfig, config.AccessPointARN)
 	}
 
 	if config.AccessPointARN == "" && config.RegionName != "" {

@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -293,4 +294,50 @@ func TestS3ReaderLoop(t *testing.T) {
 
 func TestS3WorkerLoop(t *testing.T) {
 
+}
+
+// TestConfigureAccessPointEndpoint tests the configureAccessPointEndpoint function
+func TestConfigureAccessPointEndpoint(t *testing.T) {
+	testCases := []struct {
+		name             string
+		accessPointARN   string
+		expectedRegion   string
+		expectedEndpoint string
+	}{
+		{
+			name:             "Valid Access Point ARN in us-east-1",
+			accessPointARN:   "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point",
+			expectedRegion:   "us-east-1",
+			expectedEndpoint: "https://my-access-point-123456789.s3-accesspoint.us-east-1.amazonaws.com",
+		},
+		{
+			name:             "Valid Access Point ARN in eu-west-1",
+			accessPointARN:   "arn:aws:s3:eu-west-1:123456789:accesspoint/my-other-access-point",
+			expectedRegion:   "eu-west-1",
+			expectedEndpoint: "https://my-other-access-point-123456789.s3-accesspoint.eu-west-1.amazonaws.com",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a new aws.Config
+			awsConfig := aws.Config{}
+
+			// Call the function under test
+			configureAccessPointEndpoint(&awsConfig, tc.accessPointARN)
+
+			// Assert the region was set correctly
+			assert.Equal(t, tc.expectedRegion, awsConfig.Region)
+
+			// Assert the custom endpoint resolver was configured correctly
+			//nolint:staticcheck // haven't migrated to the new interface yet
+			if resolver, ok := awsConfig.EndpointResolverWithOptions.(aws.EndpointResolverWithOptionsFunc); ok {
+				endpoint, err := resolver("s3", tc.expectedRegion)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedEndpoint, endpoint.URL)
+			} else {
+				t.Fatalf("EndpointResolverWithOptions is not properly configured")
+			}
+		})
+	}
 }
