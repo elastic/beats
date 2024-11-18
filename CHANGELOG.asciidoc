@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 *Affecting all Beats*
 
 - Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use. {pull}41356[41356]
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 
 *Filebeat*
 
@@ -158,6 +159,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
+=======
+- Beats Docker images do not log to stderr by default. The workaround is to pass the CLI flag `-e` or to set `logging.to_stderr: true` in the configuration file.
+>>>>>>> 42dd93b99b (libbeat: increase total_fields.limit to 12500 (#41640))
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
