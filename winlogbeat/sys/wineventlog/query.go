@@ -161,7 +161,9 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 		qp.Select = append(qp.Select, "("+strings.Join(includes, " or ")+")")
 	}
 
-	qp.Suppress = "(" + strings.Join(excludes, " or ") + ")"
+	if len(excludes) > 0 {
+		qp.Suppress = "(" + strings.Join(excludes, " or ") + ")"
+	}
 
 	return nil
 }
