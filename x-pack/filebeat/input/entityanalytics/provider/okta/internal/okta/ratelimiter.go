@@ -23,7 +23,7 @@ func NewRateLimiter() *RateLimiter {
 	return &r
 }
 
-func (r RateLimiter) get(path string) *rate.Limiter {
+func (r RateLimiter) limiter(path string) *rate.Limiter {
 	if existing, ok := r[path]; ok {
 		return existing
 	}
@@ -33,7 +33,7 @@ func (r RateLimiter) get(path string) *rate.Limiter {
 }
 
 func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
-	limiter := r.get(endpoint)
+	limiter := r.limiter(endpoint)
 	log.Debugw("rate limit", "limit", limiter.Limit(), "burst", limiter.Burst(), "url", url.String())
 	return limiter.Wait(ctx)
 }
@@ -42,7 +42,7 @@ func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, lo
 //
 // See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
 func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration, log *logp.Logger) error {
-	limiter := r.get(endpoint)
+	limiter := r.limiter(endpoint)
 	limit := h.Get("X-Rate-Limit-Limit")
 	remaining := h.Get("X-Rate-Limit-Remaining")
 	reset := h.Get("X-Rate-Limit-Reset")

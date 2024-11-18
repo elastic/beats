@@ -18,8 +18,8 @@ func TestRateLimiter(t *testing.T) {
 
 	t.Run("separation by endpoint", func(t *testing.T) {
 		r := NewRateLimiter()
-		limiter1 := r.get("/foo")
-		limiter2 := r.get("/bar")
+		limiter1 := r.limiter("/foo")
+		limiter2 := r.limiter("/bar")
 
 		limiter1.SetBurst(1000)
 
@@ -32,7 +32,7 @@ func TestRateLimiter(t *testing.T) {
 		r := NewRateLimiter()
 
 		const endpoint = "/foo"
-		limiter := r.get(endpoint)
+		limiter := r.limiter(endpoint)
 
 		if !limiter.Allow() {
 			t.Errorf("doesn't allow an initial request")
@@ -52,7 +52,7 @@ func TestRateLimiter(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error from Update(): %v", err)
 		}
-		limiter = r.get(endpoint)
+		limiter = r.limiter(endpoint)
 
 		if limiter.Allow() {
 			t.Errorf("allowed a request when none are remaining")
