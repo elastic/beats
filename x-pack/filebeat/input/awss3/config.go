@@ -308,5 +308,8 @@ func (c config) getFileSelectors() []fileSelectorConfig {
 
 // Helper function to detect if an ARN is an Access Point
 func isValidAccessPointARN(arn string) bool {
-	return strings.Count(arn, ":") >= 5 && strings.Contains(arn, ":accesspoint/")
+	parts := strings.Split(arn, ":")
+	return len(parts) >= 6 &&
+		strings.HasPrefix(parts[5], "accesspoint/") &&
+		len(strings.TrimPrefix(parts[5], "accesspoint/")) > 0
 }

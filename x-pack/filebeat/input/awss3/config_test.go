@@ -661,6 +661,11 @@ func TestIsValidAccessPointARN(t *testing.T) {
 			arn:      "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point/extra",
 			expected: true,
 		},
+		{
+			name:     "ARN with empty name",
+			arn:      "arn:aws:s3:us-east-1:123456789:accesspoint/",
+			expected: false,
+		},
 	}
 
 	// Run test cases
