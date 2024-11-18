@@ -41,7 +41,7 @@ func SeedPRNG(t *testing.T) {
 	}
 
 	t.Logf("reproduce test with `go test ... -seed %v`", seed)
-	rand.Seed(seed)
+	rand.New(rand.NewSource(seed))
 }
 
 func GenerateEvents(numEvents, fieldsPerLevel, depth int) []beat.Event {
