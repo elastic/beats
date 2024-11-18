@@ -337,21 +337,14 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 		Events []beat.Event
 	}{
 		{
-			Name:   "5000 events with 5 fields on each level with 3 level depth without collisions",
-			Events: testutil.GenerateEvents(5000, 5, 3, false),
+			Name:   "5000 events with 5 fields on each level with 3 level depth",
+			Events: testutil.GenerateEvents(5000, 5, 3),
 		},
 		{
-			Name:   "5000 events with 5 fields on each level with 3 level depth with collisions",
-			Events: testutil.GenerateEvents(5000, 5, 3, true),
+			Name:   "500 events with 50 fields on each level with 5 level depth",
+			Events: testutil.GenerateEvents(500, 50, 3),
 		},
-		{
-			Name:   "500 events with 50 fields on each level with 5 level depth without collisions",
-			Events: testutil.GenerateEvents(500, 50, 3, false),
-		},
-		{
-			Name:   "500 events with 50 fields on each level with 5 level depth with collisions",
-			Events: testutil.GenerateEvents(500, 50, 3, true),
-		},
+
 		// Add more test cases as needed for benchmarking
 	}
 

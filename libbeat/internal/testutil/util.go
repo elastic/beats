@@ -44,31 +44,26 @@ func SeedPRNG(t *testing.T) {
 	rand.Seed(seed)
 }
 
-func GenerateEvents(numEvents, fieldsPerLevel, depth int, withCollisions bool) []beat.Event {
+func GenerateEvents(numEvents, fieldsPerLevel, depth int) []beat.Event {
 	events := make([]beat.Event, numEvents)
 	for i := 0; i < numEvents; i++ {
 		event := &beat.Event{Fields: mapstr.M{}}
-		generateFields(event, fieldsPerLevel, depth, withCollisions)
+		generateFields(event, fieldsPerLevel, depth)
 		events[i] = *event
 	}
 	return events
 }
 
-func generateFields(event *beat.Event, fieldsPerLevel, depth int, withCollisions bool) {
+func generateFields(event *beat.Event, fieldsPerLevel, depth int) {
 	if depth == 0 {
 		return
 	}
 
 	for j := 1; j <= fieldsPerLevel; j++ {
 		var key string
-		for d := 1; d < depth; d++ {
+		for d := 1; d <= depth; d++ {
 			key += fmt.Sprintf("level%dfield%d", d, j)
 			key += "."
-		}
-		if withCollisions {
-			key += fmt.Sprintf("Level%dField%d", depth, j) // Creating a collision (Level is capitalized)
-		} else {
-			key += fmt.Sprintf("level%dfield%d", depth, j)
 		}
 		event.Fields.Put(key, "value")
 		key = ""
