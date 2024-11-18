@@ -21,8 +21,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -133,6 +135,50 @@ func TestFinalizeMessage(t *testing.T) {
 		})
 	}
 
+}
+
+func TestLogTruncatedMessage(t *testing.T) {
+	tests := []struct {
+		name       string
+		limit      int
+		messages   []reader.Message
+		assertFunc func(t *testing.T, logs []observer.LoggedEntry)
+	}{
+		{
+			name:  "truncated",
+			limit: 10,
+			messages: []reader.Message{
+				{Content: []byte("line1\nline2\nline3"), Bytes: 15},
+			},
+			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
+				assert.Len(t, logs, 1)
+				assert.Equal(t, "Multiline message is too large, truncated to the limit of 5 lines or 10 bytes", logs[0].Message)
+				assert.Equal(t, "warn", logs[0].Level.String())
+			},
+		},
+		{
+			name:  "not truncated",
+			limit: 15,
+			messages: []reader.Message{
+				{Content: []byte("line1\nline2"), Bytes: 10},
+			},
+			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
+				assert.Empty(t, logs)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logp.DevelopmentSetup(logp.ToObserverOutput())
+
+			buf := getTestMessageBuffer(tt.limit, false, tt.messages)
+			buf.finalize()
+
+			logs := logp.ObserverLogs().FilterLoggerName("reader_multiline").TakeAll()
+			tt.assertFunc(t, logs)
+		})
+	}
 }
 
 func getTestMessageBuffer(maxBytes int, skipNewline bool, messages []reader.Message) *messageBuffer {
