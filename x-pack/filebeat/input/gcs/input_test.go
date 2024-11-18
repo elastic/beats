@@ -6,7 +6,9 @@ package gcs
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -547,7 +549,7 @@ func Test_StorageClient(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tt.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
@@ -607,11 +609,23 @@ func Test_StorageClient(t *testing.T) {
 	}
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(t *testing.T) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	id, err := generateRandomID(8)
+	if err != nil {
+		t.Fatalf("failed to generate random id: %v", err)
+	}
 	return v2.Context{
 		Logger:      logp.NewLogger("gcs_test"),
-		ID:          "test_id",
+		ID:          "gcs_test-" + id,
 		Cancelation: ctx,
 	}, cancel
+}
+
+func generateRandomID(length int) (string, error) {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }
