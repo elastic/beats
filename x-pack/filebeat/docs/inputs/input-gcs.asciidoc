@@ -462,5 +462,38 @@ filebeat.inputs:
 In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the buckets
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                      | Description
+| `url`                                       | URL of the input resource.
+| `errors_total`                              | Total number of errors encountered by the input.
+| `decode_errors_total`                       | Total number of decode errors encountered by the input.
+| `gcs_objects_requested_total`               | Total number of GCS objects downloaded.
+| `gcs_objects_published_total`               | Total number of GCS objects processed that were published.
+| `gcs_objects_listed_total`                  | Total number of GCS objects returned by list operations.
+| `gcs_bytes_processed_total`                 | Total number of GCS bytes processed.
+| `gcs_events_created_total`                  | Total number of events created from processing GCS data.
+| `gcs_failed_jobs_total`                     | Total number of failed jobs.
+| `gcs_expired_failed_jobs_total`             | Total number of expired failed jobs that could not be recovered.
+| `gcs_objects_tracked_gauge`                 | Number of objects currently tracked in the state registry (gauge).
+| `gcs_objects_inflight_gauge`                | Number of GCS objects inflight (gauge).
+| `gcs_jobs_scheduled_after_validation`       | Histogram of the number of jobs scheduled after validation.
+| `gcs_object_processing_time`                | Histogram of the elapsed GCS object processing times in nanoseconds (start of download to completion of parsing).
+| `gcs_object_size_in_bytes`                  | Histogram of processed GCS object size in bytes.
+| `gcs_events_per_object`                     | Histogram of event count per GCS object.
+| `source_lag_time`                           | Histogram of the time between the source (Updated) timestamp and the time the object was read, in nanoseconds.
+|=======
+
+==== Common input options
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 NOTE: Any feedback is welcome which will help us further optimize this input. Please feel free to open a github issue for any bugs or feature requests.
