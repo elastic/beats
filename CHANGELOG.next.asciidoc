@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
 - The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 
 - Add kafka compression support for ZSTD.
 
@@ -102,6 +103,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use {pull}41356[41356]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
+- Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
 
 *Auditbeat*
 
@@ -177,6 +179,20 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
+- Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
+- Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
+- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
+- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
+- Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
+- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
+- Remove excessive info-level logs in cgroups setup {pull}40491[40491]
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
+- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
+- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
+- Fix http server helper SSL config. {pull}39405[39405]
+- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 
 *Osquerybeat*
 
@@ -292,6 +308,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Libbeat*
 
+- enrich events with EC2 tags in add_cloud_metadata processor {pull}41477[41477]
 
 
 *Heartbeat*
@@ -337,6 +354,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
+- Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 
 *Metricbeat*
@@ -351,6 +369,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
+- Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
 *Functionbeat*
