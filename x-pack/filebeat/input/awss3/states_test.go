@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -122,4 +123,74 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			assert.Equal(t, test.expectedIsProcessed, isProcessed)
 		})
 	}
+}
+
+func TestStatesCleanUp(t *testing.T) {
+	bucketName := "test-bucket"
+	lModifiedTime := time.Unix(0, 0)
+	stateA := newState(bucketName, "a", "a-etag", lModifiedTime)
+	stateB := newState(bucketName, "b", "b-etag", lModifiedTime)
+	stateC := newState(bucketName, "c", "c-etag", lModifiedTime)
+
+	tests := []struct {
+		name       string
+		initStates []state
+		knownIDs   []string
+		expectIDs  []string
+	}{
+		{
+			name:       "No cleanup if not missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID(), stateB.ID(), stateC.ID()},
+			expectIDs:  []string{stateA.ID(), stateB.ID(), stateC.ID()},
+		},
+		{
+			name:       "Clean up if missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID()},
+			expectIDs:  []string{stateA.ID()},
+		},
+		{
+			name:       "Clean up everything",
+			initStates: []state{stateA, stateC}, // given A, C
+			knownIDs:   []string{stateB.ID()},   // but known B
+			expectIDs:  []string{},              // empty state & store
+		},
+		{
+			name:       "Empty known IDs are valid",
+			initStates: []state{stateA}, // given A
+			knownIDs:   []string{},      // Known nothing
+			expectIDs:  []string{},      // empty state & store
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			store := openTestStatestore()
+			statesInstance, err := newStates(nil, store)
+			require.NoError(t, err, "states creation must succeed")
+
+			for _, s := range test.initStates {
+				err := statesInstance.AddState(s)
+				require.NoError(t, err, "state initialization must succeed")
+			}
+
+			// perform cleanup
+			err = statesInstance.CleanUp(test.knownIDs)
+			require.NoError(t, err, "state cleanup must succeed")
+
+			// validate
+			for _, id := range test.expectIDs {
+				// must be in local state
+				_, ok := statesInstance.states[id]
+				require.True(t, ok, fmt.Errorf("expected id %s in state, but got missing", id))
+
+				// must be in store
+				ok, err := statesInstance.store.Has(getStoreKey(id))
+				require.NoError(t, err, "state has must succeed")
+				require.True(t, ok, fmt.Errorf("expected id %s in store, but got missing", id))
+			}
+		})
+	}
+
 }
