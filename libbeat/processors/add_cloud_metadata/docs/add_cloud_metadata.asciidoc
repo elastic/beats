@@ -37,7 +37,8 @@ Cloud providers tend to maintain metadata services compliant with other cloud pr
 For example, Openstack supports https://docs.openstack.org/nova/latest/user/metadata.html#ec2-compatible-metadata[EC2 compliant metadat service].
 This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted).
 The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results.
-Currently, `aws/ec2` and `azure` has priority over any other provider as their metadata retrival rely on SDKs.
+Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrival rely on SDKs.
+The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
 
 [float]
 ==== Configurations
