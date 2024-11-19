@@ -46,11 +46,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	if config.AccessPointARN != "" {
-		configureAccessPointEndpoint(&awsConfig, config.AccessPointARN)
-	}
-
-	if config.AccessPointARN == "" && config.RegionName != "" {
+	if config.RegionName != "" {
 		// The awsConfig now contains the region from the credential profile or default region
 		// if the region is explicitly set in the config, then it wins
 		awsConfig.Region = config.RegionName

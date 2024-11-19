@@ -128,29 +128,3 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 	return "unknown"
 }
-
-func configureAccessPointEndpoint(awsConfig *awssdk.Config, accessPointARN string) error {
-	// When using the access point ARN, requests must be directed to the
-	// access point hostname. The access point hostname takes the form
-	// AccessPointName-AccountId.s3-accesspoint.Region.amazonaws.com
-	parts := strings.Split(accessPointARN, ":")
-	region := parts[3]
-	accountID := parts[4]
-	accessPointName := strings.Split(parts[5], "/")[1]
-
-	// Construct the endpoint for the Access Point
-	endpoint := fmt.Sprintf("%s-%s.s3-accesspoint.%s.amazonaws.com", accessPointName, accountID, region)
-
-	// Set up a custom endpoint resolver for Access Points
-	//nolint:staticcheck // haven't migrated to the new interface yet
-	awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-		return awssdk.Endpoint{
-			URL:               fmt.Sprintf("https://%s", endpoint),
-			SigningRegion:     region,
-			HostnameImmutable: true,
-		}, nil
-	})
-	awsConfig.Region = region
-
-	return nil
-}
