@@ -3,6 +3,98 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.16.0]]
+=== Beats version 8.16.0
+https://github.com/elastic/beats/compare/v8.15.4\...v8.16.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix FQDN being lowercased when used as `host.hostname`. {issue}39993[39993]
+- Beats won't log start up information when running under the Elastic Agent. {pull}40390[40390]
+- Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
+- Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
+
+*Filebeat*
+
+- Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
+- Added support for hyphens in extension keys in `decode_cef` Filebeat processor. {pull}40427[40427]
+- Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
+- Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
+- Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Redis: Added replication role as a field to submitted slowlogs.
+- Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+
+*Metricbeat*
+
+- Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Request status from a separate socket to avoid data congestion. {pull}41207[41207]
+
+*Filebeat*
+
+- Fix crashes in the journald input. {pull}40061[40061]
+- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Fix a bug in Salesforce input to only handle responses with 200 status code. {pull}41015[41015]
+- Fixed failed job handling and removed false-positive error logs in the GCS input. {pull}41142[41142]
+- Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
+- Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+
+*Metricbeat*
+
+- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
+- Remove excessive info-level logs in cgroups setup. {pull}40491[40491]
+- Fix http server helper SSL config. {pull}39405[39405]
+
+==== Added
+
+*Filebeat*
+
+- Implement Elastic Agent status and health reporting for Netflow Filebeat input. {pull}40080[40080]
+- Add SSL and username support for Redis input, now the input includes support for Redis 6.0+. {pull}40111[40111]
+- Add scaling up support for Netflow input. {issue}37761[37761] {pull}40122[40122]
+- Update CEL mito extensions to v1.15.0. {pull}40294[40294]
+- Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
+- Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
+- Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
+- Disable event normalization for netflow input. {pull}40635[40635]
+- Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
+- Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Added support for Microsoft Entra ID RBAC authentication. {issue}40434[40434] {pull}40879[40879]
+- Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests. {pull}40301[40301]
+- Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
+- Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
+- Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
+- Add CSV decoder to awss3 input. {pull}40896[40896]
+- Change request trace logging to include headers instead of complete request. {pull}41072[41072]
+- Improved GCS input documentation. {pull}41143[41143]
+- Add CSV decoding capacity to azureblobstorage input. {pull}40978[40978]
+- Add CSV decoding capacity to gcs input. {pull}40979[40979]
+- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
+- Jounrald input now supports filtering by facilities. {pull}41061[41061]
+- Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
+
+*Heartbeat*
+
+- Add journey duration to synthetics browser events. {pull}40230[40230]
+
+*Metricbeat*
+
+- Add new metrics fot datastore and minor changes to overall vSphere metrics. {pull}40766[40766]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634] {pull}40694[40694]
+- Add AWS Cloudwatch capability to retrieve tags from AWS/ApiGateway resources. {pull}40755[40755]
+- Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
+
+
 [[release-notes-8.15.4]]
 === Beats version 8.15.4
 https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
