@@ -254,7 +254,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
-	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
+	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)
 	if err != nil {
 		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
 		return err
