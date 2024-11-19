@@ -198,10 +198,11 @@ func NewMetadataKeyword(publisherMetadataHandle EvtHandle, arrayHandle EvtObject
 	if err != nil {
 		return nil, err
 	}
-	messageID, ok := v.(uint32)
-	var message string
+	messageID := v.(uint32)
+
 	// The value is -1 if the keyword did not specify a message attribute.
-	if ok {
+	var message string
+	if int32(messageID) != -1 {
 		message, err = evtFormatMessage(publisherMetadataHandle, NilHandle, messageID, nil, EvtFormatMessageId)
 		if err != nil {
 			return nil, err
@@ -270,10 +271,11 @@ func NewMetadataOpcode(publisherMetadataHandle EvtHandle, arrayHandle EvtObjectA
 	if err != nil {
 		return nil, err
 	}
-	messageID, ok := v.(uint32)
+	messageID := v.(uint32)
+
 	// The value is -1 if the opcode did not specify a message attribute.
 	var message string
-	if ok {
+	if int32(messageID) != -1 {
 		message, err = evtFormatMessage(publisherMetadataHandle, NilHandle, messageID, nil, EvtFormatMessageId)
 		if err != nil {
 			return nil, err
@@ -342,10 +344,11 @@ func NewMetadataLevel(publisherMetadataHandle EvtHandle, arrayHandle EvtObjectAr
 	if err != nil {
 		return nil, err
 	}
-	messageID, ok := v.(uint32)
+	messageID := v.(uint32)
+
 	// The value is -1 if the level did not specify a message attribute.
 	var message string
-	if ok {
+	if int32(messageID) != -1 {
 		message, err = evtFormatMessage(publisherMetadataHandle, NilHandle, messageID, nil, EvtFormatMessageId)
 		if err != nil {
 			return nil, err
@@ -415,10 +418,11 @@ func NewMetadataTask(publisherMetadataHandle EvtHandle, arrayHandle EvtObjectArr
 	if err != nil {
 		return nil, err
 	}
-	messageID, ok := v.(uint32)
+	messageID := v.(uint32)
+
 	// The value is -1 if the task did not specify a message attribute.
 	var message string
-	if ok {
+	if int32(messageID) != -1 {
 		message, err = evtFormatMessage(publisherMetadataHandle, NilHandle, messageID, nil, EvtFormatMessageId)
 		if err != nil {
 			return nil, err
@@ -495,10 +499,11 @@ func NewMetadataChannel(publisherMetadataHandle EvtHandle, arrayHandle EvtObject
 	if err != nil {
 		return nil, err
 	}
-	messageID, ok := v.(uint32)
-	// The value is -1 if the channel did not specify a message attribute.
+	messageID := v.(uint32)
+
+	// The value is -1 if the task did not specify a message attribute.
 	var message string
-	if ok {
+	if int32(messageID) != -1 {
 		message, err = evtFormatMessage(publisherMetadataHandle, NilHandle, messageID, nil, EvtFormatMessageId)
 		if err != nil {
 			return nil, err
