@@ -200,6 +200,7 @@ filebeat.inputs:
 - Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
 - Jounrald input now supports filtering by facilities. {pull}41061[41061]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 
 *Heartbeat*
 
