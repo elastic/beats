@@ -27,21 +27,21 @@ type nullSafeCache[K comparable, V any] struct {
 
 func (c *nullSafeCache[K, V]) Add(key K, value V) (evicted bool) {
 	if c.cache == nil {
-		return
+		return false
 	}
 	return c.cache.Add(key, value)
 }
 
 func (c *nullSafeCache[K, V]) Get(key K) (value V, ok bool) {
 	if c.cache == nil {
-		return
+		return value, ok
 	}
 	return c.cache.Get(key)
 }
 
 func (c *nullSafeCache[K, V]) Resize(size int) (evicted int) {
 	if c.cache == nil {
-		return
+		return 0
 	}
 	return c.cache.Resize(c.minSize + size)
 }
