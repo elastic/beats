@@ -187,7 +187,7 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 			if result.err == nil && result.metadata != nil {
 				return &result
 			} else if result.err != nil {
-				p.logger.Errorf("add_cloud_metadata: received error %v", result.err)
+				p.logger.Errorf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
 			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")
