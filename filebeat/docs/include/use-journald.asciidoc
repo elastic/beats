@@ -1,12 +1,4 @@
 *`var.use_journald`*::
 
 A boolean that when set to `true` will read logs from Journald. When
-Journald is used all events contain the tag `journald`
-
-*`var.use_files`*::
-
-A boolean that when set to `true` will read logs from the log files
-defined by `vars.paths`.
-
-If neither `var.use_journald` nor `var.use_files` are set (or both are
-`false`) {beatname_uc} will auto-detect the source for the logs.
+Journald is used all events contain the tag `journald`.
