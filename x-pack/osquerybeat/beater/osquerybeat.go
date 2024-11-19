@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	lru "github.com/hashicorp/golang-lru"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
 	klogger "github.com/osquery/osquery-go/plugin/logger"
