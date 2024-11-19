@@ -42,7 +42,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	type stateTestCase struct {
 		// An initialization callback to invoke on the (initially empty) states.
-		statesEdit func(states *states)
+		statesEdit func(states *states) error
 
 		// The state to call IsProcessed on and the expected result
 		state               state
@@ -62,42 +62,42 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			expectedIsProcessed: false,
 		},
 		"not existing state": {
-			statesEdit: func(states *states) {
-				states.AddState(testState2)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState2)
 			},
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"existing state": {
-			statesEdit: func(states *states) {
-				states.AddState(testState1)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			expectedIsProcessed: true,
 		},
 		"existing stored state is persisted": {
-			statesEdit: func(states *states) {
+			statesEdit: func(states *states) error {
 				state := testState1
 				state.Stored = true
-				states.AddState(state)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing failed state is persisted": {
-			statesEdit: func(states *states) {
+			statesEdit: func(states *states) error {
 				state := testState1
 				state.Failed = true
-				states.AddState(state)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing unprocessed state is not persisted": {
-			statesEdit: func(states *states) {
-				states.AddState(testState1)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -112,7 +112,8 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			states, err := newStates(nil, store)
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
-				test.statesEdit(states)
+				err = test.statesEdit(states)
+				require.NoError(t, err, "states edit must succeed")
 			}
 			if test.shouldReload {
 				states, err = newStates(nil, store)
