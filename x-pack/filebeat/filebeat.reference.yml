@@ -2996,6 +2996,9 @@ filebeat.inputs:
   # Bucket ARN used for polling AWS S3 buckets
   #bucket_arn: arn:aws:s3:::test-s3-bucket
 
+  # Access Point ARN used for polling AWS S3 buckets
+  #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
+
   # Bucket Name used for polling non-AWS S3 buckets
   #non_aws_bucket_name: test-s3-bucket
 
