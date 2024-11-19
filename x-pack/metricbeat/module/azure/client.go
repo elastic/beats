@@ -34,6 +34,17 @@ type Client struct {
 	MetricRegistry         *MetricRegistry
 }
 
+// Resource definitions grouping criteria
+type ResDefGroupingCriteria struct {
+	Namespace      string
+	SubscriptionID string
+	Location       string
+	Names          string
+	Aggregations   string
+	TimeGrain      string
+	Dimensions     string
+}
+
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
 type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig)
 
@@ -294,19 +305,88 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	return result
 }
 
+// Now, this function will query the batch API for each group
+func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteria][]Metric, referenceTime time.Time, reporter mb.ReporterV2) []Metric {
+	var result []Metric
+	for criteria, metricsDefinitions := range groupedMetrics {
+		// Same end time for all metrics in the same batch.
+		interval := client.Config.Period
+
+		// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
+		endTime := referenceTime.Add(interval * (-1))
+		startTime := endTime.Add(interval * (-1))
+		// Limit batch size to 50 resources (if you have more, you can split the batch)
+		batchSize := 6
+		filter := ""
+		if len(metricsDefinitions[0].Dimensions) > 0 {
+			var filterList []string
+			for _, dim := range metricsDefinitions[0].Dimensions {
+				filterList = append(filterList, dim.Name+" eq '"+dim.Value+"'")
+			}
+			filter = strings.Join(filterList, " AND ")
+		}
+		for i := 0; i < len(metricsDefinitions); i += batchSize {
+			end := i + batchSize
+			if end > len(metricsDefinitions) {
+				end = len(metricsDefinitions)
+			}
+
+			// Slice the metrics to form the batch request
+			batchMetrics := metricsDefinitions[i:end]
+
+			// Make the batch API call (adjust parameters as needed)
+			r, err := client.AzureMonitorService.QueryResources(
+				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
+				criteria.SubscriptionID,
+				criteria.Namespace,
+				criteria.TimeGrain,
+				startTime.Format("2006-01-02T15:04:05.000Z07:00"),
+				endTime.Format("2006-01-02T15:04:05.000Z07:00"),
+				strings.Split(criteria.Names, ","),
+				batchMetrics[0].Aggregations,
+				filter,
+			)
+			if err != nil {
+				err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
+				client.Log.Error(err)
+				reporter.Error(err)
+				continue
+			}
+
+			// Process the response as needed
+			for i, v := range r {
+				client.Log.Infof("Val of Metric in  response is %+v", v)
+				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
+					timeGrain: *r[i].Interval,
+					timestamp: referenceTime,
+				})
+				values := mapMetricValues2(client, v)
+				client.Log.Infof("Values are %+v", values)
+				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
+			}
+
+			result = append(result, metricsDefinitions...)
+		}
+	}
+
+	return result
+}
+
 // CreateMetric function will create a client metric based on the resource and metrics configured
-func (client *Client) CreateMetric(resourceId string, subResourceId string, namespace string, metrics []string, aggregations string, dimensions []Dimension, timeGrain string) Metric {
+func (client *Client) CreateMetric(resourceId string, subResourceId string, namespace string, location string, subscriptionId string, metrics []string, aggregations string, dimensions []Dimension, timeGrain string) Metric {
 	if subResourceId == "" {
 		subResourceId = resourceId
 	}
 	met := Metric{
-		ResourceId:    resourceId,
-		ResourceSubId: subResourceId,
-		Namespace:     namespace,
-		Names:         metrics,
-		Dimensions:    dimensions,
-		Aggregations:  aggregations,
-		TimeGrain:     timeGrain,
+		ResourceId:     resourceId,
+		ResourceSubId:  subResourceId,
+		Namespace:      namespace,
+		Names:          metrics,
+		Dimensions:     dimensions,
+		Aggregations:   aggregations,
+		TimeGrain:      timeGrain,
+		Location:       location,
+		SubscriptionId: subscriptionId,
 	}
 	if prevMetrics, ok := client.ResourceConfigurations.Metrics[resourceId]; ok {
 		for _, prevMet := range prevMetrics {
@@ -320,7 +400,7 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 }
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
-func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timeGrain string) []Metric {
+func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, location string, subscriptionId string, subResourceId string, namespace string, dim []Dimension, timeGrain string) []Metric {
 	clientMetrics := make([]Metric, 0)
 	metricGroups := make(map[string][]armmonitor.MetricDefinition)
 
@@ -333,7 +413,7 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, namespace, metricNames, key, dim, timeGrain))
+		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, location, subscriptionId, namespace, metricNames, key, dim, timeGrain))
 	}
 
 	return clientMetrics
@@ -426,15 +506,15 @@ func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
 	}
 }
 
-// NewMockClient instantiates a new client with the mock azure service
-func NewMockClient() *Client {
-	azureMockService := new(MockService)
-	logger := logp.NewLogger("test azure monitor")
-	client := &Client{
-		AzureMonitorService: azureMockService,
-		Config:              Config{},
-		Log:                 logger,
-		MetricRegistry:      NewMetricRegistry(logger),
-	}
-	return client
-}
+// // NewMockClient instantiates a new client with the mock azure service
+// func NewMockClient() *Client {
+// 	azureMockService := new(MockService)
+// 	logger := logp.NewLogger("test azure monitor")
+// 	client := &Client{
+// 		AzureMonitorService: azureMockService,
+// 		Config:              Config{},
+// 		Log:                 logger,
+// 		MetricRegistry:      NewMetricRegistry(logger),
+// 	}
+// 	return client
+// }

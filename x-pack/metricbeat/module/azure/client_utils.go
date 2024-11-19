@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
@@ -221,4 +222,101 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 		}
 	}
 	return VmResource{}, false
+}
+
+// Helper function to generate a string key for the dimensions
+func getDimensionKey(dimensions []Dimension) string {
+	var dimensionKey string
+	for _, dimension := range dimensions {
+		dimensionKey += dimension.Name + ","
+	}
+	return dimensionKey
+}
+
+// Function to group resources by common characteristics
+func groupResourcesForBatchAPI(metricsDefinitions []Metric) map[ResDefGroupingCriteria][]Metric {
+	groups := make(map[ResDefGroupingCriteria][]Metric)
+
+	for _, metric := range metricsDefinitions {
+		criteria := ResDefGroupingCriteria{
+			Namespace:      metric.Namespace,
+			SubscriptionID: metric.SubscriptionId,
+			Location:       metric.Location,
+			Names:          strings.Join(metric.Names, ","),
+			TimeGrain:      metric.TimeGrain,
+			Dimensions:     getDimensionKey(metric.Dimensions),
+		}
+		groups[criteria] = append(groups[criteria], metric)
+	}
+
+	return groups
+}
+
+// Function to get the resource IDs from the batch of metrics
+func getResourceIDs(metrics []Metric) []*string {
+	var resourceIDs []*string
+	for _, metric := range metrics {
+		resourceIDs = append(resourceIDs, &metric.ResourceId)
+	}
+	return resourceIDs
+}
+
+// metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func metricIsEmpty2(metric azmetrics.MetricValue) bool {
+	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
+		return true
+	}
+	return false
+}
+
+func mapMetricValues2(client *Client, metricValues *azmetrics.MetricValues) []MetricValue {
+	var currentMetrics []MetricValue
+	// compare with the previously returned values and filter out any double records
+	client.Log.Infof("there are %d metricvalues", len(metricValues.Values))
+	for _, v := range metricValues.Values {
+		client.Log.Infof("Value is %+v", v)
+		for _, t := range v.TimeSeries {
+			client.Log.Infof("TimeSeries is %+v", t)
+			for _, mv := range t.Data {
+				client.Log.Infof("Data is %+v", mv)
+				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
+				if metricIsEmpty2(*mv) {
+					client.Log.Infof("Data is empty")
+					continue
+				}
+				//// remove metric values that are not part of the timeline selected
+				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
+				//	continue
+				//}
+				// define the new metric value and match aggregations values
+				var val MetricValue
+				val.name = *v.Name.Value
+				val.timestamp = *mv.TimeStamp
+				if mv.Minimum != nil {
+					val.min = mv.Minimum
+				}
+				if mv.Maximum != nil {
+					val.max = mv.Maximum
+				}
+				if mv.Average != nil {
+					val.avg = mv.Average
+				}
+				if mv.Total != nil {
+					val.total = mv.Total
+				}
+				if mv.Count != nil {
+					val.count = mv.Count
+				}
+				if t.MetadataValues != nil {
+					for _, dim := range t.MetadataValues {
+						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
+					}
+				}
+				client.Log.Infof("Val created is %+v", val)
+				currentMetrics = append(currentMetrics, val)
+			}
+		}
+	}
+
+	return currentMetrics
 }

@@ -23,7 +23,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 		defer close(client.ResourceConfigurations.ErrorChan)
 		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 		for _, resource := range resources {
-			res, err := getMappedResourceDefinitions(client, *resource.ID, resourceConfig)
+			res, err := getMappedResourceDefinitions(client, *resource.ID, *resource.Location, client.Config.SubscriptionId, resourceConfig)
 			if err != nil {
 				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
 				return
@@ -34,7 +34,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 	}()
 }
 
-func getMappedResourceDefinitions(client *azure.Client, resourceId string, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func getMappedResourceDefinitions(client *azure.Client, resourceId string, location string, subscriptionId string, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 
 	var metrics []azure.Metric
 	// We use this map to avoid calling the metrics definition function for the same namespace and same resource
@@ -86,7 +86,7 @@ func getMappedResourceDefinitions(client *azure.Client, resourceId string, resou
 			for _, metricName := range metricGroup {
 				metricNames = append(metricNames, *metricName.Name.Value)
 			}
-			metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, metricNames, key, dim, metric.Timegrain))
+			metrics = append(metrics, client.CreateMetric(resourceId, "", metric.Namespace, location, subscriptionId, metricNames, key, dim, metric.Timegrain))
 		}
 	}
 	return metrics, nil

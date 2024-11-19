@@ -35,7 +35,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 		defer close(client.ResourceConfigurations.ErrorChan)
 		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 		for _, resource := range resources {
-			res, err := getStorageMappedResourceDefinitions(client, *resource.ID, namespaces)
+			res, err := getStorageMappedResourceDefinitions(client, *resource.ID, *resource.Location, client.Config.SubscriptionId, namespaces)
 			if err != nil {
 				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
 				return
@@ -46,7 +46,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 	}()
 }
 
-func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, namespaces []string) ([]azure.Metric, error) {
+func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, location string, subscriptionId string, namespaces []string) ([]azure.Metric, error) {
 
 	var metrics []azure.Metric
 
@@ -87,7 +87,7 @@ func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string
 					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 				}
 
-				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, resourceID, namespace, dimensions, time)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, resourceID, namespace, location, subscriptionId, dimensions, time)...)
 			}
 		}
 	}

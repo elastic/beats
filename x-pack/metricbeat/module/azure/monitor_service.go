@@ -20,6 +20,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 )
@@ -30,6 +31,7 @@ type MonitorService struct {
 	metricDefinitionClient *armmonitor.MetricDefinitionsClient
 	metricNamespaceClient  *armmonitor.MetricNamespacesClient
 	resourceClient         *armresources.Client
+	queryResourceClient    *azmetrics.Client
 	context                context.Context
 	log                    *logp.Logger
 }
@@ -96,11 +98,27 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
 	}
 
+	//https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics#NewClient
+	queryResourceClient, err := azmetrics.NewClient(
+		//"global",
+		"https://eastus2.metrics.monitor.azure.com",
+		//"https://westus3.metrics.monitor.azure.com",
+		credential,
+		&azmetrics.ClientOptions{
+			ClientOptions: clientOptions,
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create query resources client: %w", err)
+
+	}
+
 	service := &MonitorService{
 		metricDefinitionClient: metricsDefinitionClient,
 		metricsClient:          metricsClient,
 		metricNamespaceClient:  metricNamespaceClient,
 		resourceClient:         resourceClient,
+		queryResourceClient:    queryResourceClient,
 		context:                context.Background(),
 		log:                    logp.NewLogger("azure monitor service"),
 	}
@@ -260,6 +278,116 @@ func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, 
 	}
 
 	return metricDefinitionCollection, nil
+}
+
+func (service *MonitorService) QueryResources(
+	resourceIDs []*string,
+	subscriptionID string,
+	namespace string,
+	timegrain string,
+	//timespan string,
+	startTime string,
+	endTime string,
+	metricNames []string,
+	aggregations string,
+	filter string) ([]*azmetrics.MetricValues, error) {
+
+	var tg *string
+	//var interval string
+
+	if timegrain != "" {
+		tg = &timegrain
+	}
+
+	// orderBy := ""
+	//resultTypeData := azmetrics.ResultTypeData
+
+	// check for limit of requested metrics (20)
+	//var metrics []armmonitor.Metric
+
+	// API fails with bad request if filter value is sent empty.
+	var metricsFilter *string
+	var top int32
+
+	if filter != "" {
+		metricsFilter = &filter
+		top = int32(10)
+	}
+
+	//for i := 0; i < len(metricNames); i += metricNameLimit {
+	//	end := i + metricNameLimit
+	//
+	//	if end > len(metricNames) {
+	//		end = len(metricNames)
+	//	}
+	//
+	//metricNames := strings.Join(metricNames[i:end], ",")
+
+	opts := azmetrics.QueryResourcesOptions{
+		Aggregation: &aggregations,
+		Filter:      metricsFilter,
+		Interval:    tg,
+		//Metricnames: &metricNames,
+		//Timespan:    &timespan,
+		StartTime: &startTime,
+		EndTime:   &endTime,
+
+		Top: &top,
+		// Orderby:         &orderBy,
+		//ResultType: &resultTypeData,
+	}
+
+	//if namespace != "" {
+	//	opts.Metricnamespace = &namespace
+	//}
+
+	resp := []*azmetrics.MetricValues{}
+
+	// len(resourceIDs) 5, 50, 500
+
+	// call the query resources client passing 50 resourceIDs at a time
+	for i := 0; i < len(resourceIDs); i += 50 {
+		end := i + 50
+
+		if end > len(resourceIDs) {
+			end = len(resourceIDs)
+		}
+
+		r, err := service.queryResourceClient.QueryResources(
+			service.context,
+			subscriptionID,
+			namespace,
+			//metricNames[i:end],
+			metricNames,
+			azmetrics.ResourceIDList{
+				ResourceIDs: resourceIDs[i:end],
+			},
+			&opts,
+		)
+
+		// check for applied charges before returning any errors
+		//if resp.Cost != nil && *resp.Cost != 0 {
+		//	service.log.Warnf("Charges amounted to %v are being applied while retrieving the metric values from the resource %s ", *resp.Cost, resourceId)
+		//}
+
+		if err != nil {
+			return nil, err
+		}
+
+		resp = append(resp, r.Values...)
+	}
+
+	//interval = *resp.Interval
+	//for _, v := range resp.Values {
+	//	//metrics = append(metrics, v)
+	//	fmt.Println(v)
+	//}
+	//
+	//}
+	//return metrics, nil
+
+	return resp, nil
+
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details

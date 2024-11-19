@@ -39,7 +39,9 @@ type Metric struct {
 	TimeGrain    string
 	ResourceId   string
 	// ResourceSubId is used for the metric values api as namespaces can apply to sub resources ex. storage account: container, blob, vm scaleset: vms
-	ResourceSubId string
+	ResourceSubId  string
+	Location       string
+	SubscriptionId string
 }
 
 // Dimension represents the azure metric dimension details

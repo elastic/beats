@@ -120,6 +120,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
+	var accumulatedMetrics []Metric
+
 	for {
 		select {
 		case resMetricDefinition, ok := <-m.Client.ResourceConfigurations.MetricDefinitionsChan:
@@ -129,27 +131,56 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
 					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
 				}
-				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
-			} else {
-				// Process each metric definition as it arrives
-				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
-				metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
-				if len(resMetricDefinition) == 0 {
-					return fmt.Errorf("error mapping metrics to events: %w", err)
-				}
-				resId := resMetricDefinition[0].ResourceId
-				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
-				for _, metricsDefinition := range metricsByResourceId {
-					// Group metric definitions by cloud resource ID.
-					// We group the metric definitions by resource ID to fetch
-					// metric values for each cloud resource in one API call.
-					metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+				if len(accumulatedMetrics) > 0 {
+					m.Client.Log.Infof("MetricDefinitionsChan channel closed but accumulatedMetrics are %v", len(accumulatedMetrics))
+					// If we still have accumulated metrics, process them in a batch.
+					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
 					m.Client.Log.Infof("metricValues received at %s", referenceTime)
+					m.Client.Log.Infof("metricValues are %+v", metricValues)
 					// Turns metric values into events and sends them to Elasticsearch.
 					if err := mapToEvents(metricValues, m.Client, report); err != nil {
 						return fmt.Errorf("error mapping metrics to events: %w", err)
 					}
 				}
+				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
+			} else {
+				// Process each metric definition as it arrives
+				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
+				accumulatedMetrics = append(accumulatedMetrics, resMetricDefinition...)
+				// metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
+				if len(resMetricDefinition) == 0 {
+					return fmt.Errorf("error mapping metrics to events: %w", err)
+				}
+				resId := resMetricDefinition[0].ResourceId
+				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
+				m.Client.Log.Infof("accumulatedMetrics are %v", len(accumulatedMetrics))
+				if len(accumulatedMetrics) >= 6 {
+					// Group and query in batch when we hit the threshold
+					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+					m.Client.Log.Infof("accumulatedMetrics are now >=6 %v", len(accumulatedMetrics))
+					m.Client.Log.Infof("groupedMetrics are %+v", groupedMetrics)
+					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+					m.Client.Log.Infof("metricValues received at %s", referenceTime)
+					m.Client.Log.Infof("metricValues are %+v", metricValues)
+					// Turns metric values into events and sends them to Elasticsearch.
+					if err := mapToEvents(metricValues, m.Client, report); err != nil {
+						return fmt.Errorf("error mapping metrics to events: %w", err)
+					}
+					// Clear the accumulated metrics after processing the batch
+					accumulatedMetrics = nil
+				}
+				// for _, metricsDefinition := range metricsByResourceId {
+				// 	// Group metric definitions by cloud resource ID.
+				// 	// We group the metric definitions by resource ID to fetch
+				// 	// metric values for each cloud resource in one API call.
+				// 	metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+				// 	m.Client.Log.Infof("metricValues received at %s", referenceTime)
+				// 	// Turns metric values into events and sends them to Elasticsearch.
+				// 	if err := mapToEvents(metricValues, m.Client, report); err != nil {
+				// 		return fmt.Errorf("error mapping metrics to events: %w", err)
+				// 	}
+				// }
 			}
 		case err, ok := <-m.Client.ResourceConfigurations.ErrorChan:
 			if ok && err != nil {
@@ -165,6 +196,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		if m.Client.ResourceConfigurations.MetricDefinitionsChan == nil && m.Client.ResourceConfigurations.ErrorChan == nil {
 			m.Client.Log.Infof("Both channels closed. breaking")
 			break
+		}
+	}
+	if len(accumulatedMetrics) > 0 {
+		m.Client.Log.Infof("Processing stopped but accumulatedMetrics are %v", len(accumulatedMetrics))
+		groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+		metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+		m.Client.Log.Infof("metricValues received at %s", referenceTime)
+		m.Client.Log.Infof("metricValues are %+v", metricValues)
+		if err := mapToEvents(metricValues, m.Client, report); err != nil {
+			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
 	}
 
