@@ -110,7 +110,7 @@ var (
 // were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
-		Version:        kafka.Version("1.0.0"),
+		Version:        kafka.Version("2.1.0"),
 		InitialOffset:  initialOffsetOldest,
 		ClientID:       "filebeat",
 		ConnectBackoff: 30 * time.Second,
