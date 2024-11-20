@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// https://github.com/IBM/sarama/blob/master/examples/sasl_scram_client/scram_client.go
+// https://github.com/Shopify/sarama/blob/master/examples/sasl_scram_client/scram_client.go
 package kafka
 
 import (

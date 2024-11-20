@@ -97,7 +97,7 @@ type metaRetryConfig struct {
 
 var compressionModes = map[string]sarama.CompressionCodec{
 	// As of sarama 1.24.1, zstd support is broken
-	// (https://github.com/IBM/sarama/issues/1252), which needs to be
+	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
 	// addressed before we add support here.
 
 	// (https://github.com/IBM/sarama/pull/1574) sarama version 1.26.0 has
