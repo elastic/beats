@@ -26,8 +26,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/IBM/sarama"
 	"github.com/eapache/go-resiliency/breaker"
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"

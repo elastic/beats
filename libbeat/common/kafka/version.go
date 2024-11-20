@@ -20,7 +20,7 @@ package kafka
 import (
 	"fmt"
 
-	"github.com/IBM/sarama"
+	"github.com/elastic/sarama"
 )
 
 // Version is a kafka version

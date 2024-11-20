@@ -20,9 +20,8 @@ package kafka
 import (
 	"time"
 
-	"github.com/IBM/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/sarama"
 )
 
 type message struct {

@@ -26,11 +26,10 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/IBM/sarama"
-
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 type partitionBuilder func(*logp.Logger, *config.C) (func() partitioner, error)

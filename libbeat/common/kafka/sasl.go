@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/IBM/sarama"
+	"github.com/elastic/sarama"
 )
 
 type SaslConfig struct {

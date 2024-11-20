@@ -20,7 +20,7 @@ package kafka
 import (
 	"testing"
 
-	"github.com/IBM/sarama"
+	"github.com/elastic/sarama"
 )
 
 func TestVersionGet(t *testing.T) {

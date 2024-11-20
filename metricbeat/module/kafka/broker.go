@@ -26,10 +26,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IBM/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/sarama"
 )
 
 // Version returns a kafka version from its string representation

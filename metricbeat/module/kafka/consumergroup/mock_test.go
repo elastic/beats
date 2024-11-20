@@ -21,9 +21,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/IBM/sarama"
-
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/sarama"
 )
 
 type mockClient struct {
