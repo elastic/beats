@@ -12,6 +12,13 @@ var:
     os.windows: []
   - name: tags
     default: []
+  - name: use_journald
+    default: false
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/entrypoint.yml
+  - ingest/files.yml
+  - ingest/journald.yml
+  - ingest/grok-auth-messages.yml
+
 input: config/auth.yml
