@@ -72,6 +72,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    config.Retry,
 		})
 	}
 
@@ -83,39 +84,19 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 // are absent, assigns default values
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
-		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
-		}
-		b.MaxWorkers = &maxWorkers
+		b.MaxWorkers = &cfg.MaxWorkers
 	}
 	if b.Poll == nil {
-		var poll bool
-		if cfg.Poll != nil {
-			poll = *cfg.Poll
-		}
-		b.Poll = &poll
+		b.Poll = &cfg.Poll
 	}
 	if b.PollInterval == nil {
-		interval := time.Second * 300
-		if cfg.PollInterval != nil {
-			interval = *cfg.PollInterval
-		}
-		b.PollInterval = &interval
+		b.PollInterval = &cfg.PollInterval
 	}
 	if b.ParseJSON == nil {
-		parse := false
-		if cfg.ParseJSON != nil {
-			parse = *cfg.ParseJSON
-		}
-		b.ParseJSON = &parse
+		b.ParseJSON = &cfg.ParseJSON
 	}
 	if b.BucketTimeOut == nil {
-		timeOut := time.Second * 50
-		if cfg.BucketTimeOut != nil {
-			timeOut = *cfg.BucketTimeOut
-		}
-		b.BucketTimeOut = &timeOut
+		b.BucketTimeOut = &cfg.BucketTimeOut
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
@@ -129,6 +110,23 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	b.ReaderConfig = cfg.ReaderConfig
 
 	return b
+}
+
+// defaultConfig returns the default configuration for the input
+func defaultConfig() config {
+	return config{
+		MaxWorkers:    1,
+		Poll:          true,
+		PollInterval:  5 * time.Minute,
+		BucketTimeOut: 120 * time.Second,
+		ParseJSON:     false,
+		Retry: retryConfig{
+			MaxAttempts:            3,
+			InitialBackOffDuration: 1 * time.Second,
+			MaxBackOffDuration:     30 * time.Second,
+			BackOffMultiplier:      2,
+		},
+	}
 }
 
 // isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
@@ -173,15 +171,20 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		cancel()
 	}()
 
-	client, err := fetchStorageClient(ctx, input.config, log)
+	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
 		metrics.errorsTotal.Inc()
 		return err
 	}
+
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithMaxAttempts to change the maximum number of attempts.
+		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial: 2 * time.Second,
+			Initial:    currentSource.Retry.InitialBackOffDuration,
+			Max:        currentSource.Retry.MaxBackOffDuration,
+			Multiplier: currentSource.Retry.BackOffMultiplier,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent
