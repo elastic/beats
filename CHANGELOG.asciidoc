@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
 
 *Filebeat*
 
-- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix AWS region in aws-s3 input S3 polling mode.  {pull}41572[41572]
 
 
 [[release-notes-8.16.0]]
