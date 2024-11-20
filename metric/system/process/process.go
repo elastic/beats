@@ -282,7 +282,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 
 	status, err = FillMetricsRequiringMoreAccess(pid, status)
 	if err != nil {
-		return status, true, fmt.Errorf("FillMetricsRequiringMoreAccess failed for pid %d: %w", pid, err)
+		procStats.logger.Debugf("error calling FillMetricsRequiringMoreAccess for pid %d: %w", pid, err)
 	}
 
 	// Generate `status.Cmdline` here for compatibility because on Windows

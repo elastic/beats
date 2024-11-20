@@ -56,6 +56,7 @@ func errnoErr(e syscall.Errno) error {
 
 var (
 	modkernel32 = windows.NewLazySystemDLL("kernel32.dll")
+	ntdll  		= windows.NewLazySystemDLL("ntdll.dll")
 
 	procPssCaptureSnapshot = modkernel32.NewProc("PssCaptureSnapshot")
 	procPssQuerySnapshot   = modkernel32.NewProc("PssQuerySnapshot")

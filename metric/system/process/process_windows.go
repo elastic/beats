@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"unsafe"
 
@@ -29,7 +30,12 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	gowindows "github.com/elastic/go-windows"
 	"github.com/elastic/gosigar/sys/windows"
+)
+
+var (
+	ntQuerySystemInformation = ntdll.NewProc("NtQuerySystemInformation")
 )
 
 // FetchPids returns a map and array of pids
@@ -64,6 +70,14 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	var err error
 	var errs []error
 	state := ProcState{Pid: opt.IntWith(pid)}
+	if pid == 0 {
+		// we cannot open pid 0. Skip it and move forward.
+		// we will call getIdleMemory and getIdleProcessTime in FillPidMetrics()
+		state.Username = "NT AUTHORITY\\SYSTEM"
+		state.Name = "System Idle Process"
+		state.State = Running
+		return state, nil
+	}
 
 	name, err := getProcName(pid)
 	if err != nil {
@@ -133,14 +147,16 @@ func FetchNumThreads(pid int) (int, error) {
 
 // FillPidMetrics is the windows implementation
 func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string) bool) (ProcState, error) {
-	user, err := getProcCredName(pid)
-	if err != nil {
-		return state, fmt.Errorf("error fetching username: %w", err)
+	if pid == 0 {
+		// get metrics for idle process
+		return fillIdleProcess(state)
 	}
-	state.Username = user
+	user, _ := getProcCredName(pid)
+	state.Username = user // we cannot access process token for system-owned protected processes
 
-	ppid, _ := getParentPid(pid)
-	state.Ppid = opt.IntWith(ppid)
+	if ppid, err := getParentPid(pid); err == nil {
+		state.Ppid = opt.IntWith(ppid)
+	}
 
 	wss, size, err := procMem(pid)
 	if err != nil {
@@ -268,8 +284,15 @@ func getProcName(pid int) (string, error) {
 	}()
 
 	filename, err := windows.GetProcessImageFileName(handle)
+
+	//nolint:nilerr // safe to ignore this error
 	if err != nil {
-		return "", fmt.Errorf("GetProcessImageFileName failed for pid=%v: %w", pid, err)
+		if isNonFatal(err) {
+			// if we're able to open the handle but GetProcessImageFileName fails with access denied error,
+			// then the process doesn't have any executable associated with it.
+			return "", nil
+		}
+		return "", err
 	}
 
 	return filepath.Base(filename), nil
@@ -315,6 +338,37 @@ func getParentPid(pid int) (int, error) {
 	return int(procInfo.InheritedFromUniqueProcessID), nil
 }
 
+//nolint:unused // this is actually used while dereferencing the pointer, but results in lint failure.
+type systemProcessInformation struct {
+	NextEntryOffset uint32
+	NumberOfThreads uint32
+	Reserved1       [48]byte
+	ImageName       struct {
+		Length        uint16
+		MaximumLength uint16
+		Buffer        *uint16
+	}
+	BasePriority           int32
+	UniqueProcessID        xsyswindows.Handle
+	Reserved2              uintptr
+	HandleCount            uint32
+	SessionID              uint32
+	Reserved3              uintptr
+	PeakVirtualSize        uint64
+	VirtualSize            uint64
+	Reserved4              uint32
+	PeakWorkingSetSize     uint64
+	WorkingSetSize         uint64
+	Reserved5              uintptr
+	QuotaPagedPoolUsage    uint64
+	Reserved6              uintptr
+	QuotaNonPagedPoolUsage uint64
+	PagefileUsage          uint64
+	PeakPagefileUsage      uint64
+	PrivatePageCount       uint64
+	Reserved7              [6]int64
+}
+
 func getProcCredName(pid int) (string, error) {
 	handle, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, uint32(pid))
 	if err != nil {
@@ -350,4 +404,62 @@ func getProcCredName(pid int) (string, error) {
 	}
 
 	return fmt.Sprintf(`%s\%s`, domain, account), nil
+}
+
+func getIdleProcessTime() (float64, float64, error) {
+	idle, kernel, user, err := gowindows.GetSystemTimes()
+	if err != nil {
+		return 0, 0, toNonFatal(err)
+	}
+
+	// Average by cpu because GetSystemTimes returns summation of across all cpus
+	numCpus := float64(runtime.NumCPU())
+	idleTime := float64(idle) / numCpus
+	kernelTime := float64(kernel) / numCpus
+	userTime := float64(user) / numCpus
+	// Calculate total CPU time, averaged by cpu
+	totalTime := idleTime + kernelTime + userTime
+	return totalTime, idleTime, nil
+}
+
+func getIdleProcessMemory(state ProcState) (ProcState, error) {
+	systemInfo := make([]byte, 1024*1024)
+	var returnLength uint32
+
+	_, _, err := ntQuerySystemInformation.Call(xsyswindows.SystemProcessInformation, uintptr(unsafe.Pointer(&systemInfo[0])), uintptr(len(systemInfo)), uintptr(unsafe.Pointer(&returnLength)))
+	// NtQuerySystemInformation returns "operation permitted successfully"(i.e. errorno 0) on success.
+	// Hence, we can ignore syscall.Errno(0).
+	if err != nil && !errors.Is(err, syscall.Errno(0)) {
+		return state, toNonFatal(err)
+	}
+
+	// Process the returned data
+	for offset := uintptr(0); offset < uintptr(returnLength); {
+		processInfo := (*systemProcessInformation)(unsafe.Pointer(&systemInfo[offset]))
+		if processInfo.UniqueProcessID == 0 { // PID 0 is System Idle Process
+			state.Memory.Rss.Bytes = opt.UintWith(processInfo.WorkingSetSize)
+			state.Memory.Size = opt.UintWith(processInfo.PrivatePageCount)
+			state.NumThreads = opt.IntWith(int(processInfo.NumberOfThreads))
+			break
+		}
+		offset += uintptr(processInfo.NextEntryOffset)
+		if processInfo.NextEntryOffset == 0 {
+			break
+		}
+	}
+	return state, nil
+}
+
+func fillIdleProcess(state ProcState) (ProcState, error) {
+	state, err := getIdleProcessMemory(state)
+	if err != nil {
+		return state, err
+	}
+	_, idle, err := getIdleProcessTime()
+	if err != nil {
+		return state, err
+	}
+	state.CPU.Total.Ticks = opt.UintWith(uint64(idle / 1e6))
+	state.CPU.Total.Value = opt.FloatWith(idle)
+	return state, nil
 }
