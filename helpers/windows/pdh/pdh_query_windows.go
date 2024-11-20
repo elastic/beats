@@ -88,7 +88,7 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 	var instanceName string
 	// Extract the instance name from the counterPath.
 	if instance == "" || wildcard {
-		instanceName, err = matchInstanceName(counterPath)
+		instanceName, err = MatchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
@@ -203,6 +203,17 @@ func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, 
 	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
 
+func (q *Query) GetRawCounterValue(counterName string) (*PdhRawCounter, error) {
+	if _, ok := q.Counters[counterName]; !ok {
+		return nil, fmt.Errorf("%s doesn't exist in the map; call AddCounter()", counterName)
+	}
+	c, err := PdhGetRawCounterValue(q.Counters[counterName].handle)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
 // ExpandWildCardPath  examines local computer and returns those counter paths that match the given counter path which contains wildcard characters.
 func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	if wildCardPath == "" {
@@ -255,7 +266,7 @@ func (q *Query) Close() error {
 }
 
 // matchInstanceName will check first for instance and then for any objects names.
-func matchInstanceName(counterPath string) (string, error) {
+func MatchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) == 2 {
 		return returnLastInstance(matches[1]), nil

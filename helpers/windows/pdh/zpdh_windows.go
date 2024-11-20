@@ -67,10 +67,23 @@ var (
 	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
 	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
 	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
+	procPdhGetRawCounter          	= modpdh.NewProc("PdhGetRawCounterValue")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
 	r0, _, _ := syscall.Syscall(procPdhOpenQueryW.Addr(), 3, uintptr(unsafe.Pointer(dataSource)), uintptr(userData), uintptr(unsafe.Pointer(query)))
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+
+func _PdhGetRawCounter(query PdhCounterHandle, userData uintptr) (errcode error) {
+	return __PdhGetRawCounter(query, userData)
+}
+
+func __PdhGetRawCounter(query PdhCounterHandle, userData uintptr) (errcode error) {
+	r0, _, _ := syscall.SyscallN(procPdhGetRawCounter.Addr(), uintptr(query), 0, userData)
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

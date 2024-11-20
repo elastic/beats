@@ -91,42 +91,42 @@ func TestSuccessfulQuery(t *testing.T) {
 
 func TestMatchInstanceName(t *testing.T) {
 	query := "\\SQLServer:Databases(*)\\Log File(s) Used Size (KB)"
-	match, err := matchInstanceName(query)
+	match, err := MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "*")
 
 	query = " \\\\desktop-rfooe09\\per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
 
 	query = " \\\\desktop-rfooe09\\ (test this scenario) per processor network interface card activity(3, microsoft wi-fi directvirtual (gyfyg) adapter #2)\\dpcs queued/sec"
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "3, microsoft wi-fi directvirtual (gyfyg) adapter #2")
 
 	query = "\\RAS\\Bytes Received By Disconnected Clients"
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "RAS")
 
 	query = `\\Process (chrome.exe#4)\\Bytes Received By Disconnected Clients`
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "chrome.exe#4")
 
 	query = "\\BranchCache\\Local Cache: Cache complete file segments"
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "BranchCache")
 
 	query = `\Synchronization(*)\Exec. Resource no-Waits AcqShrdStarveExcl/sec`
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "*")
 
 	query = `\.NET CLR Exceptions(test hellp (dsdsd) #rfsfs #3)\# of Finallys / sec`
-	match, err = matchInstanceName(query)
+	match, err = MatchInstanceName(query)
 	assert.NoError(t, err)
 	assert.Equal(t, match, "test hellp (dsdsd) #rfsfs #3")
 }

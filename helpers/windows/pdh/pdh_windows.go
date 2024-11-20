@@ -101,6 +101,14 @@ type PdhCounterValueLong struct {
 	Pad_cgo_1 [4]byte
 }
 
+type PdhRawCounter struct {
+	CStatus     uint32
+	TimeStamp   windows.Filetime
+	FirstValue  int64
+	SecondValue int64
+	MultiCount  uint32
+}
+
 // PdhOpenQuery creates a new query.
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	var dataSourcePtr *uint16
@@ -196,6 +204,16 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 	}
 
 	return counterType, &value, nil
+}
+
+// PdhGetRawCounterValue returns the raw value of a given counter.
+func PdhGetRawCounterValue(counter PdhCounterHandle) (*PdhRawCounter, error) {
+	var value PdhRawCounter
+	if err := _PdhGetRawCounter(counter, uintptr(unsafe.Pointer(&value))); err != nil {
+		return &value, PdhErrno(err.(syscall.Errno))
+	}
+
+	return &value, nil
 }
 
 // PdhExpandWildCardPath returns counter paths that match the given counter path.
