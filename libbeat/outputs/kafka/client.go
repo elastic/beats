@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/eapache/go-resiliency/breaker"
+
 	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"

@@ -240,8 +240,8 @@ func (off *initialOffset) Unpack(value string) error {
 
 func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
 	return map[rebalanceStrategy]sarama.BalanceStrategy{
-		rebalanceStrategyRange:      sarama.BalanceStrategyRange,
-		rebalanceStrategyRoundRobin: sarama.BalanceStrategyRoundRobin,
+		rebalanceStrategyRange:      sarama.NewBalanceStrategyRange(),
+		rebalanceStrategyRoundRobin: sarama.NewBalanceStrategyRoundRobin(),
 	}[st]
 }
 
