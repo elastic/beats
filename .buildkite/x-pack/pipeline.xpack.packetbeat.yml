@@ -126,8 +126,26 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
 
-      - label: ":rhel: x-pack/packetbeat: RHEL9 Unit Tests"
-        key: "mandatory-rhel9-unit-test"
+      # - label: ":rhel: x-pack/packetbeat: RHEL9 Unit Tests"
+      #   key: "mandatory-rhel9-unit-test"
+      #   command: |
+      #     cd x-pack/packetbeat
+      #     mage build unitTest
+      #   retry:
+      #     automatic:
+      #       - limit: 1
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_RHEL9_X86_64}"
+      #     machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+      #   artifact_paths:
+      #     - "x-pack/packetbeat/build/*.xml"
+      #     - "x-pack/packetbeat/build/*.json"
+      #   notify:
+      #     - github_commit_status:
+      #         context: "x-pack/packetbeat: RHEL9 Unit Tests"
+
+      - label: ":redhat: x-pack/packetbeat: {{matrix}} Unit Tests"
         command: |
           cd x-pack/packetbeat
           mage build unitTest
@@ -136,7 +154,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_RHEL9_X86_64}"
+          image: "family/platform-ingest-beats-{{matrix}}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
@@ -149,7 +167,93 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: RHEL9 Unit Tests"
+              context: "x-pack/packetbeat: {{matrix}} Unit Tests"
+        matrix:
+          - rhel-8
+          - rhel-9
+          - rocky-8
+          - rocky-9
+          - almalinux-8
+          - almalinux-9
+          - oracle-8
+          - centos-stream-9
+
+      - label: ":debian: x-pack/packetbeat: {{matrix}} Unit Tests"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "family/platform-ingest-beats-{{matrix}}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: {{matrix}} Unit Tests"
+        matrix:
+          - debian-11
+          - debian-12
+
+      - label: "Suse x-pack/packetbeat: {{matrix}} Unit Tests"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "family/platform-ingest-beats-{{matrix}}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: {{matrix}} Unit Tests"
+        matrix:
+          - sles-15
+
+      - label: ":aws: x-pack/packetbeat: Amazon Linux Unit Tests"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "platform-ingest-beats-amazonlinux-2"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Amazon Linux Unit Tests"
+
+      - label: ":aws: x-pack/packetbeat: Amazon Linux Arm Unit Tests"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "platform-ingest-beats-amazonlinux-2-aarch64"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Amazon Linux arm64 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2016 Unit Tests"
         command: |
