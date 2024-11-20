@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -33,6 +34,7 @@ type config struct {
 	QueueURL           string               `config:"queue_url"`
 	RegionName         string               `config:"region"`
 	BucketARN          string               `config:"bucket_arn"`
+	AccessPointARN     string               `config:"access_point_arn"`
 	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
 	BucketListInterval time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix   string               `config:"bucket_list_prefix"`
@@ -61,7 +63,7 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
+	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.AccessPointARN != "", c.NonAWSBucketName != ""}
 	enabled := []bool{}
 	for i := range configs {
 		if configs[i] {
@@ -69,18 +71,22 @@ func (c *config) Validate() error {
 		}
 	}
 	if len(enabled) == 0 {
-		return errors.New("neither queue_url, bucket_arn nor non_aws_bucket_name were provided")
+		return errors.New("neither queue_url, bucket_arn, access_point_arn, nor non_aws_bucket_name were provided")
 	} else if len(enabled) > 1 {
-		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
+		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, access_point_arn <%v>, non_aws_bucket_name <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.AccessPointARN, c.NonAWSBucketName)
 	}
 
-	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
+	if (c.BucketARN != "" || c.AccessPointARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
+	if (c.BucketARN != "" || c.AccessPointARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
+	}
+
+	if c.AccessPointARN != "" && !isValidAccessPointARN(c.AccessPointARN) {
+		return fmt.Errorf("invalid format for access_point_arn <%v>", c.AccessPointARN)
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {
@@ -117,14 +123,15 @@ func (c *config) Validate() error {
 	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
 		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
 	}
-	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" {
+	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" && c.AccessPointARN == "" {
 		return errors.New("backup to AWS bucket can only be used for AWS sources")
 	}
 	if c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.NonAWSBackupToBucketName != "" {
 		return errors.New("backup_to_bucket_arn and non_aws_backup_to_bucket_name cannot be used together")
 	}
 	if c.BackupConfig.GetBucketName() != "" && c.QueueURL == "" {
-		if (c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.BackupToBucketArn == c.BucketARN) ||
+		if (c.BackupConfig.BackupToBucketArn != "" &&
+			(c.BackupConfig.BackupToBucketArn == c.BucketARN || c.BackupConfig.BackupToBucketArn == c.AccessPointARN)) ||
 			(c.BackupConfig.NonAWSBackupToBucketName != "" && c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName) {
 			if c.BackupConfig.BackupToBucketPrefix == "" {
 				return errors.New("backup_to_bucket_prefix is a required property when source and backup bucket are the same")
@@ -233,6 +240,9 @@ func (c config) getBucketName() string {
 	if c.NonAWSBucketName != "" {
 		return c.NonAWSBucketName
 	}
+	if c.AccessPointARN != "" {
+		return c.AccessPointARN
+	}
 	if c.BucketARN != "" {
 		return getBucketNameFromARN(c.BucketARN)
 	}
@@ -245,6 +255,9 @@ func (c config) getBucketARN() string {
 	}
 	if c.BucketARN != "" {
 		return c.BucketARN
+	}
+	if c.AccessPointARN != "" {
+		return c.AccessPointARN
 	}
 	return ""
 }
@@ -291,4 +304,12 @@ func (c config) getFileSelectors() []fileSelectorConfig {
 		return c.FileSelectors
 	}
 	return []fileSelectorConfig{{ReaderConfig: c.ReaderConfig}}
+}
+
+// Helper function to detect if an ARN is an Access Point
+func isValidAccessPointARN(arn string) bool {
+	parts := strings.Split(arn, ":")
+	return len(parts) >= 6 &&
+		strings.HasPrefix(parts[5], "accesspoint/") &&
+		len(strings.TrimPrefix(parts[5], "accesspoint/")) > 0
 }
