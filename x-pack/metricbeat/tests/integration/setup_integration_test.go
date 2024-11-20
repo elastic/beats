@@ -38,6 +38,26 @@ metricbeat.config.modules:
 	esURL := integration.GetESURL(t, "http")
 	kURL, _ := integration.GetKibana(t)
 
+	ver, _, _ := strings.Cut(version.GetDefaultVersion(), "-")
+	index := "metricbeat-" + ver
+
+	dataStreamURL, err := integration.FormatDatastreamURL(t, esURL, index)
+	require.NoError(t, err)
+	templateURL, err := integration.FormatIndexTemplateURL(t, esURL, index)
+	require.NoError(t, err)
+	policyURL, err := integration.FormatPolicyURL(t, esURL, index)
+	cleanUpES := func() {
+		_, _, err := integration.HttpDo(t, http.MethodDelete, dataStreamURL)
+		require.NoErrorf(t, err, "cleanup failed: could not remove datastream %s", index)
+		_, _, err = integration.HttpDo(t, http.MethodDelete, templateURL)
+		require.NoErrorf(t, err, "cleanup failed: could not remove index template %s", index)
+		_, _, err = integration.HttpDo(t, http.MethodDelete, policyURL)
+		require.NoErrorf(t, err, "cleanup failed: could not ilm policy %s", index)
+	}
+	// ensure datastream/index template/ ilm policy is set before running the test
+	cleanUpES()
+	t.Cleanup(cleanUpES)
+
 	metricbeat.Start("setup",
 		"--index-management",
 		"-E", "setup.kibana.protocol=http",
@@ -62,8 +82,6 @@ metricbeat.config.modules:
 	})
 	require.NoError(t, err, "could not marshal event to send to ES")
 
-	ver, _, _ := strings.Cut(version.GetDefaultVersion(), "-")
-	index := "metricbeat-" + ver
 	endpoint := fmt.Sprintf("%s/%s/_doc", esURL.String(), index)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
