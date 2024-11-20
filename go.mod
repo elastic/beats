@@ -175,7 +175,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
-	github.com/IBM/sarama v1.43.3
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
@@ -199,6 +198,7 @@ require (
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -288,7 +288,6 @@ require (
 	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elastic/pkcs8 v1.0.0 // indirect
-	github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
@@ -416,8 +415,6 @@ require (
 
 replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
-
-	github.com/IBM/sarama => github.com/elastic/sarama v1.19.1-0.20241118045140-603e70e982ce
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
 	github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
