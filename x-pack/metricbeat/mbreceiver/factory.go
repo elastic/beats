@@ -50,7 +50,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
 	}
 
-	return &metricbeatReceiver{beat: &b.Beat, beater: mbBeater}, nil
+	return &metricbeatReceiver{beat: &b.Beat, beater: mbBeater, logger: set.Logger}, nil
 }
 
 func NewFactory() receiver.Factory {
