@@ -35,8 +35,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
