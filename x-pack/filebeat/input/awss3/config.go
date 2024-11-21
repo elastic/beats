@@ -25,26 +25,33 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
+// todo
+// add ignore_older & start_timestamp
+// must be disabled by default
+// but if start_timestamp is empty, then be cautious as
+// - Fresh startup need a full read
+// - But if registry is non-empty, we can assume we have read some data
+
 type config struct {
 	APITimeout         time.Duration        `config:"api_timeout"`
-	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
-	QueueURL           string               `config:"queue_url"`
-	RegionName         string               `config:"region"`
-	BucketARN          string               `config:"bucket_arn"`
+	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
 	AccessPointARN     string               `config:"access_point_arn"`
-	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	BackupConfig       backupConfig         `config:",inline"`
+	BucketARN          string               `config:"bucket_arn"`
 	BucketListInterval time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix   string               `config:"bucket_list_prefix"`
-	NumberOfWorkers    int                  `config:"number_of_workers"`
-	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	NumberOfWorkers    int                  `config:"number_of_workers"`
 	PathStyle          bool                 `config:"path_style"`
 	ProviderOverride   string               `config:"provider"`
-	BackupConfig       backupConfig         `config:",inline"`
+	QueueURL           string               `config:"queue_url"`
+	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	RegionName         string               `config:"region"`
+	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"` // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
 }
 
 func defaultConfig() config {
