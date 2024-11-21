@@ -319,7 +319,11 @@ func getIndexTierPreferenceFromMetadata(indexMetadata mapstr.M) (string, error) 
 	fieldKey := "settings.index.routing.allocation.include._tier_preference"
 	value, err := indexMetadata.GetValue(fieldKey)
 	if err != nil {
-		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+		fieldKey = "settings.index.routing.allocation.require._tier_preference"
+		value, err = indexMetadata.GetValue(fieldKey)
+		if err != nil {
+			return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+		}
 	}
 
 	tierPreference, ok := value.(string)
