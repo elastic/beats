@@ -300,7 +300,7 @@ func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 		a.logger.Errorf("Got a wrong meta field for event %v", event)
 		return nil
 	}
-	return meta
+	return meta.Clone()
 }
 
 // getID returns the event "id" field string if present
