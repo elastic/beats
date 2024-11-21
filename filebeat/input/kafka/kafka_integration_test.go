@@ -606,7 +606,7 @@ func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, f
 	t.Cleanup(cancel)
 
 	pipeline := beattest.ConstClient(client)
-	input := inp.(*kafkaInput)
+	input, _ := inp.(*kafkaInput)
 	go func() {
 		_ = input.Run(ctx, pipeline)
 	}()

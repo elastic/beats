@@ -273,7 +273,7 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg := errMsg.Msg.Metadata.(*message)
+		msg, _ := errMsg.Msg.Metadata.(*message)
 		msg.ref.fail(msg, errMsg.Err)
 
 		if errors.Is(errMsg.Err, breaker.ErrBreakerOpen) {
