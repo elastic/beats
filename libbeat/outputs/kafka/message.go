@@ -39,8 +39,6 @@ type message struct {
 	data publisher.Event
 }
 
-var kafkaMessageKey interface{} = int(0)
-
 func (m *message) initProducerMessage() {
 	m.msg = sarama.ProducerMessage{
 		Metadata:  m,

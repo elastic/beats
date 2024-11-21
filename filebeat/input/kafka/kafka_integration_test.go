@@ -460,7 +460,8 @@ func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
 	var msg *testMessage
 	for _, m := range msgs {
 		if text == m.message {
-			msg = &m
+			mCopy := m
+			msg = &mCopy
 			break
 		}
 	}
@@ -606,7 +607,9 @@ func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, f
 
 	pipeline := beattest.ConstClient(client)
 	input := inp.(*kafkaInput)
-	go input.Run(ctx, pipeline)
+	go func() {
+		_ = input.Run(ctx, pipeline)
+	}()
 	return input, cancel
 }
 

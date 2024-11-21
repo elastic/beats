@@ -125,13 +125,13 @@ func (p *messagePartitioner) Partition(
 
 	partition, err := p.p(msg, numPartitions)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	msg.partition = partition
 
 	if _, err := msg.data.Cache.Put("partition", partition); err != nil {
-		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %v", err)
+		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %w", err)
 	}
 
 	p.partitions = numPartitions

@@ -258,7 +258,11 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.log.Debug("Stop kafka ack worker")
 
 	for libMsg := range ch {
-		msg := libMsg.Metadata.(*message)
+		msg, ok := libMsg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.done()
 	}
 }
