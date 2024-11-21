@@ -196,6 +196,8 @@ func getServiceLabelFor(serviceName string) string {
 		return gcp.CloudSQLResourceLabel
 	case gcp.ServiceRedis:
 		return gcp.RedisResourceLabel
+	case gcp.ServiceAIPlatform:
+		return gcp.AIPlatformResourceLabel
 	default:
 		return gcp.DefaultResourceLabel
 	}

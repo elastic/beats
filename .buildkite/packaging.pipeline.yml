@@ -5,7 +5,7 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
   PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
