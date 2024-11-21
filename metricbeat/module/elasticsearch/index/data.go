@@ -268,10 +268,10 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	}
 
 	indexTierPreference, err := getIndexTierPreferenceFromMetadata(indexMetadata)
-	if err != nil {
-		return fmt.Errorf("failed to get index tier preference from metadata: %w", err)
+	if err == nil {
+		// Tier preference is optional, so only set it if it exists
+		idx.TierPreference = indexTierPreference
 	}
-	idx.TierPreference = indexTierPreference
 
 	indexCreationDate, err := getIndexCreationDateFromMetadata(indexMetadata)
 	if err != nil {
