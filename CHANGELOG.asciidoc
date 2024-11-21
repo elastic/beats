@@ -300,8 +300,6 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 *Filebeat*
 
 - The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.
-<<<<<<< HEAD
-=======
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 - The AWS S3 input polling mode is not working when the S3 bucket is not in the `us-east-1` default region. This also impacts all AWS integrations and any custom AWS log integration which uses the `aws-s3` input polling mode. When using Filebeat, please add a `default_region` configuration with the region of the S3 bucket. For example:
 +
@@ -315,7 +313,6 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
->>>>>>> bb9968a0f8 (Add known issue for AWS S3 input (target main) (#41734))
 
 ==== Breaking changes
 
