@@ -56,10 +56,6 @@ type ProspectorCleaner interface {
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
 	UpdateIdentifiers(func(v Value) (string, interface{}))
-
-	// FixUpIdentifiers migrates IDs in the registry from inputs
-	// that used the deprecated `.global` ID.
-	FixUpIdentifiers(func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

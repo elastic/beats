@@ -70,7 +70,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalCleaner.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -101,6 +101,9 @@ func (p *fileProspector) Init(
 	}
 
 	identifierName := p.identifier.Name()
+
+	// If the file identity has changed, update the registry keys so we can keep
+	// the state.
 	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
@@ -114,7 +117,7 @@ func (p *fileProspector) Init(
 		}
 
 		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
+			newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
