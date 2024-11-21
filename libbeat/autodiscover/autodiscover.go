@@ -283,6 +283,11 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 		updated = true
 	}
 
+	// Cleanup meta references for this eventID
+	for configHash := range a.configs[eventID] {
+		a.meta.Remove(configHash)
+	}
+
 	delete(a.configs, eventID)
 
 	return updated
