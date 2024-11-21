@@ -305,7 +305,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	return result
 }
 
-// Now, this function will query the batch API for each group
+// GetMetricsInBatch will query the batch API for each group
 func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteria][]Metric, referenceTime time.Time, reporter mb.ReporterV2) []Metric {
 	var result []Metric
 	for criteria, metricsDefinitions := range groupedMetrics {
@@ -333,7 +333,17 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 
 			// Slice the metrics to form the batch request
 			batchMetrics := metricsDefinitions[i:end]
-
+			client.Log.Infof("resource ids are %+v", getResourceIDs(batchMetrics))
+			client.Log.Infof("SubscriptionID is %+v", criteria.SubscriptionID)
+			client.Log.Infof("Namespace is %+v", criteria.Namespace)
+			client.Log.Infof("TimeGrain is %+v", criteria.TimeGrain)
+			client.Log.Infof("startTime is %+v", startTime.Format("2006-01-02T15:04:05.000Z07:00"))
+			client.Log.Infof("endTime is %+v", endTime.Format("2006-01-02T15:04:05.000Z07:00"))
+			client.Log.Infof("Names unsplitted is %+v", criteria.Names)
+			client.Log.Infof("Names is %+v", strings.Split(criteria.Names, ","))
+			client.Log.Infof("Aggregations is %+v", strings.ToLower(batchMetrics[0].Aggregations))
+			client.Log.Infof("Filter is %+v", filter)
+			client.Log.Infof("Location is %+v", criteria.Location)
 			// Make the batch API call (adjust parameters as needed)
 			r, err := client.AzureMonitorService.QueryResources(
 				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
@@ -343,8 +353,9 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 				startTime.Format("2006-01-02T15:04:05.000Z07:00"),
 				endTime.Format("2006-01-02T15:04:05.000Z07:00"),
 				strings.Split(criteria.Names, ","),
-				batchMetrics[0].Aggregations,
+				strings.ToLower(batchMetrics[0].Aggregations),
 				filter,
+				criteria.Location,
 			)
 			if err != nil {
 				err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
@@ -355,7 +366,12 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 
 			// Process the response as needed
 			for i, v := range r {
-				client.Log.Infof("Val of Metric in  response is %+v", v)
+				client.Log.Infof("Resource id is %+v", *v.ResourceID)
+				client.Log.Infof("Resource region is %+v", *v.ResourceRegion)
+				client.Log.Infof("Resource StartTime is %+v", *v.StartTime)
+				client.Log.Infof("Resource EndTime is %+v", *v.EndTime)
+				client.Log.Infof("Resource Namespace is %+v", *v.Namespace)
+				client.Log.Infof("Resource Interval is %+v", *v.Interval)
 				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 					timeGrain: *r[i].Interval,
 					timestamp: referenceTime,

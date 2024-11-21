@@ -253,10 +253,10 @@ func groupResourcesForBatchAPI(metricsDefinitions []Metric) map[ResDefGroupingCr
 }
 
 // Function to get the resource IDs from the batch of metrics
-func getResourceIDs(metrics []Metric) []*string {
-	var resourceIDs []*string
+func getResourceIDs(metrics []Metric) []string {
+	var resourceIDs []string
 	for _, metric := range metrics {
-		resourceIDs = append(resourceIDs, &metric.ResourceId)
+		resourceIDs = append(resourceIDs, metric.ResourceId)
 	}
 	return resourceIDs
 }
@@ -269,7 +269,7 @@ func metricIsEmpty2(metric azmetrics.MetricValue) bool {
 	return false
 }
 
-func mapMetricValues2(client *Client, metricValues *azmetrics.MetricValues) []MetricValue {
+func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	client.Log.Infof("there are %d metricvalues", len(metricValues.Values))
@@ -280,7 +280,7 @@ func mapMetricValues2(client *Client, metricValues *azmetrics.MetricValues) []Me
 			for _, mv := range t.Data {
 				client.Log.Infof("Data is %+v", mv)
 				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
-				if metricIsEmpty2(*mv) {
+				if metricIsEmpty2(mv) {
 					client.Log.Infof("Data is empty")
 					continue
 				}

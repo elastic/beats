@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -22,6 +23,24 @@ func init() {
 // azure module.
 func newModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
+}
+
+// MetricStore holds the accumulated metric definitions with a mutex for synchronization.
+type MetricStore struct {
+	sync.Mutex
+	accumulatedMetrics []Metric
+}
+
+func (s *MetricStore) AddMetric(metric []Metric) {
+	s.Lock()         // Acquire the lock
+	defer s.Unlock() // Ensure the lock is released when the function returns
+	s.accumulatedMetrics = append(s.accumulatedMetrics, metric...)
+}
+
+func (s *MetricStore) GetMetrics() []Metric {
+	s.Lock()         // Acquire the lock to prevent writes while reading
+	defer s.Unlock() // Ensure the lock is released when the function returns
+	return s.accumulatedMetrics
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -120,7 +139,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return err
 	}
 
-	var accumulatedMetrics []Metric
+	accumulatedMetricsStore := &MetricStore{}
 
 	for {
 		select {
@@ -131,7 +150,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
 					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
 				}
-				if len(accumulatedMetrics) > 0 {
+				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
 					m.Client.Log.Infof("MetricDefinitionsChan channel closed but accumulatedMetrics are %v", len(accumulatedMetrics))
 					// If we still have accumulated metrics, process them in a batch.
 					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
@@ -147,15 +166,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			} else {
 				// Process each metric definition as it arrives
 				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
-				accumulatedMetrics = append(accumulatedMetrics, resMetricDefinition...)
-				// metricsByResourceId := groupMetricsDefinitionsByResourceId(resMetricDefinition)
+				accumulatedMetricsStore.AddMetric(resMetricDefinition)
 				if len(resMetricDefinition) == 0 {
 					return fmt.Errorf("error mapping metrics to events: %w", err)
 				}
 				resId := resMetricDefinition[0].ResourceId
 				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
-				m.Client.Log.Infof("accumulatedMetrics are %v", len(accumulatedMetrics))
-				if len(accumulatedMetrics) >= 6 {
+				m.Client.Log.Infof("accumulatedMetrics are %v", len(accumulatedMetricsStore.GetMetrics()))
+				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) >= 6 {
 					// Group and query in batch when we hit the threshold
 					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
 					m.Client.Log.Infof("accumulatedMetrics are now >=6 %v", len(accumulatedMetrics))
@@ -170,17 +188,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					// Clear the accumulated metrics after processing the batch
 					accumulatedMetrics = nil
 				}
-				// for _, metricsDefinition := range metricsByResourceId {
-				// 	// Group metric definitions by cloud resource ID.
-				// 	// We group the metric definitions by resource ID to fetch
-				// 	// metric values for each cloud resource in one API call.
-				// 	metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
-				// 	m.Client.Log.Infof("metricValues received at %s", referenceTime)
-				// 	// Turns metric values into events and sends them to Elasticsearch.
-				// 	if err := mapToEvents(metricValues, m.Client, report); err != nil {
-				// 		return fmt.Errorf("error mapping metrics to events: %w", err)
-				// 	}
-				// }
 			}
 		case err, ok := <-m.Client.ResourceConfigurations.ErrorChan:
 			if ok && err != nil {
@@ -198,7 +205,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-	if len(accumulatedMetrics) > 0 {
+	if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
 		m.Client.Log.Infof("Processing stopped but accumulatedMetrics are %v", len(accumulatedMetrics))
 		groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
 		metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)

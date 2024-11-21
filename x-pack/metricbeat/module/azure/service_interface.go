@@ -29,7 +29,7 @@ type Service interface {
 		filter string, // filter is the filter to query for dimensions (e.g. "ActivityType eq '*' AND ActivityName eq '*' AND StatusCode eq '*' AND StatusCodeClass eq '*'")
 	) ([]armmonitor.Metric, string, error)
 	QueryResources(
-		resourceIDs []*string,
+		resourceIDs []string,
 		subscriptionID string,
 		namespace string,
 		timegrain string,
@@ -38,5 +38,6 @@ type Service interface {
 		endTime string,
 		metricNames []string,
 		aggregations string,
-		filter string) ([]*azmetrics.MetricValues, error)
+		filter string,
+		location string) ([]azmetrics.MetricData, error)
 }
