@@ -25,13 +25,6 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-// todo
-// add ignore_older & start_timestamp
-// must be disabled by default
-// but if start_timestamp is empty, then be cautious as
-// - Fresh startup need a full read
-// - But if registry is non-empty, we can assume we have read some data
-
 type config struct {
 	APITimeout         time.Duration        `config:"api_timeout"`
 	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
@@ -41,6 +34,7 @@ type config struct {
 	BucketListInterval time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix   string               `config:"bucket_list_prefix"`
 	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
+	IgnoreOlder        time.Duration        `config:"ignore_older"`
 	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
 	NumberOfWorkers    int                  `config:"number_of_workers"`
 	PathStyle          bool                 `config:"path_style"`
@@ -51,6 +45,7 @@ type config struct {
 	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
 	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
 	SQSWaitTime        time.Duration        `config:"sqs.wait_time"` // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	StartTimestamp     string               `config:"start_timestamp"`
 	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
 }
 
@@ -146,6 +141,13 @@ func (c *config) Validate() error {
 			if c.BackupConfig.BackupToBucketPrefix == c.BucketListPrefix {
 				return errors.New("backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop")
 			}
+		}
+	}
+
+	if c.StartTimestamp != "" {
+		_, err := time.Parse(time.RFC3339, c.StartTimestamp)
+		if err != nil {
+			return fmt.Errorf("invalid input for start_timestamp: %v", err)
 		}
 	}
 
