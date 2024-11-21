@@ -124,7 +124,7 @@ func makeFetchGroupOffsets(
 
 			for i, offset := range partition {
 				T[int32(i)] = &sarama.OffsetFetchResponseBlock{
-					Offset: int64(offset),
+					Offset: offset,
 				}
 			}
 		}

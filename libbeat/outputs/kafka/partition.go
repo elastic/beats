@@ -116,7 +116,7 @@ func (p *messagePartitioner) Partition(
 	libMsg *sarama.ProducerMessage,
 	numPartitions int32,
 ) (int32, error) {
-	msg := libMsg.Metadata.(*message)
+	msg, _ := libMsg.Metadata.(*message)
 	if numPartitions == p.partitions { // if reachable is false, this is always true
 		if 0 <= msg.partition && msg.partition < numPartitions {
 			return msg.partition, nil
