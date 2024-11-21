@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
 - Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
 - Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+- Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
 
 *Auditbeat*
 
@@ -64,6 +65,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 
 *Osquerybeat*
 
@@ -76,6 +78,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Packetbeat*
+
+- Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
 
 - Expire source port mappings. {pull}41581[41581]
 
@@ -169,6 +173,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
 - Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
 - Fix missing key in streaming input logging. {pull}41600[41600]
 
@@ -430,6 +437,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
