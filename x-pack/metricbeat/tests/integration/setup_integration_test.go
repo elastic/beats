@@ -68,7 +68,7 @@ metricbeat.config.modules:
 		"-E", "output.file.enabled=false")
 	procState, err := metricbeat.Process.Wait()
 	require.NoError(t, err, "metricbeat setup failed")
-	require.Equal(t, 0, procState.ExitCode(), "metircbeat setup failed: incorrect exit code")
+	require.Equal(t, 0, procState.ExitCode(), "metricbeat setup failed: incorrect exit code")
 
 	// generate an event with dynamically mapped fields
 	fields := map[string]string{}
@@ -95,7 +95,7 @@ metricbeat.config.modules:
 	require.NoError(t, err, "could not send request to send event to ES")
 	defer resp.Body.Close()
 
-	failuremsg := fmt.Sprintf("filed to ingest events with %d new fields. If this test fails it likely means the current `index.mapping.total_fields.limit` for metricbeat index (%s) is close to be reached. Check the logs to see why the envent was not ingested", totalFields, index)
+	failuremsg := fmt.Sprintf("failed to ingest events with %d new fields. If this test fails it likely means the current `index.mapping.total_fields.limit` for metricbeat index (%s) is close to be reached. Check the logs to see why the event was not ingested", totalFields, index)
 	if !assert.Equal(t, http.StatusCreated, resp.StatusCode, failuremsg) {
 		t.Logf("event sent: %s", string(event))
 
