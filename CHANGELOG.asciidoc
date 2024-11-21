@@ -3,6 +3,23 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.16.1]]
+=== Beats version 8.16.1
+https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Expire source port mappings. {pull}41581[41581]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix AWS region in aws-s3 input S3 polling mode.  {pull}41572[41572]
+
+
 [[release-notes-8.16.0]]
 === Beats version 8.16.0
 https://github.com/elastic/beats/compare/v8.15.4\...v8.16.0[View commits]
