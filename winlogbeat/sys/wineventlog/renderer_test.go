@@ -148,6 +148,49 @@ func TestRenderer(t *testing.T) {
 			logAsJSON(t, events)
 		}
 	})
+
+	t.Run(filepath.Base(dokan1File), func(t *testing.T) {
+		log := openLog(t, dokan1File)
+		defer log.Close()
+
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Close()
+
+		events := renderAllEvents(t, log, r, false)
+		if !assert.Len(t, events, 1) {
+			return
+		}
+		e := events[0]
+
+		assert.EqualValues(t, 1, e.EventIdentifier.ID)
+		assert.Equal(t, "dokan1", e.Provider.Name)
+		assert.Equal(t, "DESKTOP-6G86QDG", e.Computer)
+		assert.Equal(t, "System", e.Channel)
+		assert.EqualValues(t, 0x2d7f, e.RecordID)
+
+		assert.Equal(t, e.Keywords, []string{"Classic"})
+
+		assert.NotNil(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, 0, *e.OpcodeRaw)
+		assert.Equal(t, "Info", e.Opcode)
+
+		assert.EqualValues(t, 0x4, e.LevelRaw)
+		assert.Equal(t, "Information", e.Level)
+
+		assert.EqualValues(t, 0, e.TaskRaw)
+		assert.Equal(t, "None", e.Task)
+
+		assert.Len(t, e.EventData.Pairs, 3)
+
+		assert.Equal(t, "Activating keepalive handle from process 9364.", e.Message)
+
+		if t.Failed() {
+			logAsJSON(t, events)
+		}
+	})
 }
 
 func TestTemplateFunc(t *testing.T) {
