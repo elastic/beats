@@ -153,7 +153,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, dokan1File)
 		defer log.Close()
 
-		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		r, err := NewRenderer(NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
