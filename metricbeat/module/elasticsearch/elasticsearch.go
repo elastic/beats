@@ -288,13 +288,21 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 }
 
 // GetClusterState returns cluster state information.
-func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filterPaths []string) (mapstr.M, error) {
+	var queryParams []string = []string{"local=true"}
 	clusterStateURI := "_cluster/state"
 	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI, "local=true")
+	if len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
 	if err != nil {
 		return nil, err
 	}
