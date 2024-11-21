@@ -60,7 +60,7 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 		Freq:       rrule.Frequency(mw.Freq),
 		Count:      mw.Count,
 		Dtstart:    dtstart,
-		Interval:   int(mw.Interval),
+		Interval:   mw.Interval,
 		Until:      dtstart.Add(mw.Duration),
 		Byweekday:  weekdays,
 		Byhour:     mw.Byhour,
