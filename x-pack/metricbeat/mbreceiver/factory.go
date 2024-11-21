@@ -26,7 +26,10 @@ func createDefaultConfig() component.Config {
 }
 
 func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
-	cfg := baseCfg.(*Config)
+	cfg, ok := baseCfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("could not convert otel config to metricbeat config")
+	}
 	settings := cmd.MetricbeatSettings(Name)
 	settings.ElasticLicensed = true
 
