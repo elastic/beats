@@ -205,9 +205,6 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {
-			if !inMaintWin {
-				// waitForPublish()
-			}
 			s.runOnceWg.Done()
 		} else {
 			// Schedule the next run
@@ -215,6 +212,12 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		}
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
+
+	if s.runOnce && pmw.IsActive(time.Now()){
+		return func() {
+			debugf("Remove scheduler job '%v'", id)
+			jobCtxCancel()
+		}, nil	}
 
 	if s.runOnce {
 		s.runOnceWg.Add(1)
