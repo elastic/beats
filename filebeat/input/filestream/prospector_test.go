@@ -112,11 +112,13 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		entries             map[string]loginp.Value
 		filesOnDisk         map[string]loginp.FileDescriptor
 		expectedUpdatedKeys map[string]string
+		newKey              string
 	}{
 		"prospector init does not update keys if there are no entries": {
 			entries:             nil,
 			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
+			newKey:              "foo", // it isn't used but it must not be empty
 		},
 		"prospector init does not update keys of not existing files": {
 			entries: map[string]loginp.Value{
@@ -129,6 +131,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			},
 			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
+			newKey:              "foo", // it isn't used but it must not be empty
 		},
 		"prospector init updates keys of existing files": {
 			entries: map[string]loginp.Value{
@@ -143,6 +146,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				tmpFileName: {Info: file.ExtendFileInfo(fi)},
 			},
 			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
+			newKey:              "path::" + tmpFileName,
 		},
 	}
 
@@ -155,7 +159,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
+			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
 
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
