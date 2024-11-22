@@ -200,7 +200,7 @@ func collectOffendingInputs(duplicates []string, empty []*conf.C, ids map[string
 			toJson := map[string]interface{}{}
 			err := cfg.Unpack(&toJson)
 			if err != nil {
-				toJson["emptyID"] = fmt.Sprintf("failes to umpack config: %v", err)
+				toJson["emptyID"] = fmt.Sprintf("failed to unpack config: %v", err)
 			}
 			cfgs = append(cfgs, toJson)
 		}
@@ -211,7 +211,7 @@ func collectOffendingInputs(duplicates []string, empty []*conf.C, ids map[string
 			toJson := map[string]interface{}{}
 			err := dupcfgs.Unpack(&toJson)
 			if err != nil {
-				toJson[id] = fmt.Sprintf("failes to umpack config: %v", err)
+				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)
 			}
 			cfgs = append(cfgs, toJson)
 		}
