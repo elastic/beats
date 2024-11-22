@@ -25,6 +25,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"text/template/parse"
 
 	"go.uber.org/multierr"
 
@@ -420,14 +421,27 @@ func (em *EventMetadata) setMessage(msg string) error {
 		return fmt.Errorf("failed to parse message template for event ID %v (template='%v'): %w", em.EventID, msg, err)
 	}
 
-	// One node means there were no parameters so this will optimize that case
-	// by using a static string rather than a text/template.
-	if len(tmpl.Root.Nodes) == 1 {
-		em.MsgStatic = msg
-	} else {
+	// If there is no dynamic content in the template then we can use a static message.
+	if containsTemplatedValues(tmpl) {
 		em.MsgTemplate = tmpl
+	} else {
+		em.MsgStatic = msg
 	}
 	return nil
+}
+
+// containsTemplatedValues traverses the template nodes to check if there are
+// any dynamic values.
+func containsTemplatedValues(tmpl *template.Template) bool {
+	// Walk through the parsed nodes and look for actionable template nodes
+	for _, node := range tmpl.Tree.Root.Nodes {
+		switch node.(type) {
+		case *parse.ActionNode, *parse.CommandNode,
+			*parse.IfNode, *parse.RangeNode, *parse.WithNode:
+			return true
+		}
+	}
+	return false
 }
 
 func (em *EventMetadata) equal(other *EventMetadata) bool {
