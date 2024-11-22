@@ -1,6 +1,10 @@
 # Kafka test container
 
-This Docker container provides an environment for testing with Kafka. It exposes two ports to the host system, `9092` for `PLAINTEXT` and `9093` for `SASL/SSL` with username `beats` and password `KafkaTest`.
+This Docker container provides an environment for testing with Kafka. It exposes two ports to the host system, `9092` for `PLAINTEXT` and `9093` for `SASL/SSL` with username `beats` and password `KafkaTest`. To run this container locally, make sure to add below entry to /etc/hosts
+
+```
+127.0.0.1      kafka
+```
 
 ## Certificates
 
