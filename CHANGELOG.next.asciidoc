@@ -182,6 +182,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
 - Fix missing key in streaming input logging. {pull}41600[41600]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Effectively clean states from removed files when clean_removed is set to True {pull}41747[41747]
 
 *Heartbeat*
 
