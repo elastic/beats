@@ -210,6 +210,8 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 type monitoredReader struct {
 	reader         io.Reader
 	totalBytesRead *monitoring.Uint
+
+	trackBytes int64
 }
 
 func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
@@ -219,5 +221,10 @@ func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
 	m.totalBytesRead.Add(uint64(n))
+	m.trackBytes += int64(n)
 	return n, err
+}
+
+func (m *monitoredReader) GetTrackedBytes() int64 {
+	return m.trackBytes
 }
