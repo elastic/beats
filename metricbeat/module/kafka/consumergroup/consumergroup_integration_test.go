@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
-
 package consumergroup
 
 import (
@@ -45,7 +43,7 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+	c, err := startConsumer(service.HostForPort(9092))
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -68,7 +66,7 @@ func TestFetch(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+	c, err := startConsumer(service.HostForPort(9092))
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -93,9 +91,8 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
+func startConsumer(host string) (io.Closer, error) {
 	brokers := []string{host}
-	topics := []string{topic}
 	config := sarama.NewConfig()
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
@@ -104,9 +101,10 @@ func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
 	// https://github.com/Shopify/sarama/issues/1638
 	// To work around the issue we need to set CommitInterval, but now sarama emits
 	// a deprecation warning.
-	config.Consumer.Offsets.CommitInterval = 1 * time.Second
+	config.Consumer.Offsets.AutoCommit.Enable = true
+	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 
-	return sarama.NewConsumer(brokers, "test-group", topics, config)
+	return sarama.NewConsumer(brokers, config)
 
 }
 
