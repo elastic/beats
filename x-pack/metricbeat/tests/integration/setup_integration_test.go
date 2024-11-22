@@ -52,9 +52,9 @@ metricbeat.config.modules:
 		_, _, err = integration.HttpDo(t, http.MethodDelete, templateURL)
 		require.NoErrorf(t, err, "cleanup failed: could not remove index template %s", index)
 		_, _, err = integration.HttpDo(t, http.MethodDelete, policyURL)
-		require.NoErrorf(t, err, "cleanup failed: could not ilm policy %s", index)
+		require.NoErrorf(t, err, "cleanup failed: could not remove ilm policy %s", index)
 	}
-	// ensure datastream/index template/ ilm policy is set before running the test
+	// ensure no datastream/index template/ilm policy is set before running the test
 	cleanUpES()
 	t.Cleanup(cleanUpES)
 
@@ -64,11 +64,11 @@ metricbeat.config.modules:
 		"-E", "setup.kibana.host="+kURL.Hostname(),
 		"-E", "setup.kibana.port="+kURL.Port(),
 		"-E", "output.elasticsearch.protocol=http",
-		"-E", "output.elasticsearch.hosts=['"+esURL.String()+"']",
-		"-E", "output.file.enabled=false")
+		"-E", "output.elasticsearch.hosts=['"+esURL.String()+"']")
 	procState, err := metricbeat.Process.Wait()
 	require.NoError(t, err, "metricbeat setup failed")
-	require.Equal(t, 0, procState.ExitCode(), "metricbeat setup failed: incorrect exit code")
+	require.Equalf(t, 0, procState.ExitCode(),
+		"metricbeat setup failed: incorrect exit code: %d", procState.ExitCode())
 
 	// generate an event with dynamically mapped fields
 	fields := map[string]string{}
@@ -77,7 +77,8 @@ metricbeat.config.modules:
 		fields[fmt.Sprintf("a-label-%d", i)] = fmt.Sprintf("some-value-%d", i)
 	}
 	event, err := json.Marshal(map[string]any{
-		"@timestamp":        time.Now().Format(time.RFC3339),
+		"@timestamp": time.Now().Format(time.RFC3339),
+		// 'kubernetes.labels.*' is a dynamically mapped field
 		"kubernetes.labels": fields,
 	})
 	require.NoError(t, err, "could not marshal event to send to ES")
