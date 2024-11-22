@@ -129,7 +129,7 @@ func (p *messagePartitioner) Partition(
 
 	partition, err := p.p(msg, numPartitions)
 	if err != nil {
-		return 0, err
+		return 0, nil
 	}
 
 	msg.partition = partition
