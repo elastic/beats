@@ -273,7 +273,11 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg, _ := errMsg.Msg.Metadata.(*message)
+		msg, ok := errMsg.Msg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.fail(msg, errMsg.Err)
 
 		if errors.Is(errMsg.Err, breaker.ErrBreakerOpen) {
