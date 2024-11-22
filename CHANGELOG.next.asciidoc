@@ -10,6 +10,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 
 *Auditbeat*
 
@@ -26,6 +27,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 
 
 *Heartbeat*
@@ -35,7 +37,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
-
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 
 *Osquerybeat*
 
@@ -46,7 +48,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-- Expire source port mappings. {pull}41581[41581]
 
 *Winlogbeat*
 
@@ -110,6 +111,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
 
 *Heartbeat*
 
@@ -224,6 +226,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
+- Add `id` field to all the vSphere metricsets. {pull}41097[41097]
 
 *Metricbeat*
 
@@ -274,6 +277,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
