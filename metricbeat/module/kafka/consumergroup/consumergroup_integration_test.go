@@ -99,9 +99,6 @@ func startConsumer(t *testing.T, host string, topic string, groupID string) (io.
 	topics := []string{topic}
 
 	config := sarama.NewConfig()
-	config.Version = sarama.V2_5_0_0 // Use the correct Kafka version
-	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRange
-	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
@@ -136,13 +133,11 @@ type Consumer struct{}
 
 // Setup is run before the consumer starts consuming
 func (c *Consumer) Setup(session sarama.ConsumerGroupSession) error {
-	fmt.Println("Consumer setup completed")
 	return nil
 }
 
 // Cleanup is run after the consumer stops consuming
 func (c *Consumer) Cleanup(session sarama.ConsumerGroupSession) error {
-	fmt.Println("Consumer cleanup completed")
 	return nil
 }
 
