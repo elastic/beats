@@ -62,4 +62,7 @@ type ProspectorCleaner interface {
 type Value interface {
 	// UnpackCursorMeta returns the cursor metadata required by the prospector.
 	UnpackCursorMeta(to interface{}) error
+
+	// Key return the registry's key for this resource
+	Key() string
 }

@@ -219,10 +219,17 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	for key, res := range s.store.ephemeralStore.table {
-		//  - res.internalState.TTL == 0 is a deleted entry
-		//  - res.internalState.TTL > 0 is an entry that will be removed once the TTL
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
+		//
+		//  - res.internalState.TTL == 0: entry has been deleted
+		//  - res.internalState.TTL == -1: entry will never be removed by TTL
+		//  - res.internalState.TTL > 0: entry will be removed once its TTL
 		//    is reached
-		//  - res.internalState.TTL == -1 is an entry that will never be removed
+		//
+		// If the entry has been deleted, skip it
 		if res.internalState.TTL == 0 {
 			continue
 		}
@@ -243,23 +250,17 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 				continue
 			}
 
-			// Pending updates due to events that have not yet been ACKed
-			// are not included in the copy. Collection on
-			// the copy start from the last known ACKed position.
-			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed position using the new key
-			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
-			s.store.writeState(r)
+			s.store.writeState(r) // writeState only writes to the log file
 
 			// Add the new resource to the ephemeralStore so the rest of the
 			// codebase can have access to the new value
 			s.store.ephemeralStore.table[newKey] = r
+
 			// Remove the old key from the store
 			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
@@ -454,6 +455,10 @@ func (r *resource) UnpackCursor(to interface{}) error {
 
 func (r *resource) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, r.cursorMeta)
+}
+
+func (r *resource) Key() string {
+	return r.key
 }
 
 // syncStateSnapshot returns the current insync state based on already ACKed update operations.
