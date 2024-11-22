@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package consumergroup
 
 import (
@@ -104,7 +106,8 @@ func startConsumer(host string) (io.Closer, error) {
 	config.Consumer.Offsets.AutoCommit.Enable = true
 	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 
-	return sarama.NewConsumer(brokers, config)
+	consumer, _ := sarama.NewConsumer(brokers, config)
+	return consumer.ConsumePartition("metricbeat-test", 0, sarama.OffsetNewest)
 
 }
 
