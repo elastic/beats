@@ -166,6 +166,11 @@ func NewHarvester(
 		h.state.TTL = h.config.CleanInactive
 	}
 
+	// Enable/disable cleaning removed files from the registrar
+	if h.config.CleanRemoved {
+		h.state.CleanRemoved = h.config.CleanRemoved
+	}
+
 	// Add outlet signal so harvester can also stop itself
 	return h, nil
 }

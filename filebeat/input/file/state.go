@@ -39,6 +39,7 @@ type State struct {
 	Meta           map[string]string `json:"meta" struct:"meta,omitempty"`
 	FileStateOS    file.StateOS      `json:"FileStateOS" struct:"FileStateOS"`
 	IdentifierName string            `json:"identifier_name" struct:"identifier_name"`
+	CleanRemoved   bool              `json:"clean_removed" struct:"clean_removed"`
 }
 
 // NewState creates a new file state

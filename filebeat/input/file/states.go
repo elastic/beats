@@ -18,6 +18,7 @@
 package file
 
 import (
+	"os"
 	"sync"
 	"time"
 
@@ -115,12 +116,18 @@ func (s *States) CleanupWith(fn func(string)) (int, int) {
 	numCanExpire := 0
 
 	L := len(s.states)
+	checkFileRemove := func(name string) bool {
+		if _, err := os.Stat(name); os.IsNotExist(err) {
+			return true
+		}
+		return false
+	}
 	for i := 0; i < L; {
 		state := &s.states[i]
 		canExpire := state.TTL > 0
 		expired := (canExpire && currentTime.Sub(state.Timestamp) > state.TTL)
 
-		if state.TTL == 0 || expired {
+		if state.TTL == 0 || expired || (state.CleanRemoved && checkFileRemove(state.Source)) {
 			if !state.Finished {
 				logp.Err("State for %s should have been dropped, but couldn't as state is not finished.", state.Source)
 				i++
