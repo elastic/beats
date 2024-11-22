@@ -3018,12 +3018,12 @@ Contents of probable licence file $GOMODCACHE/github.com/aerospike/aerospike-cli
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/apache/arrow/go/v14
-Version: v14.0.2
+Dependency : github.com/apache/arrow/go/v17
+Version: v17.0.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v14@v14.0.2/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/apache/arrow/go/v17@v17.0.0/LICENSE.txt:
 
 
                                  Apache License
@@ -22219,11 +22219,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/pierrec/lz4/v4
-Version: v4.1.18
+Version: v4.1.21
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.18/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/pierrec/lz4/v4@v4.1.21/LICENSE:
 
 Copyright (c) 2015, Pierre Curto
 All rights reserved.
@@ -33274,11 +33274,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/andybalholm/brotli
-Version: v1.0.5
+Version: v1.1.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.0.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/andybalholm/brotli@v1.1.0/LICENSE:
 
 Copyright (c) 2009, 2010, 2013-2016 by the Brotli Authors.
 
@@ -35142,11 +35142,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/apache/thrift
-Version: v0.19.0
+Version: v0.20.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.19.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/apache/thrift@v0.20.0/LICENSE:
 
 
                                  Apache License
@@ -41777,11 +41777,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/goccy/go-json
-Version: v0.10.2
+Version: v0.10.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/goccy/go-json@v0.10.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/goccy/go-json@v0.10.3/LICENSE:
 
 MIT License
 
@@ -48565,11 +48565,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/klauspost/cpuid/v2
-Version: v2.2.5
+Version: v2.2.8
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/klauspost/cpuid/v2@v2.2.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/klauspost/cpuid/v2@v2.2.8/LICENSE:
 
 The MIT License (MIT)
 
@@ -58316,11 +58316,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/exp
-Version: v0.0.0-20240205201215-2c58cdc269a3
+Version: v0.0.0-20240222234643-814bf88cf225
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20240205201215-2c58cdc269a3/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/exp@v0.0.0-20240222234643-814bf88cf225/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -58390,11 +58390,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : gonum.org/v1/gonum
-Version: v0.12.0
+Version: v0.15.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/gonum.org/v1/gonum@v0.12.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/gonum.org/v1/gonum@v0.15.0/LICENSE:
 
 Copyright ©2013 The Gonum Authors. All rights reserved.
 
