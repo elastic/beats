@@ -40,7 +40,6 @@ const (
 	security4752File      = "testdata/4752.evtx"
 	sysmon9File           = "testdata/sysmon-9.01.evtx"
 	winErrorReportingFile = "testdata/application-windows-error-reporting.evtx"
-	dokan1File            = "testdata/dokan1.evtx"
 )
 
 // createLog creates a new event log and returns a handle for writing events
