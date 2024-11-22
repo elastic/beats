@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -94,17 +95,22 @@ type: filestream
 id: duplicated-id-2
 `, `
 type: filestream
+id: duplicated-id-2
+`, `
+type: filestream
 id: unique-ID
 `,
 			},
 			assertErr: func(t *testing.T, err error) {
 				assert.ErrorContains(t, err, "filestream inputs with duplicated IDs")
-				assert.ErrorContains(t, err, "filestream inputs with duplicated IDs")
 				assert.ErrorContains(t, err, "duplicated-id-1")
 				assert.ErrorContains(t, err, "duplicated-id-2")
+				assert.Equal(t, strings.Count(err.Error(), "duplicated-id-1"), 1, "each IDs should appear only once")
+				assert.Equal(t, strings.Count(err.Error(), "duplicated-id-2"), 1, "each IDs should appear only once")
+
 			},
 			assertLogs: func(t *testing.T, obs *observer.ObservedLogs) {
-				want := `[{"id":"duplicated-id-1","type":"filestream"},{"id":"duplicated-id-1","type":"filestream"},{"id":"duplicated-id-2","type":"filestream"},{"id":"duplicated-id-2","type":"filestream"}]`
+				want := `[{"id":"duplicated-id-1","type":"filestream"},{"id":"duplicated-id-1","type":"filestream"},{"id":"duplicated-id-2","type":"filestream"},{"id":"duplicated-id-2","type":"filestream"},{"id":"duplicated-id-2","type":"filestream"}]`
 
 				logs := obs.TakeAll()
 				require.Len(t, logs, 1, "there should be only one log entry")
