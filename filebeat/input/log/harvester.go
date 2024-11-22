@@ -449,7 +449,10 @@ func (h *Harvester) onMessage(
 	// Check if json fields exist
 	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(mapstr.M)
+		jsonFields, ok = f.(mapstr.M)
+		if !ok {
+			h.logger.Debugf("Error converting jsonFields from state %v", state.IdentifierName)
+		}
 	}
 
 	var meta mapstr.M
