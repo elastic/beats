@@ -168,7 +168,7 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 				continue
 			}
 			ids[fsInput.ID] = append(ids[fsInput.ID], input)
-			if len(ids[fsInput.ID]) > 1 {
+			if len(ids[fsInput.ID]) == 2 {
 				duplicates = append(duplicates, fsInput.ID)
 			}
 		}
