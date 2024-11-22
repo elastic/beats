@@ -36,7 +36,7 @@ func init() {
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
 func currentTime() time.Time {
-	clock := clockValue.Load().(clock)
+	clock, _ := clockValue.Load().(clock)
 	return clock.Now()
 }
 
