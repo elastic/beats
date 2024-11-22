@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
+- Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
 
 *Auditbeat*
 
