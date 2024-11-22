@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	saramacluster "github.com/bsm/sarama-cluster"
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -96,7 +96,7 @@ func TestFetch(t *testing.T) {
 func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
 	brokers := []string{host}
 	topics := []string{topic}
-	config := saramacluster.NewConfig()
+	config := sarama.NewConfig()
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
@@ -105,7 +105,9 @@ func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
 	// To work around the issue we need to set CommitInterval, but now sarama emits
 	// a deprecation warning.
 	config.Consumer.Offsets.CommitInterval = 1 * time.Second
-	return saramacluster.NewConsumer(brokers, "test-group", topics, config)
+
+	return sarama.NewConsumer(brokers, "test-group", topics, config)
+
 }
 
 func getConfig(host string) map[string]interface{} {
