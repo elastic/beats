@@ -185,8 +185,8 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	clusterStateMetrics := []string{"routing_table", "metadata"}
 	filterPaths := []string{
 		"routing_table",
-		"**.settings.index.**._tier_preference",
-		"**.settings.index.**.creation_date",
+		"metadata.indices.**.settings.index.**._tier_preference",
+		"metadata.indices.**.settings.index.creation_date",
 	}
 	clusterState, err := elasticsearch.GetClusterState(
 		httpClient,
