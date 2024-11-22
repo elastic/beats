@@ -21,7 +21,7 @@ func TestValidate(t *testing.T) {
 			hasError:    true,
 			errorString: "Configuration is required",
 		},
-		"No filebeat section": {
+		"No metricbeat section": {
 			c:           &Config{Beatconfig: map[string]interface{}{"other": map[string]interface{}{}}},
 			hasError:    true,
 			errorString: "Configuration key 'metricbeat' is required",
@@ -35,11 +35,10 @@ func TestValidate(t *testing.T) {
 	for name, tc := range tests {
 		err := tc.c.Validate()
 		if tc.hasError {
-			assert.NotNil(t, err, name)
-			assert.Equal(t, err.Error(), tc.errorString, name)
-		}
-		if !tc.hasError {
-			assert.Nil(t, err, name)
+			assert.NotNilf(t, err, "%s failed, should have had error", name)
+			assert.Equalf(t, err.Error(), tc.errorString, "%s failed, error not equal", name)
+		} else {
+			assert.Nilf(t, err, "%s failed, should not have error", name)
 		}
 	}
 }

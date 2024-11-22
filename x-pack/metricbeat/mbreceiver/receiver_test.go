@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
@@ -59,12 +59,12 @@ func TestNewReceiver(t *testing.T) {
 		countLogs = countLogs + ld.LogRecordCount()
 		return nil
 	})
-	assert.NoError(t, err, "Error creating log consumer")
+	require.NoError(t, err, "Error creating log consumer")
 
 	r, err := createReceiver(context.Background(), receiverSettings, &config, logConsumer)
-	assert.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", zapLogs.String())
+	require.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", zapLogs.String())
 	err = r.Start(context.Background(), nil)
-	assert.NoError(t, err, "Error starting metricbeatreceiver")
+	require.NoError(t, err, "Error starting metricbeatreceiver")
 
 	ch := make(chan bool, 1)
 	timer := time.NewTimer(120 * time.Second)
@@ -88,5 +88,5 @@ func TestNewReceiver(t *testing.T) {
 	}
 found:
 	err = r.Shutdown(context.Background())
-	assert.NoError(t, err, "Error shutting down metricbeatreceiver")
+	require.NoError(t, err, "Error shutting down metricbeatreceiver")
 }
