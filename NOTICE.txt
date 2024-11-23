@@ -15134,11 +15134,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-lumber@v0.1.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-perf
-Version: v0.0.0-20191212140718-9c656876f595
+Version: v0.0.0-20241029065020-30bec95324b8
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-perf@v0.0.0-20191212140718-9c656876f595/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-perf@v0.0.0-20241029065020-30bec95324b8/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
