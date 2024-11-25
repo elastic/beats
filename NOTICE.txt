@@ -19960,12 +19960,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/hashicorp/golang-lru
-Version: v0.6.0
+Dependency : github.com/hashicorp/golang-lru/v2
+Version: v2.0.7
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru/v2@v2.0.7/LICENSE:
 
 Copyright (c) 2014 HashiCorp, Inc.
 
