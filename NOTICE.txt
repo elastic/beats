@@ -14225,11 +14225,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-elasticsearc
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-libaudit/v2
-Version: v2.5.0
+Version: v2.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.5.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-libaudit/v2@v2.6.1/LICENSE.txt:
 
 
                                  Apache License
@@ -15775,11 +15775,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-Version: v1.14.2
+Version: v1.15.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.14.2/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.15.0/LICENSE.txt:
 
 
                                  Apache License
@@ -19932,12 +19932,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/hashicorp/golang-lru
-Version: v0.6.0
+Dependency : github.com/hashicorp/golang-lru/v2
+Version: v2.0.7
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/golang-lru/v2@v2.0.7/LICENSE:
 
 Copyright (c) 2014 HashiCorp, Inc.
 
