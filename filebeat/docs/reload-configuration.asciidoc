@@ -135,4 +135,9 @@ set the `period` to less than 1s because the modification time of files is often
 stored in seconds. Setting the `period` to less than 1s will result in
 unnecessary overhead.
 
+WARNING: DO NOT set the `reload.period` duration to longer than 10s. During
+reload, filebeat waits for `reload.period` seconds before shipping logs. If you
+set the `reload.period` to `30m`, filebeat will only start shipping logs after
+waiting for a period of 30m.
+
 include::{libbeat-dir}/shared-note-file-permissions.asciidoc[]
