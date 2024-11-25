@@ -395,7 +395,9 @@ type XMLRenderer struct {
 	conf          RenderConfig
 	metadataCache *publisherMetadataCache
 	renderBuf     []byte
-	render        func(event EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	outBuf        *sys.ByteBuffer
+
+	render func(event EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 
 	log *logp.Logger
 }
@@ -407,6 +409,7 @@ func NewXMLRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) *XML
 	r := &XMLRenderer{
 		conf:          conf,
 		renderBuf:     make([]byte, renderBufferSize),
+		outBuf:        sys.NewByteBuffer(renderBufferSize),
 		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
 		log:           rlog,
 	}
@@ -447,14 +450,13 @@ func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) 
 	// critical to not drop data.
 	var errs []error
 
-	bb := sys.NewPooledByteBuffer()
-	defer bb.Free()
-
-	err := r.render(handle, bb)
+	r.outBuf.Reset()
+	err := r.render(handle, r.outBuf)
 	if err != nil {
 		errs = append(errs, err)
 	}
-	event := r.buildEventFromXML(bb.Bytes(), err)
+	outBytes := r.outBuf.Bytes()
+	event := r.buildEventFromXML(outBytes, err)
 
 	// This always returns a non-nil value (even on error).
 	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
@@ -476,9 +478,9 @@ func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) 
 	}
 
 	if len(errs) > 0 {
-		return event, string(bb.Bytes()), multierr.Combine(errs...)
+		return event, string(outBytes), multierr.Combine(errs...)
 	}
-	return event, string(bb.Bytes()), nil
+	return event, string(outBytes), nil
 }
 
 func (r *XMLRenderer) buildEventFromXML(x []byte, recoveredErr error) *winevent.Event {
