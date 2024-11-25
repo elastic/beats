@@ -292,7 +292,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	defer stateStore.Close()
 
-	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("filestream"))
+	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
 	if err != nil {
 		logp.Err("invalid filestream configuration: %+v", err)
 		return err

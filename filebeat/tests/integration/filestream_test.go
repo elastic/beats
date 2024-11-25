@@ -136,7 +136,6 @@ filebeat.inputs:
     paths:
       - /tmp/*.log
   - type: filestream
-    id: unique-id-1
     enabled: true
     paths:
       - /var/log/*.log
@@ -147,20 +146,61 @@ logging:
   metrics:
     enabled: false
 `
+	multipleDuplicatedIDs := `
+filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /tmp/*.log
+  - type: filestream
+    enabled: true
+    paths:
+      - /var/log/*.log
+
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /tmp/duplicated-id-1.log
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /tmp/duplicated-id-1-2.log
+
+
+  - type: filestream
+    id: unique-id-1
+    enabled: true
+    paths:
+      - /tmp/unique-id-1.log
+  - type: filestream
+    id: unique-id-2
+    enabled: true
+    paths:
+      - /var/log/unique-id-2.log
+
+output.discard.enabled: true
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
 	tcs := []struct {
-		name       string
-		cfg        string
-		wantErrLog string
+		name string
+		cfg  string
 	}{
 		{
-			name:       "duplicated IDs",
-			cfg:        duplicatedIDs,
-			wantErrLog: "filestream inputs with duplicated IDs",
+			name: "duplicated IDs",
+			cfg:  duplicatedIDs,
 		},
 		{
-			name:       "empty ID",
-			cfg:        emptyID,
-			wantErrLog: "input without ID",
+			name: "duplicated empty ID",
+			cfg:  emptyID,
+		},
+		{
+			name: "two inputs without ID and duplicated IDs",
+			cfg:  multipleDuplicatedIDs,
 		},
 	}
 
@@ -180,15 +220,12 @@ logging:
 			filebeat.WaitForLogs(
 				"filestream inputs validation error",
 				10*time.Second,
-				"Filebeat did log a validation error")
-
-			filebeat.WaitForLogs(
-				tc.wantErrLog,
-				10*time.Second, "Filebeat did not log there are issues with input ids")
+				"Filebeat did not log a filestream input validation error")
 
 			proc, err := filebeat.Process.Wait()
 			require.NoError(t, err, "filebeat process.Wait returned an error")
 			assert.False(t, proc.Success(), "filebeat should have failed to start")
+
 		})
 	}
 }
@@ -197,19 +234,26 @@ func TestFilestreamValidationSucceeds(t *testing.T) {
 	cfg := `
 filebeat.inputs:
   - type: filestream
-    id: unique-id-1
-    enabled: true
-    paths:
-      - /tmp/*.log
-  - type: filestream
-    id: unique-id-2
     enabled: true
     paths:
       - /var/log/*.log
 
+  - type: filestream
+    id: unique-id-1
+    enabled: true
+    paths:
+      - /tmp/unique-id-1.log
+  - type: filestream
+    id: unique-id-2
+    enabled: true
+    paths:
+      - /var/log/unique-id-2.log
+
 output.discard.enabled: true
 logging:
   level: debug
+  metrics:
+    enabled: false
 `
 	filebeat := integration.NewBeat(
 		t,
