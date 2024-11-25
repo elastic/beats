@@ -20,7 +20,6 @@
 package consumergroup
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"testing"
@@ -46,7 +45,7 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test", "test-group")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -69,7 +68,7 @@ func TestFetch(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test", "test-group")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
@@ -94,14 +93,16 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, host string, topic string, groupID string) (io.Closer, error) {
+func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error) {
 	brokers := []string{host}
-	topics := []string{topic}
 
 	config := sarama.NewConfig()
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
+
+	config.Consumer.Offsets.AutoCommit.Enable = true
+	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 
 	// Create a new consumer group
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, config)
@@ -110,47 +111,7 @@ func startConsumer(t *testing.T, host string, topic string, groupID string) (io.
 		return nil, err
 	}
 
-	// Run the consumer in a separate goroutine
-	ctx := context.Background()
-	go func() {
-		for {
-			err := consumerGroup.Consume(ctx, topics, &Consumer{})
-			if err != nil {
-				t.Logf("Error consuming: %v", err)
-			}
-			// Check if the context was canceled
-			if ctx.Err() != nil {
-				return
-			}
-		}
-	}()
-
 	return consumerGroup, nil
-}
-
-// Consumer struct implementing sarama.ConsumerGroupHandler
-type Consumer struct{}
-
-// Setup is run before the consumer starts consuming
-func (c *Consumer) Setup(session sarama.ConsumerGroupSession) error {
-	return nil
-}
-
-// Cleanup is run after the consumer stops consuming
-func (c *Consumer) Cleanup(session sarama.ConsumerGroupSession) error {
-	return nil
-}
-
-// ConsumeClaim processes messages from Kafka topics
-func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	for message := range claim.Messages() {
-		fmt.Printf("Message topic:%s partition:%d offset:%d key:%s value:%s\n",
-			message.Topic, message.Partition, message.Offset, string(message.Key), string(message.Value))
-
-		// Mark message as processed
-		session.MarkMessage(message, "")
-	}
-	return nil
 }
 
 func getConfig(host string) map[string]interface{} {
