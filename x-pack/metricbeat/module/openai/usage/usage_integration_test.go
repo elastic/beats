@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -27,12 +27,8 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
 
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, has %d: %v", len(errs), errs)
-	}
-
-	assert.NotEmpty(t, events)
-
+	require.Empty(t, errs, "Expected no errors")
+	require.NotEmpty(t, events, "Expected events to be returned")
 }
 
 func TestData(t *testing.T) {
@@ -44,9 +40,7 @@ func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(server.URL+"/usage", apiKey))
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	require.NoError(t, err, "Writing events should not return an error")
 }
 
 func getConfig(url, apiKey string) map[string]interface{} {
@@ -132,7 +126,25 @@ func initServer(endpoint string, api_key string) *httptest.Server {
     }
   ],
   "ft_data": [],
-  "dalle_api_data": [],
+  "dalle_api_data": [
+    {
+      "timestamp": 1730696460,
+      "num_images": 1,
+      "num_requests": 1,
+      "image_size": "1024x1024",
+      "operation": "generations",
+      "user_id": "subham.sarkar@elastic.co",
+      "organization_id": "org-FCp10pUDIN4slA4kNZK6UKkX",
+      "api_key_id": "key_10xSzP3zPsz8zB5O",
+      "api_key_name": "project_key",
+      "api_key_redacted": "sk-...zkA",
+      "api_key_type": "organization",
+      "organization_name": "Personal",
+      "model_id": "dall-e-3",
+      "project_id": "Default Project",
+      "project_name": "Default Project"
+    }
+  ],
   "whisper_api_data": [
     {
       "timestamp": 1730696460,
@@ -165,13 +177,14 @@ func initServer(endpoint string, api_key string) *httptest.Server {
 			return
 		}
 
-		// Validate the endpoint
-		if r.URL.Path == endpoint {
-			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write(data)
-		} else {
+		// If it doesn't match the expected endpoint, return 404
+		if r.URL.Path != endpoint {
 			w.WriteHeader(http.StatusNotFound)
+			return
 		}
+
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(data)
 	}))
 	return server
 }

@@ -5,7 +5,6 @@
 package usage
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -17,7 +16,6 @@ import (
 // RLHTTPClient implements a rate-limited HTTP client that wraps the standard http.Client
 // with a rate limiter to control API request frequency.
 type RLHTTPClient struct {
-	ctx         context.Context
 	client      *http.Client
 	logger      *logp.Logger
 	Ratelimiter *rate.Limiter
@@ -27,21 +25,25 @@ type RLHTTPClient struct {
 // It waits for rate limit token before proceeding with the request.
 // Returns the HTTP response and any error encountered.
 func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	c.logger.Warn("Waiting for rate limit token")
-	err := c.Ratelimiter.Wait(context.TODO())
+	c.logger.Debug("Waiting for rate limit token")
+	start := time.Now()
+	err := c.Ratelimiter.Wait(req.Context())
+	waitDuration := time.Since(start)
 	if err != nil {
 		return nil, err
 	}
-	c.logger.Warn("Rate limit token acquired")
+	c.logger.Debug("Rate limit token acquired")
+	if waitDuration > time.Minute {
+		c.logger.Infof("Rate limit wait exceeded threshold: %v", waitDuration)
+	}
 	return c.client.Do(req)
 }
 
 // newClient creates a new rate-limited HTTP client with specified rate limiter and timeout.
-func newClient(ctx context.Context, logger *logp.Logger, rl *rate.Limiter, timeout time.Duration) *RLHTTPClient {
+func newClient(logger *logp.Logger, rl *rate.Limiter, timeout time.Duration) *RLHTTPClient {
 	var client = http.DefaultClient
 	client.Timeout = timeout
 	return &RLHTTPClient{
-		ctx:         ctx,
 		client:      client,
 		logger:      logger,
 		Ratelimiter: rl,

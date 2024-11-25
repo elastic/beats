@@ -5,6 +5,7 @@
 package usage
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -48,35 +49,39 @@ func defaultConfig() Config {
 }
 
 func (c *Config) Validate() error {
-	switch {
-	case len(c.APIKeys) == 0:
-		return fmt.Errorf("at least one API key must be configured")
+	var errs []error
 
-	case c.APIURL == "":
-		return fmt.Errorf("api_url cannot be empty")
-
-	case c.RateLimit == nil:
-		return fmt.Errorf("rate_limit must be configured")
-
-	case c.RateLimit.Limit == nil:
-		return fmt.Errorf("rate_limit.limit must be configured")
-
-	case c.RateLimit.Burst == nil:
-		return fmt.Errorf("rate_limit.burst must be configured")
-
-	case c.Timeout <= 0:
-		return fmt.Errorf("timeout must be greater than 0")
-
-	case c.Collection.LookbackDays < 0:
-		return fmt.Errorf("lookback_days must be >= 0")
+	if len(c.APIKeys) == 0 {
+		errs = append(errs, errors.New("at least one API key must be configured"))
+	}
+	if c.APIURL == "" {
+		errs = append(errs, errors.New("api_url cannot be empty"))
+	}
+	if c.RateLimit == nil {
+		errs = append(errs, errors.New("rate_limit must be configured"))
+	} else {
+		if c.RateLimit.Limit == nil {
+			errs = append(errs, errors.New("rate_limit.limit must be configured"))
+		}
+		if c.RateLimit.Burst == nil {
+			errs = append(errs, errors.New("rate_limit.burst must be configured"))
+		}
+	}
+	if c.Timeout <= 0 {
+		errs = append(errs, errors.New("timeout must be greater than 0"))
+	}
+	if c.Collection.LookbackDays < 0 {
+		errs = append(errs, errors.New("lookback_days must be >= 0"))
 	}
 
-	// API keys validation in a separate loop since it needs iteration
 	for i, apiKey := range c.APIKeys {
 		if apiKey.Key == "" {
-			return fmt.Errorf("API key at position %d cannot be empty", i)
+			errs = append(errs, fmt.Errorf("API key at position %d cannot be empty", i))
 		}
 	}
 
+	if len(errs) > 0 {
+		return fmt.Errorf("validation failed: %v", errors.Join(errs...))
+	}
 	return nil
 }

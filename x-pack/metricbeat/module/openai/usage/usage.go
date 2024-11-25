@@ -6,10 +6,10 @@ package usage
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
 	"path"
 	"time"
@@ -37,10 +37,11 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	logger     *logp.Logger
-	config     Config
-	report     mb.ReporterV2
-	stateStore *stateStore
+	httpClient   *RLHTTPClient
+	logger       *logp.Logger
+	config       Config
+	report       mb.ReporterV2
+	stateManager *stateManager
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -57,16 +58,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	st, err := newStateStore(paths.Resolve(paths.Data, path.Join(base.Module().Name(), base.Name())))
+	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join(base.Module().Name(), base.Name())))
 	if err != nil {
-		return nil, fmt.Errorf("creating state store: %w", err)
+		return nil, fmt.Errorf("create state manager: %w", err)
 	}
+
+	logger := logp.NewLogger("openai.usage")
+
+	httpClient := newClient(
+		logger,
+		rate.NewLimiter(
+			rate.Every(time.Duration(*config.RateLimit.Limit)*time.Second),
+			*config.RateLimit.Burst,
+		),
+		config.Timeout,
+	)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		logger:        logp.NewLogger("openai.usage"),
+		httpClient:    httpClient,
+		logger:        logger,
 		config:        config,
-		stateStore:    st,
+		stateManager:  sm,
 	}, nil
 }
 
@@ -81,18 +94,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 //     iii. Start date is calculated based on configured lookback days
 //  3. Fetches usage data for each day in the date range
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	httpClient := newClient(
-		context.TODO(),
-		m.logger,
-		rate.NewLimiter(
-			rate.Every(time.Duration(*m.config.RateLimit.Limit)*time.Second),
-			*m.config.RateLimit.Burst,
-		),
-		m.config.Timeout,
-	)
-
-	m.report = report
-
 	endDate := time.Now().UTC()
 
 	if !m.config.Collection.Realtime {
@@ -103,7 +104,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	startDate := endDate.AddDate(0, 0, -m.config.Collection.LookbackDays)
 
-	return m.fetchDateRange(startDate, endDate, httpClient)
+	m.report = report
+	return m.fetchDateRange(startDate, endDate, m.httpClient)
 }
 
 // fetchDateRange retrieves OpenAI API usage data for each configured API key within a specified date range.
@@ -114,36 +116,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // 3. Adjusts start date if previous state exists to avoid duplicate collection
 // 4. Iterates through each day in the range, collecting usage data
 // 5. Updates state store with the latest processed date
+// Update the fetchDateRange method to use the new stateManager methods
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
-		// SHA-256 is a cryptographic hash function that generates a 256-bit (32-byte) digest,
-		// represented as a 64-character hexadecimal string. The hash function is deterministic,
-		// ensuring the same input consistently produces identical output, while being computationally
-		// infeasible to reverse. Its strong collision resistance makes it highly suitable for
-		// secure key storage.
-		//
-		// The hexadecimal representation uses only alphanumeric characters [0-9a-f], making it
-		// ideal for cross-platform filename compatibility. The fixed-length output provides
-		// predictable storage requirements and consistent behavior across different systems.
-		hasher := sha256.New()
-		hasher.Write([]byte(apiKey.Key))
-		hashedKey := hex.EncodeToString(hasher.Sum(nil))
-		stateKey := "state_" + hashedKey
-
-		if m.stateStore.Has(stateKey) {
-			lastProcessedDate, err := m.stateStore.Get(stateKey)
-			if err != nil {
-				m.logger.Errorf("Error reading state for API key: %v", err)
-				continue
-			}
-
-			lastDate, err := time.Parse("2006-01-02", lastProcessedDate)
-			if err != nil {
-				m.logger.Errorf("Error parsing last processed date: %v", err)
-				continue
-			}
-
-			startDate = lastDate.AddDate(0, 0, 1)
+		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
+		if err == nil {
+			// We have previous state, adjust start date
+			startDate = lastProcessedDate.AddDate(0, 0, 1)
 			if startDate.After(endDate) {
 				continue
 			}
@@ -157,7 +136,9 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 			}
 		}
 
-		if err := m.stateStore.Put(stateKey, endDate.Format("2006-01-02")); err != nil {
+		// Store using stateManager's key prefix and hashing
+		stateKey := m.stateManager.keyPrefix + m.stateManager.hashKey(apiKey.Key)
+		if err := m.stateManager.store.Put(stateKey, endDate.Format("2006-01-02")); err != nil {
 			m.logger.Errorf("Error storing state for API key: %v", err)
 		}
 	}
@@ -172,12 +153,16 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		if err, ok := err.(net.Error); ok && err.Timeout() {
+			return ErrHTTPClientTimeout
+		}
 		return fmt.Errorf("error making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error response from API: %s", resp.Status)
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("error response from API: status=%s, body=%s", resp.Status, string(body))
 	}
 
 	return m.processResponse(resp, dateStr)
