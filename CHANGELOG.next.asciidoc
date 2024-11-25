@@ -73,6 +73,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
+
+- Expire source port mappings. {pull}41581[41581]
 
 *Winlogbeat*
 
