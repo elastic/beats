@@ -42,6 +42,7 @@ type MetricSet struct {
 	config       Config
 	report       mb.ReporterV2
 	stateManager *stateManager
+	headers      map[string]string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -80,6 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		logger:        logger,
 		config:        config,
 		stateManager:  sm,
+		headers:       processHeaders(config.Headers),
 	}, nil
 }
 
@@ -179,7 +181,7 @@ func (m *MetricSet) createRequest(dateStr, apiKey string) (*http.Request, error)
 	req.URL.RawQuery = q.Encode()
 
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	for key, value := range processHeaders(m.config.Headers) {
+	for key, value := range m.headers {
 		req.Header.Add(key, value)
 	}
 
