@@ -68,7 +68,7 @@ type Client struct {
 	cli *osquery.ExtensionManagerClient
 	mx  sync.Mutex
 
-	cache Cache
+	cache Cache[string, map[string]string]
 
 	cliLimiter *semaphore.Weighted
 }
@@ -106,7 +106,7 @@ func New(socketPath string, opts ...Option) *Client {
 		timeout:        defaultTimeout,
 		maxTimeout:     defaultMaxTimeout,
 		connectRetries: defaultConnectRetries,
-		cache:          &nullSafeCache{},
+		cache:          &nullSafeCache[string, map[string]string]{},
 		cliLimiter:     semaphore.NewWeighted(limit),
 	}
 
@@ -258,15 +258,9 @@ func (c *Client) resolveResult(ctx context.Context, sql string, hits []map[strin
 }
 
 func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]string, error) {
-	var colTypes map[string]string
-
-	if v, ok := c.cache.Get(sql); ok {
-		colTypes, ok = v.(map[string]string)
-		if ok {
-			c.log.Debugf("using cached column types for query: %s", sql)
-		} else {
-			c.log.Error("failed get the column types from cache, incompatible type")
-		}
+	colTypes, ok := c.cache.Get(sql)
+	if ok {
+		c.log.Debugf("using cached column types for query: %s", sql)
 	}
 
 	if colTypes == nil {
