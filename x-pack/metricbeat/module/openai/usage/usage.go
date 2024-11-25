@@ -85,16 +85,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch method implements the data gathering and data conversion to the right
-// format. It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
+// Fetch collects OpenAI API usage data for the configured time range.
 //
-//  1. Creates a rate-limited HTTP client with configured timeout and burst settings
-//  2. Sets up the time range for data collection:
-//     i.	End date is current UTC time for realtime collection
-//     ii.	End date is previous day for non-realtime collection
-//     iii. Start date is calculated based on configured lookback days
-//  3. Fetches usage data for each day in the date range
+// The collection process:
+// 1. Determines the time range based on realtime/non-realtime configuration
+// 2. Calculates start date using configured lookback days
+// 3. Fetches usage data for each day in the range
+// 4. Reports collected metrics through the mb.ReporterV2
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	endDate := time.Now().UTC()
 
@@ -110,15 +107,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return m.fetchDateRange(startDate, endDate, m.httpClient)
 }
 
-// fetchDateRange retrieves OpenAI API usage data for each configured API key within a specified date range.
+// fetchDateRange retrieves OpenAI API usage data for each configured API key within a date range.
 //
 // For each API key:
-// 1. Generates a secure SHA-256 hash of the key for state tracking
-// 2. Checks the state store for the last processed date
-// 3. Adjusts start date if previous state exists to avoid duplicate collection
-// 4. Iterates through each day in the range, collecting usage data
-// 5. Updates state store with the latest processed date
-// Update the fetchDateRange method to use the new stateManager methods
+// 1. Retrieves last processed date from state store
+// 2. Adjusts collection range to avoid duplicates
+// 3. Collects daily usage data
+// 4. Updates state store with latest processed date
+// 5. Handles errors per day without failing entire range
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
 		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
@@ -147,6 +143,7 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 	return nil
 }
 
+// fetchSingleDay retrieves usage data for a specific date and API key.
 func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPClient) error {
 	req, err := m.createRequest(dateStr, apiKey)
 	if err != nil {
@@ -170,6 +167,7 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 	return m.processResponse(resp, dateStr)
 }
 
+// createRequest builds an HTTP request for the OpenAI usage API.
 func (m *MetricSet) createRequest(dateStr, apiKey string) (*http.Request, error) {
 	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, m.config.APIURL, nil)
 	if err != nil {
@@ -188,6 +186,7 @@ func (m *MetricSet) createRequest(dateStr, apiKey string) (*http.Request, error)
 	return req, nil
 }
 
+// processResponse handles the API response and processes the usage data.
 func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 	var usageResponse UsageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&usageResponse); err != nil {
