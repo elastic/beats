@@ -213,7 +213,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	}
 
 	// finally obtain total bytes of the object through metered reader
-	p.metrics.s3ObjectSizeInBytes.Update(mReader.GetTrackedBytes())
+	p.metrics.s3ObjectSizeInBytes.Update(mReader.totalBytesReadCurrent)
 
 	return nil
 }
