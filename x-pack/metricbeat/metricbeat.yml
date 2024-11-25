@@ -89,13 +89,18 @@ setup.kibana:
 # Configure what output to use when sending the data collected by the beat.
 
 # ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
 
-  # Performance preset - one of "balanced", "throughput", "scale",
-  # "latency", or "custom".
-  preset: balanced
+output.file:
+  path: "."
+  filename: openai-logs
+
+# output.elasticsearch:
+#   # Array of hosts to connect to.
+#   hosts: ["localhost:9200"]
+
+#   # Performance preset - one of "balanced", "throughput", "scale",
+#   # "latency", or "custom".
+#   preset: balanced
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"

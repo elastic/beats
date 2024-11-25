@@ -12,24 +12,24 @@ import (
 
 type Config struct {
 	APIKeys    []apiKeyConfig   `config:"api_keys" validate:"required"`
-	APIURL     string           `config:"api_url"`
+	APIURL     string           `config:"api_url" validate:"required"`
 	Headers    []string         `config:"headers"`
 	RateLimit  *rateLimitConfig `config:"rate_limit"`
-	Timeout    time.Duration    `config:"timeout"`
+	Timeout    time.Duration    `config:"timeout" validate:"required"`
 	Collection collectionConfig `config:"collection"`
 }
 
 type rateLimitConfig struct {
-	Limit *int `config:"limit"`
-	Burst *int `config:"burst"`
+	Limit *int `config:"limit" validate:"required"`
+	Burst *int `config:"burst" validate:"required"`
 }
 
 type apiKeyConfig struct {
-	Key string `config:"key"`
+	Key string `config:"key" validate:"required"`
 }
 
 type collectionConfig struct {
-	LookbackDays int  `config:"lookback_days"`
+	LookbackDays int  `config:"lookback_days" validate:"required"`
 	Realtime     bool `config:"realtime"`
 }
 
@@ -83,5 +83,6 @@ func (c *Config) Validate() error {
 	if len(errs) > 0 {
 		return fmt.Errorf("validation failed: %v", errors.Join(errs...))
 	}
+
 	return nil
 }

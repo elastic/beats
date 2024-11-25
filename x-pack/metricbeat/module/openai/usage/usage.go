@@ -117,6 +117,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // 5. Handles errors per day without failing entire range
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
+		// stateKey using stateManager's key prefix and hashing apiKey
+		stateKey := m.stateManager.keyPrefix + m.stateManager.hashKey(apiKey.Key)
+
 		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
 		if err == nil {
 			// We have previous state, adjust start date
@@ -132,12 +135,9 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 				m.logger.Errorf("Error fetching data for date %s: %v", dateStr, err)
 				continue
 			}
-		}
-
-		// Store using stateManager's key prefix and hashing
-		stateKey := m.stateManager.keyPrefix + m.stateManager.hashKey(apiKey.Key)
-		if err := m.stateManager.store.Put(stateKey, endDate.Format("2006-01-02")); err != nil {
-			m.logger.Errorf("Error storing state for API key: %v", err)
+			if err := m.stateManager.store.Put(stateKey, dateStr); err != nil {
+				m.logger.Errorf("Error storing state for API key: %v", err)
+			}
 		}
 	}
 	return nil
