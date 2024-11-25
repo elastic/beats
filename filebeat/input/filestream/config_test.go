@@ -53,7 +53,7 @@ func TestValidateInputIDs(t *testing.T) {
 			},
 		},
 		{
-			name: "empty ID",
+			name: "one empty ID is allowed",
 			cfg: []string{`
 type: filestream
 `, `
@@ -65,10 +65,36 @@ id: some-id-2
 `,
 			},
 			assertErr: func(t *testing.T, err error) {
-				assert.ErrorContains(t, err, "input without ID")
+				assert.NoError(t, err, "one empty id is allowed")
+			},
+		},
+		{
+			name: "duplicated empty ID",
+			cfg: []string{`
+type: filestream
+paths:
+  - "/tmp/empty-1"
+`, `
+type: filestream
+paths:
+  - "/tmp/empty-2"
+`, `
+type: filestream
+id: unique-id-1
+`, `
+type: filestream
+id: unique-id-2
+`, `
+type: filestream
+id: unique-ID
+`,
+			},
+			assertErr: func(t *testing.T, err error) {
+				assert.ErrorContains(t, err, `filestream inputs with duplicated IDs: ""`)
+
 			},
 			assertLogs: func(t *testing.T, obs *observer.ObservedLogs) {
-				want := `[{"type":"filestream"}]`
+				want := `[{"paths":["/tmp/empty-1"],"type":"filestream"},{"paths":["/tmp/empty-2"],"type":"filestream"}]`
 
 				logs := obs.TakeAll()
 				require.Len(t, logs, 1, "there should be only one log entry")
@@ -76,10 +102,8 @@ id: some-id-2
 				got, err := json.Marshal(logs[0].ContextMap()["inputs"])
 				require.NoError(t, err, "could not marshal duplicated IDs inputs")
 				assert.Equal(t, want, string(got))
-
 			},
-		},
-		{
+		}, {
 			name: "duplicated IDs",
 			cfg: []string{`
 type: filestream
@@ -144,7 +168,6 @@ id: unique-ID
 `,
 			},
 			assertErr: func(t *testing.T, err error) {
-				assert.ErrorContains(t, err, "input without ID")
 				assert.ErrorContains(t, err, "filestream inputs with duplicated IDs")
 			},
 			assertLogs: func(t *testing.T, obs *observer.ObservedLogs) {

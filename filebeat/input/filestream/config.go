@@ -152,7 +152,6 @@ func (c *config) Validate() error {
 func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 	ids := make(map[string][]*conf.C)
 	var duplicates []string
-	var empty []*conf.C
 	for _, input := range inputs {
 		fsInput := struct {
 			ID   string `config:"id"`
@@ -163,10 +162,6 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 			return fmt.Errorf("failed to unpack filestream input configuration: %w", err)
 		}
 		if fsInput.Type == "filestream" {
-			if fsInput.ID == "" {
-				empty = append(empty, input)
-				continue
-			}
 			ids[fsInput.ID] = append(ids[fsInput.ID], input)
 			if len(ids[fsInput.ID]) == 2 {
 				duplicates = append(duplicates, fsInput.ID)
@@ -174,37 +169,21 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 		}
 	}
 
-	var errs []string
-	if empty != nil {
-		errs = append(errs, "input without ID")
-	}
 	if len(duplicates) != 0 {
-		errs = append(errs, fmt.Sprintf("filestream inputs with duplicated IDs: %v", strings.Join(duplicates, ",")))
-	}
-
-	if len(errs) != 0 {
-		jsonDupCfg := collectOffendingInputs(duplicates, empty, ids)
-		logger.Errorw("filestream inputs with invalid IDs", "inputs", jsonDupCfg)
-
-		return fmt.Errorf("filestream inputs validation error: %s", strings.Join(errs, ", "))
+		jsonDupCfg := collectOffendingInputs(duplicates, ids)
+		logger.Errorw("filestream inputs with duplicated IDs", "inputs", jsonDupCfg)
+		var quotedDuplicates []string
+		for _, dup := range duplicates {
+			quotedDuplicates = append(quotedDuplicates, fmt.Sprintf("%q", dup))
+		}
+		return fmt.Errorf("filestream inputs validation error: filestream inputs with duplicated IDs: %v", strings.Join(quotedDuplicates, ","))
 	}
 
 	return nil
 }
 
-func collectOffendingInputs(duplicates []string, empty []*conf.C, ids map[string][]*conf.C) []map[string]interface{} {
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
 	var cfgs []map[string]interface{}
-
-	if len(empty) > 0 {
-		for _, cfg := range empty {
-			toJson := map[string]interface{}{}
-			err := cfg.Unpack(&toJson)
-			if err != nil {
-				toJson["emptyID"] = fmt.Sprintf("failed to unpack config: %v", err)
-			}
-			cfgs = append(cfgs, toJson)
-		}
-	}
 
 	for _, id := range duplicates {
 		for _, dupcfgs := range ids[id] {
