@@ -48,7 +48,7 @@ the events to {es}.
       - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
 
 cloud.id: "MyESDeployment:SomeLongString=="
-cloud.auth: "elastic:SomeLongString"
+cloud.auth: "username:SomeLongString"
 
 processors:
   - add_host_metadata: ~
