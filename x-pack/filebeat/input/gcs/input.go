@@ -152,9 +152,15 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+	metrics.url.Set("gs://" + currentSource.BucketName)
+	defer metrics.Close()
+
 	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
+			metrics.errorsTotal.Inc()
 			return err
 		}
 
@@ -169,6 +175,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 
 	client, err := fetchStorageClient(ctx, input.config, log)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
@@ -180,7 +187,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, metrics, log)
 
 	return scheduler.schedule(ctx)
 }
