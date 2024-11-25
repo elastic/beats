@@ -272,16 +272,11 @@ func metricIsEmpty2(metric azmetrics.MetricValue) bool {
 func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
-	client.Log.Infof("there are %d metricvalues", len(metricValues.Values))
 	for _, v := range metricValues.Values {
-		client.Log.Infof("Value is %+v", v)
 		for _, t := range v.TimeSeries {
-			client.Log.Infof("TimeSeries is %+v", t)
 			for _, mv := range t.Data {
-				client.Log.Infof("Data is %+v", mv)
 				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 				if metricIsEmpty2(mv) {
-					client.Log.Infof("Data is empty")
 					continue
 				}
 				//// remove metric values that are not part of the timeline selected
@@ -312,7 +307,6 @@ func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []Metri
 						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
 					}
 				}
-				client.Log.Infof("Val created is %+v", val)
 				currentMetrics = append(currentMetrics, val)
 			}
 		}

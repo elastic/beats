@@ -65,6 +65,8 @@ func NewClient(config Config) (*Client, error) {
 	}
 	client.ResourceConfigurations.Metrics = make(map[string][]Metric)
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
+	client.ResourceConfigurations.MetricDefinitionsChan = nil
+	client.ResourceConfigurations.ErrorChan = nil
 
 	return client, nil
 }
@@ -77,9 +79,9 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	}
 
 	// check if refresh interval has been set and if it has expired
-	client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
-	client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 	if !client.ResourceConfigurations.Expired() {
+		client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
+		client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 		go func() {
 			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 			defer close(client.ResourceConfigurations.ErrorChan)
@@ -106,7 +108,14 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
+			// return err
 			continue
+		}
+		client.Log.Infof("AAAAAAAA checking if the channels are nil %+v,  %+v", client.ResourceConfigurations.MetricDefinitionsChan, client.ResourceConfigurations.ErrorChan)
+
+		if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
+			client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
+			client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 		}
 
 		// Map resources to the client
@@ -125,8 +134,8 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 		// Collects and stores metrics definitions for the cloud resources.
 		fn(client, resourceList, resource)
+		client.Log.Infof("AAAAAAAA finished with %d ", len(resourceList))
 	}
-
 	return nil
 }
 
@@ -316,7 +325,6 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 		endTime := referenceTime.Add(interval * (-1))
 		startTime := endTime.Add(interval * (-1))
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
-		batchSize := 6
 		filter := ""
 		if len(metricsDefinitions[0].Dimensions) > 0 {
 			var filterList []string
@@ -325,8 +333,8 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 			}
 			filter = strings.Join(filterList, " AND ")
 		}
-		for i := 0; i < len(metricsDefinitions); i += batchSize {
-			end := i + batchSize
+		for i := 0; i < len(metricsDefinitions); i += BatchApiResourcesLimit {
+			end := i + BatchApiResourcesLimit
 			if end > len(metricsDefinitions) {
 				end = len(metricsDefinitions)
 			}
@@ -366,18 +374,11 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 
 			// Process the response as needed
 			for i, v := range r {
-				client.Log.Infof("Resource id is %+v", *v.ResourceID)
-				client.Log.Infof("Resource region is %+v", *v.ResourceRegion)
-				client.Log.Infof("Resource StartTime is %+v", *v.StartTime)
-				client.Log.Infof("Resource EndTime is %+v", *v.EndTime)
-				client.Log.Infof("Resource Namespace is %+v", *v.Namespace)
-				client.Log.Infof("Resource Interval is %+v", *v.Interval)
 				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 					timeGrain: *r[i].Interval,
 					timestamp: referenceTime,
 				})
 				values := mapMetricValues2(client, v)
-				client.Log.Infof("Values are %+v", values)
 				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
 			}
 

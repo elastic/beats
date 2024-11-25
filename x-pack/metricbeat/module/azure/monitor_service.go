@@ -43,8 +43,9 @@ type MonitorService struct {
 }
 
 const (
-	metricNameLimit = 20
-	ApiVersion      = "2021-04-01"
+	metricNameLimit        = 20
+	ApiVersion             = "2021-04-01"
+	BatchApiResourcesLimit = 50
 )
 
 // NewService instantiates the Azure monitoring service
@@ -369,8 +370,8 @@ func (service *MonitorService) QueryResources(
 	}
 
 	// call the query resources client passing 50 resourceIDs at a time
-	for i := 0; i < len(resourceIDs); i += 6 {
-		end := i + 6
+	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
+		end := i + BatchApiResourcesLimit
 
 		if end > len(resourceIDs) {
 			end = len(resourceIDs)
