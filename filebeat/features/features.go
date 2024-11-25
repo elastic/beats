@@ -23,7 +23,6 @@ import (
 )
 
 const (
-	envAgentlessElasticsearchStateStoreEnabled    = "AGENTLESS_ELASTICSEARCH_STATE_STORE_ENABLED"
 	envAgentlessElasticsearchStateStoreInputTypes = "AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES"
 )
 
@@ -35,8 +34,6 @@ var esTypesEnabled map[string]void
 var isESEnabled bool
 
 func init() {
-	isESEnabled = (os.Getenv(envAgentlessElasticsearchStateStoreEnabled) != "")
-
 	esTypesEnabled = make(map[string]void)
 
 	s := os.Getenv(envAgentlessElasticsearchStateStoreInputTypes)
@@ -47,6 +44,7 @@ func init() {
 			esTypesEnabled[k] = void{}
 		}
 	}
+	isESEnabled = (len(esTypesEnabled) > 0)
 }
 
 // IsElasticsearchStateStoreEnabled returns true if feature is enabled for agentless
