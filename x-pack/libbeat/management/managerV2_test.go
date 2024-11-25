@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -55,6 +56,10 @@ func TestManagerV2(t *testing.T) {
 				t.Log("output, inputs, and APM configuration set")
 			}
 		} else if currentIdx == 2 {
+			period, err := inputs.Configs()[0].Config.String("period", -1)
+			require.NoError(t, err)
+			assert.Equal(t, "10m", period)
+		} else if currentIdx == 3 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
@@ -183,7 +188,49 @@ func TestManagerV2(t *testing.T) {
 				{
 					Id:             "input-unit-1",
 					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 2,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "system/metrics-system-default-system-1",
+						Type: "system/metrics",
+						Name: "system-1",
+						Streams: []*proto.Stream{
+							{
+								Id: "system/metrics-system.filesystem-default-system-1",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "10m",
+								}),
+							},
+						},
+					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-2",
+					Type:           proto.UnitType_INPUT,
 					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+			},
+			Features:    nil,
+			FeaturesIdx: 1,
+		},
+		{
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 2,
 					State:          proto.State_HEALTHY,
 					LogLevel:       proto.UnitLogLevel_DEBUG,
 				},
@@ -214,7 +261,7 @@ func TestManagerV2(t *testing.T) {
 				{
 					Id:             "input-unit-1",
 					Type:           proto.UnitType_INPUT,
-					ConfigStateIdx: 1,
+					ConfigStateIdx: 2,
 					State:          proto.State_STOPPED,
 					LogLevel:       proto.UnitLogLevel_DEBUG,
 				},
@@ -264,6 +311,9 @@ func TestManagerV2(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
 	}, 15*time.Second, 300*time.Millisecond)
+	assert.Equal(t, 1, output.reloadCount)
+	assert.Equal(t, 1, inputs.reloadCount)
+	assert.Equal(t, 1, apm.reloadCount)
 }
 
 func TestOutputError(t *testing.T) {
@@ -553,19 +603,22 @@ func TestErrorPerUnit(t *testing.T) {
 }
 
 type reloadable struct {
-	mx     sync.Mutex
-	config *reload.ConfigWithMeta
+	mx          sync.Mutex
+	config      *reload.ConfigWithMeta
+	reloadCount int
 }
 
 type reloadableList struct {
-	mx      sync.Mutex
-	configs []*reload.ConfigWithMeta
+	mx          sync.Mutex
+	configs     []*reload.ConfigWithMeta
+	reloadCount int
 }
 
 func (r *reloadable) Reload(config *reload.ConfigWithMeta) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	r.config = config
+	r.reloadCount++
 	return nil
 }
 
@@ -579,6 +632,7 @@ func (r *reloadableList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	r.configs = configs
+	r.reloadCount++
 	return nil
 }
 
