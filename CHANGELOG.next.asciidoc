@@ -381,6 +381,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
+- Properly set events `UserData` when experimental api is used. {pull}41525[41525]
+- Include XML is respected for experimental api {pull}41525[41525]
+- Forwarded events use renderedtext info for experimental api {pull}41525[41525]
+- Language setting is respected for experimental api {pull}41525[41525]
+- Language setting also added to decode xml wineventlog processor {pull}41525[41525]
+- Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
