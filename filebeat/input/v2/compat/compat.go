@@ -21,9 +21,17 @@
 package compat
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/gofrs/uuid/v5"
@@ -32,9 +40,11 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -60,6 +70,7 @@ type runner struct {
 	input          v2.Input
 	connector      beat.PipelineConnector
 	statusReporter status.StatusReporter
+	diag           diagnostics.DiagnosticReporter
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -157,6 +168,121 @@ func (r *runner) Stop() {
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 	r.statusReporter = nil
+}
+
+func getRegistry() []byte {
+	fmt.Println("================================================== getRegistry")
+	buf := bytes.Buffer{}
+	dataPath := paths.Resolve(paths.Data, "")
+	registryPath := filepath.Join(dataPath, "registry")
+	f, err := os.CreateTemp("", "filebeat-registry-*.tar")
+	if err != nil {
+		panic(err)
+	}
+	f.Close()
+
+	defer func() {
+		if err := os.Remove(f.Name()); err != nil {
+			panic(err)
+		}
+	}()
+
+	tarFolder(registryPath, f.Name())
+	// tarFolder("/home/tiago/devel/beats/x-pack/filebeat/data/registry", "/tmp/registry.tar")
+	gzipFile(f.Name(), &buf)
+
+	return buf.Bytes()
+}
+
+func gzipFile(src string, dst io.Writer) error {
+	reader, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("cannot open '%s': '%w'", src, err)
+	}
+	defer reader.Close()
+
+	writer := gzip.NewWriter(dst)
+	defer writer.Close()
+	writer.Name = filepath.Base(src)
+
+	if _, err := io.Copy(writer, reader); err != nil {
+		if err != nil {
+			fmt.Errorf("cannot gzip file '%s': '%w'", src, err)
+		}
+	}
+
+	return nil
+}
+
+// tarFolder creates a tar archive from the folder src and stores it at dst.
+//
+// dst must be the full path with extension, e.g: /tmp/foo.tar
+// If src is not a folder an error is retruned
+func tarFolder(src, dst string) error {
+	fullPath, err := filepath.Abs(src)
+
+	fmt.Println("============================== src:", src)
+	fmt.Println("============================== fullPath:", fullPath)
+	fmt.Println("============================== dst:", dst)
+	if err != nil {
+		fmt.Errorf("cannot get full path from '%s': '%w'", src, err)
+	}
+	tarFile, err := os.Create(dst)
+	if err != nil {
+		return fmt.Errorf("cannot create tar file '%s': '%w'", dst, err)
+	}
+	defer tarFile.Close()
+
+	tarWriter := tar.NewWriter(tarFile)
+	defer tarWriter.Close()
+
+	info, err := os.Stat(fullPath)
+	if err != nil {
+		return fmt.Errorf("cannot stat '%s': '%w'", fullPath, err)
+	}
+
+	if !info.IsDir() {
+		return fmt.Errorf("'%s' is not a directory", fullPath)
+	}
+	baseDir := filepath.Base(src)
+
+	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, err error) error {
+		header, err := tar.FileInfoHeader(info, info.Name())
+		header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, src))
+
+		if err := tarWriter.WriteHeader(header); err != nil {
+			return fmt.Errorf("cannot write tar header for '%s': '%w'", path, err)
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		file, err := os.Open(path)
+		if err != nil {
+			return fmt.Errorf("cannot open '%s' for reading: '%w", path, err)
+		}
+		defer file.Close()
+
+		if _, err := io.Copy(tarWriter, file); err != nil {
+			return fmt.Errorf("cannot read '%s': '%w'", path, err)
+		}
+
+		return nil
+	})
+}
+
+func (r *runner) Diagnostics() []diagnostics.DiagnosticSetup {
+	fmt.Println("================================================== Diagnostics called!")
+	setup := diagnostics.DiagnosticSetup{
+		Name:        "registry collector",
+		Description: "Collect Filebeat's registry",
+		Filename:    "registry.tar.gz",
+		ContentType: "application/octet-stream",
+		Callback:    getRegistry,
+	}
+
+	return []diagnostics.DiagnosticSetup{setup}
 }
 
 func configID(config *conf.C) (string, error) {
