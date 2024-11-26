@@ -352,6 +352,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					s3ObjectHandler: s3EventHandlerFactory,
 					states:          states,
 					provider:        "provider",
+					filterProvider:  newFilterProvider(&config),
 				}
 
 				s3Poller.run(ctx)
