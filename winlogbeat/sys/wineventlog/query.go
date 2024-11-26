@@ -32,7 +32,7 @@ const (
 	query = `<QueryList>
   <Query Id="0">
     <Select Path="{{.Path}}">*{{if .Select}}[System[{{join .Select " and "}}]]{{end}}</Select>{{if .Suppress}}
-    <Suppress Path="{{.Path}}">*[System[({{join .Suppress " or "}})]]</Suppress>{{end}}
+    <Suppress Path="{{.Path}}">*[System[{{.Suppress}}]]</Suppress>{{end}}
   </Query>
 </QueryList>`
 )
@@ -43,6 +43,7 @@ var (
 	incEventIDRegex      = regexp.MustCompile(`^\d+$`)
 	incEventIDRangeRegex = regexp.MustCompile(`^(\d+)\s*-\s*(\d+)$`)
 	excEventIDRegex      = regexp.MustCompile(`^-(\d+)$`)
+	excEventIDRangeRegex = regexp.MustCompile(`^-(\d+)\s*-\s*(\d+)$`)
 )
 
 // Query that identifies the source of the events and one or more selectors or
@@ -100,7 +101,7 @@ func (q Query) Build() (string, error) {
 type queryParams struct {
 	Path     string
 	Select   []string
-	Suppress []string
+	Suppress string
 }
 
 func (qp *queryParams) ignoreOlderSelect(q Query) error {
@@ -139,6 +140,15 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 			}
 			includes = append(includes,
 				fmt.Sprintf("(EventID &gt;= %d and EventID &lt;= %d)", r1, r2))
+		case excEventIDRangeRegex.MatchString(c):
+			m := excEventIDRangeRegex.FindStringSubmatch(c)
+			r1, _ := strconv.Atoi(m[1])
+			r2, _ := strconv.Atoi(m[2])
+			if r1 >= r2 {
+				return fmt.Errorf("event ID range '%s' is invalid", c)
+			}
+			excludes = append(excludes,
+				fmt.Sprintf("(EventID &gt;= %d and EventID &lt;= %d)", r1, r2))
 		default:
 			return fmt.Errorf("invalid event ID query component ('%s')", c)
 		}
@@ -149,10 +159,9 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 	} else if len(includes) > 1 {
 		qp.Select = append(qp.Select, "("+strings.Join(includes, " or ")+")")
 	}
-	if len(excludes) == 1 {
-		qp.Suppress = append(qp.Suppress, excludes...)
-	} else if len(excludes) > 1 {
-		qp.Suppress = append(qp.Suppress, "("+strings.Join(excludes, " or ")+")")
+
+	if len(excludes) > 0 {
+		qp.Suppress = "(" + strings.Join(excludes, " or ") + ")"
 	}
 
 	return nil

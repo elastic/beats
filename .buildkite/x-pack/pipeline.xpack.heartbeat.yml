@@ -32,6 +32,11 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
+
 steps:
   - group: "Check/Update"
     key: "x-pack-heartbeat-check-update"
@@ -94,6 +99,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
@@ -117,6 +128,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Go Integration Tests"
@@ -138,6 +155,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2016 Unit Tests"
@@ -159,6 +182,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2022 Unit Tests"
@@ -185,6 +214,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 10 Unit Tests"
@@ -206,6 +241,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 11 Unit Tests"
@@ -227,6 +268,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2019 Unit Tests"
@@ -244,6 +291,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -253,6 +303,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
@@ -265,6 +321,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
             - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
@@ -274,6 +333,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS arm64 Extended Tests"

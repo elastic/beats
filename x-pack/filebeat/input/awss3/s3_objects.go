@@ -25,30 +25,47 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const (
-	contentTypeJSON   = "application/json"
-	contentTypeNDJSON = "application/x-ndjson"
-)
-
 type s3ObjectProcessorFactory struct {
-	log           *logp.Logger
 	metrics       *inputMetrics
 	s3            s3API
 	fileSelectors []fileSelectorConfig
 	backupConfig  backupConfig
 }
 
+type s3ObjectProcessor struct {
+	*s3ObjectProcessorFactory
+
+	ctx           context.Context
+	eventCallback func(beat.Event)
+	readerConfig  *readerConfig // Config about how to process the object.
+	s3Obj         s3EventV2     // S3 object information.
+	s3ObjHash     string
+	s3RequestURL  string
+
+	s3Metadata map[string]interface{} // S3 object metadata.
+}
+
+type s3DownloadedObject struct {
+	body        io.ReadCloser
+	contentType string
+	metadata    map[string]interface{}
+}
+
+const (
+	contentTypeJSON   = "application/json"
+	contentTypeNDJSON = "application/x-ndjson"
+)
+
 // errS3DownloadFailed reports problems downloading an S3 object. Download errors
 // should never treated as permanent, they are just an indication to apply a
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)
@@ -59,7 +76,6 @@ func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3A
 		}
 	}
 	return &s3ObjectProcessorFactory{
-		log:           log,
 		metrics:       metrics,
 		s3:            s3,
 		fileSelectors: sel,
@@ -78,64 +94,33 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
-	log = log.With(
-		"bucket_arn", obj.S3.Bucket.Name,
-		"object_key", obj.S3.Object.Key)
-
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, obj s3EventV2) s3ObjectHandler {
 	readerConfig := f.findReaderConfig(obj.S3.Object.Key)
 	if readerConfig == nil {
-		log.Debug("Skipping S3 object processing. No file_selectors are a match.")
+		// No file_selectors are a match, skip.
 		return nil
 	}
 
 	return &s3ObjectProcessor{
 		s3ObjectProcessorFactory: f,
-		log:                      log,
 		ctx:                      ctx,
-		publisher:                client,
-		acker:                    ack,
 		readerConfig:             readerConfig,
 		s3Obj:                    obj,
 		s3ObjHash:                s3ObjectHash(obj),
 	}
 }
 
-// s3DownloadedObject encapsulate downloaded s3 object for internal processing
-type s3DownloadedObject struct {
-	body        io.ReadCloser
-	length      int64
-	contentType string
-	metadata    map[string]interface{}
-}
-
-type s3ObjectProcessor struct {
-	*s3ObjectProcessorFactory
-
-	log          *logp.Logger
-	ctx          context.Context
-	publisher    beat.Client
-	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig              // Config about how to process the object.
-	s3Obj        s3EventV2                  // S3 object information.
-	s3ObjHash    string
-	s3RequestURL string
-	eventCount   int64
-
-	s3Metadata map[string]interface{} // S3 object metadata.
-}
-
-func (p *s3ObjectProcessor) Wait() {
-	p.acker.Wait()
-}
-
-func (p *s3ObjectProcessor) ProcessS3Object() error {
+func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error {
 	if p == nil {
 		return nil
 	}
+	p.eventCallback = eventCallback
+	log = log.With(
+		"bucket_arn", p.s3Obj.S3.Bucket.Name,
+		"object_key", p.s3Obj.S3.Object.Key)
 
 	// Metrics and Logging
-	p.log.Debug("Begin S3 object processing.")
+	log.Debug("Begin S3 object processing.")
 	p.metrics.s3ObjectsRequestedTotal.Inc()
 	p.metrics.s3ObjectsInflight.Inc()
 	start := time.Now()
@@ -143,7 +128,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		elapsed := time.Since(start)
 		p.metrics.s3ObjectsInflight.Dec()
 		p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
-		p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
+		log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
 	}()
 
 	// Request object (download).
@@ -156,9 +141,9 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	defer s3Obj.body.Close()
 
 	p.s3Metadata = s3Obj.metadata
-	p.metrics.s3ObjectSizeInBytes.Update(s3Obj.length)
 
-	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal))
+	mReader := newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal)
+	reader, err := p.addGzipDecoderIfNeeded(mReader)
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
@@ -181,7 +166,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		for dec.next() {
 			val, err := dec.decodeValue()
 			if err != nil {
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					return nil
 				}
 				break
@@ -191,7 +176,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 				return err
 			}
 			evt := p.createEvent(string(data), evtOffset)
-			p.publish(p.acker, &evt)
+
+			p.eventCallback(evt)
 		}
 
 	case decoder:
@@ -226,7 +212,9 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 			time.Since(start).Nanoseconds(), err)
 	}
 
-	p.metrics.s3EventsPerObject.Update(p.eventCount)
+	// finally obtain total bytes of the object through metered reader
+	p.metrics.s3ObjectSizeInBytes.Update(mReader.totalBytesReadCurrent)
+
 	return nil
 }
 
@@ -255,7 +243,6 @@ func (p *s3ObjectProcessor) download() (obj *s3DownloadedObject, err error) {
 
 	s := &s3DownloadedObject{
 		body:        getObjectOutput.Body,
-		length:      *getObjectOutput.ContentLength,
 		contentType: ctType,
 		metadata:    meta,
 	}
@@ -298,7 +285,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), offset)
-		p.publish(p.acker, &evt)
+		p.eventCallback(evt)
 	}
 
 	return nil
@@ -333,7 +320,7 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), evtOffset)
-		p.publish(p.acker, &evt)
+		p.eventCallback(evt)
 		evtOffset++
 	}
 
@@ -378,7 +365,7 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		data, _ := item.MarshalJSON()
 		p.s3ObjHash = objHash
 		evt := p.createEvent(string(data), offset+arrayOffset)
-		p.publish(p.acker, &evt)
+		p.eventCallback(evt)
 	}
 
 	return nil
@@ -418,7 +405,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 			event := p.createEvent(string(message.Content), offset)
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
-			p.publish(p.acker, &event)
+			p.eventCallback(event)
 		}
 
 		if errors.Is(err, io.EOF) {
@@ -431,15 +418,6 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	}
 
 	return nil
-}
-
-// publish the generated event and perform necessary tracking
-func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
-	ack.Add()
-	event.Private = ack
-	p.eventCount += 1
-	p.metrics.s3EventsCreatedTotal.Inc()
-	p.publisher.Publish(*event)
 }
 
 func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {

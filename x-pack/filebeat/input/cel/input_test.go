@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -55,6 +54,20 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+	},
+	{
+		name: "hello_world_sprintf",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
 			"state":    nil,
 			"resource": map[string]interface{}{
 				"url": "",
@@ -1947,7 +1960,8 @@ func retryHandler() http.HandlerFunc {
 			w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count++
 	}
 }

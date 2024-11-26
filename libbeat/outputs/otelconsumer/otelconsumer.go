@@ -20,15 +20,18 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
@@ -41,6 +44,7 @@ type otelConsumer struct {
 	observer     outputs.Observer
 	logsConsumer consumer.Logs
 	beatInfo     beat.Info
+	log          *logp.Logger
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -49,6 +53,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		observer:     observer,
 		logsConsumer: beat.LogConsumer,
 		beatInfo:     beat,
+		log:          logp.NewLogger("otelconsumer"),
 	}
 
 	ocConfig := defaultConfig()
@@ -63,7 +68,7 @@ func (out *otelConsumer) Close() error {
 	return nil
 }
 
-// Publish converts Beat events to Otel format and send to the next otel consumer
+// Publish converts Beat events to Otel format and sends them to the Otel collector
 func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) error {
 	switch {
 	case out.logsConsumer != nil:
@@ -73,8 +78,7 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	}
 }
 
-func (out *otelConsumer) logsPublish(_ context.Context, batch publisher.Batch) error {
-	defer batch.ACK()
+func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
@@ -97,10 +101,50 @@ func (out *otelConsumer) logsPublish(_ context.Context, batch publisher.Batch) e
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
 	}
 
-	if err := out.logsConsumer.ConsumeLogs(context.TODO(), pLogs); err != nil {
-		return fmt.Errorf("error otel log consumer: %w", err)
+	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	if err != nil {
+		// If the batch is too large, the elasticsearchexporter will
+		// return a 413 error.
+		//
+		// At the moment, the exporter does not support batch splitting
+		// on error so we do it here.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36163.
+		if strings.Contains(err.Error(), "Request Entity Too Large") {
+			// Try and split the batch into smaller batches and retry
+			if batch.SplitRetry() {
+				st.BatchSplit()
+				st.RetryableErrors(len(events))
+			} else {
+				// If the batch could not be split, there is no option left but
+				// to drop it and log the error state.
+				batch.Drop()
+				st.PermanentErrors(len(events))
+				out.log.Errorf("the batch is too large to be sent: %v", err)
+			}
+
+			// Don't propagate the error, the batch was split and retried.
+			return nil
+		}
+
+		// Permanent errors shouldn't be retried. This tipically means
+		// the data cannot be serialized by the exporter that is attached
+		// to the pipeline or when the destination refuses the data because
+		// it cannot decode it. Retrying in this case is useless.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
+		if consumererror.IsPermanent(err) {
+			st.PermanentErrors(len(events))
+			batch.Drop()
+		} else {
+			st.RetryableErrors(len(events))
+			batch.Retry()
+		}
+
+		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
 	}
 
+	batch.ACK()
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil

@@ -136,7 +136,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
-			s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
+			s.log.Debugw("received websocket message", logp.Namespace("websocket"), "msg", string(message))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
@@ -228,7 +228,11 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 			if err == nil {
 				return conn, response, nil
 			}
-			log.Debugw("attempt %d: webSocket connection failed. retrying...\n", attempt)
+			if err == websocket.ErrBadHandshake {
+				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				continue
+			}
+			log.Debugf("attempt %d: webSocket connection failed. retrying...\n", attempt)
 			waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 			time.Sleep(waitTime)
 		}

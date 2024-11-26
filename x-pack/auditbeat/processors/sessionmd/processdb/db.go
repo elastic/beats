@@ -254,6 +254,13 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) {
 	}
 }
 
+func (db *DB) InsertProcess(process Process) {
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+
+	db.insertProcess(process)
+}
+
 func (db *DB) insertProcess(process Process) {
 	pid := process.PIDs.Tgid
 	db.processes[pid] = process
@@ -414,7 +421,7 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	pid := exit.PIDs.Tgid
 	process, ok := db.processes[pid]
 	if !ok {
-		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+		db.logger.Debugf("could not insert exit, pid %v not found in db", pid)
 		return
 	}
 	process.ExitCode = exit.ExitCode
@@ -458,8 +465,8 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	}
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
-	ret.TTY.CharDevice.Major = p.CTTY.Major
-	ret.TTY.CharDevice.Minor = p.CTTY.Minor
+	ret.TTY.CharDevice.Major = uint16(p.CTTY.Major)
+	ret.TTY.CharDevice.Minor = uint16(p.CTTY.Minor)
 	ret.ExitCode = p.ExitCode
 
 	return ret
@@ -736,7 +743,7 @@ func isFilteredExecutable(executable string) bool {
 	return stringStartsWithEntryInList(executable, filteredExecutables[:])
 }
 
-func getTTYType(major uint16, minor uint16) TTYType {
+func getTTYType(major uint32, minor uint32) TTYType {
 	if major >= ptsMinMajor && major <= ptsMaxMajor {
 		return Pts
 	}

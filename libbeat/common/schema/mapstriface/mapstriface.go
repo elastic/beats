@@ -113,7 +113,7 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 	default:
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
-		logp.Err(err.Error())
+		logp.Err("%s", err.Error())
 		return []error{err}
 	}
 }
@@ -135,11 +135,11 @@ func toStrFromNum(key string, data map[string]interface{}) (interface{}, error) 
 	if err != nil {
 		return "", schema.NewKeyNotFoundError(key)
 	}
-	switch ei := emptyIface.(type) {
+	switch val := emptyIface.(type) {
 	case int, int32, int64, uint, uint32, uint64, float32, float64:
 		return fmt.Sprintf("%v", emptyIface), nil
 	case json.Number:
-		return string(ei), nil
+		return string(val), nil
 	default:
 		msg := fmt.Sprintf("expected number, found %T", emptyIface)
 		return "", schema.NewWrongFormatError(key, msg)
@@ -207,23 +207,23 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
-	switch num := emptyIface.(type) {
+	switch val := emptyIface.(type) {
 	case int64:
-		return num, nil
+		return val, nil
 	case int:
-		return int64(num), nil
+		return int64(val), nil
 	case float64:
-		return int64(num), nil
+		return int64(val), nil
 	case json.Number:
-		i64, err := num.Int64()
+		i64, err := val.Int64()
 		if err == nil {
 			return i64, nil
 		}
-		f64, err := num.Float64()
+		f64, err := val.Float64()
 		if err == nil {
 			return int64(f64), nil
 		}
-		msg := fmt.Sprintf("expected integer, found json.Number (%v) that cannot be converted", num)
+		msg := fmt.Sprintf("expected integer, found json.Number (%v) that cannot be converted", val)
 		return 0, schema.NewWrongFormatError(key, msg)
 	default:
 		msg := fmt.Sprintf("expected integer, found %T", emptyIface)
@@ -242,23 +242,23 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return 0.0, schema.NewKeyNotFoundError(key)
 	}
-	switch num := emptyIface.(type) {
+	switch val := emptyIface.(type) {
 	case float64:
-		return num, nil
+		return val, nil
 	case int:
-		return float64(num), nil
+		return float64(val), nil
 	case int64:
-		return float64(num), nil
+		return float64(val), nil
 	case json.Number:
-		i64, err := num.Float64()
+		i64, err := val.Float64()
 		if err == nil {
 			return i64, nil
 		}
-		f64, err := num.Float64()
+		f64, err := val.Float64()
 		if err == nil {
 			return f64, nil
 		}
-		msg := fmt.Sprintf("expected float, found json.Number (%v) that cannot be converted", num)
+		msg := fmt.Sprintf("expected float, found json.Number (%v) that cannot be converted", val)
 		return 0.0, schema.NewWrongFormatError(key, msg)
 	default:
 		msg := fmt.Sprintf("expected float, found %T", emptyIface)
@@ -278,11 +278,11 @@ func toTime(key string, data map[string]interface{}) (interface{}, error) {
 		return common.Time(time.Unix(0, 0)), schema.NewKeyNotFoundError(key)
 	}
 
-	switch ts := emptyIface.(type) {
+	switch val := emptyIface.(type) {
 	case time.Time:
-		return common.Time(ts), nil
+		return common.Time(val), nil
 	case common.Time:
-		return ts, nil
+		return val, nil
 	}
 
 	msg := fmt.Sprintf("expected date, found %T", emptyIface)

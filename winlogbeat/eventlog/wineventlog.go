@@ -61,8 +61,7 @@ var (
 
 const (
 	// renderBufferSize is the size in bytes of the buffer used to render events.
-	renderBufferSize = 1 << 14
-
+	renderBufferSize = 1 << 19 // 512KB, 256K wide characters
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
@@ -447,14 +446,6 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
-		var bufErr sys.InsufficientBufferError
-		if errors.As(err, &bufErr) {
-			detailf("%s Increasing render buffer size to %d", l.logPrefix,
-				bufErr.RequiredSize)
-			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			l.outputBuf.Reset()
-			err = l.render(h, l.outputBuf)
-		}
 		l.metrics.logError(err)
 		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
@@ -546,7 +537,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	}
 
 	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
+	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name, l.config.EventLanguage), &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
@@ -613,7 +604,7 @@ func newWinMetaCache(ttl time.Duration) winMetaCache {
 	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
 }
 
-func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
+func (c *winMetaCache) winMeta(provider string, locale uint32) *winevent.WinMeta {
 	c.mu.RLock()
 	e, ok := c.cache[provider]
 	c.mu.RUnlock()
@@ -632,7 +623,7 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 		return e.WinMeta
 	}
 
-	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
+	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, locale, c.logger)
 	if err != nil {
 		// Return an empty store on error (can happen in cases where the
 		// log was forwarded and the provider doesn't exist on collector).

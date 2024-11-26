@@ -103,7 +103,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -126,7 +126,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs []error
@@ -148,7 +148,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)
