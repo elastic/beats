@@ -7,9 +7,11 @@ package usage
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"sync"
 	"time"
 )
@@ -29,6 +31,10 @@ type stateStore struct {
 
 // newStateManager creates a new state manager instance with the given storage path
 func newStateManager(storePath string) (*stateManager, error) {
+	if strings.TrimSpace(storePath) == "" {
+		return nil, errors.New("empty path provided")
+	}
+
 	store, err := newStateStore(storePath)
 	if err != nil {
 		return nil, fmt.Errorf("create state store: %w", err)
@@ -74,6 +80,11 @@ func (s *stateStore) Put(key string, value string) error {
 	if err != nil {
 		return fmt.Errorf("writing value to state file: %w", err)
 	}
+
+	if err = f.Sync(); err != nil {
+		return fmt.Errorf("syncing state file: %w", err)
+	}
+
 	return nil
 }
 
@@ -125,8 +136,7 @@ func (s *stateStore) Clear() error {
 
 // GetLastProcessedDate retrieves and parses the last processed date for a given API key
 func (s *stateManager) GetLastProcessedDate(apiKey string) (time.Time, error) {
-	hashedKey := s.hashKey(apiKey)
-	stateKey := s.keyPrefix + hashedKey
+	stateKey := s.GetStateKey(apiKey)
 
 	if !s.store.Has(stateKey) {
 		return time.Time{}, ErrNoState
@@ -149,10 +159,14 @@ func (s *stateManager) hashKey(apiKey string) string {
 
 	// Generate SHA-256 hash and hex encode for safe filename usage
 	hasher := sha256.New()
-	hasher.Write([]byte(apiKey))
+	_, _ = hasher.Write([]byte(apiKey))
 	hashedKey := hex.EncodeToString(hasher.Sum(nil))
 
 	// Cache the computed hash for future lookups
 	s.hashCache.Store(apiKey, hashedKey)
 	return hashedKey
+}
+
+func (s *stateManager) GetStateKey(apiKey string) string {
+	return s.keyPrefix + s.hashKey(apiKey)
 }

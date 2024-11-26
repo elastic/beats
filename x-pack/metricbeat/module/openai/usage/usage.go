@@ -58,7 +58,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join(base.Module().Name(), base.Name())))
+	sm, err := newStateManager(paths.Resolve(paths.Data, path.Join("state", base.Module().Name(), base.Name())))
 	if err != nil {
 		return nil, fmt.Errorf("create state manager: %w", err)
 	}
@@ -117,7 +117,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
 		// stateKey using stateManager's key prefix and hashing apiKey
-		stateKey := m.stateManager.keyPrefix + m.stateManager.hashKey(apiKey.Key)
+		stateKey := m.stateManager.GetStateKey(apiKey.Key)
 
 		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
 		if err == nil {
