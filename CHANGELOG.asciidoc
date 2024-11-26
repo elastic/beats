@@ -3,15 +3,9 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
 [[release-notes-8.16.1]]
 === Beats version 8.16.1
 https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
-=======
-[[release-notes-8.15.5]]
-=== Beats version 8.15.5
-https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
->>>>>>> b215a4a367 (docs: Prepare Changelog for 8.15.5 (#41771))
 
 ==== Breaking changes
 
@@ -21,7 +15,6 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 
 ==== Bugfixes
 
-<<<<<<< HEAD
 *Filebeat*
 
 - Fix AWS region in aws-s3 input S3 polling mode.  {pull}41572[41572]
@@ -146,7 +139,27 @@ filebeat.inputs:
 *Filebeat*
 
 - Fix AWS region in `aws-s3` input S3 polling mode.  {pull}41572[41572]
->>>>>>> b215a4a367 (docs: Prepare Changelog for 8.15.5 (#41771))
+
+
+[[release-notes-8.15.5]]
+=== Beats version 8.15.5
+https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Expire source port mappings. {pull}41581[41581]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+
+*Filebeat*
+
+- Fix AWS region in `aws-s3` input S3 polling mode.  {pull}41572[41572]
 
 
 [[release-notes-8.15.4]]
