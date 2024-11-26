@@ -669,11 +669,9 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		return
 	}
 
-	//if outputUnit != nil {
-	//	if err := outputUnit.UpdateState(status.Running, "Healthy", nil); err != nil {
-	//		cm.logger.Errorw("setting output state", "error", err)
-	//	}
-	//}
+	if err := outputUnit.UpdateState(status.Running, "Healthy", nil); err != nil {
+		cm.logger.Errorw("setting output state", "error", err)
+	}
 
 	// reload APM tracing configuration
 	// all error handling is handled inside of reloadAPM

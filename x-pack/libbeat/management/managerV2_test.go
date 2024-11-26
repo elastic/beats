@@ -41,6 +41,7 @@ func TestManagerV2(t *testing.T) {
 	apm := &reloadable{}
 	r.MustRegisterAPM(apm)
 
+	inputConfigUpdated := atomic.Bool{}
 	configsSet := atomic.Bool{}
 	configsCleared := atomic.Bool{}
 	logLevelSet := atomic.Bool{}
@@ -51,14 +52,26 @@ func TestManagerV2(t *testing.T) {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
 			apmCfg := apm.Config()
+			var period string
+			for _, c := range inputs.Configs() {
+				if c.InputUnitID == "input-unit-1" {
+					var err error
+					period, err = inputs.Configs()[0].Config.String("period", -1)
+					require.NoError(t, err)
+				}
+			}
+			if oCfg != nil && len(iCfgs) == 3 && apmCfg == nil && period == "10m" {
+				inputConfigUpdated.Store(true)
+				t.Log("input-unit-1 config updated")
+			}
+		} else if currentIdx == 2 {
+			oCfg := output.Config()
+			iCfgs := inputs.Configs()
+			apmCfg := apm.Config()
 			if oCfg != nil && len(iCfgs) == 3 && apmCfg != nil {
 				configsSet.Store(true)
 				t.Log("output, inputs, and APM configuration set")
 			}
-		} else if currentIdx == 2 {
-			period, err := inputs.Configs()[0].Config.String("period", -1)
-			require.NoError(t, err)
-			assert.Equal(t, "10m", period)
 		} else if currentIdx == 3 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
@@ -309,13 +322,11 @@ func TestManagerV2(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
-		t.Log(configsSet.Load(), configsCleared.Load(), logLevelSet.Load(), fqdnEnabled.Load(), allStopped.Load())
-		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
-
+		return inputConfigUpdated.Load() && configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
 	}, 15*time.Second, 300*time.Millisecond)
 	assert.Equal(t, 1, output.reloadCount)
-	assert.Equal(t, 1, inputs.reloadCount)
-	assert.Equal(t, 1, apm.reloadCount)
+	assert.Equal(t, 2, inputs.reloadCount)
+	assert.Equal(t, 2, apm.reloadCount)
 }
 
 func TestOutputError(t *testing.T) {
