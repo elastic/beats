@@ -309,7 +309,9 @@ func TestManagerV2(t *testing.T) {
 	defer m.Stop()
 
 	require.Eventually(t, func() bool {
+		t.Log(configsSet.Load(), configsCleared.Load(), logLevelSet.Load(), fqdnEnabled.Load(), allStopped.Load())
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
+
 	}, 15*time.Second, 300*time.Millisecond)
 	assert.Equal(t, 1, output.reloadCount)
 	assert.Equal(t, 1, inputs.reloadCount)
