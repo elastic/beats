@@ -397,9 +397,9 @@ func TestManagerV2_ReloadCount(t *testing.T) {
 	defer m.Stop()
 
 	<-inputConfigUpdated
-	assert.Equal(t, 1, output.reloadCount)
-	assert.Equal(t, 2, inputs.reloadCount)
-	assert.Equal(t, 0, apm.reloadCount)
+	assert.Equal(t, 1, output.reloadCount) // initial load
+	assert.Equal(t, 2, inputs.reloadCount) // initial load + config update
+	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
 }
 
 func TestOutputError(t *testing.T) {
