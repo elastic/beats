@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 
 *Auditbeat*
 
@@ -40,7 +39,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-- Expire source port mappings. {pull}41581[41581]
 
 *Winlogbeat*
 
@@ -99,9 +97,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
-- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
-- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 
 *Heartbeat*
@@ -257,6 +253,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
