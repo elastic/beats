@@ -79,13 +79,13 @@ func DistributionHistogramToES(d *distribution.Distribution) mapstr.M {
 		bucket := d.BucketOptions.GetExponentialBuckets()
 
 		for i := range d.BucketCounts {
-			values = append(values, calcExponentialUpperBound(bucket, i+1))
+			values = append(values, calcExponentialUpperBound(bucket, i))
 		}
 	case d.BucketOptions.GetLinearBuckets() != nil:
 		bucket := d.BucketOptions.GetLinearBuckets()
 
 		for i := range d.BucketCounts {
-			values = append(values, calcLinearUpperBound(bucket, i+1))
+			values = append(values, calcLinearUpperBound(bucket, i))
 		}
 	}
 

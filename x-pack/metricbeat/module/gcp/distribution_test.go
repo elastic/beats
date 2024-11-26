@@ -64,7 +64,7 @@ func TestDistributionHistogramToES(t *testing.T) {
 					},
 					expected: mapstr.M{
 						"counts": []uint64{0, 0, 3, 1},
-						"values": []float64{6, 12, 24, 48},
+						"values": []float64{3, 6, 12, 24},
 					},
 				},
 			},
@@ -87,7 +87,7 @@ func TestDistributionHistogramToES(t *testing.T) {
 					},
 					expected: mapstr.M{
 						"counts": []uint64{0, 1, 2, 0},
-						"values": []float64{20, 35, 50, 65},
+						"values": []float64{5, 20, 35, 50},
 					},
 				},
 			},
