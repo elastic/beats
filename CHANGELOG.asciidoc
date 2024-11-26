@@ -9,15 +9,15 @@ https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
-
 *Packetbeat*
 
 - Expire source port mappings. {pull}41581[41581]
 
 ==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 
 *Filebeat*
 
