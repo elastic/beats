@@ -81,7 +81,7 @@ func (c *Config) Validate() error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("validation failed: %v", errors.Join(errs...))
+		return fmt.Errorf("validation failed: %w", errors.Join(errs...))
 	}
 
 	return nil

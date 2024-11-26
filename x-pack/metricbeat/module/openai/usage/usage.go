@@ -7,6 +7,7 @@ package usage
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -151,7 +152,8 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		if err, ok := err.(net.Error); ok && err.Timeout() {
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
 			return fmt.Errorf("request timed out with configured timeout: %v and error: %w", m.config.Timeout, err)
 		}
 		return fmt.Errorf("error making request: %w", err)
