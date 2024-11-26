@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"path"
@@ -153,15 +152,14 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		if err, ok := err.(net.Error); ok && err.Timeout() {
-			return ErrHTTPClientTimeout
+			return fmt.Errorf("request timed out with configured timeout: %v and error: %w", m.config.Timeout, err)
 		}
 		return fmt.Errorf("error making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("error response from API: status=%s, body=%s", resp.Status, string(body))
+		return fmt.Errorf("error response from API: status=%s", resp.Status)
 	}
 
 	return m.processResponse(resp, dateStr)
