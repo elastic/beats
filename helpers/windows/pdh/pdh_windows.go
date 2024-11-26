@@ -20,7 +20,9 @@
 package pdh
 
 import (
+	"sort"
 	"strconv"
+	"strings"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
@@ -107,6 +109,31 @@ type PdhRawCounter struct {
 	FirstValue  int64
 	SecondValue int64
 	MultiCount  uint32
+}
+type pdhRawCounterItem struct {
+	// Pointer to a null-terminated string that specifies the instance name of the counter. The string is appended to the end of this structure.
+	SzName *uint16
+	//A pdhRawCounter structure that contains the raw counter value of the instance
+	RawValue PdhRawCounter
+}
+
+type PdhRawCounterItem struct {
+	InstanceName string
+	RawValue     PdhRawCounter
+}
+
+type RawCounterArray []PdhRawCounterItem
+
+func (a RawCounterArray) Len() int {
+	return len(a)
+}
+
+func (a RawCounterArray) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a RawCounterArray) Less(i, j int) bool {
+	return a[i].InstanceName < a[j].InstanceName
 }
 
 // PdhOpenQuery creates a new query.
@@ -207,13 +234,43 @@ func PdhGetFormattedCounterValueLong(counter PdhCounterHandle) (uint32, *PdhCoun
 }
 
 // PdhGetRawCounterValue returns the raw value of a given counter.
-func PdhGetRawCounterValue(counter PdhCounterHandle) (*PdhRawCounter, error) {
+func PdhGetRawCounterValue(counter PdhCounterHandle) (PdhRawCounter, error) {
 	var value PdhRawCounter
 	if err := _PdhGetRawCounter(counter, uintptr(unsafe.Pointer(&value))); err != nil {
-		return &value, PdhErrno(err.(syscall.Errno))
+		return value, PdhErrno(err.(syscall.Errno))
 	}
 
-	return &value, nil
+	return value, nil
+}
+
+func PdhGetRawCounterArray(counter PdhCounterHandle, filterTotal bool) (RawCounterArray, error) {
+	var bufferSize, itemCount uint32
+	if err := _PdhGetRawCounterArray(counter, &bufferSize, &itemCount, nil); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		buf := make([]byte, bufferSize)
+		if err := _PdhGetRawCounterArray(counter, &bufferSize, &itemCount, &buf[0]); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+		items := unsafe.Slice((*pdhRawCounterItem)(unsafe.Pointer(&buf[0])), itemCount)
+		ret := make([]PdhRawCounterItem, 0, len(items))
+		for _, item := range items {
+			instance := windows.UTF16PtrToString(item.SzName)
+			if filterTotal && strings.Contains(instance, "_Total") {
+				continue
+			}
+			ret = append(ret, PdhRawCounterItem{
+				RawValue:     item.RawValue,
+				InstanceName: instance,
+			})
+		}
+		// we sort the array by the instance name to ensure that each index in the final array corresponds to a specific core
+		// This is important because we will be collecting three different types of counters, and sorting ensures that each index in each counter aligns with the correct core.
+		sort.Sort(RawCounterArray(ret))
+		return ret, nil
+	}
+	return nil, PdhErrno(syscall.ERROR_NOT_FOUND)
 }
 
 // PdhExpandWildCardPath returns counter paths that match the given counter path.

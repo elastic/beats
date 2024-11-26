@@ -80,7 +80,7 @@ func (q *Query) AddEnglishCounter(counterPath string) (PdhCounterHandle, error) 
 }
 
 // AddCounter adds the specified counter to the query.
-func (q *Query) AddCounter(counterPath string, instance string, format string, wildcard bool) error {
+func (q *Query) AddCounter(counterPath string, instance string, format string, wildcard bool, english bool) error {
 	if _, found := q.Counters[counterPath]; found {
 		return nil
 	}
@@ -95,7 +95,12 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 	} else {
 		instanceName = instance
 	}
-	h, err := PdhAddCounter(q.Handle, counterPath, 0)
+	var h PdhCounterHandle
+	if english {
+		h, err = PdhAddEnglishCounter(q.Handle, counterPath, 0)
+	} else {
+		h, err = PdhAddCounter(q.Handle, counterPath, 0)
+	}
 	if err != nil {
 		return err
 	}
@@ -203,11 +208,22 @@ func (q *Query) GetCountersAndInstances(objectName string) ([]string, []string, 
 	return UTF16ToStringArray(counters), UTF16ToStringArray(instances), nil
 }
 
-func (q *Query) GetRawCounterValue(counterName string) (*PdhRawCounter, error) {
+func (q *Query) GetRawCounterValue(counterName string) (PdhRawCounter, error) {
+	if _, ok := q.Counters[counterName]; !ok {
+		return PdhRawCounter{}, fmt.Errorf("%s doesn't exist in the map; call AddCounter()", counterName)
+	}
+	c, err := PdhGetRawCounterValue(q.Counters[counterName].handle)
+	if err != nil {
+		return PdhRawCounter{}, err
+	}
+	return c, nil
+}
+
+func (q *Query) GetRawCounterArray(counterName string, filterTotal bool) (RawCounterArray, error) {
 	if _, ok := q.Counters[counterName]; !ok {
 		return nil, fmt.Errorf("%s doesn't exist in the map; call AddCounter()", counterName)
 	}
-	c, err := PdhGetRawCounterValue(q.Counters[counterName].handle)
+	c, err := PdhGetRawCounterArray(q.Counters[counterName].handle, filterTotal)
 	if err != nil {
 		return nil, err
 	}
