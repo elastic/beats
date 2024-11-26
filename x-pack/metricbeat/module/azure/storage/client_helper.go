@@ -6,6 +6,7 @@ package storage
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -17,7 +18,7 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) {
+func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig, wg *sync.WaitGroup) {
 
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}
@@ -32,8 +33,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 		}
 	}
 	go func() {
-		defer close(client.ResourceConfigurations.ErrorChan)
-		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+		defer wg.Done()
 		for _, resource := range resources {
 			res, err := getStorageMappedResourceDefinitions(client, *resource.ID, *resource.Location, client.Config.SubscriptionId, namespaces)
 			if err != nil {
@@ -42,7 +42,6 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 			client.ResourceConfigurations.MetricDefinitionsChan <- res
 		}
-		client.ResourceConfigurations.ErrorChan <- nil // Signal successful completion
 	}()
 }
 

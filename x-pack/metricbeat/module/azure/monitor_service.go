@@ -368,7 +368,6 @@ func (service *MonitorService) QueryResources(
 	if err != nil {
 		return nil, err
 	}
-
 	// call the query resources client passing 50 resourceIDs at a time
 	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
 		end := i + BatchApiResourcesLimit
@@ -376,7 +375,6 @@ func (service *MonitorService) QueryResources(
 		if end > len(resourceIDs) {
 			end = len(resourceIDs)
 		}
-
 		r, err := queryResourceClient.QueryResources(
 			service.context,
 			subscriptionID,

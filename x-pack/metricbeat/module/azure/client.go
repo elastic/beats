@@ -7,6 +7,7 @@ package azure
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -46,7 +47,7 @@ type ResDefGroupingCriteria struct {
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig)
+type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig, wg *sync.WaitGroup)
 
 // NewClient instantiates the Azure monitoring client
 func NewClient(config Config) (*Client, error) {
@@ -80,20 +81,21 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 	// check if refresh interval has been set and if it has expired
 	if !client.ResourceConfigurations.Expired() {
+		client.Log.Infof("MetricDefinitions are not expired. Writing metrics to MetricDefinitionsChan")
 		client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
 		client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 		go func() {
 			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 			defer close(client.ResourceConfigurations.ErrorChan)
 			for _, metrics := range client.ResourceConfigurations.Metrics {
-				client.Log.Infof("MetricDefinitionsChan are not expired. Writing metrics to MetricDefinitionsChan")
 				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
 			}
 		}()
 		return nil
 	}
 
-	// var metrics []Metric
+	// Initialize a WaitGroup to track all goroutines
+	var wg sync.WaitGroup
 	//reset client resources
 	client.Resources = []Resource{}
 	for _, resource := range client.Config.Resources {
@@ -101,6 +103,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
 		if err != nil {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
+			// Should we return here or continue?
 			return err
 		}
 
@@ -108,11 +111,9 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
 				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
-			// return err
 			continue
 		}
-		client.Log.Infof("AAAAAAAA checking if the channels are nil %+v,  %+v", client.ResourceConfigurations.MetricDefinitionsChan, client.ResourceConfigurations.ErrorChan)
-
+		// create the channels if they are not already created by a previous itteration
 		if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
 			client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
 			client.ResourceConfigurations.ErrorChan = make(chan error, 1)
@@ -133,9 +134,17 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		}
 
 		// Collects and stores metrics definitions for the cloud resources.
-		fn(client, resourceList, resource)
-		client.Log.Infof("AAAAAAAA finished with %d ", len(resourceList))
+		wg.Add(1)
+		fn(client, resourceList, resource, &wg)
+		client.Log.Infof("Finished collection with %d metric definitions", len(resourceList))
 	}
+	go func() {
+		wg.Wait() // Wait for all the resource collection goroutines to finish
+		// Once all the goroutines are done, close the channels
+		client.Log.Infof("All collections finished. Closing channels ")
+		close(client.ResourceConfigurations.MetricDefinitionsChan)
+		close(client.ResourceConfigurations.ErrorChan)
+	}()
 	return nil
 }
 
@@ -387,6 +396,47 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 	}
 
 	return result
+}
+
+// Function to group resources by common characteristics
+func (client *Client) GroupResourcesForBatchAPI(metricsDefinitions []Metric, referenceTime time.Time) map[ResDefGroupingCriteria][]Metric {
+	groups := make(map[ResDefGroupingCriteria][]Metric)
+
+	for _, metric := range metricsDefinitions {
+		criteria := ResDefGroupingCriteria{
+			Namespace:      metric.Namespace,
+			SubscriptionID: metric.SubscriptionId,
+			Location:       metric.Location,
+			Names:          strings.Join(metric.Names, ","),
+			TimeGrain:      metric.TimeGrain,
+			Dimensions:     getDimensionKey(metric.Dimensions),
+		}
+		//
+		// Before fetching the metric values, check if the metric
+		// has been collected within the time grain.
+		//
+		// Why do we need this?
+		//
+		// Some metricsets contains metrics with long time grains (e.g. 1 hour).
+		//
+		// If we collect the metric values every 5 minutes, we will end up fetching
+		// the same data over and over again for all metrics with a time grain
+		// larger than 5 minutes.
+		//
+		// The registry keeps track of the last timestamp the metricset collected
+		// the metric values and the time grain used.
+		//
+		// By comparing the last collection time with the current time, and
+		// the time grain of the metric, we can determine if the metric needs
+		// to be collected again, or if we can skip it.
+		//
+		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
+			continue
+		}
+		groups[criteria] = append(groups[criteria], metric)
+	}
+
+	return groups
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured

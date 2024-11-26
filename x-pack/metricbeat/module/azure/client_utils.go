@@ -233,25 +233,6 @@ func getDimensionKey(dimensions []Dimension) string {
 	return dimensionKey
 }
 
-// Function to group resources by common characteristics
-func groupResourcesForBatchAPI(metricsDefinitions []Metric) map[ResDefGroupingCriteria][]Metric {
-	groups := make(map[ResDefGroupingCriteria][]Metric)
-
-	for _, metric := range metricsDefinitions {
-		criteria := ResDefGroupingCriteria{
-			Namespace:      metric.Namespace,
-			SubscriptionID: metric.SubscriptionId,
-			Location:       metric.Location,
-			Names:          strings.Join(metric.Names, ","),
-			TimeGrain:      metric.TimeGrain,
-			Dimensions:     getDimensionKey(metric.Dimensions),
-		}
-		groups[criteria] = append(groups[criteria], metric)
-	}
-
-	return groups
-}
-
 // Function to get the resource IDs from the batch of metrics
 func getResourceIDs(metrics []Metric) []string {
 	var resourceIDs []string

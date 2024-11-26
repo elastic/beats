@@ -164,7 +164,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
 					m.Client.Log.Infof("MetricDefinitionsChan channel closed but accumulatedMetrics are %v", len(accumulatedMetrics))
 					// If we still have accumulated metrics, process them in a batch.
-					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+					groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
 					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
 					m.Client.Log.Infof("metricValues received at %s", referenceTime)
 					m.Client.Log.Infof("metricValues are %+v", metricValues)
@@ -172,6 +172,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					if err := mapToEvents(metricValues, m.Client, report); err != nil {
 						return fmt.Errorf("error mapping metrics to events: %w", err)
 					}
+					// Clear the accumulated metrics after processing the batch
+					accumulatedMetricsStore.ClearMetrics()
 				}
 				m.Client.Log.Infof("MetricDefinitionsChan is not ok closing")
 				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
@@ -187,7 +189,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.Client.Log.Infof("accumulatedMetrics are %v", len(accumulatedMetricsStore.GetMetrics()))
 				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) >= BatchApiResourcesLimit {
 					// Group and query in batch when we hit the threshold
-					groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+					groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
 					m.Client.Log.Infof("accumulatedMetrics are now >=50 %v", len(accumulatedMetrics))
 					// m.Client.Log.Infof("groupedMetrics are %+v", groupedMetrics)
 					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
@@ -219,13 +221,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
 		m.Client.Log.Infof("Processing stopped but accumulatedMetrics are %v", len(accumulatedMetrics))
-		groupedMetrics := groupResourcesForBatchAPI(accumulatedMetrics)
+		groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
 		metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
 		m.Client.Log.Infof("metricValues received at %s", referenceTime)
 		m.Client.Log.Infof("metricValues are %+v", metricValues)
 		if err := mapToEvents(metricValues, m.Client, report); err != nil {
 			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
+		// Clear the accumulated metrics after processing the batch
+		accumulatedMetricsStore.ClearMetrics()
 	}
 
 	return nil

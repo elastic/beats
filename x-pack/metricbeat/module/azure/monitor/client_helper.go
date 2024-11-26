@@ -7,6 +7,7 @@ package monitor
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
@@ -18,10 +19,9 @@ import (
 const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) {
+func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig, wg *sync.WaitGroup) {
 	go func() {
-		defer close(client.ResourceConfigurations.ErrorChan)
-		defer close(client.ResourceConfigurations.MetricDefinitionsChan)
+		defer wg.Done()
 		for _, resource := range resources {
 			res, err := getMappedResourceDefinitions(client, *resource.ID, *resource.Location, client.Config.SubscriptionId, resourceConfig)
 			if err != nil {
@@ -30,7 +30,6 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 			client.ResourceConfigurations.MetricDefinitionsChan <- res
 		}
-		client.ResourceConfigurations.ErrorChan <- nil // Signal successful completion
 	}()
 }
 
