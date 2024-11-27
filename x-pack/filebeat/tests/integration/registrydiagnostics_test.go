@@ -60,7 +60,7 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 		Type:           proto.UnitType_OUTPUT,
 		ConfigStateIdx: 1,
 		State:          proto.State_HEALTHY,
-		LogLevel:       proto.UnitLogLevel_INFO,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
 		Config: &proto.UnitExpectedConfig{
 			Id:   "output-" + t.Name(),
 			Type: "file",

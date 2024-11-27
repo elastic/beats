@@ -39,26 +39,24 @@ func gzipRegistry() []byte {
 	registryPath := filepath.Join(dataPath, "registry")
 	f, err := os.CreateTemp("", "filebeat-registry-*.tar")
 	if err != nil {
-		panic(err)
+		logger.Errorw("cannot create temporary registry archive", "error.message", err)
 	}
+	// Close the file, we just need the empty file created to use it later
 	f.Close()
-	defer func() {
-		if err := os.Remove(f.Name()); err != nil {
-			logp.L().Named("diagnostics").Warnf("cannot remove temporary registry archive '%s': '%w'", f.Name(), err)
-		}
-	}()
+	defer logger.Debug("finished gziping Filebeat's registry")
 
 	defer func() {
 		if err := os.Remove(f.Name()); err != nil {
-			panic(err)
+			logp.L().Named("diagnostics").Warnf("cannot remove temporary registry archive '%s': '%s'", f.Name(), err)
 		}
 	}()
 
-	if err := tarFolder(registryPath, f.Name()); err != nil {
+	logger.Debugf("temporary file '%s' created", f.Name())
+	if err := tarFolder(logger, registryPath, f.Name()); err != nil {
 		logger.Errorw(fmt.Sprintf("cannot archive Filebeat's registry at '%s'", f.Name()), "error.message", err)
 	}
 
-	if err := gzipFile(f.Name(), &buf); err != nil {
+	if err := gzipFile(logger, f.Name(), &buf); err != nil {
 		logger.Errorw("cannot gzip Filebeat's registry", "error.message", err)
 	}
 
@@ -66,7 +64,7 @@ func gzipRegistry() []byte {
 }
 
 // gzipFile gzips src writing the compressed data to dst
-func gzipFile(src string, dst io.Writer) error {
+func gzipFile(logger *logp.Logger, src string, dst io.Writer) error {
 	reader, err := os.Open(src)
 	if err != nil {
 		return fmt.Errorf("cannot open '%s': '%w'", src, err)
@@ -90,7 +88,7 @@ func gzipFile(src string, dst io.Writer) error {
 //
 // dst must be the full path with extension, e.g: /tmp/foo.tar
 // If src is not a folder an error is retruned
-func tarFolder(src, dst string) error {
+func tarFolder(logger *logp.Logger, src, dst string) error {
 	fullPath, err := filepath.Abs(src)
 	if err != nil {
 		return fmt.Errorf("cannot get full path from '%s': '%w'", src, err)
@@ -115,6 +113,7 @@ func tarFolder(src, dst string) error {
 	}
 	baseDir := filepath.Base(src)
 
+	logger.Debugf("starting to walk '%s'", fullPath)
 	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, err error) error {
 		// Stop if there is any errors
 		if err != nil {
@@ -138,6 +137,7 @@ func tarFolder(src, dst string) error {
 		}
 		defer file.Close()
 
+		logger.Debugf("adding '%s' to the tar archive", file.Name())
 		if _, err := io.Copy(tarWriter, file); err != nil {
 			return fmt.Errorf("cannot read '%s': '%w'", path, err)
 		}
