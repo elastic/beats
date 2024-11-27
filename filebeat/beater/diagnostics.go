@@ -114,13 +114,16 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 	baseDir := filepath.Base(src)
 
 	logger.Debugf("starting to walk '%s'", fullPath)
-	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, err error) error {
+	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, prevErr error) error {
 		// Stop if there is any errors
-		if err != nil {
+		if prevErr != nil {
 			return err
 		}
 
 		header, err := tar.FileInfoHeader(info, info.Name())
+		if err != nil {
+			return fmt.Errorf("cannot create tar info header: '%w'", err)
+		}
 		header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, src))
 
 		if err := tarWriter.WriteHeader(header); err != nil {

@@ -20,11 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegistryIsInDiagnostics(t *testing.T) {
@@ -89,8 +88,9 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 		SentActions: map[string]*mock.PerformAction{},
 	}
 
+	// requirerequestDiagnostics runs on a different goroutine, we cannot call t.Fatal
 	requestDiagnostics := func() {
-		require.Eventuallyf(t, func() bool {
+		assert.Eventuallyf(t, func() bool {
 			return filebeat.CountFileLines(outputGlob) == 2
 		},
 			1*time.Minute,
@@ -105,7 +105,7 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 			Level: proto.ActionRequest_COMPONENT, // aka diagnostics for the whole Beat
 			DiagCallback: func(diagResults []*proto.ActionDiagnosticUnitResult, diagErr error) {
 				if diagErr != nil {
-					t.Fatalf("diagnostics failed: %s", diagErr)
+					t.Errorf("diagnostics failed: %s", diagErr)
 				}
 
 				for _, dr := range diagResults {
@@ -114,12 +114,12 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 					}
 
 					if len(dr.Content) == 0 {
-						t.Fatalf("registry cannot be an empty file")
+						t.Errorf("registry cannot be an empty file")
 					}
 
 					gzipReader, err := gzip.NewReader(bytes.NewReader(dr.Content))
 					if err != nil {
-						t.Fatalf("cannot create gzip reader: '%s'", err)
+						t.Errorf("cannot create gzip reader: '%s'", err)
 					}
 					defer gzipReader.Close()
 
