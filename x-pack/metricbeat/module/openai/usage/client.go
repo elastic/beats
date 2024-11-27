@@ -25,24 +25,39 @@ type RLHTTPClient struct {
 // It waits for rate limit token before proceeding with the request.
 // Returns the HTTP response and any error encountered.
 func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	c.logger.Debug("Waiting for rate limit token")
 	start := time.Now()
+
+	c.logger.Debug("Waiting for rate limit token")
+
 	err := c.Ratelimiter.Wait(req.Context())
-	waitDuration := time.Since(start)
 	if err != nil {
 		return nil, err
 	}
+
 	c.logger.Debug("Rate limit token acquired")
+
+	waitDuration := time.Since(start)
+
 	if waitDuration > time.Minute {
 		c.logger.Infof("Rate limit wait exceeded threshold: %v", waitDuration)
 	}
+
 	return c.client.Do(req)
 }
 
 // newClient creates a new rate-limited HTTP client with specified rate limiter and timeout.
 func newClient(logger *logp.Logger, rl *rate.Limiter, timeout time.Duration) *RLHTTPClient {
-	var client = http.DefaultClient
-	client.Timeout = timeout
+	transport := &http.Transport{
+		MaxIdleConns:        100,
+		MaxIdleConnsPerHost: 100,
+		IdleConnTimeout:     90 * time.Second,
+	}
+
+	client := &http.Client{
+		Timeout:   timeout,
+		Transport: transport,
+	}
+
 	return &RLHTTPClient{
 		client:      client,
 		logger:      logger,
