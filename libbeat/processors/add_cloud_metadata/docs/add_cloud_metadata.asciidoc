@@ -21,7 +21,10 @@ The following cloud providers are supported:
 - Openstack Nova
 - Hetzner Cloud
 
-NOTE: `huawei` is an alias for `openstack`. Huawei cloud runs on OpenStack platform, and when
+[float]
+==== Special notes
+
+`huawei` is an alias for `openstack`. Huawei cloud runs on OpenStack platform, and when
 viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you know that your
 deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`, you can achieve
 this by overwriting the value using an `add_fields` processor.
@@ -29,6 +32,16 @@ this by overwriting the value using an `add_fields` processor.
 The Alibaba Cloud and Tencent cloud providers are disabled by default, because
 they require to access a remote host. The `providers` setting allows users to
 select a list of default providers to query.
+
+Cloud providers tend to maintain metadata services compliant with other cloud providers.
+For example, Openstack supports https://docs.openstack.org/nova/latest/user/metadata.html#ec2-compatible-metadata[EC2 compliant metadat service].
+This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted).
+The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results.
+Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrival rely on SDKs.
+The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
+
+[float]
+==== Configurations
 
 The simple configuration below enables the processor.
 
@@ -71,12 +84,25 @@ List of names the `providers` setting supports:
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 - "hetzner" for Hetzner Cloud (enabled by default).
 
+For example, configuration below only utilize `aws` metadata retrival mechanism,
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+  - add_cloud_metadata:
+      providers:
+        aws
+-------------------------------------------------------------------------------
+
 The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
 default).
 
 The `add_cloud_metadata` processor supports SSL options to configure the http
 client used to query cloud metadata. See <<configuration-ssl>> for more information.
+
+[float]
+==== Provided metadata
 
 The metadata that is added to events varies by hosting provider. Below are
 examples for each of the supported providers.

@@ -32,8 +32,8 @@ const (
 // Hetzner Cloud Metadata Service
 // Document https://docs.hetzner.cloud/#server-metadata
 var hetznerMetadataFetcher = provider{
-	Name:  "hetzner-cloud",
-	Local: true,
+	Name:           "hetzner-cloud",
+	DefaultEnabled: true,
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		hetznerSchema := func(m map[string]interface{}) mapstr.M {
 			m["service"] = mapstr.M{
