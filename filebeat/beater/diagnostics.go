@@ -73,7 +73,7 @@ func gzipFile(src string, dst io.Writer) error {
 
 	if _, err := io.Copy(writer, reader); err != nil {
 		if err != nil {
-			fmt.Errorf("cannot gzip file '%s': '%w'", src, err)
+			return fmt.Errorf("cannot gzip file '%s': '%w'", src, err)
 		}
 	}
 
@@ -87,7 +87,7 @@ func gzipFile(src string, dst io.Writer) error {
 func tarFolder(src, dst string) error {
 	fullPath, err := filepath.Abs(src)
 	if err != nil {
-		fmt.Errorf("cannot get full path from '%s': '%w'", src, err)
+		return fmt.Errorf("cannot get full path from '%s': '%w'", src, err)
 	}
 
 	tarFile, err := os.Create(dst)
