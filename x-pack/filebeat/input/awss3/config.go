@@ -147,7 +147,7 @@ func (c *config) Validate() error {
 	if c.StartTimestamp != "" {
 		_, err := time.Parse(time.RFC3339, c.StartTimestamp)
 		if err != nil {
-			return fmt.Errorf("invalid input for start_timestamp: %v", err)
+			return fmt.Errorf("invalid input for start_timestamp: %w", err)
 		}
 	}
 
@@ -304,6 +304,7 @@ func (c config) sqsConfigModifier(o *sqs.Options) {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 	}
 	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // not changing through this PR
 		o.EndpointResolver = sqs.EndpointResolverFromURL(c.AWSConfig.Endpoint)
 	}
 }

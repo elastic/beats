@@ -94,11 +94,7 @@ func newStartTimestampFilter(start time.Time) *startTimestampFilter {
 }
 
 func (s startTimestampFilter) isValid(objState state) bool {
-	if s.timeStart.Before(objState.LastModified) {
-		return true
-	}
-
-	return false
+	return s.timeStart.Before(objState.LastModified)
 }
 
 func (s startTimestampFilter) getID() string {
@@ -120,11 +116,7 @@ func newOldestTimeFilter(timespan time.Duration) *oldestTimeFilter {
 }
 
 func (s oldestTimeFilter) isValid(objState state) bool {
-	if s.timeOldest.Before(objState.LastModified) {
-		return true
-	}
-
-	return false
+	return s.timeOldest.Before(objState.LastModified)
 }
 
 func (s oldestTimeFilter) getID() string {
