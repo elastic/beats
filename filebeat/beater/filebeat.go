@@ -150,7 +150,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 			"Filebeat's registry",
 			"registry.tar.gz",
 			"application/octet-stream",
-			getRegistry)
+			gzipRegistry)
 	}
 
 	// Add inputs created by the modules

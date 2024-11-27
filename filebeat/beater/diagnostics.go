@@ -28,11 +28,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func getRegistry() []byte {
-	fmt.Println("================================================== getRegistry")
+func gzipRegistry() []byte {
 	buf := bytes.Buffer{}
 	dataPath := paths.Resolve(paths.Data, "")
 	registryPath := filepath.Join(dataPath, "registry")
@@ -41,6 +41,11 @@ func getRegistry() []byte {
 		panic(err)
 	}
 	f.Close()
+	defer func() {
+		if err := os.Remove(f.Name()); err != nil {
+			logp.L().Named("diagnostics").Warnf("cannot remove temporary registry archive '%s': '%w'", f.Name(), err)
+		}
+	}()
 
 	defer func() {
 		if err := os.Remove(f.Name()); err != nil {
@@ -49,12 +54,12 @@ func getRegistry() []byte {
 	}()
 
 	tarFolder(registryPath, f.Name())
-	// tarFolder("/home/tiago/devel/beats/x-pack/filebeat/data/registry", "/tmp/registry.tar")
 	gzipFile(f.Name(), &buf)
 
 	return buf.Bytes()
 }
 
+// gzipFile gzips src writing the compressed data to dst
 func gzipFile(src string, dst io.Writer) error {
 	reader, err := os.Open(src)
 	if err != nil {
@@ -81,13 +86,10 @@ func gzipFile(src string, dst io.Writer) error {
 // If src is not a folder an error is retruned
 func tarFolder(src, dst string) error {
 	fullPath, err := filepath.Abs(src)
-
-	fmt.Println("============================== src:", src)
-	fmt.Println("============================== fullPath:", fullPath)
-	fmt.Println("============================== dst:", dst)
 	if err != nil {
 		fmt.Errorf("cannot get full path from '%s': '%w'", src, err)
 	}
+
 	tarFile, err := os.Create(dst)
 	if err != nil {
 		return fmt.Errorf("cannot create tar file '%s': '%w'", dst, err)
