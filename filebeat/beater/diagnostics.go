@@ -117,7 +117,7 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, prevErr error) error {
 		// Stop if there is any errors
 		if prevErr != nil {
-			return err
+			return prevErr
 		}
 
 		header, err := tar.FileInfoHeader(info, info.Name())
