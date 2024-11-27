@@ -69,7 +69,7 @@ require (
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
 	github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8
-	github.com/elastic/go-seccomp-bpf v1.4.0
+	github.com/elastic/go-seccomp-bpf v1.5.0
 	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.15.0
 	github.com/elastic/go-ucfg v0.8.8
