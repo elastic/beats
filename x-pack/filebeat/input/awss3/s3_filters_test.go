@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,14 +30,14 @@ func Test_filterProvider(t *testing.T) {
 
 	tests := []struct {
 		name                string
-		cfg                 config
+		cfg                 *config
 		inputState          state
 		runFilterForCount   int
 		expectFilterResults []bool
 	}{
 		{
 			name: "Simple run - all valid result",
-			cfg: config{
+			cfg: &config{
 				StartTimestamp: "2024-11-26T21:00:00Z",
 				IgnoreOlder:    10 * time.Minute,
 			},
@@ -46,7 +47,7 @@ func Test_filterProvider(t *testing.T) {
 		},
 		{
 			name: "Simple run - all invalid result",
-			cfg: config{
+			cfg: &config{
 				StartTimestamp: "2024-11-26T21:00:00Z",
 			},
 			inputState:          newState("bucket", "key", "eTag", time.Unix(0, 0)),
@@ -55,14 +56,14 @@ func Test_filterProvider(t *testing.T) {
 		},
 		{
 			name:                "Simple run - no filters hence valid result",
-			cfg:                 config{},
+			cfg:                 &config{},
 			inputState:          newState("bucket", "key", "eTag", time.Now()),
 			runFilterForCount:   1,
 			expectFilterResults: []bool{true},
 		},
 		{
 			name: "Single filter - ignore old invalid result",
-			cfg: config{
+			cfg: &config{
 				IgnoreOlder: 1 * time.Minute,
 			},
 			inputState:          newState("bucket", "key", "eTag", time.Unix(time.Now().Add(-2*time.Minute).Unix(), 0)),
@@ -71,7 +72,7 @@ func Test_filterProvider(t *testing.T) {
 		},
 		{
 			name: "Combined filters - ignore old won't affect first run if timestamp is given but will affect thereafter",
-			cfg: config{
+			cfg: &config{
 				StartTimestamp: "2024-11-26T21:00:00Z",
 				IgnoreOlder:    10 * time.Minute,
 			},
@@ -83,7 +84,7 @@ func Test_filterProvider(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			provider := newFilterProvider(&test.cfg)
+			provider := newFilterProvider(test.cfg)
 			results := make([]bool, 0, test.runFilterForCount)
 
 			for i := 0; i < test.runFilterForCount; i++ {
