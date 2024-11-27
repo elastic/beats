@@ -33,6 +33,7 @@ import (
 )
 
 func gzipRegistry() []byte {
+	logger := logp.L().Named("diagnostics")
 	buf := bytes.Buffer{}
 	dataPath := paths.Resolve(paths.Data, "")
 	registryPath := filepath.Join(dataPath, "registry")
@@ -53,8 +54,13 @@ func gzipRegistry() []byte {
 		}
 	}()
 
-	tarFolder(registryPath, f.Name())
-	gzipFile(f.Name(), &buf)
+	if err := tarFolder(registryPath, f.Name()); err != nil {
+		logger.Errorw(fmt.Sprintf("cannot archive Filebeat's registry at '%s'", f.Name()), "error.message", err)
+	}
+
+	if err := gzipFile(f.Name(), &buf); err != nil {
+		logger.Errorw("cannot gzip Filebeat's registry", "error.message", err)
+	}
 
 	return buf.Bytes()
 }
@@ -110,6 +116,11 @@ func tarFolder(src, dst string) error {
 	baseDir := filepath.Base(src)
 
 	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, err error) error {
+		// Stop if there is any errors
+		if err != nil {
+			return err
+		}
+
 		header, err := tar.FileInfoHeader(info, info.Name())
 		header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, src))
 

@@ -91,12 +91,7 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 
 	requestDiagnostics := func() {
 		require.Eventuallyf(t, func() bool {
-			lines := filebeat.CountFileLines(outputGlob)
-			if lines == 2 {
-				return true
-			}
-
-			return false
+			return filebeat.CountFileLines(outputGlob) == 2
 		},
 			1*time.Minute,
 			100*time.Millisecond,
@@ -171,7 +166,7 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 
 	server.Port = 3000
 	if err := server.Start(); err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 
 	filebeat.Start(

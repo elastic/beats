@@ -32,7 +32,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -61,7 +60,6 @@ type runner struct {
 	input          v2.Input
 	connector      beat.PipelineConnector
 	statusReporter status.StatusReporter
-	diag           diagnostics.DiagnosticReporter
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
