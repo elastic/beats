@@ -45,7 +45,7 @@ services under "Google Cloud metrics", but does not work for other services
 (`kubernetes` aka GKE for example).
 This option allow to override the default and specify an arbitrary metric prefix.
 
-* *locationlabel*: Use this option to specify the resource label that identifies the location (such as zone or region) for a Google Cloud service when filtering metrics. For example, labels like `resource.label.location` or `resource.label.zone` are used by Google Cloud to represent the region or zone of a resource.
+* *location_label*: Use this option to specify the resource label that identifies the location (such as zone or region) for a Google Cloud service when filtering metrics. For example, labels like `resource.label.location` or `resource.label.zone` are used by Google Cloud to represent the region or zone of a resource.
 
 [float]
 === Example Configuration
@@ -153,7 +153,7 @@ user wants to filter the incoming data
   credentials_json: "your JSON credentials"
   exclude_labels: false
   period: 1m
-  locationlabel: "resource.label.location"
+  location_label: "resource.label.location"
   regions:
   - us-east4
   metrics:
