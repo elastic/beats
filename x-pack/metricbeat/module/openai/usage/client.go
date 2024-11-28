@@ -31,7 +31,7 @@ func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
 
 	err := c.Ratelimiter.Wait(req.Context())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to acquire rate limit token: %w", err)
 	}
 
 	c.logger.Debug("Rate limit token acquired")
