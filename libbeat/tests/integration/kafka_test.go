@@ -54,7 +54,7 @@ output.kafka:
 `
 )
 
-// TestKafkaOutputCanConnectAndPublish ensures the beat Kafka output can successfuly produce messages to Kafka.
+// TestKafkaOutputCanConnectAndPublish ensures the beat Kafka output can successfully produce messages to Kafka.
 // Regression test for https://github.com/elastic/beats/issues/41823 where the Kafka output would
 // panic on the first Publish because it's Connect method was no longer called.
 func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
