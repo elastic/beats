@@ -19,6 +19,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -102,7 +103,8 @@ func (b *backoffClient) updateFailReason(err error) {
 		return
 	}
 
-	if _, ok := err.(redis.Error); ok {
+	var redisErr *redis.Error
+	if errors.As(err, &redisErr) {
 		b.reason = failRedis
 	} else {
 		b.reason = failOther
