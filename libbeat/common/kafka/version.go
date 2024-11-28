@@ -31,6 +31,8 @@ var (
 	// We also allow versions to be specified as a prefix, e.g. "1",
 	// understood as referencing the most recent version starting with "1".
 	// truncatedKafkaVersions stores a lookup of the abbreviations we accept.
+
+	//Ref for version mapping - https://kafka.apache.org/downloads
 	truncatedKafkaVersions = map[string]sarama.KafkaVersion{
 		"0.8.2": sarama.V0_8_2_2,
 		"0.8":   sarama.V0_8_2_2,
