@@ -66,8 +66,8 @@ require (
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
-	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
-	github.com/elastic/go-seccomp-bpf v1.4.0
+	github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8
+	github.com/elastic/go-seccomp-bpf v1.5.0
 	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.15.0
 	github.com/elastic/go-ucfg v0.8.8
@@ -144,10 +144,6 @@ require (
 	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
-	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
@@ -209,6 +205,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
+	github.com/jcmturner/gokrb5/v8 v8.4.2
 	github.com/klauspost/compress v1.17.11
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/otiai10/copy v1.12.0
@@ -326,6 +323,8 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
+	github.com/jcmturner/gofork v1.0.0 // indirect
+	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
@@ -405,7 +404,6 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
-	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 )
 
 replace (
@@ -417,5 +415,4 @@ replace (
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
-	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 )
