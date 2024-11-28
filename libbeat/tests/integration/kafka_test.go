@@ -20,11 +20,20 @@
 package integration
 
 import (
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/Shopify/sarama"
 )
 
-var kafkaCfg = `
+var (
+	// https://github.com/elastic/sarama/blob/c7eabfcee7e5bcd7d0071f0ece4d6bec8c33928a/config_test.go#L14-L17
+	// The version of MockBroker used when this test was written only supports the lowest protocol version by default.
+	// Version incompatibilities will result in message decoding errors between the mock and the beat.
+	kafkaVersion = sarama.MinVersion
+	kafkaTopic   = "test_topic"
+	kafkaCfg     = `
 mockbeat:
 logging:
   level: debug
@@ -33,33 +42,48 @@ logging:
     - kafka
 queue.mem:
   events: 4096
-  flush.min_events: 8
-  flush.timeout: 0.1s
+  flush.timeout: 0s
 output.kafka:
-  topic: test
+  topic: %s
+  version: %s
   hosts:
-    - "localhost:9092"
+    - %s
   backoff:
     init: 0.1s
     max: 0.2s
 `
+)
 
-// Regression test for https://github.com/elastic/beats/issues/41823
-// The Kafka output would panic on the first Publish because it's Connect method was no longer called.
-func TestKafkaOutputCanConnect(t *testing.T) {
+// TestKafkaOutputCanConnectAndPublish ensures the beat Kafka output can successfuly produce messages to Kafka.
+// Regression test for https://github.com/elastic/beats/issues/41823 where the Kafka output would
+// panic on the first Publish because it's Connect method was no longer called.
+func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
+	// Create a Mock Kafka broker that will listen on localhost on a random unallocated port.
+	// The reference configuration was taken from https://github.com/elastic/sarama/blob/c7eabfcee7e5bcd7d0071f0ece4d6bec8c33928a/async_producer_test.go#L141.
+	leader := sarama.NewMockBroker(t, 1)
+	defer leader.Close()
+
+	// The mock broker must respond to a single metadata request.
+	metadataResponse := new(sarama.MetadataResponse)
+	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	leader.Returns(metadataResponse)
+
+	// The mock broker must return a single produce response. If no produce request is received, the test wil fail.
+	// This guarantees that mockbeat successfully produced a message to Kafka and connectivity is established.
+	prodSuccess := new(sarama.ProduceResponse)
+	prodSuccess.AddTopicPartition(kafkaTopic, 0, sarama.ErrNoError)
+	leader.Returns(prodSuccess)
+
+	// Start mockbeat with the appropriate configuration.
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-	mockbeat.WriteConfigFile(kafkaCfg)
-
+	mockbeat.WriteConfigFile(fmt.Sprintf(kafkaCfg, kafkaTopic, kafkaVersion, leader.Addr()))
 	mockbeat.Start()
 
-	// 3. Wait for connection error logs
+	// Wait for mockbeat to log that it successfully published a batch to Kafka.
+	// This ensures that mockbeat received the expected produce response configured above.
 	mockbeat.WaitForLogs(
-		`Connection to kafka(localhost:9092) established`,
-		15*time.Second,
-		"did not find connection establishment log")
-
-	mockbeat.WaitForLogs(
-		"Kafka publish failed with: kafka: client has run out of available brokers to talk to (Is your cluster reachable?",
-		5*time.Second,
-		"did not find message from Kafka producer after connecting")
+		`finished kafka batch`,
+		10*time.Second,
+		"did not find finished batch log")
 }
