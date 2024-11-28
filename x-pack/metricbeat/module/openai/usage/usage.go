@@ -215,7 +215,6 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 }
 
 func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
-
 	for _, usage := range data {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{

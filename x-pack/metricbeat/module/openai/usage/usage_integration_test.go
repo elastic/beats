@@ -63,7 +63,7 @@ func getConfig(url, apiKey string) map[string]interface{} {
 	}
 }
 
-func initServer(endpoint string, api_key string) *httptest.Server {
+func initServer(endpoint, api_key string) *httptest.Server {
 	data := []byte(`{
   "object": "list",
   "data": [

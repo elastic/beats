@@ -63,7 +63,7 @@ func (s *stateStore) getStatePath(name string) string {
 }
 
 // Put stores a value in a file named by the key
-func (s *stateStore) Put(key string, value string) error {
+func (s *stateStore) Put(key, value string) error {
 	s.Lock()
 	defer s.Unlock()
 
