@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
@@ -294,4 +295,25 @@ func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []Metri
 	}
 
 	return currentMetrics
+}
+
+func processStore(client *Client, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) {
+	groupedMetrics := map[ResDefGroupingCriteria][]Metric{
+		criteria: store.GetMetrics(),
+	}
+	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+	client.Log.Infof("metricValues received at %s for criteria %+v", referenceTime, criteria)
+	if err := mapToEvents(metricValues, client, report); err != nil {
+		client.Log.Errorf("error mapping metrics to events: %v", err)
+	}
+	store.ClearMetrics()
+
+}
+
+func processAllStores(client *Client, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) {
+	for criteria, store := range stores {
+		if store.Size() > 0 {
+			processStore(client, criteria, store, referenceTime, report)
+		}
+	}
 }

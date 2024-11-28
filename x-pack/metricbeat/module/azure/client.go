@@ -398,6 +398,26 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 	return result
 }
 
+func (client *Client) GroupAndStoreMetrics(metricsDefinitions []Metric, referenceTime time.Time, store map[ResDefGroupingCriteria]*MetricStore) {
+	for _, metric := range metricsDefinitions {
+		criteria := ResDefGroupingCriteria{
+			Namespace:      metric.Namespace,
+			SubscriptionID: metric.SubscriptionId,
+			Location:       metric.Location,
+			Names:          strings.Join(metric.Names, ","),
+			TimeGrain:      metric.TimeGrain,
+			Dimensions:     getDimensionKey(metric.Dimensions),
+		}
+		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
+			continue
+		}
+		if _, exists := store[criteria]; !exists {
+			store[criteria] = &MetricStore{}
+		}
+		store[criteria].AddMetric(metric)
+	}
+}
+
 // Function to group resources by common characteristics
 func (client *Client) GroupResourcesForBatchAPI(metricsDefinitions []Metric, referenceTime time.Time) map[ResDefGroupingCriteria][]Metric {
 	groups := make(map[ResDefGroupingCriteria][]Metric)

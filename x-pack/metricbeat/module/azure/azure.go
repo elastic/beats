@@ -31,10 +31,10 @@ type MetricStore struct {
 	accumulatedMetrics []Metric
 }
 
-func (s *MetricStore) AddMetric(metric []Metric) {
+func (s *MetricStore) AddMetric(metric Metric) {
 	s.Lock()         // Acquire the lock
 	defer s.Unlock() // Ensure the lock is released when the function returns
-	s.accumulatedMetrics = append(s.accumulatedMetrics, metric...)
+	s.accumulatedMetrics = append(s.accumulatedMetrics, metric)
 }
 
 func (s *MetricStore) GetMetrics() []Metric {
@@ -48,6 +48,11 @@ func (s *MetricStore) ClearMetrics() {
 	s.Lock()                          // Acquire the lock
 	defer s.Unlock()                  // Ensure the lock is released when the function returns
 	s.accumulatedMetrics = []Metric{} // Reset the accumulated metrics slice
+}
+
+// Size returns the size of the store
+func (s *MetricStore) Size() int {
+	return len(s.GetMetrics())
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -150,7 +155,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return fmt.Errorf("no resources were found based on all the configurations options entered")
 	}
 
-	accumulatedMetricsStore := &MetricStore{}
+	metricStores := make(map[ResDefGroupingCriteria]*MetricStore)
 
 	for {
 		select {
@@ -161,46 +166,24 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
 					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
 				}
-				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
-					m.Client.Log.Infof("MetricDefinitionsChan channel closed but accumulatedMetrics are %v", len(accumulatedMetrics))
-					// If we still have accumulated metrics, process them in a batch.
-					groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
-					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
-					m.Client.Log.Infof("metricValues received at %s", referenceTime)
-					m.Client.Log.Infof("metricValues are %+v", metricValues)
-					// Turns metric values into events and sends them to Elasticsearch.
-					if err := mapToEvents(metricValues, m.Client, report); err != nil {
-						return fmt.Errorf("error mapping metrics to events: %w", err)
-					}
-					// Clear the accumulated metrics after processing the batch
-					accumulatedMetricsStore.ClearMetrics()
-				}
+				m.Client.Log.Infof("processAllStores")
+				processAllStores(m.Client, metricStores, referenceTime, report)
 				m.Client.Log.Infof("MetricDefinitionsChan is not ok closing")
 				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
 				// Process each metric definition as it arrives
 				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
-				accumulatedMetricsStore.AddMetric(resMetricDefinition)
 				if len(resMetricDefinition) == 0 {
 					return fmt.Errorf("error mapping metrics to events: %w", err)
 				}
 				resId := resMetricDefinition[0].ResourceId
 				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
-				m.Client.Log.Infof("accumulatedMetrics are %v", len(accumulatedMetricsStore.GetMetrics()))
-				if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) >= BatchApiResourcesLimit {
-					// Group and query in batch when we hit the threshold
-					groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
-					m.Client.Log.Infof("accumulatedMetrics are now >=50 %v", len(accumulatedMetrics))
-					// m.Client.Log.Infof("groupedMetrics are %+v", groupedMetrics)
-					metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
-					m.Client.Log.Infof("metricValues received at %s", referenceTime)
-					// m.Client.Log.Infof("metricValues are %+v", metricValues)
-					// Turns metric values into events and sends them to Elasticsearch.
-					if err := mapToEvents(metricValues, m.Client, report); err != nil {
-						return fmt.Errorf("error mapping metrics to events: %w", err)
+				m.Client.GroupAndStoreMetrics(resMetricDefinition, referenceTime, metricStores)
+				for criteria, store := range metricStores {
+					m.Client.Log.Infof("Store %+v size is %d", criteria, store.Size())
+					if store.Size() >= BatchApiResourcesLimit {
+						processStore(m.Client, criteria, store, referenceTime, report)
 					}
-					// Clear the accumulated metrics after processing the batch
-					accumulatedMetricsStore.ClearMetrics()
 				}
 			}
 		case err, ok := <-m.Client.ResourceConfigurations.ErrorChan:
@@ -219,19 +202,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-	if accumulatedMetrics := accumulatedMetricsStore.GetMetrics(); len(accumulatedMetrics) > 0 {
-		m.Client.Log.Infof("Processing stopped but accumulatedMetrics are %v", len(accumulatedMetrics))
-		groupedMetrics := m.Client.GroupResourcesForBatchAPI(accumulatedMetrics, referenceTime)
-		metricValues := m.Client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
-		m.Client.Log.Infof("metricValues received at %s", referenceTime)
-		m.Client.Log.Infof("metricValues are %+v", metricValues)
-		if err := mapToEvents(metricValues, m.Client, report); err != nil {
-			return fmt.Errorf("error mapping metrics to events: %w", err)
-		}
-		// Clear the accumulated metrics after processing the batch
-		accumulatedMetricsStore.ClearMetrics()
-	}
-
+	processAllStores(m.Client, metricStores, referenceTime, report)
 	return nil
 }
 
