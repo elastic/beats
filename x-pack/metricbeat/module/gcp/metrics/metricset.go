@@ -103,7 +103,7 @@ type config struct {
 	Zone                string   `config:"zone"`
 	Region              string   `config:"region"`
 	Regions             []string `config:"regions"`
-	ServiceLabel        string   `config:"servicelabel"`
+	LocationLabel       string   `config:"locationlabel"`
 	ProjectID           string   `config:"project_id" validate:"required"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
