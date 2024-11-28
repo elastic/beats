@@ -62,11 +62,16 @@ type MetricValue struct {
 	dimensions []Dimension
 }
 
+type MetricDefinitions struct {
+	Update  bool
+	Metrics map[string][]Metric
+}
+
 // ResourceConfiguration represents the resource related configuration entered by the user
 type ResourceConfiguration struct {
-	Metrics         map[string][]Metric
-	RefreshInterval time.Duration
-	lastUpdate      struct {
+	MetricDefinitions MetricDefinitions
+	RefreshInterval   time.Duration
+	lastUpdate        struct {
 		time.Time
 		sync.Mutex
 	}

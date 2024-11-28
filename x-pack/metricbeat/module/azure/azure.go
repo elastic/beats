@@ -166,8 +166,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
 					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
 				}
+				// process all stores in case there are remaining metricstores for which values are not collected.
 				m.Client.Log.Infof("processAllStores")
-				processAllStores(m.Client, metricStores, referenceTime, report)
+				metricValues := processAllStores(m.Client, metricStores, referenceTime, report)
+				if len(metricValues) > 0 {
+					if err := mapToEvents(metricValues, m.Client, report); err != nil {
+						m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+					}
+				}
 				m.Client.Log.Infof("MetricDefinitionsChan is not ok closing")
 				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
@@ -176,13 +182,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				if len(resMetricDefinition) == 0 {
 					return fmt.Errorf("error mapping metrics to events: %w", err)
 				}
-				resId := resMetricDefinition[0].ResourceId
-				m.Client.ResourceConfigurations.Metrics[resId] = resMetricDefinition
+				if m.Client.ResourceConfigurations.MetricDefinitions.Update {
+					// Update MetricDefinitions because they have expired
+					resId := resMetricDefinition[0].ResourceId
+					m.Client.Log.Infof("MetricDefinitions Data need update")
+					m.Client.ResourceConfigurations.MetricDefinitions.Metrics[resId] = resMetricDefinition
+				}
 				m.Client.GroupAndStoreMetrics(resMetricDefinition, referenceTime, metricStores)
+				var metricValues []Metric
+				// check if the store size is >= BatchApiResourcesLimit and then process the store(collect metric values)
 				for criteria, store := range metricStores {
 					m.Client.Log.Infof("Store %+v size is %d", criteria, store.Size())
 					if store.Size() >= BatchApiResourcesLimit {
-						processStore(m.Client, criteria, store, referenceTime, report)
+						metricValues = append(metricValues, processStore(m.Client, criteria, store, referenceTime, report)...)
+					}
+				}
+				// Map the collected metric values into events and publish them.
+				if len(metricValues) > 0 {
+					if err := mapToEvents(metricValues, m.Client, report); err != nil {
+						m.Client.Log.Errorf("error mapping metrics to events: %v", err)
 					}
 				}
 			}
@@ -202,7 +220,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			break
 		}
 	}
-	processAllStores(m.Client, metricStores, referenceTime, report)
+	// process all stores in case there are remaining metricstores for which values are not collected.
+	metricValues := processAllStores(m.Client, metricStores, referenceTime, report)
+	if len(metricValues) > 0 {
+		if err := mapToEvents(metricValues, m.Client, report); err != nil {
+			m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+		}
+	}
 	return nil
 }
 

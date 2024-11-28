@@ -64,7 +64,10 @@ func NewClient(config Config) (*Client, error) {
 		Log:                 logger,
 		MetricRegistry:      NewMetricRegistry(logger),
 	}
-	client.ResourceConfigurations.Metrics = make(map[string][]Metric)
+	client.ResourceConfigurations.MetricDefinitions = MetricDefinitions{
+		Update:  true,
+		Metrics: make(map[string][]Metric),
+	}
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
 	client.ResourceConfigurations.MetricDefinitionsChan = nil
 	client.ResourceConfigurations.ErrorChan = nil
@@ -84,15 +87,19 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		client.Log.Infof("MetricDefinitions are not expired. Writing metrics to MetricDefinitionsChan")
 		client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
 		client.ResourceConfigurations.ErrorChan = make(chan error, 1)
+		// MetricDefinitions do not need update
+		client.ResourceConfigurations.MetricDefinitions.Update = false
 		go func() {
 			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
 			defer close(client.ResourceConfigurations.ErrorChan)
-			for _, metrics := range client.ResourceConfigurations.Metrics {
+			for _, metrics := range client.ResourceConfigurations.MetricDefinitions.Metrics {
 				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
 			}
 		}()
 		return nil
 	}
+	// MetricDefinitions need update
+	client.ResourceConfigurations.MetricDefinitions.Update = true
 
 	// Initialize a WaitGroup to track all goroutines
 	var wg sync.WaitGroup
@@ -292,7 +299,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			timeGrain: timeGrain,
 			timestamp: referenceTime,
 		})
-		if prevMetrics, ok := client.ResourceConfigurations.Metrics[metric.ResourceId]; ok {
+		if prevMetrics, ok := client.ResourceConfigurations.MetricDefinitions.Metrics[metric.ResourceId]; ok {
 			for i, currentMetric := range prevMetrics {
 				if matchMetrics(currentMetric, metric) {
 					// Map the metric values from the API response.
@@ -408,29 +415,7 @@ func (client *Client) GroupAndStoreMetrics(metricsDefinitions []Metric, referenc
 			TimeGrain:      metric.TimeGrain,
 			Dimensions:     getDimensionKey(metric.Dimensions),
 		}
-		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
-			continue
-		}
-		if _, exists := store[criteria]; !exists {
-			store[criteria] = &MetricStore{}
-		}
-		store[criteria].AddMetric(metric)
-	}
-}
 
-// Function to group resources by common characteristics
-func (client *Client) GroupResourcesForBatchAPI(metricsDefinitions []Metric, referenceTime time.Time) map[ResDefGroupingCriteria][]Metric {
-	groups := make(map[ResDefGroupingCriteria][]Metric)
-
-	for _, metric := range metricsDefinitions {
-		criteria := ResDefGroupingCriteria{
-			Namespace:      metric.Namespace,
-			SubscriptionID: metric.SubscriptionId,
-			Location:       metric.Location,
-			Names:          strings.Join(metric.Names, ","),
-			TimeGrain:      metric.TimeGrain,
-			Dimensions:     getDimensionKey(metric.Dimensions),
-		}
 		//
 		// Before fetching the metric values, check if the metric
 		// has been collected within the time grain.
@@ -453,10 +438,11 @@ func (client *Client) GroupResourcesForBatchAPI(metricsDefinitions []Metric, ref
 		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
 			continue
 		}
-		groups[criteria] = append(groups[criteria], metric)
+		if _, exists := store[criteria]; !exists {
+			store[criteria] = &MetricStore{}
+		}
+		store[criteria].AddMetric(metric)
 	}
-
-	return groups
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
@@ -475,7 +461,7 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 		Location:       location,
 		SubscriptionId: subscriptionId,
 	}
-	if prevMetrics, ok := client.ResourceConfigurations.Metrics[resourceId]; ok {
+	if prevMetrics, ok := client.ResourceConfigurations.MetricDefinitions.Metrics[resourceId]; ok {
 		for _, prevMet := range prevMetrics {
 			if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
 				met.Values = prevMet.Values

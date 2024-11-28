@@ -368,7 +368,7 @@ func (service *MonitorService) QueryResources(
 	if err != nil {
 		return nil, err
 	}
-	service.log.Infof("AAAAAAAA QueryResources to be called. length of resources is %d", len(resourceIDs))
+	service.log.Infof("QueryResources to be called. length of resources is %d", len(resourceIDs))
 	// call the query resources client passing 50 resourceIDs at a time
 	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
 		end := i + BatchApiResourcesLimit
