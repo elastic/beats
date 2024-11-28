@@ -15,7 +15,7 @@ import (
 type config struct {
 	ArchiveFile string   `config:"archive_file"`
 	TraceFile   string   `config:"trace_file"`
-	Predicate   string   `config:"predicate"`
+	Predicate   []string `config:"predicate"`
 	Process     []string `config:"process"`
 	Source      bool     `config:"source"`
 	Info        bool     `config:"info"`
@@ -45,6 +45,9 @@ func defaultConfig() config {
 }
 
 func checkDateFormat(date string) error {
+	if date == "" {
+		return nil
+	}
 	acceptedLayouts := []string{
 		"2006-01-02",
 		"2006-01-02 15:04:05",

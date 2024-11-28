@@ -202,8 +202,10 @@ func newLogCmd(ctx context.Context, config config, resumeCursor inputcursor.Curs
 	if config.TraceFile != "" {
 		args = append(args, "--file", config.TraceFile)
 	}
-	if config.Predicate != "" {
-		args = append(args, "--predicate", config.Predicate)
+	if len(config.Predicate) > 0 {
+		for _, p := range config.Predicate {
+			args = append(args, "--predicate", p)
+		}
 	}
 	if len(config.Process) > 0 {
 		for _, p := range config.Process {
