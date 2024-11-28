@@ -229,6 +229,7 @@ func TestIsAGlobalService(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, false},
 		{"CloudSQL service", gcp.ServiceCloudSQL, false},
 		{"Redis service", gcp.ServiceRedis, false},
+		{"AIPlatform service", gcp.ServiceAIPlatform, false},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
@@ -256,6 +257,7 @@ func TestGetServiceLabelFor(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, "resource.label.region"},
 		{"CloudSQL service", gcp.ServiceCloudSQL, "resource.labels.region"},
 		{"Redis service", gcp.ServiceRedis, "resource.label.region"},
+		{"AIPlatform service", gcp.ServiceAIPlatform, "resource.label.location"},
 	}
 
 	for _, c := range cases {
