@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package fbreceiver
+package mbreceiver
 
 import (
 	"context"
@@ -13,25 +13,25 @@ import (
 	"go.uber.org/zap"
 )
 
-type filebeatReceiver struct {
+type metricbeatReceiver struct {
 	beat   *beat.Beat
 	beater beat.Beater
 	logger *zap.Logger
 }
 
-func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
+func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
 	go func() {
-		fb.logger.Info("starting filebeat receiver")
-		err := fb.beater.Run(fb.beat)
+		mb.logger.Info("starting metricbeat receiver")
+		err := mb.beater.Run(mb.beat)
 		if err != nil {
-			fb.logger.Error("filebeat receiver run error", zap.Error(err))
+			mb.logger.Error("metricbeat receiver run error", zap.Error(err))
 		}
 	}()
 	return nil
 }
 
-func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
-	fb.logger.Info("stopping filebeat receiver")
-	fb.beater.Stop()
+func (mb *metricbeatReceiver) Shutdown(ctx context.Context) error {
+	mb.logger.Info("stopping metricbeat receiver")
+	mb.beater.Stop()
 	return nil
 }

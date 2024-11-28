@@ -64,11 +64,16 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
+- Upgrade to osquery 5.13.1. {pull}40849[40849]
 
 *Osquerybeat*
 
 
 *Packetbeat*
+
+- Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
 
 - Expire source port mappings. {pull}41581[41581]
 
@@ -104,9 +109,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
+- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 
 *Auditbeat*
 
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
 
 *Filebeat*
 
@@ -164,6 +173,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Fix missing key in streaming input logging. {pull}41600[41600]
 
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
 
 *Heartbeat*
 
@@ -194,6 +209,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fix http server helper SSL config. {pull}39405[39405]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 
 *Osquerybeat*
@@ -203,6 +219,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
+
+- Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
 
 
 *Elastic Logging Plugin*
@@ -363,6 +381,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
 - Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 *Metricbeat*
 
@@ -376,6 +395,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
+- Properly set events `UserData` when experimental api is used. {pull}41525[41525]
+- Include XML is respected for experimental api {pull}41525[41525]
+- Forwarded events use renderedtext info for experimental api {pull}41525[41525]
+- Language setting is respected for experimental api {pull}41525[41525]
+- Language setting also added to decode xml wineventlog processor {pull}41525[41525]
+- Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
@@ -416,6 +441,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
