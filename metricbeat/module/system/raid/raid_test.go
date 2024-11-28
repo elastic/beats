@@ -18,6 +18,8 @@
 package raid
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,6 +46,20 @@ func TestFetch(t *testing.T) {
 	}
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "raid").Fields.StringToPrint())
+}
+
+func TestFetchNoRAID(t *testing.T) {
+	// Ensure that we don't error out when no RAID devices are present
+	tmpDir := t.TempDir()
+	assert.NoError(t, os.MkdirAll(filepath.Join(tmpDir, "sys/block"), 0755))
+	c := getConfig()
+	c["hostfs"] = tmpDir
+
+	f := mbtest.NewReportingMetricSetV2Error(t, c)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	assert.Empty(t, errs)
+	assert.Empty(t, events)
 }
 
 func getConfig() map[string]interface{} {
