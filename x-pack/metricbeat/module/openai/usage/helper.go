@@ -6,6 +6,9 @@ package usage
 
 import "strings"
 
+// dateFormatForStateStore is used to parse and format dates in the YYYY-MM-DD format
+const dateFormatForStateStore = "2006-01-02"
+
 func ptr[T any](value T) *T {
 	return &value
 }
@@ -13,11 +16,15 @@ func ptr[T any](value T) *T {
 func processHeaders(headers []string) map[string]string {
 	headersMap := make(map[string]string, len(headers))
 	for _, header := range headers {
-		parts := strings.Split(header, ":")
+		parts := strings.SplitN(header, ":", 2)
 		if len(parts) != 2 {
 			continue
 		}
-		headersMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		k, v := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
+		if k == "" || v == "" {
+			continue
+		}
+		headersMap[k] = v
 	}
 	return headersMap
 }

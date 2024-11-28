@@ -7,6 +7,7 @@ package usage
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -56,6 +57,11 @@ func (c *Config) Validate() error {
 	}
 	if c.APIURL == "" {
 		errs = append(errs, errors.New("api_url cannot be empty"))
+	} else {
+		_, err := url.ParseRequestURI(c.APIURL)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("invalid api_url format: %w", err))
+		}
 	}
 	if c.RateLimit == nil {
 		errs = append(errs, errors.New("rate_limit must be configured"))

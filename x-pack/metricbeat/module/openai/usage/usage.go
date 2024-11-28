@@ -193,7 +193,7 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 		return fmt.Errorf("error decoding response: %w", err)
 	}
 
-	m.logger.Info("Fetched usage metrics for date:", dateStr)
+	m.logger.Infof("Fetched usage metrics for date: %s", dateStr)
 
 	events := make([]mb.Event, 0, len(usageResponse.Data))
 

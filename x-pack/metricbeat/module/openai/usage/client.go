@@ -5,6 +5,7 @@
 package usage
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -13,8 +14,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// RLHTTPClient implements a rate-limited HTTP client that wraps the standard http.Client
-// with a rate limiter to control API request frequency.
+// RLHTTPClient wraps the standard http.Client with a rate limiter to control API request frequency.
 type RLHTTPClient struct {
 	client      *http.Client
 	logger      *logp.Logger
@@ -42,7 +42,12 @@ func (c *RLHTTPClient) Do(req *http.Request) (*http.Response, error) {
 		c.logger.Infof("Rate limit wait exceeded threshold: %v", waitDuration)
 	}
 
-	return c.client.Do(req)
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute request: %w", err)
+	}
+
+	return resp, nil
 }
 
 // newClient creates a new rate-limited HTTP client with specified rate limiter and timeout.

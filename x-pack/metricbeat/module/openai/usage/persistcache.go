@@ -147,7 +147,7 @@ func (s *stateManager) GetLastProcessedDate(apiKey string) (time.Time, error) {
 		return time.Time{}, fmt.Errorf("get state: %w", err)
 	}
 
-	return time.Parse("2006-01-02", dateStr)
+	return time.Parse(dateFormatForStateStore, dateStr)
 }
 
 // hashKey generates and caches a SHA-256 hash of the provided API key
