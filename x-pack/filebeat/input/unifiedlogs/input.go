@@ -128,6 +128,8 @@ func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor
 		startFrom = cursor.Format(cursorDateLayout)
 		log.Infof("cursor loaded, resuming from: %v", startFrom)
 	}
+	tick := time.NewTicker(time.Second)
+	defer tick.Stop()
 	for {
 		metrics.intervals.Add(1)
 
@@ -135,7 +137,7 @@ func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor
 		case <-ctx.Done():
 			log.Infof("input stopped because context was cancelled with: %v", ctx.Err())
 			return nil
-		default:
+		case <-tick.C:
 		}
 
 		logCmd, err := newLogCmd(ctx, input.config, startFrom)
