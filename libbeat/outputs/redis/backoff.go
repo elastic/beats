@@ -61,7 +61,7 @@ func newBackoffClient(client *client, init, max time.Duration) *backoffClient {
 }
 
 func (b *backoffClient) Connect(ctx context.Context) error {
-	err := b.client.Connect()
+	err := b.client.Connect(ctx)
 	if err != nil {
 		// give the client a chance to promote an internal error to a network error.
 		b.updateFailReason(err)
