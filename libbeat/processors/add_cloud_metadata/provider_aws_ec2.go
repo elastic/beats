@@ -65,7 +65,7 @@ var NewEC2Client func(cfg awssdk.Config) EC2Client = func(cfg awssdk.Config) EC2
 var ec2MetadataFetcher = provider{
 	Name: "aws-ec2",
 
-	Local: true,
+	DefaultEnabled: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
