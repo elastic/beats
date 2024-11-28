@@ -28,9 +28,11 @@ import (
 )
 
 const (
-	inputName      = "unifiedlogs"
-	srcArchiveName = "log-cmd-archive"
-	srcPollName    = "log-cmd-poll"
+	inputName        = "unifiedlogs"
+	srcArchiveName   = "log-cmd-archive"
+	srcPollName      = "log-cmd-poll"
+	logDateLayout    = "2006-01-02 15:04:05.999999-0700"
+	cursorDateLayout = "2006-01-02 15:04:05-0700"
 )
 
 var (
@@ -52,7 +54,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-type cursor struct {
+type logRecord struct {
 	Timestamp string `json:"timestamp"`
 }
 
@@ -112,23 +114,33 @@ func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor in
 	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
 	metrics := newInputMetrics(reg)
 	log := ctxt.Logger.With("source", src.Name())
-	logCmd, err := newLogCmd(stdCtx, input.config, resumeCursor)
-	if err != nil {
-		return err
-	}
 
-	return input.runWithMetrics(stdCtx, logCmd, pub, metrics, log)
+	return input.runWithMetrics(stdCtx, resumeCursor, pub, metrics, log)
 }
 
-func (input *input) runWithMetrics(ctx context.Context, logCmd *exec.Cmd, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) error {
+func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) error {
+	var startFrom string
+	if !resumeCursor.IsNew() {
+		var cursor time.Time
+		if err := resumeCursor.Unpack(&cursor); err != nil {
+			return fmt.Errorf("unpack cursor: %w", err)
+		}
+		startFrom = cursor.Format(cursorDateLayout)
+		log.Infof("cursor loaded, resuming from: %v", startFrom)
+	}
 	for {
 		metrics.intervals.Add(1)
 
 		select {
 		case <-ctx.Done():
-			log.Infof("input stopped because context was cancelled with: %w", ctx.Err())
+			log.Infof("input stopped because context was cancelled with: %v", ctx.Err())
 			return nil
 		default:
+		}
+
+		logCmd, err := newLogCmd(ctx, input.config, startFrom)
+		if err != nil {
+			return fmt.Errorf("new log command: %w", err)
 		}
 
 		pipe, err := logCmd.StdoutPipe()
@@ -136,12 +148,16 @@ func (input *input) runWithMetrics(ctx context.Context, logCmd *exec.Cmd, pub in
 			return fmt.Errorf("get stdout pipe: %w", err)
 		}
 
+		log.Debugf("exec command start: %v", logCmd)
 		if err := logCmd.Start(); err != nil {
 			return fmt.Errorf("start log command: %w", err)
 		}
 
-		if err = input.processLogs(pipe, pub, metrics, log); err != nil {
-			log.Errorf("process logs: %w", err)
+		lastProcessedDate, err := input.processLogs(pipe, pub, metrics, log)
+		if err != nil {
+			log.Errorf("process logs: %v", err)
+		} else {
+			startFrom = lastProcessedDate
 		}
 
 		if err := logCmd.Wait(); err != nil {
@@ -157,44 +173,53 @@ func (input *input) runWithMetrics(ctx context.Context, logCmd *exec.Cmd, pub in
 
 func (input *input) isArchive() bool { return input.ArchiveFile != "" || input.TraceFile != "" }
 
-func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) error {
+func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) (string, error) {
 	scanner := bufio.NewScanner(stdout)
 
-	var c int64
-	defer func() { metrics.intervalEvents.Update(c) }()
+	var (
+		event             beat.Event
+		line              string
+		logRecord         logRecord
+		lastProcessedDate string
+		timestamp         time.Time
+		err               error
+		count             int64
+	)
 
+	defer func() { metrics.intervalEvents.Update(count) }()
 	for scanner.Scan() {
-		line := scanner.Text()
-		var logRecord cursor
-		if err := json.Unmarshal([]byte(line), &logRecord); err != nil {
-			log.Errorf("invalid json log: %w", err)
+		line = scanner.Text()
+		if err = json.Unmarshal([]byte(line), &logRecord); err != nil {
+			log.Errorf("invalid json log: %v", err)
 			metrics.errs.Add(1)
 			continue
 		}
 
-		event, err := makeEvent(logRecord.Timestamp, line)
+		timestamp, err = time.Parse(logDateLayout, logRecord.Timestamp)
 		if err != nil {
-			log.Errorf("makeEvent: %w", err)
 			metrics.errs.Add(1)
+			log.Errorf("invalid timestamp: %v", err)
 			continue
 		}
 
-		if err := pub.Publish(event, logRecord); err != nil {
-			log.Errorf("publish event: %w", err)
+		event = makeEvent(timestamp, line)
+		if err = pub.Publish(event, timestamp); err != nil {
+			log.Errorf("publish event: %v", err)
 			metrics.errs.Add(1)
 			continue
 		}
-
-		c++
+		lastProcessedDate = timestamp.Format(cursorDateLayout)
+		count++
 	}
-	if err := scanner.Err(); err != nil {
+	if err = scanner.Err(); err != nil {
 		metrics.errs.Add(1)
-		return fmt.Errorf("scanning stdout: %w", err)
+		return "", fmt.Errorf("scanning stdout: %w", err)
 	}
-	return nil
+
+	return lastProcessedDate, nil
 }
 
-func newLogCmd(ctx context.Context, config config, resumeCursor inputcursor.Cursor) (*exec.Cmd, error) {
+func newLogCmd(ctx context.Context, config config, startFrom string) (*exec.Cmd, error) {
 	args := []string{"show", "--style", "ndjson"}
 	if config.ArchiveFile != "" {
 		args = append(args, "--archive", config.ArchiveFile)
@@ -228,12 +253,8 @@ func newLogCmd(ctx context.Context, config config, resumeCursor inputcursor.Curs
 		args = append(args, "--timezone", config.Timezone)
 	}
 	start := config.Start
-	if !resumeCursor.IsNew() {
-		cursor := cursor{}
-		if err := resumeCursor.Unpack(&cursor); err != nil {
-			return nil, fmt.Errorf("unpacking cursor: %w", err)
-		}
-		start = cursor.Timestamp
+	if startFrom != "" {
+		start = startFrom
 	}
 	if start != "" {
 		args = append(args, "--start", start)
@@ -241,13 +262,7 @@ func newLogCmd(ctx context.Context, config config, resumeCursor inputcursor.Curs
 	return exec.CommandContext(ctx, "log", args...), nil
 }
 
-func makeEvent(timestamp, message string) (beat.Event, error) {
-	const layout = "2006-01-02 15:04:05-0700"
-
-	ts, err := time.Parse(layout, timestamp)
-	if err != nil {
-		return beat.Event{}, fmt.Errorf("invalid timestamp: %w", err)
-	}
+func makeEvent(timestamp time.Time, message string) beat.Event {
 	now := timeNow()
 	fields := mapstr.M{
 		"event": mapstr.M{
@@ -257,7 +272,7 @@ func makeEvent(timestamp, message string) (beat.Event, error) {
 	}
 
 	return beat.Event{
-		Timestamp: ts,
+		Timestamp: timestamp,
 		Fields:    fields,
-	}, nil
+	}
 }
