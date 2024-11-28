@@ -136,7 +136,7 @@ func defaultConfig() kafkaConfig {
 		BrokerTimeout:    10 * time.Second,
 		Compression:      "gzip",
 		CompressionLevel: 4,
-		Version:          kafka.Version("1.0.0"),
+		Version:          kafka.Version("2.1.0"),
 		MaxRetries:       3,
 		Headers:          nil,
 		Backoff: backoffConfig{
