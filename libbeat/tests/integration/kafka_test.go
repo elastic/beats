@@ -69,7 +69,7 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
 	leader.Returns(metadataResponse)
 
-	// The mock broker must return a single produce response. If no produce request is received, the test wil fail.
+	// The mock broker must return a single produce response. If no produce request is received, the test will fail.
 	// This guarantees that mockbeat successfully produced a message to Kafka and connectivity is established.
 	prodSuccess := new(sarama.ProduceResponse)
 	prodSuccess.AddTopicPartition(kafkaTopic, 0, sarama.ErrNoError)
