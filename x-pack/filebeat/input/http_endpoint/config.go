@@ -37,6 +37,8 @@ type config struct {
 	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
+	MaxInFlight           int64                   `config:"max_in_flight_bytes"`
+	RetryAfter            int                     `config:"retry_after"`
 	Program               string                  `config:"program"`
 	SecretHeader          string                  `config:"secret.header"`
 	SecretValue           string                  `config:"secret.value"`
@@ -66,6 +68,7 @@ func defaultConfig() config {
 		BasicAuth:     false,
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
+		RetryAfter:    10,
 		ListenAddress: "127.0.0.1",
 		ListenPort:    "8000",
 		URL:           "/",
