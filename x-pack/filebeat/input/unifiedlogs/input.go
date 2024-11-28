@@ -143,9 +143,13 @@ func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor
 			return fmt.Errorf("new log command: %w", err)
 		}
 
-		pipe, err := logCmd.StdoutPipe()
+		outpipe, err := logCmd.StdoutPipe()
 		if err != nil {
 			return fmt.Errorf("get stdout pipe: %w", err)
+		}
+		errpipe, err := logCmd.StderrPipe()
+		if err != nil {
+			return fmt.Errorf("get stderr pipe: %w", err)
 		}
 
 		log.Debugf("exec command start: %v", logCmd)
@@ -153,15 +157,16 @@ func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor
 			return fmt.Errorf("start log command: %w", err)
 		}
 
-		lastProcessedDate, err := input.processLogs(pipe, pub, metrics, log)
+		lastProcessedDate, err := input.processLogs(outpipe, pub, metrics, log)
 		if err != nil {
 			log.Errorf("process logs: %v", err)
 		} else {
 			startFrom = lastProcessedDate
 		}
 
+		stderrBytes, _ := io.ReadAll(errpipe)
 		if err := logCmd.Wait(); err != nil {
-			return fmt.Errorf("log command exited with an error: %w", err)
+			return fmt.Errorf("log command exited with an error: %w, %q", err, string(stderrBytes))
 		}
 
 		if input.isArchive() {
