@@ -62,7 +62,7 @@ var NewClusterClient func(clientFactory *armcontainerservice.ClientFactory) *arm
 var azureVMMetadataFetcher = provider{
 	Name: "azure-compute",
 
-	Local: true,
+	DefaultEnabled: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		azMetadataURI := "/metadata/instance/compute?api-version=2021-02-01"
