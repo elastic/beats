@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/elastic/sarama"
 )
 
 var (
