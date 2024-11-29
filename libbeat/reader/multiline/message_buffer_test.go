@@ -177,7 +177,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 				msgs := []reader.Message{
 					{Content: []byte("line1\nline2\nline3"), Bytes: 10},
 				}
-				for range 2000 {
+				for i := 0; i < 2000; i++ {
 					getTestMessageBuffer(10, false, msgs).finalize()
 				}
 			},
