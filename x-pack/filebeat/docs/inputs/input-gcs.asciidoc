@@ -164,7 +164,6 @@ Now let's explore the configuration attributes a bit more elaborately.
    11. <<attrib-file_selectors-gcs,file_selectors>>
    12. <<attrib-expand_event_list_from_field-gcs,expand_event_list_from_field>>
    13. <<attrib-timestamp_epoch-gcs,timestamp_epoch>>
-   14. <<attrib-retry-gcs,retry>>
 
 
 [id="attrib-project-id"]
@@ -397,43 +396,6 @@ filebeat.inputs:
 ----
 
 The GCS APIs don't provide a direct way to filter files based on the timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available. This option scales vertically and not horizontally.
-
-[id="attrib-retry-gcs"]
-[float]
-==== `retry`
-
-This attribute can be used to configure a list of sub attributes that directly control how the input should behave when a download for a file/object fails or gets interrupted. The list of sub attributes are as follows :-
-
-    1. `max_attempts`: This attribute defines the maximum number of retries that should be attempted for a failed download. The default value for this is `3`. 
-    2. `initial_backoff_duration`: This attribute defines the initial backoff time in seconds. The default value for this is `1s`.
-    3. `max_backoff_duration`: This attribute defines the maximum backoff time in seconds. The default value for this is `30s`.
-    4. `backoff_multiplier`: This attribute defines the backoff multiplication factor. The default value for this is `2`.
-
-By configuring these attributes, the user is given the flexibility to control how the input should behave when a download fails or gets interrupted. This attribute can only be 
-specified at the root level of the configuration and not at the bucket level. It applies uniformly to all the buckets.
-
-An example configuration is given below :-
-
-[source, yml]
-----
-filebeat.inputs:
-- type: gcs
-  project_id: my_project_id
-  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
-  retry:
-    max_attempts: 3
-    initial_backoff_duration: 2s
-    max_backoff_duration: 60s
-    backoff_multiplier: 2
-  buckets:
-  - name: obs-bucket
-    max_workers: 3
-    poll: true
-    poll_interval: 11m
-    bucket_timeout: 10m
-----
-
-While configuring the `retry` attribute, the user should take into consideration the `bucket_timeout` value. The `retry` attribute should be configured in such a way that the retries are completed within the `bucket_timeout` window. If the `retry` attribute is configured in such a way that the retries are not completed successfully within the `bucket_timeout` window, then the input will suffer a `context timeout` for that specific object/file which it was retrying. This can cause gaps in ingested data to pile up over time.
 
 [id="bucket-overrides"]
 *The sample configs below will explain the bucket level overriding of attributes a bit further :-*

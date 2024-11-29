@@ -6,6 +6,7 @@ package gcs
 
 import (
 	"context"
+	"time"
 
 	"cloud.google.com/go/storage"
 	gax "github.com/googleapis/gax-go/v2"
@@ -63,7 +64,6 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
-			Retry:                    in.config.Retry,
 		}
 
 		st := newState()
@@ -80,13 +80,9 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		}()
 
 		bkt := client.Bucket(currentSource.BucketName).Retryer(
-			// Use WithMaxAttempts to change the maximum number of attempts.
-			storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 			// Use WithBackoff to change the timing of the exponential backoff.
 			storage.WithBackoff(gax.Backoff{
-				Initial:    currentSource.Retry.InitialBackOffDuration,
-				Max:        currentSource.Retry.MaxBackOffDuration,
-				Multiplier: currentSource.Retry.BackOffMultiplier,
+				Initial: 2 * time.Second,
 			}),
 			// RetryAlways will retry the operation even if it is non-idempotent.
 			// Since we are only reading, the operation is always idempotent

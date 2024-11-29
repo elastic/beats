@@ -50,8 +50,6 @@ type config struct {
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// This field is only used for system test purposes, to override the HTTP endpoint.
 	AlternativeHost string `config:"alternative_host,omitempty"`
-	// Retry - Defines the retry configuration for the input.
-	Retry retryConfig `config:"retry"`
 }
 
 // bucket contains the config for each specific object storage bucket in the root account
@@ -90,17 +88,6 @@ type fileCredentialsConfig struct {
 }
 type jsonCredentialsConfig struct {
 	AccountKey string `config:"account_key"`
-}
-
-type retryConfig struct {
-	// MaxAttempts is the maximum number of retry attempts, defaults to 3.
-	MaxAttempts int `config:"max_attempts" validate:"min=0"`
-	// InitialBackOffDuration is the initial value of the retry period, defaults to 1 second.
-	InitialBackOffDuration time.Duration `config:"initial_backoff_duration" validate:"min=1"`
-	// MaxBackOffDuration is the maximum value of the retry period, defaults to 30 seconds.
-	MaxBackOffDuration time.Duration `config:"max_backoff_duration" validate:"min=2"`
-	// BackOffMultiplier is the factor by which the retry period increases. It should be greater than 1 and defaults to 2.
-	BackOffMultiplier float64 `config:"backoff_multiplier" validate:"min=2"`
 }
 
 func (c authConfig) Validate() error {

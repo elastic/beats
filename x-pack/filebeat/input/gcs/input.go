@@ -72,7 +72,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
-			Retry:                    config.Retry,
 		})
 	}
 
@@ -120,12 +119,6 @@ func defaultConfig() config {
 		PollInterval:  5 * time.Minute,
 		BucketTimeOut: 120 * time.Second,
 		ParseJSON:     false,
-		Retry: retryConfig{
-			MaxAttempts:            3,
-			InitialBackOffDuration: 1 * time.Second,
-			MaxBackOffDuration:     30 * time.Second,
-			BackOffMultiplier:      2,
-		},
 	}
 }
 
@@ -178,13 +171,9 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	}
 
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
-		// Use WithMaxAttempts to change the maximum number of attempts.
-		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial:    currentSource.Retry.InitialBackOffDuration,
-			Max:        currentSource.Retry.MaxBackOffDuration,
-			Multiplier: currentSource.Retry.BackOffMultiplier,
+			Initial: 2 * time.Second,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent
