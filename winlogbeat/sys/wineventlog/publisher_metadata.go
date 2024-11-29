@@ -42,7 +42,7 @@ func (m *PublisherMetadata) Close() error {
 
 // NewPublisherMetadata opens the publisher's metadata. Close must be called on
 // the returned PublisherMetadata to release its handle.
-func NewPublisherMetadata(session EvtHandle, name string) (*PublisherMetadata, error) {
+func NewPublisherMetadata(session EvtHandle, name string, locale uint32) (*PublisherMetadata, error) {
 	var publisherName, logFile *uint16
 	if info, err := os.Stat(name); err == nil && info.Mode().IsRegular() {
 		logFile, err = syscall.UTF16PtrFromString(name)

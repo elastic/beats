@@ -1016,6 +1016,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Crypto(),
 		lib.JSON(nil),
 		xml,
+		lib.Printf(),
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),

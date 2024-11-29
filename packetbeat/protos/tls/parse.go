@@ -18,7 +18,7 @@
 package tls
 
 import (
-	"crypto/dsa" //lint:ignore SA1019 Deprecated, but still used. So we have to handle it.
+	"crypto/dsa" //nolint:staticcheck // SA1019 Deprecated, but still used. So we have to handle it.
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
@@ -270,7 +270,7 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 				debugf("handshake completed")
 			}
 			// discard remaining data for this stream (encrypted)
-			buf.Advance(buf.Len())
+			_ = buf.Advance(buf.Len())
 			return resultEncrypted
 
 		case recordTypeHandshake:
@@ -300,7 +300,7 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 			}
 		}
 
-		buf.Advance(limit)
+		_ = buf.Advance(limit)
 	}
 
 	if buf.Len() == 0 {
@@ -350,10 +350,10 @@ func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) (err er
 		}
 		if !parser.parseHandshake(header.handshakeType,
 			bufferView{&parser.handshakeBuf, handshakeHeaderSize, limit}) {
-			parser.handshakeBuf.Advance(limit)
+			_ = parser.handshakeBuf.Advance(limit)
 			return fmt.Errorf("bad handshake %+v", header)
 		}
-		parser.handshakeBuf.Advance(limit)
+		_ = parser.handshakeBuf.Advance(limit)
 	}
 	if parser.handshakeBuf.Len() == 0 {
 		parser.handshakeBuf.Reset()
@@ -639,7 +639,7 @@ func certToMap(cert *x509.Certificate) mapstr.M {
 	certMap := mapstr.M{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		"serial_number":        cert.SerialNumber.Text(10),
+		"serial_number":        strings.ToUpper(cert.SerialNumber.Text(16)),
 		"issuer":               toMap(&cert.Issuer),
 		"subject":              toMap(&cert.Subject),
 		"not_before":           cert.NotBefore,

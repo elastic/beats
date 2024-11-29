@@ -56,6 +56,20 @@ type handler struct {
 	txBaseID    string        // Random value to make transaction IDs unique.
 	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
+	// inFlight is the sum of message body length
+	// that have been received but not yet ACKed
+	// or timed out or otherwise handled.
+	//
+	// Requests that do not request a timeout do
+	// not contribute to this value.
+	inFlight atomic.Int64
+	// maxInFlight is the maximum value of inFligh
+	// that will be allowed for any messages received
+	// by the handler. If non-zero, inFlight may
+	// not exceed this value.
+	maxInFlight int64
+	retryAfter  int
+
 	reqLogger    *zap.Logger
 	host, scheme string
 
@@ -86,9 +100,38 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		acked   chan struct{}
 		timeout *time.Timer
 	)
+	if h.maxInFlight != 0 {
+		// Consider non-ACKing messages as well. These do not add
+		// to the sum of in-flight bytes, but we can still assess
+		// whether a message would take us over the limit.
+		inFlight := h.inFlight.Load() + r.ContentLength
+		if inFlight > h.maxInFlight {
+			w.Header().Set(headerContentEncoding, "application/json")
+			w.Header().Set("Retry-After", strconv.Itoa(h.retryAfter))
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, err := fmt.Fprintf(w,
+				`{"warn":"max in flight message memory exceeded","max_in_flight":%d,"in_flight":%d}`,
+				h.maxInFlight, inFlight,
+			)
+			if err != nil {
+				h.log.Errorw("failed to write 503", "error", err)
+			}
+			return
+		}
+	}
 	if wait != 0 {
 		acked = make(chan struct{})
 		timeout = time.NewTimer(wait)
+		h.inFlight.Add(r.ContentLength)
+		defer func() {
+			// Any return will be a message handling completion and the
+			// the removal of the allocation from the queue assuming that
+			// the client has requested a timeout. Either we have an early
+			// error condition or timeout and the message is dropped, we
+			// have ACKed all the events in the request, or the input has
+			// been cancelled.
+			h.inFlight.Add(-r.ContentLength)
+		}()
 	}
 	start := time.Now()
 	acker := newBatchACKTracker(func() {

@@ -46,9 +46,9 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	// The awsConfig now contains the region from the credential profile or default region
-	// if the region is explicitly set in the config, then it wins
 	if config.RegionName != "" {
+		// The awsConfig now contains the region from the credential profile or default region
+		// if the region is explicitly set in the config, then it wins
 		awsConfig.Region = config.RegionName
 	}
 
@@ -56,7 +56,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return newSQSReaderInput(config, awsConfig), nil
 	}
 
-	if config.BucketARN != "" || config.NonAWSBucketName != "" {
+	if config.BucketARN != "" || config.AccessPointARN != "" || config.NonAWSBucketName != "" {
 		return newS3PollerInput(config, awsConfig, im.store)
 	}
 

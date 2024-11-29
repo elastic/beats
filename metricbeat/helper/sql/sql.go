@@ -21,10 +21,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
 	"strconv"
-	"strings"
 	"time"
+
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -114,7 +114,7 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	return rr, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+// FetchVariableMode executes the provided SQL query and returns the results in a key/value format.
 func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
@@ -123,7 +123,7 @@ func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, e
 	return d.fetchVariableMode(rows)
 }
 
-// fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
+// fetchVariableMode scans the provided SQL rows and returns the results in a key/value format.
 func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
 	data := mapstr.M{}
 
@@ -167,24 +167,25 @@ func ReplaceUnderscores(ms mapstr.M) mapstr.M {
 }
 
 func getValue(pval *interface{}) interface{} {
+	if pval == nil {
+		return nil
+	}
+
 	switch v := (*pval).(type) {
-	case nil, bool:
+	case nil, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, string, []interface{}:
 		return v
 	case []byte:
-		s := string(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			return num
-		}
-		return s
+		return string(v)
 	case time.Time:
 		return v.Format(time.RFC3339Nano)
-	case []interface{}:
-		return v
 	default:
+		// For any other types, convert to string and try to parse as number
 		s := fmt.Sprint(v)
-		num, err := strconv.ParseFloat(s, 64)
-		if err == nil {
+		if len(s) > 1 && s[0] == '0' && s[1] != '.' {
+			// Preserve string with leading zeros i.e., 00100 stays 00100
+			return s
+		}
+		if num, err := strconv.ParseFloat(s, 64); err == nil {
 			return num
 		}
 		return s

@@ -64,6 +64,20 @@ var inputTests = []struct {
 		},
 	},
 	{
+		name: "hello_world_sprintf",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+	},
+	{
 		name: "hello_world_time",
 		config: map[string]interface{}{
 			"interval": 1,

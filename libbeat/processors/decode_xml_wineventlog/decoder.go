@@ -26,7 +26,7 @@ import (
 
 type nonWinDecoder struct{}
 
-func newDecoder() decoder {
+func newDecoder(uint32) decoder {
 	return nonWinDecoder{}
 }
 

@@ -4,15 +4,15 @@
 
 package osqdcli
 
-type Cache interface {
-	Add(key, value interface{}) (evicted bool)
-	Get(key interface{}) (value interface{}, ok bool)
+type Cache[K comparable, V any] interface {
+	Add(K, V) (evicted bool)
+	Get(K) (value V, ok bool)
 	Resize(size int) (evicted int)
 }
 
-func WithCache(cache Cache, minSize int) Option {
+func WithCache(cache Cache[string, map[string]string], minSize int) Option {
 	return func(c *Client) {
-		nsc := &nullSafeCache{cache: cache}
+		nsc := &nullSafeCache[string, map[string]string]{cache: cache}
 		if minSize > 0 {
 			nsc.minSize = minSize
 		}
@@ -20,28 +20,28 @@ func WithCache(cache Cache, minSize int) Option {
 	}
 }
 
-type nullSafeCache struct {
-	cache   Cache
+type nullSafeCache[K comparable, V any] struct {
+	cache   Cache[K, V]
 	minSize int
 }
 
-func (c *nullSafeCache) Add(key, value interface{}) (evicted bool) {
+func (c *nullSafeCache[K, V]) Add(key K, value V) (evicted bool) {
 	if c.cache == nil {
-		return
+		return false
 	}
 	return c.cache.Add(key, value)
 }
 
-func (c *nullSafeCache) Get(key interface{}) (value interface{}, ok bool) {
+func (c *nullSafeCache[K, V]) Get(key K) (value V, ok bool) {
 	if c.cache == nil {
-		return
+		return value, ok
 	}
 	return c.cache.Get(key)
 }
 
-func (c *nullSafeCache) Resize(size int) (evicted int) {
+func (c *nullSafeCache[K, V]) Resize(size int) (evicted int) {
 	if c.cache == nil {
-		return
+		return 0
 	}
 	return c.cache.Resize(c.minSize + size)
 }

@@ -33,6 +33,7 @@ func TestPublisherMetadataStore(t *testing.T) {
 	s, err := NewPublisherMetadataStore(
 		NilHandle,
 		"Microsoft-Windows-Security-Auditing",
+		0,
 		logp.NewLogger("metadata"))
 	if err != nil {
 		t.Fatal(err)

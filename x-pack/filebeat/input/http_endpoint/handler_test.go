@@ -192,6 +192,9 @@ type publisher struct {
 func (p *publisher) Publish(e beat.Event) {
 	p.mu.Lock()
 	p.events = append(p.events, e)
+	if ack, ok := e.Private.(*batchACKTracker); ok {
+		ack.ACK()
+	}
 	p.mu.Unlock()
 }
 

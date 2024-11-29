@@ -30,8 +30,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -280,7 +281,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			output, ok := grp.Clients[0].(*client)
 			assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
-			if err := output.Connect(); err != nil {
+			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, output.index, "testbeat")

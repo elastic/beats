@@ -5,10 +5,16 @@ prepare an environment and manually test Kafka module.
 
 #### Kafka container
 
-In order to have a Kafka instance up and running the best way to go is to use the container that is used by the CI tests.
+In order to have a Kafka instance up and running the best way to go is to use the container that is used by the CI tests. Make sure to add below entry to `/etc/hosts`
+
+```
+127.0.0.1      kafka
+```
+
 To bring this container up simply run the tests for Kafka module:
 
 `go test -tags integration ./metricbeat/module/kafka/...`
+
 
 
 After the tests have been completed, the Kafka container should be still running. Verify with:

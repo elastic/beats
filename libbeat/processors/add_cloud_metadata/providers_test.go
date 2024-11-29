@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -34,7 +35,7 @@ func init() {
 func TestProvidersFilter(t *testing.T) {
 	var allLocal []string
 	for name, ff := range cloudMetaProviders {
-		if ff.Local {
+		if ff.DefaultEnabled {
 			allLocal = append(allLocal, name)
 		}
 	}
@@ -116,6 +117,62 @@ func TestProvidersFilter(t *testing.T) {
 
 			sort.Strings(actual)
 			assert.Equal(t, expected, actual)
+		})
+	}
+}
+
+func Test_priorityResult(t *testing.T) {
+	tLogger := logp.NewLogger("add_cloud_metadata testing")
+	awsRsp := result{
+		provider: "aws",
+		metadata: map[string]interface{}{
+			"id": "a-1",
+		},
+	}
+
+	openStackRsp := result{
+		provider: "openstack",
+		metadata: map[string]interface{}{
+			"id": "o-1",
+		},
+	}
+
+	digitaloceanRsp := result{
+		provider: "digitalocean",
+		metadata: map[string]interface{}{
+			"id": "d-1",
+		},
+	}
+
+	tests := []struct {
+		name      string
+		collected []result
+		want      *result
+	}{
+		{
+			name:      "Empty results returns nil",
+			collected: []result{},
+			want:      nil,
+		},
+		{
+			name:      "Single result returns the same",
+			collected: []result{awsRsp},
+			want:      &awsRsp,
+		},
+		{
+			name:      "Priority result wins",
+			collected: []result{openStackRsp, awsRsp},
+			want:      &awsRsp,
+		},
+		{
+			name:      "For non-priority result, response order wins",
+			collected: []result{openStackRsp, digitaloceanRsp},
+			want:      &openStackRsp,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, priorityResult(tt.collected, tLogger))
 		})
 	}
 }

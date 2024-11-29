@@ -31,7 +31,10 @@ func createDefaultConfig() component.Config {
 }
 
 func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.Config, consumer consumer.Logs) (receiver.Logs, error) {
-	cfg := baseCfg.(*Config)
+	cfg, ok := baseCfg.(*Config)
+	if !ok {
+		return nil, fmt.Errorf("could not convert otel config to filebeat config")
+	}
 
 	settings := cmd.FilebeatSettings(Name)
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
@@ -59,7 +62,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
 	}
 
-	return &filebeatReceiver{beat: &b.Beat, beater: fbBeater}, nil
+	return &filebeatReceiver{beat: &b.Beat, beater: fbBeater, logger: set.Logger}, nil
 }
 
 func defaultProcessors() []mapstr.M {

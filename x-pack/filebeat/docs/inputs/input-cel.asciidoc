@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.15.0
+:mito_version: v1.16.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -225,6 +225,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-RE_Find_Submatch[RE Find Submatch]
 ** {mito_docs}/lib#hdr-RE_Find_All_Submatch[RE Find All Submatch]
 ** {mito_docs}/lib#hdr-RE_Replace_All[RE Replace All]
+
+* {mito_docs}/lib#Printf[Printf]
+** {mito_docs}/lib#hdr-Sprintf-Printf[Sprintf]
 
 * {mito_docs}/lib#Strings[Strings]
 ** {mito_docs}/lib#hdr-String_Methods[String Methods]

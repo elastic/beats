@@ -51,7 +51,6 @@ type s3ObjectProcessor struct {
 
 type s3DownloadedObject struct {
 	body        io.ReadCloser
-	length      int64
 	contentType string
 	metadata    map[string]interface{}
 }
@@ -142,9 +141,9 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	defer s3Obj.body.Close()
 
 	p.s3Metadata = s3Obj.metadata
-	p.metrics.s3ObjectSizeInBytes.Update(s3Obj.length)
 
-	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal))
+	mReader := newMonitoredReader(s3Obj.body, p.metrics.s3BytesProcessedTotal)
+	reader, err := p.addGzipDecoderIfNeeded(mReader)
 	if err != nil {
 		return fmt.Errorf("failed checking for gzip content: %w", err)
 	}
@@ -213,6 +212,9 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 			time.Since(start).Nanoseconds(), err)
 	}
 
+	// finally obtain total bytes of the object through metered reader
+	p.metrics.s3ObjectSizeInBytes.Update(mReader.totalBytesReadCurrent)
+
 	return nil
 }
 
@@ -241,7 +243,6 @@ func (p *s3ObjectProcessor) download() (obj *s3DownloadedObject, err error) {
 
 	s := &s3DownloadedObject{
 		body:        getObjectOutput.Body,
-		length:      *getObjectOutput.ContentLength,
 		contentType: ctType,
 		metadata:    meta,
 	}

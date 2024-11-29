@@ -18,13 +18,13 @@
 package actions
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -337,21 +337,14 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 		Events []beat.Event
 	}{
 		{
-			Name:   "5000 events with 5 fields on each level with 3 level depth without collisions",
-			Events: GenerateEvents(5000, 5, 3, false),
+			Name:   "5000 events with 5 fields on each level with 3 level depth",
+			Events: testutil.GenerateEvents(5000, 5, 3),
 		},
 		{
-			Name:   "5000 events with 5 fields on each level with 3 level depth with collisions",
-			Events: GenerateEvents(5000, 5, 3, true),
+			Name:   "500 events with 50 fields on each level with 5 level depth",
+			Events: testutil.GenerateEvents(500, 50, 3),
 		},
-		{
-			Name:   "500 events with 50 fields on each level with 5 level depth without collisions",
-			Events: GenerateEvents(500, 50, 3, false),
-		},
-		{
-			Name:   "500 events with 50 fields on each level with 5 level depth with collisions",
-			Events: GenerateEvents(500, 50, 3, true),
-		},
+
 		// Add more test cases as needed for benchmarking
 	}
 
@@ -375,36 +368,4 @@ func BenchmarkLowerCaseProcessorRun(b *testing.B) {
 			}
 		})
 	}
-}
-
-func GenerateEvents(numEvents, fieldsPerLevel, depth int, withCollisions bool) []beat.Event {
-	events := make([]beat.Event, numEvents)
-	for i := 0; i < numEvents; i++ {
-		event := &beat.Event{Fields: mapstr.M{}}
-		generateFields(event, fieldsPerLevel, depth, withCollisions)
-		events[i] = *event
-	}
-	return events
-}
-
-func generateFields(event *beat.Event, fieldsPerLevel, depth int, withCollisions bool) {
-	if depth == 0 {
-		return
-	}
-
-	for j := 1; j <= fieldsPerLevel; j++ {
-		var key string
-		for d := 1; d < depth; d++ {
-			key += fmt.Sprintf("level%dfield%d", d, j)
-			key += "."
-		}
-		if withCollisions {
-			key += fmt.Sprintf("Level%dField%d", depth, j) // Creating a collision (Level is capitalized)
-		} else {
-			key += fmt.Sprintf("level%dfield%d", depth, j)
-		}
-		event.Fields.Put(key, "value")
-		key = ""
-	}
-
 }

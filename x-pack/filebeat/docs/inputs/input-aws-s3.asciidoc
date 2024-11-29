@@ -348,7 +348,7 @@ configuring multiline options.
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
+URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn`, `access_point_arn`, and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `region`
@@ -472,7 +472,12 @@ value is `20s`.
 [float]
 ==== `bucket_arn`
 
-ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` and `non_aws_bucket_name` are not set).
+ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url`, `access_point_arn, and `non_aws_bucket_name` are not set).
+
+[float]
+==== `access_point_arn`
+
+ARN of the AWS S3 Access Point that will be polled for list operation. (Required when `queue_url`, `bucket_arn`, and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `non_aws_bucket_name`
@@ -492,7 +497,7 @@ Prefix to apply for the list request to the S3 bucket. Default empty.
 [float]
 ==== `number_of_workers`
 
-Number of workers that will process the S3 or SQS objects listed. Required when `bucket_arn` is set, otherwise (in the SQS case) defaults to 5.
+Number of workers that will process the S3 or SQS objects listed. Required when `bucket_arn` or `access_point_arn` is set, otherwise (in the SQS case) defaults to 5.
 
 
 [float]

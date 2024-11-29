@@ -347,6 +347,8 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacType:     c.HMACType,
 			hmacPrefix:   c.HMACPrefix,
 		},
+		maxInFlight:           c.MaxInFlight,
+		retryAfter:            c.RetryAfter,
 		program:               prg,
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
