@@ -26,8 +26,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -105,13 +106,21 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
+<<<<<<< HEAD
 		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
+=======
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+>>>>>>> 4942592a8 (Update Beats to the current Sarama fork (#41655))
 			offsetBefore, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}
 
 	for _, data := range dataAfter {
+<<<<<<< HEAD
 		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
+=======
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+>>>>>>> 4942592a8 (Update Beats to the current Sarama fork (#41655))
 			offsetAfter, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}
