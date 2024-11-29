@@ -570,6 +570,7 @@ func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
 		for k, v := range parent.resolvedDomains {
 			child.resolvedDomains[k] = v
 		}
+		s.log.Debugf("forking process %d with %d associated domains", childPID, len(child.resolvedDomains))
 		s.processes[childPID] = child
 	}
 	return nil
@@ -579,6 +580,7 @@ func (s *state) TerminateProcess(pid uint32) error {
 	if pid == 0 {
 		return errors.New("can't terminate process with PID 0")
 	}
+	s.log.Debugf("terminating process %d", pid)
 	s.Lock()
 	defer s.Unlock()
 	delete(s.processes, pid)
@@ -676,6 +678,7 @@ func (s *state) CreateSocket(ref flow) error {
 func (s *state) OnDNSTransaction(tr dns.Transaction) error {
 	s.Lock()
 	defer s.Unlock()
+	s.log.Debugf("adding DNS transaction for domain %s for client %s", tr.Domain, tr.Client.String())
 	s.dns.AddTransaction(tr)
 	return nil
 }
@@ -721,6 +724,10 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 }
 
 func (s *state) createFlow(ref flow) error {
+	if ref.process != nil {
+		s.log.Debugf("creating flow for pid %s", ref.process.pid)
+	}
+
 	// Get or create a socket for this flow
 	sock := s.getSocket(ref.sock)
 	ref.createdTime = ref.lastSeenTime
@@ -820,6 +827,9 @@ func (s *state) enrichDNS(f *flow) {
 		localUDP := net.UDPAddr{
 			IP:   f.local.addr.IP,
 			Port: f.local.addr.Port,
+		}
+		if f.process != nil {
+			s.log.Debugf("registering endpoint %s for process %d", localUDP.String(), f.process.pid)
 		}
 		s.dns.RegisterEndpoint(localUDP, f.process)
 	}
