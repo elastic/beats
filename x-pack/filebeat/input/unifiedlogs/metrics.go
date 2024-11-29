@@ -7,16 +7,11 @@
 package unifiedlogs
 
 import (
-	"github.com/rcrowley/go-metrics"
-
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 type inputMetrics struct {
-	intervalEvents metrics.Sample   // histogram of the total events per interval
-	intervals      *monitoring.Uint // total number of intervals executed
-	errs           *monitoring.Uint // total number of errors
+	errs *monitoring.Uint // total number of errors
 }
 
 func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
@@ -25,13 +20,8 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	}
 
 	out := &inputMetrics{
-		intervals:      monitoring.NewUint(reg, "unifiedlogs_interval_total"),
-		errs:           monitoring.NewUint(reg, "unifiedlogs_errors_total"),
-		intervalEvents: metrics.NewUniformSample(1024),
+		errs: monitoring.NewUint(reg, "unifiedlogs_errors_total"),
 	}
-
-	_ = adapter.GetGoMetrics(reg, "unifiedlogs_interval_events", adapter.Accept).
-		GetOrRegister("histogram", metrics.NewHistogram(out.intervalEvents))
 
 	return out
 }

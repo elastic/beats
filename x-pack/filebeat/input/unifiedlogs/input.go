@@ -12,8 +12,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
+	"sync"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -73,6 +74,7 @@ func (src source) Name() string { return src.name }
 
 type input struct {
 	config
+	metrics *inputMetrics
 }
 
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
@@ -95,14 +97,6 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	if _, err := exec.LookPath("log"); err != nil {
 		return err
 	}
-	if src.Name() == srcArchiveName {
-		if _, err := os.Stat(input.ArchiveFile); input.ArchiveFile != "" && os.IsNotExist(err) {
-			return err
-		}
-		if _, err := os.Stat(input.TraceFile); input.TraceFile != "" && os.IsNotExist(err) {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -110,101 +104,149 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
 	reg, unreg := inputmon.NewInputRegistry(input.Name(), ctxt.ID, nil)
 	defer unreg()
+	input.metrics = newInputMetrics(reg)
 
 	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
-	metrics := newInputMetrics(reg)
 	log := ctxt.Logger.With("source", src.Name())
 
-	return input.runWithMetrics(stdCtx, resumeCursor, pub, metrics, log)
+	startFrom, err := loadCursor(resumeCursor, log)
+	if err != nil {
+		return err
+	}
+	if startFrom != "" {
+		input.Start = startFrom
+	}
+
+	return input.runWithMetrics(stdCtx, pub, log)
 }
 
-func (input *input) runWithMetrics(ctx context.Context, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) error {
-	var startFrom string
-	if !resumeCursor.IsNew() {
-		var cursor time.Time
-		if err := resumeCursor.Unpack(&cursor); err != nil {
-			return fmt.Errorf("unpack cursor: %w", err)
-		}
-		startFrom = cursor.Format(cursorDateLayout)
-		log.Infof("cursor loaded, resuming from: %v", startFrom)
-	}
-	tick := time.NewTicker(time.Second)
-	defer tick.Stop()
-	for {
-		metrics.intervals.Add(1)
-
-		select {
-		case <-ctx.Done():
-			log.Infof("input stopped because context was cancelled with: %v", ctx.Err())
-			return nil
-		case <-tick.C:
-		}
-
-		logCmd, err := newLogCmd(ctx, input.config, startFrom)
-		if err != nil {
-			return fmt.Errorf("new log command: %w", err)
-		}
-
-		outpipe, err := logCmd.StdoutPipe()
-		if err != nil {
-			return fmt.Errorf("get stdout pipe: %w", err)
-		}
-		errpipe, err := logCmd.StderrPipe()
-		if err != nil {
-			return fmt.Errorf("get stderr pipe: %w", err)
-		}
-
-		log.Debugf("exec command start: %v", logCmd)
-		if err := logCmd.Start(); err != nil {
-			return fmt.Errorf("start log command: %w", err)
-		}
-
-		lastProcessedDate, err := input.processLogs(outpipe, pub, metrics, log)
-		if err != nil {
-			log.Errorf("process logs: %v", err)
-		} else {
-			startFrom = lastProcessedDate
-		}
-
-		stderrBytes, _ := io.ReadAll(errpipe)
-		if err := logCmd.Wait(); err != nil {
-			return fmt.Errorf("log command exited with an error: %w, %q", err, string(stderrBytes))
-		}
-
-		if input.isArchive() {
-			log.Info("finished processing the archived logs, stopping")
-			return nil
-		}
-	}
+// wrappedPublisher wraps a publisher and stores the first published event date.
+// this is required in order to backfill the events when we start a streaming command.
+type wrappedPublisher struct {
+	once               sync.Once
+	done               chan struct{}
+	firstProcessedTime time.Time
+	inner              inputcursor.Publisher
 }
 
-func (input *input) isArchive() bool { return input.ArchiveFile != "" || input.TraceFile != "" }
+func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
+	pub.once.Do(func() {
+		pub.firstProcessedTime = cursor.(time.Time)
+		close(pub.done)
+	})
+	return pub.inner.Publish(event, cursor)
+}
 
-func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, metrics *inputMetrics, log *logp.Logger) (string, error) {
+// getFfirstProcessedTime will block until there is a value set for firstProcessedTime.
+func (pub *wrappedPublisher) getFfirstProcessedTime() time.Time {
+	<-pub.done
+	return pub.firstProcessedTime
+}
+
+func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, log *logp.Logger) error {
+	wrappedPub := &wrappedPublisher{
+		done:  make(chan struct{}),
+		inner: pub,
+	}
+
+	var g errgroup.Group
+	// we start the streaming command in the background
+	// it will use the wrapped publisher to set the end date for the
+	// backfilling process.
+	if input.mustStream() {
+		g.Go(func() error {
+			logCmd := newLogStreamCmd(ctx, input.commonConfig)
+			return input.runLogCmd(logCmd, wrappedPub, log)
+		})
+	}
+
+	if input.mustBackfill() {
+		g.Go(func() error {
+			if input.mustStream() {
+				t := wrappedPub.getFfirstProcessedTime()
+				// The time resolution of the log tool is microsecond, while it only
+				// accepts second resolution as an end parameter.
+				// To avoid potentially losing data we move the end forward one second,
+				// since it is preferable to have some duplicated events.
+				t = t.Add(time.Second)
+				input.End = t.Format(cursorDateLayout)
+			}
+			logCmd := newLogShowCmd(ctx, input.config)
+			err := input.runLogCmd(logCmd, pub, log)
+			if !input.mustStream() {
+				log.Debugf("finished processing events, stopping")
+			}
+			return err
+		})
+	}
+
+	return g.Wait()
+}
+
+// mustStream returns true in case a stream command is needed.
+// This is the default case and the only exceptions are when an archive file or an end date are set.
+func (input *input) mustStream() bool {
+	return !(input.ArchiveFile != "" || input.TraceFile != "" || input.End != "")
+}
+
+// mustBackfill returns true in case a show command is needed.
+// This happens when start or end dates are set (for example when resuming filebeat), when an archive file is used,
+// or when user forces it via the backfill config.
+func (input *input) mustBackfill() bool {
+	return input.Backfill || input.ArchiveFile != "" || input.TraceFile != "" || input.Start != "" || input.End != ""
+}
+
+func (input *input) runLogCmd(logCmd *exec.Cmd, pub inputcursor.Publisher, log *logp.Logger) error {
+	outpipe, err := logCmd.StdoutPipe()
+	if err != nil {
+		return fmt.Errorf("get stdout pipe: %w", err)
+	}
+	errpipe, err := logCmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("get stderr pipe: %w", err)
+	}
+
+	log.Debugf("exec command start: %v", logCmd)
+	defer log.Debugf("exec command end: %v", logCmd)
+
+	if err := logCmd.Start(); err != nil {
+		return fmt.Errorf("start log command: %w", err)
+	}
+
+	if err := input.processLogs(outpipe, pub, log); err != nil {
+		log.Errorf("process logs: %v", err)
+	}
+
+	stderrBytes, _ := io.ReadAll(errpipe)
+	if err := logCmd.Wait(); err != nil {
+		return fmt.Errorf("log command exited with an error: %w, %q", err, string(stderrBytes))
+	}
+
+	return nil
+}
+
+func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log *logp.Logger) error {
 	scanner := bufio.NewScanner(stdout)
 
 	var (
-		event             beat.Event
-		line              string
-		logRecord         logRecord
-		lastProcessedDate string
-		timestamp         time.Time
-		err               error
-		count             int64
+		event     beat.Event
+		line      string
+		logRecord logRecord
+		timestamp time.Time
+		err       error
 	)
 
-	defer func() { metrics.intervalEvents.Update(count) }()
 	for scanner.Scan() {
 		line = scanner.Text()
 		if err = json.Unmarshal([]byte(line), &logRecord); err != nil {
 			log.Errorf("invalid json log: %v", err)
-			metrics.errs.Add(1)
+			input.metrics.errs.Add(1)
 			continue
 		}
 
 		timestamp, err = time.Parse(logDateLayout, logRecord.Timestamp)
 		if err != nil {
-			metrics.errs.Add(1)
+			input.metrics.errs.Add(1)
 			log.Errorf("invalid timestamp: %v", err)
 			continue
 		}
@@ -212,22 +254,43 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, met
 		event = makeEvent(timestamp, line)
 		if err = pub.Publish(event, timestamp); err != nil {
 			log.Errorf("publish event: %v", err)
-			metrics.errs.Add(1)
+			input.metrics.errs.Add(1)
 			continue
 		}
-		lastProcessedDate = timestamp.Format(cursorDateLayout)
-		count++
 	}
 	if err = scanner.Err(); err != nil {
-		metrics.errs.Add(1)
-		return "", fmt.Errorf("scanning stdout: %w", err)
+		input.metrics.errs.Add(1)
+		return fmt.Errorf("scanning stdout: %w", err)
 	}
 
-	return lastProcessedDate, nil
+	return nil
 }
 
-func newLogCmd(ctx context.Context, config config, startFrom string) (*exec.Cmd, error) {
-	args := []string{"show", "--style", "ndjson"}
+func loadCursor(c inputcursor.Cursor, log *logp.Logger) (string, error) {
+	if c.IsNew() {
+		return "", nil
+	}
+	var (
+		startFrom string
+		cursor    time.Time
+	)
+	if err := c.Unpack(&cursor); err != nil {
+		return "", fmt.Errorf("unpack cursor: %w", err)
+	}
+	log.Infof("cursor loaded, resuming from: %v", startFrom)
+	return cursor.Format(cursorDateLayout), nil
+}
+
+func newLogShowCmd(ctx context.Context, cfg config) *exec.Cmd {
+	return exec.CommandContext(ctx, "log", newLogCmdArgs("show", cfg)...) // #nosec G204
+}
+
+func newLogStreamCmd(ctx context.Context, cfg commonConfig) *exec.Cmd {
+	return exec.CommandContext(ctx, "log", newLogCmdArgs("stream", config{commonConfig: cfg})...) // #nosec G204
+}
+
+func newLogCmdArgs(subcmd string, config config) []string {
+	args := []string{subcmd, "--style", "ndjson"}
 	if config.ArchiveFile != "" {
 		args = append(args, "--archive", config.ArchiveFile)
 	}
@@ -253,20 +316,25 @@ func newLogCmd(ctx context.Context, config config, startFrom string) (*exec.Cmd,
 	if config.Debug {
 		args = append(args, "--debug")
 	}
-	if config.Signposts {
-		args = append(args, "--signposts")
+	if config.Backtrace {
+		args = append(args, "--backtrace")
 	}
-	if config.Timezone != "" {
-		args = append(args, "--timezone", config.Timezone)
+	if config.Signpost {
+		args = append(args, "--signpost")
 	}
-	start := config.Start
-	if startFrom != "" {
-		start = startFrom
+	if config.Unreliable {
+		args = append(args, "--unreliable")
 	}
-	if start != "" {
-		args = append(args, "--start", start)
+	if config.MachContinuousTime {
+		args = append(args, "--mach-continuous-time")
 	}
-	return exec.CommandContext(ctx, "log", args...), nil
+	if config.Start != "" {
+		args = append(args, "--start", config.Start)
+	}
+	if config.End != "" {
+		args = append(args, "--end", config.End)
+	}
+	return args
 }
 
 func makeEvent(timestamp time.Time, message string) beat.Event {

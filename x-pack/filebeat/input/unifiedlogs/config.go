@@ -13,21 +13,36 @@ import (
 )
 
 type config struct {
-	ArchiveFile string   `config:"archive_file"`
-	TraceFile   string   `config:"trace_file"`
-	Predicate   []string `config:"predicate"`
-	Process     []string `config:"process"`
-	Source      bool     `config:"source"`
-	Info        bool     `config:"info"`
-	Debug       bool     `config:"debug"`
-	Signposts   bool     `config:"signposts"`
-	Start       string   `config:"start"`
-	Timezone    string   `config:"timezone"`
+	showConfig
+	commonConfig
+	Backfill bool `config:"backfill"`
+}
+
+type showConfig struct {
+	ArchiveFile string `config:"archive_file"`
+	TraceFile   string `config:"trace_file"`
+	Start       string `config:"start"`
+	End         string `config:"end"`
+}
+
+type commonConfig struct {
+	Predicate          []string `config:"predicate"`
+	Process            []string `config:"process"`
+	Source             bool     `config:"source"`
+	Info               bool     `config:"info"`
+	Debug              bool     `config:"debug"`
+	Backtrace          bool     `config:"backtrace"`
+	Signpost           bool     `config:"signpost"`
+	Unreliable         bool     `config:"unreliable"`
+	MachContinuousTime bool     `config:"mach_continuous_time"`
 }
 
 func (c config) Validate() error {
 	if err := checkDateFormat(c.Start); err != nil {
 		return fmt.Errorf("start date is not valid: %w", err)
+	}
+	if err := checkDateFormat(c.End); err != nil {
+		return fmt.Errorf("end date is not valid: %w", err)
 	}
 	if c.ArchiveFile != "" && !strings.HasSuffix(c.ArchiveFile, ".logarchive") {
 		return fmt.Errorf("archive_file %v has the wrong extension", c.ArchiveFile)
@@ -39,9 +54,7 @@ func (c config) Validate() error {
 }
 
 func defaultConfig() config {
-	return config{
-		Timezone: "UTC",
-	}
+	return config{}
 }
 
 func checkDateFormat(date string) error {
