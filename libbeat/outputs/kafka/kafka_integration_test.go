@@ -281,7 +281,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			output, ok := grp.Clients[0].(*client)
 			assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
-			if err := output.Connect(); err != nil {
+			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, output.index, "testbeat")

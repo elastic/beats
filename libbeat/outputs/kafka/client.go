@@ -114,7 +114,7 @@ func newKafkaClient(
 	return c, nil
 }
 
-func (c *client) Connect() error {
+func (c *client) Connect(_ context.Context) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
