@@ -140,30 +140,54 @@ func TestFinalizeMessage(t *testing.T) {
 func TestLogTruncatedMessage(t *testing.T) {
 	tests := []struct {
 		name       string
-		limit      int
-		messages   []reader.Message
+		msgFunc    func()
 		assertFunc func(t *testing.T, logs []observer.LoggedEntry)
 	}{
 		{
-			name:  "truncated",
-			limit: 10,
-			messages: []reader.Message{
-				{Content: []byte("line1\nline2\nline3"), Bytes: 15},
+			name: "truncated",
+			msgFunc: func() {
+				msgs := []reader.Message{
+					{Content: []byte("line1\nline2\nline3"), Bytes: 15},
+				}
+
+				getTestMessageBuffer(10, false, msgs).finalize()
 			},
 			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
 				assert.Len(t, logs, 1)
-				assert.Equal(t, "Multiline message is too large, truncated to the limit of 5 lines or 10 bytes", logs[0].Message)
+				assert.Contains(t, logs[0].Message, "The multiline message is too large and has been truncated to the limit of 5 lines or 10 bytes.")
 				assert.Equal(t, "warn", logs[0].Level.String())
 			},
 		},
 		{
-			name:  "not truncated",
-			limit: 15,
-			messages: []reader.Message{
-				{Content: []byte("line1\nline2"), Bytes: 10},
+			name: "not truncated",
+			msgFunc: func() {
+				msgs := []reader.Message{
+					{Content: []byte("line1\nline2"), Bytes: 15},
+				}
+
+				getTestMessageBuffer(15, false, msgs).finalize()
 			},
 			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
 				assert.Empty(t, logs)
+			},
+		},
+		{
+			name: "log messages are rate limited",
+			msgFunc: func() {
+				msgs := []reader.Message{
+					{Content: []byte("line1\nline2\nline3"), Bytes: 10},
+				}
+				for range 2000 {
+					getTestMessageBuffer(10, false, msgs).finalize()
+				}
+			},
+			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
+				// Log happens once every 1000 messages.
+				assert.Len(t, logs, 2)
+				for _, l := range logs {
+					assert.Contains(t, l.Message, "The multiline message is too large and has been truncated to the limit of 5 lines or 10 bytes.")
+					assert.Equal(t, "warn", l.Level.String())
+				}
 			},
 		},
 	}
@@ -172,8 +196,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			logp.DevelopmentSetup(logp.ToObserverOutput())
 
-			buf := getTestMessageBuffer(tt.limit, false, tt.messages)
-			buf.finalize()
+			tt.msgFunc()
 
 			logs := logp.ObserverLogs().FilterLoggerName("reader_multiline").TakeAll()
 			tt.assertFunc(t, logs)

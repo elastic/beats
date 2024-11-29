@@ -20,7 +20,12 @@ package multiline
 import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"golang.org/x/time/rate"
 )
+
+// truncatedLogRate is a rate limiter for the log message that is
+// printed when a multiline message is too large.
+var truncatedLogRate = rate.Sometimes{Every: 1000}
 
 type messageBuffer struct {
 	maxBytes       int // bytes stored in content
@@ -123,7 +128,9 @@ func (b *messageBuffer) addLine(m reader.Message) {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (b *messageBuffer) finalize() reader.Message {
 	if b.truncated > 0 {
-		b.logger.Warnf("Multiline message is too large, truncated to the limit of %d lines or %d bytes", b.maxLines, b.maxBytes)
+		truncatedLogRate.Do(func() {
+			b.logger.Warnf("The multiline message is too large and has been truncated to the limit of %d lines or %d bytes. This log is sampled, and the number of truncated messages is likely higher than the number of times this log message appears.", b.maxLines, b.maxBytes)
+		})
 		b.message.AddFlagsWithKey("log.flags", "truncated")
 	}
 
