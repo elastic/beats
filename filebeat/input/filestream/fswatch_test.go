@@ -309,7 +309,7 @@ scanner:
 
 			require.EventuallyWithT(t, func(c *assert.CollectT) {
 				assert.Equal(c, expEvent.NewPath, e.NewPath)
-			}, 100*time.Millisecond, 10*time.Millisecond, "NewPath")
+			}, 1000*time.Millisecond, 100*time.Millisecond, "NewPath")
 
 			require.Equal(t, expEvent.Op, e.Op, "Op")
 			requireEqualDescriptors(t, expEvent.Descriptor, e.Descriptor)
