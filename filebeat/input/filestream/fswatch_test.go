@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -305,9 +306,11 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
-			require.Eventually(t, func() bool {
-				return expEvent.NewPath == e.NewPath
+
+			require.EventuallyWithT(t, func(c *assert.CollectT) {
+				assert.Equal(c, expEvent.NewPath, e.NewPath)
 			}, 100*time.Millisecond, 10*time.Millisecond, "NewPath")
+
 			require.Equal(t, expEvent.Op, e.Op, "Op")
 			requireEqualDescriptors(t, expEvent.Descriptor, e.Descriptor)
 		})
