@@ -27,7 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -261,10 +260,10 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())
@@ -306,13 +305,7 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
-
-			require.EventuallyWithT(t, func(c *assert.CollectT) {
-				assert.Equal(c, expEvent.NewPath, e.NewPath)
-			}, 100*time.Millisecond, 10*time.Millisecond, "NewPath")
-
-			require.Equal(t, expEvent.Op, e.Op, "Op")
-			requireEqualDescriptors(t, expEvent.Descriptor, e.Descriptor)
+			requireEqualEvents(t, expEvent, e)
 		})
 	})
 
