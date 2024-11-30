@@ -36,7 +36,6 @@ import (
 )
 
 func TestFileWatcher(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/41209")
 	dir := t.TempDir()
 	paths := []string{filepath.Join(dir, "*.log")}
 	cfgStr := `
@@ -306,7 +305,11 @@ scanner:
 					Info:     file.ExtendFileInfo(&testFileInfo{name: basename, size: 5}), // +5 bytes appended
 				},
 			}
-			requireEqualEvents(t, expEvent, e)
+			require.Eventually(t, func() bool {
+				return expEvent.NewPath == e.NewPath
+			}, 100*time.Millisecond, 10*time.Millisecond, "NewPath")
+			require.Equal(t, expEvent.Op, e.Op, "Op")
+			requireEqualDescriptors(t, expEvent.Descriptor, e.Descriptor)
 		})
 	})
 
