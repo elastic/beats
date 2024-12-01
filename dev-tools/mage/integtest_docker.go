@@ -453,6 +453,11 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 		goModCache = os.Getenv("GOPATH") + "/pkg/mod"
 	}
 
+	if goModCache == "" {
+		_, file, no, _ := runtime.Caller(1)
+		return nil, fmt.Errorf("empty gomodcache: %s:%d", file, no)
+	}
+
 	return map[string]string{
 		"ES_BEATS":          esBeatsDir,
 		"STACK_ENVIRONMENT": StackEnvironment,
