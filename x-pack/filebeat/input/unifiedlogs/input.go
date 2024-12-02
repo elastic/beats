@@ -14,7 +14,10 @@ import (
 	"io"
 	"os/exec"
 	"sync"
+	"sync/atomic"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -25,7 +28,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/ctxtool"
-	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -120,34 +122,12 @@ func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor in
 	return input.runWithMetrics(stdCtx, pub, log)
 }
 
-// wrappedPublisher wraps a publisher and stores the first published event date.
-// this is required in order to backfill the events when we start a streaming command.
-type wrappedPublisher struct {
-	once               sync.Once
-	done               chan struct{}
-	firstProcessedTime time.Time
-	inner              inputcursor.Publisher
-}
-
-func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
-	pub.once.Do(func() {
-		pub.firstProcessedTime = cursor.(time.Time)
-		close(pub.done)
-	})
-	return pub.inner.Publish(event, cursor)
-}
-
-// getFfirstProcessedTime will block until there is a value set for firstProcessedTime.
-func (pub *wrappedPublisher) getFfirstProcessedTime() time.Time {
-	<-pub.done
-	return pub.firstProcessedTime
-}
-
 func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, log *logp.Logger) error {
-	wrappedPub := &wrappedPublisher{
-		done:  make(chan struct{}),
-		inner: pub,
-	}
+	// we create a wrapped publisher for the streaming go routine.
+	// It will notify the backfilling goroutine with the end date of the
+	// backfilling period and avoid updating the stored date to resume
+	// until backfilling is done.
+	wrappedPub := newWrappedPublisher(!input.mustBackfill(), pub)
 
 	var g errgroup.Group
 	// we start the streaming command in the background
@@ -163,13 +143,18 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 	if input.mustBackfill() {
 		g.Go(func() error {
 			if input.mustStream() {
-				t := wrappedPub.getFfirstProcessedTime()
+				t := wrappedPub.getFirstProcessedTime()
 				// The time resolution of the log tool is microsecond, while it only
 				// accepts second resolution as an end parameter.
 				// To avoid potentially losing data we move the end forward one second,
 				// since it is preferable to have some duplicated events.
 				t = t.Add(time.Second)
 				input.End = t.Format(cursorDateLayout)
+
+				// to avoid race conditions updating the cursor, and to be able to
+				// resume from the oldest point in time, we only update cursor
+				// from the streaming gorouting once backfilling is done.
+				defer wrappedPub.startUpdatingCursor()
 			}
 			logCmd := newLogShowCmd(ctx, input.config)
 			err := input.runLogCmd(logCmd, pub, log)
@@ -264,6 +249,49 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 	}
 
 	return nil
+}
+
+// wrappedPublisher wraps a publisher and stores the first published event date.
+// this is required in order to backfill the events when we start a streaming command.
+type wrappedPublisher struct {
+	firstTimeOnce      sync.Once
+	firstTimeC         chan struct{}
+	firstProcessedTime time.Time
+
+	updateCursor *atomic.Bool
+
+	inner inputcursor.Publisher
+}
+
+func newWrappedPublisher(updateCursor bool, inner inputcursor.Publisher) *wrappedPublisher {
+	var atomicUC atomic.Bool
+	atomicUC.Store(updateCursor)
+	return &wrappedPublisher{
+		firstTimeC:   make(chan struct{}),
+		updateCursor: &atomicUC,
+		inner:        inner,
+	}
+}
+
+func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
+	pub.firstTimeOnce.Do(func() {
+		pub.firstProcessedTime = cursor.(time.Time)
+		close(pub.firstTimeC)
+	})
+	if !pub.updateCursor.Load() {
+		cursor = nil
+	}
+	return pub.inner.Publish(event, cursor)
+}
+
+// getFirstProcessedTime will block until there is a value set for firstProcessedTime.
+func (pub *wrappedPublisher) getFirstProcessedTime() time.Time {
+	<-pub.firstTimeC
+	return pub.firstProcessedTime
+}
+
+func (pub *wrappedPublisher) startUpdatingCursor() {
+	pub.updateCursor.Store(true)
 }
 
 func loadCursor(c inputcursor.Cursor, log *logp.Logger) (string, error) {

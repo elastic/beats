@@ -20,7 +20,7 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	}
 
 	out := &inputMetrics{
-		errs: monitoring.NewUint(reg, "unifiedlogs_errors_total"),
+		errs: monitoring.NewUint(reg, "errors_total"),
 	}
 
 	return out
