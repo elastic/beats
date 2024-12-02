@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Added `creation_date` and `tier_preference` fields to the Elasticsearch module. {pull}41652[41652]
 
 *Osquerybeat*
 
