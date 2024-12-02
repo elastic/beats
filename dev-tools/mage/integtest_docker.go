@@ -98,11 +98,9 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	if err != nil {
 		return err
 	}
-	dockerRepoRoot := filepath.Join("/go/src", repo.CanonicalRootImportPath)
-	dockerGoCache := filepath.Join(dockerRepoRoot, "build/docker-gocache")
 	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-"+GOARCH)
-	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod/cache/download")
-	dockerGoPkgCache := "/gocache"
+	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod")
+	dockerGoPkgCache := "/go/pkg/mod"
 
 	// Execute the inside of docker-compose.
 	args := []string{"-p", DockerComposeProjectName(), "run",
@@ -113,10 +111,8 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		// compose.EnsureUp needs to know the environment type.
 		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
 		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
-		"-e", "GOCACHE=" + dockerGoCache,
 		// Use the host machine's pkg cache to minimize external downloads.
-		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
-		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
+		"-v", goPkgCache + ":" + dockerGoPkgCache,
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
@@ -448,20 +444,9 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 		return nil, err
 	}
 
-	goModCache := os.Getenv("GOMODCACHE")
-	if goModCache == "" {
-		goModCache = os.Getenv("GOPATH") + "/pkg/mod"
-	}
-
-	if goModCache == "" {
-		_, file, no, _ := runtime.Caller(1)
-		return nil, fmt.Errorf("empty gomodcache: %s:%d", file, no)
-	}
-
 	return map[string]string{
 		"ES_BEATS":          esBeatsDir,
 		"STACK_ENVIRONMENT": StackEnvironment,
-		"GOMODCACHE":        goModCache,
 		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).
 		"TESTING_ENVIRONMENT": StackEnvironment,
 	}, nil

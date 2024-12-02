@@ -11,7 +11,6 @@ services:
     working_dir: /go/src/github.com/elastic/beats/metricbeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
-      - ${GOMODCACHE}:/go/pkg/mod/
       - /var/run/docker.sock:/var/run/docker.sock
     network_mode: host
     command: make
