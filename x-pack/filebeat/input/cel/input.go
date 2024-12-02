@@ -167,7 +167,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	wantDump := cfg.FailureDumpPath != ""
+	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
 	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace, wantDump)
 	if err != nil {
 		return err
@@ -261,8 +261,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					return err
 				case errors.As(err, &dump):
-					dir := strings.ReplaceAll(cfg.FailureDumpPath, "*", sanitizeFileName(env.IDWithoutName))
-					path := filepath.Join(dir, "dump_"+i.now().In(time.UTC).Format("20060102150405.999Z"))
+					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
+					dir := filepath.Dir(path)
+					base := filepath.Base(path)
+					ext := filepath.Ext(base)
+					prefix := strings.TrimSuffix(base, ext)
+					path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
 					log.Debugw("writing failure dump file", "path", path)
 					err := dump.writeToFile(path)
 					if err != nil {
@@ -785,6 +789,26 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
 		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
+	}
+	if !cfg.FailureDump.enabled() && cfg.FailureDump != nil && cfg.FailureDump.Filename != "" {
+		// We have a fail-dump name, but we are not enabled,
+		// so remove all dumps we own.
+		err = os.Remove(cfg.FailureDump.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.FailureDump.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.FailureDump.Filename)
+		base := strings.TrimSuffix(cfg.FailureDump.Filename, ext)
 		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
 		if err != nil {
 			log.Errorw("failed to collect request trace log path names", "error", err)

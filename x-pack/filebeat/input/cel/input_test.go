@@ -45,6 +45,7 @@ var inputTests = []struct {
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
 	wantErr       error
+	prepare       func() error
 	wantFile      string
 	wantNoFile    string
 }{
@@ -1694,10 +1695,13 @@ var inputTests = []struct {
 			"resource": map[string]interface{}{
 				"url": "",
 			},
-			"failure_dump": "failure_dumps",
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
 		},
 		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
-		wantNoFile: filepath.Join("failure_dumps", "dump_20100208000000Z"),
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
 		want: []map[string]interface{}{{
 			"message": map[string]interface{}{
 				"value": "division by zero",
@@ -1713,10 +1717,47 @@ var inputTests = []struct {
 			"resource": map[string]interface{}{
 				"url": "",
 			},
-			"failure_dump": "failure_dumps",
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
 		},
 		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
-		wantFile: filepath.Join("failure_dumps", "dump_20100209000000Z"), // One day after the no dump case.
+		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+	{
+		name: "dump_error_delete",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  false, // We have a name but are disabled, so delete.
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		prepare: func() error {
+			// Make a file that the configuration should delete.
+			err := os.MkdirAll("failure_dumps", 0o700)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+		},
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
@@ -1763,6 +1804,13 @@ func TestInput(t *testing.T) {
 			}
 			if test.remote && !*runRemote {
 				t.Skip("skipping remote endpoint test")
+			}
+
+			if test.prepare != nil {
+				err := test.prepare()
+				if err != nil {
+					t.Fatalf("unexpected from prepare(): %v", err)
+				}
 			}
 
 			if test.server != nil {
