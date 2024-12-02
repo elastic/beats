@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/reader"
@@ -153,7 +154,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 				getTestMessageBuffer(10, false, msgs).finalize()
 			},
 			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
-				assert.Len(t, logs, 1)
+				require.Len(t, logs, 1)
 				assert.Contains(t, logs[0].Message, "The multiline message is too large and has been truncated to the limit of 5 lines or 10 bytes.")
 				assert.Equal(t, "warn", logs[0].Level.String())
 			},
@@ -168,7 +169,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 				getTestMessageBuffer(15, false, msgs).finalize()
 			},
 			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
-				assert.Empty(t, logs)
+				require.Empty(t, logs)
 			},
 		},
 		{
@@ -183,7 +184,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 			},
 			assertFunc: func(t *testing.T, logs []observer.LoggedEntry) {
 				// Log happens once every 1000 messages.
-				assert.Len(t, logs, 2)
+				require.Len(t, logs, 2)
 				for _, l := range logs {
 					assert.Contains(t, l.Message, "The multiline message is too large and has been truncated to the limit of 5 lines or 10 bytes.")
 					assert.Equal(t, "reader_multiline", l.LoggerName)
