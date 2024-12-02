@@ -25,6 +25,8 @@ Integration tests are labelled with the `//go:build integration` build tag and u
 
 To run the integration tests use the `mage goIntegTest` target, which will start the required services using https://docs.docker.com/compose/[docker-compose] and run all integration tests.
 
+It is also possible to run module specific integration tests. For example, to run kafka only tests use `MODULE=kafka mage integTest -v`
+
 It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. An example follows for filebeat:
 
 [source,bash]

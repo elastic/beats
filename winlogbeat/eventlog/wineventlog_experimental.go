@@ -62,7 +62,7 @@ type winEventLogExp struct {
 	log         *logp.Logger
 
 	iterator *win.EventIterator
-	renderer *win.Renderer
+	renderer win.EventRenderer
 
 	metrics *inputMetrics
 }
@@ -115,11 +115,6 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
 	}
 
-	renderer, err := win.NewRenderer(win.NilHandle, log)
-	if err != nil {
-		return nil, err
-	}
-
 	l := &winEventLogExp{
 		config:      c,
 		query:       xmlQuery,
@@ -127,8 +122,27 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		channelName: c.Name,
 		file:        isFile,
 		maxRead:     c.BatchReadSize,
-		renderer:    renderer,
 		log:         log,
+	}
+
+	switch c.IncludeXML {
+	case true:
+		l.renderer = win.NewXMLRenderer(
+			win.RenderConfig{
+				IsForwarded: l.isForwarded(),
+				Locale:      c.EventLanguage,
+			},
+			win.NilHandle, log)
+	case false:
+		l.renderer, err = win.NewRenderer(
+			win.RenderConfig{
+				IsForwarded: l.isForwarded(),
+				Locale:      c.EventLanguage,
+			},
+			win.NilHandle, log)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return l, nil
@@ -309,7 +323,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
 	// NOTE: Render can return an error and a partial event.
-	evt, err := l.renderer.Render(h)
+	evt, xml, err := l.renderer.Render(h)
 	if evt == nil {
 		return nil, err
 	}
@@ -317,12 +331,13 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
-	//nolint:godox // Bad linter! Keep to have a record of feature disparity between non-experimental vs experimental.
-	// TODO: Need to add XML when configured.
-
 	r := &Record{
 		API:   winEventLogExpAPIName,
 		Event: *evt,
+	}
+
+	if l.config.IncludeXML {
+		r.XML = xml
 	}
 
 	if l.file {
