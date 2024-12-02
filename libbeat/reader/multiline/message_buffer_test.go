@@ -186,6 +186,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 				assert.Len(t, logs, 2)
 				for _, l := range logs {
 					assert.Contains(t, l.Message, "The multiline message is too large and has been truncated to the limit of 5 lines or 10 bytes.")
+					assert.Equal(t, "reader_multiline", l.LoggerName)
 					assert.Equal(t, "warn", l.Level.String())
 				}
 			},
@@ -198,7 +199,7 @@ func TestLogTruncatedMessage(t *testing.T) {
 
 			tt.msgFunc()
 
-			logs := logp.ObserverLogs().FilterLoggerName("reader_multiline").TakeAll()
+			logs := logp.ObserverLogs().TakeAll()
 			tt.assertFunc(t, logs)
 		})
 	}
