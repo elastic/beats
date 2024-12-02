@@ -140,9 +140,6 @@ func (r *KubeRemote) Run(env map[string]string, stdout io.Writer, stderr io.Writ
 	if err := r.rsync(randomPort, stderr, stderr, r.syncDir, r.destDir); err != nil {
 		return fmt.Errorf("rsync failed: %w", err)
 	}
-	if err := r.rsync(randomPort, stderr, stderr, filepath.Join(build.Default.GOPATH, "pkg", "mod"), "/go/pkg/mod"); err != nil {
-		return fmt.Errorf("gomodcache rsync failed: %w", err)
-	}
 
 	// stop port forwarding
 	close(stopChannel)
@@ -502,6 +499,10 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 							Name:      "destdir",
 							MountPath: destDir,
 						},
+						{
+							Name:      "gomodcache",
+							MountPath: "/go/pkg/mod",
+						},
 					},
 				},
 			},
@@ -519,6 +520,14 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 					Name: "destdir",
 					VolumeSource: apiv1.VolumeSource{
 						EmptyDir: &apiv1.EmptyDirVolumeSource{},
+					},
+				},
+				{
+					Name: "gomodcache",
+					VolumeSource: apiv1.VolumeSource{
+						HostPath: &apiv1.HostPathVolumeSource{
+							Path: "/go/pkg/mod",
+						},
 					},
 				},
 			},
