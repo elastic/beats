@@ -131,11 +131,15 @@ func (b *messageBuffer) finalize() reader.Message {
 		truncatedLogRate.Do(func() {
 			b.logger.Warnf("The multiline message is too large and has been truncated to the limit of %d lines or %d bytes. This log is sampled, and the number of truncated messages is likely higher than the number of times this log message appears.", b.maxLines, b.maxBytes)
 		})
-		b.message.AddFlagsWithKey("log.flags", "truncated")
+		if err := b.message.AddFlagsWithKey("log.flags", "truncated"); err != nil {
+			b.logger.Errorf("Failed to add truncated flag: %v", err)
+		}
 	}
 
 	if b.numLines > 1 {
-		b.message.AddFlagsWithKey("log.flags", "multiline")
+		if err := b.message.AddFlagsWithKey("log.flags", "multiline"); err != nil {
+			b.logger.Errorf("Failed to add multiline flag: %v", err)
+		}
 	}
 
 	// Copy message from existing content
