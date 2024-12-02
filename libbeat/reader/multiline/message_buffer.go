@@ -18,9 +18,10 @@
 package multiline
 
 import (
+	"golang.org/x/time/rate"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"golang.org/x/time/rate"
 )
 
 // truncatedLogRate is a rate limiter for the log message that is
