@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // ListAll lists all the multi-disk devices in a RAID array
@@ -43,7 +45,7 @@ func ListAll(path string) ([]MDDevice, error) {
 	}
 
 	if len(mds) == 0 {
-		return nil, nil
+		return nil, mb.PartialMetricsError{Err: fmt.Errorf("no RAID devices found. You have probably enabled the RAID metrics on a non-RAID system.")}
 	}
 
 	return mds, nil

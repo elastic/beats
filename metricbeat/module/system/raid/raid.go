@@ -62,7 +62,7 @@ func blockto1024(b int64) int64 {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	devices, err := blockinfo.ListAll(m.mod.ResolveHostFS("/sys/block"))
 	if err != nil {
-		return fmt.Errorf("failed to parse sysfs: %w", err)
+		return fmt.Errorf("failed to list RAID devices: %w", err)
 	}
 
 	for _, blockDev := range devices {
