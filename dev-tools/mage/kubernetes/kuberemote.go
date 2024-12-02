@@ -25,7 +25,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"go/build"
 	"io"
 	"log"
 	"net"
@@ -33,7 +32,6 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 
