@@ -49,10 +49,6 @@ Process all old and new logs:
 - type: unifiedlogs
   id: unifiedlogs-id
   enabled: true
-  predicate:
-    - 'process == "loginwindow" && sender == "Security"'
-    - 'process == "logind"'
-    - 'process == "sudo"'
   backfill: true
 ----
 
