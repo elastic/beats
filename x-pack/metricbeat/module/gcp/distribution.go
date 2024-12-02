@@ -53,7 +53,7 @@ func calcLinearUpperBound(bucket *distribution.Distribution_BucketOptions_Linear
 	return bucket.Offset + (bucket.Width * float64(i))
 }
 
-func createHistogram(values []float64, counts []uint64) mapstr.M {
+func createHistogram(values []float64, counts []int64) mapstr.M {
 	return mapstr.M{
 		"values": values,
 		"counts": counts,
@@ -62,11 +62,11 @@ func createHistogram(values []float64, counts []uint64) mapstr.M {
 
 func DistributionHistogramToES(d *distribution.Distribution) mapstr.M {
 	if !containsHistogram(d) {
-		return createHistogram([]float64{}, []uint64{})
+		return createHistogram([]float64{}, []int64{})
 	}
 
 	values := make([]float64, 0, len(d.BucketCounts))
-	counts := make([]uint64, 0, len(d.BucketCounts))
+	counts := make([]int64, 0, len(d.BucketCounts))
 
 	switch {
 	case d.BucketOptions.GetExplicitBuckets() != nil:
@@ -89,9 +89,7 @@ func DistributionHistogramToES(d *distribution.Distribution) mapstr.M {
 		}
 	}
 
-	for i := range d.BucketCounts {
-		counts = append(counts, uint64(d.BucketCounts[i]))
-	}
+	counts = append(counts, d.BucketCounts...)
 
 	return createHistogram(values, counts)
 }
