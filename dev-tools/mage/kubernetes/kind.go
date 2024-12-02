@@ -88,6 +88,9 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	}
 
 	cfg, err := os.CreateTemp("", "kind-")
+	if err != nil {
+		return err
+	}
 	if _, err := cfg.WriteString(fmt.Sprintf(`
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
