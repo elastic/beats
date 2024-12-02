@@ -43,7 +43,6 @@ type config struct {
 	Retry *retry `config:"retry"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-
 	// CrowdstrikeAppID is the value used to set the
 	// appId request parameter in the FalconHose stream
 	// discovery request.
