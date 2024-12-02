@@ -50,7 +50,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := config{}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
@@ -109,17 +109,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	b.ReaderConfig = cfg.ReaderConfig
 
 	return b
-}
-
-// defaultConfig returns the default configuration for the input
-func defaultConfig() config {
-	return config{
-		MaxWorkers:    1,
-		Poll:          true,
-		PollInterval:  5 * time.Minute,
-		BucketTimeOut: 120 * time.Second,
-		ParseJSON:     false,
-	}
 }
 
 // isValidUnixTimestamp checks if the timestamp is a valid Unix timestamp
