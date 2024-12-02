@@ -166,6 +166,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 
 *Heartbeat*
 
@@ -367,6 +368,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
 - Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 *Metricbeat*
 
