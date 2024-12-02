@@ -1,33 +1,25 @@
-type: system-logs
 {{ if .use_journald }}
-use_journald: true
+type: journald
+id: system-auth
+facilities:
+  - 4
+  - 10
+{{ else }}
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+multiline:
+  pattern: "^\\s"
+  match: after
 {{ end }}
 
-{{ if .use_files }}
-use_files: true
-{{ end }}
-
-tags: {{ .tags | tojson }}
+# Common configuration
 processors:
   - add_locale: ~
 
+tags: {{ .tags | tojson }}
+
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
-
-journald:
-  id: system-auth
-  facilities:
-    - 4
-    - 10
-
-files:
-  id: system-auth
-  paths:
-  {{ range $i, $path := .paths }}
-    - {{$path}}
-  {{ end }}
-  exclude_files: [".gz$"]
-
-  multiline:
-    pattern: "^\\s"
-    match: after
-

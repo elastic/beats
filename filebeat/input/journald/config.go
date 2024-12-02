@@ -38,6 +38,9 @@ var includeMatchesWarnOnce sync.Once
 
 // Config stores the options of a journald input.
 type config struct {
+	// ID is the input ID, each instance must have a unique ID
+	ID string `config:"id"`
+
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 

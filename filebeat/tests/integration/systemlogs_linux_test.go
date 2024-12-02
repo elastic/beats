@@ -20,26 +20,19 @@
 package integration
 
 import (
-	_ "embed"
 	"fmt"
-	"os"
-	"path"
 	"path/filepath"
 	"testing"
 	"time"
 
-	cp "github.com/otiai10/copy"
-
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
-
-//go:embed testdata/filebeat_system_module.yml
-var systemModuleCfg string
 
 // TestSystemLogsCanUseJournald aims to ensure the system-logs input can
 // correctly choose and start a journald input when the globs defined in
 // var.paths do not resolve to any file.
-func TestSystemLogsCanUseJournaldInput(t *testing.T) {
+func TestSystemModuleCanUseJournaldInput(t *testing.T) {
+	t.Skip("The system module is not using the system-logs input at the moment")
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -50,7 +43,7 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 
 	// As the name says, we want this folder to exist bu t be empty
 	globWithoutFiles := filepath.Join(filebeat.TempDir(), "this-folder-does-not-exist")
-	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, workDir)
+	yamlCfg := fmt.Sprintf(systemModuleCfg, globWithoutFiles, globWithoutFiles, workDir)
 
 	filebeat.WriteConfigFile(yamlCfg)
 	filebeat.Start()
@@ -63,46 +56,12 @@ func TestSystemLogsCanUseJournaldInput(t *testing.T) {
 		"journalctl started with PID",
 		10*time.Second,
 		"system-logs did not start journald input")
-}
 
-func TestSystemLogsCanUseLogInput(t *testing.T) {
-	filebeat := integration.NewBeat(
+	// Scan every event in the output until at least one from
+	// each fileset (auth, syslog) is found.
+	waitForAllFilesets(
 		t,
-		"filebeat",
-		"../../filebeat.test",
+		filepath.Join(workDir, "output*.ndjson"),
+		"did not find events from both filesets: 'auth' and 'syslog'",
 	)
-	workDir := filebeat.TempDir()
-	copyModulesDir(t, workDir)
-
-	logFilePath := path.Join(workDir, "syslog")
-	integration.GenerateLogFile(t, logFilePath, 5, false)
-	yamlCfg := fmt.Sprintf(systemModuleCfg, logFilePath, workDir)
-
-	filebeat.WriteConfigFile(yamlCfg)
-	filebeat.Start()
-
-	filebeat.WaitForLogs(
-		"using log input because file(s) was(were) found",
-		10*time.Second,
-		"system-logs did not select the log input")
-	filebeat.WaitForLogs(
-		"Harvester started for paths:",
-		10*time.Second,
-		"system-logs did not start the log input")
-}
-
-func copyModulesDir(t *testing.T, dst string) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("cannot get the current directory: %s", err)
-	}
-	localModules := filepath.Join(pwd, "../", "../", "module")
-	localModulesD := filepath.Join(pwd, "../", "../", "modules.d")
-
-	if err := cp.Copy(localModules, filepath.Join(dst, "module")); err != nil {
-		t.Fatalf("cannot copy 'module' folder to test folder: %s", err)
-	}
-	if err := cp.Copy(localModulesD, filepath.Join(dst, "modules.d")); err != nil {
-		t.Fatalf("cannot copy 'modules.d' folder to test folder: %s", err)
-	}
 }
