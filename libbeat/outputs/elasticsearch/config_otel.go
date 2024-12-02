@@ -100,7 +100,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		"headers":           headers,                          // headers
 		"timeout":           escfg.Transport.Timeout,          // timeout
 		"idle_conn_timeout": &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
-		"tls":               otelTLSConfg,                     //TODO: convert it to map[string]any
+		"tls":               otelTLSConfg,                     // tls config
 
 		// Retry
 		"retry": map[string]any{

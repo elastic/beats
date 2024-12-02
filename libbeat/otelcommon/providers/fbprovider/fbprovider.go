@@ -34,9 +34,18 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 		return nil, fmt.Errorf("%q uri is not supported by %q provider", uri, schemeName)
 	}
 
+	// Load filebeat config file
 	cfg, err := cfgfile.Load(filepath.Clean(uri[len(schemeName)+1:]), nil)
 	if err != nil {
 		return nil, err
+	}
+
+	// Throw error if any output type other than ES is configured
+	output, _ := cfg.Child("output", -1)
+	for _, value := range output.GetFields() {
+		if value != "elasticsearch" {
+			return nil, fmt.Errorf("%s output type is not supported in otel mode ", value)
+		}
 	}
 
 	esCfg, err := elasticsearch.ToOTelConfig(cfg)
@@ -78,6 +87,10 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 			},
 		},
 	}
+
+	// TODO: Remove this debug statement
+	// s, _ := json.MarshalIndent(cfgMap, "", " ")
+	// fmt.Println(string(s))
 
 	return confmap.NewRetrieved(cfgMap)
 }
