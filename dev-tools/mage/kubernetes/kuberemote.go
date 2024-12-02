@@ -26,12 +26,14 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"go/build"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -491,6 +493,10 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 							Name:      "destdir",
 							MountPath: destDir,
 						},
+						{
+							Name:      "gomodcache",
+							MountPath: "/go/pkg/mod",
+						},
 					},
 				},
 			},
@@ -508,6 +514,14 @@ func createPodManifest(name string, image string, env map[string]string, cmd []s
 					Name: "destdir",
 					VolumeSource: apiv1.VolumeSource{
 						EmptyDir: &apiv1.EmptyDirVolumeSource{},
+					},
+				},
+				{
+					Name: "gomodcache",
+					VolumeSource: apiv1.VolumeSource{
+						HostPath: &apiv1.HostPathVolumeSource{
+							Path: filepath.Join(build.Default.GOPATH, "pkg", "mod"),
+						},
 					},
 				},
 			},
