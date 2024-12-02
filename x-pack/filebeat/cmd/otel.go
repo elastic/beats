@@ -8,57 +8,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/otelcommon"
 	"github.com/elastic/beats/v7/libbeat/otelcommon/providers/fbprovider"
-	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
-	"go.opentelemetry.io/collector/exporter"
-	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
-	"go.opentelemetry.io/collector/processor"
-	"go.opentelemetry.io/collector/processor/batchprocessor"
-	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
-	"go.opentelemetry.io/collector/receiver"
 )
-
-// initialize collector components
-func components() (otelcol.Factories, error) {
-	receivers, err := receiver.MakeFactoryMap(
-		fbreceiver.NewFactory(),
-	)
-	if err != nil {
-		return otelcol.Factories{}, nil
-	}
-
-	exporters, err := exporter.MakeFactoryMap(
-		debugexporter.NewFactory(),
-		elasticsearchexporter.NewFactory(),
-	)
-	if err != nil {
-		return otelcol.Factories{}, nil
-	}
-
-	processors, err := processor.MakeFactoryMap(
-		batchprocessor.NewFactory(),
-		memorylimiterprocessor.NewFactory(),
-	)
-	if err != nil {
-		return otelcol.Factories{}, nil
-	}
-
-	return otelcol.Factories{
-		Receivers:  receivers,
-		Exporters:  exporters,
-		Processors: processors,
-	}, nil
-
-}
 
 func OtelCmd() *cobra.Command {
 	command := &cobra.Command{
-		Short: "Run this to start filebeat as a otel",
+		Short: "Run this to start filebeat with otel collector",
 		Use:   "otel",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			info := component.BuildInfo{
@@ -69,15 +29,17 @@ func OtelCmd() *cobra.Command {
 
 			// get filebeat configuration file
 			filebeatCfg, _ := cmd.Flags().GetString("config")
+			// adds scheme name as prefix
+			filebeatCfg = "fb:" + filebeatCfg
 
 			// initialize collector settings
 			set := otelcol.CollectorSettings{
 				BuildInfo: info,
-				Factories: components,
+				Factories: otelcommon.Component,
 				ConfigProviderSettings: otelcol.ConfigProviderSettings{
 					ResolverSettings: confmap.ResolverSettings{
 						URIs:          []string{filebeatCfg},
-						DefaultScheme: "file",
+						DefaultScheme: "fb",
 						ProviderFactories: []confmap.ProviderFactory{
 							fbprovider.NewFactory(),
 						},

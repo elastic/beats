@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
-	otelcommon "github.com/elastic/beats/v7/libbeat/otelcommon/configTranslation"
+	oteltranslate "github.com/elastic/beats/v7/libbeat/otelcommon/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -79,7 +79,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		headers[k] = configopaque.String(v)
 	}
 
-	otelTLSConfg, err := otelcommon.TLSCommonToOTel(escfg.Transport.TLS)
+	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}

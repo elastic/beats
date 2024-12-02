@@ -6,7 +6,6 @@ package fbprovider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -18,7 +17,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-const schemeName = "file"
+const schemeName = "fb"
 
 type provider struct{}
 
@@ -79,10 +78,6 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 			},
 		},
 	}
-
-	// TODO: Remove this debug statement
-	s, _ := json.MarshalIndent(cfgMap, "", " ")
-	fmt.Println(string(s))
 
 	return confmap.NewRetrieved(cfgMap)
 }
