@@ -26,7 +26,7 @@ import (
 
 // truncatedLogRate is a rate limiter for the log message that is
 // printed when a multiline message is too large.
-var truncatedLogRate = rate.Sometimes{Every: 1000}
+var truncatedLogRate = rate.Sometimes{First: 1, Every: 1000}
 
 type messageBuffer struct {
 	maxBytes       int // bytes stored in content
