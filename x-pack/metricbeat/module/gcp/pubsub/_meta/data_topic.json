@@ -116,7 +116,7 @@
         },
         "labels": {
             "resource": {
-                "topic_id": "tommyers-topic"
+                "topic_id": "test-topic"
             }
         }
     },
