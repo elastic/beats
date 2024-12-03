@@ -64,9 +64,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				},
 			}
 			conf.Merge(confmap.NewFromStringMap(out))
-		case "kafka":
+		case "kafka", "logstash":
 			return fmt.Errorf("%s is currently unsupported in otel mode", key)
-		case "default":
+		default:
 			return fmt.Errorf("%s is unsupported output", key)
 		}
 	}
