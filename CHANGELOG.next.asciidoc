@@ -346,7 +346,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for Journald in the System module. {pull}41555[41555]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Update CEL mito extensions to v1.16.0. {pull}41727[41727]
+- Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 
 *Auditbeat*
 
@@ -397,6 +399,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
+- Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
 
 *Metricbeat*
 

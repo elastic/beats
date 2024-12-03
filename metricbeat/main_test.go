@@ -21,21 +21,27 @@ package main
 
 import (
 	"flag"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	"github.com/elastic/beats/v7/metricbeat/cmd"
+	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 )
 
-var systemTest *bool
+var (
+	systemTest *bool
+	mbCommand  *cmd.BeatsRootCmd
+)
 
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	mbCommand = mbcmd.Initialize(mbcmd.MetricbeatSettings(""))
+	mbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
 	cfgfile.AddAllowedBackwardsCompatibleFlag("systemTest")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	mbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
 	cfgfile.AddAllowedBackwardsCompatibleFlag("test.coverprofile")
 }
 
@@ -43,10 +49,12 @@ func init() {
 func TestSystem(t *testing.T) {
 	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
-		main()
+		if err := mbCommand.Execute(); err != nil {
+			os.Exit(1)
+		}
 	}
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name, false)
+	template.TestTemplate(t, mbCommand.Name(), false)
 }
