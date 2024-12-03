@@ -28,16 +28,16 @@ type config struct {
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
 	Auth authConfig `config:"auth"`
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
-	MaxWorkers int `config:"max_workers,omitempty" validate:"max=5000"`
+	MaxWorkers int `config:"max_workers" validate:"max=5000"`
 	// Poll - Defines if polling should be performed on the input bucket source.
-	Poll bool `config:"poll,omitempty"`
+	Poll bool `config:"poll"`
 	// PollInterval - Defines the maximum amount of time to wait before polling for the next batch of objects from the bucket.
-	PollInterval time.Duration `config:"poll_interval,omitempty"`
+	PollInterval time.Duration `config:"poll_interval"`
 	// ParseJSON - Informs the publisher whether to parse & objectify json data or not. By default this is set to
 	// false, since it can get expensive dealing with highly nested json data.
-	ParseJSON bool `config:"parse_json,omitempty"`
+	ParseJSON bool `config:"parse_json"`
 	// BucketTimeOut - Defines the maximum time that the sdk will wait for a bucket api response before timing out.
-	BucketTimeOut time.Duration `config:"bucket_timeout,omitempty"`
+	BucketTimeOut time.Duration `config:"bucket_timeout"`
 	// Buckets - Defines a list of buckets that will be polled for objects.
 	Buckets []bucket `config:"buckets" validate:"required"`
 	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
@@ -49,7 +49,7 @@ type config struct {
 	// ExpandEventListFromField - Defines the field name that will be used to expand the event into separate events.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// This field is only used for system test purposes, to override the HTTP endpoint.
-	AlternativeHost string `config:"alternative_host,omitempty"`
+	AlternativeHost string `config:"alternative_host"`
 	// Retry - Defines the retry configuration for the input.
 	Retry retryConfig `config:"retry"`
 }
@@ -104,7 +104,7 @@ type retryConfig struct {
 	// MaxBackOffDuration is the maximum value of the retry period, defaults to 30 seconds.
 	MaxBackOffDuration time.Duration `config:"max_backoff_duration" validate:"min=2"`
 	// BackOffMultiplier is the factor by which the retry period increases. It should be greater than 1 and defaults to 2.
-	BackOffMultiplier float64 `config:"backoff_multiplier" validate:"min=2"`
+	BackOffMultiplier float64 `config:"backoff_multiplier" validate:"min=1.1"`
 }
 
 func (c authConfig) Validate() error {

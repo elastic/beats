@@ -404,7 +404,7 @@ The GCS APIs don't provide a direct way to filter files based on the timestamp, 
 
 This attribute can be used to configure a list of sub attributes that directly control how the input should behave when a download for a file/object fails or gets interrupted. The list of sub attributes are as follows :-
 
-    1. `max_attempts`: This attribute defines the maximum number of retries that should be attempted for a failed download. The default value for this is `3`. 
+    1. `max_attempts`: This attribute defines the maximum number of retry attempts(including the initial api call) that should be attempted for a retryable error. The default value for this is `3`. 
     2. `initial_backoff_duration`: This attribute defines the initial backoff time in seconds. The default value for this is `1s`.
     3. `max_backoff_duration`: This attribute defines the maximum backoff time in seconds. The default value for this is `30s`.
     4. `backoff_multiplier`: This attribute defines the backoff multiplication factor. The default value for this is `2`.
