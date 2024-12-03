@@ -145,12 +145,13 @@ func (c *config) Validate() error {
 	return nil
 }
 
-// ValidateInputIDs checks all filestream inputs to ensure all have an ID and
-// the ID is unique. If there is any empty or duplicated ID, it logs an error
-// containing the offending input configurations and returns an error containing
-// the duplicated IDs.
+// ValidateInputIDs checks all filestream inputs to ensure all input IDs are
+// unique. If there is a duplicated ID, it logs an error containing the offending
+// input configurations and returns an error containing the duplicated IDs.
+// A single empty ID is a valid ID as it's unique, however multiple empty IDs
+// are not unique and are therefore are treated as any other duplicated ID.
 func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
-	ids := make(map[string][]*conf.C)
+	duplicatedConfigs := make(map[string][]*conf.C)
 	var duplicates []string
 	for _, input := range inputs {
 		fsInput := struct {
@@ -162,15 +163,17 @@ func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
 			return fmt.Errorf("failed to unpack filestream input configuration: %w", err)
 		}
 		if fsInput.Type == "filestream" {
-			ids[fsInput.ID] = append(ids[fsInput.ID], input)
-			if len(ids[fsInput.ID]) == 2 {
+			duplicatedConfigs[fsInput.ID] = append(duplicatedConfigs[fsInput.ID], input)
+			// we just need to collect the duplicated IDs once, therefore collect
+			// it only the first time we see a duplicated ID.
+			if len(duplicatedConfigs[fsInput.ID]) == 2 {
 				duplicates = append(duplicates, fsInput.ID)
 			}
 		}
 	}
 
 	if len(duplicates) != 0 {
-		jsonDupCfg := collectOffendingInputs(duplicates, ids)
+		jsonDupCfg := collectOffendingInputs(duplicates, duplicatedConfigs)
 		logger.Errorw("filestream inputs with duplicated IDs", "inputs", jsonDupCfg)
 		var quotedDuplicates []string
 		for _, dup := range duplicates {
