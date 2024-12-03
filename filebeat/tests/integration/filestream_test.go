@@ -26,6 +26,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -104,4 +107,167 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
 	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
+}
+
+func TestFilestreamValidationPreventsFilebeatStart(t *testing.T) {
+	duplicatedIDs := `
+filebeat.inputs:
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /tmp/*.log
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /var/log/*.log
+
+output.discard.enabled: true
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+	emptyID := `
+filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /tmp/*.log
+  - type: filestream
+    enabled: true
+    paths:
+      - /var/log/*.log
+
+output.discard.enabled: true
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+	multipleDuplicatedIDs := `
+filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /tmp/*.log
+  - type: filestream
+    enabled: true
+    paths:
+      - /var/log/*.log
+
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /tmp/duplicated-id-1.log
+  - type: filestream
+    id: duplicated-id-1
+    enabled: true
+    paths:
+      - /tmp/duplicated-id-1-2.log
+
+
+  - type: filestream
+    id: unique-id-1
+    enabled: true
+    paths:
+      - /tmp/unique-id-1.log
+  - type: filestream
+    id: unique-id-2
+    enabled: true
+    paths:
+      - /var/log/unique-id-2.log
+
+output.discard.enabled: true
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+	tcs := []struct {
+		name string
+		cfg  string
+	}{
+		{
+			name: "duplicated IDs",
+			cfg:  duplicatedIDs,
+		},
+		{
+			name: "duplicated empty ID",
+			cfg:  emptyID,
+		},
+		{
+			name: "two inputs without ID and duplicated IDs",
+			cfg:  multipleDuplicatedIDs,
+		},
+	}
+
+	for _, tc := range tcs {
+		t.Run(tc.name, func(t *testing.T) {
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+
+			// Write configuration file and start Filebeat
+			filebeat.WriteConfigFile(tc.cfg)
+			filebeat.Start()
+
+			// Wait for error log
+			filebeat.WaitForLogs(
+				"filestream inputs validation error",
+				10*time.Second,
+				"Filebeat did not log a filestream input validation error")
+
+			proc, err := filebeat.Process.Wait()
+			require.NoError(t, err, "filebeat process.Wait returned an error")
+			assert.False(t, proc.Success(), "filebeat should have failed to start")
+
+		})
+	}
+}
+
+func TestFilestreamValidationSucceeds(t *testing.T) {
+	cfg := `
+filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - /var/log/*.log
+
+  - type: filestream
+    id: unique-id-1
+    enabled: true
+    paths:
+      - /tmp/unique-id-1.log
+  - type: filestream
+    id: unique-id-2
+    enabled: true
+    paths:
+      - /var/log/unique-id-2.log
+
+output.discard.enabled: true
+logging:
+  level: debug
+  metrics:
+    enabled: false
+`
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	// Write configuration file and start Filebeat
+	filebeat.WriteConfigFile(cfg)
+	filebeat.Start()
+
+	// Wait for error log
+	filebeat.WaitForLogs(
+		"Input 'filestream' starting",
+		10*time.Second,
+		"Filebeat did log a validation error")
 }
