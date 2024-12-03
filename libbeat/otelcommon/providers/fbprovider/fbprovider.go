@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package fbprovider
 
@@ -13,8 +26,6 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const schemeName = "fb"
@@ -40,57 +51,21 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 		return nil, err
 	}
 
-	// Throw error if any output type other than ES is configured
-	output, _ := cfg.Child("output", -1)
-	for _, value := range output.GetFields() {
-		if value != "elasticsearch" {
-			return nil, fmt.Errorf("%s output type is not supported in otel mode ", value)
-		}
-	}
-
-	esCfg, err := elasticsearch.ToOTelConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("cannot convert Filebeat config: %w", err)
-	}
-
-	// We need to edit the output settings from Filebeat:
-	// first we create a new config with a single key `otelconsumer`
-	// which is an empty map, then we replace the `output` by this
-	// new config.
-	//
-	// Effectively we're replacing `output.elasticsearch` by
-	// `output.otelconsumer`.
-	otelConsumerCfg := config.NewConfig()
-	otelConsumerCfg.SetChild("otelconsumer", -1, config.MustNewConfigFrom(map[string]any{}))
-	cfg.SetChild("output", -1, otelConsumerCfg)
-
 	var receiverMap map[string]any
 	cfg.Unpack(&receiverMap)
 
 	cfgMap := map[string]any{
-		"exporters": map[string]any{
-			"elasticsearch": esCfg,
-			"debug":         map[string]any{},
-		},
 		"receivers": map[string]any{
 			"filebeatreceiver": receiverMap,
 		},
 		"service": map[string]any{
 			"pipelines": map[string]any{
 				"logs": map[string]any{
-					"exporters": []string{
-						"debug",
-						"elasticsearch",
-					},
 					"receivers": []string{"filebeatreceiver"},
 				},
 			},
 		},
 	}
-
-	// TODO: Remove this debug statement
-	// s, _ := json.MarshalIndent(cfgMap, "", " ")
-	// fmt.Println(string(s))
 
 	return confmap.NewRetrieved(cfgMap)
 }

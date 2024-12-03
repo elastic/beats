@@ -13,6 +13,9 @@ output:
     index: form-otel-exporter
     ssl.verification_mode: none
 
+  kafka:
+    enabled: true
+
 setup.template.name: form-otel-exporter
 setup.template.pattern: form-otel-exporter
 setup.dashboards.index: "form-otel-exporter*"

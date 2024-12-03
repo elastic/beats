@@ -1,5 +1,4 @@
 exporters:
-  debug: {}
   elasticsearch:
     api_key: ""
     batcher:
@@ -62,7 +61,6 @@ service:
   pipelines:
     logs:
       exporters:
-        - debug
         - elasticsearch
       receivers:
         - filebeatreceiver

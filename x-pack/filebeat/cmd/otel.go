@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/otelcommon"
+	"github.com/elastic/beats/v7/libbeat/otelcommon/converters"
 	"github.com/elastic/beats/v7/libbeat/otelcommon/providers/fbprovider"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/component"
@@ -43,6 +44,9 @@ func OtelCmd() *cobra.Command {
 						ProviderFactories: []confmap.ProviderFactory{
 							fbprovider.NewFactory(),
 						},
+						ConverterFactories: []confmap.ConverterFactory{
+							converters.NewFactory(),
+						},
 					},
 				},
 			}
@@ -55,6 +59,6 @@ func OtelCmd() *cobra.Command {
 		},
 	}
 
-	command.Flags().String("config", "filebeat.yml", "pass filebeat config")
+	command.Flags().String("config", "filebeat-otel.yml", "pass filebeat config")
 	return command
 }
