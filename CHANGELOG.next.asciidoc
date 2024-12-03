@@ -365,6 +365,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add label based opportunity to enable stream based container stats (allowing podman container to return percpu_stats). {pull}37773[37773] 
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
