@@ -10,9 +10,7 @@
 ++++
 
 Use the `google cloud storage input` to read content from files stored in buckets which reside on your Google Cloud.
-The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
-perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
-even though it can get expensive with dealing with a very large number of files.
+The input can be configured to work with and without polling, though if polling is disabled it will only perform a single collection of data, list the file contents and end the process.
 
 *To mitigate errors and ensure a stable processing environment, this input employs the following features :* 
 
@@ -66,12 +64,11 @@ many buckets as we deem fit. We are also able to configure the attributes `max_w
 then be applied to all buckets which do not specify any of these attributes explicitly. 
 
 NOTE: If the attributes `max_workers`, `poll`, `poll_interval` and `bucket_timeout` are specified at the root level, these can still be overridden at the bucket level with 
-different values, thus offering extensive flexibility and customization. Examples <<bucket-overrides,below>> show this behaviour.
+different values, thus offering extensive flexibility and customization. Examples <<bucket-overrides,below>> show this behavior.
 
 On receiving this config the google cloud storage input will connect to the service and retrieve a `Storage Client` using the given `bucket_name` and 
 `auth.credentials_file`, then it will spawn two main go-routines, one for each bucket. After this each of these routines (threads) will initialize a scheduler 
-which will in turn use the `max_workers` value to initialize an in-memory worker pool (thread pool) with `3` `workers` available. Basically that equates to two instances of a worker pool,
-one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
+which will in turn use the `max_workers` value to initialize an in-memory worker pool (thread pool) with `3` `workers` available. Basically that equates to two instances of a worker pool, one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
 
 NOTE: The scheduler is responsible for scheduling jobs, and uses the `maximum available workers` in the pool, at each iteration, to decide the number of files to retrieve and 
 process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
@@ -213,7 +210,7 @@ This is a specific subfield of a bucket. It specifies the bucket name.
 
 This attribute defines the maximum amount of time after which a bucket operation will give and stop if no response is recieved (example: reading a file / listing a file). 
 It can be defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
-If no value is specified for this, by default its initialized to `50 seconds`. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified. The value of `bucket_timeout` that should be used depends on the size of the files and the network speed. If the timeout is too low, the input will not be able to read the file completely and `context_deadline_exceeded` errors will be seen in the logs. If the timeout is too high, the input will wait for a long time for the file to be read, which can cause the input to be slow. The ratio between the `bucket_timeout` and `poll_interval` should be considered while setting both the values. A low `poll_interval` and a very high `bucket_timeout` can cause resource utilization issues as schedule ops will be spawned every poll iteration. If previous poll ops are still running, this could result in concurrently running ops and so could cause a bottleneck over time.
+If no value is specified for this, by default its initialized to `120 seconds`. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified. The value of `bucket_timeout` that should be used depends on the size of the files and the network speed. If the timeout is too low, the input will not be able to read the file completely and `context_deadline_exceeded` errors will be seen in the logs. If the timeout is too high, the input will wait for a long time for the file to be read, which can cause the input to be slow. The ratio between the `bucket_timeout` and `poll_interval` should be considered while setting both the values. A low `poll_interval` and a very high `bucket_timeout` can cause resource utilization issues as schedule ops will be spawned every poll iteration. If previous poll ops are still running, this could result in concurrently running ops and so could cause a bottleneck over time.
 
 [id="attrib-max_workers-gcs"]
 [float]
@@ -228,9 +225,8 @@ NOTE: The value of `max_workers` is tied to the `batch_size` currently to ensure
 [float]
 ==== `poll`
 
-This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is `false`, so it will not keep polling if not explicitly 
-specified. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always 
-take priority and override the root level values if both are specified.
+This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is set to `true`. This attribute can be specified both at the 
+root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 [id="attrib-poll_interval-gcs"]
 [float]
@@ -238,7 +234,7 @@ take priority and override the root level values if both are specified.
 
 This attribute defines the maximum amount of time after which the internal scheduler will make the polling call for the next set of objects/files. It can be 
 defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
-Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `300 seconds`. 
+Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `5 minutes`. 
 This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority 
 and override the root level values if both are specified. The `poll_interval` should be set to a value that is equal to the `bucket_timeout` value. This would ensure that another schedule operation is not started before the current buckets have all been processed. If the `poll_interval` is set to a value that is less than the `bucket_timeout`, then the input will start another schedule operation before the current one has finished, which can cause a bottleneck over time. Having a lower `poll_interval` can make the input faster at the cost of more resource utilization. 
 
