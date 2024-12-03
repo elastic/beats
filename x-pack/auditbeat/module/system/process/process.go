@@ -76,6 +76,7 @@ func init() {
 	)
 }
 
+// New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	var ms MetricSet
 

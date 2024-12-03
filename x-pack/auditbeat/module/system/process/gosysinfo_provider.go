@@ -80,7 +80,7 @@ func (p Process) toMapStr() mapstr.M {
 	}
 }
 
-// New constructs a new MetricSet.
+// NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
 func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
