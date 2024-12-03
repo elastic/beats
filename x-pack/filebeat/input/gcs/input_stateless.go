@@ -88,7 +88,6 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			// Since we are only reading, the operation is always idempotent
 			storage.WithPolicy(storage.RetryAlways),
 		)
-
 		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic

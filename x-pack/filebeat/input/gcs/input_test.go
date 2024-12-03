@@ -535,7 +535,7 @@ func Test_StorageClient(t *testing.T) {
 
 			client, _ := storage.NewClient(context.Background(), option.WithEndpoint(serv.URL), option.WithoutAuthentication(), option.WithHTTPClient(&httpclient))
 			cfg := conf.MustNewConfigFrom(tt.baseConfig)
-			conf := config{}
+			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				assert.EqualError(t, err, fmt.Sprint(tt.isError))
@@ -558,8 +558,8 @@ func Test_StorageClient(t *testing.T) {
 			})
 
 			var timeout *time.Timer
-			if conf.PollInterval != nil {
-				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
+			if conf.PollInterval != 0 {
+				timeout = time.NewTimer(1*time.Second + conf.PollInterval)
 			} else {
 				timeout = time.NewTimer(5 * time.Second)
 			}
