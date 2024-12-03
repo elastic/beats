@@ -78,9 +78,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault, overrides global values with local
-// bucket level values if present. If both global & local values
-// are absent, assigns default values
+// tryOverrideOrDefault, overrides the bucket level values with global values if the bucket fields are not set
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
 		b.MaxWorkers = &cfg.MaxWorkers
