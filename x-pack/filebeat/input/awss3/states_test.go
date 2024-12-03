@@ -145,7 +145,7 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("Store only load entries matching the given prefix", func(t *testing.T) {
+	t.Run("states store only load entries matching the given prefix", func(t *testing.T) {
 		// given
 		registry := openTestStatestore()
 
