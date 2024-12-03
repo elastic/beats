@@ -50,7 +50,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := config{}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
@@ -78,44 +78,22 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault, overrides global values with local
-// bucket level values if present. If both global & local values
-// are absent, assigns default values
+// tryOverrideOrDefault, overrides the bucket level values with global values if the bucket fields are not set
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
-		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
-		}
-		b.MaxWorkers = &maxWorkers
+		b.MaxWorkers = &cfg.MaxWorkers
 	}
 	if b.Poll == nil {
-		var poll bool
-		if cfg.Poll != nil {
-			poll = *cfg.Poll
-		}
-		b.Poll = &poll
+		b.Poll = &cfg.Poll
 	}
 	if b.PollInterval == nil {
-		interval := time.Second * 300
-		if cfg.PollInterval != nil {
-			interval = *cfg.PollInterval
-		}
-		b.PollInterval = &interval
+		b.PollInterval = &cfg.PollInterval
 	}
 	if b.ParseJSON == nil {
-		parse := false
-		if cfg.ParseJSON != nil {
-			parse = *cfg.ParseJSON
-		}
-		b.ParseJSON = &parse
+		b.ParseJSON = &cfg.ParseJSON
 	}
 	if b.BucketTimeOut == nil {
-		timeOut := time.Second * 50
-		if cfg.BucketTimeOut != nil {
-			timeOut = *cfg.BucketTimeOut
-		}
-		b.BucketTimeOut = &timeOut
+		b.BucketTimeOut = &cfg.BucketTimeOut
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
@@ -173,11 +151,12 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		cancel()
 	}()
 
-	client, err := fetchStorageClient(ctx, input.config, log)
+	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
 		metrics.errorsTotal.Inc()
 		return err
 	}
+
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
