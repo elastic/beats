@@ -27,9 +27,9 @@ func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
-	f.(*MetricSet).lastState = time.Now()
+	f.(*SysInfoMetricSet).lastState = time.Now()
 	p := testProcess()
-	f.(*MetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Process{p}))
+	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Process{p}))
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -56,7 +56,7 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*MetricSet)
+	ms := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*SysInfoMetricSet)
 
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
