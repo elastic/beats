@@ -5,93 +5,40 @@
 package process
 
 import (
-	"encoding/binary"
 	"fmt"
+	"os"
+	"os/user"
+	"runtime"
+	"strconv"
 	"time"
 
-<<<<<<< HEAD
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
-=======
->>>>>>> 5a85598f4e (auditbeat: split system process module (#41868))
-	"github.com/elastic/beats/v7/auditbeat/ab"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 const (
-	metricsetName = "process"
-	namespace     = "system.audit.process"
-
-	eventTypeState = "state"
-	eventTypeEvent = "event"
+	bucketName              = "auditbeat.process.v1"
+	bucketKeyStateTimestamp = "state_timestamp"
 )
 
-// MetricSet collects data about the host.
-type MetricSet struct {
-	config Config
-	log    *logp.Logger
-}
-
-type eventAction uint8
-
-const (
-	eventActionExistingProcess eventAction = iota
-	eventActionProcessStarted
-	eventActionProcessStopped
-	eventActionProcessError
-)
-
-func (action eventAction) String() string {
-	switch action {
-	case eventActionExistingProcess:
-		return "existing_process"
-	case eventActionProcessStarted:
-		return "process_started"
-	case eventActionProcessStopped:
-		return "process_stopped"
-	case eventActionProcessError:
-		return "process_error"
-	default:
-		return ""
-	}
-}
-
-func (action eventAction) Type() string {
-	switch action {
-	case eventActionExistingProcess:
-		return "info"
-	case eventActionProcessStarted:
-		return "start"
-	case eventActionProcessStopped:
-		return "end"
-	case eventActionProcessError:
-		return "info"
-	default:
-		return "info"
-	}
-}
-
-func init() {
-	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
-		mb.DefaultMetricSet(),
-		mb.WithNamespace(namespace),
-	)
-}
-
-<<<<<<< HEAD
-// MetricSet collects data about the host.
-type MetricSet struct {
+// SysinfoMetricSet collects data about the host.
+type SysInfoMetricSet struct {
 	system.SystemMetricSet
-	config    Config
+	MetricSet
+	hasher    *hasher.FileHasher
 	cache     *cache.Cache
-	log       *logp.Logger
 	bucket    datastore.Bucket
 	lastState time.Time
-	hasher    *hasher.FileHasher
 
 	suppressPermissionWarnings bool
 }
@@ -111,7 +58,9 @@ type Process struct {
 // Hash creates a hash for Process.
 func (p Process) Hash() uint64 {
 	h := xxhash.New()
+	//nolint:errcheck // always return nil err
 	h.WriteString(strconv.Itoa(p.Info.PID))
+	//nolint:errcheck // always return nil err
 	h.WriteString(p.Info.StartTime.String())
 	return h.Sum64()
 }
@@ -131,36 +80,56 @@ func (p Process) toMapStr() mapstr.M {
 	}
 }
 
-// entityID creates an ID that uniquely identifies this process across machines.
-func (p Process) entityID(hostID string) string {
-	h := system.NewEntityHash()
-	h.Write([]byte(hostID))
-	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
-	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
-	return h.Sum()
-}
-
-=======
->>>>>>> 5a85598f4e (auditbeat: split system process module (#41868))
-// New constructs a new MetricSet.
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var ms MetricSet
-
-	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
-
-	ms.config = defaultConfig
-	ms.log = logp.NewLogger(metricsetName)
-
-	if err := base.Module().UnpackConfig(&ms.config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
+// NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
+func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
 
-	return NewFromSysInfo(base, ms)
+	// Load from disk: Time when state was last sent
+	var lastState time.Time
+	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		bucket.Close()
+		return nil, err
+	}
+	if !lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.",
+			lastState, lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
+	}
+
+	hasher, err := hasher.NewFileHasher(ms.config.HasherConfig, nil)
+	if err != nil {
+		bucket.Close()
+		return nil, err
+	}
+
+	if runtime.GOOS != "windows" && os.Geteuid() != 0 {
+		ms.log.Warn("Running as non-root user, will likely not report all processes.")
+	}
+
+	sm := &SysInfoMetricSet{
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		MetricSet:       ms,
+		cache:           cache.New(),
+		bucket:          bucket,
+		lastState:       lastState,
+		hasher:          hasher,
+	}
+
+	return sm, nil
 }
 
-<<<<<<< HEAD
 // Close cleans up the MetricSet when it finishes.
-func (ms *MetricSet) Close() error {
+func (ms *SysInfoMetricSet) Close() error {
 	if ms.bucket != nil {
 		return ms.bucket.Close()
 	}
@@ -168,7 +137,7 @@ func (ms *MetricSet) Close() error {
 }
 
 // Fetch collects process information. It is invoked periodically.
-func (ms *MetricSet) Fetch(report mb.ReporterV2) {
+func (ms *SysInfoMetricSet) Fetch(report mb.ReporterV2) {
 	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
 	if needsStateUpdate || ms.cache.IsEmpty() {
 		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
@@ -188,7 +157,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 }
 
 // reportState reports all running processes on the system.
-func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+func (ms *SysInfoMetricSet) reportState(report mb.ReporterV2) error {
 	// Only update lastState if this state update was regularly scheduled,
 	// i.e. not caused by an Auditbeat restart (when the cache would be empty).
 	if !ms.cache.IsEmpty() {
@@ -237,7 +206,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 }
 
 // reportChanges detects and reports any changes to processes on this system since the last call.
-func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
+func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 	processes, err := ms.getProcesses()
 	if err != nil {
 		return fmt.Errorf("failed to get processes: %w", err)
@@ -247,7 +216,10 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
 
 	for _, cacheValue := range started {
-		p := cacheValue.(*Process)
+		p, ok := cacheValue.(*Process)
+		if !ok {
+			return fmt.Errorf("cache type error")
+		}
 		ms.enrichProcess(p)
 
 		if p.Error == nil {
@@ -259,7 +231,10 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	for _, cacheValue := range stopped {
-		p := cacheValue.(*Process)
+		p, ok := cacheValue.(*Process)
+		if !ok {
+			return fmt.Errorf("cache type error")
+		}
 
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStopped))
@@ -271,7 +246,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 // enrichProcess enriches a process with user lookup information
 // and executable file hash.
-func (ms *MetricSet) enrichProcess(process *Process) {
+func (ms *SysInfoMetricSet) enrichProcess(process *Process) {
 	if process.UserInfo != nil {
 		goUser, err := user.LookupId(process.UserInfo.UID)
 		if err == nil {
@@ -306,7 +281,7 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 	}
 }
 
-func (ms *MetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
+func (ms *SysInfoMetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: mapstr.M{
 			"event": mapstr.M{
@@ -362,7 +337,8 @@ func (ms *MetricSet) processEvent(process *Process, eventType string, action eve
 	}
 
 	if ms.HostID() != "" {
-		event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
+		event.RootFields.Put("process.entity_id",
+			entityID(ms.HostID(), process.Info.PID, process.Info.StartTime))
 	}
 
 	return event
@@ -408,14 +384,13 @@ func convertToCacheable(processes []*Process) []cache.Cacheable {
 	return c
 }
 
-func (ms *MetricSet) getProcesses() ([]*Process, error) {
-	var processes []*Process
-
+func (ms *SysInfoMetricSet) getProcesses() ([]*Process, error) {
 	sysinfoProcs, err := sysinfo.Processes()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch processes: %w", err)
 	}
 
+	processes := make([]*Process, 0, len(sysinfoProcs))
 	for _, sysinfoProc := range sysinfoProcs {
 		var process *Process
 
@@ -483,15 +458,4 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 	}
 
 	return processes, nil
-=======
-// entityID creates an ID that uniquely identifies this process across machines.
-func entityID(hostID string, pid int, startTime time.Time) string {
-	h := system.NewEntityHash()
-	h.Write([]byte(hostID))
-	//nolint:errcheck // no error handling
-	binary.Write(h, binary.LittleEndian, int64(pid))
-	//nolint:errcheck // no error handling
-	binary.Write(h, binary.LittleEndian, int64(startTime.Nanosecond()))
-	return h.Sum()
->>>>>>> 5a85598f4e (auditbeat: split system process module (#41868))
 }
