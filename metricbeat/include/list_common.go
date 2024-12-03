@@ -191,6 +191,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/service"
+	_ "github.com/elastic/beats/v7/metricbeat/module/windows/wmi"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/connection"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/mntr"
