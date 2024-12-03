@@ -216,7 +216,10 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 	started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
 
 	for _, cacheValue := range started {
-		p := cacheValue.(*Process)
+		p, ok := cacheValue.(*Process)
+		if !ok {
+			return fmt.Errorf("cache type error")
+		}
 		ms.enrichProcess(p)
 
 		if p.Error == nil {
@@ -228,7 +231,10 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	for _, cacheValue := range stopped {
-		p := cacheValue.(*Process)
+		p, ok := cacheValue.(*Process)
+		if !ok {
+			return fmt.Errorf("cache type error")
+		}
 
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStopped))

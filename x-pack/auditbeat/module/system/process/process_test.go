@@ -56,7 +56,8 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*SysInfoMetricSet)
+	ms, ok := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*SysInfoMetricSet)
+	assert.True(t, ok)
 
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
