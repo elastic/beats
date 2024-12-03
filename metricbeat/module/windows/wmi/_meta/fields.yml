@@ -1,0 +1,10 @@
+- name: wmi
+  type: group
+  release: beta
+  description: >
+    wmi
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
