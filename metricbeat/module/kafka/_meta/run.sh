@@ -34,7 +34,7 @@ wait_for_port() {
     nc -z localhost $port
 }
 
-${KAFKA_HOME}/bin/kafka-topics.sh --zookeeper=127.0.0.1:2181 --create --partitions 1 --topic test --replication-factor 1
+${KAFKA_HOME}/bin/kafka-topics.sh  --bootstrap-server localhost:9091 --create --partitions 1 --topic test --replication-factor 1
 
 echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
@@ -44,7 +44,7 @@ echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 export KAFKA_OPTS="-Djava.security.auth.login.config=/etc/kafka/server_jaas.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8779,host=0.0.0.0"
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
-    --override authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer \
+    --override authorizer.class.name=kafka.security.authorizer.AclAuthorizer \
     --override super.users=User:admin \
     --override sasl.enabled.mechanisms=PLAIN \
     --override sasl.mechanism.inter.broker.protocol=PLAIN \
