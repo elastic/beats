@@ -54,6 +54,7 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 	var receiverMap map[string]any
 	cfg.Unpack(&receiverMap)
 
+	// filebeat specific configuration is defined here
 	cfgMap := map[string]any{
 		"receivers": map[string]any{
 			"filebeatreceiver": receiverMap,

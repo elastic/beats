@@ -1,19 +1,78 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package converters
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/confmap/confmaptest"
+	"gopkg.in/yaml.v2"
 )
 
-func TestESConverter(t *testing.T) {
-	expectedCfgMap, _ := confmaptest.LoadConf("otel.yaml")
+func TestConverter(t *testing.T) {
 	c := converter{}
 
-	fmt.Println(c.Convert(context.Background(), expectedCfgMap))
-	s, _ := json.MarshalIndent(expectedCfgMap.ToStringMap(), "", " ")
-	fmt.Println(string(s))
+	tests := []struct {
+		name      string
+		input     string
+		expOutput string
+		experr    bool
+	}{
+		{
+			name:      "correct input type",
+			input:     "supported.yml",
+			expOutput: "oteloutput.yml",
+			experr:    false,
+		},
+		{
+			name:      "unsupported output type is configured",
+			input:     "unsupported-output.yml",
+			expOutput: "",
+			experr:    true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			input, err := confmaptest.LoadConf(filepath.Join("testdata", test.input))
+			require.NoError(t, err, "could not load file")
+
+			// convert given conf
+			err = c.Convert(context.Background(), input)
+			if test.experr {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
+
+				expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
+				require.NoError(t, err)
+
+				retYAML, err := yaml.Marshal(input.ToStringMap())
+				require.NoError(t, err)
+
+				assert.Equal(t, string(expectedYAML), string(retYAML))
+			}
+		})
+	}
+
 }

@@ -43,12 +43,6 @@ func TestFileBeatProvider(t *testing.T) {
 			expOutput: "oteloutput.yml",
 			experr:    false,
 		},
-		{ // change testdata/invalid.yml as and when more output configurations are supported
-			name:      "unsupported beat output configured",
-			input:     "invalid.yml",
-			expOutput: "",
-			experr:    true,
-		},
 	}
 
 	for _, test := range tests {
@@ -56,16 +50,15 @@ func TestFileBeatProvider(t *testing.T) {
 			// prefix file path with fb:
 			ret, err := p.Retrieve(context.Background(), "fb:"+filepath.Join("testdata", test.input), nil)
 			if test.experr {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
 				retValue, err := ret.AsRaw()
 				require.NoError(t, err)
 				expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
-				expMap := expectedValue.ToStringMap()
 
 				// convert both expected and actual output to same format
-				expectedYAML, err := yaml.Marshal(expMap)
+				expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
 				require.NoError(t, err)
 
 				retYAML, err := yaml.Marshal(retValue)

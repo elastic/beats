@@ -230,9 +230,6 @@ require (
 	go.opentelemetry.io/collector/exporter/debugexporter v0.114.0
 	go.opentelemetry.io/collector/otelcol v0.114.0
 	go.opentelemetry.io/collector/pdata v1.20.0
-	go.opentelemetry.io/collector/processor v0.114.0
-	go.opentelemetry.io/collector/processor/batchprocessor v0.114.0
-	go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.114.0
 	go.opentelemetry.io/collector/receiver v0.114.0
 	golang.org/x/term v0.26.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
@@ -422,11 +419,11 @@ require (
 	go.opentelemetry.io/collector/extension/extensiontest v0.114.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.20.0 // indirect
 	go.opentelemetry.io/collector/internal/fanoutconsumer v0.114.0 // indirect
-	go.opentelemetry.io/collector/internal/memorylimiter v0.114.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.114.0 // indirect
 	go.opentelemetry.io/collector/pdata/testdata v0.114.0 // indirect
 	go.opentelemetry.io/collector/pipeline v0.114.0 // indirect
 	go.opentelemetry.io/collector/pipeline/pipelineprofiles v0.114.0 // indirect
+	go.opentelemetry.io/collector/processor v0.114.0 // indirect
 	go.opentelemetry.io/collector/processor/processorprofiles v0.114.0 // indirect
 	go.opentelemetry.io/collector/processor/processortest v0.114.0 // indirect
 	go.opentelemetry.io/collector/receiver/receiverprofiles v0.114.0 // indirect

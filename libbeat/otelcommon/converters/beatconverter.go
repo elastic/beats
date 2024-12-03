@@ -43,7 +43,7 @@ func newConverter(set confmap.ConverterSettings) confmap.Converter {
 	}
 }
 
-// converts beats output config to OTel config
+// [beatreceiver].output is unpacked to OTel config here
 func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 	var out map[string]any
 	receiverCfg, _ := conf.Sub("receivers::filebeatreceiver")
@@ -71,6 +71,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		}
 	}
 
+	// Replace output.elasticsearch with output.otelconsumer
 	out = map[string]any{
 		"receivers::filebeatreceiver::output": nil,
 	}
