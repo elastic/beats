@@ -4,7 +4,7 @@ go 1.22.8
 
 require (
 	github.com/docker/docker v26.1.5+incompatible
-	github.com/elastic/elastic-agent-libs v0.9.13
+	github.com/elastic/elastic-agent-libs v0.17.4-0.20241126154321-6ed75416832d
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.14.1

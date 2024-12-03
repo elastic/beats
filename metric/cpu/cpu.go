@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // CPU manages the CPU metrics from /proc/stat
@@ -79,21 +78,17 @@ func (cpu CPU) Total() uint64 {
 	return opt.SumOptUint(cpu.User, cpu.Nice, cpu.Sys, cpu.Idle, cpu.Wait, cpu.Irq, cpu.SoftIrq, cpu.Stolen)
 }
 
-/*
-The below code implements a "metrics tracker" that gives us the ability to
-calculate CPU percentages, as we average usage across a time period.
-*/
-
-// Monitor is used to monitor the overall CPU usage of the system over time.
-type Monitor struct {
-	lastSample CPUMetrics
-	Hostfs     resolve.Resolver
+type option struct {
+	usePerformanceCounter bool
 }
 
-// New returns a new CPU metrics monitor
-// Hostfs is only relevant on linux and freebsd.
-func New(hostfs resolve.Resolver) *Monitor {
-	return &Monitor{Hostfs: hostfs}
+type OptionFunc func(*option)
+
+// Note: WithPerformanceCounter option is only effective for windows and is ineffective if used by other OS'.
+func WithPerformanceCounter() OptionFunc {
+	return func(o *option) {
+		o.usePerformanceCounter = true
+	}
 }
 
 // Fetch collects a new sample of the CPU usage metrics.

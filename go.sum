@@ -21,8 +21,8 @@ github.com/docker/go-connections v0.4.0 h1:El9xVISelRB7BuFusrZozjnkIM5YnzCViNKoh
 github.com/docker/go-connections v0.4.0/go.mod h1:Gbd7IOopHjR8Iph03tsViu4nIes5XhDvyHbTtUxmeec=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/elastic/elastic-agent-libs v0.9.13 h1:D1rh1s67zlkDWmixWQaNWzn+qy6DafIDPTQnLpBNBUA=
-github.com/elastic/elastic-agent-libs v0.9.13/go.mod h1:G9ljFvDE+muOOOQBf2eRituF0fE4suGkv25rfjTwY+c=
+github.com/elastic/elastic-agent-libs v0.17.4-0.20241126154321-6ed75416832d h1:nY8LSeTYU1uSDAAg7WwGH/cALgdovAXLdIzV25Ky0Bo=
+github.com/elastic/elastic-agent-libs v0.17.4-0.20241126154321-6ed75416832d/go.mod h1:5CR02awPrBr+tfmjBBK+JI+dMmHNQjpVY24J0wjbC7M=
 github.com/elastic/go-licenser v0.4.2 h1:bPbGm8bUd8rxzSswFOqvQh1dAkKGkgAmrPxbUi+Y9+A=
 github.com/elastic/go-licenser v0.4.2/go.mod h1:W8eH6FaZDR8fQGm+7FnVa7MxI1b/6dAqxz+zPB8nm5c=
 github.com/elastic/go-structform v0.0.9 h1:HpcS7xljL4kSyUfDJ8cXTJC6rU5ChL1wYb6cx3HLD+o=

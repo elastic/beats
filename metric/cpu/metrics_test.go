@@ -31,7 +31,8 @@ import (
 
 func TestMonitorSample(t *testing.T) {
 	_ = logp.DevelopmentSetup()
-	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: systemtests.DockerTestResolver()}
+	cpu, err := New(systemtests.DockerTestResolver())
+	require.NoError(t, err)
 	s, err := cpu.Fetch()
 	require.NoError(t, err)
 
@@ -46,7 +47,9 @@ func TestCoresMonitorSample(t *testing.T) {
 	cpuMetrics, err := Get(systemtests.DockerTestResolver())
 	assert.NoError(t, err, "error in Get()")
 
-	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: systemtests.DockerTestResolver()}
+	cores, err := New(systemtests.DockerTestResolver())
+	require.NoError(t, err)
+	cores.lastSample = CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}
 	sample, err := cores.FetchCores()
 	require.NoError(t, err)
 
