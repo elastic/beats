@@ -28,16 +28,16 @@ type config struct {
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
 	Auth authConfig `config:"auth"`
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
-	MaxWorkers int `config:"max_workers" validate:"max=5000"`
+	MaxWorkers int `config:"max_workers,omitempty" validate:"max=5000"`
 	// Poll - Defines if polling should be performed on the input bucket source.
-	Poll bool `config:"poll"`
+	Poll bool `config:"poll,omitempty"`
 	// PollInterval - Defines the maximum amount of time to wait before polling for the next batch of objects from the bucket.
-	PollInterval time.Duration `config:"poll_interval"`
+	PollInterval time.Duration `config:"poll_interval,omitempty"`
 	// ParseJSON - Informs the publisher whether to parse & objectify json data or not. By default this is set to
 	// false, since it can get expensive dealing with highly nested json data.
-	ParseJSON bool `config:"parse_json"`
+	ParseJSON bool `config:"parse_json,omitempty"`
 	// BucketTimeOut - Defines the maximum time that the sdk will wait for a bucket api response before timing out.
-	BucketTimeOut time.Duration `config:"bucket_timeout"`
+	BucketTimeOut time.Duration `config:"bucket_timeout,omitempty"`
 	// Buckets - Defines a list of buckets that will be polled for objects.
 	Buckets []bucket `config:"buckets" validate:"required"`
 	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
@@ -49,7 +49,9 @@ type config struct {
 	// ExpandEventListFromField - Defines the field name that will be used to expand the event into separate events.
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// This field is only used for system test purposes, to override the HTTP endpoint.
-	AlternativeHost string `config:"alternative_host"`
+	AlternativeHost string `config:"alternative_host,omitempty"`
+	// Retry - Defines the retry configuration for the input.
+	Retry retryConfig `config:"retry"`
 }
 
 // bucket contains the config for each specific object storage bucket in the root account
@@ -92,6 +94,19 @@ type jsonCredentialsConfig struct {
 	AccountKey string `config:"account_key"`
 }
 
+type retryConfig struct {
+	// MaxAttempts configures the maximum number of times an API call can be made in the case of retryable errors.
+	// For example, if you set MaxAttempts(5), the operation will be attempted up to 5 times total (initial call plus 4 retries).
+	// If you set MaxAttempts(1), the operation will be attempted only once and there will be no retries. This setting defaults to 3.
+	MaxAttempts int `config:"max_attempts" validate:"min=1"`
+	// InitialBackOffDuration is the initial value of the retry period, defaults to 1 second.
+	InitialBackOffDuration time.Duration `config:"initial_backoff_duration" validate:"min=1"`
+	// MaxBackOffDuration is the maximum value of the retry period, defaults to 30 seconds.
+	MaxBackOffDuration time.Duration `config:"max_backoff_duration" validate:"min=2"`
+	// BackOffMultiplier is the factor by which the retry period increases. It should be greater than 1 and defaults to 2.
+	BackOffMultiplier float64 `config:"backoff_multiplier" validate:"min=2"`
+}
+
 func (c authConfig) Validate() error {
 	// credentials_file
 	if c.CredentialsFile != nil {
@@ -126,5 +141,11 @@ func defaultConfig() config {
 		PollInterval:  5 * time.Minute,
 		BucketTimeOut: 120 * time.Second,
 		ParseJSON:     false,
+		Retry: retryConfig{
+			MaxAttempts:            3,
+			InitialBackOffDuration: 1 * time.Second,
+			MaxBackOffDuration:     30 * time.Second,
+			BackOffMultiplier:      2,
+		},
 	}
 }
