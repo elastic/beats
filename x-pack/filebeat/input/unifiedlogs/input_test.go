@@ -10,12 +10,17 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"fmt"
+	"os"
+	"os/exec"
+	"path"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -46,6 +51,10 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 }
 
 func TestInput(t *testing.T) {
+	archivePath, err := openArchive()
+	require.NoError(t, err)
+	t.Cleanup(func() { os.RemoveAll(archivePath) })
+
 	testCases := []struct {
 		name                 string
 		cfg                  config
@@ -80,6 +89,113 @@ func TestInput(t *testing.T) {
 			expectedLogShowCmd:  "/usr/bin/log show --style ndjson --archive notfound.logarchive",
 			expectedRunErrorMsg: "\"/usr/bin/log show --style ndjson --archive notfound.logarchive\" exited with an error: exit status 64",
 		},
+		{
+			name: "Archived file",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s", archivePath),
+			assertFunc:         eventsAndCursorAssertN(462),
+		},
+		{
+			name: "Trace file",
+			cfg: config{
+				showConfig: showConfig{
+					TraceFile: path.Join(archivePath, "logdata.LiveData.tracev3"),
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --file %s", path.Join(archivePath, "logdata.LiveData.tracev3")),
+			assertFunc:         eventsAndCursorAssertN(7),
+		},
+		{
+			name: "With start date",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+					Start:       "2024-12-04 13:46:00+0200",
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --start 2024-12-04 13:46:00+0200", archivePath),
+			assertFunc:         eventsAndCursorAssertN(314),
+		},
+		{
+			name: "With start and end dates",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+					Start:       "2024-12-04 13:45:00+0200",
+					End:         "2024-12-04 13:46:00+0200",
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --start 2024-12-04 13:45:00+0200 --end 2024-12-04 13:46:00+0200", archivePath),
+			assertFunc:         eventsAndCursorAssertN(149),
+		},
+		{
+			name: "With end date",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+					End:         "2024-12-04 13:46:00+0200",
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --end 2024-12-04 13:46:00+0200", archivePath),
+			assertFunc:         eventsAndCursorAssertN(462),
+		},
+		{
+			name: "With predicate",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+				},
+				commonConfig: commonConfig{
+					Predicate: []string{
+						`processImagePath == "\/kernel"`,
+					},
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --predicate sender = 'Security'", archivePath),
+			assertFunc:         eventsAndCursorAssertN(460),
+		},
+		{
+			name: "With process",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+				},
+				commonConfig: commonConfig{
+					Process: []string{""},
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --process 617", archivePath),
+			assertFunc:         eventsAndCursorAssertN(462),
+		},
+		{
+			name: "With optional flags",
+			cfg: config{
+				showConfig: showConfig{
+					ArchiveFile: archivePath,
+				},
+				commonConfig: commonConfig{
+					Info:               true,
+					Debug:              true,
+					Backtrace:          true,
+					Signpost:           true,
+					MachContinuousTime: true,
+				},
+			},
+			timeUntilClose:     time.Second,
+			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --info --debug --backtrace --signpost --mach-continuous-time", archivePath),
+			assertFunc:         eventsAndCursorAssertN(4081),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -105,7 +221,12 @@ func TestInput(t *testing.T) {
 				}
 			}(t)
 
-			time.AfterFunc(tc.timeUntilClose, cancel)
+			select {
+			case <-ctx.Done():
+			case <-time.After(tc.timeUntilClose):
+			}
+
+			cancel()
 			wg.Wait()
 
 			assert.EventuallyWithT(t,
@@ -116,7 +237,7 @@ func TestInput(t *testing.T) {
 						tc.assertFunc(collect, pub.events, pub.cursors)
 					}
 				},
-				10*time.Second, time.Second,
+				30*time.Second, time.Second,
 			)
 		})
 	}
@@ -149,4 +270,36 @@ func filterLogCmdLine(buf []byte, cmdPrefix string) string {
 		}
 	}
 	return ""
+}
+
+func eventsAndCursorAssertN(n int) func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
+	return func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
+		assert.Equal(collect, n, len(events))
+		assert.Equal(collect, n, len(cursors))
+		lastEvent := events[len(events)-1]
+		lastCursor := cursors[len(cursors)-1]
+		assert.EqualValues(collect, &lastEvent.Timestamp, lastCursor)
+	}
+}
+
+func openArchive() (string, error) {
+	return extractTarGz(path.Join("testdata", "test.logarchive.tar.gz"))
+}
+
+func extractTarGz(tarGzPath string) (string, error) {
+	// Create a temporary directory
+	tempDir, err := os.MkdirTemp("", "extracted-*")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temporary directory: %v", err)
+	}
+
+	// Use the 'tar' command to extract the .tar.gz file
+	cmd := exec.Command("tar", "-xzf", tarGzPath, "-C", tempDir)
+
+	// Run the command
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("failed to extract .tar.gz: %v", err)
+	}
+
+	return path.Join(tempDir, "test.logarchive"), nil
 }
