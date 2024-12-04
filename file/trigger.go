@@ -138,6 +138,8 @@ func newIntervalTrigger(interval time.Duration, clock clock) trigger {
 			return lastInterval != currentInterval
 		}
 	}
+
+	t.lastRotate = clock.Now()
 	return &t
 }
 
