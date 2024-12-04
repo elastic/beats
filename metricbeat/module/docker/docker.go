@@ -91,7 +91,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 }
 
 // FetchStats returns a list of running containers with all related stats inside
-func FetchStats(client *client.Client, timeout time.Duration) ([]Stat, error) {
+func FetchStats(client *client.Client, timeout time.Duration, stream bool) ([]Stat, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	containers, err := client.ContainerList(ctx, container.ListOptions{})
@@ -108,7 +108,7 @@ func FetchStats(client *client.Client, timeout time.Duration) ([]Stat, error) {
 	for _, container := range containers {
 		go func(container types.Container) {
 			defer wg.Done()
-			statsQueue <- exportContainerStats(ctx, client, &container)
+			statsQueue <- exportContainerStats(ctx, client, &container, stream)
 		}(container)
 	}
 
@@ -133,18 +133,36 @@ func FetchStats(client *client.Client, timeout time.Duration) ([]Stat, error) {
 // This is currently very inefficient as docker calculates the average for each request,
 // means each request will take at least 2s: https://github.com/docker/docker/blob/master/cli/command/container/stats_helpers.go#L148
 // Getting all stats at once is implemented here: https://github.com/docker/docker/pull/25361
-func exportContainerStats(ctx context.Context, client *client.Client, container *types.Container) Stat {
+// In case stream is true, we use get a stream of results for container stats. From the stream we keep the second result.
+// This is needed for podman use case where in case stream is false, no precpu stats are returned. The precpu stats
+// are required for the cpu percentage calculation. We keep the second  result as in the first result, the stats are not correct.
+func exportContainerStats(ctx context.Context, client *client.Client, container *types.Container, stream bool) Stat {
 	var event Stat
 	event.Container = container
-
-	containerStats, err := client.ContainerStats(ctx, container.ID, false)
+	containerStats, err := client.ContainerStats(ctx, container.ID, stream)
 	if err != nil {
 		return event
 	}
-
 	defer containerStats.Body.Close()
-	decoder := json.NewDecoder(containerStats.Body)
-	decoder.Decode(&event.Stats)
 
+	// JSON decoder
+	decoder := json.NewDecoder(containerStats.Body)
+	if !stream {
+		decoder.Decode(&event.Stats)
+	} else {
+		// handle stream. Take the second result.
+		count := 0
+		for decoder.More() {
+			if err := decoder.Decode(&event.Stats); err != nil {
+				return event
+			}
+
+			count++
+			// Exit after the second result
+			if count == 2 {
+				break
+			}
+		}
+	}
 	return event
 }
