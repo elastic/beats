@@ -409,7 +409,7 @@ This attribute can be used to configure a list of sub attributes that directly c
     - `max_backoff_duration`: This attribute defines the maximum backoff time. The default value for this is `30s`.
     - `backoff_multiplier`: This attribute defines the backoff multiplication factor. The default value for this is `2`.
 
-NOTE: The `initial_backoff_duration` and `max_backoff_duration` attributes must have time units. Valid time units are `ns`, `us (or µs)`, `ms`, `s`, `m`, `h`
+NOTE: The `initial_backoff_duration` and `max_backoff_duration` attributes must have time units. Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.
 
 By configuring these attributes, the user is given the flexibility to control how the input should behave when a download fails or gets interrupted. This attribute can only be 
 specified at the root level of the configuration and not at the bucket level. It applies uniformly to all the buckets.
