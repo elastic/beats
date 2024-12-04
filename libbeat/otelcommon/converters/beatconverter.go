@@ -27,6 +27,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// list of supported beatreceivers
+var supportedReceivers = []string{"filebeatreceiver"} // Add more beat receivers to this list when we add support
+
 type converter struct {
 	logger *zap.Logger
 }
@@ -45,40 +48,59 @@ func newConverter(set confmap.ConverterSettings) confmap.Converter {
 
 // [beatreceiver].output is unpacked to OTel config here
 func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
-	var out map[string]any
-	receiverCfg, _ := conf.Sub("receivers::filebeatreceiver")
-	outputs, _ := receiverCfg.Sub("output")
 
-	for key := range outputs.ToStringMap() {
-		switch key {
-		case "elasticsearch":
-			escfg := config.MustNewConfigFrom(receiverCfg.ToStringMap())
-			esCfg, err := elasticsearch.ToOTelConfig(escfg)
-			if err != nil {
-				return fmt.Errorf("cannot convert Filebeat config: %w", err)
+	for _, receiverbeat := range supportedReceivers {
+		var out map[string]any
+
+		// check if supported beat receiver is configured. Skip translation logic if not
+		if v := conf.Get("receivers::" + receiverbeat); v == nil {
+			continue
+		}
+
+		receiverCfg, _ := conf.Sub("receivers::" + receiverbeat)
+		outputs, _ := receiverCfg.Sub("output")
+
+		for key := range outputs.ToStringMap() {
+			switch key {
+			case "elasticsearch":
+				escfg := config.MustNewConfigFrom(receiverCfg.ToStringMap())
+				esCfg, err := elasticsearch.ToOTelConfig(escfg)
+				if err != nil {
+					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
+				}
+				out = map[string]any{
+					"service::pipelines::logs::exporters": []string{"elasticsearch"},
+					"exporters": map[string]any{
+						"elasticsearch": esCfg,
+					},
+				}
+				err = conf.Merge(confmap.NewFromStringMap(out))
+				if err != nil {
+					return err
+				}
+			case "kafka", "logstash":
+				return fmt.Errorf("%s is currently unsupported in otel mode", key)
+			default:
+				return fmt.Errorf("%s is unsupported output", key)
 			}
-			out = map[string]any{
-				"service::pipelines::logs::exporters": []string{"elasticsearch"},
-				"exporters": map[string]any{
-					"elasticsearch": esCfg,
-				},
-			}
-			conf.Merge(confmap.NewFromStringMap(out))
-		case "kafka", "logstash":
-			return fmt.Errorf("%s is currently unsupported in otel mode", key)
-		default:
-			return fmt.Errorf("%s is unsupported output", key)
+		}
+
+		// Replace output.elasticsearch with output.otelconsumer
+		out = map[string]any{
+			"receivers::" + receiverbeat + "::output": nil,
+		}
+		err := conf.Merge(confmap.NewFromStringMap(out))
+		if err != nil {
+			return err
+		}
+		out = map[string]any{
+			"receivers::" + receiverbeat + "::output::otelconsumer": nil,
+		}
+		err = conf.Merge(confmap.NewFromStringMap(out))
+		if err != nil {
+			return err
 		}
 	}
 
-	// Replace output.elasticsearch with output.otelconsumer
-	out = map[string]any{
-		"receivers::filebeatreceiver::output": nil,
-	}
-	conf.Merge(confmap.NewFromStringMap(out))
-	out = map[string]any{
-		"receivers::filebeatreceiver::output::otelconsumer": nil,
-	}
-
-	return conf.Merge(confmap.NewFromStringMap(out))
+	return nil
 }
