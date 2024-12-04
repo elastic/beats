@@ -161,6 +161,16 @@ metricbeat.modules:
   # Aerospike Cluster Name
   #cluster_name: myclustername
 
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
+
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
 
@@ -608,6 +618,7 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute

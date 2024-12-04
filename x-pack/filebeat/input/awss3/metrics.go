@@ -36,7 +36,7 @@ func init() {
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
 func currentTime() time.Time {
-	clock := clockValue.Load().(clock)
+	clock, _ := clockValue.Load().(clock)
 	return clock.Now()
 }
 
@@ -206,18 +206,26 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	return out
 }
 
-// monitoredReader implements io.Reader and counts the number of bytes read.
+// monitoredReader implements io.Reader and wraps byte read tracking fields for S3 bucket objects.
+// Following are the tracked metrics,
+//   - totalBytesReadMetric - a total metric tracking bytes reads throughout the runtime from all processed objects
+//   - totalBytesReadCurrent - total bytes read from the currently tracked object
+//
+// See newMonitoredReader for initialization considerations.
 type monitoredReader struct {
-	reader         io.Reader
-	totalBytesRead *monitoring.Uint
+	reader                io.Reader
+	totalBytesReadMetric  *monitoring.Uint
+	totalBytesReadCurrent int64
 }
 
+// newMonitoredReader initialize the monitoredReader with a shared monitor that tracks all bytes read.
 func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
-	return &monitoredReader{reader: r, totalBytesRead: metric}
+	return &monitoredReader{reader: r, totalBytesReadMetric: metric}
 }
 
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
-	m.totalBytesRead.Add(uint64(n))
+	m.totalBytesReadMetric.Add(uint64(n))
+	m.totalBytesReadCurrent += int64(n)
 	return n, err
 }

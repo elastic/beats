@@ -66,14 +66,14 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store)
+	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 	defer in.states.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
-	in.s3, err = createS3API(ctx, in.config, in.awsConfig)
+	in.s3, err = in.createS3API(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to create S3 API: %w", err)
 	}
