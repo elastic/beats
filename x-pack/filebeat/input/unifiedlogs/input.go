@@ -136,7 +136,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 	if input.mustStream() {
 		g.Go(func() error {
 			logCmd := newLogStreamCmd(ctx, input.commonConfig)
-			return input.runLogCmd(logCmd, wrappedPub, log)
+			return input.runLogCmd(ctx, logCmd, wrappedPub, log)
 		})
 	}
 
@@ -157,7 +157,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 				defer wrappedPub.startUpdatingCursor()
 			}
 			logCmd := newLogShowCmd(ctx, input.config)
-			err := input.runLogCmd(logCmd, pub, log)
+			err := input.runLogCmd(ctx, logCmd, pub, log)
 			if !input.mustStream() {
 				log.Debugf("finished processing events, stopping")
 			}
@@ -181,7 +181,7 @@ func (input *input) mustBackfill() bool {
 	return input.Backfill || input.ArchiveFile != "" || input.TraceFile != "" || input.Start != "" || input.End != ""
 }
 
-func (input *input) runLogCmd(logCmd *exec.Cmd, pub inputcursor.Publisher, log *logp.Logger) error {
+func (input *input) runLogCmd(ctx context.Context, logCmd *exec.Cmd, pub inputcursor.Publisher, log *logp.Logger) error {
 	outpipe, err := logCmd.StdoutPipe()
 	if err != nil {
 		return fmt.Errorf("get stdout pipe: %w", err)
@@ -203,8 +203,8 @@ func (input *input) runLogCmd(logCmd *exec.Cmd, pub inputcursor.Publisher, log *
 	}
 
 	stderrBytes, _ := io.ReadAll(errpipe)
-	if err := logCmd.Wait(); err != nil {
-		return fmt.Errorf("log command exited with an error: %w, %q", err, string(stderrBytes))
+	if err := logCmd.Wait(); err != nil && ctx.Err() == nil {
+		return fmt.Errorf("%q exited with an error: %w, %q", logCmd, err, string(stderrBytes))
 	}
 
 	return nil
