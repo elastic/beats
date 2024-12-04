@@ -24,10 +24,20 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelcommon/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 )
+
+type unsupportedConfig struct {
+	CompressionLevel   int               `config:"compression_level" `
+	LoadBalance        bool              `config:"loadbalance"`
+	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
+	AllowOlderVersion  bool              `config:"allow_older_versions"`
+	EscapeHTML         bool              `config:"escape_html"`
+	Kerberos           *kerberos.Config  `config:"kerberos"`
+}
 
 // toOTelConfig converts a Beat config into an OTel elasticsearch exporter config
 func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
@@ -43,6 +53,13 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("could not parse Elasticsearch output configuration: %w", err)
 	}
 	escfg := defaultConfig
+
+	// check if unsupported configuration is provided
+	temp := unsupportedConfig{}
+	if esRawCfg.Unpack(&temp); temp != (unsupportedConfig{}) {
+		return nil, fmt.Errorf("these configuration paramaters are not supported %+v", temp)
+	}
+
 	if err := esRawCfg.Unpack(&escfg); err != nil {
 		return nil, err
 	}

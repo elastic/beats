@@ -21,10 +21,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
-	"github.com/elastic/elastic-agent-libs/config"
 	"go.opentelemetry.io/collector/confmap"
 	"go.uber.org/zap"
+
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // list of supported beatreceivers

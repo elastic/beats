@@ -53,9 +53,18 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	}
 
 	certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
+	if err != nil {
+		logger.Errorf("Failed reading key file: %+v", err)
+		return nil, fmt.Errorf("%w %v", err, certKeyBytes)
+	}
+
 	certKeyPem := string(certKeyBytes)
 
 	certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
+	if err != nil {
+		logger.Errorf("Failed reading key file: %+v", err)
+		return nil, fmt.Errorf("%w %v", err, certBytes)
+	}
 	certPem := string(certBytes)
 
 	// We only include the system certificates if no CA is defined

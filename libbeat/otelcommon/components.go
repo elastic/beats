@@ -18,12 +18,13 @@
 package otelcommon
 
 import (
-	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/receiver"
+
+	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 )
 
 // Component initializes collector components
