@@ -214,31 +214,37 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 	return nil
 }
 
+func getBaseFields(data BaseData) mapstr.M {
+	return mapstr.M{
+		"organization_id":   data.OrganizationID,
+		"organization_name": data.OrganizationName,
+		"api_key_id":        data.ApiKeyID,
+		"api_key_name":      data.ApiKeyName,
+		"api_key_redacted":  data.ApiKeyRedacted,
+		"api_key_type":      data.ApiKeyType,
+		"project_id":        data.ProjectID,
+		"project_name":      data.ProjectName,
+	}
+}
+
 func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 	for _, usage := range data {
 		event := mb.Event{
+			Timestamp: time.Unix(usage.AggregationTimestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"data": mapstr.M{
-					"organization_id":               usage.OrganizationID,
-					"organization_name":             usage.OrganizationName,
-					"aggregation_timestamp":         time.Unix(usage.AggregationTimestamp, 0).UTC(), // epoch time to time.Time (UTC)
 					"n_requests":                    usage.NRequests,
 					"operation":                     usage.Operation,
 					"snapshot_id":                   usage.SnapshotID,
 					"n_context_tokens_total":        usage.NContextTokensTotal,
 					"n_generated_tokens_total":      usage.NGeneratedTokensTotal,
 					"email":                         usage.Email,
-					"api_key_id":                    usage.ApiKeyID,
-					"api_key_name":                  usage.ApiKeyName,
-					"api_key_redacted":              usage.ApiKeyRedacted,
-					"api_key_type":                  usage.ApiKeyType,
-					"project_id":                    usage.ProjectID,
-					"project_name":                  usage.ProjectName,
 					"request_type":                  usage.RequestType,
 					"n_cached_context_tokens_total": usage.NCachedContextTokensTotal,
 				},
 			},
 		}
+		event.MetricSetFields.DeepUpdate(getBaseFields(usage.BaseData))
 		events = append(events, event)
 	}
 	m.processEvents(events)
@@ -247,26 +253,19 @@ func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 	for _, dalle := range data {
 		event := mb.Event{
+			Timestamp: time.Unix(dalle.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"dalle": mapstr.M{
-					"timestamp":         time.Unix(dalle.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
-					"num_images":        dalle.NumImages,
-					"num_requests":      dalle.NumRequests,
-					"image_size":        dalle.ImageSize,
-					"operation":         dalle.Operation,
-					"user_id":           dalle.UserID,
-					"organization_id":   dalle.OrganizationID,
-					"api_key_id":        dalle.ApiKeyID,
-					"api_key_name":      dalle.ApiKeyName,
-					"api_key_redacted":  dalle.ApiKeyRedacted,
-					"api_key_type":      dalle.ApiKeyType,
-					"organization_name": dalle.OrganizationName,
-					"model_id":          dalle.ModelID,
-					"project_id":        dalle.ProjectID,
-					"project_name":      dalle.ProjectName,
+					"num_images":   dalle.NumImages,
+					"num_requests": dalle.NumRequests,
+					"image_size":   dalle.ImageSize,
+					"operation":    dalle.Operation,
+					"user_id":      dalle.UserID,
+					"model_id":     dalle.ModelID,
 				},
 			},
 		}
+		event.MetricSetFields.DeepUpdate(getBaseFields(dalle.BaseData))
 		events = append(events, event)
 	}
 	m.processEvents(events)
@@ -275,24 +274,17 @@ func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 	for _, whisper := range data {
 		event := mb.Event{
+			Timestamp: time.Unix(whisper.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"whisper": mapstr.M{
-					"timestamp":         time.Unix(whisper.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
-					"model_id":          whisper.ModelID,
-					"num_seconds":       whisper.NumSeconds,
-					"num_requests":      whisper.NumRequests,
-					"user_id":           whisper.UserID,
-					"organization_id":   whisper.OrganizationID,
-					"api_key_id":        whisper.ApiKeyID,
-					"api_key_name":      whisper.ApiKeyName,
-					"api_key_redacted":  whisper.ApiKeyRedacted,
-					"api_key_type":      whisper.ApiKeyType,
-					"organization_name": whisper.OrganizationName,
-					"project_id":        whisper.ProjectID,
-					"project_name":      whisper.ProjectName,
+					"model_id":     whisper.ModelID,
+					"num_seconds":  whisper.NumSeconds,
+					"num_requests": whisper.NumRequests,
+					"user_id":      whisper.UserID,
 				},
 			},
 		}
+		event.MetricSetFields.DeepUpdate(getBaseFields(whisper.BaseData))
 		events = append(events, event)
 	}
 	m.processEvents(events)
@@ -301,24 +293,17 @@ func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 	for _, tts := range data {
 		event := mb.Event{
+			Timestamp: time.Unix(tts.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"tts": mapstr.M{
-					"timestamp":         time.Unix(tts.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
-					"model_id":          tts.ModelID,
-					"num_characters":    tts.NumCharacters,
-					"num_requests":      tts.NumRequests,
-					"user_id":           tts.UserID,
-					"organization_id":   tts.OrganizationID,
-					"api_key_id":        tts.ApiKeyID,
-					"api_key_name":      tts.ApiKeyName,
-					"api_key_redacted":  tts.ApiKeyRedacted,
-					"api_key_type":      tts.ApiKeyType,
-					"organization_name": tts.OrganizationName,
-					"project_id":        tts.ProjectID,
-					"project_name":      tts.ProjectName,
+					"model_id":       tts.ModelID,
+					"num_characters": tts.NumCharacters,
+					"num_requests":   tts.NumRequests,
+					"user_id":        tts.UserID,
 				},
 			},
 		}
+		event.MetricSetFields.DeepUpdate(getBaseFields(tts.BaseData))
 		events = append(events, event)
 	}
 

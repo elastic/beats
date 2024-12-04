@@ -30,7 +30,7 @@ type apiKeyConfig struct {
 }
 
 type collectionConfig struct {
-	LookbackDays int  `config:"lookback_days" validate:"required"`
+	LookbackDays int  `config:"lookback_days"`
 	Realtime     bool `config:"realtime"`
 }
 

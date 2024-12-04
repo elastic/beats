@@ -7,7 +7,6 @@ package usage
 type BaseData struct {
 	OrganizationID   string  `json:"organization_id"`
 	OrganizationName string  `json:"organization_name"`
-	UserID           *string `json:"user_id"`
 	ApiKeyID         *string `json:"api_key_id"`
 	ApiKeyName       *string `json:"api_key_name"`
 	ApiKeyRedacted   *string `json:"api_key_redacted"`
@@ -48,6 +47,7 @@ type DalleData struct {
 	ImageSize   string `json:"image_size"`
 	Operation   string `json:"operation"`
 	ModelID     string `json:"model_id"`
+	UserID      string `json:"user_id"`
 }
 
 type WhisperData struct {
@@ -56,6 +56,7 @@ type WhisperData struct {
 	ModelID     string `json:"model_id"`
 	NumSeconds  int    `json:"num_seconds"`
 	NumRequests int    `json:"num_requests"`
+	UserID      string `json:"user_id"`
 }
 
 type TtsData struct {
@@ -64,4 +65,5 @@ type TtsData struct {
 	ModelID       string `json:"model_id"`
 	NumCharacters int    `json:"num_characters"`
 	NumRequests   int    `json:"num_requests"`
+	UserID        string `json:"user_id"`
 }

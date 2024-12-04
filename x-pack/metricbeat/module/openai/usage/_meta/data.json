@@ -11,25 +11,24 @@
     },
     "openai": {
         "usage": {
+            "api_key_id": null,
+            "api_key_name": null,
+            "api_key_redacted": null,
+            "api_key_type": null,
             "data": {
-                "aggregation_timestamp": "2024-11-04T05:01:00Z",
-                "api_key_id": null,
-                "api_key_name": null,
-                "api_key_redacted": null,
-                "api_key_type": null,
                 "email": null,
                 "n_cached_context_tokens_total": 0,
                 "n_context_tokens_total": 118,
                 "n_generated_tokens_total": 35,
                 "n_requests": 1,
                 "operation": "completion-realtime",
-                "organization_id": "org-dummy",
-                "organization_name": "Personal",
-                "project_id": null,
-                "project_name": null,
                 "request_type": "",
                 "snapshot_id": "gpt-4o-realtime-preview-2024-10-01"
-            }
+            },
+            "organization_id": "org-dummy",
+            "organization_name": "Personal",
+            "project_id": null,
+            "project_name": null
         }
     },
     "service": {
