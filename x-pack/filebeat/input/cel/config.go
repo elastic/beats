@@ -58,6 +58,9 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+
+	// FailureDump configures failure dump behaviour.
+	FailureDump *dumpConfig `config:"failure_dump"`
 }
 
 type redact struct {
@@ -67,6 +70,19 @@ type redact struct {
 	// Delete indicates that fields should be completely deleted
 	// before logging rather than redaction with a "*".
 	Delete bool `config:"delete"`
+}
+
+// dumpConfig configures the CEL program to retain
+// the full evaluation state using the cel.OptTrackState
+// option. The state is written to a file in the path if
+// the evaluation fails.
+type dumpConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	Filename string `config:"filename"`
+}
+
+func (t *dumpConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 func (c config) Validate() error {
@@ -89,7 +105,8 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
+	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

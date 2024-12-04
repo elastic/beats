@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
 - Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
 - Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 
 *Auditbeat*
 
@@ -58,16 +59,22 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
+- Upgrade to osquery 5.13.1. {pull}40849[40849]
 
 *Osquerybeat*
 
 
 *Packetbeat*
+
+- Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
 
 - Expire source port mappings. {pull}41581[41581]
 
@@ -103,9 +110,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
+- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 
 *Auditbeat*
 
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
 
 *Filebeat*
 
@@ -161,7 +173,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix missing key in streaming input logging. {pull}41600[41600]
+
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
 - Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 
 *Heartbeat*
 
@@ -192,6 +212,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fix http server helper SSL config. {pull}39405[39405]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 
 *Osquerybeat*
@@ -201,6 +222,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
+
+- Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
 
 
 *Elastic Logging Plugin*
@@ -234,6 +257,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Split module/system/process into common and provider bits. {pull}41868[41868]
 
 *Auditbeat*
 
@@ -302,7 +326,16 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support to include AWS cloudwatch linked accounts when using log_group_name_prefix to define log group names. {pull}41206[41206]
 - Improved Azure Blob Storage input documentation. {pull}41252[41252]
 - Make ETW input GA. {pull}41389[41389]
+- Added input metrics to GCS input. {issue}36640[36640] {pull}41505[41505]
 - Add support for Okta entity analytics provider to collect role and factor data for users. {pull}41460[41460]
+- Add support for Journald in the System module. {pull}41555[41555]
+- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
+- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Update CEL mito extensions to v1.16.0. {pull}41727[41727]
+- Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
+- Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
+- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
 
 *Auditbeat*
 
@@ -334,7 +367,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
 - Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
-- Add new metricset datastorecluster for vSphere module. {pull}40634[40634] 
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
 - Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
 - Add metrics related to alert in all the vSphere metricsets. {pull}40714[40714]
 - Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
@@ -357,6 +390,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `id` field to all the vSphere metricsets. {pull}41097[41097]
 - Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
+- Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
 
 *Metricbeat*
 
@@ -370,6 +405,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
+- Properly set events `UserData` when experimental api is used. {pull}41525[41525]
+- Include XML is respected for experimental api {pull}41525[41525]
+- Forwarded events use renderedtext info for experimental api {pull}41525[41525]
+- Language setting is respected for experimental api {pull}41525[41525]
+- Language setting also added to decode xml wineventlog processor {pull}41525[41525]
+- Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
@@ -410,6 +451,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
