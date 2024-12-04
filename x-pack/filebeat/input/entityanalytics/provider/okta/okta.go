@@ -478,7 +478,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		next, err := okta.Next(h)
 		if err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				break
 			}
 			p.logger.Debugf("received %d users from API", len(users))
@@ -615,7 +615,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				next, err := okta.Next(h)
 				if err != nil {
-					if errors.Is(err, io.EOF) {
+					if err == io.EOF {
 						break
 					}
 					p.logger.Debugf("received %d devices from API", len(devices))
@@ -644,7 +644,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 		next, err := okta.Next(h)
 		if err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				break
 			}
 			p.logger.Debugf("received %d devices from API", len(devices))
