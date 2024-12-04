@@ -148,7 +148,9 @@ func exportContainerStats(ctx context.Context, client *client.Client, container 
 	// JSON decoder
 	decoder := json.NewDecoder(containerStats.Body)
 	if !stream {
-		decoder.Decode(&event.Stats)
+		if err := decoder.Decode(&event.Stats); err != nil {
+			return event
+		}
 	} else {
 		// handle stream. Take the second result.
 		count := 0
