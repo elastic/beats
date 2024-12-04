@@ -50,8 +50,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
 - The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
 - Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
-
 - Add kafka compression support for ZSTD.
+- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
 
 *Heartbeat*
 
@@ -116,12 +116,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
+- Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
 
 *Auditbeat*
 
 - auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
 - auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
 - auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
 
 *Filebeat*
 
@@ -217,6 +219,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 - Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
+- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 
 
 *Osquerybeat*
@@ -261,6 +264,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Split module/system/process into common and provider bits. {pull}41868[41868]
 
 *Auditbeat*
 
@@ -351,6 +355,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry config in GCS input. {issue}11580[11580] {pull}41862[41862]
 
+- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
 
 *Auditbeat*
 
