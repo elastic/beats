@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 
 - Only watch metadata for ReplicaSets in metricbeat k8s module. {pull}41289[41289]
 
+
 [[release-notes-8.15.3]]
 === Beats version 8.15.3
 https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
@@ -202,6 +203,7 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.2[View commits]
 *Metricbeat*
 
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+
 
 [[release-notes-8.15.1]]
 === Beats version 8.15.1
