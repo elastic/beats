@@ -195,7 +195,11 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 
 	m.logger.Infof("Fetched usage metrics for date: %s", dateStr)
 
-	events := make([]mb.Event, 0, len(usageResponse.Data))
+	events := make([]mb.Event, 0, len(usageResponse.Data)+
+		len(usageResponse.DalleApiData)+
+		len(usageResponse.WhisperApiData)+
+		len(usageResponse.TtsApiData),
+	)
 
 	m.processUsageData(events, usageResponse.Data)
 	m.processDalleData(events, usageResponse.DalleApiData)
