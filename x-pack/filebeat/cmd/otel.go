@@ -53,7 +53,7 @@ func OtelCmd() *cobra.Command {
 
 			col, err := otelcol.NewCollector(set)
 			if err != nil {
-				panic(fmt.Errorf("error initializting collector process: %w", err))
+				panic(fmt.Errorf("error initializing collector process: %w", err))
 			}
 			return col.Run(context.Background())
 		},
