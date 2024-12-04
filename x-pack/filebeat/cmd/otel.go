@@ -8,13 +8,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/otelcommon"
-	"github.com/elastic/beats/v7/libbeat/otelcommon/converters"
-	"github.com/elastic/beats/v7/libbeat/otelcommon/providers/fbprovider"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/otelcol"
+
+	"github.com/elastic/beats/v7/libbeat/otelcommon"
+	"github.com/elastic/beats/v7/libbeat/otelcommon/converters"
+	"github.com/elastic/beats/v7/libbeat/otelcommon/providers/fbprovider"
 )
 
 func OtelCmd() *cobra.Command {

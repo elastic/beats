@@ -36,7 +36,6 @@ type converter struct {
 }
 
 // NewFactory returns a factory for a  confmap.Converter,
-// which expands all environment variables for a given confmap.Conf.
 func NewFactory() confmap.ConverterFactory {
 	return confmap.NewConverterFactory(newConverter)
 }

@@ -30,6 +30,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
+// need to add
+// ssl.curve_types
+// ssl.ca_sha256
+// ssl.ca_trustred_fingerprint
+// indices
+// pipelines
+// paramaters
 type unsupportedConfig struct {
 	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
