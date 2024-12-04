@@ -59,6 +59,6 @@ func OtelCmd() *cobra.Command {
 		},
 	}
 
-	command.Flags().String("config", "filebeat-otel.yml", "pass filebeat config")
+	command.Flags().String("config", "filebeat-otel.yml", "path to filebeat config file")
 	return command
 }
