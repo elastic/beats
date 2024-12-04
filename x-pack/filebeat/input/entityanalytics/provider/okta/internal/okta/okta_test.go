@@ -263,14 +263,14 @@ var localTests = []struct {
 	name   string
 	msg    string
 	id     string
-	fn     func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error)
+	fn     func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error)
 	mkWant func(string) (any, error)
 }{
 	{
 		// Test case constructed from API-returned value with details anonymised.
 		name: "users",
 		msg:  `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`,
-		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetUserDetails(context.Background(), cli, host, key, user, query, OmitNone, lim, window, log)
 		},
 		mkWant: mkWant[User],
@@ -279,7 +279,7 @@ var localTests = []struct {
 		// Test case from https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices
 		name: "devices",
 		msg:  `[{"id":"devid","status":"CREATED","created":"2019-10-02T18:03:07.000Z","lastUpdated":"2019-10-02T18:03:07.000Z","profile":{"displayName":"Example Device name 1","platform":"WINDOWS","serialNumber":"XXDDRFCFRGF3M8MD6D","sid":"S-1-11-111","registered":true,"secureHardwarePresent":false,"diskEncryptionType":"ALL_INTERNAL_VOLUMES"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 1","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g4","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g4/users","hints":{"allow":["GET"]}}}},{"id":"guo4a5u7YAHhjXrMK0g5","status":"ACTIVE","created":"2023-06-21T23:24:02.000Z","lastUpdated":"2023-06-21T23:24:02.000Z","profile":{"displayName":"Example Device name 2","platform":"ANDROID","manufacturer":"Google","model":"Pixel 6","osVersion":"13:2023-05-05","registered":true,"secureHardwarePresent":true,"diskEncryptionType":"USER"},"resourceType":"UDDevice","resourceDisplayName":{"value":"Example Device name 2","sensitive":false},"resourceAlternateId":null,"resourceId":"guo4a5u7YAHhjXrMK0g5","_links":{"activate":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/lifecycle/activate","hints":{"allow":["POST"]}},"self":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5","hints":{"allow":["GET","PATCH","PUT"]}},"users":{"href":"https://{yourOktaDomain}/api/v1/devices/guo4a5u7YAHhjXrMK0g5/users","hints":{"allow":["GET"]}}}}]`,
-		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetDeviceDetails(context.Background(), cli, host, key, device, query, lim, window, log)
 		},
 		mkWant: mkWant[Device],
@@ -289,7 +289,7 @@ var localTests = []struct {
 		name: "devices_users",
 		msg:  `[{"created":"2023-08-07T21:48:27.000Z","managementStatus":"NOT_MANAGED","user":{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}}]`,
 		id:   "devid",
-		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
+		fn: func(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) (any, http.Header, error) {
 			return GetDeviceUsers(context.Background(), cli, host, key, device, query, OmitNone, lim, window, log)
 		},
 		mkWant: mkWant[devUser],
@@ -375,13 +375,13 @@ func TestLocal(t *testing.T) {
 				t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
 			}
 
-			if len(*limiter) != 1 {
-				t.Errorf("unexpected number endpoints track by rate limiter: %d", len(*limiter))
+			if len(limiter) != 1 {
+				t.Errorf("unexpected number endpoints track by rate limiter: %d", len(limiter))
 			}
 			// retrieve the rate.Limiter parameters for the one endpoint
 			var limit rate.Limit
 			var burst int
-			for _, l := range *limiter {
+			for _, l := range limiter {
 				limit = l.Limit()
 				burst = l.Burst()
 				break

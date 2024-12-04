@@ -176,6 +176,7 @@ func TestOktaDoFetch(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse server URL: %v", err)
 			}
+			rateLimiter := okta.NewRateLimiter()
 			a := oktaInput{
 				cfg: conf{
 					OktaDomain: u.Host,
@@ -184,7 +185,7 @@ func TestOktaDoFetch(t *testing.T) {
 					EnrichWith: test.enrichWith,
 				},
 				client: ts.Client(),
-				lim:    okta.NewRateLimiter(),
+				lim:    rateLimiter,
 				logger: logp.L(),
 			}
 			if *trace {

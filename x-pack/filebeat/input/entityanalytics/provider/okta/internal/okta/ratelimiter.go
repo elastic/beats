@@ -18,9 +18,9 @@ import (
 
 type RateLimiter map[string]*rate.Limiter
 
-func NewRateLimiter() *RateLimiter {
+func NewRateLimiter() RateLimiter {
 	r := make(RateLimiter)
-	return &r
+	return r
 }
 
 func (r RateLimiter) limiter(path string) *rate.Limiter {

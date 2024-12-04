@@ -59,7 +59,7 @@ type oktaInput struct {
 	cfg conf
 
 	client *http.Client
-	lim    *okta.RateLimiter
+	lim    okta.RateLimiter
 
 	metrics *inputMetrics
 	logger  *logp.Logger
