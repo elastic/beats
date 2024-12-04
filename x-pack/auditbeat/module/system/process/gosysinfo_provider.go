@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid/v5"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
