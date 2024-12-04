@@ -143,7 +143,7 @@ func defaultConfig() config {
 		ParseJSON:     false,
 		Retry: retryConfig{
 			MaxAttempts:            3,
-			InitialBackOffDuration: 1 * time.Second,
+			InitialBackOffDuration: time.Second,
 			MaxBackOffDuration:     30 * time.Second,
 			BackOffMultiplier:      2,
 		},
