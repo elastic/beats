@@ -30,13 +30,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-// need to add
-// ssl.curve_types
-// ssl.ca_sha256
-// ssl.ca_trustred_fingerprint
+// TODO: add  following params to below struct
 // indices
 // pipelines
-// paramaters
+// parameters
+// preset
 type unsupportedConfig struct {
 	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
@@ -63,8 +61,11 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 
 	// check if unsupported configuration is provided
 	temp := unsupportedConfig{}
-	if esRawCfg.Unpack(&temp); temp != (unsupportedConfig{}) {
-		return nil, fmt.Errorf("these configuration paramaters are not supported %+v", temp)
+	if err := esRawCfg.Unpack(&temp); err != nil {
+		return nil, err
+	}
+	if temp != (unsupportedConfig{}) {
+		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
 	}
 
 	if err := esRawCfg.Unpack(&escfg); err != nil {
@@ -86,7 +87,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	for _, h := range esToOTelOptions.Hosts {
 		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
 		if err != nil {
-			return nil, fmt.Errorf("cannot generate ES URL from host %q", err)
+			return nil, fmt.Errorf("cannot generate ES URL from host %w", err)
 		}
 		hosts = append(hosts, esURL)
 	}

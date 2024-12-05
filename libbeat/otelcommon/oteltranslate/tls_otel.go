@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-// currently unsupported paramaters
+// currently unsupported parameters
 // ssl.curve_types
 // ssl.ca_sha256
 // ssl.ca_trustred_fingerprint

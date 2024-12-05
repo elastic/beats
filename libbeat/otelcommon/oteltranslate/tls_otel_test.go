@@ -6,7 +6,7 @@
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//	http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
@@ -20,9 +20,10 @@ package oteltranslate
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func TestTLSCommonToOTel(t *testing.T) {
@@ -60,7 +61,7 @@ func TestTLSCommonToOTel(t *testing.T) {
 			want: nil,
 			err:  true,
 		},
-		// TODO: Add more rest of the scenarios
+		// TODO: Add  rest of the scenarios
 	}
 
 	for _, test := range tests {

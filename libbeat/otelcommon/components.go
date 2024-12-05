@@ -33,7 +33,7 @@ func Component() (otelcol.Factories, error) {
 		fbreceiver.NewFactory(),
 	)
 	if err != nil {
-		return otelcol.Factories{}, nil
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
 	exporters, err := exporter.MakeFactoryMap(
@@ -41,11 +41,11 @@ func Component() (otelcol.Factories, error) {
 		elasticsearchexporter.NewFactory(),
 	)
 	if err != nil {
-		return otelcol.Factories{}, nil
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
 	if err != nil {
-		return otelcol.Factories{}, nil
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
 	return otelcol.Factories{

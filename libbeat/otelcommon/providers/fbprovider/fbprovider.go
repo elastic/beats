@@ -52,7 +52,10 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 	}
 
 	var receiverMap map[string]any
-	cfg.Unpack(&receiverMap)
+	err = cfg.Unpack(&receiverMap)
+	if err != nil {
+		return nil, err
+	}
 
 	// filebeat specific configuration is defined here
 	cfgMap := map[string]any{
