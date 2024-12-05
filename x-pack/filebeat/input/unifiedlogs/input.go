@@ -214,22 +214,26 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 	scanner := bufio.NewScanner(stdout)
 
 	var (
-		event     beat.Event
-		line      string
-		logRecord logRecord
-		timestamp time.Time
-		err       error
+		event         beat.Event
+		line          string
+		logRecordLine logRecord
+		timestamp     time.Time
+		err           error
 	)
 
 	for scanner.Scan() {
 		line = scanner.Text()
-		if err = json.Unmarshal([]byte(line), &logRecord); err != nil {
+		if err = json.Unmarshal([]byte(line), &logRecordLine); err != nil {
 			log.Errorf("invalid json log: %v", err)
 			input.metrics.errs.Add(1)
 			continue
 		}
 
-		timestamp, err = time.Parse(logDateLayout, logRecord.Timestamp)
+		if logRecordLine == (logRecord{}) {
+			continue
+		}
+
+		timestamp, err = time.Parse(logDateLayout, logRecordLine.Timestamp)
 		if err != nil {
 			input.metrics.errs.Add(1)
 			log.Errorf("invalid timestamp: %v", err)
