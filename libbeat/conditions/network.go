@@ -101,7 +101,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		log:    logp.NewLogger(logName),
 	}
 
-	makeMatcher := func(network string) (networkMatcher, error) { //nolint: typecheck // linter is confused
+	makeMatcher := func(network string) (networkMatcher, error) {
 		m := singleNetworkMatcher{name: network, netContainsFunc: namedNetworks[network]}
 		if m.netContainsFunc == nil {
 			subnet, err := parseCIDR(network)
@@ -113,7 +113,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		return m, nil
 	}
 
-	invalidTypeError := func(field string, value interface{}) error { //nolint: typecheck // linter is confused
+	invalidTypeError := func(field string, value interface{}) error {
 		return fmt.Errorf("network condition attempted to set "+
 			"'%v' -> '%v' and encountered unexpected type '%T', only "+
 			"strings or []strings are allowed", field, value, value)
