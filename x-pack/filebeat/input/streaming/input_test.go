@@ -6,6 +6,7 @@ package streaming
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -450,6 +451,75 @@ var inputTests = []struct {
 		},
 		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake"),
 	},
+	{
+		name:    "single_event_tls",
+		server:  webSocketServerWithTLS(httptest.NewUnstartedServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"ssl": map[string]interface{}{
+				"certificate_authorities": []string{"testdata/certs/ca.crt"},
+				"certificate":             "testdata/certs/cert.pem",
+				"key":                     "testdata/certs/key.pem",
+			},
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+		   }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
 }
 
 var urlEvalTests = []struct {
@@ -769,6 +839,46 @@ func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*t
 		}
 		t.Cleanup(server.Close)
 	}
+}
+
+// webSocketServerWithTLS returns a function that creates a WebSocket server with TLS.
+func webSocketServerWithTLS(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			upgrader := websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
+				},
+			}
+
+			conn, err := upgrader.Upgrade(w, r, nil)
+			if err != nil {
+				t.Fatalf("error upgrading connection to WebSocket: %v", err)
+				return
+			}
+
+			handler(t, conn, response)
+		}))
+		//nolint:gosec // there is no need to use a secure cert for testing
+		server.TLS = &tls.Config{
+			Certificates: []tls.Certificate{generateSelfSignedCert(t)},
+		}
+		server.StartTLS()
+
+		if config["url"] == nil {
+			config["url"] = "ws" + server.URL[4:]
+		}
+		t.Cleanup(server.Close)
+	}
+}
+
+// generateSelfSignedCert returns a self-signed certificate for testing purposes based on the dummy certs in the testdata directory
+func generateSelfSignedCert(t *testing.T) tls.Certificate {
+	cert, err := tls.LoadX509KeyPair("testdata/certs/cert.pem", "testdata/certs/key.pem")
+	if err != nil {
+		t.Fatalf("failed to generate self-signed cert: %v", err)
+	}
+	return cert
 }
 
 // defaultHandler is a default handler for WebSocket connections.
