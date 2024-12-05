@@ -69,7 +69,7 @@ func GetNpcapInstaller() error {
 	if os.Getenv("NPCAP_LOCAL") == "true" {
 		fi, err := os.Stat(dstPath)
 		if err == nil && !fi.IsDir() {
-			fmt.Println("using local Npcap installer with NPCAP_LOCAL=true")
+			fmt.Println("using local Npcap installer with NPCAP_LOCAL=true") //nolint:forbidigo // fmt.Println is ok here
 			return nil
 		}
 		if !errors.Is(err, fs.ErrNotExist) {
@@ -78,7 +78,7 @@ func GetNpcapInstaller() error {
 	}
 	ciBucketName := getBucketName()
 
-	fmt.Printf("getting %s from private cache\n", installer)
+	fmt.Printf("getting %s from private cache\n", installer) //nolint:forbidigo // fmt.Println is ok here
 	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }
 
