@@ -414,6 +414,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Language setting also added to decode xml wineventlog processor {pull}41525[41525]
 - Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
+- Make the experimental API GA and rename it to winlogbeat-raw {issue}39580[39580] {pull}41770[41770]
 
 
 *Functionbeat*
