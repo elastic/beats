@@ -101,6 +101,8 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		log:    logp.NewLogger(logName),
 	}
 
+	//nolint:nolintlint // the linter seems broken here
+	//nolint:typecheck // false positive
 	makeMatcher := func(network string) (networkMatcher, error) {
 		m := singleNetworkMatcher{name: network, netContainsFunc: namedNetworks[network]}
 		if m.netContainsFunc == nil {
@@ -113,6 +115,8 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		return m, nil
 	}
 
+	//nolint:nolintlint // the linter seems broken here
+	//nolint:typecheck // false positive
 	invalidTypeError := func(field string, value interface{}) error {
 		return fmt.Errorf("network condition attempted to set "+
 			"'%v' -> '%v' and encountered unexpected type '%T', only "+
