@@ -22,7 +22,6 @@ import (
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"golang.org/x/time/rate"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -59,7 +58,7 @@ type oktaInput struct {
 	cfg conf
 
 	client *http.Client
-	lim    *rate.Limiter
+	lim    okta.RateLimiter
 
 	metrics *inputMetrics
 	logger  *logp.Logger
@@ -110,7 +109,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	updateTimer := time.NewTimer(updateWaitTime)
 
 	// Allow a single fetch operation to obtain limits from the API.
-	p.lim = rate.NewLimiter(1, 1)
+	p.lim = okta.NewRateLimiter()
 
 	if p.cfg.Tracer != nil {
 		id := sanitizeFileName(inputCtx.ID)

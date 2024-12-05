@@ -17,7 +17,6 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/time/rate"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
@@ -147,6 +146,7 @@ func TestOktaDoFetch(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse server URL: %v", err)
 			}
+			rateLimiter := okta.NewRateLimiter()
 			a := oktaInput{
 				cfg: conf{
 					OktaDomain: u.Host,
@@ -154,7 +154,7 @@ func TestOktaDoFetch(t *testing.T) {
 					Dataset:    test.dataset,
 				},
 				client: ts.Client(),
-				lim:    rate.NewLimiter(1, 1),
+				lim:    rateLimiter,
 				logger: logp.L(),
 			}
 			if *trace {
