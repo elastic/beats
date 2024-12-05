@@ -9,8 +9,6 @@
 <titleabbrev>Unified Logs</titleabbrev>
 ++++
 
-beta[]
-
 NOTE: Only available for MacOS.
 
 The unified logging system provides a comprehensive and performant API to capture

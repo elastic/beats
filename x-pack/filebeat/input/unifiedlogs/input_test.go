@@ -60,7 +60,7 @@ func TestInput(t *testing.T) {
 		name                 string
 		cfg                  config
 		timeUntilClose       time.Duration
-		assertFunc           func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time, cmd ...string)
+		assertFunc           func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time)
 		expectedLogStreamCmd string
 		expectedLogShowCmd   string
 		expectedRunErrorMsg  string
@@ -70,7 +70,7 @@ func TestInput(t *testing.T) {
 			cfg:                  config{},
 			timeUntilClose:       time.Second,
 			expectedLogStreamCmd: "/usr/bin/log stream --style ndjson",
-			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time, cmd ...string) {
+			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
 				assert.NotEmpty(collect, events)
 				assert.NotEmpty(collect, cursors)
 				assert.Equal(collect, len(events), len(cursors))
@@ -199,48 +199,6 @@ func TestInput(t *testing.T) {
 			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --info --debug --backtrace --signpost --mach-continuous-time", archivePath),
 			assertFunc:         eventsAndCursorAssertN(462),
 		},
-		{
-			name: "Stream and Backfill",
-			cfg: config{
-				Backfill: true,
-				showConfig: showConfig{
-					Start: time.Now().Add(-5 * time.Second).Format("2006-01-02 15:04:05"),
-				},
-				commonConfig: commonConfig{
-					Info:               true,
-					Debug:              true,
-					Backtrace:          true,
-					Signpost:           true,
-					MachContinuousTime: true,
-				},
-			},
-			timeUntilClose:       2 * time.Second,
-			expectedLogShowCmd:   fmt.Sprintf("/usr/bin/log show --style ndjson --info --debug --backtrace --signpost --mach-continuous-time --start %v", time.Now().Format("2006-01-02")),
-			expectedLogStreamCmd: "/usr/bin/log stream --style ndjson --info --debug --backtrace --signpost --mach-continuous-time",
-			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time, cmd ...string) {
-				assert.Less(collect, 0, len(events))
-				assert.Less(collect, 0, len(cursors))
-
-				var endTime time.Time
-				regex := regexp.MustCompile(`--end\s+(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}[+-]\d{4})`)
-				if len(cmd) > 0 {
-					matches := regex.FindStringSubmatch(cmd[0])
-					assert.Equal(collect, 2, len(matches))
-					endTime, _ = time.Parse("2006-01-02 15:04:05-0700", matches[1])
-				}
-				endTime = endTime.Truncate(time.Second)
-
-				for i := range events {
-					if cursors[i] == nil {
-						firstStreamedEventTime := events[i].Timestamp
-						firstStreamedEventTime = firstStreamedEventTime.Add(time.Second).Truncate(time.Second)
-						assert.Equal(collect, endTime, firstStreamedEventTime)
-						break
-					}
-				}
-
-			},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -276,10 +234,10 @@ func TestInput(t *testing.T) {
 
 			assert.EventuallyWithT(t,
 				func(collect *assert.CollectT) {
-					assert.Equal(collect, tc.expectedLogStreamCmd, filterLogStreamLogline(buf.Bytes()))
-					assert.Equal(collect, true, strings.HasPrefix(filterLogShowLogline(buf.Bytes()), tc.expectedLogShowCmd))
+					assert.Equal(collect, tc.expectedLogStreamCmd, filterStartLogStreamLogline(buf.Bytes()))
+					assert.Equal(collect, tc.expectedLogShowCmd, filterStartLogShowLogline(buf.Bytes()))
 					if tc.assertFunc != nil {
-						tc.assertFunc(collect, pub.events, pub.cursors, filterLogShowLogline(buf.Bytes()))
+						tc.assertFunc(collect, pub.events, pub.cursors)
 					}
 				},
 				30*time.Second, time.Second,
@@ -288,19 +246,102 @@ func TestInput(t *testing.T) {
 	}
 }
 
-const cmdStartPrefix = "exec command start: "
+func TestBackfillAndStream(t *testing.T) {
+	archivePath, err := openArchive()
+	require.NoError(t, err)
+	t.Cleanup(func() { os.RemoveAll(archivePath) })
 
-func filterLogStreamLogline(buf []byte) string {
+	cfg := config{
+		Backfill: true,
+		showConfig: showConfig{
+			Start: time.Now().Add(-5 * time.Second).Format("2006-01-02 15:04:05"),
+		},
+		commonConfig: commonConfig{
+			Info:               true,
+			Debug:              true,
+			Backtrace:          true,
+			Signpost:           true,
+			MachContinuousTime: true,
+		},
+	}
+
+	expectedLogShowCmd := fmt.Sprintf("/usr/bin/log show --style ndjson --info --debug --backtrace --signpost --mach-continuous-time --start %v", time.Now().Format("2006-01-02"))
+	expectedLogStreamCmd := "/usr/bin/log stream --style ndjson --info --debug --backtrace --signpost --mach-continuous-time"
+
+	_, cursorInput := newCursorInput(cfg)
+	input := cursorInput.(*input)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	pub := &publisher{}
+	log, buf := logp.NewInMemory("unifiedlogs_test", logp.JSONEncoderConfig())
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func(t *testing.T) {
+		defer wg.Done()
+		err := input.runWithMetrics(ctx, pub, log)
+		assert.NoError(t, err)
+	}(t)
+
+	var firstStreamedEventTime *time.Time
+	assert.EventuallyWithT(t,
+		func(collect *assert.CollectT) {
+			showCmdLog := filterStartLogShowLogline(buf.Bytes())
+			assert.Equal(collect, expectedLogStreamCmd, filterStartLogStreamLogline(buf.Bytes()))
+			assert.True(collect, strings.HasPrefix(showCmdLog, expectedLogShowCmd))
+			assert.NotEmpty(collect, pub.events)
+			assert.NotEmpty(collect, pub.cursors)
+
+			var endTime time.Time
+			regex := regexp.MustCompile(`--end\s+(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}[+-]\d{4})`)
+			matches := regex.FindStringSubmatch(showCmdLog)
+			assert.Equal(collect, 2, len(matches))
+			endTime, _ = time.Parse("2006-01-02 15:04:05-0700", matches[1])
+			endTime = endTime.Truncate(time.Second)
+
+			if firstStreamedEventTime == nil {
+				for i := range pub.events {
+					if pub.cursors[i] == nil {
+						first := pub.events[i].Timestamp.Add(time.Second).Truncate(time.Second)
+						firstStreamedEventTime = &first
+						break
+					}
+				}
+			}
+			assert.NotNil(collect, firstStreamedEventTime)
+			assert.EqualValues(collect, endTime, *firstStreamedEventTime)
+			assert.True(collect, strings.HasPrefix(showCmdLog, filterEndLogShowLogline(buf.Bytes())))
+		},
+		30*time.Second, time.Second,
+	)
+
+	cancel()
+	wg.Wait()
+}
+
+const (
+	cmdStartPrefix = "exec command start: "
+	cmdEndPrefix   = "exec command end: "
+)
+
+func filterStartLogStreamLogline(buf []byte) string {
 	const cmd = "/usr/bin/log stream"
-	return filterLogCmdLine(buf, cmd)
+	return filterLogCmdLine(buf, cmd, cmdStartPrefix)
 }
 
-func filterLogShowLogline(buf []byte) string {
+func filterStartLogShowLogline(buf []byte) string {
 	const cmd = "/usr/bin/log show"
-	return filterLogCmdLine(buf, cmd)
+	return filterLogCmdLine(buf, cmd, cmdStartPrefix)
 }
 
-func filterLogCmdLine(buf []byte, cmdPrefix string) string {
+func filterEndLogShowLogline(buf []byte) string {
+	const cmd = "/usr/bin/log show"
+	return filterLogCmdLine(buf, cmd, cmdEndPrefix)
+}
+
+func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 	scanner := bufio.NewScanner(bytes.NewBuffer(buf))
 	for scanner.Scan() {
 		text := scanner.Text()
@@ -309,16 +350,16 @@ func filterLogCmdLine(buf []byte, cmdPrefix string) string {
 			continue
 		}
 
-		cmd := strings.TrimPrefix(parts[3], cmdStartPrefix)
-		if strings.HasPrefix(cmd, cmdPrefix) {
-			return cmd
+		trimmed := strings.TrimPrefix(parts[3], cmdStartPrefix)
+		if strings.HasPrefix(trimmed, cmd) {
+			return trimmed
 		}
 	}
 	return ""
 }
 
-func eventsAndCursorAssertN(n int) func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time, cmd ...string) {
-	return func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time, cmd ...string) {
+func eventsAndCursorAssertN(n int) func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
+	return func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
 		assert.Equal(collect, n, len(events))
 		assert.Equal(collect, n, len(cursors))
 		lastEvent := events[len(events)-1]

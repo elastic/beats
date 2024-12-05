@@ -46,7 +46,7 @@ var (
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Manager: &inputcursor.InputManager{
 			Logger:     log,
