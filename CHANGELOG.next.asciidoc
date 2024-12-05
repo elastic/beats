@@ -117,7 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
-- Allow network processor to handle multiple IPs {pull}41918[41918]
+- Allow network condition to handle multiple IPs {pull}41918[41918]
 
 *Auditbeat*
 

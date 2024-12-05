@@ -101,8 +101,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		log:    logp.NewLogger(logName),
 	}
 
-	//nolint: typecheck // linter is confused
-	makeMatcher := func(network string) (networkMatcher, error) {
+	makeMatcher := func(network string) (networkMatcher, error) { //nolint: typecheck // linter is confused
 		m := singleNetworkMatcher{name: network, netContainsFunc: namedNetworks[network]}
 		if m.netContainsFunc == nil {
 			subnet, err := parseCIDR(network)
@@ -114,8 +113,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 		return m, nil
 	}
 
-	//nolint: typecheck // linter is confused
-	invalidTypeError := func(field string, value interface{}) error {
+	invalidTypeError := func(field string, value interface{}) error { //nolint: typecheck // linter is confused
 		return fmt.Errorf("network condition attempted to set "+
 			"'%v' -> '%v' and encountered unexpected type '%T', only "+
 			"strings or []strings are allowed", field, value, value)
@@ -166,7 +164,6 @@ func (c *Network) Check(event ValuesMap) bool {
 		}
 		// match on an "any" basis when we find multiple IPs in the event;
 		// if the network matcher returns true for any seen IP, consider it a match
-		fmt.Printf("matching: %v\n", ipList)
 		matches := 0
 		for _, ip := range ipList {
 			if network.Contains(ip) {
