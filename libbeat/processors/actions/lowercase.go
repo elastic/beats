@@ -15,34 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || windows
-
-package platformcheck
+package actions
 
 import (
-	"fmt"
-	"math/bits"
 	"strings"
 
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func CheckNativePlatformCompat() error {
-	const compiledArchBits = bits.UintSize // 32 if the binary was compiled for 32 bit architecture.
+func init() {
+	processors.RegisterPlugin(
+		"lowercase",
+		checks.ConfigChecked(
+			NewLowerCaseProcessor,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "ignore_missing", "fail_on_error", "alter_full_field", "values"),
+		),
+	)
+}
 
-	if compiledArchBits > 32 {
-		// We assume that 64bit binaries can only be run on 64bit systems
-		return nil
-	}
+// NewLowerCaseProcessor converts event keys matching the provided fields to lowercase
+func NewLowerCaseProcessor(c *conf.C) (beat.Processor, error) {
+	return NewAlterFieldProcessor(c, "lowercase", lowerCase)
+}
 
-	arch, err := host.KernelArch()
-	if err != nil {
-		return err
-	}
-
-	if strings.Contains(arch, "64") {
-		return fmt.Errorf("trying to run %vBit binary on 64Bit system", compiledArchBits)
-	}
-
-	return nil
+func lowerCase(field string) (string, error) {
+	return strings.ToLower(field), nil
 }

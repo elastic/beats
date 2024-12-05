@@ -15,10 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux && !windows
-
-package platformcheck
-
-func CheckNativePlatformCompat() error {
-	return nil
-}
+// Package translate_ldap_attribute provides a Beat processor for converting
+// LDAP attributes from one to another. It is typically used for converting Windows
+// Global Unique Identifiers (GUIDs) to object names.
+package translate_ldap_attribute

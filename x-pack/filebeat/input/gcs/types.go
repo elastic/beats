@@ -22,6 +22,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
+	Retry                    retryConfig
 }
 
 func (s *Source) Name() string {

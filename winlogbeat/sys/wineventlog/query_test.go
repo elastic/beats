@@ -99,14 +99,14 @@ func TestCombinedQuery(t *testing.T) {
 	const expected = `<QueryList>
   <Query Id="0">
     <Select Path="Application">*[System[TimeCreated[timediff(@SystemTime) &lt;= 3600000] and (EventID=1 or (EventID &gt;= 1 and EventID &lt;= 100)) and (Level = 3)]]</Select>
-    <Suppress Path="Application">*[System[(EventID=75)]]</Suppress>
+    <Suppress Path="Application">*[System[(EventID=75 or (EventID &gt;= 97 and EventID &lt;= 99))]]</Suppress>
   </Query>
 </QueryList>`
 
 	q, err := Query{
 		Log:         "Application",
 		IgnoreOlder: time.Hour,
-		EventID:     "1, 1-100, -75",
+		EventID:     "1, 1-100, -75, -97-99",
 		Level:       "Warning",
 	}.Build()
 	if assert.NoError(t, err) {

@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"io"
@@ -38,13 +37,12 @@ func Test_httpReadJSON(t *testing.T) {
 	log := logp.NewLogger("http_endpoint_test")
 
 	tests := []struct {
-		name           string
-		body           string
-		program        string
-		wantObjs       []mapstr.M
-		wantStatus     int
-		wantErr        bool
-		wantRawMessage []json.RawMessage
+		name       string
+		body       string
+		program    string
+		wantObjs   []mapstr.M
+		wantStatus int
+		wantErr    bool
 	}{
 		{
 			name:       "single object",
@@ -82,10 +80,6 @@ func Test_httpReadJSON(t *testing.T) {
 			name: "sequence of objects accepted (LF)",
 			body: `{"a":"1"}
 									{"a":"2"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-			},
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
@@ -110,26 +104,14 @@ func Test_httpReadJSON(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "array of objects in stream",
-			body: `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-				[]byte(`{"a":"3"}`),
-				[]byte(`{"a":"4"}`),
-			},
+			name:       "array of objects in stream",
+			body:       `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name: "numbers",
 			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":1}`),
-				[]byte(`{"a":false}`),
-				[]byte(`{"a":3.14}`),
-				[]byte(`{"a":-4}`),
-			},
 			wantObjs: []mapstr.M{
 				{"a": int64(1)},
 				{"a": false},
@@ -171,13 +153,6 @@ func Test_httpReadJSON(t *testing.T) {
 				"timestamp": string(obj.timestamp), // leave timestamp in unix milli for ingest to handle.
 				"event": r,
 			})`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"event":{"data":"aGVsbG8=","number":1},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"c21hbGwgd29ybGQ=","number":9007199254740991},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"aGVsbG8gd29ybGQ=","number":"9007199254740992"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"YmlnIHdvcmxk","number":"9223372036854775808"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=","number":3.14},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-			},
 			wantObjs: []mapstr.M{
 				{"event": map[string]any{"data": "aGVsbG8=", "number": int64(1)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
 				{"event": map[string]any{"data": "c21hbGwgd29ybGQ=", "number": int64(9007199254740991)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
@@ -194,7 +169,7 @@ func Test_httpReadJSON(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to compile program: %v", err)
 			}
-			gotObjs, rawMessages, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
+			gotObjs, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("httpReadJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -205,10 +180,6 @@ func Test_httpReadJSON(t *testing.T) {
 			if gotStatus != tt.wantStatus {
 				t.Errorf("httpReadJSON() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
-			if tt.wantRawMessage != nil {
-				assert.Equal(t, tt.wantRawMessage, rawMessages)
-			}
-			assert.Equal(t, len(gotObjs), len(rawMessages))
 		})
 	}
 }
@@ -221,6 +192,9 @@ type publisher struct {
 func (p *publisher) Publish(e beat.Event) {
 	p.mu.Lock()
 	p.events = append(p.events, e)
+	if ack, ok := e.Private.(*batchACKTracker); ok {
+		ack.ACK()
+	}
 	p.mu.Unlock()
 }
 

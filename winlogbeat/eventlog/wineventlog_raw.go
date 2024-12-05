@@ -28,7 +28,6 @@ import (
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -39,19 +38,23 @@ const (
 	// winEventLogExpApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogExpAPIName = "wineventlog-experimental"
+	// winEventLogRawAPIName is the name used to identify the Windows Event Log API
+	// as both an event type and an API.
+	winEventLogRawAPIName = "wineventlog-raw"
 )
 
 func init() {
 	// Register wineventlog API if it is available.
 	available, _ := win.IsAvailable()
 	if available {
-		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
+		Register(winEventLogExpAPIName, 10, newWinEventLogRaw, win.Channels)
+		Register(winEventLogRawAPIName, 11, newWinEventLogRaw, win.Channels)
 	}
 }
 
-// winEventLogExp implements the EventLog interface for reading from the Windows
+// winEventLogRaw implements the EventLog interface for reading from the Windows
 // Event Log API.
-type winEventLogExp struct {
+type winEventLogRaw struct {
 	config      winEventLogConfig
 	query       string
 	id          string                   // Identifier of this event log.
@@ -62,20 +65,18 @@ type winEventLogExp struct {
 	log         *logp.Logger
 
 	iterator *win.EventIterator
-	renderer *win.Renderer
+	renderer win.EventRenderer
 
 	metrics *inputMetrics
 }
 
-// newWinEventLogExp creates and returns a new EventLog for reading event logs
+// newWinEventLogRaw creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLogExp(options *conf.C) (EventLog, error) {
+func newWinEventLogRaw(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 	var isFile bool
 	var log *logp.Logger
-
-	cfgwarn.Experimental("The %s event log reader is experimental.", winEventLogExpAPIName)
 
 	c := winEventLogConfig{BatchReadSize: 512}
 	if err := readConfig(options, &c); err != nil {
@@ -115,46 +116,60 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
 	}
 
-	renderer, err := win.NewRenderer(win.NilHandle, log)
-	if err != nil {
-		return nil, err
-	}
-
-	l := &winEventLogExp{
+	l := &winEventLogRaw{
 		config:      c,
 		query:       xmlQuery,
 		id:          id,
 		channelName: c.Name,
 		file:        isFile,
 		maxRead:     c.BatchReadSize,
-		renderer:    renderer,
 		log:         log,
+	}
+
+	switch c.IncludeXML {
+	case true:
+		l.renderer = win.NewXMLRenderer(
+			win.RenderConfig{
+				IsForwarded: l.isForwarded(),
+				Locale:      c.EventLanguage,
+			},
+			win.NilHandle, log)
+	case false:
+		l.renderer, err = win.NewRenderer(
+			win.RenderConfig{
+				IsForwarded: l.isForwarded(),
+				Locale:      c.EventLanguage,
+			},
+			win.NilHandle, log)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return l, nil
 }
 
-func (l *winEventLogExp) isForwarded() bool {
+func (l *winEventLogRaw) isForwarded() bool {
 	c := l.config
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
-func (l *winEventLogExp) Name() string {
+func (l *winEventLogRaw) Name() string {
 	return l.id
 }
 
 // Channel returns the event log's channel name.
-func (l *winEventLogExp) Channel() string {
+func (l *winEventLogRaw) Channel() string {
 	return l.channelName
 }
 
 // IsFile returns true if the event log is an evtx file.
-func (l *winEventLogExp) IsFile() bool {
+func (l *winEventLogRaw) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
+func (l *winEventLogRaw) Open(state checkpoint.EventLogState) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
@@ -171,7 +186,7 @@ func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
 	return err
 }
 
-func (l *winEventLogExp) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
+func (l *winEventLogRaw) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
 	var bookmark win.Bookmark
 	if len(state.Bookmark) > 0 {
 		var err error
@@ -188,7 +203,7 @@ func (l *winEventLogExp) open(state checkpoint.EventLogState) (win.EvtHandle, er
 	return l.openChannel(bookmark)
 }
 
-func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
+func (l *winEventLogRaw) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
 	path := l.channelName
 
 	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
@@ -225,7 +240,7 @@ func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.B
 	return h, err
 }
 
-func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
+func (l *winEventLogRaw) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
@@ -267,7 +282,7 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	}
 }
 
-func (l *winEventLogExp) Read() ([]Record, error) {
+func (l *winEventLogRaw) Read() ([]Record, error) {
 	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
@@ -305,11 +320,11 @@ func (l *winEventLogExp) Read() ([]Record, error) {
 	return records, nil
 }
 
-func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
+func (l *winEventLogRaw) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
 	// NOTE: Render can return an error and a partial event.
-	evt, err := l.renderer.Render(h)
+	evt, xml, err := l.renderer.Render(h)
 	if evt == nil {
 		return nil, err
 	}
@@ -317,12 +332,13 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
-	//nolint:godox // Bad linter! Keep to have a record of feature disparity between non-experimental vs experimental.
-	// TODO: Need to add XML when configured.
-
 	r := &Record{
 		API:   winEventLogExpAPIName,
 		Event: *evt,
+	}
+
+	if l.config.IncludeXML {
+		r.XML = xml
 	}
 
 	if l.file {
@@ -342,7 +358,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 	return r, nil
 }
 
-func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+func (l *winEventLogRaw) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
 	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
 	if err != nil {
 		return "", fmt.Errorf("failed to create new bookmark from event handle: %w", err)
@@ -352,18 +368,18 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 	return bookmark.XML()
 }
 
-func (l *winEventLogExp) Reset() error {
+func (l *winEventLogRaw) Reset() error {
 	l.log.Debug("Closing event log reader handles for reset.")
 	return l.close()
 }
 
-func (l *winEventLogExp) Close() error {
+func (l *winEventLogRaw) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
 	return l.close()
 }
 
-func (l *winEventLogExp) close() error {
+func (l *winEventLogRaw) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
