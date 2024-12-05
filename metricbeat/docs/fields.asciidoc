@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
+* <<exported-fields-benchmark>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-cloudfoundry>>
@@ -10469,6 +10470,36 @@ type: long
 +
 --
 type: long
+
+--
+
+[[exported-fields-benchmark]]
+== Benchmark fields
+
+benchmark module
+
+
+
+[float]
+=== benchmark
+
+
+
+
+[float]
+=== info
+
+info
+
+
+
+*`benchmark.info.counter`*::
++
+--
+The nth info metric emitted by the benchmark module
+
+
+type: keyword
 
 --
 

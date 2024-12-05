@@ -170,11 +170,11 @@ func TestWindowsEventLogAPI(t *testing.T) {
 	testWindowsEventLog(t, winEventLogAPIName, false)
 }
 
-func TestWindowsEventLogAPIExperimental(t *testing.T) {
-	// for the experimental api using include xml behave differently than not
+func TestWindowsEventLogAPIRaw(t *testing.T) {
+	// for the raw api using include xml behave differently than not
 	// so we must test both settings
-	testWindowsEventLog(t, winEventLogExpAPIName, true)
-	testWindowsEventLog(t, winEventLogExpAPIName, false)
+	testWindowsEventLog(t, winEventLogRawAPIName, true)
+	testWindowsEventLog(t, winEventLogRawAPIName, false)
 }
 
 func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
@@ -407,8 +407,8 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 	switch api {
 	case winEventLogAPIName:
 		log, err = newWinEventLog(cfg)
-	case winEventLogExpAPIName:
-		log, err = newWinEventLogExp(cfg)
+	case winEventLogRawAPIName:
+		log, err = newWinEventLogRaw(cfg)
 	default:
 		t.Fatalf("Unknown API name: '%s'", api)
 	}
