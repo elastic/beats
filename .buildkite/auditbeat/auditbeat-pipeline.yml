@@ -203,7 +203,7 @@ steps:
     steps:
       - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-integ-tests"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
@@ -236,7 +236,7 @@ steps:
 
       - label: ":ubuntu: Auditbeat: Ubuntu arm64 Integration Tests -- {{matrix.image}}"
         key: "auditbeat-extended-arm64-integ-tests"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
