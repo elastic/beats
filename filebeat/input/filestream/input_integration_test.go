@@ -162,8 +162,8 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	id := getIDFromPath(env.abspath(testlogName), id, fi)
-	env.requireOffsetInRegistryByID(id, len(testlines))
+	idFromPath := getIDFromPath(env.abspath(testlogName), id, fi)
+	env.requireOffsetInRegistryByID(idFromPath, len(testlines))
 }
 
 // test_close_eof from test_harvester.py
