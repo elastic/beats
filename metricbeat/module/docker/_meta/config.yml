@@ -15,7 +15,7 @@
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
-  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # Docker module supports metrics collection from podman's Docker-compatible API. In case of podman set to true.
   # podman: false
 
   # Skip metrics for certain device major numbers in docker/diskio. 
