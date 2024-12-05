@@ -94,33 +94,29 @@ func (m multiNetworkMatcher) String() string {
 	return strings.Join(names, " OR ")
 }
 
+func makeMatcher(network string) (networkMatcher, error) {
+	m := singleNetworkMatcher{name: network, netContainsFunc: namedNetworks[network]}
+	if m.netContainsFunc == nil {
+		subnet, err := parseCIDR(network)
+		if err != nil {
+			return nil, err
+		}
+		m.netContainsFunc = subnet.Contains
+	}
+	return m, nil
+}
+
+func invalidTypeError(field string, value interface{}) error {
+	return fmt.Errorf("network condition attempted to set "+
+		"'%v' -> '%v' and encountered unexpected type '%T', only "+
+		"strings or []strings are allowed", field, value, value)
+}
+
 // NewNetworkCondition builds a new Network using the given configuration.
 func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 	cond := &Network{
 		fields: map[string]networkMatcher{},
 		log:    logp.NewLogger(logName),
-	}
-
-	//nolint:nolintlint // the linter seems broken here
-	//nolint:typecheck // false positive
-	makeMatcher := func(network string) (networkMatcher, error) {
-		m := singleNetworkMatcher{name: network, netContainsFunc: namedNetworks[network]}
-		if m.netContainsFunc == nil {
-			subnet, err := parseCIDR(network)
-			if err != nil {
-				return nil, err
-			}
-			m.netContainsFunc = subnet.Contains
-		}
-		return m, nil
-	}
-
-	//nolint:nolintlint // the linter seems broken here
-	//nolint:typecheck // false positive
-	invalidTypeError := func(field string, value interface{}) error {
-		return fmt.Errorf("network condition attempted to set "+
-			"'%v' -> '%v' and encountered unexpected type '%T', only "+
-			"strings or []strings are allowed", field, value, value)
 	}
 
 	for field, value := range mapstr.M(fields).Flatten() {
