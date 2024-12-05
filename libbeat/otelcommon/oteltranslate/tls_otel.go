@@ -19,6 +19,7 @@ package oteltranslate
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -26,19 +27,56 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
+// currently unsupported paramaters
+// ssl.curve_types
+// ssl.ca_sha256
+// ssl.ca_trustred_fingerprint
+// ssl.key_passphrase
+// ssl.supported_protocols -> partially supported
+// ssl.restart_on_cert_change.*
+// ssl.renegotiation
+// ssl.verification_mode: All modes are not distinctly mapped yet
+func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
+	if len(tlscfg.CurveTypes) > 0 {
+		return errors.New("setting ssl.curve_types is currently is currently not supported")
+	}
+	if tlscfg.CATrustedFingerprint != "" {
+		return errors.New("setting ssl.ca_trusted_fingerprint is currently not supported")
+	}
+	if len(tlscfg.CASha256) > 0 {
+		return errors.New("setting ssl.ca_sha256 is currently not supported")
+	}
+	if tlscfg.Certificate.Passphrase != "" {
+		return errors.New("setting ssl.key_passphrase is currently not supported")
+	}
+	return nil
+}
+
 // TLSCommonToOTel converts a tlscommon.Config into the OTel configtls.ClientConfig
 func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
 
-	if tlscfg == nil {
+	if !tlscfg.IsEnabled() {
 		return nil, nil
 	}
 
-	if tlscfg.VerificationMode == tlscommon.VerifyNone {
-		insecureSkipVerify = true
+	// throw error if unsupported tls config is passed
+	if err := validateUnsupportedConfig(tlscfg); err != nil {
+		return nil, err
 	}
 
+	// if ssl.verification_mode:none
+	if tlscfg.VerificationMode == tlscommon.VerifyNone {
+		insecureSkipVerify = true
+		return map[string]any{
+			"insecure":             insecureSkipVerify, // ssl.verirication_mode, used for gRPC
+			"insecure_skip_verify": insecureSkipVerify, // ssl.verirication_mode, used for HTTPS
+		}, nil
+
+	}
+
+	// unpacks -> ssl.certificate_authorities
 	// The OTel exporter accepts either single CA file or CA string. However,
 	// Beats support any combination and number of files and certificates
 	// as string, so we read them all and assemble one PEM string with
@@ -51,15 +89,18 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		}
 		caCerts = append(caCerts, string(d))
 	}
+	// We only include the system certificates if no CA is defined
+	includeSystemCACertsPool := len(caCerts) == 0
 
+	// unpacks ->  ssl.key
 	certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
 	if err != nil {
 		logger.Errorf("Failed reading key file: %+v", err)
-		return nil, fmt.Errorf("%w %v", err, certKeyBytes)
+		return nil, err
 	}
-
 	certKeyPem := string(certKeyBytes)
 
+	// unpacks ->  ssl.certificate
 	certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
 	if err != nil {
 		logger.Errorf("Failed reading key file: %+v", err)
@@ -67,14 +108,13 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	}
 	certPem := string(certBytes)
 
-	// We only include the system certificates if no CA is defined
-	includeSystemCACertsPool := len(caCerts) == 0
-
 	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load SSL configuration: %w", err)
 	}
 	goTLSConfig := tlsConfig.ToConfig()
+
+	// unpacks -> ssl.cipher_suites
 	ciphersuites := []string{}
 	for _, cs := range goTLSConfig.CipherSuites {
 		ciphersuites = append(ciphersuites, tls.CipherSuiteName(cs))

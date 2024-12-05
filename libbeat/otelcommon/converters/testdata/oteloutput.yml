@@ -19,13 +19,8 @@ exporters:
       max_interval: 1m0s
     timeout: 1m30s
     tls:
-      ca_pem: ""
-      cert_pem: ""
-      cipher_suites: []
-      include_system_ca_certs_pool: true
       insecure: true
       insecure_skip_verify: true
-      key_pem: ""
     user: elastic
 
 receivers:
@@ -39,11 +34,6 @@ receivers:
           type: filestream
     output:
       otelconsumer: null
-    path:
-      config: .
-      data: ./data
-      home: .
-      logs: ./logs
     setup:
       dashboards:
         index: form-otel-exporter*

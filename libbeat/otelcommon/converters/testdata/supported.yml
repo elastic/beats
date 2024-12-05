@@ -15,11 +15,6 @@ receivers:
         index: form-otel-exporter
         ssl:
           verification_mode: none
-    path:
-      config: .
-      data: ./data
-      home: .
-      logs: ./logs
     setup:
       dashboards:
         index: form-otel-exporter*
