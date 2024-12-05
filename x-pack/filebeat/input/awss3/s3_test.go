@@ -22,6 +22,7 @@ func TestS3Poller(t *testing.T) {
 	logp.TestingSetup()
 
 	const bucket = "bucket"
+	const listPrefix = "key"
 	const numberOfWorkers = 5
 	const pollInterval = 2 * time.Second
 	const testTimeout = 1 * time.Second
@@ -127,7 +128,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(nil, store)
+		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
@@ -135,7 +136,7 @@ func TestS3Poller(t *testing.T) {
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
 				BucketARN:          bucket,
-				BucketListPrefix:   "key",
+				BucketListPrefix:   listPrefix,
 				RegionName:         "region",
 			},
 			s3:              mockAPI,
@@ -265,7 +266,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
-		states, err := newStates(nil, store)
+		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
@@ -273,7 +274,7 @@ func TestS3Poller(t *testing.T) {
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
 				BucketARN:          bucket,
-				BucketListPrefix:   "key",
+				BucketListPrefix:   listPrefix,
 				RegionName:         "region",
 			},
 			s3:              mockS3,

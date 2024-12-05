@@ -520,6 +520,81 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
 		},
+		{
+			name: "RetryWithDefaultValues",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "1m",
+				"bucket_timeout":             "1m",
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "RetryWithCustomValues",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"bucket_timeout":             "10s",
+				"retry": map[string]interface{}{
+					"max_attempts":             5,
+					"initial_backoff_duration": "1s",
+					"max_backoff_duration":     "3s",
+					"backoff_multiplier":       1.4,
+				},
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "RetryMinimumValueCheck",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"bucket_timeout":             "10s",
+				"retry": map[string]interface{}{
+					"max_attempts":             5,
+					"initial_backoff_duration": "1s",
+					"max_backoff_duration":     "3s",
+					"backoff_multiplier":       1,
+				},
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value >= 1.1 accessing 'retry.backoff_multiplier'"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
