@@ -36,8 +36,15 @@ func TestPulsarOutput(t *testing.T) {
 		testcontainers.WithEnv(map[string]string{"PULSAR_MEM": "-Xmx256m"}))
 
 	require.NoError(t, err)
+
 	timeout := 10 * time.Second
-	defer c.Stop(context.Background(), &timeout)
+	defer func() {
+		err := c.Stop(context.Background(), &timeout)
+		if err != nil {
+			t.Logf("error stopping pulsar container: %v", err)
+		}
+	}()
+
 	addr, err := c.ContainerIP(context.Background())
 	require.NoError(t, err)
 
