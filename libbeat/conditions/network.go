@@ -20,6 +20,7 @@ package conditions
 import (
 	"fmt"
 	"net"
+	"slices"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -164,14 +165,7 @@ func (c *Network) Check(event ValuesMap) bool {
 		}
 		// match on an "any" basis when we find multiple IPs in the event;
 		// if the network matcher returns true for any seen IP, consider it a match
-		matches := false
-		for _, ip := range ipList {
-			if network.Contains(ip) {
-				matches = true
-				break
-			}
-		}
-		if !matches {
+		if !slices.ContainsFunc(ipList, network.Contains) {
 			return false
 		}
 
@@ -215,6 +209,8 @@ func extractIP(unk interface{}) []net.IP {
 	switch v := unk.(type) {
 	case string:
 		return []net.IP{net.ParseIP(v)}
+	case []net.IP:
+		return v
 	case net.IP:
 		return []net.IP{v}
 	case []string:
