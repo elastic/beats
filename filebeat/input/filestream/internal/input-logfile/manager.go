@@ -25,6 +25,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -170,9 +171,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	metricsID := settings.ID
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		err := fmt.Errorf("filestream input with ID '%s' already exists, this "+
-			"will lead to data duplication, please use a different ID", settings.ID)
-
 		duplicatedInput := map[string]any{}
 		unpackErr := config.Unpack(&duplicatedInput)
 		if unpackErr != nil {
@@ -184,7 +182,8 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 				settings.ID),
 			"input", duplicatedInput)
 		cim.idsMux.Unlock()
-		return nil, err
+		return nil, &common.ErrNonReloadable{Err: fmt.Errorf("filestream input with ID '%s' already exists, this "+
+			"will lead to data duplication, please use a different ID", settings.ID)}
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.

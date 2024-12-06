@@ -147,7 +147,11 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 				}
 			}
 
-			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
+			if !errors.As(err, new(*common.ErrNonReloadable)) {
+				errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
+			} else {
+				r.logger.Debugf("error creating runner isn't reloadable, not reporting the error: %s ", err)
+			}
 			continue
 		}
 

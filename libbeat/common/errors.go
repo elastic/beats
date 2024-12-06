@@ -31,3 +31,13 @@ type ErrInputNotFinished struct {
 func (e *ErrInputNotFinished) Error() string {
 	return fmt.Sprintf("Can only start an input when all related states are finished: %+v", e.State)
 }
+
+type ErrNonReloadable struct {
+	Err error
+}
+
+func (e *ErrNonReloadable) Error() string {
+	return e.Err.Error()
+}
+
+func (e *ErrNonReloadable) Unwrap() error { return e.Err }
