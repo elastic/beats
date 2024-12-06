@@ -41,11 +41,11 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index  string     `json:"index"`
-	Status string     `json:"status"`
+	Index          string     `json:"index"`
+	Status         string     `json:"status"`
 	TierPreference string     `json:"tier_preference"`
 	CreationDate   int        `json:"creation_date"`
-	Shards shardStats `json:"shards"`
+	Shards         shardStats `json:"shards"`
 }
 
 type primaries struct {
