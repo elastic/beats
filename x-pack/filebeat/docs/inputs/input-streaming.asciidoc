@@ -375,7 +375,6 @@ This specifies the SSL configuration for the connection. The `ssl` configuration
 
 If this is a self-signed certificate, the `certificate_authorities` field should be set to the certificate itself.
 
-
 [float]
 === Metrics
 
