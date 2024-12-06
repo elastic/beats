@@ -269,5 +269,5 @@ logging:
 	filebeat.WaitForLogs(
 		"Input 'filestream' starting",
 		10*time.Second,
-		"Filebeat did log a validation error")
+		"Filebeat did not log a validation error")
 }

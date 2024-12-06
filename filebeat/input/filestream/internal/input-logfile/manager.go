@@ -164,17 +164,27 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	if settings.ID == "" {
-		cim.Logger.Error("filestream input ID without ID might lead to data" +
-			" duplication, please add an ID and restart Filebeat")
+		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
 	metricsID := settings.ID
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
-			"will lead to data duplication, please use a different ID. Metrics "+
-			"collection has been disabled on this input.", settings.ID)
-		metricsID = ""
+		err := fmt.Errorf("filestream input with ID '%s' already exists, this "+
+			"will lead to data duplication, please use a different ID", settings.ID)
+
+		duplicatedInput := map[string]any{}
+		unpackErr := config.Unpack(&duplicatedInput)
+		if unpackErr != nil {
+			duplicatedInput["error"] = fmt.Errorf("failed to umpack dupliucated input config: %w", unpackErr).Error()
+		}
+
+		cim.Logger.Errorw(
+			fmt.Sprintf("filestream input '%s' is duplicated: input will NOT start",
+				settings.ID),
+			"input", duplicatedInput)
+		cim.idsMux.Unlock()
+		return nil, err
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.

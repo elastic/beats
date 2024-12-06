@@ -19,6 +19,8 @@ package input_logfile
 
 import (
 	"bytes"
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +28,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -40,6 +43,20 @@ type testSource struct {
 
 func (s *testSource) Name() string {
 	return s.name
+}
+
+type noopProspector struct{}
+
+func (m noopProspector) Init(_, _ ProspectorCleaner, _ func(Source) string) error {
+	return nil
+}
+
+func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {
+	return
+}
+
+func (m noopProspector) Test() error {
+	return nil
 }
 
 func TestSourceIdentifier_ID(t *testing.T) {
@@ -198,6 +215,72 @@ func TestInputManager_Create(t *testing.T) {
 			assert.NotContains(t, buff.String(),
 				"already exists")
 		})
+
+	t.Run("does not start an iput with duplicated ID", func(t *testing.T) {
+		tcs := []struct {
+			name string
+			id   string
+		}{
+			{name: "ID is empty", id: ""},
+			{name: "non-empty ID", id: "non-empty-ID"},
+		}
+
+		for _, tc := range tcs {
+			t.Run(tc.name, func(t *testing.T) {
+				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+				testStore, err := storeReg.Get("test")
+				require.NoError(t, err)
+
+				log, buff := newBufferLogger()
+
+				cim := &InputManager{
+					Logger:     log,
+					StateStore: testStateStore{Store: testStore},
+					Configure: func(_ *config.C) (Prospector, Harvester, error) {
+						var wg sync.WaitGroup
+
+						return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+					}}
+				cfg1, err := config.NewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: %s
+paths:
+  - /var/log/messages
+  - /var/log/*.log
+`, tc.id))
+				require.NoError(t, err, "could not create config")
+
+				// Create a different 2nd config with duplicated ID to ensure
+				// the ID itself is the only requirement to prevent the 2nd input
+				// from being created.
+				paths := []string{"/var/log/messages/2", "/var/log/*.log"}
+				cfg2, err := config.NewConfigFrom(fmt.Sprintf(`
+type: filestream
+id: %s
+paths:
+  - %s
+  - %s
+`, tc.id, paths[0], paths[1]))
+				require.NoError(t, err, "could not create config")
+
+				_, err = cim.Create(cfg1)
+				require.NoError(t, err, "1st inout should have been created")
+
+				// Attempt to create an input with a duplicated ID
+				_, err = cim.Create(cfg2)
+				require.Error(t, err, "filestream should not have created an input with a duplicated ID")
+
+				logs := buff.String()
+				assert.Contains(t, logs,
+					fmt.Sprintf("filestream input with ID '%s'", tc.id))
+				assert.Contains(t, logs,
+					"already exists")
+				assert.Contains(t, logs, "input")
+				assert.Contains(t, logs, paths[0])
+				assert.Contains(t, logs, paths[1])
+			})
+		}
+	})
 }
 
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
