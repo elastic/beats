@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
@@ -40,19 +41,26 @@ const Name = "filebeat"
 // RootCmd to handle beats cli
 var RootCmd *cmd.BeatsRootCmd
 
-// FilebeatSettings contains the default settings for filebeat
-func FilebeatSettings() instance.Settings {
+// FilebeatSettings contains the default settings for filebeat.
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func FilebeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("once")
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("modules")
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 		Initialize: []func(){
 			include.InitializeModule,
-			fileset.RegisterMonitoringModules,
-			input.RegisterMonitoringInputs,
+			func() { fileset.RegisterMonitoringModules(moduleNameSpace) },
+			func() { input.RegisterMonitoringInputs("") },
 		},
 	}
 }
@@ -61,8 +69,10 @@ func FilebeatSettings() instance.Settings {
 func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.BeatsRootCmd {
 	command := cmd.GenRootCmdWithSettings(beater.New(inputs), settings)
 	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("M")
 	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("modules")
 	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	command.AddCommand(genGenerateCmd())
 	return command

@@ -2,15 +2,19 @@
 
 set -euo pipefail
 
-source .buildkite/env-scripts/util.sh
-
+WORKSPACE=$(pwd)
 export KUBECONFIG="${WORKSPACE}/kubecfg"
 export BIN="${WORKSPACE}/bin"
-add_bin_path
 
-echo "--- Installing kind & kubectl"
+echo "--- Add ${BIN} to PATH"
+if [[ ! -d "${BIN}" ]]; then
+  mkdir -p "${BIN}"
+fi
+export PATH="${PATH}:${BIN}"
+
+echo "~~~ Installing kind & kubectl"
 asdf plugin add kind
-asdf install kind $ASDF_KIND_VERSION
+asdf install kind "$ASDF_KIND_VERSION"
 
 echo "~~~ Setting up kind"
 max_retries=3

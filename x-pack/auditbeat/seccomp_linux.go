@@ -19,6 +19,7 @@ func init() {
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
 			"mremap",
 			"umask",
+			"setreuid",
 		); err != nil {
 			panic(err)
 		}
@@ -31,6 +32,14 @@ func init() {
 			"perf_event_open",
 			"ppoll",
 			"umount2",
+		); err != nil {
+			panic(err)
+		}
+
+		// The sessionmd processor kerneltracingprovider needs
+		// memfd_create to operate via EBPF
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"memfd_create",
 		); err != nil {
 			panic(err)
 		}

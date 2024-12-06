@@ -28,9 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/queuetest"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/stretchr/testify/require"
 )
 
 var seed int64
@@ -76,44 +73,6 @@ func TestProduceConsumer(t *testing.T) {
 	}
 
 	t.Run("direct", testWith(makeTestQueue()))
-}
-
-func TestMetrics(t *testing.T) {
-	dir, err := ioutil.TempDir("", "diskqueue_metrics")
-	defer func() {
-		_ = os.RemoveAll(dir)
-	}()
-	require.NoError(t, err)
-	settings := DefaultSettings()
-	settings.Path = dir
-	// lower max segment size so we can get multiple segments
-	settings.MaxSegmentSize = 100
-
-	testQueue, err := NewQueue(logp.L(), nil, settings, nil)
-	require.NoError(t, err)
-	defer testQueue.Close()
-
-	eventsToTest := 100
-
-	// Send events to queue
-	producer := testQueue.Producer(queue.ProducerConfig{})
-	sendEventsToQueue(eventsToTest, producer)
-
-	// fetch metrics before we read any events
-	time.Sleep(time.Millisecond * 500)
-	testMetrics, err := testQueue.Metrics()
-	require.NoError(t, err)
-
-	require.Equal(t, testMetrics.ByteLimit.ValueOr(0), uint64((1 << 30)))
-	require.NotZero(t, testMetrics.ByteCount.ValueOr(0))
-	t.Logf("got %d bytes written", testMetrics.ByteCount.ValueOr(0))
-
-}
-
-func sendEventsToQueue(count int, prod queue.Producer) {
-	for i := 0; i < count; i++ {
-		prod.Publish(queuetest.MakeEvent(mapstr.M{"count": i}))
-	}
 }
 
 func makeTestQueue() queuetest.QueueFactory {

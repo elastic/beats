@@ -128,6 +128,13 @@ func TestGetFilterForMetric(t *testing.T) {
 			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}, logger: logger},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foobar\")",
 		},
+		{
+			"aiplatform service with configured region and zone",
+			"aiplatform",
+			"",
+			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}, logger: logger},
+			"metric.type=\"dummy\" AND resource.label.location = starts_with(\"foo\")",
+		},
 	}
 
 	for _, c := range cases {
@@ -222,6 +229,7 @@ func TestIsAGlobalService(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, false},
 		{"CloudSQL service", gcp.ServiceCloudSQL, false},
 		{"Redis service", gcp.ServiceRedis, false},
+		{"AIPlatform service", gcp.ServiceAIPlatform, false},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
@@ -249,6 +257,7 @@ func TestGetServiceLabelFor(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, "resource.label.region"},
 		{"CloudSQL service", gcp.ServiceCloudSQL, "resource.labels.region"},
 		{"Redis service", gcp.ServiceRedis, "resource.label.region"},
+		{"AIPlatform service", gcp.ServiceAIPlatform, "resource.label.location"},
 	}
 
 	for _, c := range cases {

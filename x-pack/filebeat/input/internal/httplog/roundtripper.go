@@ -13,11 +13,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"strconv"
+	"sync/atomic"
 	"time"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -36,22 +35,21 @@ type contextKey string
 // responses to the provided logger. Transaction creation is logged to log.
 func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
-		transport:   next,
-		maxBodyLen:  maxBodyLen,
-		txLog:       logger,
-		txBaseID:    newID(),
-		txIDCounter: atomic.NewUint64(0),
-		log:         log,
+		transport:  next,
+		maxBodyLen: maxBodyLen,
+		txLog:      logger,
+		txBaseID:   newID(),
+		log:        log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
-	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
-	txLog       *zap.Logger    // Destination logger.
-	txBaseID    string         // Random value to make transaction IDs unique.
-	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	maxBodyLen  int           // The maximum length of a body. Longer bodies will be truncated.
+	txLog       *zap.Logger   // Destination logger.
+	txBaseID    string        // Random value to make transaction IDs unique.
+	txIDCounter atomic.Uint64 // Transaction ID counter that is incremented for each request.
 	log         *logp.Logger
 }
 
@@ -72,7 +70,7 @@ type LoggingRoundTripper struct {
 //	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
-//	event.original (the request without body from httputil.DumpRequestOut)
+//	http.request.header
 //
 // Fields logged in responses:
 //
@@ -81,7 +79,7 @@ type LoggingRoundTripper struct {
 //	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
-//	event.original (the response without body from httputil.DumpResponse)
+//	http.response.header
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
 	txID := rt.nextTxID()
@@ -121,13 +119,8 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
 		zap.Int("http.response.body.bytes", len(body)),
 		zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
+		zap.Any("http.response.header", resp.Header),
 	)
-	message, err := httputil.DumpResponse(resp, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
-	} else {
-		respParts = append(respParts, zap.ByteString("event.original", message))
-	}
 	switch len(errorsMessages) {
 	case 0:
 	case 1:
@@ -156,7 +149,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
-//	event.original (the request without body from httputil.DumpRequestOut)
+//	http.request.header
 //
 // Additional fields in extra will also be logged.
 func LogRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) *http.Request {
@@ -173,6 +166,7 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 		zap.String("url.port", req.URL.Port()),
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
+		zap.Any("http.request.header", req.Header),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
 	}, extra...)
 
@@ -190,12 +184,6 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 		zap.Int("http.request.body.bytes", len(body)),
 		zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 	)
-	message, err := httputil.DumpRequestOut(req, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump request: %s", err))
-	} else {
-		reqParts = append(reqParts, zap.ByteString("event.original", message))
-	}
 	switch len(errorsMessages) {
 	case 0:
 	case 1:
@@ -220,7 +208,7 @@ func (rt *LoggingRoundTripper) TxID() string {
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
-	count := rt.txIDCounter.Inc()
+	count := rt.txIDCounter.Add(1)
 	return rt.formatTxID(count)
 }
 

@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -27,18 +28,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	ID             string             `config:"id"`
-	Paths          []string           `config:"paths"`
-	Close          closerConfig       `config:"close"`
-	FileWatcher    *conf.Namespace    `config:"prospector"`
-	FileIdentity   *conf.Namespace    `config:"file_identity"`
-	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	ID           string          `config:"id"`
+	Paths        []string        `config:"paths"`
+	Close        closerConfig    `config:"close"`
+	FileWatcher  *conf.Namespace `config:"prospector"`
+	FileIdentity *conf.Namespace `config:"file_identity"`
+
+	// -1 means that registry will never be cleaned
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=-1"`
 	CleanRemoved   bool               `config:"clean_removed"`
 	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
@@ -98,7 +102,7 @@ func defaultConfig() config {
 		Reader:         defaultReaderConfig(),
 		Paths:          []string{},
 		Close:          defaultCloserConfig(),
-		CleanInactive:  0,
+		CleanInactive:  -1,
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
@@ -139,4 +143,61 @@ func (c *config) Validate() error {
 	}
 
 	return nil
+}
+
+// ValidateInputIDs checks all filestream inputs to ensure all input IDs are
+// unique. If there is a duplicated ID, it logs an error containing the offending
+// input configurations and returns an error containing the duplicated IDs.
+// A single empty ID is a valid ID as it's unique, however multiple empty IDs
+// are not unique and are therefore are treated as any other duplicated ID.
+func ValidateInputIDs(inputs []*conf.C, logger *logp.Logger) error {
+	duplicatedConfigs := make(map[string][]*conf.C)
+	var duplicates []string
+	for _, input := range inputs {
+		fsInput := struct {
+			ID   string `config:"id"`
+			Type string `config:"type"`
+		}{}
+		err := input.Unpack(&fsInput)
+		if err != nil {
+			return fmt.Errorf("failed to unpack filestream input configuration: %w", err)
+		}
+		if fsInput.Type == "filestream" {
+			duplicatedConfigs[fsInput.ID] = append(duplicatedConfigs[fsInput.ID], input)
+			// we just need to collect the duplicated IDs once, therefore collect
+			// it only the first time we see a duplicated ID.
+			if len(duplicatedConfigs[fsInput.ID]) == 2 {
+				duplicates = append(duplicates, fsInput.ID)
+			}
+		}
+	}
+
+	if len(duplicates) != 0 {
+		jsonDupCfg := collectOffendingInputs(duplicates, duplicatedConfigs)
+		logger.Errorw("filestream inputs with duplicated IDs", "inputs", jsonDupCfg)
+		var quotedDuplicates []string
+		for _, dup := range duplicates {
+			quotedDuplicates = append(quotedDuplicates, fmt.Sprintf("%q", dup))
+		}
+		return fmt.Errorf("filestream inputs validation error: filestream inputs with duplicated IDs: %v", strings.Join(quotedDuplicates, ","))
+	}
+
+	return nil
+}
+
+func collectOffendingInputs(duplicates []string, ids map[string][]*conf.C) []map[string]interface{} {
+	var cfgs []map[string]interface{}
+
+	for _, id := range duplicates {
+		for _, dupcfgs := range ids[id] {
+			toJson := map[string]interface{}{}
+			err := dupcfgs.Unpack(&toJson)
+			if err != nil {
+				toJson[id] = fmt.Sprintf("failed to unpack config: %v", err)
+			}
+			cfgs = append(cfgs, toJson)
+		}
+	}
+
+	return cfgs
 }

@@ -7,16 +7,19 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "noexec_taint_pod",
+                "name": "daemonset",
                 "workqueue": {
                     "adds": {
-                        "count": 16
+                        "count": 5
                     },
                     "depth": {
                         "count": 0
                     },
                     "longestrunning": {
                         "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
                     },
                     "unfinished": {
                         "sec": 0
@@ -41,10 +44,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "serviceaccount",
+                "name": "ClusterRoleAggregator",
                 "workqueue": {
                     "adds": {
-                        "count": 5
+                        "count": 20
                     },
                     "depth": {
                         "count": 0
@@ -117,73 +120,12 @@
             "controllermanager": {
                 "client": {
                     "request": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 1546,
-                                    "100000": 1523,
-                                    "1000000": 1545,
-                                    "15000000": 1546,
-                                    "2000000": 1545,
-                                    "25000": 1482,
-                                    "250000": 1531,
-                                    "30000000": 1546,
-                                    "4000000": 1546,
-                                    "5000": 1414,
-                                    "500000": 1543,
-                                    "60000000": 1546,
-                                    "8000000": 1546
-                                },
-                                "count": 1546,
-                                "sum": 16967002.752999995
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1546,
-                                    "1024": 1546,
-                                    "1048576": 1546,
-                                    "16384": 1546,
-                                    "16777216": 1546,
-                                    "256": 1546,
-                                    "262144": 1546,
-                                    "4096": 1546,
-                                    "4194304": 1546,
-                                    "512": 1546,
-                                    "64": 1546,
-                                    "65536": 1546
-                                },
-                                "count": 1546,
-                                "sum": 0
-                            }
-                        }
-                    },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 1546,
-                                    "1024": 1226,
-                                    "1048576": 1546,
-                                    "16384": 1543,
-                                    "16777216": 1546,
-                                    "256": 88,
-                                    "262144": 1546,
-                                    "4096": 1233,
-                                    "4194304": 1546,
-                                    "512": 1223,
-                                    "64": 21,
-                                    "65536": 1546
-                                },
-                                "count": 1546,
-                                "sum": 4165150
-                            }
-                        }
+                        "count": 1
                     }
                 },
-                "host": "172.18.0.2:6443",
-                "verb": "GET"
+                "code": "409",
+                "host": "192.168.58.2:8443",
+                "method": "PUT"
             }
         },
         "metricset": {
@@ -203,75 +145,61 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "client": {
-                    "request": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 84,
-                                    "100000": 64,
-                                    "1000000": 84,
-                                    "15000000": 84,
-                                    "2000000": 84,
-                                    "25000": 46,
-                                    "250000": 66,
-                                    "30000000": 84,
-                                    "4000000": 84,
-                                    "5000": 10,
-                                    "500000": 77,
-                                    "60000000": 84,
-                                    "8000000": 84
-                                },
-                                "count": 84,
-                                "sum": 11851414.454
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 84,
-                                    "1024": 70,
-                                    "1048576": 84,
-                                    "16384": 84,
-                                    "16777216": 84,
-                                    "256": 55,
-                                    "262144": 84,
-                                    "4096": 84,
-                                    "4194304": 84,
-                                    "512": 66,
-                                    "64": 1,
-                                    "65536": 84
-                                },
-                                "count": 84,
-                                "sum": 34927
-                            }
-                        }
+                "name": "validatingadmissionpolicy-status",
+                "workqueue": {
+                    "adds": {
+                        "count": 0
                     },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 84,
-                                    "1024": 51,
-                                    "1048576": 84,
-                                    "16384": 84,
-                                    "16777216": 84,
-                                    "256": 38,
-                                    "262144": 84,
-                                    "4096": 82,
-                                    "4194304": 84,
-                                    "512": 39,
-                                    "64": 0,
-                                    "65536": 84
-                                },
-                                "count": 84,
-                                "sum": 78889
-                            }
-                        }
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
                     }
-                },
-                "host": "172.18.0.2:6443",
-                "verb": "POST"
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "garbage_collector_graph_changes",
+                "workqueue": {
+                    "adds": {
+                        "count": 400
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
             }
         },
         "metricset": {
@@ -402,37 +330,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 1
-                    }
-                },
-                "code": "403",
-                "host": "172.18.0.2:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "DynamicServingCertificateController",
+                "name": "DynamicCABundle-csr-controller",
                 "workqueue": {
                     "adds": {
-                        "count": 38
+                        "count": 6
                     },
                     "depth": {
                         "count": 0
@@ -466,10 +367,212 @@
         },
         "kubernetes": {
             "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 34
+                    }
+                },
+                "code": "404",
+                "host": "192.168.58.2:8443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
                 "name": "orphaned_pods_nodes",
                 "workqueue": {
                     "adds": {
                         "count": 0
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "endpoint",
+                "workqueue": {
+                    "adds": {
+                        "count": 7
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 3
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "serviceaccount_tokens_service",
+                "workqueue": {
+                    "adds": {
+                        "count": 42
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 10
+                    }
+                },
+                "code": "200",
+                "host": "192.168.58.2:8443",
+                "method": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "endpoint_slice_mirroring",
+                "workqueue": {
+                    "adds": {
+                        "count": 6
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "certificate",
+                "workqueue": {
+                    "adds": {
+                        "count": 15
                     },
                     "depth": {
                         "count": 0
@@ -540,84 +643,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "endpoint_slice_mirroring",
-                "workqueue": {
-                    "adds": {
-                        "count": 4
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
                 "name": "horizontalpodautoscaler",
                 "workqueue": {
                     "adds": {
                         "count": 0
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "ClusterRoleAggregator",
-                "workqueue": {
-                    "adds": {
-                        "count": 19
                     },
                     "depth": {
                         "count": 0
@@ -725,24 +754,75 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "endpoint",
-                "workqueue": {
-                    "adds": {
-                        "count": 6
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 17,
+                                    "100000": 14,
+                                    "1000000": 17,
+                                    "15000000": 17,
+                                    "2000000": 17,
+                                    "25000": 12,
+                                    "250000": 16,
+                                    "30000000": 17,
+                                    "4000000": 17,
+                                    "5000": 3,
+                                    "500000": 16,
+                                    "60000000": 17,
+                                    "8000000": 17
+                                },
+                                "count": 17,
+                                "sum": 990688.5049999999
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 17,
+                                    "1024": 7,
+                                    "1048576": 17,
+                                    "16384": 17,
+                                    "16777216": 17,
+                                    "256": 0,
+                                    "262144": 17,
+                                    "4096": 17,
+                                    "4194304": 17,
+                                    "512": 2,
+                                    "64": 0,
+                                    "65536": 17
+                                },
+                                "count": 17,
+                                "sum": 18631
+                            }
+                        }
                     },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 4
-                    },
-                    "unfinished": {
-                        "sec": 0
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 17,
+                                    "1024": 3,
+                                    "1048576": 17,
+                                    "16384": 17,
+                                    "16777216": 17,
+                                    "256": 1,
+                                    "262144": 17,
+                                    "4096": 17,
+                                    "4194304": 17,
+                                    "512": 1,
+                                    "64": 0,
+                                    "65536": 17
+                                },
+                                "count": 17,
+                                "sum": 42059
+                            }
+                        }
                     }
-                }
+                },
+                "host": "192.168.58.2:8443",
+                "verb": "PUT"
             }
         },
         "metricset": {
@@ -799,98 +879,14 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "replicaset",
-                "workqueue": {
-                    "adds": {
-                        "count": 18
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
+                "client": {
+                    "request": {
+                        "count": 1
                     }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "endpoint_slice",
-                "workqueue": {
-                    "adds": {
-                        "count": 7
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 6
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "garbage_collector_graph_changes",
-                "workqueue": {
-                    "adds": {
-                        "count": 2979
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
+                },
+                "code": "404",
+                "host": "192.168.58.2:8443",
+                "method": "DELETE"
             }
         },
         "metricset": {
@@ -947,10 +943,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "DynamicCABundle-client-ca-bundle",
+                "name": "ttlcontroller",
                 "workqueue": {
                     "adds": {
-                        "count": 2
+                        "count": 7
                     },
                     "depth": {
                         "count": 0
@@ -1021,6 +1017,121 @@
         },
         "kubernetes": {
             "controllermanager": {
+                "client": {
+                    "request": {
+                        "count": 1
+                    }
+                },
+                "code": "200",
+                "host": "192.168.58.2:8443",
+                "method": "DELETE"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 71,
+                                    "100000": 49,
+                                    "1000000": 69,
+                                    "15000000": 71,
+                                    "2000000": 71,
+                                    "25000": 24,
+                                    "250000": 52,
+                                    "30000000": 71,
+                                    "4000000": 71,
+                                    "5000": 13,
+                                    "500000": 61,
+                                    "60000000": 71,
+                                    "8000000": 71
+                                },
+                                "count": 71,
+                                "sum": 13400135.484
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 71,
+                                    "1024": 63,
+                                    "1048576": 71,
+                                    "16384": 71,
+                                    "16777216": 71,
+                                    "256": 56,
+                                    "262144": 71,
+                                    "4096": 71,
+                                    "4194304": 71,
+                                    "512": 61,
+                                    "64": 1,
+                                    "65536": 71
+                                },
+                                "count": 71,
+                                "sum": 19672
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 71,
+                                    "1024": 45,
+                                    "1048576": 71,
+                                    "16384": 71,
+                                    "16777216": 71,
+                                    "256": 38,
+                                    "262144": 71,
+                                    "4096": 71,
+                                    "4194304": 71,
+                                    "512": 38,
+                                    "64": 0,
+                                    "65536": 71
+                                },
+                                "count": 71,
+                                "sum": 52967
+                            }
+                        }
+                    }
+                },
+                "host": "192.168.58.2:8443",
+                "verb": "POST"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
                 "name": "stale_pod_disruption",
                 "workqueue": {
                     "adds": {
@@ -1058,10 +1169,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "daemonset",
+                "name": "pvprotection",
                 "workqueue": {
                     "adds": {
-                        "count": 17
+                        "count": 0
                     },
                     "depth": {
                         "count": 0
@@ -1095,94 +1206,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "node": {
-                    "collector": {
-                        "count": 1,
-                        "eviction": {
-                            "count": 0
-                        },
-                        "health": {
-                            "pct": 100
-                        },
-                        "unhealthy": {
-                            "count": 0
-                        }
-                    }
-                },
-                "process": {
-                    "cpu": {
-                        "sec": 58
-                    },
-                    "fds": {
-                        "max": {
-                            "count": 1048576
-                        },
-                        "open": {
-                            "count": 18
-                        }
-                    },
-                    "memory": {
-                        "resident": {
-                            "bytes": 109260800
-                        },
-                        "virtual": {
-                            "bytes": 1337397248
-                        }
-                    },
-                    "started": {
-                        "sec": 1704894767.11
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 1125
-                    }
-                },
-                "code": "200",
-                "host": "172.18.0.2:6443",
-                "method": "PUT"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "pvprotection",
+                "name": "resource_quota_controller_resource_changes",
                 "workqueue": {
                     "adds": {
-                        "count": 0
+                        "count": 1
                     },
                     "depth": {
                         "count": 0
@@ -1253,14 +1280,24 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 10
+                "name": "replicaset",
+                "workqueue": {
+                    "adds": {
+                        "count": 7
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
                     }
-                },
-                "code": "200",
-                "host": "172.18.0.2:6443",
-                "method": "PATCH"
+                }
             }
         },
         "metricset": {
@@ -1314,68 +1351,24 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 34
+                "name": "DynamicCABundle-client-ca-bundle",
+                "workqueue": {
+                    "adds": {
+                        "count": 1
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
                     }
-                },
-                "code": "404",
-                "host": "172.18.0.2:6443",
-                "method": "GET"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 3
-                    }
-                },
-                "code": "409",
-                "host": "172.18.0.2:6443",
-                "method": "PUT"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "client": {
-                    "request": {
-                        "count": 1756
-                    }
-                },
-                "code": "200",
-                "host": "172.18.0.2:6443",
-                "method": "GET"
+                }
             }
         },
         "metricset": {
@@ -1432,10 +1425,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "ttlcontroller",
+                "name": "node_lifecycle_controller_pods",
                 "workqueue": {
                     "adds": {
-                        "count": 12
+                        "count": 8
                     },
                     "depth": {
                         "count": 0
@@ -1450,29 +1443,6 @@
                         "sec": 0
                     }
                 }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "leader": {
-                    "is_master": true
-                },
-                "name": "kube-controller-manager"
             }
         },
         "metricset": {
@@ -1531,12 +1501,174 @@
             "controllermanager": {
                 "client": {
                     "request": {
-                        "count": 84
+                        "count": 71
                     }
                 },
                 "code": "201",
-                "host": "172.18.0.2:6443",
+                "host": "192.168.58.2:8443",
                 "method": "POST"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "DynamicServingCertificateController",
+                "workqueue": {
+                    "adds": {
+                        "count": 3
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 11,
+                                    "100000": 7,
+                                    "1000000": 11,
+                                    "15000000": 11,
+                                    "2000000": 11,
+                                    "25000": 4,
+                                    "250000": 8,
+                                    "30000000": 11,
+                                    "4000000": 11,
+                                    "5000": 0,
+                                    "500000": 8,
+                                    "60000000": 11,
+                                    "8000000": 11
+                                },
+                                "count": 11,
+                                "sum": 3115352.958
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 11,
+                                    "1024": 6,
+                                    "1048576": 11,
+                                    "16384": 11,
+                                    "16777216": 11,
+                                    "256": 5,
+                                    "262144": 11,
+                                    "4096": 11,
+                                    "4194304": 11,
+                                    "512": 6,
+                                    "64": 2,
+                                    "65536": 11
+                                },
+                                "count": 11,
+                                "sum": 14842
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 11,
+                                    "1024": 2,
+                                    "1048576": 11,
+                                    "16384": 11,
+                                    "16777216": 11,
+                                    "256": 1,
+                                    "262144": 11,
+                                    "4096": 7,
+                                    "4194304": 11,
+                                    "512": 1,
+                                    "64": 0,
+                                    "65536": 11
+                                },
+                                "count": 11,
+                                "sum": 31657
+                            }
+                        }
+                    }
+                },
+                "host": "192.168.58.2:8443",
+                "verb": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "serviceaccount",
+                "workqueue": {
+                    "adds": {
+                        "count": 4
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
             }
         },
         "metricset": {
@@ -1667,10 +1799,10 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "deployment",
+                "name": "endpoint_slice",
                 "workqueue": {
                     "adds": {
-                        "count": 20
+                        "count": 8
                     },
                     "depth": {
                         "count": 0
@@ -1679,7 +1811,7 @@
                         "sec": 0
                     },
                     "retries": {
-                        "count": 9
+                        "count": 6
                     },
                     "unfinished": {
                         "sec": 0
@@ -1704,75 +1836,24 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "client": {
-                    "request": {
-                        "duration": {
-                            "us": {
-                                "bucket": {
-                                    "+Inf": 10,
-                                    "100000": 6,
-                                    "1000000": 10,
-                                    "15000000": 10,
-                                    "2000000": 10,
-                                    "25000": 4,
-                                    "250000": 6,
-                                    "30000000": 10,
-                                    "4000000": 10,
-                                    "5000": 0,
-                                    "500000": 6,
-                                    "60000000": 10,
-                                    "8000000": 10
-                                },
-                                "count": 10,
-                                "sum": 3209190.2879999997
-                            }
-                        },
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 10,
-                                    "1024": 4,
-                                    "1048576": 10,
-                                    "16384": 10,
-                                    "16777216": 10,
-                                    "256": 3,
-                                    "262144": 10,
-                                    "4096": 10,
-                                    "4194304": 10,
-                                    "512": 4,
-                                    "64": 1,
-                                    "65536": 10
-                                },
-                                "count": 10,
-                                "sum": 18531
-                            }
-                        }
+                "name": "root_ca_cert_publisher",
+                "workqueue": {
+                    "adds": {
+                        "count": 4
                     },
-                    "response": {
-                        "size": {
-                            "bytes": {
-                                "bucket": {
-                                    "+Inf": 10,
-                                    "1024": 1,
-                                    "1048576": 10,
-                                    "16384": 10,
-                                    "16777216": 10,
-                                    "256": 0,
-                                    "262144": 10,
-                                    "4096": 10,
-                                    "4194304": 10,
-                                    "512": 0,
-                                    "64": 0,
-                                    "65536": 10
-                                },
-                                "count": 10,
-                                "sum": 28839
-                            }
-                        }
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
                     }
-                },
-                "host": "172.18.0.2:6443",
-                "verb": "PATCH"
+                }
             }
         },
         "metricset": {
@@ -1866,10 +1947,71 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "certificate",
+                "client": {
+                    "request": {
+                        "count": 1
+                    }
+                },
+                "code": "409",
+                "host": "192.168.58.2:8443",
+                "method": "PATCH"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "node_lifecycle_controller",
                 "workqueue": {
                     "adds": {
+                        "count": 6
+                    },
+                    "depth": {
                         "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "deployment",
+                "workqueue": {
+                    "adds": {
+                        "count": 9
                     },
                     "depth": {
                         "count": 0
@@ -1878,7 +2020,7 @@
                         "sec": 0
                     },
                     "retries": {
-                        "count": 0
+                        "count": 5
                     },
                     "unfinished": {
                         "sec": 0
@@ -1940,40 +2082,6 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "node_lifecycle_controller",
-                "workqueue": {
-                    "adds": {
-                        "count": 12
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
                 "name": "volumes",
                 "workqueue": {
                     "adds": {
@@ -2008,24 +2116,14 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "DynamicCABundle-request-header",
-                "workqueue": {
-                    "adds": {
-                        "count": 2
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
+                "client": {
+                    "request": {
+                        "count": 190
                     }
-                }
+                },
+                "code": "200",
+                "host": "192.168.58.2:8443",
+                "method": "GET"
             }
         },
         "metricset": {
@@ -2045,61 +2143,14 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "serviceaccount_tokens_service",
-                "workqueue": {
-                    "adds": {
-                        "count": 43
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
+                "client": {
+                    "request": {
+                        "count": 16
                     }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "resource_quota_controller_resource_changes",
-                "workqueue": {
-                    "adds": {
-                        "count": 0
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
+                },
+                "code": "200",
+                "host": "192.168.58.2:8443",
+                "method": "PUT"
             }
         },
         "metricset": {
@@ -2193,6 +2244,100 @@
         },
         "kubernetes": {
             "controllermanager": {
+                "node": {
+                    "collector": {
+                        "count": 1,
+                        "eviction": {
+                            "count": 0
+                        },
+                        "health": {
+                            "pct": 100
+                        },
+                        "unhealthy": {
+                            "count": 0
+                        }
+                    }
+                },
+                "process": {
+                    "cpu": {
+                        "sec": 7
+                    },
+                    "fds": {
+                        "max": {
+                            "count": 1048576
+                        },
+                        "open": {
+                            "count": 19
+                        }
+                    },
+                    "memory": {
+                        "resident": {
+                            "bytes": 116060160
+                        },
+                        "virtual": {
+                            "bytes": 1367392256
+                        }
+                    },
+                    "started": {
+                        "sec": 1714044432.9
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "DynamicCABundle-request-header",
+                "workqueue": {
+                    "adds": {
+                        "count": 1
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "retries": {
+                        "count": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
                 "name": "claims",
                 "workqueue": {
                     "adds": {
@@ -2229,45 +2374,106 @@
             "controllermanager": {
                 "client": {
                     "request": {
+                        "count": 2
+                    }
+                },
+                "code": "403",
+                "host": "192.168.58.2:8443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "name": "noexec_taint_pod",
+                "workqueue": {
+                    "adds": {
+                        "count": 12
+                    },
+                    "depth": {
+                        "count": 0
+                    },
+                    "longestrunning": {
+                        "sec": 0
+                    },
+                    "unfinished": {
+                        "sec": 0
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
                         "duration": {
                             "us": {
                                 "bucket": {
-                                    "+Inf": 1128,
-                                    "100000": 1125,
-                                    "1000000": 1128,
-                                    "15000000": 1128,
-                                    "2000000": 1128,
-                                    "25000": 1114,
-                                    "250000": 1127,
-                                    "30000000": 1128,
-                                    "4000000": 1128,
+                                    "+Inf": 2,
+                                    "100000": 1,
+                                    "1000000": 2,
+                                    "15000000": 2,
+                                    "2000000": 2,
+                                    "25000": 1,
+                                    "250000": 1,
+                                    "30000000": 2,
+                                    "4000000": 2,
                                     "5000": 1,
-                                    "500000": 1127,
-                                    "60000000": 1128,
-                                    "8000000": 1128
+                                    "500000": 1,
+                                    "60000000": 2,
+                                    "8000000": 2
                                 },
-                                "count": 1128,
-                                "sum": 15549394.524000004
+                                "count": 2,
+                                "sum": 599931.8539999999
                             }
                         },
                         "size": {
                             "bytes": {
                                 "bucket": {
-                                    "+Inf": 1128,
-                                    "1024": 1104,
-                                    "1048576": 1128,
-                                    "16384": 1128,
-                                    "16777216": 1128,
-                                    "256": 0,
-                                    "262144": 1128,
-                                    "4096": 1128,
-                                    "4194304": 1128,
-                                    "512": 1099,
-                                    "64": 0,
-                                    "65536": 1128
+                                    "+Inf": 2,
+                                    "1024": 2,
+                                    "1048576": 2,
+                                    "16384": 2,
+                                    "16777216": 2,
+                                    "256": 2,
+                                    "262144": 2,
+                                    "4096": 2,
+                                    "4194304": 2,
+                                    "512": 2,
+                                    "64": 2,
+                                    "65536": 2
                                 },
-                                "count": 1128,
-                                "sum": 534678
+                                "count": 2,
+                                "sum": 62
                             }
                         }
                     },
@@ -2275,101 +2481,27 @@
                         "size": {
                             "bytes": {
                                 "bucket": {
-                                    "+Inf": 1128,
-                                    "1024": 1103,
-                                    "1048576": 1128,
-                                    "16384": 1128,
-                                    "16777216": 1128,
-                                    "256": 1,
-                                    "262144": 1128,
-                                    "4096": 1123,
-                                    "4194304": 1128,
-                                    "512": 1101,
+                                    "+Inf": 2,
+                                    "1024": 2,
+                                    "1048576": 2,
+                                    "16384": 2,
+                                    "16777216": 2,
+                                    "256": 2,
+                                    "262144": 2,
+                                    "4096": 2,
+                                    "4194304": 2,
+                                    "512": 2,
                                     "64": 0,
-                                    "65536": 1128
+                                    "65536": 2
                                 },
-                                "count": 1128,
-                                "sum": 578751
+                                "count": 2,
+                                "sum": 275
                             }
                         }
                     }
                 },
-                "host": "172.18.0.2:6443",
-                "verb": "PUT"
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "node_lifecycle_controller_pods",
-                "workqueue": {
-                    "adds": {
-                        "count": 10
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
-            }
-        },
-        "metricset": {
-            "name": "controllermanager",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.controllermanager",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "controllermanager": {
-                "name": "root_ca_cert_publisher",
-                "workqueue": {
-                    "adds": {
-                        "count": 5
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
-                    }
-                }
+                "host": "192.168.58.2:8443",
+                "verb": "DELETE"
             }
         },
         "metricset": {
@@ -2426,24 +2558,102 @@
         },
         "kubernetes": {
             "controllermanager": {
-                "name": "DynamicCABundle-csr-controller",
-                "workqueue": {
-                    "adds": {
-                        "count": 8
-                    },
-                    "depth": {
-                        "count": 0
-                    },
-                    "longestrunning": {
-                        "sec": 0
-                    },
-                    "retries": {
-                        "count": 0
-                    },
-                    "unfinished": {
-                        "sec": 0
+                "client": {
+                    "request": {
+                        "count": 1
                     }
-                }
+                },
+                "code": "500",
+                "host": "192.168.58.2:8443",
+                "method": "GET"
+            }
+        },
+        "metricset": {
+            "name": "controllermanager",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.controllermanager",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "controllermanager": {
+                "client": {
+                    "request": {
+                        "duration": {
+                            "us": {
+                                "bucket": {
+                                    "+Inf": 179,
+                                    "100000": 152,
+                                    "1000000": 179,
+                                    "15000000": 179,
+                                    "2000000": 179,
+                                    "25000": 85,
+                                    "250000": 164,
+                                    "30000000": 179,
+                                    "4000000": 179,
+                                    "5000": 77,
+                                    "500000": 175,
+                                    "60000000": 179,
+                                    "8000000": 179
+                                },
+                                "count": 179,
+                                "sum": 12788541.488999996
+                            }
+                        },
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 179,
+                                    "1024": 179,
+                                    "1048576": 179,
+                                    "16384": 179,
+                                    "16777216": 179,
+                                    "256": 179,
+                                    "262144": 179,
+                                    "4096": 179,
+                                    "4194304": 179,
+                                    "512": 179,
+                                    "64": 179,
+                                    "65536": 179
+                                },
+                                "count": 179,
+                                "sum": 0
+                            }
+                        }
+                    },
+                    "response": {
+                        "size": {
+                            "bytes": {
+                                "bucket": {
+                                    "+Inf": 179,
+                                    "1024": 134,
+                                    "1048576": 179,
+                                    "16384": 163,
+                                    "16777216": 179,
+                                    "256": 92,
+                                    "262144": 179,
+                                    "4096": 143,
+                                    "4194304": 179,
+                                    "512": 128,
+                                    "64": 19,
+                                    "65536": 179
+                                },
+                                "count": 179,
+                                "sum": 514937
+                            }
+                        }
+                    }
+                },
+                "host": "192.168.58.2:8443",
+                "verb": "GET"
             }
         },
         "metricset": {

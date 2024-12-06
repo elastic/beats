@@ -1,0 +1,6 @@
+- module: benchmark
+  metricsets:
+    - info
+  enabled: false
+  period: 10s
+

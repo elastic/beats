@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
-const missingNamespace = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case."
+const missingMetricDefinitions = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
@@ -42,10 +42,11 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 
 			if len(metricDefinitions.Value) == 0 {
 				if metric.IgnoreUnsupported {
-					client.Log.Infof(missingNamespace, *resource.ID, metric.Namespace)
+					client.Log.Infof(missingMetricDefinitions, *resource.ID, metric.Namespace)
 					continue
 				}
-				return nil, fmt.Errorf("%s %s %s", missingNamespace, *resource.ID, metric.Namespace)
+
+				return nil, fmt.Errorf(missingMetricDefinitions, *resource.ID, metric.Namespace)
 			}
 
 			// validate metric names and filter on the supported metrics

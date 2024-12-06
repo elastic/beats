@@ -15,7 +15,7 @@ definePattern() {
 }
 
 defineExclusions() {
-  exclude="^$beatPath\/module\/(.*(?<!\.asciidoc|\.png))$"
+  exclude="^$beatPath\/module\/(.*(?<!\.asciidoc|\.png|Dockerfile))$"
 }
 
 defineFromCommit() {

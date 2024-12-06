@@ -15,19 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
 import (
-	"errors"
 	"sync"
 	"time"
 
 	"github.com/elastic/go-ucfg"
 
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
-	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
+
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
@@ -38,25 +38,18 @@ var includeMatchesWarnOnce sync.Once
 
 // Config stores the options of a journald input.
 type config struct {
+	// ID is the input ID, each instance must have a unique ID
+	ID string `config:"id"`
+
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 
-	// Backoff is the current interval to wait before
-	// attempting to read again from the journal.
-	Backoff time.Duration `config:"backoff" validate:"min=0,nonzero"`
-
-	// MaxBackoff is the limit of the backoff time.
-	MaxBackoff time.Duration `config:"max_backoff" validate:"min=0,nonzero"`
-
 	// Since is the relative time offset from now to provide journal
-	// entries from. If Since is nil, no offset is applied.
-	Since *time.Duration `config:"since"`
+	// entries from.
+	Since time.Duration `config:"since"`
 
 	// Seek is the method to read from journals.
-	Seek journalread.SeekMode `config:"seek"`
-
-	// CursorSeekFallback sets where to seek if registry file is not available.
-	CursorSeekFallback journalread.SeekMode `config:"cursor_seek_fallback"`
+	Seek journalctl.SeekMode `config:"seek"`
 
 	// Matches store the key value pairs to match entries.
 	Matches bwcIncludeMatches `config:"include_matches"`
@@ -72,6 +65,9 @@ type config struct {
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
+
+	// Facility is a list of facilities to filter journal messages
+	Facilities []int `config:"facilities"`
 
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
@@ -89,11 +85,8 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 		if err := c.Unpack(&matches); err != nil {
 			return err
 		}
-		for _, x := range matches {
-			im.OR = append(im.OR, journalfield.IncludeMatches{
-				Matches: []journalfield.Matcher{x},
-			})
-		}
+		im.Matches = append(im.Matches, matches...)
+
 		includeMatchesWarnOnce.Do(func() {
 			cfgwarn.Deprecate("", "Please migrate your journald input's "+
 				"include_matches config to the new more expressive format.")
@@ -104,43 +97,9 @@ func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
 	return c.Unpack((*journalfield.IncludeMatches)(im))
 }
 
-var (
-	errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")
-	errInvalidSeek         = errors.New("invalid setting for seek")
-	errInvalidSeekSince    = errors.New("incompatible setting for since and seek or cursor_seek_fallback")
-)
-
 func defaultConfig() config {
 	return config{
-		Backoff:            1 * time.Second,
-		MaxBackoff:         20 * time.Second,
-		Seek:               journalread.SeekCursor,
-		CursorSeekFallback: journalread.SeekHead,
+		Seek:               journalctl.SeekHead,
 		SaveRemoteHostname: false,
 	}
-}
-
-func (c *config) Validate() error {
-	if c.Seek == journalread.SeekInvalid {
-		return errInvalidSeek
-	}
-	switch c.CursorSeekFallback {
-	case journalread.SeekHead, journalread.SeekTail, journalread.SeekSince:
-	default:
-		return errInvalidSeekFallback
-	}
-	if c.Since == nil {
-		switch {
-		case c.Seek == journalread.SeekSince,
-			c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince:
-			return errInvalidSeekSince
-		default:
-			return nil
-		}
-	}
-	needSince := c.Seek == journalread.SeekSince || (c.Seek == journalread.SeekCursor && c.CursorSeekFallback == journalread.SeekSince)
-	if !needSince {
-		return errInvalidSeekSince
-	}
-	return nil
 }

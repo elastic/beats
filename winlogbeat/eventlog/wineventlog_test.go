@@ -20,6 +20,7 @@
 package eventlog
 
 import (
+	"fmt"
 	"io"
 	"os/exec"
 	"path/filepath"
@@ -28,9 +29,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/windows/registry"
+	"golang.org/x/sys/windows/svc/eventlog"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
@@ -165,14 +167,17 @@ func TestWinEventLogConfig_Validate(t *testing.T) {
 }
 
 func TestWindowsEventLogAPI(t *testing.T) {
-	testWindowsEventLog(t, winEventLogAPIName)
+	testWindowsEventLog(t, winEventLogAPIName, false)
 }
 
-func TestWindowsEventLogAPIExperimental(t *testing.T) {
-	testWindowsEventLog(t, winEventLogExpAPIName)
+func TestWindowsEventLogAPIRaw(t *testing.T) {
+	// for the raw api using include xml behave differently than not
+	// so we must test both settings
+	testWindowsEventLog(t, winEventLogRawAPIName, true)
+	testWindowsEventLog(t, winEventLogRawAPIName, false)
 }
 
-func testWindowsEventLog(t *testing.T, api string) {
+func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
 	writer, teardown := createLog(t)
 	defer teardown()
 
@@ -182,7 +187,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000)+1, []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
+		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" "+randomSentence(messageSize))
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
@@ -190,7 +195,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	}
 
 	t.Run("has_message", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1, "include_xml": includeXML})
 		defer log.Close()
 
 		for i := 0; i < 10; i++ {
@@ -206,8 +211,9 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
 		cfg := map[string]interface{}{
-			"id":        "custom-xml-query",
-			"xml_query": customXMLQuery,
+			"id":          "custom-xml-query",
+			"xml_query":   customXMLQuery,
+			"include_xml": includeXML,
 		}
 
 		log := openLog(t, cfg)
@@ -234,7 +240,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2
 
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize, "include_xml": includeXML})
 		defer log.Close()
 
 		records, err := log.Read()
@@ -249,7 +255,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// When combined with large messages this causes EvtNext to fail with
 	// RPC_S_INVALID_BOUND error. The reader should recover from the error.
 	t.Run("large_batch_read", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024, "include_xml": includeXML})
 		defer log.Close()
 
 		var eventCount int
@@ -280,6 +286,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 		log := openLog(t, map[string]interface{}{
 			"name":           path,
 			"no_more_events": "stop",
+			"include_xml":    includeXML,
 		})
 		defer log.Close()
 
@@ -308,6 +315,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 			"name":           path,
 			"no_more_events": "stop",
 			"event_id":       "3, 5",
+			"include_xml":    includeXML,
 		})
 		defer log.Close()
 
@@ -339,7 +347,7 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 		messageFile = strings.Join(messageFiles, ";")
 	}
 
-	existed, err := eventlog.Install(name, source, messageFile, true, eventlog.Error|eventlog.Warning|eventlog.Info)
+	existed, err := install(name, source, messageFile, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -351,8 +359,8 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	log, err = eventlog.Open(source)
 	//nolint:errcheck // This is just a resource release.
 	if err != nil {
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 		t.Fatal(err)
 	}
 
@@ -360,17 +368,17 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	tearDown = func() {
 		log.Close()
 		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 	}
 
 	return log, tearDown
 }
 
-func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+func safeWriteEvent(t testing.TB, log *eventlog.Log, eid uint32, msg string) {
 	deadline := time.Now().Add(time.Second * 10)
 	for {
-		err := log.Report(etype, eid, msgs)
+		err := log.Info(eid, msg)
 		if err == nil {
 			return
 		}
@@ -399,8 +407,8 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 	switch api {
 	case winEventLogAPIName:
 		log, err = newWinEventLog(cfg)
-	case winEventLogExpAPIName:
-		log, err = newWinEventLogExp(cfg)
+	case winEventLogRawAPIName:
+		log, err = newWinEventLogRaw(cfg)
 	default:
 		t.Fatalf("Unknown API name: '%s'", api)
 	}
@@ -419,4 +427,72 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 	}
 
 	return log
+}
+
+const Application = "Application"
+
+const eventLogKeyName = `SYSTEM\CurrentControlSet\Services\EventLog`
+
+// removeSource deletes all registry elements installed for an event logging source.
+func removeSource(provider, src string) error {
+	providerKeyName := fmt.Sprintf("%s\\%s", eventLogKeyName, provider)
+	pk, err := registry.OpenKey(registry.LOCAL_MACHINE, providerKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer pk.Close()
+	return registry.DeleteKey(pk, src)
+}
+
+// removeProvider deletes all registry elements installed for an event logging provider.
+// Only use this method if you have installed a custom provider.
+func removeProvider(provider string) error {
+	// Protect against removing Application.
+	if provider == Application {
+		return fmt.Errorf("%s cannot be removed. Only custom providers can be removed.", provider)
+	}
+
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer eventLogKey.Close()
+	return registry.DeleteKey(eventLogKey, provider)
+}
+
+func install(provider, src, msgFile string, eventsSupported uint32) (bool, error) {
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.CREATE_SUB_KEY)
+	if err != nil {
+		return false, err
+	}
+	defer eventLogKey.Close()
+
+	pk, _, err := registry.CreateKey(eventLogKey, provider, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer pk.Close()
+
+	sk, alreadyExist, err := registry.CreateKey(pk, src, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer sk.Close()
+	if alreadyExist {
+		return true, nil
+	}
+
+	err = sk.SetDWordValue("CustomSource", 1)
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetExpandStringValue("EventMessageFile", msgFile)
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetDWordValue("TypesSupported", eventsSupported)
+	if err != nil {
+		return false, err
+	}
+	return false, nil
 }

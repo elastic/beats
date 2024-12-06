@@ -18,13 +18,13 @@
 package beater
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -112,7 +112,9 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		}
 		overwritePipelines = config.OverwritePipelines
 		b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
-			esClient, err := eslegclient.NewConnectedClient(esConfig, "Packetbeat")
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat")
 			if err != nil {
 				return err
 			}
@@ -209,7 +211,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.RegisterV2.MustRegisterInput(runner)
+	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when

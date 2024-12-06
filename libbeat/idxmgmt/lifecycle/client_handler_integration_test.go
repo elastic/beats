@@ -20,12 +20,13 @@
 package lifecycle
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -141,7 +142,9 @@ func newRawESClient(t *testing.T) ESClient {
 		t.Fatal(err)
 	}
 
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Failed to connect to Test Elasticsearch instance: %v", err)
 	}
 

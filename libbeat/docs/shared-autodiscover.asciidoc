@@ -140,10 +140,7 @@ The `kubernetes` autodiscover provider has the following configuration settings:
 `node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
   cannot be accurately detected, as when running {beatname_lc} in host network
   mode.
-`namespace`:: (Optional) Select the namespace from which to collect the
-  metadata. If it is not set, the processor collects metadata from all
-  namespaces. It is unset by default. The namespace configuration only applies to
-  kubernetes resources that are namespace scoped.
+`namespace`:: (Optional) Select the namespace from which to collect the events from the resources. If it is not set, the provider collects them from all namespaces. It is unset by default. The namespace configuration only applies to kubernetes resources that are namespace scoped and if `unique` field is set to `false`.
 `cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container,
 ifeval::["{beatname_lc}"=="filebeat"]
@@ -196,7 +193,7 @@ Example:
 
 `unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
   making the provider to enable the provided templates only when it will gain the leader lease.
-  This setting can only be combined with `cluster` scope. When `unique` is enabled enabled, `resource`
+  This setting can only be combined with `cluster` scope. When `unique` is enabled, `resource`
   and `add_resource_metadata` settings are not taken into account.
 `leader_lease`:: (Optional) Defaults to +{beatname_lc}-cluster-leader+. This will be name of the lock lease.
   One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.

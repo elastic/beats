@@ -27,8 +27,6 @@ import (
 	"strconv"
 	"testing"
 
-	"golang.org/x/sys/windows/svc/eventlog"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -57,27 +55,30 @@ func TestBenchmarkRead(t *testing.T) {
 
 	// Publish test messages:
 	for i := 0; i < *injectAmount; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(rand.Int63()%1000), []string{strconv.Itoa(i) + " " + randomSentence(256)})
+		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i)+" "+randomSentence(256))
 	}
 
 	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {
 		t.Run("api="+api, func(t *testing.T) {
-			for _, batchSize := range []int{10, 100, 500, 1000} {
-				t.Run(fmt.Sprintf("batch_size=%d", batchSize), func(t *testing.T) {
-					result := testing.Benchmark(benchmarkEventLog(api, batchSize))
-					outputBenchmarkResults(t, result)
-				})
+			for _, includexml := range []bool{true, false} {
+				for _, batchSize := range []int{10, 100, 500, 1000} {
+					t.Run(fmt.Sprintf("include_xml=%v/batch_size=%d", includexml, batchSize), func(t *testing.T) {
+						result := testing.Benchmark(benchmarkEventLog(api, includexml, batchSize))
+						outputBenchmarkResults(t, result)
+					})
+				}
 			}
 		})
 	}
 }
 
-func benchmarkEventLog(api string, batchSize int) func(b *testing.B) {
+func benchmarkEventLog(api string, includexml bool, batchSize int) func(b *testing.B) {
 	return func(b *testing.B) {
 		conf := mapstr.M{
 			"name":            providerName,
 			"batch_read_size": batchSize,
 			"no_more_events":  "stop",
+			"include_xml":     includexml,
 		}
 
 		log := openLog(b, api, nil, conf)

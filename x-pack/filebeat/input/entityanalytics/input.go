@@ -17,6 +17,7 @@ import (
 	// For provider registration.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/activedirectory"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/jamf"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta"
 )
 

@@ -21,6 +21,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Use journald to collect system logs
+    #var.use_journald: false
+
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -32,6 +35,9 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Use journald to collect auth logs
+    #var.use_journald: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -111,7 +117,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Process CloudTrail logs
@@ -160,9 +166,6 @@ filebeat.modules:
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
 
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
-
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
 
@@ -184,7 +187,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -220,9 +223,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -245,7 +245,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -281,9 +281,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -306,7 +303,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -342,9 +339,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -367,7 +361,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -403,9 +397,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -428,7 +419,7 @@ filebeat.modules:
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -464,9 +455,6 @@ filebeat.modules:
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -2541,7 +2529,7 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_inactive: 0
+  #clean_inactive: -1
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
@@ -2884,9 +2872,8 @@ filebeat.inputs:
   # You may wish to have separate inputs for each service. You can use
   # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
-  #include_matches.or:
-    #- equals:
-      #- _SYSTEMD_UNIT=foo.service
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
@@ -2986,8 +2973,8 @@ filebeat.inputs:
   # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
-  # Maximum number of SQS messages that can be inflight at any time.
-  #max_number_of_messages: 5
+  # Number of workers on S3 bucket or SQS queue
+  #number_of_workers: 5
 
   # Maximum duration of an AWS API call (excluding S3 GetObject calls).
   #api_timeout: 120s
@@ -3008,6 +2995,9 @@ filebeat.inputs:
 
   # Bucket ARN used for polling AWS S3 buckets
   #bucket_arn: arn:aws:s3:::test-s3-bucket
+
+  # Access Point ARN used for polling AWS S3 buckets
+  #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
 
   # Bucket Name used for polling non-AWS S3 buckets
   #non_aws_bucket_name: test-s3-bucket
@@ -3042,6 +3032,8 @@ filebeat.inputs:
   #credential_profile_name: test-aws-s3-input
 
   # ARN of the log group to collect logs from
+  # This ARN could refer to a log group from a linked source account
+  # Note: This property precedes over `log_group_name` & `log_group_name_prefix`
   #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
 
   # Name of the log group to collect logs from.
@@ -3049,9 +3041,14 @@ filebeat.inputs:
   #log_group_name: test
 
   # The prefix for a group of log group names.
+  # You can include linked source accounts by using the property `include_linked_accounts_for_prefix_mode`.
   # Note: `region_name` is required when `log_group_name_prefix` is given.
   # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
   #log_group_name_prefix: /aws/
+
+  # State whether to include linked source accounts when obtaining log groups matching the prefix provided through `log_group_name_prefix`
+  # This property works together with `log_group_name_prefix` and default value (if unset) is false
+  #include_linked_accounts_for_prefix_mode: true
 
   # Region that the specified log group or log group prefix belongs to.
   #region_name: us-east-1
@@ -3146,6 +3143,30 @@ filebeat.inputs:
 #            - type: container
 #              paths:
 #                - /var/log/containers/*.log
+
+#Example: for kubernetes container logs autodiscovery
+#  filebeat.autodiscover:
+#    providers:
+#      - type: kubernetes
+#        node: ${NODE_NAME}
+#        hints.enabled: true
+#        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#        use_kubeadm: true
+#        hints.default_config:
+#          type: filestream
+#          id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
+#          paths:
+#          - /var/log/containers/*-${data.kubernetes.container.id}.log
+#          parsers:
+#          - container: ~
+#          prospector:
+#            scanner:
+#              fingerprint.enabled: true
+#              symlinks: true
+#          file_identity.fingerprint: ~
+
+#By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#  use_kubeadm: true
 
 # ========================== Filebeat global options ===========================
 
@@ -4566,6 +4587,54 @@ logging.files:
   # Rotate existing logs on startup rather than appending them to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+#=============================== Events Logging ===============================
+# Some outputs will log raw events on errors like indexing errors in the
+# Elasticsearch output, to prevent logging raw events (that may contain
+# sensitive information) together with other log messages, a different
+# log file, only for log entries containing raw events, is used. It will
+# use the same level, selectors and all other configurations from the
+# default logger, but it will have it's own file configuration.
+#
+# Having a different log file for raw events also prevents event data
+# from drowning out the regular log files.
+#
+# IMPORTANT: No matter the default logger output configuration, raw events
+# will **always** be logged to a file configured by `logging.event_data.files`.
+
+# logging.event_data:
+# Logging to rotating files. Set logging.to_files to false to disable logging to
+# files.
+#logging.event_data.to_files: true
+#logging.event_data:
+  # Configure the path where the logs are written. The default is the logs directory
+  # under the home path (the binary location).
+  #path: /var/log/filebeat
+
+  # The name of the files where the logs are written to.
+  #name: filebeat-event-data
+
+  # Configure log file size limit. If the limit is reached, log file will be
+  # automatically rotated.
+  #rotateeverybytes: 5242880 # = 5MB
+
+  # Number of rotated log files to keep. The oldest files will be deleted first.
+  #keepfiles: 2
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
+
+  # Enable log file rotation on time intervals in addition to the size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # Unix epoch. Defaults to disabled.
+  #interval: 0
+
+  # Rotate existing logs on startup rather than appending them to the existing
+  # file. Defaults to false.
+  # rotateonstartup: false
 
 # ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring

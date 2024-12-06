@@ -51,6 +51,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
+|<<metricbeat-module-benchmark,Benchmark>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-benchmark-info,info>> beta[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .13+| .13+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -213,6 +215,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
 |<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
+|<<metricbeat-module-meraki,Cisco Meraki>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-meraki-device_health,device_health>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
@@ -244,6 +248,11 @@ This file is generated! See scripts/mage/docs_collector.go
 .3+| .3+|  |<<metricbeat-metricset-oracle-performance,performance>>   
 |<<metricbeat-metricset-oracle-sysmetric,sysmetric>> beta[]  
 |<<metricbeat-metricset-oracle-tablespace,tablespace>>   
+|<<metricbeat-module-panw,Panw>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.4+| .4+|  |<<metricbeat-metricset-panw-interfaces,interfaces>> beta[]  
+|<<metricbeat-metricset-panw-routing,routing>> beta[]  
+|<<metricbeat-metricset-panw-system,system>> beta[]  
+|<<metricbeat-metricset-panw-vpn,vpn>> beta[]  
 |<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
 |<<metricbeat-metricset-php_fpm-process,process>>   
@@ -311,8 +320,12 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-uwsgi,uWSGI>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
 |<<metricbeat-module-vsphere,vSphere>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-vsphere-datastore,datastore>>   
+.7+| .7+|  |<<metricbeat-metricset-vsphere-cluster,cluster>> beta[]  
+|<<metricbeat-metricset-vsphere-datastore,datastore>>   
+|<<metricbeat-metricset-vsphere-datastorecluster,datastorecluster>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>>   
+|<<metricbeat-metricset-vsphere-network,network>> beta[]  
+|<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
@@ -333,6 +346,7 @@ include::modules/aws.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]
+include::modules/benchmark.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
@@ -363,6 +377,7 @@ include::modules/kvm.asciidoc[]
 include::modules/linux.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
+include::modules/meraki.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/munin.asciidoc[]
@@ -371,6 +386,7 @@ include::modules/nats.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/openmetrics.asciidoc[]
 include::modules/oracle.asciidoc[]
+include::modules/panw.asciidoc[]
 include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]

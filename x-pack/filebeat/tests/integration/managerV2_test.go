@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -241,7 +242,7 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	waitDeadlineOr5Min := func() time.Duration {
 		deadline, deadileSet := t.Deadline()
 		if deadileSet {
-			left := deadline.Sub(time.Now())
+			left := time.Until(deadline)
 			final := left - 500*time.Millisecond
 			if final <= 0 {
 				return left
@@ -468,36 +469,57 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	// Those are the 'states' Filebeat will go through.
 	// After each state is reached the mockServer will
 	// send the next.
-	protoUnits := [][]*proto.UnitExpected{
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	protos := []*proto.CheckinExpected{
 		{
-			&healthyOutput,
-			&filestreamInputHealthy,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&healthyOutput,
+				&filestreamInputHealthy,
+			},
 		},
 		{
-			&brokenOutput,
-			&filestreamInputStarting,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&brokenOutput,
+				&filestreamInputStarting,
+			},
 		},
 		{
-			&healthyOutput,
-			&filestreamInputHealthy,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				&healthyOutput,
+				&filestreamInputHealthy,
+			},
 		},
-		{}, // An empty one makes the Beat exit
+		{
+			AgentInfo: agentInfo,
+			Units:     []*proto.UnitExpected{}, // An empty one makes the Beat exit
+		},
 	}
 
 	// We use `success` to signal the test has ended successfully
 	// if `success` is never closed, then the test will fail with a timeout.
 	success := make(chan struct{})
+
+	// closeSucceededOnce The Filestream input is now reporting its state
+	// to the Elastic-Agent, which makes more checkins to happen, thus the
+	// `success` channel was being close twice. `closeSucceededOnce`
+	// prevents that from happening.
+	closeSucceededOnce := sync.Once{}
 	// The test is successful when we reach the last element of `protoUnits`
 	onObserved := func(observed *proto.CheckinObserved, protoUnitsIdx int) {
-		if protoUnitsIdx == len(protoUnits)-1 {
-			close(success)
+		if protoUnitsIdx == len(protos)-1 {
+			closeSucceededOnce.Do(func() { close(success) })
 		}
 	}
 
 	server := integration.NewMockServer(
-		protoUnits,
-		[]uint64{0, 0, 0, 0},
-		[]*proto.Features{nil, nil, nil, nil},
+		protos,
 		onObserved,
 		100*time.Millisecond,
 	)

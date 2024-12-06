@@ -20,7 +20,7 @@
 package pod
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -67,6 +67,7 @@ func (s *PodTestSuite) SetupTest() {
 	s.NodeMetrics.MemoryAllocatable = util.NewFloat64Metric(146227200)
 
 	s.ContainerMetrics = util.NewContainerMetrics()
+	s.ContainerMetrics.CoresLimit = util.NewFloat64Metric(0.5)
 	s.ContainerMetrics.MemoryLimit = util.NewFloat64Metric(14622720)
 
 	s.AnotherContainerMetrics = util.NewContainerMetrics()
@@ -77,7 +78,7 @@ func (s *PodTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
 	s.NoError(err, "cannot open test file "+testFile)
 
-	body, err := ioutil.ReadAll(f)
+	body, err := io.ReadAll(f)
 	s.NoError(err, "cannot read test file "+testFile)
 
 	return body
@@ -98,7 +99,7 @@ func (s *PodTestSuite) TestEventMapping() {
 		// calculated pct fields:
 		"cpu.usage.nanocores": 11263994,
 		"cpu.usage.node.pct":  0.005631997,
-		"cpu.usage.limit.pct": 0.005631997,
+		"cpu.usage.limit.pct": 0.022527988,
 
 		"memory.usage.bytes":           1462272,
 		"memory.usage.node.pct":        0.01,
@@ -124,8 +125,10 @@ func (s *PodTestSuite) TestEventMappingWithZeroNodeMetrics() {
 
 	cpuMemoryTestCases := map[string]interface{}{
 		"cpu.usage.nanocores": 11263994,
+		"cpu.usage.limit.pct": 0.022527988,
 
 		"memory.usage.bytes":           1462272,
+		"memory.usage.limit.pct":       0.1,
 		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
@@ -144,6 +147,7 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 
 	cpuMemoryTestCases := map[string]interface{}{
 		"cpu.usage.nanocores": 11263994,
+		"cpu.usage.limit.pct": 0.022527988,
 
 		"memory.usage.bytes":           1462272,
 		"memory.usage.limit.pct":       0.1,
@@ -153,7 +157,7 @@ func (s *PodTestSuite) TestEventMappingWithNoNodeMetrics() {
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
+func (s *PodTestSuite) TestEventMappingWithMultipleContainers_NodeAndOneContainerLimits() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
 	s.addNodeMetric(s.NodeMetrics)
@@ -168,18 +172,23 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainers() {
 		// Following comments explain what is the difference with the test `TestEventMapping`
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
-		"cpu.usage.limit.pct": 0.011263994, // same value as `cpu.usage.node.pct` since `podCoreLimit` = 2x nodeCores = `nodeCores` (capped value)
+		// "cpu.usage.limit.pct" is not reported, since AnotherCntainer does not contain CoresLimit
 
-		"memory.usage.bytes":           2924544,              // 2x since 2 containers
-		"memory.usage.node.pct":        0.02,                 // 2x usage since 2 containers
-		"memory.usage.limit.pct":       0.02,                 // same value as `cpu.usage.node.pct` since 2 containers but only 1 with limit, podMemLimit = containerMemLimit + nodeLimit > nodeLimit = nodeLimit (capped value)
-		"memory.working_set.limit.pct": 0.019887955182072828, // similar concept to `memory.usage.limit.pct`. 2x usage but denominator 10x since nodeLimit = 10x containerMemLimit
+		"memory.usage.bytes":    2924544, // 2x since 2 containers
+		"memory.usage.node.pct": 0.02,    // 2x usage since 2 containers
+		// "memory.usage.limit.pct" is not reported, since AnotherContainer metrics were not added
+		// "memory.working_set.limit.pct" is not reported, since AnotherContainer metrics were not added
 	}
 
 	s.RunMetricsTests(events[0], cpuMemoryTestCases)
 }
 
-func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() {
+// Scenario:
+// Node metrics are defined,
+// Pod contains 2 containers:
+// - nginx with both cpu and memore limits defined
+// - sidecar with memory limit defined
+func (s *PodTestSuite) TestEventMappingWithMultipleContainers_AllMemLimits() {
 	s.MetricsRepo.DeleteAllNodeStore()
 
 	s.addNodeMetric(s.NodeMetrics)
@@ -195,7 +204,7 @@ func (s *PodTestSuite) TestEventMappingWithMultipleContainersWithAllMemLimits() 
 		// Following comments explain what is the difference with the test `TestEventMapping
 		"cpu.usage.nanocores": 22527988,    // 2x usage since 2 container
 		"cpu.usage.node.pct":  0.011263994, // 2x usage since 2 container
-		"cpu.usage.limit.pct": 0.011263994, // same value as `cpu.usage.node.pct` since `podCoreLimit` = 2x nodeCores = `nodeCores` (capped value)
+		// "cpu.usage.limit.pct" is not reported, since AnotherCntainer does not contain CoresLimit
 
 		"memory.usage.bytes":           2924544,             // 2x since 2 containers
 		"memory.usage.node.pct":        0.02,                // 2x usage since 2 containers

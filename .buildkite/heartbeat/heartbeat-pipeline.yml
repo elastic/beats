@@ -18,25 +18,72 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
+  ASDF_NODEJS_VERSION: 18.17.1
+  ASDF_PYTHON_VERSION: 3.10.9
 
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
+
 steps:
-  - group: "Heartbeat Mandatory Testing"
+  - group: "Check/Update"
+    key: "heartbeat-check-update"
+
+    steps:
+      - label: "Heartbeat: Run check/update"
+        command: |
+          set -eo pipefail
+          make -C heartbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "hearbeat: check/update"
+
+      - label: "Heartbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "heartbeat: pre-commit"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "heartbeat-check-update"
+
+  - group: "Mandatory Testing"
     key: "heartbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Heartbeat Unit Tests"
+      - label: ":ubuntu: Heartbeat: Ubuntu x86_64 Unit Tests"
         command: |
           cd heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -46,15 +93,15 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Ubuntu Unit Tests"
+              context: "heartbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
+      - label: ":rhel: Heartbeat: RHEL9 Unit Tests"
         command: |
           cd heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -64,16 +111,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Rhel9 Unit Tests"
+              context: "heartbeat: RHEL9 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-2016 Unit Tests"
+      - label: ":windows: Heartbeat: Win 2016 Unit Tests"
         key: "windows-2016"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -84,16 +131,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2016 Unit Tests"
+              context: "heartbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-2022 Unit Test"
+      - label: ":windows: Heartbeat: Win 2022 Unit Test"
         key: "windows-2022"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -104,15 +151,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2022 Unit Tests"
+              context: "heartbeat: Win 2022 Unit Tests"
 
-      - label: ":ubuntu: Heartbeat Go Integration Tests"
+      # Heartbeat has no modules
+      - label: ":ubuntu: Heartbeat: Go Integration Tests"
         command: |
           cd heartbeat
           mage goIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -122,15 +170,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Go Integration Tests"
+              context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Heartbeat Python Integration Tests"
+      # Heartbeat has no modules yet
+      - label: ":ubuntu: Heartbeat: Python Integration Tests"
         command: |
           cd heartbeat
           mage pythonIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -140,21 +189,22 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Python Integration Tests"
+              context: "heartbeat: Python Integration Tests"
 
-  - group: "Heartbeat ARM Tests"
-    key: "heartbeat-extended-tests-arm"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+  - group: "Extended Tests"
+    key: "heartbeat-extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
-      - label: ":linux: Heartbeat ARM64 Unit Tests"
+      - label: ":ubuntu: Heartbeat: Ubuntu arm64 Unit Tests"
         key: "arm-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -162,22 +212,22 @@ steps:
         artifact_paths: "heartbeat/build/*.xml"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Ubuntu ARM64 Unit Tests"
+              context: "heartbeat: Ubuntu arm64 Unit Tests"
 
-  - group: "Heartbeat Extended Testing MacOS"
-    key: "heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-    steps:
-      - label: ":mac: Heartbeat MacOS Unit Tests"
+      - label: ":mac: Heartbeat: macOS x86_64 Unit Tests"
         key: "macos-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -186,18 +236,22 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: MacOS Unit Tests"
+              context: "heartbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Heartbeat MacOS ARM Unit Tests"
+      - label: ":mac: Heartbeat: macOS arm64 Unit Tests"
         key: "macos-arm-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd heartbeat
           mage build unitTest
+        concurrency_group: "${CONCURRENCY_GROUP}"
+        concurrency: "${CONCURRENCY_COUNT}"
+        concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
-            - limit: 3
+            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -206,21 +260,21 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: MacOS ARM Unit Tests"
+              context: "heartbeat: macOS arm64 Unit Tests"
 
-  - group: "Heartbeat Windows Extended Testing"
+  - group: "Extended Windows Tests"
     key: "heartbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Heartbeat Win-2019 Unit Tests"
+      - label: ":windows: Heartbeat: Win 2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -231,16 +285,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2019 Unit Tests"
+              context: "heartbeat: Win 2019 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-11 Unit Tests"
+      - label: ":windows: Heartbeat: Win 11 Unit Tests"
         key: "heartbeat-windows-extended-11"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -251,16 +305,16 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-11 Unit Tests"
+              context: "heartbeat: Win 11 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-10 Unit Tests"
+      - label: ":windows: Heartbeat: Win 10 Unit Tests"
         key: "heartbeat-windows-extended-10"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -271,26 +325,29 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-10 Unit Tests"
+              context: "heartbeat: Win 10 Unit Tests"
 
   - wait: ~
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "heartbeat-mandatory-tests"
 
-  - group: "Heartbeat Packaging"
+  - group: "Packaging"
     key: "heartbeat-packaging"
+
     steps:
-      - label: ":ubuntu: Heartbeat Packaging Linux X86"
-        key: "heartbeat-package-linux-x86"
+      - label: ":ubuntu: Heartbeat: Packaging Linux"
+        key: "heartbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
         command: |
           cd heartbeat
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: gcp
@@ -298,20 +355,19 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Packaging Ubuntu x86_64"
+              context: "heartbeat: Packaging Linux"
 
-      - label: ":linux: Heartbeat Packaging Linux ARM"
+      - label: ":ubuntu: Heartbeat: Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-          SNAPSHOT: true
         command: |
           cd heartbeat
           mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "aws"
@@ -319,4 +375,4 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Packaging Ubuntu ARM"
+              context: "heartbeat: Packaging Linux arm64"

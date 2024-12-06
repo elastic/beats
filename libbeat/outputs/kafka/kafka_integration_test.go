@@ -30,8 +30,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -240,6 +241,18 @@ func TestKafkaPublish(t *testing.T) {
 				"host": "test-host",
 			}),
 		},
+		{
+			"publish message with zstd compression to test topic",
+			map[string]interface{}{
+				"compression": "zstd",
+				"version":     "2.2",
+			},
+			testTopic,
+			single(mapstr.M{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
@@ -254,7 +267,10 @@ func TestKafkaPublish(t *testing.T) {
 
 		cfg := makeConfig(t, defaultConfig)
 		if test.config != nil {
-			cfg.Merge(makeConfig(t, test.config))
+			err := cfg.Merge(makeConfig(t, test.config))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
 
 		t.Run(name, func(t *testing.T) {
@@ -263,8 +279,9 @@ func TestKafkaPublish(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			output := grp.Clients[0].(*client)
-			if err := output.Connect(); err != nil {
+			output, ok := grp.Clients[0].(*client)
+			assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
+			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, output.index, "testbeat")
@@ -279,7 +296,10 @@ func TestKafkaPublish(t *testing.T) {
 				}
 
 				wg.Add(1)
-				output.Publish(context.Background(), batch)
+				err := output.Publish(context.Background(), batch)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 
 			// wait for all published batches to be ACKed
@@ -335,7 +355,8 @@ func validateJSON(t *testing.T, value []byte, events []beat.Event) string {
 		return ""
 	}
 
-	msg := decoded["message"].(string)
+	msg, ok := decoded["message"].(string)
+	assert.True(t, ok, "type of decoded message was not string")
 	event := findEvent(events, msg)
 	if event == nil {
 		t.Errorf("could not find expected event with message: %v", msg)

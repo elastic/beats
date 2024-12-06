@@ -124,6 +124,11 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 		}
 	}
 
+	start := time.Now()
+	defer func() {
+		r.logger.Debugf("Total time taken for all ListTimeSeries requests: %s and config period: %s", time.Since(start), r.config.period.AsDuration())
+	}()
+
 	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
@@ -191,6 +196,8 @@ func getServiceLabelFor(serviceName string) string {
 		return gcp.CloudSQLResourceLabel
 	case gcp.ServiceRedis:
 		return gcp.RedisResourceLabel
+	case gcp.ServiceAIPlatform:
+		return gcp.AIPlatformResourceLabel
 	default:
 		return gcp.DefaultResourceLabel
 	}
@@ -244,7 +251,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	// NOTE: some GCP services are global, not regional or zonal. To these services we don't need
 	// to apply any additional filters.
 	if locationsConfigsAvailable && !isAGlobalService(serviceName) {
-		serviceLabel := getServiceLabelFor(serviceName)
+		serviceLabel := r.getServiceLabel(serviceName)
 		f = r.buildLocationFilter(serviceLabel, f)
 	}
 
@@ -252,6 +259,16 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 	r.logger.Debugf("ListTimeSeries API filter = %s", f)
 
 	return f
+}
+
+// getServiceLabel determines the service label to be used for the given service name. If a custom
+// location label is configured, it will be used. Otherwise, the default service label for the
+// given service name will be returned.
+func (r *metricsRequester) getServiceLabel(serviceName string) string {
+	if r.config.LocationLabel != "" {
+		return r.config.LocationLabel
+	}
+	return getServiceLabelFor(serviceName)
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor

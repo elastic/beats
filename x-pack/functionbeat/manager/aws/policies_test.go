@@ -7,8 +7,8 @@ package aws
 import (
 	"testing"
 
-	"github.com/awslabs/goformation/v4/cloudformation"
-	"github.com/awslabs/goformation/v4/cloudformation/iam"
+	"github.com/awslabs/goformation/v7/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation/iam"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"

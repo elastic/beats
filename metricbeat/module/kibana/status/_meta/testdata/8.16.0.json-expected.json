@@ -1,0 +1,48 @@
+[
+    {
+        "event": {
+            "dataset": "kibana.status",
+            "duration": 115000,
+            "module": "kibana"
+        },
+        "kibana": {
+            "status": {
+                "metrics": {
+                    "concurrent_connections": 6,
+                    "requests": {
+                        "disconnects": 0,
+                        "total": 312
+                    }
+                },
+                "name": "kibana",
+                "status": {
+                    "overall": {
+                        "level": "available",
+                        "summary": "All services and plugins are available"
+                    },
+                    "core": {
+                        "elasticsearch": {
+                            "level": "available",
+                            "summary": "Elasticsearch is available"
+                        },
+                        "savedObjects": {
+                            "level": "available",
+                            "summary": "SavedObjects service has completed migrations and is available"
+                        }
+                    }
+                }
+            }
+        },
+        "metricset": {
+            "name": "status",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
+            "name": "kibana",
+            "type": "kibana",
+            "version": "8.16.0"
+        }
+    }
+]

@@ -252,9 +252,11 @@ class Test(BaseTest):
 
         self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o600")
 
+        registry_home = "a/b/c/d/registry_x"
+        registry_path = os.path.join(registry_home, "filebeat")
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registry_home="a/b/c/registry_x",
+            registry_home=registry_home,
             registry_file_permissions=0o640
         )
 
@@ -266,7 +268,7 @@ class Test(BaseTest):
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
             lambda: self.has_registry(registry_path),
-            max_timeout=1)
+            max_timeout=10)
 
         # Wait a moment to make sure registry is completely written
         time.sleep(1)
@@ -950,7 +952,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             close_inactive="200ms",
             ignore_older="2000ms",
-            clean_inactive="3s",
+            clean_inactive="10s",
         )
 
         filebeat = self.start_beat()
@@ -976,7 +978,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             clean_inactive="10s",
-            ignore_older="5s"
+            ignore_older="9s"
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1003,7 +1005,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test2.log",
             clean_inactive="10s",
-            ignore_older="5s",
+            ignore_older="9s",
         )
 
         filebeat = self.start_beat(output="filebeat2.log")
@@ -1137,7 +1139,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/test.log",
             clean_inactive="10s",
-            ignore_older="5s"
+            ignore_older="9s"
         )
         os.mkdir(self.working_dir + "/log/")
 

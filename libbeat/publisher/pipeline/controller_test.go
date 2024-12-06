@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
@@ -150,9 +151,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// We aren't testing the values sent to eventConsumer, we
 			// just need a placeholder here so outputController can
 			// send configuration updates without blocking.
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	// Set to an empty output group. This should not create a queue.
 	controller.Set(outputs.Group{})
@@ -173,9 +174,9 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 			memqueue.Settings{Events: 1},
 		),
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	controller.Set(outputs.Group{
 		Clients:      []outputs.Client{newMockClient(nil)},
@@ -189,15 +190,15 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 
 func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
-	failedFactory := func(_ *logp.Logger, _ func(int), _ int, _ queue.EncoderFactory) (queue.Queue, error) {
+	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	controller := outputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 		monitors: Monitors{
 			Logger: logp.NewLogger("tests"),
 		},
@@ -213,9 +214,9 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
-			targetChan: make(chan consumerTarget, 4),
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
 		},
-		observer: nilObserver,
 	}
 	// Send producer requests from different goroutines. They should all
 	// block, because there is no queue, but they should become unblocked
@@ -242,4 +243,27 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		return remaining.Load() == 0
 	})
 	assert.True(t, allFinished, "All queueProducer requests should be unblocked once an output is set")
+}
+
+func TestQueueMetrics(t *testing.T) {
+	// More thorough testing of queue metrics are in the queue package,
+	// here we just want to make sure that they appear under the right
+	// monitoring namespace.
+	reg := monitoring.NewRegistry()
+	controller := outputController{
+		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
+		consumer: &eventConsumer{
+			targetChan:    make(chan consumerTarget, 4),
+			retryObserver: nilObserver,
+		},
+		monitors: Monitors{Metrics: reg},
+	}
+	controller.Set(outputs.Group{
+		Clients: []outputs.Client{newMockClient(nil)},
+	})
+	entry := reg.Get("pipeline.queue.max_events")
+	require.NotNil(t, entry, "pipeline.queue.max_events must exist")
+	value, ok := entry.(*monitoring.Uint)
+	require.True(t, ok, "pipeline.queue.max_events must be a *monitoring.Uint")
+	assert.Equal(t, uint64(1000), value.Get(), "pipeline.queue.max_events should match the events configuration key")
 }

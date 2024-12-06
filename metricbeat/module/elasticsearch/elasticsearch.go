@@ -351,6 +351,9 @@ type XPack struct {
 		CCR struct {
 			Enabled bool `json:"enabled"`
 		} `json:"CCR"`
+		ML struct {
+			Enabled bool `json:"enabled"`
+		} `json:"ml"`
 	} `json:"features"`
 }
 
@@ -555,7 +558,7 @@ func (l *License) ToMapStr() mapstr.M {
 func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
-		return nil, fmt.Errorf("failure to determine if "+groupKey+" settings exist: %w", err)
+		return nil, fmt.Errorf("failure to determine if %s settings exist: %w", groupKey, err)
 	}
 
 	if !hasSettingGroup {
@@ -564,12 +567,12 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 
 	settings, err := allSettings.GetValue(groupKey)
 	if err != nil {
-		return nil, fmt.Errorf("failure to extract "+groupKey+" settings: %w", err)
+		return nil, fmt.Errorf("failure to extract %s settings: %w", groupKey, err)
 	}
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf(groupKey + " settings are not a map")
+		return nil, fmt.Errorf("%s settings are not a map", groupKey)
 	}
 
 	return mapstr.M(v), nil

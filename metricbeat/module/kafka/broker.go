@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -26,10 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/sarama"
 )
 
 // Version returns a kafka version from its string representation
@@ -302,13 +302,20 @@ func queryMetadataWithRetry(
 	b *sarama.Broker,
 	cfg *sarama.Config,
 	topics []string,
-) (r *sarama.MetadataResponse, err error) {
-	err = withRetry(b, cfg, func() (e error) {
+) (*sarama.MetadataResponse, error) {
+	var r *sarama.MetadataResponse
+	var err error
+
+	err = withRetry(b, cfg, func() error {
 		requ := &sarama.MetadataRequest{Topics: topics}
-		r, e = b.GetMetadata(requ)
-		return
+		r, err = b.GetMetadata(requ)
+		return err
 	})
-	return
+
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 func closeBroker(b *sarama.Broker) {
@@ -354,22 +361,20 @@ func checkRetryQuery(err error) (retry, reconnect bool) {
 		return false, false
 	}
 
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return true, true
 	}
 
-	k, ok := err.(sarama.KError)
-	if !ok {
-		return false, false
-	}
-
-	switch k {
-	case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
-		sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
-		return true, false
-	case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
-		sarama.ErrNetworkException:
-		return true, true
+	var k *sarama.KError
+	if errors.As(err, &k) {
+		switch *k {
+		case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
+			sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
+			return true, false
+		case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
+			sarama.ErrNetworkException:
+			return true, true
+		}
 	}
 
 	return false, false

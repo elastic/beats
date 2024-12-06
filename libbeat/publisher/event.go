@@ -27,6 +27,8 @@ import (
 // errors), one of the signal methods must be called. In normal operation
 // every batch will eventually receive an ACK() or a Drop().
 type Batch interface {
+	// The output that receives a batch owns the entries in its Events array,
+	// and changes to them will persist between retries.
 	Events() []Event
 
 	// All events have been acknowledged by the output.

@@ -25,8 +25,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/urso/sderr"
-
 	"github.com/elastic/go-concert/unison"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -96,9 +94,6 @@ type StateStore interface {
 
 func (cim *InputManager) init() error {
 	cim.initOnce.Do(func() {
-		if cim.DefaultCleanTimeout <= 0 {
-			cim.DefaultCleanTimeout = 30 * time.Minute
-		}
 
 		log := cim.Logger.With("input_type", cim.Type)
 
@@ -141,7 +136,7 @@ func (cim *InputManager) Init(group unison.Group) error {
 	if err != nil {
 		store.Release()
 		cim.shutdown()
-		return sderr.Wrap(err, "Can not start registry cleanup process")
+		return fmt.Errorf("Can not start registry cleanup process: %w", err)
 	}
 
 	return nil

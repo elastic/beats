@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,7 +61,6 @@ type config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	Config config
-	db     *sqlx.DB
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -348,18 +345,27 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 
 	for k, v := range ms {
 		switch v.(type) {
-		case float64:
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 			numericMetrics[k] = v
 		case string:
 			stringMetrics[k] = v
 		case bool:
 			boolMetrics[k] = v
 		case nil:
-		// Ignore because a nil has no data type and thus cannot be indexed
+			// Ignore nil values as they cannot be indexed
+
+		// TODO: Handle []interface{} properly; for now it is going to "string" field.
+		// Keeping the behaviour as it is for now.
+		//
+		// case []interface{}:
+
 		default:
 			stringMetrics[k] = v
 		}
 	}
+
+	// TODO: Ideally the field keys should have in sync with ES types like s/bool/boolean, etc.
+	// But changing the field keys will be a breaking change. So, we are leaving it as it is.
 
 	if len(numericMetrics) > 0 {
 		ret["numeric"] = numericMetrics
@@ -374,12 +380,4 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
-}
-
-// Close closes the connection pool releasing its resources
-func (m *MetricSet) Close() (err error) {
-	if m.db == nil {
-		return nil
-	}
-	return m.db.Close()
 }

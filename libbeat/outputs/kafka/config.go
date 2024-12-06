@@ -22,11 +22,8 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"regexp"
 	"strings"
 	"time"
-
-	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -39,6 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type backoffConfig struct {
@@ -101,18 +99,19 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	// As of sarama 1.24.1, zstd support is broken
 	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
 	// addressed before we add support here.
+
+	// (https://github.com/IBM/sarama/pull/1574) sarama version 1.26.0 has
+	// fixed this issue and elastic version of sarama has merged this commit.
+	// (https://github.com/elastic/sarama/commit/37faed7ffc7d59e681d99cfebd1f3d453d6d607c)
+
 	"none":   sarama.CompressionNone,
 	"no":     sarama.CompressionNone,
 	"off":    sarama.CompressionNone,
 	"gzip":   sarama.CompressionGZIP,
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
+	"zstd":   sarama.CompressionZSTD,
 }
-
-// validTopicRegExp is used to validate the topic contains only valid characters
-// when running under Elastic-Agent. The regexp is taken from:
-// https://github.com/apache/kafka/blob/a126e3a622f2b7142f3543b9dbee54b6412ba9d8/clients/src/main/java/org/apache/kafka/common/internals/Topic.java#L33
-var validTopicRegExp = regexp.MustCompile("^[a-zA-Z0-9._-]+$")
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -136,7 +135,7 @@ func defaultConfig() kafkaConfig {
 		BrokerTimeout:    10 * time.Second,
 		Compression:      "gzip",
 		CompressionLevel: 4,
-		Version:          kafka.Version("1.0.0"),
+		Version:          kafka.Version("2.1.0"),
 		MaxRetries:       3,
 		Headers:          nil,
 		Backoff: backoffConfig{
@@ -192,10 +191,6 @@ func (c *kafkaConfig) Validate() error {
 	if management.UnderAgent() {
 		if len(c.Topics) != 0 {
 			return errors.New("'topics' is not supported when running under Elastic-Agent")
-		}
-
-		if !validTopicRegExp.MatchString(c.Topic) {
-			return fmt.Errorf("topic '%s' is invalid, it must match '[a-zA-Z0-9._-]'", c.Topic)
 		}
 	}
 

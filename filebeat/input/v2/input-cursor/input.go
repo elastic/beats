@@ -19,11 +19,10 @@ package cursor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"time"
-
-	"github.com/urso/sderr"
 
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
@@ -81,7 +80,7 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 
 	errs := grp.Wait()
 	if len(errs) > 0 {
-		return sderr.WrapAll(errs, "input tests failed")
+		return fmt.Errorf("input tests failed: %w", errors.Join(errs...))
 	}
 	return nil
 }
@@ -116,6 +115,8 @@ func (inp *managedInput) Run(
 		grp.Go(func() (err error) {
 			// refine per worker context
 			inpCtx := ctx
+			// Preserve IDWithoutName, in case the context was constructed who knows how
+			inpCtx.IDWithoutName = ctx.ID
 			inpCtx.ID = ctx.ID + "::" + source.Name()
 			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
 
@@ -127,7 +128,7 @@ func (inp *managedInput) Run(
 	}
 
 	if errs := grp.Wait(); len(errs) > 0 {
-		return sderr.WrapAll(errs, "input %{id} failed", ctx.ID)
+		return fmt.Errorf("input %s failed: %w", ctx.ID, errors.Join(errs...))
 	}
 	return nil
 }

@@ -21,6 +21,7 @@ docker run \
   --mount type=bind,source=/var/run/dbus/system_bus_socket,target=/hostfs/var/run/dbus/system_bus_socket,readonly \ <4>
   --env DBUS_SYSTEM_BUS_ADDRESS='unix:path=/hostfs/var/run/dbus/system_bus_socket' \ <4>
   --net=host \ <5>
+  --cgroupns=host \ <6>
   {dockerimage} -e -system.hostfs=/hostfs
 ----
 
@@ -45,6 +46,7 @@ both require access to dbus. Mount the dbus socket and set the `DBUS_SYSTEM_BUS_
 to make this file contain the host's network devices is to use the `--net=host`
 flag. This is due to Linux namespacing; simply bind mounting the host's `/proc`
 to `/hostfs/proc` is not sufficient.
+<6> Runs the container using the host's cgroup namespace, instead of a private namespace. While this is optional, <<metricbeat-metricset-system-process,system process metricset>> may produce more correct cgroup metrics when running in host mode.
 
 NOTE: The special filesystems +/proc+ and +/sys+ are only available if the
 host system is running Linux. Attempts to bind-mount these filesystems will

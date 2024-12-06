@@ -17,6 +17,20 @@ UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `met
 from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
 `metricbeat modules enable elasticsearch-xpack`.
 
+When xpack mode is enabled, all the legacy metricsets are automatically enabled by default.
+This means that you do not need to manually enable them, and there will be no conflicts or issues because Metricbeat merges the user-defined metricsets with the ones that xpack mode forces to enable.
+As a result, you can seamlessly collect comprehensive metrics without worrying about dataset overlap or duplication.
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: elasticsearch
+  xpack.enabled: true
+  metricsets:
+    - ingest_pipeline
+  period: 10s
+----
+
 NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
 monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see

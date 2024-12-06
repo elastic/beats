@@ -485,7 +485,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.log_contains(
                 "Start next scan"),
-            max_timeout=5)
+            max_timeout=10)
 
         with open(testfile, 'a') as f:
             # write additional lines
@@ -596,7 +596,7 @@ class Test(BaseTest):
         # run filebeat
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=len(encodings)),
-                        max_timeout=15)
+                        max_timeout=25)
 
         # write another line in all files
         for _, enc_py, text in encodings:

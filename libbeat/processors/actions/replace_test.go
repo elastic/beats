@@ -22,13 +22,74 @@ import (
 	"regexp"
 	"testing"
 
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestBadConfig(t *testing.T) {
+	var cases = []struct {
+		name        string
+		cfg         replaceStringConfig
+		shouldError bool
+	}{
+		{
+			name:        "field-only",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message"}}},
+			shouldError: true,
+		},
+		{
+			name:        "no-regex",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr("new_message")}}},
+			shouldError: true,
+		},
+		{
+			name:        "no-replacement",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Pattern: regexp.MustCompile(`message`)}}},
+			shouldError: true,
+		},
+		{
+			name: "valid-then-invalid",
+			cfg: replaceStringConfig{Fields: []replaceConfig{
+				{Field: "message", Pattern: regexp.MustCompile(`message`), Replacement: ptr("new_message")},
+				{Field: "message", Pattern: regexp.MustCompile(`message`)},
+			},
+			},
+			shouldError: true,
+		},
+		{
+			name:        "no-error",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr("new_message"), Pattern: regexp.MustCompile(`message`)}}},
+			shouldError: false,
+		},
+		{
+			name:        "no-error zero string",
+			cfg:         replaceStringConfig{Fields: []replaceConfig{{Field: "message", Replacement: ptr(""), Pattern: regexp.MustCompile(`message`)}}},
+			shouldError: false,
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(testCase.cfg)
+			require.NoError(t, err)
+			unpacked := replaceStringConfig{}
+			err = cfg.Unpack(&unpacked)
+			if testCase.shouldError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+		})
+	}
+
+}
 
 func TestReplaceRun(t *testing.T) {
 	var tests = []struct {
@@ -46,7 +107,7 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`a`),
-					Replacement: "b",
+					Replacement: ptr("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -60,12 +121,31 @@ func TestReplaceRun(t *testing.T) {
 			FailOnError:   true,
 		},
 		{
+			description: "replace with zero",
+			Fields: []replaceConfig{
+				{
+					Field:       "f",
+					Pattern:     regexp.MustCompile(`a`),
+					Replacement: ptr(""),
+				},
+			},
+			Input: mapstr.M{
+				"f": "abc",
+			},
+			Output: mapstr.M{
+				"f": "bc",
+			},
+			error:         false,
+			IgnoreMissing: false,
+			FailOnError:   true,
+		},
+		{
 			description: "Add one more hierarchy to event",
 			Fields: []replaceConfig{
 				{
 					Field:       "f.b",
 					Pattern:     regexp.MustCompile(`a`),
-					Replacement: "b",
+					Replacement: ptr("b"),
 				},
 			},
 			Input: mapstr.M{
@@ -88,12 +168,12 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`a.*c`),
-					Replacement: "cab",
+					Replacement: ptr("cab"),
 				},
 				{
 					Field:       "g",
 					Pattern:     regexp.MustCompile(`ef`),
-					Replacement: "oor",
+					Replacement: ptr("oor"),
 				},
 			},
 			Input: mapstr.M{
@@ -114,12 +194,12 @@ func TestReplaceRun(t *testing.T) {
 				{
 					Field:       "f",
 					Pattern:     regexp.MustCompile(`abc`),
-					Replacement: "xyz",
+					Replacement: ptr("xyz"),
 				},
 				{
 					Field:       "g",
 					Pattern:     regexp.MustCompile(`def`),
-					Replacement: "",
+					Replacement: nil,
 				},
 			},
 			Input: mapstr.M{
@@ -160,10 +240,12 @@ func TestReplaceRun(t *testing.T) {
 				assert.Error(t, err)
 			}
 
-			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
+			assert.Equal(t, newEvent.Fields, test.Output)
 		})
 	}
 }
+
+func ptr[T any](v T) *T { return &v }
 
 func TestReplaceField(t *testing.T) {
 	var tests = []struct {
@@ -266,7 +348,7 @@ func TestReplaceField(t *testing.T) {
 					{
 						Field:       "@metadata.f",
 						Pattern:     regexp.MustCompile(`a`),
-						Replacement: "b",
+						Replacement: ptr("b"),
 					},
 				},
 			},

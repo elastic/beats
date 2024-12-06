@@ -22,6 +22,7 @@ func TestS3Poller(t *testing.T) {
 	logp.TestingSetup()
 
 	const bucket = "bucket"
+	const listPrefix = "key"
 	const numberOfWorkers = 5
 	const pollInterval = 2 * time.Second
 	const testTimeout = 1 * time.Second
@@ -36,7 +37,7 @@ func TestS3Poller(t *testing.T) {
 		defer ctrl.Finish()
 		mockAPI := NewMockS3API(ctrl)
 		mockPager := NewMockS3Pager(ctrl)
-		mockPublisher := NewMockBeatClient(ctrl)
+		pipeline := newFakePipeline()
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -103,31 +104,31 @@ func TestS3Poller(t *testing.T) {
 			})
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key2")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key3")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key4")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockAPI.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(nil, store)
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
+		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
@@ -135,11 +136,11 @@ func TestS3Poller(t *testing.T) {
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
 				BucketARN:          bucket,
-				BucketListPrefix:   "key",
+				BucketListPrefix:   listPrefix,
 				RegionName:         "region",
 			},
 			s3:              mockAPI,
-			client:          mockPublisher,
+			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
@@ -162,7 +163,7 @@ func TestS3Poller(t *testing.T) {
 		mockS3 := NewMockS3API(ctrl)
 		mockErrorPager := NewMockS3Pager(ctrl)
 		mockSuccessPager := NewMockS3Pager(ctrl)
-		mockPublisher := NewMockBeatClient(ctrl)
+		pipeline := newFakePipeline()
 
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
@@ -245,27 +246,27 @@ func TestS3Poller(t *testing.T) {
 			})
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key2")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key3")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key4")).
 			Return(nil, errFakeConnectivityFailure)
 
 		mockS3.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			GetObject(gomock.Any(), gomock.Eq(""), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3, nil, backupConfig{})
-		states, err := newStates(nil, store)
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
+		states, err := newStates(nil, store, listPrefix)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
@@ -273,11 +274,11 @@ func TestS3Poller(t *testing.T) {
 				NumberOfWorkers:    numberOfWorkers,
 				BucketListInterval: pollInterval,
 				BucketARN:          bucket,
-				BucketListPrefix:   "key",
+				BucketListPrefix:   listPrefix,
 				RegionName:         "region",
 			},
 			s3:              mockS3,
-			client:          mockPublisher,
+			pipeline:        pipeline,
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",

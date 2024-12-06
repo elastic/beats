@@ -1,10 +1,10 @@
-FROM golang:1.21.10 as builder
+FROM golang:1.22.9 as builder
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
 ENV CGO_ENABLED=0
 
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.21.2
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
 COPY build/metricbeat-debugger /usr/share/metricbeat/metricbeat-debugger
 

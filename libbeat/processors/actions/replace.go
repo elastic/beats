@@ -23,7 +23,6 @@ import (
 	"regexp"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
@@ -44,9 +43,16 @@ type replaceStringConfig struct {
 }
 
 type replaceConfig struct {
-	Field       string         `config:"field"`
-	Pattern     *regexp.Regexp `config:"pattern"`
-	Replacement string         `config:"replacement"`
+	Field       string         `config:"field" validate:"required"`
+	Pattern     *regexp.Regexp `config:"pattern" validate:"required"`
+	Replacement *string        `config:"replacement"`
+}
+
+func (c replaceConfig) Validate() error {
+	if c.Replacement == nil {
+		return errors.New("missing replacement")
+	}
+	return nil
 }
 
 func init() {
@@ -83,12 +89,11 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
+		err := f.replaceField(field.Field, field.Pattern, *field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %w", err)
-			if management.TraceLevelEnabled() {
-				f.log.Debug(errMsg.Error())
-			}
+			f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 			if f.config.FailOnError {
 				event = backup
 				_, _ = event.PutValue("error.message", errMsg.Error())

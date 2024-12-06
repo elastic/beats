@@ -9,6 +9,7 @@ scms:
       owner: '{{ .scm.owner }}'
       repository: '{{ .scm.repository }}'
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: main
       commitusingapi: true
@@ -46,7 +47,7 @@ sources:
       owner: elastic
       repository: golang-crossbuild
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      username: '{{ requiredEnv "GIT_USER" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       versionfilter:
         kind: regex
         pattern: v1\.{{ source "minor" }}\.(\d*)$
@@ -86,7 +87,7 @@ targets:
     scmid: githubConfig
     kind: file
     spec:
-      content: 'go {{ source "gomod" }}'
+      content: 'go {{ source "latestGoVersion" }}'
       file: go.mod
       matchpattern: 'go \d+.\d+.\d+'
   update-go-version:

@@ -9,16 +9,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"path"
-	"strconv"
 	"strings"
 	"time"
 
-	"golang.org/x/time/rate"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ISO8601 is the time format accepted by Okta queries.
@@ -38,47 +37,10 @@ type User struct {
 	PasswordChanged       *time.Time     `json:"passwordChanged,omitempty"`
 	Type                  map[string]any `json:"type"`
 	TransitioningToStatus *string        `json:"transitioningToStatus,omitempty"`
-	Profile               Profile        `json:"profile"`
+	Profile               map[string]any `json:"profile"`
 	Credentials           *Credentials   `json:"credentials,omitempty"`
 	Links                 HAL            `json:"_links,omitempty"` // See https://developer.okta.com/docs/reference/api/users/#links-object for details.
-	Embedded              HAL            `json:"_embedded,omitempty"`
-}
-
-// Profile is an Okta user's profile.
-//
-// See https://developer.okta.com/docs/reference/api/users/#profile-object for details.
-type Profile struct {
-	Login             string  `json:"login"`
-	Email             string  `json:"email"`
-	SecondEmail       *string `json:"secondEmail,omitempty"`
-	FirstName         *string `json:"firstName,omitempty"`
-	LastName          *string `json:"lastName,omitempty"`
-	MiddleName        *string `json:"middleName,omitempty"`
-	HonorificPrefix   *string `json:"honorificPrefix,omitempty"`
-	HonorificSuffix   *string `json:"honorificSuffix,omitempty"`
-	Title             *string `json:"title,omitempty"`
-	DisplayName       *string `json:"displayName,omitempty"`
-	NickName          *string `json:"nickName,omitempty"`
-	ProfileUrl        *string `json:"profileUrl,omitempty"`
-	PrimaryPhone      *string `json:"primaryPhone,omitempty"`
-	MobilePhone       *string `json:"mobilePhone,omitempty"`
-	StreetAddress     *string `json:"streetAddress,omitempty"`
-	City              *string `json:"city,omitempty"`
-	State             *string `json:"state,omitempty"`
-	ZipCode           *string `json:"zipCode,omitempty"`
-	CountryCode       *string `json:"countryCode,omitempty"`
-	PostalAddress     *string `json:"postalAddress,omitempty"`
-	PreferredLanguage *string `json:"preferredLanguage,omitempty"`
-	Locale            *string `json:"locale,omitempty"`
-	Timezone          *string `json:"timezone,omitempty"`
-	UserType          *string `json:"userType,omitempty"`
-	EmployeeNumber    *string `json:"employeeNumber,omitempty"`
-	CostCenter        *string `json:"costCenter,omitempty"`
-	Organization      *string `json:"organization,omitempty"`
-	Division          *string `json:"division,omitempty"`
-	Department        *string `json:"department,omitempty"`
-	ManagerId         *string `json:"managerId,omitempty"`
-	Manager           *string `json:"manager,omitempty"`
+	Embedded              map[string]any `json:"_embedded,omitempty"`
 }
 
 // Credentials is a redacted Okta user's credential details. Only the credential provider is retained.
@@ -98,6 +60,45 @@ type Provider struct {
 	Name *string `json:"name,omitempty"`
 }
 
+// Group is an Okta user group.
+//
+// See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
+type Group struct {
+	ID      string         `json:"id"`
+	Profile map[string]any `json:"profile"`
+}
+
+// Factor is an Okta identity factor description.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
+type Factor struct {
+	ID          string         `json:"id"`
+	FactorType  string         `json:"factorType"`
+	Provider    string         `json:"provider"`
+	VendorName  string         `json:"vendorName"`
+	Status      string         `json:"status"`
+	Created     time.Time      `json:"created"`
+	LastUpdated time.Time      `json:"lastUpdated"`
+	Profile     map[string]any `json:"profile"`
+	Links       HAL            `json:"_links,omitempty"`
+	Embedded    map[string]any `json:"_embedded,omitempty"`
+}
+
+// Role is an Okta user role description.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentAUser/#tag/RoleAssignmentAUser/operation/listAssignedRolesForUser
+// and https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+type Role struct {
+	ID             string    `json:"id"`
+	Label          string    `json:"label"`
+	Type           string    `json:"type"`
+	Status         string    `json:"status"`
+	Created        time.Time `json:"created"`
+	LastUpdated    time.Time `json:"lastUpdated"`
+	AssignmentType string    `json:"assignmentType"`
+	Links          HAL       `json:"_links"`
+}
+
 // Device is an Okta device's details.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
@@ -105,7 +106,7 @@ type Device struct {
 	Created             time.Time         `json:"created"`
 	ID                  string            `json:"id"`
 	LastUpdated         time.Time         `json:"lastUpdated"`
-	Profile             DeviceProfile     `json:"profile"`
+	Profile             map[string]any    `json:"profile"`
 	ResourceAlternateID string            `json:"resourceAlternateID"`
 	ResourceDisplayName DeviceDisplayName `json:"resourceDisplayName"`
 	ResourceID          string            `json:"resourceID"`
@@ -117,27 +118,6 @@ type Device struct {
 	// It is not part of the list devices API return, but can
 	// be populated by a call to GetDeviceUsers.
 	Users []User `json:"users,omitempty"`
-}
-
-// DeviceProfile is an Okta device's hardware and security profile.
-//
-// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details
-type DeviceProfile struct {
-	DiskEncryptionType    *string `json:"diskEncryptionType,omitempty"`
-	DisplayName           string  `json:"displayName"`
-	IMEI                  *string `json:"imei,omitempty"`
-	IntegrityJailBreak    *bool   `json:"integrityJailBreak,omitempty"`
-	Manufacturer          *string `json:"manufacturer,omitempty"`
-	MEID                  *string `json:"meid,omitempty"`
-	Model                 *string `json:"model,omitempty"`
-	OSVersion             *string `json:"osVersion,omitempty"`
-	Platform              string  `json:"platform"`
-	Registered            bool    `json:"registered"`
-	SecureHardwarePresent *bool   `json:"secureHardwarePresent,omitempty"`
-	SerialNumber          *string `json:"serialNumber,omitempty"`
-	SID                   *string `json:"sid,omitempty"`
-	TPMPublicKeyHash      *string `json:"tpmPublicKeyHash,omitempty"`
-	UDID                  *string `json:"udid,omitempty"`
 }
 
 // DeviceDisplayName is an Okta device's annotated display name.
@@ -211,16 +191,111 @@ func (o Response) String() string {
 // https://${yourOktaDomain}/reports/rate-limit.
 //
 // See https://developer.okta.com/docs/reference/api/users/#list-users for details.
-func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
-	const endpoint = "/api/v1/users"
+func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
+	var endpoint, path string
+	if user == "" {
+		endpoint = "/api/v1/users"
+		path = endpoint
+	} else {
+		endpoint = "/api/v1/users/{user}"
+		path = strings.Replace(endpoint, "{user}", user, 1)
+	}
 
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     host,
-		Path:     path.Join(endpoint, user),
+		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	return getDetails[User](ctx, cli, u, key, user == "", omit, lim, window)
+	return getDetails[User](ctx, cli, u, endpoint, key, user == "", omit, lim, window, log)
+}
+
+// GetUserFactors returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
+func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Factor, http.Header, error) {
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	const endpoint = "/api/v1/users/{user}/factors"
+	path := strings.Replace(endpoint, "{user}", user, 1)
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path,
+	}
+	return getDetails[Factor](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+}
+
+// GetUserRoles returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	const endpoint = "/api/v1/users/{user}/roles"
+	path := strings.Replace(endpoint, "{user}", user, 1)
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path,
+	}
+	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+}
+
+// GetUserGroupDetails returns Okta group details using the users API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. user must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
+func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Group, http.Header, error) {
+	if user == "" {
+		return nil, nil, errors.New("no user specified")
+	}
+
+	const endpoint = "/api/v1/users/{user}/groups"
+	path := strings.Replace(endpoint, "{user}", user, 1)
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path,
+	}
+	return getDetails[Group](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+}
+
+// GetGroupRoles returns Okta group roles using the groups API endpoint. host is the
+// Okta user domain and key is the API token to use for the query. group must not be empty.
+//
+// See GetUserDetails for details of the query and rate limit parameters.
+//
+// See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
+func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+	if group == "" {
+		return nil, nil, errors.New("no group specified")
+	}
+
+	const endpoint = "/api/v1/groups/{group}/rules"
+	path := strings.Replace(endpoint, "{group}", group, 1)
+
+	u := &url.URL{
+		Scheme: "https",
+		Host:   host,
+		Path:   path,
+	}
+	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
 }
 
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
@@ -230,40 +305,49 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details.
-func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *rate.Limiter, window time.Duration) ([]Device, http.Header, error) {
-	const endpoint = "/api/v1/devices"
+func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Device, http.Header, error) {
+	var endpoint string
+	var path string
+	if device == "" {
+		endpoint = "/api/v1/devices"
+		path = endpoint
+	} else {
+		endpoint = "/api/v1/devices/{device}"
+		path = strings.Replace(endpoint, "{device}", device, 1)
+	}
 
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     host,
-		Path:     path.Join(endpoint, device),
+		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	return getDetails[Device](ctx, cli, u, key, device == "", OmitNone, lim, window)
+	return getDetails[Device](ctx, cli, u, endpoint, key, device == "", OmitNone, lim, window, log)
 }
 
-// GetDeviceUsers returns Okta user details for users asscoiated with the provided device identifier
+// GetDeviceUsers returns Okta user details for users associated with the provided device identifier
 // using the list device users API. host is the Okta user domain and key is the API token to use for
 // the query. If device is empty, a nil User slice and header is returned, without error.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDeviceUsers for details.
-func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *rate.Limiter, window time.Duration) ([]User, http.Header, error) {
+func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
 	if device == "" {
 		// No user associated with a null device. Not an error.
 		return nil, nil, nil
 	}
 
-	const endpoint = "/api/v1/devices"
+	const endpoint = "/api/v1/devices/{device}/users"
+	path := strings.Replace(endpoint, "{device}", device, 1)
 
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     host,
-		Path:     path.Join(endpoint, device, "users"),
+		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	du, h, err := getDetails[devUser](ctx, cli, u, key, true, omit, lim, window)
+	du, h, err := getDetails[devUser](ctx, cli, u, endpoint, key, true, omit, lim, window, log)
 	if err != nil {
 		return nil, h, err
 	}
@@ -276,7 +360,7 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 
 // entity is an Okta entity analytics entity.
 type entity interface {
-	User | Device | devUser
+	User | Group | Role | Factor | Device | devUser
 }
 
 type devUser struct {
@@ -288,8 +372,9 @@ type devUser struct {
 // for the specific user are returned, otherwise a list of all users is returned.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
-func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key string, all bool, omit Response, lim *rate.Limiter, window time.Duration) ([]E, http.Header, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
+func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, endpoint string, key string, all bool, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]E, http.Header, error) {
+	url := u.String()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -301,7 +386,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
 
-	err = lim.Wait(ctx)
+	err = lim.Wait(ctx, endpoint, u, log)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -310,7 +395,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	err = oktaRateLimit(resp.Header, window, lim)
+	err = lim.Update(endpoint, resp.Header, window, log)
 	if err != nil {
 		io.Copy(io.Discard, resp.Body)
 		return nil, nil, err
@@ -371,56 +456,6 @@ func (e *Error) Error() string {
 		causes[i] = c.Error()
 	}
 	return fmt.Sprintf("%s: %s", summary, strings.Join(causes, ","))
-}
-
-// oktaRateLimit implements the Okta rate limit policy translation.
-//
-// See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
-func oktaRateLimit(h http.Header, window time.Duration, limiter *rate.Limiter) error {
-	limit := h.Get("X-Rate-Limit-Limit")
-	remaining := h.Get("X-Rate-Limit-Remaining")
-	reset := h.Get("X-Rate-Limit-Reset")
-	if limit == "" || remaining == "" || reset == "" {
-		return nil
-	}
-
-	lim, err := strconv.ParseFloat(limit, 64)
-	if err != nil {
-		return err
-	}
-	rem, err := strconv.ParseFloat(remaining, 64)
-	if err != nil {
-		return err
-	}
-	rst, err := strconv.ParseInt(reset, 10, 64)
-	if err != nil {
-		return err
-	}
-	resetTime := time.Unix(rst, 0)
-	per := time.Until(resetTime).Seconds()
-
-	// Be conservative here; the docs don't exactly specify burst rates.
-	// Make sure we can make at least one new request, even if we fail
-	// to get a non-zero rate.Limit. We could set to zero for the case
-	// that limit=rate.Inf, but that detail is not important.
-	burst := 1
-
-	rateLimit := rate.Limit(rem / per)
-
-	// Process reset if we need to wait until reset to avoid a request against a zero quota.
-	if rateLimit == 0 {
-		waitUntil := resetTime.UTC()
-		// next gives us a sane next window estimate, but the
-		// estimate will be overwritten when we make the next
-		// permissible API request.
-		next := rate.Limit(lim / window.Seconds())
-		limiter.SetLimitAt(waitUntil, next)
-		limiter.SetBurstAt(waitUntil, burst)
-		return nil
-	}
-	limiter.SetLimit(rateLimit)
-	limiter.SetBurst(burst)
-	return nil
 }
 
 // Next returns the next URL query for a pagination sequence. If no further
