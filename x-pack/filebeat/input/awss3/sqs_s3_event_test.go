@@ -26,9 +26,10 @@ import (
 )
 
 func TestSQSS3EventProcessor(t *testing.T) {
-	logp.TestingSetup()
-
-	msg := newSQSMessage(newS3Event("log.json"))
+	err := logp.TestingSetup()
+	require.NoError(t, err)
+	msg, err := newSQSMessage(newS3Event("log.json"))
+	require.NoError(t, err)
 
 	t.Run("s3 events are processed and sqs msg is deleted", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -59,7 +60,9 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 
-		invalidBodyMsg := newSQSMessage(newS3Event("log.json"))
+		invalidBodyMsg, err := newSQSMessage(newS3Event("log.json"))
+		require.NoError(t, err)
+
 		body := *invalidBodyMsg.Body
 		body = body[10:]
 		invalidBodyMsg.Body = &body
@@ -82,7 +85,8 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 
-		emptyRecordsMsg := newSQSMessage([]s3EventV2{}...)
+		emptyRecordsMsg, err := newSQSMessage([]s3EventV2{}...)
+		require.NoError(t, err)
 
 		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil)
 
@@ -174,7 +178,8 @@ func TestSQSS3EventProcessor(t *testing.T) {
 }
 
 func TestSqsProcessor_keepalive(t *testing.T) {
-	msg := newSQSMessage(newS3Event("log.json"))
+	msg, err := newSQSMessage(newS3Event("log.json"))
+	require.NoError(t, err)
 
 	// Ensure both ReceiptHandleIsInvalid and InvalidParameterValue error codes trigger stops.
 	// See https://github.com/elastic/beats/issues/30675.
@@ -218,13 +223,14 @@ func TestSqsProcessor_keepalive(t *testing.T) {
 }
 
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	require.NoError(t, err)
 
 	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, nil, time.Minute, 5, nil)
 
 	t.Run("s3 key is url unescaped", func(t *testing.T) {
-		msg := newSQSMessage(newS3Event("Happy+Face.jpg"))
-
+		msg, err := newSQSMessage(newS3Event("Happy+Face.jpg"))
+		require.NoError(t, err)
 		events, err := p.getS3Notifications(*msg.Body)
 		require.NoError(t, err)
 		assert.Len(t, events, 1)
@@ -234,15 +240,27 @@ func TestSqsProcessor_getS3Notifications(t *testing.T) {
 	t.Run("non-ObjectCreated event types are ignored", func(t *testing.T) {
 		event := newS3Event("HappyFace.jpg")
 		event.EventName = "ObjectRemoved:Delete"
-		msg := newSQSMessage(event)
-
+		msg, err := newSQSMessage(event)
+		require.NoError(t, err)
 		events, err := p.getS3Notifications(*msg.Body)
 		require.NoError(t, err)
 		assert.Len(t, events, 0)
 	})
 
 	t.Run("sns-sqs notification", func(t *testing.T) {
-		msg := newSNSSQSMessage()
+		msg, err := newSNSSQSMessage()
+		require.NoError(t, err)
+		events, err := p.getS3Notifications(*msg.Body)
+		require.NoError(t, err)
+		assert.Len(t, events, 1)
+		assert.Equal(t, "test-object-key", events[0].S3.Object.Key)
+		assert.Equal(t, "arn:aws:s3:::vpc-flow-logs-ks", events[0].S3.Bucket.ARN)
+		assert.Equal(t, "vpc-flow-logs-ks", events[0].S3.Bucket.Name)
+	})
+
+	t.Run("EventBridge-sqs notification", func(t *testing.T) {
+		msg, err := newEventBridgeSQSMessage()
+		require.NoError(t, err)
 		events, err := p.getS3Notifications(*msg.Body)
 		require.NoError(t, err)
 		assert.Len(t, events, 1)
