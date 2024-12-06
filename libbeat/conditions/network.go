@@ -164,13 +164,14 @@ func (c *Network) Check(event ValuesMap) bool {
 		}
 		// match on an "any" basis when we find multiple IPs in the event;
 		// if the network matcher returns true for any seen IP, consider it a match
-		matches := 0
+		matches := false
 		for _, ip := range ipList {
 			if network.Contains(ip) {
-				matches += 1
+				matches = true
+				break
 			}
 		}
-		if matches == 0 {
+		if !matches {
 			return false
 		}
 
