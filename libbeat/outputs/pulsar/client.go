@@ -47,7 +47,7 @@ type client struct {
 }
 
 // Connect creates a new pulsar client and producer.
-func (c *client) Connect() error {
+func (c *client) Connect(context.Context) error {
 	c.mutex.Lock()
 	c.wg.Add(1)
 	defer c.mutex.Unlock()
@@ -104,7 +104,7 @@ func (c *client) Publish(ctx context.Context, batch publisher.Batch) error {
 		msg, err := c.getPulsarMessage(event)
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
-			c.observer.Dropped(1)
+			c.observer.WriteError(err)
 			continue
 		}
 		c.producer.SendAsync(ctx, msg, c.handleSendFailed)
@@ -135,8 +135,8 @@ func (c *client) getPulsarMessage(d *publisher.Event) (*pulsar.ProducerMessage, 
 func (c *client) handleSendFailed(id pulsar.MessageID, _ *pulsar.ProducerMessage, err error) {
 	size := int(id.BatchSize())
 	if err != nil {
-		c.observer.Failed(size)
+		c.observer.WriteError(err)
 	} else {
-		c.observer.Acked(size)
+		c.observer.NewBatch(size)
 	}
 }
