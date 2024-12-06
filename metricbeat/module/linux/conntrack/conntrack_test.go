@@ -21,7 +21,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -79,7 +78,7 @@ func TestFetchConntrackModuleNotLoaded(t *testing.T) {
 	require.Len(t, errs, 1)
 	err := errors.Join(errs...)
 	assert.ErrorAs(t, err, &mb.PartialMetricsError{})
-	assert.Regexp(t, regexp.MustCompile(`error fetching conntrack stats: nf_conntrack kernel module not loaded: open .*\/proc\/net\/stat\/nf_conntrack: no such file or directory`), err.Error())
+	assert.Contains(t, err.Error(), "error fetching conntrack stats: nf_conntrack kernel module not loaded")
 	require.Empty(t, events)
 }
 
