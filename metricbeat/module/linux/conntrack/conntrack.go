@@ -51,7 +51,10 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux conntrack metricset is beta.")
 
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
