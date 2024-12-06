@@ -23,10 +23,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/collector/config/configtls"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // currently unsupported parameters
