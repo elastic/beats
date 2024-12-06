@@ -29,8 +29,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -81,12 +79,12 @@ func (imp Importer) Import() error {
 	if imp.cfg.URL != "" || imp.cfg.File != "" {
 		err := imp.ImportArchive()
 		if err != nil {
-			return errw.Wrap(err, "Error importing URL/file")
+			return fmt.Errorf("Error importing URL/file: %w", err)
 		}
 	} else {
 		err := imp.ImportKibanaDir(imp.cfg.Dir)
 		if err != nil {
-			return errw.Wrapf(err, "Error importing directory %s", imp.cfg.Dir)
+			return fmt.Errorf("Error importing directory %s: %w", imp.cfg.Dir, err)
 		}
 	}
 	return nil
@@ -308,7 +306,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 	// Loads the internal index pattern
 	if imp.fields != nil {
 		if err = imp.loader.ImportIndex(imp.fields); err != nil {
-			return errw.Wrap(err, "failed to import Kibana index pattern")
+			return fmt.Errorf("failed to import Kibana index pattern: %w", err)
 		}
 	}
 

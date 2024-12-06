@@ -127,7 +127,7 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // reporting will be done at flow lifetime end.
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
-func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
+func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration, enableDeltaFlowReports bool) (*worker, error) {
 	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
@@ -161,10 +161,11 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
-		table:    table,
-		watcher:  watcher,
-		counters: counters,
-		timeout:  timeout,
+		table:                    table,
+		watcher:                  watcher,
+		counters:                 counters,
+		timeout:                  timeout,
+		enableDeltaFlowReporting: enableDeltaFlowReports,
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
@@ -221,11 +222,12 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 }
 
 type flowsProcessor struct {
-	spool    spool
-	watcher  *procs.ProcessesWatcher
-	table    *flowMetaTable
-	counters *counterReg
-	timeout  time.Duration
+	spool                    spool
+	watcher                  *procs.ProcessesWatcher
+	table                    *flowMetaTable
+	counters                 *counterReg
+	timeout                  time.Duration
+	enableDeltaFlowReporting bool
 }
 
 func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool) {
@@ -281,13 +283,13 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 }
 
 func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string) {
-	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames)
+	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames, fw.enableDeltaFlowReporting)
 
 	debugf("add event: %v", event)
 	fw.spool.publish(event)
 }
 
-func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string) beat.Event {
+func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string, enableDeltaFlowReporting bool) beat.Event {
 	timestamp := ts
 
 	event := mapstr.M{
@@ -418,7 +420,7 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 	var totalBytes, totalPackets uint64
 	if f.stats[0] != nil {
 		// Source stats.
-		stats := encodeStats(f.stats[0], intNames, uintNames, floatNames)
+		stats := encodeStats(f.stats[0], intNames, uintNames, floatNames, enableDeltaFlowReporting)
 		for k, v := range stats {
 			switch k {
 			case "icmpV4TypeCode":
@@ -449,7 +451,7 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 	}
 	if f.stats[1] != nil {
 		// Destination stats.
-		stats := encodeStats(f.stats[1], intNames, uintNames, floatNames)
+		stats := encodeStats(f.stats[1], intNames, uintNames, floatNames, enableDeltaFlowReporting)
 		for k, v := range stats {
 			switch k {
 			case "icmpV4TypeCode", "icmpV6TypeCode":
@@ -533,7 +535,7 @@ func formatHardwareAddr(addr net.HardwareAddr) string {
 	return string(buf)
 }
 
-func encodeStats(stats *flowStats, ints, uints, floats []string) map[string]interface{} {
+func encodeStats(stats *flowStats, ints, uints, floats []string, enableDeltaFlowReporting bool) map[string]interface{} {
 	report := make(map[string]interface{})
 
 	i := 0
@@ -551,6 +553,12 @@ func encodeStats(stats *flowStats, ints, uints, floats []string) map[string]inte
 		for m := mask; m != 0; m >>= 1 {
 			if (m & 1) == 1 {
 				report[uints[i]] = stats.uints[i]
+				if enableDeltaFlowReporting && (uints[i] == "bytes" || uints[i] == "packets") {
+					// If Delta Flow Reporting is enabled, reset bytes and packets at each period.
+					// Only the bytes and packets received during the flow period will be reported.
+					// This should be thread safe as it is called under the flowmetadatatable lock.
+					stats.uints[i] = 0
+				}
 			}
 			i++
 		}

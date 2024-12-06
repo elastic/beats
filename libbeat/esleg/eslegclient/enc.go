@@ -19,10 +19,12 @@ package eslegclient
 
 import (
 	"bytes"
-	"compress/gzip"
+
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -109,6 +111,13 @@ func (b *jsonEncoder) Marshal(obj interface{}) error {
 	return b.AddRaw(obj)
 }
 
+// RawEncoding is used to wrap objects that have already been json-encoded,
+// so the encoder knows to append them directly instead of treating them
+// like a string.
+type RawEncoding struct {
+	Encoding []byte
+}
+
 func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	var err error
 	switch v := obj.(type) {
@@ -116,6 +125,8 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case *beat.Event:
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case RawEncoding:
+		_, err = b.buf.Write(v.Encoding)
 	default:
 		err = b.folder.Fold(obj)
 	}
@@ -170,62 +181,64 @@ func (g *gzipEncoder) resetState() {
 	}
 }
 
-func (b *gzipEncoder) Reset() {
-	b.buf.Reset()
-	b.gzip.Reset(b.buf)
+func (g *gzipEncoder) Reset() {
+	g.buf.Reset()
+	g.gzip.Reset(g.buf)
 }
 
-func (b *gzipEncoder) Reader() io.Reader {
-	b.gzip.Close()
-	return b.buf
+func (g *gzipEncoder) Reader() io.Reader {
+	g.gzip.Close()
+	return g.buf
 }
 
-func (b *gzipEncoder) AddHeader(header *http.Header) {
+func (g *gzipEncoder) AddHeader(header *http.Header) {
 	header.Add("Content-Type", "application/json; charset=UTF-8")
 	header.Add("Content-Encoding", "gzip")
 }
 
-func (b *gzipEncoder) Marshal(obj interface{}) error {
-	b.Reset()
-	return b.AddRaw(obj)
+func (g *gzipEncoder) Marshal(obj interface{}) error {
+	g.Reset()
+	return g.AddRaw(obj)
 }
 
 var nl = []byte("\n")
 
-func (b *gzipEncoder) AddRaw(obj interface{}) error {
+func (g *gzipEncoder) AddRaw(obj interface{}) error {
 	var err error
 	switch v := obj.(type) {
 	case beat.Event:
-		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case *beat.Event:
-		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case RawEncoding:
+		_, err = g.gzip.Write(v.Encoding)
 	default:
-		err = b.folder.Fold(obj)
+		err = g.folder.Fold(obj)
 	}
 
 	if err != nil {
-		b.resetState()
+		g.resetState()
 	}
 
-	_, err = b.gzip.Write(nl)
+	_, err = g.gzip.Write(nl)
 	if err != nil {
-		b.resetState()
+		g.resetState()
 	}
 
 	return nil
 }
 
-func (b *gzipEncoder) Add(meta, obj interface{}) error {
-	pos := b.buf.Len()
-	if err := b.AddRaw(meta); err != nil {
-		b.buf.Truncate(pos)
+func (g *gzipEncoder) Add(meta, obj interface{}) error {
+	pos := g.buf.Len()
+	if err := g.AddRaw(meta); err != nil {
+		g.buf.Truncate(pos)
 		return err
 	}
-	if err := b.AddRaw(obj); err != nil {
-		b.buf.Truncate(pos)
+	if err := g.AddRaw(obj); err != nil {
+		g.buf.Truncate(pos)
 		return err
 	}
 
-	b.gzip.Flush()
+	g.gzip.Flush()
 	return nil
 }

@@ -18,8 +18,9 @@
 package require
 
 import (
+	"fmt"
+
 	"github.com/dop251/goja_nodejs/require"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 )
@@ -33,5 +34,5 @@ func init() {
 
 // loadSource disallows loading custom modules from file.
 func loadSource(path string) ([]byte, error) {
-	return nil, errors.Errorf("cannot load %v, only built-in modules are supported", path)
+	return nil, fmt.Errorf("cannot load %v, only built-in modules are supported", path)
 }

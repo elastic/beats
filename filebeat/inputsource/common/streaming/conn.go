@@ -18,11 +18,10 @@
 package streaming
 
 import (
+	"errors"
 	"io"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // ErrMaxReadBuffer returns when too many bytes was read on the io.Reader

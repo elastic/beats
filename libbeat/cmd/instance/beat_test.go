@@ -20,22 +20,28 @@
 package instance
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-ucfg/yaml"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewInstance(t *testing.T) {
-	b, err := NewBeat("testbeat", "testidx", "0.9", false)
+	b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +55,7 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, 36, len(b.Info.ID.String()))
 
 	// indexPrefix set to name if empty
-	b, err = NewBeat("testbeat", "", "0.9", false)
+	b, err = NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +65,7 @@ func TestNewInstance(t *testing.T) {
 }
 
 func TestNewInstanceUUID(t *testing.T) {
-	b, err := NewBeat("testbeat", "", "0.9", false)
+	b, err := NewBeat("testbeat", "", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -73,7 +79,7 @@ func TestNewInstanceUUID(t *testing.T) {
 }
 
 func TestInitKibanaConfig(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -116,7 +122,7 @@ func TestInitKibanaConfig(t *testing.T) {
 }
 
 func TestEmptyMetaJson(t *testing.T) {
-	b, err := NewBeat("filebeat", "testidx", "0.9", false)
+	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -137,7 +143,7 @@ func TestEmptyMetaJson(t *testing.T) {
 }
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
-	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -153,7 +159,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	err = firstBeat.loadMeta(metaPath)
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 
-	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -229,14 +235,14 @@ func TestSanitizeIPs(t *testing.T) {
 
 func TestReloader(t *testing.T) {
 	t.Run("updates the output configuration on the beat", func(t *testing.T) {
-		b, err := NewBeat("testbeat", "testidx", "0.9", false)
+		b, err := NewBeat("testbeat", "testidx", "0.9", false, nil)
 		require.NoError(t, err)
 
 		cfg := `
 elasticsearch:
   hosts: ["https://127.0.0.1:9200"]
   username: "elastic"
-  allow_older_versions: true
+  allow_older_versions: false
 `
 		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
 		require.NoError(t, err)
@@ -248,13 +254,13 @@ elasticsearch:
 		reloader := b.makeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
-		require.False(t, b.isConnectionToOlderVersionAllowed(), "the flag should not be present in the empty configuration")
+		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
 		err = reloader.Reload(update)
 		require.NoError(t, err)
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
-		require.True(t, b.isConnectionToOlderVersionAllowed(), "the flag should be present")
+		require.False(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should now be set to false")
 	})
 }
 
@@ -269,3 +275,221 @@ func (r *outputReloaderMock) Reload(
 	r.cfg = cfg
 	return nil
 }
+
+func TestPromoteOutputQueueSettings(t *testing.T) {
+	tests := map[string]struct {
+		input     []byte
+		memEvents int
+	}{
+		"blank": {
+			input:     []byte(""),
+			memEvents: 3200,
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 3200,
+		},
+		"topLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 8096
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 8096,
+		},
+		"outputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			memEvents: 8096,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			require.NoError(t, err)
+
+			err = promoteOutputQueueSettings(&config)
+			require.NoError(t, err)
+
+			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			require.NoError(t, err)
+			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
+		})
+	}
+}
+
+func TestValidateBeatConfig(t *testing.T) {
+	tests := map[string]struct {
+		input                 []byte
+		expectValidationError string
+	}{
+		"blank": {
+			input:                 []byte(""),
+			expectValidationError: "",
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "",
+		},
+		"topAndOutputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 2048
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config",
+		},
+		"managementTopLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+queue:
+  disk:
+    max_size: 1G
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementFalseOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: false
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			if tc.expectValidationError != "" {
+				require.Error(t, err)
+				require.Equal(t, tc.expectValidationError, err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestLogSystemInfo(t *testing.T) {
+	tcs := []struct {
+		name     string
+		managed  bool
+		assertFn func(*testing.T, *bytes.Buffer)
+	}{
+		{
+			name: "managed mode", managed: true,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				assert.Empty(t, b, "logSystemInfo should not have produced any log")
+			},
+		},
+		{
+			name: "stand alone", managed: false,
+			assertFn: func(t *testing.T, b *bytes.Buffer) {
+				logs := b.String()
+				assert.Contains(t, logs, "Beat info")
+				assert.Contains(t, logs, "Build info")
+				assert.Contains(t, logs, "Go runtime info")
+			},
+		},
+	}
+	log, buff := logp.NewInMemory("beat", logp.ConsoleEncoderConfig())
+	log.WithOptions()
+
+	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	require.NoError(t, err, "could not create beat")
+
+	for _, tc := range tcs {
+		buff.Reset()
+
+		b.Manager = mockManager{enabled: tc.managed}
+		b.logSystemInfo(log)
+
+		tc.assertFn(t, buff)
+	}
+}
+
+type mockManager struct {
+	enabled bool
+}
+
+func (m mockManager) AgentInfo() client.AgentInfo         { return client.AgentInfo{} }
+func (m mockManager) CheckRawConfig(cfg *config.C) error  { return nil }
+func (m mockManager) Enabled() bool                       { return m.enabled }
+func (m mockManager) RegisterAction(action client.Action) {}
+func (m mockManager) RegisterDiagnosticHook(name, description, filename, contentType string, hook client.DiagnosticHook) {
+}
+func (m mockManager) SetPayload(payload map[string]interface{})     {}
+func (m mockManager) SetStopCallback(f func())                      {}
+func (m mockManager) Start() error                                  { return nil }
+func (m mockManager) Status() status.Status                         { return status.Status(-42) }
+func (m mockManager) Stop()                                         {}
+func (m mockManager) UnregisterAction(action client.Action)         {}
+func (m mockManager) UpdateStatus(status status.Status, msg string) {}

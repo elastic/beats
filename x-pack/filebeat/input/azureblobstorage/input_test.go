@@ -6,10 +6,13 @@ package azureblobstorage
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,6 +20,8 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage/mock"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -30,17 +35,16 @@ const (
 	beatsJSONContainer          = "beatsjsoncontainer"
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
+	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
 )
 
 func Test_StorageClient(t *testing.T) {
-	t.Skip("Flaky test: issue -  https://github.com/elastic/beats/issues/34332")
 	tests := []struct {
-		name            string
-		baseConfig      map[string]interface{}
-		mockHandler     func() http.Handler
-		expected        map[string]bool
-		isError         error
-		unexpectedError error
+		name          string
+		baseConfig    map[string]interface{}
+		mockHandler   func() http.Handler
+		expected      map[string]bool
+		expectedError error
 	}{
 		{
 			name: "SingleContainerWithPoll_NoErr",
@@ -62,7 +66,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_blob_data3_json:    true,
 				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "SingleContainerWithoutPoll_NoErr",
@@ -84,7 +87,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_blob_data3_json:    true,
 				mock.Beatscontainer_blob_docs_ata_json: true,
 			},
-			unexpectedError: nil,
 		},
 		{
 			name: "TwoContainersWithPoll_NoErr",
@@ -111,7 +113,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_ata_json:    true,
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "TwoContainersWithoutPoll_NoErr",
@@ -138,7 +139,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_ata_json:    true,
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "SingleContainerPoll_InvalidContainerErr",
@@ -154,10 +154,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "SingleContainerWithoutPoll_InvalidBucketErr",
@@ -173,10 +172,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "TwoContainersWithPoll_InvalidBucketErr",
@@ -195,10 +193,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         mock.NotFoundErr,
-			unexpectedError: nil,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: mock.NotFoundErr,
 		},
 		{
 			name: "SingleBucketWithPoll_InvalidConfigValue",
@@ -214,10 +211,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "TwoBucketWithPoll_InvalidConfigValue",
@@ -236,10 +232,9 @@ func Test_StorageClient(t *testing.T) {
 					},
 				},
 			},
-			mockHandler:     mock.AzureStorageServer,
-			expected:        map[string]bool{},
-			isError:         errors.New("requires value <= 5000 accessing 'max_workers'"),
-			unexpectedError: nil,
+			mockHandler:   mock.AzureStorageServer,
+			expected:      map[string]bool{},
+			expectedError: errors.New("requires value <= 5000 accessing 'max_workers'"),
 		},
 		{
 			name: "ReadJSON",
@@ -261,7 +256,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_json[1]: true,
 				mock.BeatsFilesContainer_log_json[2]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadOctetStreamJSON",
@@ -282,7 +276,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json[0]: true,
 				mock.BeatsFilesContainer_multiline_json[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadNdJSON",
@@ -303,7 +296,6 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_ndjson[0]: true,
 				mock.BeatsFilesContainer_log_ndjson[1]: true,
 			},
-			unexpectedError: context.Canceled,
 		},
 		{
 			name: "ReadMultilineGzJSON",
@@ -324,7 +316,160 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
-			unexpectedError: context.Canceled,
+		},
+		{
+			name: "ReadJSONWithRootAsArray",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         1,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsJSONWithArrayContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_json_array[0]: true,
+				mock.BeatsFilesContainer_json_array[1]: true,
+				mock.BeatsFilesContainer_json_array[2]: true,
+				mock.BeatsFilesContainer_json_array[3]: true,
+			},
+		},
+		{
+			name: "FilterByTimeStampEpoch",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"timestamp_epoch":                     1663157564,
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByFileSelectorRegexSingle",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "docs/",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "FilterByFileSelectorRegexMulti",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                false,
+				"poll_interval":                       "10s",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "docs/",
+					},
+					{
+						"regex": "data",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_data3_json:    true,
+				mock.Beatscontainer_blob_docs_ata_json: true,
+			},
+		},
+		{
+			name: "ExpandEventListFromField",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"expand_event_list_from_field":        "Events",
+				"file_selectors": []map[string]interface{}{
+					{
+						"regex": "events-array",
+					},
+				},
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_events_array_json[0]: true,
+				mock.BeatsFilesContainer_events_array_json[1]: true,
+			},
+		},
+		{
+			name: "MultiContainerWithMultiFileSelectors",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsContainer,
+						"file_selectors": []map[string]interface{}{
+							{
+								"regex": "docs/",
+							},
+						},
+					},
+					{
+						"name": beatsContainer2,
+						"file_selectors": []map[string]interface{}{
+							{
+								"regex": "data_3",
+							},
+						},
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageServer,
+			expected: map[string]bool{
+				mock.Beatscontainer_blob_docs_ata_json: true,
+				mock.Beatscontainer_2_blob_data3_json:  true,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -336,7 +481,7 @@ func Test_StorageClient(t *testing.T) {
 			conf := config{}
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				assert.EqualError(t, err, tt.isError.Error())
+				assert.EqualError(t, err, tt.expectedError.Error())
 				return
 			}
 			input := newStatelessInput(conf, serv.URL+"/")
@@ -349,6 +494,7 @@ func Test_StorageClient(t *testing.T) {
 
 			ctx, cancel := newV2Context()
 			t.Cleanup(cancel)
+			ctx.ID += tt.name
 
 			var g errgroup.Group
 			g.Go(func() error {
@@ -364,14 +510,14 @@ func Test_StorageClient(t *testing.T) {
 			t.Cleanup(func() { timeout.Stop() })
 
 			if len(tt.expected) == 0 {
-				if tt.isError != nil && g.Wait() != nil {
+				if tt.expectedError != nil && g.Wait() != nil {
 					//nolint:errorlint // This will never be a wrapped error
-					if tt.isError == mock.NotFoundErr {
+					if tt.expectedError == mock.NotFoundErr {
 						arr := strings.Split(g.Wait().Error(), "\n")
 						errStr := strings.Join(arr[1:], "\n")
-						assert.Equal(t, tt.isError.Error(), errStr)
+						assert.Equal(t, tt.expectedError.Error(), errStr)
 					} else {
-						assert.EqualError(t, g.Wait(), tt.isError.Error())
+						assert.EqualError(t, g.Wait(), tt.expectedError.Error())
 					}
 					cancel()
 				} else {
@@ -395,7 +541,7 @@ func Test_StorageClient(t *testing.T) {
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
 					assert.True(t, tt.expected[val.(string)])
-					assert.Equal(t, tt.isError, err)
+					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
 						cancel()
@@ -403,16 +549,122 @@ func Test_StorageClient(t *testing.T) {
 					}
 				}
 			}
-			assert.ErrorIs(t, g.Wait(), tt.unexpectedError)
 		})
 	}
+}
+
+func Test_Concurrency(t *testing.T) {
+	for _, workers := range []int{100, 1000, 2000} {
+		t.Run(fmt.Sprintf("TestConcurrency_%d_Workers", workers), func(t *testing.T) {
+			const expectedLen = mock.TotalRandomDataSets
+			serv := httptest.NewServer(mock.AzureConcurrencyServer())
+			t.Cleanup(serv.Close)
+
+			cfg := conf.MustNewConfigFrom(map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         workers,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name": mock.ConcurrencyContainer,
+					},
+				},
+			})
+			conf := config{}
+			err := cfg.Unpack(&conf)
+			assert.NoError(t, err)
+			input := azurebsInput{
+				config:     conf,
+				serviceURL: serv.URL + "/",
+			}
+			name := input.Name()
+			if name != "azure-blob-storage" {
+				t.Errorf(`unexpected input name: got:%q want:"azure-blob-storage"`, name)
+			}
+
+			var src cursor.Source
+			// This test will always have only one container
+			for _, c := range input.config.Containers {
+				container := tryOverrideOrDefault(input.config, c)
+				src = &Source{
+					AccountName:   input.config.AccountName,
+					ContainerName: c.Name,
+					MaxWorkers:    *container.MaxWorkers,
+					Poll:          *container.Poll,
+					PollInterval:  *container.PollInterval,
+				}
+			}
+			v2Ctx, cancel := newV2Context()
+			t.Cleanup(cancel)
+			v2Ctx.ID += t.Name()
+			client := publisher{
+				stop: func(e []beat.Event) {
+					if len(e) >= expectedLen {
+						cancel()
+					}
+				},
+			}
+			st := newState()
+			var g errgroup.Group
+			g.Go(func() error {
+				return input.run(v2Ctx, src, st, &client)
+			})
+			timeout := time.NewTimer(100 * time.Second)
+			t.Cleanup(func() { timeout.Stop() })
+			select {
+			case <-timeout.C:
+				t.Errorf("timed out waiting for %d events", expectedLen)
+				cancel()
+			case <-v2Ctx.Cancelation.Done():
+			}
+			//nolint:errcheck // We can ignore as the error will always be context canceled, which is expected in this case
+			g.Wait()
+			if len(client.events) < expectedLen {
+				t.Errorf("failed to get all events: got:%d want:%d", len(client.events), expectedLen)
+			}
+		})
+	}
+}
+
+type publisher struct {
+	stop    func([]beat.Event)
+	events  []beat.Event
+	mu      sync.Mutex
+	cursors []map[string]interface{}
+}
+
+func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
+	p.mu.Lock()
+	p.events = append(p.events, e)
+	if cursor != nil {
+		var c map[string]interface{}
+		chkpt, ok := cursor.(*Checkpoint)
+		if !ok {
+			return fmt.Errorf("invalid cursor type for testing: %T", cursor)
+		}
+		cursorBytes, err := json.Marshal(chkpt)
+		if err != nil {
+			return fmt.Errorf("error marshaling cursor data: %w", err)
+		}
+		err = json.Unmarshal(cursorBytes, &c)
+		if err != nil {
+			return fmt.Errorf("error converting checkpoint struct to cursor map: %w", err)
+		}
+
+		p.cursors = append(p.cursors, c)
+	}
+	p.stop(p.events)
+	p.mu.Unlock()
+	return nil
 }
 
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("azure-blob-storage_test"),
-		ID:          "test_id",
+		ID:          "test_id:",
 		Cancelation: ctx,
 	}, cancel
 }

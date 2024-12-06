@@ -7,7 +7,7 @@ package gcppubsub
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -57,7 +57,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	}
 
 	once.Do(func() {
-		_ = logp.TestingSetup()
+		logp.TestingSetup()
 
 		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
@@ -70,7 +70,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 		}
 		defer resp.Body.Close()
 
-		_, err = ioutil.ReadAll(resp.Body)
+		_, err = io.ReadAll(resp.Body)
 		if err != nil {
 			t.Fatal("failed to read response", err)
 		}

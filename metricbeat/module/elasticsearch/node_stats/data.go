@@ -46,6 +46,11 @@ var (
 						"pct":   c.Int("heap_used_percent"),
 					},
 				},
+				"pools": c.Dict("pools", s.Schema{
+					"young":    c.Dict("young", poolSchema),
+					"survivor": c.Dict("survivor", poolSchema),
+					"old":      c.Dict("old", poolSchema),
+				}),
 			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
@@ -112,9 +117,15 @@ var (
 					"count": c.Int("query_total"),
 				},
 			}),
+			"shard_stats": c.Dict("shard_stats", s.Schema{
+				"total_count": c.Int("total_count"),
+			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
 				"size": s.Object{
 					"bytes": c.Int("size_in_bytes"),
+				},
+				"total_data_set_size": s.Object{
+					"bytes": c.Int("total_data_set_size_in_bytes", s.Optional),
 				},
 			}),
 			"segments": c.Dict("segments", s.Schema{
@@ -302,6 +313,21 @@ var (
 		},
 	}
 
+	poolSchema = s.Schema{
+		"used": s.Object{
+			"bytes": c.Int("used_in_bytes"),
+		},
+		"max": s.Object{
+			"bytes": c.Int("max_in_bytes"),
+		},
+		"peak": s.Object{
+			"bytes": c.Int("peak_used_in_bytes"),
+		},
+		"peak_max": s.Object{
+			"bytes": c.Int("peak_max_in_bytes"),
+		},
+	}
+
 	totalMemoryPressureSchema = s.Schema{
 		"primary": s.Object{
 			"rejections": c.Int("primary_rejections"),
@@ -366,6 +392,12 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		if err != nil {
 			errs = append(errs, fmt.Errorf("unable to put field service.name: %w", err))
 			continue
+		}
+
+		if transportAddress, hasTransportAddress := node["transport_address"]; hasTransportAddress {
+			if transportAddress, ok := transportAddress.(string); ok {
+				event.Host = transportAddress
+			}
 		}
 
 		roles := node["roles"]

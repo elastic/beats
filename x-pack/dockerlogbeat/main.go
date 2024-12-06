@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/docker/go-plugins-helpers/sdk"
 

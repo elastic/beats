@@ -1,0 +1,30 @@
+[[migrate-from-deprecated-module]]
+== Migrating from a Deprecated Filebeat Module
+
+If a Filebeat module has been deprecated, there are a few options available for
+a path forward:
+
+1. Migrate to an Elastic integration, if available. The deprecation notice will
+link to an appropriate integration, if one exists.
+
+2. https://www.elastic.co/guide/en/fleet/current/migrate-beats-to-agent.html[Migrate to Elastic Agent]
+for ingesting logs. If a specific integration for the vendor/product does not
+exist, then one of the custom integrations can be used for ingesting events. A
+https://www.elastic.co/guide/en/fleet/current/data-streams-pipeline-tutorial.html[custom pipeline]
+may also be attached to the integration for further processing.
+    - https://docs.elastic.co/integrations/cel[CEL Custom API] - Collect events from an API using CEL (Common Expression Language)
+    - https://docs.elastic.co/integrations/httpjson[Custom API] - Collect events from an API using the HTTPJSON input
+    - https://docs.elastic.co/integrations/gcp_pubsub[Custom Google Pub/Sub] - Collect events from Google Pub/Sub topics
+    - https://docs.elastic.co/integrations/http_endpoint[Custom HTTP Endpoint] - Collect events from a listening HTTP port
+    - https://docs.elastic.co/integrations/journald[Custom Journald] - Collect events from journald
+    - https://docs.elastic.co/integrations/kafka_log[Custom Kafka] - Collect events from a Kafka topic
+    - https://docs.elastic.co/integrations/log[Custom Logs] - Collect events from files
+    - https://docs.elastic.co/integrations/tcp[Custom TCP] - Collect events from a listening TCP port
+    - https://docs.elastic.co/integrations/udp[Custom UDP] - Collect events from a listening UDP port
+    - https://docs.elastic.co/integrations/winlog[Custom Windows Event] - Collect events from a Windows Event Log channel
+
+3. Migrate to a different Filebeat module. In some cases, a Filebeat module may
+be superseded by a new module. The deprecation notice will link to an appropriate
+module, if one exists.
+
+4. Use a custom Filebeat input, processors, and ingest pipeline (if necessary).

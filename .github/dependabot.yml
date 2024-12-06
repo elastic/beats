@@ -1,7 +1,5 @@
 ---
 version: 2
-# This section is segmented by the responsible GitHub teams in order
-# to make it clear who is responsible for reviewing.
 updates:
   - package-ecosystem: gomod
     directory: /
@@ -10,8 +8,8 @@ updates:
     labels:
       - automation
       - dependabot
-      - Team:Elastic-Agent-Data-Plane
     allow:
+      # Team:Elastic-Agent-Data-Plane
       - dependency-name: github.com/elastic/elastic-agent-autodiscover
       - dependency-name: github.com/elastic/elastic-agent-client/*
       - dependency-name: github.com/elastic/elastic-agent-libs
@@ -29,36 +27,55 @@ updates:
       - dependency-name: go.elastic.co/apm/*
       - dependency-name: go.elastic.co/ecszap
       - dependency-name: go.elastic.co/go-licence-detector
-    reviewers:
-      - elastic/elastic-agent-data-plane
-    open-pull-requests-limit: 2
-  - package-ecosystem: gomod
-    directory: /
-    schedule:
-      interval: daily
-    labels:
-      - automation
-      - dependabot
-      - Team:Security-External Integrations
-    allow:
-      # Skip github.com/elastic/mito because it requires documentation updates.
+      # Team:Service-Integrations
+      - dependency-name: github.com/elastic/bayeux
+      # Team:Security-Linux Platform
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
-    reviewers:
-      - elastic/security-external-integrations
+      - dependency-name: github.com/elastic/ebpfevents
+      # Team:Team:obs-ds-hosted-services, Team:obs-infraobs-integrations
+      # AWS SDK dependencies
+      - dependency-name: github.com/aws/aws-sdk-go-v2/*
+      - dependency-name: github.com/aws/aws-lambda-go/*
+      - dependency-name: github.com/aws/smithy-go/*
+      # Azure SDK dependencies
+      - dependency-name: github.com/Azure/azure-sdk-for-go/*
+      - dependency-name: github.com/Azure/azure-event-hubs-go/*
+      - dependency-name: github.com/Azure/azure-storage-blob-go/*
+      - dependency-name: github.com/Azure/go-autorest/*
+      # GCP SDK dependencies
+      - dependency-name: cloud.google.com/go/*
+    groups:
+      # Cloud providers' SDK dependencies
+      aws-sdks:
+        patterns:
+          - "github.com/aws/aws-sdk-go-v2/*"
+      azure-sdks:
+        patterns:
+          - "github.com/Azure/azure-*-go"
+          - "github.com/Azure/go-autorest/*"
+      gcp-sdks:
+        patterns:
+          - "cloud.google.com/go/*"
+    ignore:
+      # Skip github.com/elastic/mito because it requires documentation updates.
+      - dependency-name: github.com/elastic/mito
     open-pull-requests-limit: 2
-  - package-ecosystem: gomod
-    directory: /
+
+  # GitHub actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: daily
+      interval: "weekly"
+      day: "sunday"
+      time: "22:00"
     labels:
       - automation
       - dependabot
-      - Team:Service-Integrations
-    allow:
-      - dependency-name: github.com/elastic/bayeux
-    reviewers:
-      - elastic/obs-infraobs-integrations
-    open-pull-requests-limit: 2
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5

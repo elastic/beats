@@ -31,16 +31,21 @@ import (
 // RTT formats a round-trip-time given as time.Duration into an
 // event field. The duration is stored in `{"us": rtt}`.
 func RTT(rtt time.Duration) mapstr.M {
-	if rtt < 0 {
-		rtt = 0
-	}
-
 	return mapstr.M{
 		// cast to int64 since a go duration is a nano, but we want micros
 		// This makes the types less confusing because other wise the duration
 		// we get back has the wrong unit
-		"us": rtt.Microseconds(),
+		"us": RTTMS(rtt),
 	}
+}
+
+// RTTMS returns the given time.Duration as an int64 in microseconds, with a value of 0
+// if input is negative.
+func RTTMS(rtt time.Duration) int64 {
+	if rtt < 0 {
+		return 0
+	}
+	return rtt.Microseconds()
 }
 
 // Reason formats an error into an error event field.

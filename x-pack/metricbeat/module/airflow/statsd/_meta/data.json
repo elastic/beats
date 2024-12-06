@@ -2,13 +2,13 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "airflow": {
         "dag_duration": {
-            "15m_rate": 0.2,
-            "1m_rate": 0.2,
-            "5m_rate": 0.2,
+            "15m_rate": 0,
+            "1m_rate": 0,
+            "5m_rate": 0,
             "count": 1,
             "max": 200,
             "mean": 200,
-            "mean_rate": 0.2222490946071946,
+            "mean_rate": 38960.532980091164,
             "median": 200,
             "min": 200,
             "p75": 200,

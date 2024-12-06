@@ -30,6 +30,24 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
+    integTest:
+        mage: "mage build integTest"
+        when:
+            comments:
+                - "/test auditbeat integTest"
+            branches: false
+            tags: false
+        stage: extended
+    integTest-arm:
+        mage: "mage build integTest"
+        platforms:
+          - "ubuntu-2204-aarch64"
+        when:
+            comments:
+                - "/test auditbeat integTest arm"
+            branches: false
+            tags: false
+        stage: extended
     crosscompile:
         make: "make -C auditbeat crosscompile"
         stage: mandatory

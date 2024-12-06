@@ -1,0 +1,93 @@
+[role="xpack"]
+
+:type: benchmark
+
+[id="{beatname_lc}-input-{type}"]
+=== Benchmark input
+
+++++
+<titleabbrev>Benchmark</titleabbrev>
+++++
+
+beta[]
+
+The Benchmark input generates generic events and sends them to the output. This can be useful when you want to benchmark the difference between outputs or output settings.
+
+Example configurations:
+
+Basic example, infinite events as quickly as possible:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: benchmark
+  enabled: true
+  message: "test message"
+  threads: 1
+----
+
+Send 1024 events and stop example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: benchmark
+  enabled: true
+  message: "test message"
+  threads: 1
+  count: 1024
+----
+
+Send 5 events per second example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: benchmark
+  enabled: true
+  message: "test message"
+  threads: 1
+  eps: 5
+----
+
+==== Configuration options
+
+The Benchmark input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[float]
+==== `message`
+
+This is the value that will be in the `message` field of the json document.
+
+[float]
+==== `threads`
+
+This is the number of goroutines that will be started generating messages. Normally 1 thread can saturate an output but if necessary this can be increased.
+
+[float]
+==== `count`
+
+This is the number of messages to send. 0 represents sending infinite messages. This is mutually exclusive with the `eps` option.
+
+[float]
+==== `eps`
+
+This is the number of events per second to send. 0 represents sending as quickly as possible. This is mutually exclusive with the `count` option.
+
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                    | Description
+| `events_published_total`  | Number of events published.
+| `publishing_time`         | Histogram of the elapsed in nanoseconds (time of publisher.Publish).
+|=======
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:

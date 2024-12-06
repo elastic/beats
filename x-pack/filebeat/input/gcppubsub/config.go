@@ -73,7 +73,9 @@ func defaultConfig() config {
 		Type: "gcp-pubsub",
 	}
 	c.Subscription.NumGoroutines = 1
-	c.Subscription.MaxOutstandingMessages = 1000
+	// The input gets blocked until flush.min_events or flush.timeout is reached.
+	// Hence max_outstanding_message has to be at least flush.min_events to avoid this blockage.
+	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
 	return c
 }

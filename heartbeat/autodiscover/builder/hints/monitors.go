@@ -34,10 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
-}
-
 const (
 	schedule   = "schedule"
 	hosts      = "hosts"
@@ -48,6 +44,14 @@ const (
 type heartbeatHints struct {
 	config *config
 	logger *logp.Logger
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
@@ -170,7 +174,7 @@ func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int, podEvent bo
 		return nil, fmt.Errorf("no hosts selected for port %d with hints: %+v", port, thosts)
 	}
 
-	var result []string
+	result := make([]string, 0, len(hostSet))
 	for host := range hostSet {
 		result = append(result, host)
 	}

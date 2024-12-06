@@ -19,8 +19,7 @@ package status
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -81,7 +80,7 @@ func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 	var stats uwsgiStat
 	err := json.Unmarshal(content, &stats)
 	if err != nil {
-		return errors.Wrap(err, "uwsgi statistics parsing failed")
+		return fmt.Errorf("uwsgi statistics parsing failed: %w", err)
 	}
 
 	totalRequests := 0

@@ -62,8 +62,7 @@ var (
 
 const (
 	// renderBufferSize is the size in bytes of the buffer used to render events.
-	renderBufferSize = 1 << 14
-
+	renderBufferSize = 1 << 19 // 512KB, 256K wide characters
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
@@ -270,15 +269,13 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		cache:        newMessageFilesCache(id, eventMetadataHandle, freeHandle),
 		winMetaCache: newWinMetaCache(metaTTL),
 		logPrefix:    fmt.Sprintf("WinEventLog[%s]", id),
-		metrics:      newInputMetrics(c.Name, id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
 	// efficient and does not attempt to use local message files for rendering
 	// the event's message.
 	switch {
-	case c.Forwarded == nil && c.Name == "ForwardedEvents",
-		c.Forwarded != nil && *c.Forwarded:
+	case l.isForwarded():
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEventXML(event, l.renderBuf, out)
 		}
@@ -292,6 +289,11 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	}
 
 	return l, nil
+}
+
+func (l *winEventLog) isForwarded() bool {
+	c := l.config
+	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
@@ -312,6 +314,11 @@ func (l *winEventLog) IsFile() bool {
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
+	// we need to defer metrics initialization since when the event log
+	// is used from winlog input it would register it twice due to CheckConfig calls
+	if l.metrics == nil {
+		l.metrics = newInputMetrics(l.channelName, l.id)
+	}
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
 	} else if state.RecordNumber > 0 && l.channelName != "" {
@@ -332,7 +339,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
 		l.metrics.logError(err)
 		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
@@ -382,9 +389,12 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
-		// subscribe again from the beginning.
-		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
+		flags = win.EvtSubscribeStartAfterBookmark
+		if !l.isForwarded() {
+			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+			// subscribe again from the beginning.
+			flags |= win.EvtSubscribeStrict
+		}
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -424,6 +434,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		return nil, err
 	}
 
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
 		l.metrics.log(records)
@@ -436,14 +447,6 @@ func (l *winEventLog) Read() ([]Record, error) {
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
-		var bufErr sys.InsufficientBufferError
-		if errors.As(err, &bufErr) {
-			detailf("%s Increasing render buffer size to %d", l.logPrefix,
-				bufErr.RequiredSize)
-			l.renderBuf = make([]byte, bufErr.RequiredSize)
-			l.outputBuf.Reset()
-			err = l.render(h, l.outputBuf)
-		}
 		l.metrics.logError(err)
 		if err != nil && l.outputBuf.Len() == 0 {
 			logp.Err("%s Dropping event with rendering error. %v", l.logPrefix, err)
@@ -535,7 +538,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	}
 
 	// Get basic string values for raw fields.
-	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name), &e)
+	winevent.EnrichRawValuesWithNames(l.winMeta(e.Provider.Name, l.config.EventLanguage), &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
@@ -572,6 +575,11 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	return string(l.outputBuf.Bytes()), err
 }
 
+func (l *winEventLog) Reset() error {
+	debugf("%s Closing handle for reset", l.logPrefix)
+	return win.Close(l.subscription)
+}
+
 func (l *winEventLog) Close() error {
 	debugf("%s Closing handle", l.logPrefix)
 	l.metrics.close()
@@ -597,7 +605,7 @@ func newWinMetaCache(ttl time.Duration) winMetaCache {
 	return winMetaCache{cache: make(map[string]winMetaCacheEntry), ttl: ttl, logger: logp.L()}
 }
 
-func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
+func (c *winMetaCache) winMeta(provider string, locale uint32) *winevent.WinMeta {
 	c.mu.RLock()
 	e, ok := c.cache[provider]
 	c.mu.RUnlock()
@@ -616,7 +624,7 @@ func (c *winMetaCache) winMeta(provider string) *winevent.WinMeta {
 		return e.WinMeta
 	}
 
-	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, c.logger)
+	s, err := win.NewPublisherMetadataStore(win.NilHandle, provider, locale, c.logger)
 	if err != nil {
 		// Return an empty store on error (can happen in cases where the
 		// log was forwarded and the provider doesn't exist on collector).

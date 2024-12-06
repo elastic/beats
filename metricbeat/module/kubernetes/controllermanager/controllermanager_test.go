@@ -22,26 +22,34 @@ package controllermanager
 import (
 	"testing"
 
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var files = []string{
+	"./_meta/test/metrics.1.28",
+	"./_meta/test/metrics.1.29",
+	"./_meta/test/metrics.1.30",
+	"./_meta/test/metrics.1.31",
+}
+
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "controllermanager",
-		ptest.TestCases{
-			ptest.TestCase{
-				MetricsFile:  "./_meta/test/metrics.1.25",
-				ExpectedFile: "./_meta/test/metrics.1.25.expected",
-			},
-			ptest.TestCase{
-				MetricsFile:  "./_meta/test/metrics.1.26",
-				ExpectedFile: "./_meta/test/metrics.1.26.expected",
-			},
-		},
-	)
+	var testCases ptest.TestCases
+	for _, file := range files {
+		testCases = append(testCases, ptest.TestCase{
+			MetricsFile:  file,
+			ExpectedFile: file + ".expected",
+		})
+	}
+	ptest.TestMetricSet(t, "kubernetes", "controllermanager", testCases)
 }
 
 func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "kubernetes", "controllermanager")
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestMetricsFamilyFromFiles(t, files, mapping)
 }

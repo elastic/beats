@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4767",
-      "ingested": "2022-06-08T06:21:08.406967900Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

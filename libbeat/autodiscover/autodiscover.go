@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -35,8 +33,8 @@ import (
 )
 
 const (
-	// If a config reload fails after a new event, a new reload will be run after this period
-	retryPeriod = 10 * time.Second
+	// defaultDebouncePeriod is the time autodiscover will wait before reloading inputs
+	defaultDebouncePeriod = time.Second
 )
 
 // EventConfigurer is used to configure the creation of configuration objects
@@ -65,10 +63,7 @@ type Autodiscover struct {
 	meta            *meta.Map
 	listener        bus.Listener
 	logger          *logp.Logger
-
-	// workDone is a channel used for testing purpouses, to know when the worker has
-	// done some work.
-	workDone chan struct{}
+	debouncePeriod  time.Duration
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -90,7 +85,7 @@ func NewAutodiscover(
 	for _, providerCfg := range c.Providers {
 		provider, err := Registry.BuildProvider(name, bus, providerCfg, keystore)
 		if err != nil {
-			return nil, errors.Wrap(err, "error in autodiscover provider settings")
+			return nil, fmt.Errorf("error in autodiscover provider settings: %w", err)
 		}
 		logger.Debugf("Configured autodiscover provider: %s", provider)
 		providers = append(providers, provider)
@@ -102,10 +97,11 @@ func NewAutodiscover(
 		factory:         factory,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover", factory, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
+		debouncePeriod:  defaultDebouncePeriod,
 	}, nil
 }
 
@@ -132,6 +128,7 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
+	t := time.NewTimer(defaultDebouncePeriod)
 
 	for {
 		select {
@@ -142,38 +139,48 @@ func (a *Autodiscover) worker() {
 			}
 
 			if _, ok := event["start"]; ok {
-				updated = a.handleStart(event)
+				// if updated is true, we don't want to set it back to false
+				if a.handleStart(event) {
+					updated = true
+				}
 			}
 			if _, ok := event["stop"]; ok {
-				updated = a.handleStop(event)
-			}
-
-		case <-time.After(retryPeriod):
-		}
-
-		if updated || retry {
-			if retry {
-				a.logger.Debug("Reloading existing autodiscover configs after error")
-			}
-
-			configs := []*reload.ConfigWithMeta{}
-			for _, list := range a.configs {
-				for _, c := range list {
-					configs = append(configs, c)
+				// if updated is true, we don't want to set it back to false
+				if a.handleStop(event) {
+					updated = true
 				}
 			}
 
-			err := a.runners.Reload(configs)
+		case <-t.C:
+			if updated || retry {
+				a.logger.Debugf("Reloading autodiscover configs reason: updated: %t, retry: %t", updated, retry)
 
-			// On error, make sure the next run also updates because some runners were not properly loaded
-			retry = err != nil
-			// reset updated status
-			updated = false
-		}
+				configs := []*reload.ConfigWithMeta{}
+				for _, list := range a.configs {
+					for _, c := range list {
+						configs = append(configs, c)
+					}
+				}
 
-		// For testing purpouses.
-		if a.workDone != nil {
-			a.workDone <- struct{}{}
+				a.logger.Debugf("calling reload with %d config(s)", len(configs))
+				err := a.runners.Reload(configs)
+
+				// reset updated status
+				updated = false
+
+				// On error, make sure the next run also updates because some runners were not properly loaded
+				retry = err != nil
+				if retry {
+					// The recoverable errors that can lead to retry are related
+					// to the harvester state, so we need to give the publishing
+					// pipeline some time to finish flushing the events from that
+					// file. Hence we wait for 10x the normal debounce period.
+					t.Reset(10 * a.debouncePeriod)
+					continue
+				}
+			}
+
+			t.Reset(a.debouncePeriod)
 		}
 	}
 }
@@ -233,9 +240,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 
 		err = a.factory.CheckConfig(config)
 		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s', won't start runner",
-				conf.DebugString(config, true))))
+			a.logger.Errorf(
+				"Auto discover config check failed for config '%s', won't start runner, err: %s",
+				conf.DebugString(config, true), err)
 			continue
 		}
 		newCfg[hash] = &reload.ConfigWithMeta{

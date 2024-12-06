@@ -19,9 +19,9 @@ package ml_job
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,7 +58,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch ML Job Stats API response: %w", err)
 	}
 
 	var errs multierror.Errors

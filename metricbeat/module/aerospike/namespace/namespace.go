@@ -18,10 +18,10 @@
 package namespace
 
 import (
+	"fmt"
 	"strings"
 
-	as "github.com/aerospike/aerospike-client-go"
-	"github.com/pkg/errors"
+	as "github.com/aerospike/aerospike-client-go/v7"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
@@ -42,27 +42,36 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	host   *as.Host
-	client *as.Client
+	host         *as.Host
+	clientPolicy *as.ClientPolicy
+	client       *as.Client
+	infoPolicy   *as.InfoPolicy
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct{}{}
+	config := aerospike.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	host, err := aerospike.ParseHost(base.Host())
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid host format, expected hostname:port")
+		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
+	}
+
+	clientPolicy, err := aerospike.ParseClientPolicy(config)
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize aerospike client policy: %w", err)
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		host:          host,
+		clientPolicy:  clientPolicy,
+		infoPolicy:    as.NewInfoPolicy(),
 	}, nil
 }
 
@@ -71,18 +80,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err := m.connect(); err != nil {
-		return errors.Wrap(err, "error connecting to Aerospike")
+		return fmt.Errorf("error connecting to Aerospike: %w", err)
 	}
 
 	for _, node := range m.client.GetNodes() {
-		info, err := as.RequestNodeInfo(node, "namespaces")
+		info, err := node.RequestInfo(m.infoPolicy, "namespaces")
 		if err != nil {
 			m.Logger().Error("Failed to retrieve namespaces from node %s", node.GetName())
 			continue
 		}
 
 		for _, namespace := range strings.Split(info["namespaces"], ";") {
-			info, err := as.RequestNodeInfo(node, "namespace/"+namespace)
+			info, err := node.RequestInfo(m.infoPolicy, "namespace/"+namespace)
 			if err != nil {
 				m.Logger().Error("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
 				continue
@@ -105,7 +114,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 // create an aerospike client if it doesn't exist yet
 func (m *MetricSet) connect() error {
 	if m.client == nil {
-		client, err := as.NewClientWithPolicyAndHost(as.NewClientPolicy(), m.host)
+		client, err := as.NewClientWithPolicyAndHost(m.clientPolicy, m.host)
 		if err != nil {
 			return err
 		}

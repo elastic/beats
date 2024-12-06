@@ -21,9 +21,11 @@ package filestream
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -31,10 +33,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -64,6 +66,22 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
+	logp.DevelopmentSetup(logp.ToObserverOutput())
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Debug Logs:\n")
+			for _, log := range logp.ObserverLogs().TakeAll() {
+				data, err := json.Marshal(log)
+				if err != nil {
+					t.Errorf("failed encoding log as JSON: %s", err)
+				}
+				t.Logf("%s", string(data))
+			}
+			return
+		}
+	})
+
 	return &inputTestingEnvironment{
 		t:          t,
 		workingDir: t.TempDir(),
@@ -76,7 +94,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	manager.Init(&e.grp, v2.ModeRun)
+	_ = manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
@@ -88,7 +106,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	manager.Init(&e.grp, v2.ModeRun)
+	_ = manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
@@ -109,10 +127,9 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
-		defer grp.Stop()
-
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
-		inp.Run(inputCtx, e.pipeline)
+		defer func() { _ = grp.Stop() }()
+		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
 
@@ -194,6 +211,8 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	e.t.Helper()
+	var offsetStr strings.Builder
+
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -202,16 +221,23 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 
 	id := getIDFromPath(filepath, inputID, fi)
 	var entry registryEntry
-	require.Eventually(e.t, func() bool {
+	require.Eventuallyf(e.t, func() bool {
+		offsetStr.Reset()
+
 		entry, err = e.getRegistryState(id)
 		if err != nil {
-			return true
+			e.t.Fatalf("could not get state for '%s' from registry, err: %s", id, err)
 		}
 
+		fmt.Fprint(&offsetStr, entry.Cursor.Offset)
+
 		return expectedOffset == entry.Cursor.Offset
-	}, time.Second, time.Millisecond)
-	require.NoError(e.t, err)
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	},
+		time.Second,
+		100*time.Millisecond,
+		"expected offset: '%d', cursor offset: '%s'",
+		expectedOffset,
+		&offsetStr)
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
@@ -251,7 +277,16 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
+// If timeout is reached or there is an error getting the state from the
+// registry, the test fails
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
+	filename, inputID string,
+	expectedOffset int,
+	timeout time.Duration) {
+
+	var cursorString strings.Builder
+	var fileSizeString strings.Builder
+
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -259,12 +294,34 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID st
 	}
 
 	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	for err != nil || entry.Cursor.Offset != expectedOffset {
-		entry, err = e.getRegistryState(id)
-	}
 
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	require.Eventuallyf(e.t, func() bool {
+		cursorString.Reset()
+		fileSizeString.Reset()
+
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			e.t.Fatalf(
+				"error getting state for ID '%s' from the registry, err: %s",
+				id, err)
+		}
+
+		fi, err := os.Stat(filepath)
+		if err != nil {
+			e.t.Fatalf("could not stat '%s', err: %s", filepath, err)
+		}
+
+		fileSizeString.WriteString(fmt.Sprint(fi.Size()))
+		cursorString.WriteString(fmt.Sprint(entry.Cursor.Offset))
+
+		return entry.Cursor.Offset == expectedOffset
+	},
+		timeout,
+		100*time.Millisecond,
+		"expected offset: '%d', cursor offset: '%s', file size: '%s'",
+		expectedOffset,
+		&cursorString,
+		&fileSizeString)
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {
@@ -300,14 +357,16 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
 	if err != nil {
-		keys := []string{}
-		inputStore.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
+		var keys []string
+		_ = inputStore.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
 			keys = append(keys, key)
 			return false, nil
 		})
 		e.t.Logf("keys in store: %v", keys)
 
-		return registryEntry{}, fmt.Errorf("error when getting expected key '%s' from store: %+v", key, err)
+		return registryEntry{},
+			fmt.Errorf("error when getting expected key '%s' from store: %w",
+				key, err)
 	}
 
 	return entry, nil
@@ -315,22 +374,32 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	src := identifier.GetSource(loginp.FSEvent{
+		Descriptor: loginp.FileDescriptor{
+			Info: file.ExtendFileInfo(fi),
+		},
+		Op:      loginp.OpCreate,
+		NewPath: filepath,
+	})
 	return "filestream::" + inputID + "::" + src.Name()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
-	for {
-		sum := len(e.pipeline.GetAllEvents())
+	msg := &strings.Builder{}
+	require.Eventuallyf(e.t, func() bool {
+		msg.Reset()
+
+		events := e.pipeline.GetAllEvents()
+		sum := len(events)
 		if sum == count {
-			return
+			return true
 		}
-		if count < sum {
-			e.t.Fatalf("too many events; expected: %d, actual: %d", count, sum)
-		}
-		time.Sleep(10 * time.Millisecond)
-	}
+		fmt.Fprintf(msg, "unexpected number of events; expected: %d, actual: %d\n",
+			count, sum)
+
+		return false
+	}, 2*time.Minute, 10*time.Millisecond, "%s", msg)
 }
 
 // waitUntilEventCountCtx calls waitUntilEventCount, but fails if ctx is cancelled.
@@ -384,7 +453,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	}
 }
 
-// requireEventReceived requires that the list of messages has made it into the output.
+// requireEventsReceived requires that the list of messages has made it into the output.
 func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	foundEvents := make([]bool, len(events))
 	checkedEventCount := 0
@@ -425,9 +494,7 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 func (e *inputTestingEnvironment) requireEventContents(nr int, key, value string) {
 	events := make([]beat.Event, 0)
 	for _, c := range e.pipeline.clients {
-		for _, evt := range c.GetEvents() {
-			events = append(events, evt)
-		}
+		events = append(events, c.GetEvents()...)
 	}
 
 	selectedEvent := events[nr]
@@ -450,9 +517,7 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	}
 	events := make([]beat.Event, 0)
 	for _, c := range e.pipeline.clients {
-		for _, evt := range c.GetEvents() {
-			events = append(events, evt)
-		}
+		events = append(events, c.GetEvents()...)
 	}
 
 	selectedEvent := events[nr]
@@ -514,9 +579,7 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	}
 	c.ackHandler.ACKEvents(len(events))
 
-	for _, event := range events {
-		c.published = append(c.published, event)
-	}
+	c.published = append(c.published, events...)
 }
 
 func (c *mockClient) waitUntilPublishingHasStarted() {
@@ -586,17 +649,6 @@ func (pc *mockPipelineConnector) cancelAllClients() {
 	for _, client := range pc.clients {
 		client.canceler()
 	}
-}
-
-func (pc *mockPipelineConnector) cancelClient(i int) {
-	pc.mtx.Lock()
-	defer pc.mtx.Unlock()
-
-	if len(pc.clients) < i+1 {
-		return
-	}
-
-	pc.clients[i].canceler()
 }
 
 func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {

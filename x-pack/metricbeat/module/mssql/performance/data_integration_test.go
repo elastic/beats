@@ -5,11 +5,9 @@
 package performance
 
 import (
-	"net/url"
 	"testing"
 
-	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/pkg/errors"
+	_ "github.com/microsoft/go-mssqldb"
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -23,31 +21,4 @@ func TestData(t *testing.T) {
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	assert.NoError(t, err)
-}
-
-func getHostURI() (string, map[string]interface{}, error) {
-	config := mtest.GetConfig("performance")
-
-	host, ok := config["hosts"].([]string)
-	if !ok {
-		return "", nil, errors.New("error getting host name information")
-	}
-
-	username, ok := config["username"].(string)
-	if !ok {
-		return "", nil, errors.New("error getting username information")
-	}
-
-	password, ok := config["password"].(string)
-	if !ok {
-		return "", nil, errors.New("error getting password information")
-	}
-
-	u := &url.URL{
-		Scheme: "sqlserver",
-		User:   url.UserPassword(username, password),
-		Host:   host[0],
-	}
-
-	return u.String(), config, nil
 }

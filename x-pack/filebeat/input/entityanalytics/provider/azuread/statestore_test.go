@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
@@ -33,6 +33,8 @@ func testCleanupStore(store *kvstore.Store, filename string) {
 }
 
 func testAssertValueEquals(t *testing.T, store *kvstore.Store, bucket, key, value []byte) {
+	t.Helper()
+
 	var gotValue []byte
 
 	err := store.RunTransaction(false, func(tx *kvstore.Transaction) error {
@@ -47,6 +49,8 @@ func testAssertValueEquals(t *testing.T, store *kvstore.Store, bucket, key, valu
 }
 
 func testAssertJSONValueEquals(t *testing.T, store *kvstore.Store, bucket, key []byte, value any) {
+	t.Helper()
+
 	valueData, err := json.Marshal(&value)
 	require.NoError(t, err)
 
@@ -76,8 +80,10 @@ func TestStateStore_New(t *testing.T) {
 	require.NoError(t, err)
 	testStoreSetJSONValue(t, store, stateBucket, lastUpdateKey, &lastUpdate)
 	usersLink := "users-link"
+	devicesLink := "devices-link"
 	groupsLink := "groups-link"
 	testStoreSetJSONValue(t, store, stateBucket, usersLinkKey, &usersLink)
+	testStoreSetJSONValue(t, store, stateBucket, devicesLinkKey, &devicesLink)
 	testStoreSetJSONValue(t, store, stateBucket, groupsLinkKey, &groupsLink)
 
 	ss, err := newStateStore(store)
@@ -87,6 +93,7 @@ func TestStateStore_New(t *testing.T) {
 	require.Equal(t, lastSync, ss.lastSync)
 	require.Equal(t, lastUpdate, ss.lastUpdate)
 	require.Equal(t, usersLink, ss.usersLink)
+	require.Equal(t, devicesLink, ss.devicesLink)
 	require.Equal(t, groupsLink, ss.groupsLink)
 }
 
@@ -106,11 +113,13 @@ func TestStateStore_Close(t *testing.T) {
 	require.NoError(t, err)
 
 	ss.usersLink = "users-link"
+	ss.devicesLink = "devices-link"
 	ss.groupsLink = "groups-link"
 
-	user1ID := uuid.MustParse("a77e8cbb-27a5-49d3-9d5e-801997621f87")
-	group1ID := uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80")
-	group2ID := uuid.MustParse("ec8b17ae-ce9d-4099-97ee-4a959638bc29")
+	user1ID := uuid.Must(uuid.FromString("a77e8cbb-27a5-49d3-9d5e-801997621f87"))
+	device1ID := uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f"))
+	group1ID := uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80"))
+	group2ID := uuid.Must(uuid.FromString("ec8b17ae-ce9d-4099-97ee-4a959638bc29"))
 
 	ss.users = map[uuid.UUID]*fetcher.User{
 		user1ID: {
@@ -131,6 +140,33 @@ func TestStateStore_Close(t *testing.T) {
 			Deleted:            false,
 		},
 	}
+	ss.devices = map[uuid.UUID]*fetcher.Device{
+		device1ID: {
+			ID: device1ID,
+			Fields: map[string]interface{}{
+				"accountEnabled":         true,
+				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
+				"displayName":            "DESKTOP-LETW452G",
+				"operatingSystem":        "Windows",
+				"operatingSystemVersion": "10.0.19043.1337",
+				"physicalIds":            []interface{}{},
+				"extensionAttributes": map[string]interface{}{
+					"extensionAttribute1": "BYOD-Device",
+				},
+				"alternativeSecurityIds": []interface{}{
+					map[string]interface{}{
+						"type":             "2",
+						"identityProvider": nil,
+						"key":              "DGFSGHSGGTH345A...35DSFH0A",
+					},
+				},
+			},
+			MemberOf:           collections.NewUUIDSet(group1ID),
+			TransitiveMemberOf: collections.NewUUIDSet(group1ID),
+			Modified:           false,
+			Deleted:            false,
+		},
+	}
 	ss.groups = map[uuid.UUID]*fetcher.Group{
 		group1ID: {
 			ID:   group1ID,
@@ -139,6 +175,10 @@ func TestStateStore_Close(t *testing.T) {
 				{
 					ID:   user1ID,
 					Type: fetcher.MemberUser,
+				},
+				{
+					ID:   device1ID,
+					Type: fetcher.MemberDevice,
 				},
 			},
 		},
@@ -151,6 +191,7 @@ func TestStateStore_Close(t *testing.T) {
 	testAssertJSONValueEquals(t, store, stateBucket, lastSyncKey, &ss.lastSync)
 	testAssertJSONValueEquals(t, store, stateBucket, lastUpdateKey, &ss.lastUpdate)
 	testAssertJSONValueEquals(t, store, stateBucket, usersLinkKey, &ss.usersLink)
+	testAssertJSONValueEquals(t, store, stateBucket, devicesLinkKey, &ss.devicesLink)
 	testAssertJSONValueEquals(t, store, stateBucket, groupsLinkKey, &ss.groupsLink)
 
 	gotUsers := map[uuid.UUID]*fetcher.User{}
@@ -169,6 +210,23 @@ func TestStateStore_Close(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.EqualValues(t, ss.users, gotUsers)
+
+	gotDevices := map[uuid.UUID]*fetcher.Device{}
+	err = store.RunTransaction(false, func(tx *kvstore.Transaction) error {
+		err = tx.ForEach(devicesBucket, func(key, value []byte) error {
+			var d fetcher.Device
+			err = json.Unmarshal(value, &d)
+			require.NoError(t, err)
+			gotDevices[d.ID] = &d
+
+			return nil
+		})
+		require.NoError(t, err)
+
+		return nil
+	})
+	require.NoError(t, err)
+	require.EqualValues(t, ss.devices, gotDevices)
 
 	gotGroups := map[uuid.UUID]*fetcher.Group{}
 	err = store.RunTransaction(false, func(tx *kvstore.Transaction) error {

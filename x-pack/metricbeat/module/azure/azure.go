@@ -6,8 +6,7 @@ package azure
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -41,7 +40,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	var config Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")
+		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 
 	//validate config based on metricset
@@ -49,13 +48,13 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	case nativeMetricset:
 		// resources must be configured for the monitor metricset
 		if len(config.Resources) == 0 {
-			return nil, errors.Errorf("no resource options defined: module azure - %s metricset", metricsetName)
+			return nil, fmt.Errorf("no resource options defined: module azure - %s metricset", metricsetName)
 		}
 	default:
 		// validate config resource options entered, no resource queries allowed for the compute_vm and compute_vm_scaleset metricsets
 		for _, resource := range config.Resources {
 			if resource.Query != "" {
-				return nil, errors.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
+				return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset. No queries allowed, please select one of the allowed options", metricsetName)
 			}
 		}
 		// check for lightweight resources if no groups or ids have been entered, if not a new resource is created to check the entire subscription
@@ -77,7 +76,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// instantiate monitor client
 	monitorClient, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing the monitor client: module azure - %s metricset", metricsetName)
+		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -89,24 +88,59 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// Set the reference time for the current fetch.
+	//
+	// The reference time is used to calculate time intervals
+	// and compare with collection info in the metric
+	// registry to decide whether to collect metrics or not,
+	// depending on metric time grain (check `MetricRegistry`
+	// for more information).
+	//
+	// We round the reference time to the nearest second to avoid
+	// millisecond variations in the collection period causing
+	// skipped collections.
+	//
+	// See "Round outer limits" and "Round inner limits" tests in
+	// the metric_registry_test.go for more information.
+	referenceTime := time.Now().UTC()
+
+	// Initialize cloud resources and monitor metrics
+	// information.
+	//
+	// The client collects and stores:
+	// - existing cloud resource definitions (e.g. VMs, DBs, etc.)
+	// - metric definitions for the resources (e.g. CPU, memory, etc.)
+	//
+	// The metricset periodically refreshes the information
+	// after `RefreshListInterval` (default 600s for
+	// most metricsets).
 	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
+
 	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
-		// error message is previously logged in the InitResources, no error event should be created
+		// error message is previously logged in the InitResources,
+		// no error event should be created
 		return nil
 	}
-	// retrieve metrics
-	groupedMetrics := groupMetricsByResource(m.Client.ResourceConfigurations.Metrics)
 
-	for _, metrics := range groupedMetrics {
-		results := m.Client.GetMetricValues(metrics, report)
-		err := EventsMapping(results, m.Client, report)
-		if err != nil {
-			return errors.Wrap(err, "error running EventsMapping")
+	// Group metric definitions by cloud resource ID.
+	//
+	// We group the metric definitions by resource ID to fetch
+	// metric values for each cloud resource in one API call.
+	metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
+
+	for _, metricsDefinition := range metricsByResourceId {
+		// Fetch metric values for each resource.
+		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+
+		// Turns metric values into events and sends them to Elasticsearch.
+		if err := mapToEvents(metricValues, m.Client, report); err != nil {
+			return fmt.Errorf("error mapping metrics to events: %w", err)
 		}
 	}
+
 	return nil
 }
 

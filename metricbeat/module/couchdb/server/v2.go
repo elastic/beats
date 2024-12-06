@@ -19,8 +19,7 @@ package server
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,7 +31,7 @@ func (v *V2) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 	var data ServerV2
 	err := json.Unmarshal(in, &data)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error parsing v2 server JSON")
+		return mb.Event{}, fmt.Errorf("error parsing v2 server JSON: %w", err)
 	}
 
 	event := mapstr.M{

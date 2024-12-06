@@ -41,7 +41,7 @@ func TestGetAWSCredentials(t *testing.T) {
 		SecretAccessKey: "abc",
 		SessionToken:    "fake-session-token",
 	}
-	awsConfig, err := GetAWSCredentials(inputConfig)
+	awsConfig, err := getAWSCredentials(inputConfig)
 	assert.NoError(t, err)
 
 	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())

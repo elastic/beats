@@ -8,9 +8,17 @@ metadata:
 data:
   filebeat.yml: |-
     filebeat.inputs:
-    - type: container
+    - type: filestream
+      id: kubernetes-container-logs
       paths:
         - /var/log/containers/*.log
+      parsers:
+        - container: ~
+      prospector:
+        scanner:
+          fingerprint.enabled: true
+          symlinks: true
+      file_identity.fingerprint: ~
       processors:
         - add_kubernetes_metadata:
             host: ${NODE_NAME}
@@ -19,15 +27,23 @@ data:
                 logs_path: "/var/log/containers/"
 
     # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
-    #filebeat.autodiscover:
+    # filebeat.autodiscover:
     #  providers:
     #    - type: kubernetes
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #      hints.default_config:
-    #        type: container
+    #        type: filestream
+    #        id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
     #        paths:
-    #          - /var/log/containers/*${data.kubernetes.container.id}.log
+    #        - /var/log/containers/*-${data.kubernetes.container.id}.log
+    #        parsers:
+    #        - container: ~
+    #        prospector:
+    #         scanner:
+    #           fingerprint.enabled: true
+    #           symlinks: true
+    #        file_identity.fingerprint: ~
 
     processors:
       - add_cloud_metadata:

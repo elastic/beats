@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4964",
-      "ingested": "2022-06-08T06:21:08.427966400Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -86,7 +85,6 @@
         "iam"
       ],
       "code": "4964",
-      "ingested": "2022-06-08T06:21:08.427985300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

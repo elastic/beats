@@ -62,7 +62,7 @@ func TestManager_Init(t *testing.T) {
 			DefaultCleanTimeout: 10 * time.Millisecond,
 		}
 
-		err := manager.Init(&grp, input.ModeRun)
+		err := manager.Init(&grp)
 		require.NoError(t, err)
 
 		time.Sleep(200 * time.Millisecond)
@@ -94,7 +94,7 @@ func TestManager_Init(t *testing.T) {
 			DefaultCleanTimeout: 10 * time.Millisecond,
 		}
 
-		err := manager.Init(&grp, input.ModeRun)
+		err := manager.Init(&grp)
 		require.NoError(t, err)
 
 		for len(store.snapshot()) > 0 {

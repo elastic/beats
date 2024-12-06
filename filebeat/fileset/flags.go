@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/config"
-	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Modules related command line flags.
@@ -32,11 +31,11 @@ var (
 	moduleOverrides = config.SettingFlag(nil, "M", "Module configuration overwrite")
 )
 
-type ModuleOverrides map[string]map[string]*conf.C // module -> fileset -> Config
+type ModuleOverrides map[string]map[string]*config.C // module -> fileset -> Config
 
 // Get returns an array of configuration overrides that should be merged in order.
-func (mo *ModuleOverrides) Get(module, fileset string) []*conf.C {
-	ret := []*conf.C{}
+func (mo *ModuleOverrides) Get(module, fileset string) []*config.C {
+	ret := []*config.C{}
 
 	moduleWildcard := (*mo)["*"]["*"]
 	if moduleWildcard != nil {

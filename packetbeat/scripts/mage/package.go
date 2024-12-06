@@ -18,10 +18,9 @@
 package mage
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -93,7 +92,7 @@ func CustomizePackaging() {
 		case devtools.Docker:
 			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
 		default:
-			panic(errors.Errorf("unhandled package type: %v", pkgType))
+			panic(fmt.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }

@@ -1,0 +1,64 @@
+---
+description: Route to appropriate data source pipenline.
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+
+  - pipeline:
+      if: ctx.type == "amqp"
+      name: '{< IngestPipeline "amqp" >}'
+  - pipeline:
+      if: ctx.type == "cassandra"
+      name: '{< IngestPipeline "cassandra" >}'
+  - pipeline:
+      if: ctx.type == "dhcpv4"
+      name: '{< IngestPipeline "dhcpv4" >}'
+  - pipeline:
+      if: ctx.type == "dns"
+      name: '{< IngestPipeline "dns" >}'
+  - pipeline:
+      if: ctx.type == "flow"
+      name: '{< IngestPipeline "flow" >}'
+  - pipeline:
+      if: ctx.type == "http"
+      name: '{< IngestPipeline "http" >}'
+  - pipeline:
+      if: ctx.type == "icmp"
+      name: '{< IngestPipeline "icmp" >}'
+  - pipeline:
+      if: ctx.type == "memcache"
+      name: '{< IngestPipeline "memcached" >}'
+  - pipeline:
+      if: ctx.type == "mongodb"
+      name: '{< IngestPipeline "mongodb" >}'
+  - pipeline:
+      if: ctx.type == "mysql"
+      name: '{< IngestPipeline "mysql" >}'
+  - pipeline:
+      if: ctx.type == "nfs"
+      name: '{< IngestPipeline "nfs" >}'
+  - pipeline:
+      if: ctx.type == "pgsql"
+      name: '{< IngestPipeline "pgsql" >}'
+  - pipeline:
+      if: ctx.type == "redis"
+      name: '{< IngestPipeline "redis" >}'
+  - pipeline:
+      if: ctx.type == "sip"
+      name: '{< IngestPipeline "sip" >}'
+  - pipeline:
+      if: ctx.type == "thrift"
+      name: '{< IngestPipeline "thrift" >}'
+  - pipeline:
+      if: ctx.type == "tls"
+      name: '{< IngestPipeline "tls" >}'
+
+on_failure:
+  - set:
+      field: event.kind
+      value: pipeline_error
+  - append:
+      field: error.message
+      value: |-
+          Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"

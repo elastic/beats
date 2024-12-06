@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -78,4 +79,28 @@ func TestNewInputMonitor(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMetricSnapshotJSON(t *testing.T) {
+	require.NoError(t, globalRegistry().Clear())
+	t.Cleanup(func() {
+		require.NoError(t, globalRegistry().Clear())
+	})
+
+	r, cancel := NewInputRegistry("test", "my-id", nil)
+	defer cancel()
+	monitoring.NewInt(r, "foo_total").Set(100)
+
+	jsonBytes, err := MetricSnapshotJSON()
+	require.NoError(t, err)
+
+	const expected = `[
+  {
+    "foo_total": 100,
+    "id": "my-id",
+    "input": "test"
+  }
+]`
+
+	assert.Equal(t, expected, string(jsonBytes))
 }

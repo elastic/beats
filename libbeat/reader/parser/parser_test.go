@@ -367,6 +367,54 @@ func TestJSONParsersWithFields(t *testing.T) {
 				},
 			},
 		},
+		"JSON post processor with dotted target key": {
+			message: reader.Message{
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target": "kubernetes.audit",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields: mapstr.M{
+					"kubernetes": mapstr.M{
+						"audit": mapstr.M{
+							"key": "value",
+						},
+					},
+				},
+			},
+		},
+		"JSON post processor with non-dotted target key": {
+			message: reader.Message{
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target": "kubernetes",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields: mapstr.M{
+					"kubernetes": mapstr.M{
+						"key": "value",
+					},
+				},
+			},
+		},
 		"JSON post processor with document ID": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),

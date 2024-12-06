@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4726",
-      "ingested": "2022-06-08T06:21:08.313870400Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -89,7 +88,6 @@
         "iam"
       ],
       "code": "4726",
-      "ingested": "2022-06-08T06:21:08.313890100Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

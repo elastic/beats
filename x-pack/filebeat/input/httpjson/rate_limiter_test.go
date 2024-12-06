@@ -16,7 +16,7 @@ import (
 )
 
 // Test getRateLimit function with a remaining quota, expect to receive 0, nil.
-func TestGetRateLimitReturns0IfRemainingQuota(t *testing.T) {
+func TestGetRateLimitReturnsFalse0IfRemainingQuota(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "118")
@@ -34,12 +34,13 @@ func TestGetRateLimitReturns0IfRemainingQuota(t *testing.T) {
 		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 0, epoch)
+	assert.False(t, applied)
+	assert.EqualValues(t, 0, resumeAt)
 }
 
-func TestGetRateLimitReturns0IfEpochInPast(t *testing.T) {
+func TestGetRateLimitReturnsTrue0IfResumeAtInPast(t *testing.T) {
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "10")
 	header.Add("X-Rate-Limit-Remaining", "0")
@@ -57,20 +58,21 @@ func TestGetRateLimitReturns0IfEpochInPast(t *testing.T) {
 		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 0, epoch)
+	assert.True(t, applied)
+	assert.EqualValues(t, 0, resumeAt)
 }
 
 func TestGetRateLimitReturnsResetValue(t *testing.T) {
-	epoch := int64(1604582732 + 100)
+	reset := int64(1604582732 + 100)
 	timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "10")
 	header.Add("X-Rate-Limit-Remaining", "0")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(epoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(reset, 10))
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
@@ -84,22 +86,23 @@ func TestGetRateLimitReturnsResetValue(t *testing.T) {
 		log:       logp.NewLogger(""),
 	}
 	resp := &http.Response{Header: header}
-	epoch2, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 1604582832, epoch2)
+	assert.True(t, applied)
+	assert.EqualValues(t, reset, resumeAt)
 }
 
 // Test getRateLimit function with a remaining quota, using default early limit
-// expect to receive 0, nil.
+// expect to receive false, 0, nil.
 func TestGetRateLimitReturns0IfEarlyLimit0(t *testing.T) {
-	resetEpoch := int64(1634579974 + 100)
+	resetAt := int64(1634579974 + 100)
 	timeNow = func() time.Time { return time.Unix(1634579974, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "1")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetAt, 10))
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
@@ -115,22 +118,23 @@ func TestGetRateLimitReturns0IfEarlyLimit0(t *testing.T) {
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 0, epoch)
+	assert.False(t, applied)
+	assert.EqualValues(t, 0, resumeAt)
 }
 
 // Test getRateLimit function with a remaining limit, but early limit
-// expect to receive Reset Time
+// expect to receive true, Reset Time
 func TestGetRateLimitReturnsResetValueIfEarlyLimit1(t *testing.T) {
-	resetEpoch := int64(1634579974 + 100)
+	resetAt := int64(1634579974 + 100)
 	timeNow = func() time.Time { return time.Unix(1634579974, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "1")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetAt, 10))
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
@@ -146,22 +150,23 @@ func TestGetRateLimitReturnsResetValueIfEarlyLimit1(t *testing.T) {
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, resetEpoch, epoch)
+	assert.True(t, applied)
+	assert.EqualValues(t, resetAt, resumeAt)
 }
 
 // Test getRateLimit function with a remaining quota, using 90% early limit
-// expect to receive 0, nil.
+// expect to receive false, 0, nil.
 func TestGetRateLimitReturns0IfEarlyLimitPercent(t *testing.T) {
-	resetEpoch := int64(1634579974 + 100)
+	resetAt := int64(1634579974 + 100)
 	timeNow = func() time.Time { return time.Unix(1634579974, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "13")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetAt, 10))
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
@@ -177,22 +182,23 @@ func TestGetRateLimitReturns0IfEarlyLimitPercent(t *testing.T) {
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 0, epoch)
+	assert.False(t, applied)
+	assert.EqualValues(t, 0, resumeAt)
 }
 
 // Test getRateLimit function with a remaining limit, but early limit of 90%
-// expect to receive Reset Time
+// expect to receive true, Reset Time
 func TestGetRateLimitReturnsResetValueIfEarlyLimitPercent(t *testing.T) {
-	resetEpoch := int64(1634579974 + 100)
+	resetAt := int64(1634579974 + 100)
 	timeNow = func() time.Time { return time.Unix(1634579974, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "12")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetAt, 10))
 	tplLimit := &valueTpl{}
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
@@ -208,21 +214,22 @@ func TestGetRateLimitReturnsResetValueIfEarlyLimitPercent(t *testing.T) {
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, resetEpoch, epoch)
+	assert.True(t, applied)
+	assert.EqualValues(t, resetAt, resumeAt)
 }
 
 // Test getRateLimit function when "Limit" header is missing, when using a Percentage early-limit
-// expect to receive 0, nil. (default rate-limiting)
+// expect to receive false, 0, nil. (default rate-limiting)
 func TestGetRateLimitWhenMissingLimit(t *testing.T) {
-	resetEpoch := int64(1634579974 + 100)
+	reset := int64(1634579974 + 100)
 	timeNow = func() time.Time { return time.Unix(1634579974, 0).UTC() }
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
 	header.Add("X-Rate-Limit-Remaining", "1")
-	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
+	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(reset, 10))
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
 	earlyLimit := func(i float64) *float64 { return &i }(0.9)
@@ -236,7 +243,8 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 		earlyLimit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
-	epoch, err := rateLimit.getRateLimit(resp)
+	applied, resumeAt, err := rateLimit.getRateLimit(resp)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 0, epoch)
+	assert.False(t, applied)
+	assert.EqualValues(t, 0, resumeAt)
 }

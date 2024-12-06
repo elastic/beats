@@ -15,3 +15,8 @@ services:
     extends:
       file: ../../../../x-pack/metricbeat/module/oracle/docker-compose.yml
       service: oracle
+
+  mssql:
+    extends:
+      file: ../../../../x-pack/metricbeat/module/mssql/docker-compose.yml
+      service: mssql

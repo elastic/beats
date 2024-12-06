@@ -28,6 +28,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -72,7 +73,7 @@ var (
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),
 		mb.WithNamespace(namespace),
@@ -86,6 +87,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config     Config
+	control    *libaudit.AuditClient
 	client     *libaudit.AuditClient
 	log        *logp.Logger
 	kernelLost struct {
@@ -106,9 +108,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	_, _, kernel, _ := kernelVersion()
 	log.Infof("auditd module is running as euid=%v on kernel=%v", os.Geteuid(), kernel)
 
+	control, err := libaudit.NewAuditClient(nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create audit control client: %w", err)
+	}
+
 	client, err := newAuditClient(&config, log)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create audit client: %w", err)
+		return nil, fmt.Errorf("failed to create audit data client: %w", err)
 	}
 
 	reassemblerGapsMetric.Set(0)
@@ -118,6 +125,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet:        base,
+		control:              control,
 		client:               client,
 		config:               config,
 		log:                  log,
@@ -167,10 +175,13 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer closeAuditClient(ms.client, ms.log)
+	defer ms.control.Close()
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
-	// Will result in EPERM.
-	status, err := ms.client.GetStatus()
+	// Will result in EPERM. Also, ensure that another socket is used to determine the
+	// status, because audit data can already buffering for ms.client. Which can lead
+	// to an ENOBUFS error bubbling up.
+	status, err := ms.control.GetStatus()
 	if err != nil {
 		err = fmt.Errorf("failed to get audit status before adding rules: %w", err)
 		reporter.Error(err)
@@ -979,8 +990,7 @@ func determineSocketType(c *Config, log *logp.Logger) (string, error) {
 		if c.SocketType == "" {
 			return "", fmt.Errorf("failed to create audit client: %w", err)
 		}
-		// Ignore errors if a socket type has been specified. It will fail during
-		// further setup and its necessary for unit tests to pass
+		// Ignore errors if a socket type has been specified.
 		return c.SocketType, nil
 	}
 	defer client.Close()

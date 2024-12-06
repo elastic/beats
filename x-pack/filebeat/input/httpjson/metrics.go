@@ -38,7 +38,7 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalExecutionTime))
 	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages_execution_time", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPageExecutionTime))
-	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages_total", adapter.Accept).
+	_ = adapter.GetGoMetrics(reg, "httpjson_interval_pages", adapter.Accept).
 		GetOrRegister("histogram", metrics.NewHistogram(out.intervalPages))
 
 	return out

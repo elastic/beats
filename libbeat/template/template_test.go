@@ -31,7 +31,7 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
-type testTemplate struct {
+type unitTestTemplate struct {
 	t    *testing.T
 	tmpl *Template
 	data mapstr.M
@@ -109,19 +109,19 @@ func TestTemplate(t *testing.T) {
 	})
 }
 
-func createTestTemplate(t *testing.T, beatVersion, esVersion string, config TemplateConfig) *testTemplate {
+func createTestTemplate(t *testing.T, beatVersion, esVersion string, config TemplateConfig) *unitTestTemplate {
 	beatVersion = getVersion(beatVersion)
 	esVersion = getVersion(esVersion)
 	ver := libversion.MustNew(esVersion)
-	template, err := New(beatVersion, "testbeat", false, *ver, config, false)
+	template, err := New(false, beatVersion, "testbeat", false, *ver, config, false)
 	if err != nil {
 		t.Fatalf("Failed to create the template: %+v", err)
 	}
 
-	return &testTemplate{t: t, tmpl: template, data: template.Generate(nil, nil, nil)}
+	return &unitTestTemplate{t: t, tmpl: template, data: template.Generate(nil, nil, nil)}
 }
 
-func (t *testTemplate) Has(path string) bool {
+func (t *unitTestTemplate) Has(path string) bool {
 	t.t.Helper()
 	has, err := t.data.HasKey(path)
 	if err != nil && err != mapstr.ErrKeyNotFound {
@@ -131,7 +131,7 @@ func (t *testTemplate) Has(path string) bool {
 	return has
 }
 
-func (t *testTemplate) Get(path string) interface{} {
+func (t *unitTestTemplate) Get(path string) interface{} {
 	t.t.Helper()
 	val, err := t.data.GetValue(path)
 	if err != nil {
@@ -141,14 +141,14 @@ func (t *testTemplate) Get(path string) interface{} {
 	return val
 }
 
-func (t *testTemplate) AssertMissing(path string) {
+func (t *unitTestTemplate) AssertMissing(path string) {
 	t.t.Helper()
 	if t.Has(path) {
 		t.t.Fatalf("Expected '%v' to be missing", path)
 	}
 }
 
-func (t *testTemplate) Assert(path string, val interface{}) {
+func (t *unitTestTemplate) Assert(path string, val interface{}) {
 	t.t.Helper()
 	assert.Equal(t.t, val, t.Get(path))
 }

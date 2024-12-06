@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
@@ -31,31 +31,41 @@ import (
 // it only tests a single parser, but that is enough to ensure
 // we're correctly using the parsers
 func TestInputParsers(t *testing.T) {
-	inputParsersExpected := []string{"1st line\n2nd line\n3rd line", "4th line\n5th line\n6th line"}
 	env := newInputTestingEnvironment(t)
-
 	inp := env.mustCreateInput(mapstr.M{
-		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
-		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+		"paths": []string{path.Join("testdata", "ndjson-parser.journal")},
 		"parsers": []mapstr.M{
 			{
-				"multiline": mapstr.M{
-					"type":        "count",
-					"count_lines": 3,
+				"ndjson": mapstr.M{
+					"target": "",
 				},
 			},
 		},
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
 	env.startInput(ctx, inp)
-	env.waitUntilEventCount(len(inputParsersExpected))
+	env.waitUntilEventCount(1)
+	event := env.pipeline.clients[0].GetEvents()[0]
 
-	for idx, event := range env.pipeline.clients[0].GetEvents() {
-		if got, expected := event.Fields["message"], inputParsersExpected[idx]; got != expected {
-			t.Errorf("expecting event message %q, got %q", expected, got)
-		}
+	foo, isString := event.Fields["foo"].(string)
+	if !isString {
+		t.Errorf("expecting field 'foo' to be string, got %T", event.Fields["foo"])
 	}
 
-	cancelInput()
+	answer, isInt := event.Fields["answer"].(int64)
+	if !isInt {
+		t.Errorf("expecting field 'answer' to be int64, got %T", event.Fields["answer"])
+	}
+
+	// The JSON in the test journal is: '{"foo": "bar", "answer":42}'
+	expectedFoo := "bar"
+	expectedAnswer := int64(42)
+	if foo != expectedFoo {
+		t.Errorf("expecting 'foo' from the Journal JSON to be '%s' got '%s' instead", expectedFoo, foo)
+	}
+	if answer != expectedAnswer {
+		t.Errorf("expecting 'answer' from the Journal JSON to be '%d' got '%d' instead", expectedAnswer, answer)
+	}
 }

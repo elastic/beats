@@ -36,7 +36,7 @@ func init() {
 // currentTime returns the current time. This exists to allow unit tests
 // simulate the passage of time.
 func currentTime() time.Time {
-	clock := clockValue.Load().(clock)
+	clock, _ := clockValue.Load().(clock)
 	return clock.Now()
 }
 
@@ -71,24 +71,14 @@ type inputMetrics struct {
 	s3EventsCreatedTotal    *monitoring.Uint // Number of events created from processing S3 data.
 	s3ObjectsInflight       *monitoring.Uint // Number of S3 objects inflight (gauge).
 	s3ObjectProcessingTime  metrics.Sample   // Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
+	s3ObjectSizeInBytes     metrics.Sample   // Histogram of processed S3 object size in bytes
+	s3EventsPerObject       metrics.Sample   // Histogram of events in an individual S3 object
 }
 
 // Close cancels the context and removes the metrics from the registry.
 func (m *inputMetrics) Close() {
 	m.cancel()
 	m.unregister()
-}
-
-func (m *inputMetrics) setSQSMessagesWaiting(count int64) {
-	if m.sqsMessagesWaiting == nil {
-		// if metric not initialized, and count is -1, do nothing
-		if count == -1 {
-			return
-		}
-		m.sqsMessagesWaiting = monitoring.NewInt(m.registry, "sqs_messages_waiting_gauge")
-	}
-
-	m.sqsMessagesWaiting.Set(count)
 }
 
 // beginSQSWorker tracks the start of a new SQS worker. The returned ID
@@ -174,6 +164,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),
 		sqsMessagesDeletedTotal:             monitoring.NewUint(reg, "sqs_messages_deleted_total"),
+		sqsMessagesWaiting:                  monitoring.NewInt(reg, "sqs_messages_waiting_gauge"),
 		sqsWorkerUtilization:                monitoring.NewFloat(reg, "sqs_worker_utilization"),
 		sqsMessageProcessingTime:            metrics.NewUniformSample(1024),
 		sqsLagTime:                          metrics.NewUniformSample(1024),
@@ -185,13 +176,23 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		s3EventsCreatedTotal:                monitoring.NewUint(reg, "s3_events_created_total"),
 		s3ObjectsInflight:                   monitoring.NewUint(reg, "s3_objects_inflight_gauge"),
 		s3ObjectProcessingTime:              metrics.NewUniformSample(1024),
+		s3ObjectSizeInBytes:                 metrics.NewUniformSample(1024),
+		s3EventsPerObject:                   metrics.NewUniformSample(1024),
 	}
+
+	// Initializing the sqs_messages_waiting_gauge value to -1 so that we can distinguish between no messages waiting (0) and never collected / error collecting (-1).
+	out.sqsMessagesWaiting.Set(int64(-1))
+
 	adapter.NewGoMetrics(reg, "sqs_message_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsMessageProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "sqs_lag_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.sqsLagTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 	adapter.NewGoMetrics(reg, "s3_object_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.s3ObjectProcessingTime)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_object_size_in_bytes", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3ObjectSizeInBytes)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
+	adapter.NewGoMetrics(reg, "s3_events_per_object", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.s3EventsPerObject)) //nolint:errcheck // A unique namespace is used so name collisions are impossible.
 
 	if maxWorkers > 0 {
 		// Periodically update the sqs worker utilization metric.
@@ -205,18 +206,26 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 	return out
 }
 
-// monitoredReader implements io.Reader and counts the number of bytes read.
+// monitoredReader implements io.Reader and wraps byte read tracking fields for S3 bucket objects.
+// Following are the tracked metrics,
+//   - totalBytesReadMetric - a total metric tracking bytes reads throughout the runtime from all processed objects
+//   - totalBytesReadCurrent - total bytes read from the currently tracked object
+//
+// See newMonitoredReader for initialization considerations.
 type monitoredReader struct {
-	reader         io.Reader
-	totalBytesRead *monitoring.Uint
+	reader                io.Reader
+	totalBytesReadMetric  *monitoring.Uint
+	totalBytesReadCurrent int64
 }
 
+// newMonitoredReader initialize the monitoredReader with a shared monitor that tracks all bytes read.
 func newMonitoredReader(r io.Reader, metric *monitoring.Uint) *monitoredReader {
-	return &monitoredReader{reader: r, totalBytesRead: metric}
+	return &monitoredReader{reader: r, totalBytesReadMetric: metric}
 }
 
 func (m *monitoredReader) Read(p []byte) (int, error) {
 	n, err := m.reader.Read(p)
-	m.totalBytesRead.Add(uint64(n))
+	m.totalBytesReadMetric.Add(uint64(n))
+	m.totalBytesReadCurrent += int64(n)
 	return n, err
 }

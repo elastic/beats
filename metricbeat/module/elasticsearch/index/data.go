@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -43,7 +42,6 @@ type Index struct {
 
 	Index  string     `json:"index"`
 	Status string     `json:"status"`
-	Hidden bool       `json:"hidden"`
 	Shards shardStats `json:"shards"`
 }
 
@@ -74,7 +72,8 @@ type primaries struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
@@ -133,7 +132,8 @@ type total struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
@@ -182,34 +182,25 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	clusterStateMetrics := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
+		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
-		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
-	}
-
-	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
+		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
 	var errs multierror.Errors
-	for name, idx := range indicesStats.Indices {
+	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
 		}
+		idx := indicesStats.Indices[name]
 		idx.Index = name
-
-		settings, exists := indicesSettings[name]
-		if exists {
-			idx.Hidden = settings.Hidden
-		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure adding cluster state fields"))
+			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
 			continue
 		}
 
@@ -220,12 +211,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		// metricset level
 		indexBytes, err := json.Marshal(idx)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert metrics results to JSON"))
+			errs = append(errs, fmt.Errorf("failure trying to convert metrics results to JSON: %w", err))
 			continue
 		}
 		var indexOutput mapstr.M
 		if err = json.Unmarshal(indexBytes, &indexOutput); err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert JSON metrics back to mapstr"))
+			errs = append(errs, fmt.Errorf("failure trying to convert JSON metrics back to mapstr: %w", err))
 			continue
 		}
 
@@ -255,12 +246,12 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
-		return errors.Wrap(err, "failed to get index routing table from cluster state")
+		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
-		return errors.Wrap(err, "failed to get shards from routing table")
+		return fmt.Errorf("failed to get shards from routing table: %w", err)
 	}
 
 	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
@@ -268,13 +259,13 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 
 	status, err := getIndexStatus(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index status")
+		return fmt.Errorf("failed to get index status: %w", err)
 	}
 	idx.Status = status
 
 	shardStats, err := getIndexShardStats(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index shard stats")
+		return fmt.Errorf("failed to get index shard stats: %w", err)
 	}
 	idx.Shards = *shardStats
 	return nil
@@ -284,7 +275,7 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "'"+fieldKey+"'")
+		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
 	metric, ok := value.(map[string]interface{})

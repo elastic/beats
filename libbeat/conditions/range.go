@@ -19,7 +19,6 @@ package conditions
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -113,30 +112,13 @@ func (c Range) Check(event ValuesMap) bool {
 			return false
 		}
 
-		switch value.(type) {
-		case int, int8, int16, int32, int64:
-			intValue := reflect.ValueOf(value).Int()
+		floatValue, err := ExtractFloat(value)
+		if err != nil {
+			logp.L().Named(logName).Warnf(err.Error())
+			return false
+		}
 
-			if !checkValue(float64(intValue), rangeValue) {
-				return false
-			}
-
-		case uint, uint8, uint16, uint32, uint64:
-			uintValue := reflect.ValueOf(value).Uint()
-
-			if !checkValue(float64(uintValue), rangeValue) {
-				return false
-			}
-
-		case float64, float32:
-			floatValue := reflect.ValueOf(value).Float()
-
-			if !checkValue(floatValue, rangeValue) {
-				return false
-			}
-
-		default:
-			logp.L().Named(logName).Warnf("unexpected type %T in range condition.", value)
+		if !checkValue(floatValue, rangeValue) {
 			return false
 		}
 

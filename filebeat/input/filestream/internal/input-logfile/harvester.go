@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -46,7 +47,7 @@ type Harvester interface {
 	Test(Source, inputv2.TestContext) error
 	// Run is the event loop which reads from the source
 	// and forwards it to the publisher.
-	Run(inputv2.Context, Source, Cursor, Publisher) error
+	Run(inputv2.Context, Source, Cursor, Publisher, *Metrics) error
 }
 
 type readerGroup struct {
@@ -125,6 +126,7 @@ type defaultHarvesterGroup struct {
 	ackCH        *updateChan
 	identifier   *sourceIdentifier
 	tg           *task.Group
+	metrics      *Metrics
 }
 
 // Start starts the Harvester for a Source if no Harvester is running for the
@@ -137,7 +139,7 @@ func (hg *defaultHarvesterGroup) Start(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Starting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, false)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, false, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
 			"tried to start harvester with task group already closed",
 			ctx.ID)
@@ -154,7 +156,7 @@ func (hg *defaultHarvesterGroup) Restart(ctx inputv2.Context, src Source) {
 	ctx.Logger = ctx.Logger.With("source_file", sourceName)
 	ctx.Logger.Debug("Restarting harvester for file")
 
-	if err := hg.tg.Go(startHarvester(ctx, hg, src, true)); err != nil {
+	if err := hg.tg.Go(startHarvester(ctx, hg, src, true, hg.metrics)); err != nil {
 		ctx.Logger.Warnf(
 			"input %s tried to restart harvester with task group already closed",
 			ctx.ID)
@@ -169,7 +171,9 @@ func startHarvester(
 	ctx inputv2.Context,
 	hg *defaultHarvesterGroup,
 	src Source,
-	restart bool) func(context.Context) error {
+	restart bool,
+	metrics *Metrics,
+) func(context.Context) error {
 	srcID := hg.identifier.ID(src)
 
 	return func(canceler context.Context) error {
@@ -201,7 +205,7 @@ func startHarvester(
 			if errors.Is(err, ErrHarvesterAlreadyRunning) {
 				return nil
 			}
-
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while adding new reader to the bookkeeper %v", err))
 			return fmt.Errorf("error while adding new reader to the bookkeeper %w", err)
 		}
 
@@ -211,16 +215,17 @@ func startHarvester(
 		resource, err := lock(ctx, hg.store, srcID)
 		if err != nil {
 			hg.readers.remove(srcID)
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while locking resource: %v", err))
 			return fmt.Errorf("error while locking resource: %w", err)
 		}
 		defer releaseResource(resource)
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:      ctx.Cancelation,
 			EventListener: newInputACKHandler(hg.ackCH),
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while connecting to output with pipeline: %v", err))
 			return fmt.Errorf("error while connecting to output with pipeline: %w", err)
 		}
 		defer client.Close()
@@ -229,9 +234,10 @@ func startHarvester(
 		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
-		err = hg.harvester.Run(ctx, src, cursor, publisher)
+		err = hg.harvester.Run(ctx, src, cursor, publisher, metrics)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			hg.readers.remove(srcID)
+			ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while running harvester: %v", err))
 			return fmt.Errorf("error while running harvester: %w", err)
 		}
 		// If the context was not cancelled it means that the Harvester is stopping because of
@@ -315,6 +321,7 @@ func lockResource(log *logp.Logger, resource *resource, canceler inputv2.Cancele
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)
+		log.Infof("Resource '%v' finally released. Lock acquired", resource.key)
 		if err != nil {
 			log.Infof("Input for resource '%v' has been stopped while waiting", resource.key)
 			return err

@@ -86,6 +86,7 @@ type PythonTestArgs struct {
 	Files               []string          // Globs used to find tests.
 	XUnitReportFile     string            // File to write the XUnit XML test report to.
 	CoverageProfileFile string            // Test coverage profile file.
+	ForceCreateVenv     bool              // Set to true to always install required dependencies in the test virtual environment.
 }
 
 func makePythonTestArgs(name string) PythonTestArgs {
@@ -126,7 +127,7 @@ func PythonTest(params PythonTestArgs) error {
 	fmt.Println(">> python test:", params.TestName, "Testing")
 
 	// Only activate the virtualenv if necessary.
-	ve, err := PythonVirtualenv(false)
+	ve, err := PythonVirtualenv(params.ForceCreateVenv)
 	if err != nil {
 		return err
 	}
@@ -298,6 +299,12 @@ func pythonVirtualenvPath() (string, error) {
 		return pythonVirtualenvDir, nil
 	}
 
+	// If VIRTUAL_ENV is set we are already in a virtual environment.
+	pythonVirtualenvDir = os.Getenv("VIRTUAL_ENV")
+	if pythonVirtualenvDir != "" {
+		return pythonVirtualenvDir, nil
+	}
+
 	// PYTHON_ENV can override the default location. This is used by CI to
 	// shorten the overall shebang interpreter path below the path length limits.
 	pythonVirtualenvDir = os.Getenv("PYTHON_ENV")
@@ -309,6 +316,7 @@ func pythonVirtualenvPath() (string, error) {
 
 		pythonVirtualenvDir = info.RootDir
 	}
+
 	pythonVirtualenvDir = filepath.Join(pythonVirtualenvDir, "build/ve")
 
 	// Use OS and docker specific virtualenv's because the interpreter in

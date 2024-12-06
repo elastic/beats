@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -26,12 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/sarama"
 )
 
 // Version returns a kafka version from its string representation
@@ -115,7 +113,7 @@ func (b *Broker) Close() error {
 // Connect connects the broker to the configured host
 func (b *Broker) Connect() error {
 	if err := b.broker.Open(b.cfg); err != nil {
-		return errors.Wrap(err, "broker.Open failed")
+		return fmt.Errorf("broker.Open failed: %w", err)
 	}
 
 	c, err := getClusterWideClient(b.Addr(), b.cfg)
@@ -133,7 +131,7 @@ func (b *Broker) Connect() error {
 	meta, err := queryMetadataWithRetry(b.broker, b.cfg, nil)
 	if err != nil {
 		closeBroker(b.broker)
-		return errors.Wrap(err, "failed to query metadata")
+		return fmt.Errorf("failed to query metadata: %w", err)
 	}
 
 	finder := brokerFinder{Net: &defaultNet{}}
@@ -189,12 +187,12 @@ func (b *Broker) PartitionOffset(
 	req.AddBlock(topic, partition, time, 1)
 	resp, err := b.broker.GetAvailableOffsets(req)
 	if err != nil {
-		return -1, errors.Wrap(err, "get available offsets failed")
+		return -1, fmt.Errorf("get available offsets failed: %w", err)
 	}
 
 	block := resp.GetBlock(topic, partition)
 	if len(block.Offsets) == 0 {
-		return -1, errors.Wrap(block.Err, "block offsets is empty")
+		return -1, fmt.Errorf("block offsets is empty: %w", block.Err)
 	}
 
 	return block.Offsets[0], nil
@@ -304,13 +302,20 @@ func queryMetadataWithRetry(
 	b *sarama.Broker,
 	cfg *sarama.Config,
 	topics []string,
-) (r *sarama.MetadataResponse, err error) {
-	err = withRetry(b, cfg, func() (e error) {
+) (*sarama.MetadataResponse, error) {
+	var r *sarama.MetadataResponse
+	var err error
+
+	err = withRetry(b, cfg, func() error {
 		requ := &sarama.MetadataRequest{Topics: topics}
-		r, e = b.GetMetadata(requ)
-		return
+		r, err = b.GetMetadata(requ)
+		return err
 	})
-	return
+
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 func closeBroker(b *sarama.Broker) {
@@ -356,22 +361,20 @@ func checkRetryQuery(err error) (retry, reconnect bool) {
 		return false, false
 	}
 
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return true, true
 	}
 
-	k, ok := err.(sarama.KError)
-	if !ok {
-		return false, false
-	}
-
-	switch k {
-	case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
-		sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
-		return true, false
-	case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
-		sarama.ErrNetworkException:
-		return true, true
+	var k *sarama.KError
+	if errors.As(err, &k) {
+		switch *k {
+		case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
+			sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
+			return true, false
+		case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
+			sarama.ErrNetworkException:
+			return true, true
+		}
 	}
 
 	return false, false

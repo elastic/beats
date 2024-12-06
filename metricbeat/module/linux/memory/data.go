@@ -23,8 +23,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	util "github.com/elastic/elastic-agent-system-metrics/metric"
@@ -37,7 +35,7 @@ import (
 func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	vmstat, err := GetVMStat(hostfs)
 	if err != nil {
-		return errors.Wrap(err, "error fetching VMStats")
+		return fmt.Errorf("error fetching VMStats: %w", err)
 	}
 
 	pageStats := mapstr.M{}
@@ -55,7 +53,7 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 
 	thp, err := getHugePages(hostfs)
 	if err != nil {
-		return errors.Wrap(err, "error getting huge pages")
+		return fmt.Errorf("error getting huge pages: %w", err)
 	}
 	baseMap["hugepages"] = thp
 
@@ -71,12 +69,12 @@ func FetchLinuxMemStats(baseMap mapstr.M, hostfs resolve.Resolver) error {
 	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
 	eventRaw, err := metrics.Get(hostfs)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory metrics")
+		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
 	swap := mapstr.M{}
 	err = typeconv.Convert(&swap, &eventRaw.Swap)
 	if err != nil {
-		return errors.Wrap(err, "error converting raw event")
+		return fmt.Errorf("error converting raw event: %w", err)
 	}
 
 	baseMap["swap"] = swap
@@ -122,7 +120,7 @@ func getHugePages(hostfs resolve.Resolver) (mapstr.M, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
 	table, err := memory.ParseMeminfo(hostfs)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing meminfo")
+		return nil, fmt.Errorf("error parsing meminfo: %w", err)
 	}
 	thp := mapstr.M{}
 
@@ -168,7 +166,7 @@ func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 	vmstatFile := hostfs.ResolveHostFS("proc/vmstat")
 	content, err := os.ReadFile(vmstatFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading vmstat from %s", vmstatFile)
+		return nil, fmt.Errorf("error reading vmstat from %s: %w", vmstatFile, err)
 	}
 
 	// I'm not a fan of throwing stuff directly to maps, but this is a huge amount of kernel/config specific metrics, and we're the only consumer of this for now.
@@ -181,7 +179,7 @@ func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 
 		num, err := strconv.ParseUint(string(parts[1]), 10, 64)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to parse value %s", parts[1])
+			return nil, fmt.Errorf("failed to parse value %s: %w", parts[1], err)
 		}
 		vmstat[parts[0]] = num
 

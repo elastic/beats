@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
 
 	"github.com/docker/docker/pkg/ioutils"
-	"github.com/pkg/errors"
 )
 
 // StartLoggingRequest represents the request object we get on a call to //LogDriver.StartLogging
@@ -54,7 +54,7 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 		var startReq StartLoggingRequest
 		err := json.NewDecoder(r.Body).Decode(&startReq)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("error decoding json request: %v", err), http.StatusBadRequest)
 			return
 		}
 
@@ -64,13 +64,13 @@ func startLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respon
 
 		cfg, err := pipelinemanager.NewCfgFromRaw(startReq.Info.Config)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error creating client config").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Errorf("error creating client config: %w", err).Error(), http.StatusBadRequest)
 			return
 		}
 		pm.Logger.Debugf("Got config: %#v", cfg)
 		cl, err := pm.CreateClientWithConfig(cfg, startReq.Info, startReq.File)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error creating client").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Errorf("error creating client: %w", err).Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -86,7 +86,7 @@ func stopLoggingHandler(pm *pipelinemanager.PipelineManager) func(w http.Respons
 		var stopReq StopLoggingRequest
 		err := json.NewDecoder(r.Body).Decode(&stopReq)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Errorf("error decoding json request: %w", err).Error(), http.StatusBadRequest)
 			return
 		}
 		pm.Logger.Debugf("Got stop request object %#v\n", stopReq)
@@ -108,14 +108,14 @@ func readLogHandler(pm *pipelinemanager.PipelineManager) func(w http.ResponseWri
 		var logReq logsRequest
 		err := json.NewDecoder(r.Body).Decode(&logReq)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error decoding json request").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Errorf("error decoding json request: %w", err).Error(), http.StatusBadRequest)
 			return
 		}
 
 		pm.Logger.Debugf("Got logging request for container %s\n", logReq.Info.ContainerName)
 		stream, err := pm.CreateReaderForContainer(logReq.Info, logReq.Config)
 		if err != nil {
-			http.Error(w, errors.Wrap(err, "error creating log reader").Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Errorf("error creating log reader: %w", err).Error(), http.StatusBadRequest)
 			return
 		}
 		defer stream.Close()

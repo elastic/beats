@@ -358,3 +358,7 @@ var BeatsFilesBucket_multiline_json_gz = []string{
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:42.806Z\",\n    \"log.level\": \"error\",\n    \"message\": \"error making http request\"\n}",
 	"{\n    \"@timestamp\": \"2021-05-25T17:25:51.391Z\",\n    \"log.level\": \"info\",\n    \"message\": \"available disk space 44.3gb\"\n}",
 }
+var BeatsFilesBucket_events_array_json = []string{
+	"{\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        }",
+	"{\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }",
+}

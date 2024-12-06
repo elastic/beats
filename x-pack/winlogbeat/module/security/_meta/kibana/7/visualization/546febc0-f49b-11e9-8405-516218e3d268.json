@@ -78,13 +78,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:09.418Z",
     "id": "546febc0-f49b-11e9-8405-516218e3d268",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:56.323Z",
-    "version": "WzIyMzQsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:09.418Z",
+    "version": "WzI5MSwxXQ=="
 }

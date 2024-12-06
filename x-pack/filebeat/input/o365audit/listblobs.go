@@ -6,6 +6,7 @@ package o365audit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 )
@@ -280,10 +280,10 @@ func readJSONBody(response *http.Response, dest interface{}) error {
 		autorest.ByClosing())
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return errors.Wrap(err, "reading body failed")
+		return fmt.Errorf("reading body failed: %w", err)
 	}
 	if err = json.Unmarshal(body, dest); err != nil {
-		return errors.Wrap(err, "decoding json failed")
+		return fmt.Errorf("decoding json failed: %w", err)
 	}
 	return nil
 }

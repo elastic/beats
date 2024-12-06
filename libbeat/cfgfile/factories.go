@@ -18,7 +18,7 @@
 package cfgfile
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"

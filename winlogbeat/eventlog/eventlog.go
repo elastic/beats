@@ -48,6 +48,11 @@ type EventLog interface {
 	// reading and close the log.
 	Read() ([]Record, error)
 
+	// Reset closes the event log channel to allow recovering from recoverable
+	// errors. Open must be successfully called after a Reset before Read may
+	// be called.
+	Reset() error
+
 	// Close the event log. It should not be re-opened after closing.
 	Close() error
 

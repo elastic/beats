@@ -54,7 +54,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -102,7 +102,198 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
+                    ]
+                }
+            },
+            "istio_requests_total": {
+                "counter": 6,
+                "rate": 0
+            },
+            "istio_response_bytes": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
+                    ]
+                }
+            },
+            "labels": {
+                "connection_security_policy": "unknown",
+                "destination_app": "details",
+                "destination_canonical_revision": "v1",
+                "destination_canonical_service": "details",
+                "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-details",
+                "destination_service": "details.default.svc.cluster.local",
+                "destination_service_name": "details",
+                "destination_service_namespace": "default",
+                "destination_version": "v1",
+                "destination_workload": "details-v1",
+                "destination_workload_namespace": "default",
+                "instance": "127.0.0.1:49435",
+                "job": "istio",
+                "reporter": "source",
+                "request_protocol": "http",
+                "response_code": "200",
+                "response_flags": "-",
+                "source_app": "productpage",
+                "source_canonical_revision": "v1",
+                "source_canonical_service": "productpage",
+                "source_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-productpage",
+                "source_version": "v1",
+                "source_workload": "productpage-v1",
+                "source_workload_namespace": "default"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.proxy",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "prometheus": {
+            "istio_request_bytes": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
+                    ]
+                }
+            },
+            "istio_request_duration_milliseconds": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
                     ]
                 }
             },
@@ -154,7 +345,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -170,7 +361,7 @@
                 "destination_version": "v1",
                 "destination_workload": "productpage-v1",
                 "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "reporter": "destination",
                 "request_protocol": "http",
@@ -245,7 +436,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -293,7 +484,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -345,7 +536,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -361,7 +552,7 @@
                 "destination_version": "v2",
                 "destination_workload": "reviews-v2",
                 "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "reporter": "source",
                 "request_protocol": "http",
@@ -436,7 +627,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -484,198 +675,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
-                    ]
-                }
-            },
-            "istio_requests_total": {
-                "counter": 6,
-                "rate": 0
-            },
-            "istio_response_bytes": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
-                    ]
-                }
-            },
-            "labels": {
-                "connection_security_policy": "unknown",
-                "destination_app": "details",
-                "destination_canonical_revision": "v1",
-                "destination_canonical_service": "details",
-                "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-details",
-                "destination_service": "details.default.svc.cluster.local",
-                "destination_service_name": "details",
-                "destination_service_namespace": "default",
-                "destination_version": "v1",
-                "destination_workload": "details-v1",
-                "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
-                "job": "istio",
-                "reporter": "source",
-                "request_protocol": "http",
-                "response_code": "200",
-                "response_flags": "-",
-                "source_app": "productpage",
-                "source_canonical_revision": "v1",
-                "source_canonical_service": "productpage",
-                "source_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-productpage",
-                "source_version": "v1",
-                "source_workload": "productpage-v1",
-                "source_workload_namespace": "default"
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.proxy",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "metricset": {
-            "name": "proxy",
-            "period": 10000
-        },
-        "prometheus": {
-            "istio_request_bytes": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
-                    ]
-                }
-            },
-            "istio_request_duration_milliseconds": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -727,7 +727,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -743,7 +743,7 @@
                 "destination_version": "v1",
                 "destination_workload": "productpage-v1",
                 "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "reporter": "destination",
                 "request_protocol": "http",
@@ -774,203 +774,12 @@
             "period": 10000
         },
         "prometheus": {
-            "istio_request_bytes": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
-                    ]
-                }
-            },
-            "istio_request_duration_milliseconds": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
-                    ]
-                }
-            },
-            "istio_requests_total": {
-                "counter": 6,
-                "rate": 0
-            },
-            "istio_response_bytes": {
-                "histogram": {
-                    "counts": [
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0
-                    ],
-                    "values": [
-                        0.25,
-                        0.75,
-                        3,
-                        7.5,
-                        17.5,
-                        37.5,
-                        75,
-                        175,
-                        375,
-                        750,
-                        1750,
-                        3750,
-                        7500,
-                        20000,
-                        45000,
-                        180000,
-                        450000,
-                        1200000,
-                        2700000,
-                        5400000
-                    ]
-                }
-            },
-            "labels": {
-                "connection_security_policy": "mutual_tls",
-                "destination_app": "productpage",
-                "destination_canonical_revision": "v1",
-                "destination_canonical_service": "productpage",
-                "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-productpage",
-                "destination_service": "productpage.default.svc.cluster.local",
-                "destination_service_name": "productpage",
-                "destination_service_namespace": "default",
-                "destination_version": "v1",
-                "destination_workload": "productpage-v1",
-                "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
-                "job": "istio",
-                "reporter": "destination",
-                "request_protocol": "http",
-                "response_code": "200",
-                "response_flags": "-",
-                "source_app": "istio-ingressgateway",
-                "source_canonical_revision": "latest",
-                "source_canonical_service": "istio-ingressgateway",
-                "source_principal": "spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account",
-                "source_version": "unknown",
-                "source_workload": "istio-ingressgateway",
-                "source_workload_namespace": "istio-system"
-            }
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "istio"
-        }
-    },
-    {
-        "event": {
-            "dataset": "istio.proxy",
-            "duration": 115000,
-            "module": "istio"
-        },
-        "metricset": {
-            "name": "proxy",
-            "period": 10000
-        },
-        "prometheus": {
             "istio_build": {
                 "value": 1
             },
             "labels": {
                 "component": "proxy",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "tag": "1.7.1"
             }
@@ -1035,7 +844,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -1083,12 +892,12 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
             "istio_requests_total": {
-                "counter": 1,
+                "counter": 6,
                 "rate": 0
             },
             "istio_response_bytes": {
@@ -1135,23 +944,214 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
+                    ]
+                }
+            },
+            "labels": {
+                "connection_security_policy": "mutual_tls",
+                "destination_app": "productpage",
+                "destination_canonical_revision": "v1",
+                "destination_canonical_service": "productpage",
+                "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-productpage",
+                "destination_service": "productpage.default.svc.cluster.local",
+                "destination_service_name": "productpage",
+                "destination_service_namespace": "default",
+                "destination_version": "v1",
+                "destination_workload": "productpage-v1",
+                "destination_workload_namespace": "default",
+                "instance": "127.0.0.1:49435",
+                "job": "istio",
+                "reporter": "destination",
+                "request_protocol": "http",
+                "response_code": "200",
+                "response_flags": "-",
+                "source_app": "istio-ingressgateway",
+                "source_canonical_revision": "latest",
+                "source_canonical_service": "istio-ingressgateway",
+                "source_principal": "spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account",
+                "source_version": "unknown",
+                "source_workload": "istio-ingressgateway",
+                "source_workload_namespace": "istio-system"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.proxy",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "proxy",
+            "period": 10000
+        },
+        "prometheus": {
+            "istio_request_bytes": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
+                    ]
+                }
+            },
+            "istio_request_duration_milliseconds": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
+                    ]
+                }
+            },
+            "istio_requests_total": {
+                "counter": 3,
+                "rate": 0
+            },
+            "istio_response_bytes": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.25,
+                        0.75,
+                        3,
+                        7.5,
+                        17.5,
+                        37.5,
+                        75,
+                        175,
+                        375,
+                        750,
+                        1750,
+                        3750,
+                        7500,
+                        20000,
+                        45000,
+                        180000,
+                        450000,
+                        1200000,
+                        2700000,
+                        3600000
                     ]
                 }
             },
             "labels": {
                 "connection_security_policy": "unknown",
                 "destination_app": "reviews",
-                "destination_canonical_revision": "v3",
+                "destination_canonical_revision": "v1",
                 "destination_canonical_service": "reviews",
                 "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-reviews",
                 "destination_service": "reviews.default.svc.cluster.local",
                 "destination_service_name": "reviews",
                 "destination_service_namespace": "default",
-                "destination_version": "v3",
-                "destination_workload": "reviews-v3",
+                "destination_version": "v1",
+                "destination_workload": "reviews-v1",
                 "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "reporter": "source",
                 "request_protocol": "http",
@@ -1226,7 +1226,7 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
@@ -1274,12 +1274,12 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
             "istio_requests_total": {
-                "counter": 3,
+                "counter": 1,
                 "rate": 0
             },
             "istio_response_bytes": {
@@ -1326,23 +1326,23 @@
                         450000,
                         1200000,
                         2700000,
-                        5400000
+                        3600000
                     ]
                 }
             },
             "labels": {
                 "connection_security_policy": "unknown",
                 "destination_app": "reviews",
-                "destination_canonical_revision": "v1",
+                "destination_canonical_revision": "v3",
                 "destination_canonical_service": "reviews",
                 "destination_principal": "spiffe://cluster.local/ns/default/sa/bookinfo-reviews",
                 "destination_service": "reviews.default.svc.cluster.local",
                 "destination_service_name": "reviews",
                 "destination_service_namespace": "default",
-                "destination_version": "v1",
-                "destination_workload": "reviews-v1",
+                "destination_version": "v3",
+                "destination_workload": "reviews-v3",
                 "destination_workload_namespace": "default",
-                "instance": "127.0.0.1:49701",
+                "instance": "127.0.0.1:49435",
                 "job": "istio",
                 "reporter": "source",
                 "request_protocol": "http",

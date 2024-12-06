@@ -1,9 +1,9 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "db273ae4a6486d1e52dda314a8d0ce84d9014ce5e0f9c94812119a73d579e2fc",
+        "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
         "image": {
-            "name": "docker.io/kindest/kindnetd:v20221004-44d545d1"
+            "name": "docker.io/library/busybox:latest"
         },
         "runtime": "containerd"
     },
@@ -14,36 +14,21 @@
     },
     "kubernetes": {
         "container": {
-            "cpu": {
-                "limit": {
-                    "cores": 0.1
-                },
-                "request": {
-                    "cores": 0.1
-                }
-            },
-            "id": "db273ae4a6486d1e52dda314a8d0ce84d9014ce5e0f9c94812119a73d579e2fc",
-            "memory": {
-                "limit": {
-                    "bytes": 52428800
-                },
-                "request": {
-                    "bytes": 52428800
-                }
-            },
-            "name": "kindnet-cni",
+            "id": "054b424625a7c22c210e3fe0aae55069d4f3e18ce8bc802a9a96ce87bb7a2483",
+            "name": "hello",
             "status": {
-                "phase": "running",
-                "ready": true,
+                "phase": "terminated",
+                "ready": false,
+                "reason": "Completed",
                 "restarts": 0
             }
         },
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "kindnet-4tnzw"
+            "name": "hello-28564555-zdfjz"
         }
     },
     "metricset": {

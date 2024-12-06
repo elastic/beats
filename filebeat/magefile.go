@@ -119,7 +119,7 @@ func TestPackages() error {
 
 // Update is an alias for executing fields, dashboards, config, includes.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, includeList, fieldDocs,
+	mg.SerialDeps(Fields, Dashboards, Config, GenerateModuleIncludeListGo, fieldDocs,
 		filebeat.CollectDocs,
 		filebeat.PrepareModulePackagingOSS)
 }
@@ -135,10 +135,10 @@ func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, filebeat.OSSConfigFileParams(), ".")
 }
 
-// includeList generates include/list.go with imports for inputs.
-func includeList() error {
+// GenerateModuleIncludeListGo generates include/list.go with imports for inputs.
+func GenerateModuleIncludeListGo() error {
 	options := devtools.DefaultIncludeListOptions()
-	options.ImportDirs = []string{"input/*"}
+	options.ImportDirs = []string{"autodiscover", "autodiscover/**/*", "input", "input/*", "processor/*"}
 	return devtools.GenerateIncludeListGo(options)
 }
 
@@ -205,6 +205,7 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
+	mg.Deps(BuildSystemTestBinary)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 

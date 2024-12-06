@@ -25,15 +25,18 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	k8sclient "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
 )
 
 const (
@@ -115,7 +118,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 		kubernetesAvailable: false,
 	}
 
-	// complete processor's initialisation asynchronously so as to re-try on failing k8s client initialisations in case
+	// complete processor's initialisation asynchronously to re-try on failing k8s client initialisations in case
 	// the k8s node is not yet ready.
 	go processor.init(config, cfg)
 
@@ -123,8 +126,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 }
 
 func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig, error) {
-	config := defaultKubernetesAnnotatorConfig()
-
+	var config kubeAnnotatorConfig
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)
@@ -145,8 +147,17 @@ func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig,
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 	k.initOnce.Do(func() {
-		var replicaSetWatcher, jobWatcher kubernetes.Watcher
+		var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
+		// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+		err := config.AddResourceMetadata.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+		if err != nil {
+			k.log.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+		}
+		err = config.AddResourceMetadata.Node.SetBool("use_kubeadm", -1, config.KubeAdm)
+		if err != nil {
+			k.log.Errorf("couldn't set kubeadm variable for node due to error %+v", err)
+		}
 		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
@@ -187,9 +198,10 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		}
 
 		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Node:        config.Node,
-			Namespace:   config.Namespace,
+			SyncTimeout:  config.SyncPeriod,
+			Node:         config.Node,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
@@ -198,31 +210,50 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		metaConf := config.AddResourceMetadata
 
-		options := kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Node:        config.Node,
-			Namespace:   config.Namespace,
+		if metaConf.Node.Enabled() {
+			nodeWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Node:         config.Node,
+				HonorReSyncs: true,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+			}
 		}
 
-		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
-		if err != nil {
-			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-		}
-		namespaceWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-		}, nil)
-		if err != nil {
-			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		if metaConf.Namespace.Enabled() {
+			namespaceWatcher, err = kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
+			}, nil)
+			if err != nil {
+				k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+			}
 		}
 
-		// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
+		// Resource is Pod, so we need to create watchers for Replicasets and Jobs that it might belong to
 		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 		// Deployment -> Replicaset -> Pod
 		// CronJob -> job -> Pod
 		if metaConf.Deployment {
-			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
-			}, nil)
+			metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+			if err != nil {
+				k.log.Errorf("Error creating metadata client due to error %+v", err)
+			}
+			replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+				"resource_metadata_enricher_rs",
+				client,
+				metadataClient,
+				schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+				kubernetes.WatchOptions{
+					SyncTimeout:  config.SyncPeriod,
+					Namespace:    config.Namespace,
+					HonorReSyncs: true,
+				},
+				nil,
+				metadata.RemoveUnnecessaryReplicaSetData,
+			)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 			}
@@ -230,7 +261,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		}
 		if metaConf.CronJob {
 			jobWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_job", client, &kubernetes.Job{}, kubernetes.WatchOptions{
-				SyncTimeout: config.SyncPeriod,
+				SyncTimeout:  config.SyncPeriod,
+				Namespace:    config.Namespace,
+				HonorReSyncs: true,
 			}, nil)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.Job{}, err)
@@ -249,18 +282,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Adding kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Updating kubernetes pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
-				k.log.Debugf("Removing pod: %s/%s", pod.GetNamespace(), pod.GetName())
+				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(pod)
 			},
 		})
@@ -306,19 +336,17 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 	if kubernetesMetadataExist(event) {
-		k.log.Debug("Skipping add_kubernetes_metadata processor as kubernetes metadata already exist")
 		return event, nil
 	}
+
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
 
-	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
-		k.log.Debugf("Index key %s did not match any of the cached resources", index)
 		return event, nil
 	}
 
@@ -371,7 +399,6 @@ func (k *kubernetesAnnotator) Close() error {
 func (k *kubernetesAnnotator) addPod(pod *kubernetes.Pod) {
 	metadata := k.indexers.GetMetadata(pod)
 	for _, m := range metadata {
-		k.log.Debugf("Created index %s for pod %s/%s", m.Index, pod.GetNamespace(), pod.GetName())
 		k.cache.set(m.Index, m.Data)
 	}
 }
@@ -381,7 +408,6 @@ func (k *kubernetesAnnotator) updatePod(pod *kubernetes.Pod) {
 
 	// Add it again only if it is not being deleted
 	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		k.log.Debugf("Removing kubernetes pod being terminated: %s/%s", pod.GetNamespace(), pod.GetName())
 		return
 	}
 

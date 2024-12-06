@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -38,12 +39,16 @@ type DurationLoggable struct {
 	Mills int64 `json:"ms"`
 }
 
+type NetworkInfo map[string]interface{}
+
 type MonitorRunInfo struct {
-	MonitorID string `json:"id"`
-	Type      string `json:"type"`
-	Duration  int64  `json:"-"`
-	Steps     *int   `json:"steps,omitempty"`
-	Status    string `json:"status"`
+	MonitorID   string      `json:"id"`
+	Type        string      `json:"type"`
+	Duration    int64       `json:"-"`
+	Steps       *int        `json:"steps,omitempty"`
+	Status      string      `json:"status"`
+	Attempt     int         `json:"attempt"`
+	NetworkInfo NetworkInfo `json:"network_info,omitempty"`
 }
 
 func (m *MonitorRunInfo) MarshalJSON() ([]byte, error) {
@@ -78,33 +83,47 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	errors := []error{}
 	monitorID, err := event.GetValue("monitor.id")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.id: %w", err))
 	}
 
 	durationUs, err := event.GetValue("monitor.duration.us")
 	if err != nil {
-		errors = append(errors, err)
+		durationUs = int64(0)
 	}
 
 	monType, err := event.GetValue("monitor.type")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.type: %w", err))
 	}
 
 	status, err := event.GetValue("monitor.status")
 	if err != nil {
-		errors = append(errors, err)
+		errors = append(errors, fmt.Errorf("could not extract monitor.status: %w", err))
+	}
+
+	jsIface, err := event.GetValue("summary")
+	var attempt int
+	if err != nil {
+		errors = append(errors, fmt.Errorf("could not extract summary to add attempt info: %w", err))
+	} else {
+		js, ok := jsIface.(*jobsummary.JobSummary)
+		if ok && js != nil {
+			attempt = int(js.Attempt)
+		}
 	}
 
 	if len(errors) > 0 {
 		return nil, fmt.Errorf("logErrors: %+v", errors)
 	}
 
+	networkInfo := extractNetworkInfo(event, monType.(string))
 	monitor := MonitorRunInfo{
-		MonitorID: monitorID.(string),
-		Type:      monType.(string),
-		Duration:  durationUs.(int64),
-		Status:    status.(string),
+		MonitorID:   monitorID.(string),
+		Type:        monType.(string),
+		Duration:    durationUs.(int64),
+		Status:      status.(string),
+		Attempt:     attempt,
+		NetworkInfo: networkInfo,
 	}
 
 	sc, _ := event.Meta.GetValue(META_STEP_COUNT)
@@ -116,10 +135,33 @@ func extractRunInfo(event *beat.Event) (*MonitorRunInfo, error) {
 	return &monitor, nil
 }
 
+func extractNetworkInfo(event *beat.Event, monitorType string) NetworkInfo {
+	// Only relevant for lightweight monitors
+	if monitorType == "browser" {
+		return nil
+	}
+
+	fields := []string{
+		"resolve.ip", "resolve.rtt.us", "tls.rtt.handshake.us", "icmp.rtt.us",
+		"tcp.rtt.connect.us", "tcp.rtt.validate.us", "http.rtt.content.us", "http.rtt.validate.us",
+		"http.rtt.validate_body.us", "http.rtt.write_request.us", "http.rtt.response_header.us",
+		"http.rtt.total.us", "socks5.rtt.connect.us",
+	}
+	networkInfo := make(NetworkInfo)
+	for _, field := range fields {
+		value, err := event.GetValue(field)
+		if err == nil && value != nil {
+			networkInfo[field] = value
+		}
+	}
+
+	return networkInfo
+}
+
 func LogRun(event *beat.Event) {
 	monitor, err := extractRunInfo(event)
 	if err != nil {
-		getLogger().Errorw("error gathering information to log event: ", err)
+		getLogger().Error(fmt.Errorf("error gathering information to log event: %w", err))
 		return
 	}
 

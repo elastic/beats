@@ -75,7 +75,7 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
-	mg.Deps(Fields)
+	mg.Deps(Fields, devtools.BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	// ES_USER must be admin in order for the Go Integration tests to function because they require
 	// indices:data/read/search

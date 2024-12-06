@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -21,7 +21,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 		title            string
 		ingestDelay      time.Duration
 		samplePeriod     time.Duration
-		collectionPeriod *duration.Duration
+		collectionPeriod *durationpb.Duration
 		inputAligner     string
 		expectedAligner  string
 	}{
@@ -29,7 +29,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"",
@@ -39,7 +39,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod larger than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(300),
 			},
 			"ALIGN_MEAN",
@@ -49,7 +49,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod smaller than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(30),
 			},
 			"ALIGN_MAX",
@@ -59,7 +59,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod with given aligner",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"ALIGN_MEAN",
@@ -76,10 +76,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 }
 
 func TestGetFilterForMetric(t *testing.T) {
-	if err := logp.DevelopmentSetup(logp.ToObserverOutput()); err != nil {
-		t.Fatalf("cannot initialise logger on development mode: %+v", err)
-	}
-
+	logp.DevelopmentSetup(logp.ToObserverOutput())
 	var logger = logp.NewLogger("TestGetFilterForMetric")
 
 	cases := []struct {
@@ -130,6 +127,13 @@ func TestGetFilterForMetric(t *testing.T) {
 			"",
 			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}, logger: logger},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foobar\")",
+		},
+		{
+			"aiplatform service with configured region and zone",
+			"aiplatform",
+			"",
+			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}, logger: logger},
+			"metric.type=\"dummy\" AND resource.label.location = starts_with(\"foo\")",
 		},
 	}
 
@@ -225,6 +229,7 @@ func TestIsAGlobalService(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, false},
 		{"CloudSQL service", gcp.ServiceCloudSQL, false},
 		{"Redis service", gcp.ServiceRedis, false},
+		{"AIPlatform service", gcp.ServiceAIPlatform, false},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
@@ -252,6 +257,7 @@ func TestGetServiceLabelFor(t *testing.T) {
 		{"Dataproc service", gcp.ServiceDataproc, "resource.label.region"},
 		{"CloudSQL service", gcp.ServiceCloudSQL, "resource.labels.region"},
 		{"Redis service", gcp.ServiceRedis, "resource.label.region"},
+		{"AIPlatform service", gcp.ServiceAIPlatform, "resource.label.location"},
 	}
 
 	for _, c := range cases {

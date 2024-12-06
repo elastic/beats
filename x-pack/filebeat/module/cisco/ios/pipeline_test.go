@@ -176,7 +176,7 @@ var testCases = []testCase{
 }
 
 func TestFilebeatSyslogCisco(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},

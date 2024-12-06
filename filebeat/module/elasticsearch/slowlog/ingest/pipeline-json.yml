@@ -10,3 +10,23 @@ processors:
   - pipeline:
       if: 'ctx.message.contains("ecs.version")'
       name: '{< IngestPipeline "pipeline-json-8" >}'
+  - rename:
+      field: auth.type
+      target_field: elasticsearch.slowlog.auth.type
+      ignore_missing: true
+  - rename:
+      field: user.realm
+      target_field: elasticsearch.slowlog.user.realm
+      ignore_missing: true
+  - rename:
+      field: user.effective.realm
+      target_field: elasticsearch.slowlog.user.effective.realm
+      ignore_missing: true
+  - rename:
+      field: apikey.id
+      target_field: elasticsearch.slowlog.user.apikey.id
+      ignore_missing: true
+  - rename:
+      field: apikey.name
+      target_field: elasticsearch.slowlog.user.apikey.name
+      ignore_missing: true

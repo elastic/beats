@@ -18,7 +18,7 @@
 package node
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -71,7 +71,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+nodeStatsPath)
 	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
+		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
 	return eventsMapping(r, info, content, m.XPackEnabled)

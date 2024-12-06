@@ -7,12 +7,11 @@ package v1
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
@@ -92,11 +91,11 @@ func (p *NetflowProtocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows []
 	numFlows, timestamp, metadata, err := p.readHeader(buf, source)
 	if err != nil {
 		p.logger.Printf("Failed parsing packet: %v", err)
-		return nil, errors.Wrap(err, "error reading netflow header")
+		return nil, fmt.Errorf("error reading netflow header: %w", err)
 	}
 	flows, err = p.flowTemplate.Apply(buf, numFlows)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing flows")
+		return nil, fmt.Errorf("error parsing flows: %w", err)
 	}
 	for i := range flows {
 		flows[i].Exporter = metadata

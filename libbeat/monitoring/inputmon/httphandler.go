@@ -64,7 +64,14 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metrics := monitoring.CollectStructSnapshot(h.registry, monitoring.Full, false)
+	filtered := filteredSnapshot(h.registry, requestedType)
+
+	w.Header().Set(contentType, applicationJSON)
+	serveJSON(w, filtered, requestedPretty)
+}
+
+func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
+	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
@@ -84,9 +91,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 
 		filtered = append(filtered, m)
 	}
-
-	w.Header().Set(contentType, applicationJSON)
-	serveJSON(w, filtered, requestedPretty)
+	return filtered
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

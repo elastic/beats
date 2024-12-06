@@ -97,8 +97,8 @@ metrics_one_count_total{name="john",surname="williams"} 2
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
-	openMetricsCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors counter
-metrics_one_count_errors{name="jane",surname="foster"} 1
+	openMetricsCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors_total counter
+metrics_one_count_errors_total{name="jane",surname="foster"} 1
 # TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} NaN
 metrics_one_count_total{name="john",surname="williams"} +Inf
@@ -537,14 +537,12 @@ func TestOpenMetrics(t *testing.T) {
 			msg: "Info metric",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"target_info": Metric("target_info.metric"),
+					"target": Metric("target"),
 				},
 			},
 			expected: []mapstr.M{
 				mapstr.M{
-					"target_info": mapstr.M{
-						"metric": int64(1),
-					},
+					"target": int64(1),
 				},
 			},
 		},
@@ -552,7 +550,7 @@ func TestOpenMetrics(t *testing.T) {
 			msg: "Info metric with labels",
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"target_with_labels_info": Metric("target_with_labels_info.metric"),
+					"target_with_labels": Metric("target_with_labels"),
 				},
 				Labels: map[string]LabelMap{
 					"env":      Label("labels.env"),
@@ -561,9 +559,7 @@ func TestOpenMetrics(t *testing.T) {
 			},
 			expected: []mapstr.M{
 				mapstr.M{
-					"target_with_labels_info": mapstr.M{
-						"metric": int64(1),
-					},
+					"target_with_labels": int64(1),
 					"labels": mapstr.M{
 						"env":      "prod",
 						"hostname": "myhost",
@@ -747,8 +743,8 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 			openmetricsResponse: openMetricsCounterKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
-					"metrics_one_count_errors": Metric("metrics.one.count"),
-					"metrics_one_count_total":  Metric("metrics.one.count"),
+					"metrics_one_count_errors_total": Metric("metrics.one.count"),
+					"metrics_one_count_total":        Metric("metrics.one.count"),
 				},
 				Labels: map[string]LabelMap{
 					"name":    KeyLabel("metrics.one.labels.name"),

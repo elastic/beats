@@ -12,294 +12,552 @@
         - name: apm-server
           type: group
           fields:
+            - name: acm
+              type: group
+              fields:
+                - name: request.count
+                  type: alias
+                  path: beat.stats.apm_server.acm.request.count
+                - name: response
+                  type: group
+                  fields:
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.acm.response.count
+                    - name: errors
+                      type: group
+                      fields:
+                        - name: closed
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.closed
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.count
+                        - name: decode
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.decode
+                        - name: forbidden
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.forbidden
+                        - name: internal
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.internal
+                        - name: invalidquery
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.invalidquery
+                        - name: method
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.method
+                        - name: notfound
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.notfound
+                        - name: queue
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.queue
+                        - name: ratelimit
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.ratelimit
+                        - name: timeout
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.timeout
+                        - name: toolarge
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.toolarge
+                        - name: unauthorized
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.unauthorized
+                        - name: unavailable
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.unavailable
+                        - name: validate
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.errors.validate
+                    - name: valid
+                      type: group
+                      fields:
+                        - name: accepted
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.valid.accepted
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.valid.count
+                        - name: notmodified
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.valid.notmodified
+                        - name: ok
+                          type: alias
+                          path: beat.stats.apm_server.acm.response.valid.ok
+                - name: unset
+                  type: alias
+                  path: beat.stats.apm_server.acm.unset
+            - name: agentcfg
+              type: group
+              fields:
+                - name: elasticsearch
+                  type: group
+                  fields:
+                    - name: cache.entries.count
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count
+                    - name: cache.refresh.failures
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.failures
+                    - name: cache.refresh.successes
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.cache.refresh.successes
+                    - name: fetch.es
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.fetch.es
+                    - name: fetch.fallback
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.fetch.fallback
+                    - name: fetch.invalid
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid
+                    - name: fetch.unavailable
+                      type: alias
+                      path: beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable
+            - name: jaeger
+              type: group
+              fields:
+                - name: grpc
+                  type: group
+                  fields:
+                    - name: collect
+                      type: group
+                      fields:
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.jaeger.grpc.collect.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.jaeger.grpc.collect.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.jaeger.grpc.collect.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.jaeger.grpc.collect.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.jaeger.grpc.collect.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.jaeger.grpc.collect.response.valid.count
+                    - name: sampling
+                      type: group
+                      fields:
+                        - name: event.received.count
+                          type: alias
+                          path: beat.stats.apm_server.jaeger.grpc.sampling.event.received.count
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.jaeger.grpc.sampling.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.jaeger.grpc.sampling.response.count
+                            - name: errors.count
+                              type: alias
+                              path: beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count
+            - name: otlp
+              type: group
+              fields:
+                - name: grpc
+                  type: group
+                  fields:
+                    - name: logs
+                      type: group
+                      fields:
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.grpc.logs.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.logs.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.logs.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.logs.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.logs.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.logs.response.valid.count
+                    - name: metrics
+                      type: group
+                      fields:
+                        - name: consumer.unsupported_dropped
+                          type: alias
+                          path: beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.grpc.metrics.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.metrics.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.metrics.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.metrics.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.metrics.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.metrics.response.valid.count
+                    - name: traces
+                      type: group
+                      fields:
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.grpc.traces.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.traces.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.traces.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.traces.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.traces.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.grpc.traces.response.valid.count
+                - name: http
+                  type: group
+                  fields:
+                    - name: logs
+                      type: group
+                      fields:
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.http.logs.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.logs.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.logs.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.logs.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.logs.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.logs.response.valid.count
+                    - name: metrics
+                      type: group
+                      fields:
+                        - name: consumer.unsupported_dropped
+                          type: alias
+                          path: beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.http.metrics.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.metrics.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.metrics.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.metrics.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.metrics.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.metrics.response.valid.count
+                    - name: traces
+                      type: group
+                      fields:
+                        - name: request.count
+                          type: alias
+                          path: beat.stats.apm_server.otlp.http.traces.request.count
+                        - name: response
+                          type: group
+                          fields:
+                            - name: count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.traces.response.count
+                            - name: errors
+                              type: group
+                              fields:
+                                - name: count
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.traces.response.errors.count
+                                - name: ratelimit
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.traces.response.errors.ratelimit
+                                - name: timeout
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.traces.response.errors.timeout
+                                - name: unauthorized
+                                  type: alias
+                                  path: beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized
+                            - name: valid.count
+                              type: alias
+                              path: beat.stats.apm_server.otlp.http.traces.response.valid.count
             - name: processor
               type: group
               fields:
+                - name: error.transformations
+                  type: alias
+                  path: beat.stats.apm_server.processor.error.transformations
+                - name: metric.transformations
+                  type: alias
+                  path: beat.stats.apm_server.processor.metric.transformations
                 - name: span.transformations
                   type: alias
                   path: beat.stats.apm_server.processor.span.transformations
-                - name: error
+                - name: stream
                   type: group
                   fields:
-                    - name: spans
+                    - name: accepted
                       type: alias
-                      path: beat.stats.apm_server.processor.error.spans
-                    - name: stacktraces
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.stacktraces
-                    - name: frames
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.frames
-                    - name: transformations
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.transformations
-                    - name: decoding.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.decoding.errors
-                    - name: decoding.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.decoding.count
-                    - name: validation.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.validation.errors
-                    - name: validation.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.error.validation.count
-                - name: transaction
-                  type: group
-                  fields:
-                    - name: spans
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.spans
-                    - name: stacktraces
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.stacktraces
-                    - name: frames
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.frames
-                    - name: transactions
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.transactions
-                    - name: transformations
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.transformations
-                    - name: decoding.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.decoding.errors
-                    - name: decoding.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.decoding.count
-                    - name: validation.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.validation.errors
-                    - name: validation.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.transaction.validation.count
-                - name: sourcemap
-                  type: group
-                  fields:
-                    - name: counter
-                      type: alias
-                      path: beat.stats.apm_server.processor.sourcemap.counter
-                    - name: decoding.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.sourcemap.decoding.errors
-                    - name: decoding.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.sourcemap.decoding.count
-                    - name: validation.errors
-                      type: alias
-                      path: beat.stats.apm_server.processor.sourcemap.validation.errors
-                    - name: validation.count
-                      type: alias
-                      path: beat.stats.apm_server.processor.sourcemap.validation.count
-                - name: metric
-                  type: group
-                  fields:
-                    - name: transformations
-                      type: alias
-                      path: beat.stats.apm_server.processor.metric.transformations
-                    - name: decoding
+                      path: beat.stats.apm_server.processor.stream.accepted
+                    - name: errors
                       type: group
                       fields:
-                        - name: errors
+                        - name: invalid
                           type: alias
-                          path: beat.stats.apm_server.processor.metric.decoding.errors
-                        - name: count
+                          path: beat.stats.apm_server.processor.stream.errors.invalid
+                        - name: toolarge
                           type: alias
-                          path: beat.stats.apm_server.processor.metric.decoding.count
-                    - name: validation
-                      type: group
-                      fields:
-                        - name: errors
-                          type: alias
-                          path: beat.stats.apm_server.processor.metric.validation.errors
-                        - name: count
-                          type: alias
-                          path: beat.stats.apm_server.processor.metric.validation.count
-            - name: decoder
+                          path: beat.stats.apm_server.processor.stream.errors.toolarge
+                - name: transaction.transformations
+                  type: alias
+                  path: beat.stats.apm_server.processor.transaction.transformations
+            - name: root
               type: group
               fields:
-                - name: deflate
-                  type: group
-                  fields:
-                    - name: content-length
-                      type: alias
-                      path: beat.stats.apm_server.decoder.deflate.content-length
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.decoder.deflate.count
-                - name: gzip
-                  type: group
-                  fields:
-                    - name: content-length
-                      type: alias
-                      path: beat.stats.apm_server.decoder.gzip.content-length
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.decoder.gzip.count
-                - name: uncompressed
-                  type: group
-                  fields:
-                    - name: content-length
-                      type: alias
-                      path: beat.stats.apm_server.decoder.uncompressed.content-length
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.decoder.uncompressed.count
-                - name: reader
-                  type: group
-                  fields:
-                    - name: size
-                      type: alias
-                      path: beat.stats.apm_server.decoder.reader.size
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.decoder.reader.count
-                - name: missing-content-length.count
+                - name: request.count
                   type: alias
-                  path: beat.stats.apm_server.decoder.missing-content-length.count
+                  path: beat.stats.apm_server.root.request.count
+                - name: response
+                  type: group
+                  fields:
+                    - name: count
+                      type: alias
+                      path: beat.stats.apm_server.root.response.count
+                    - name: errors
+                      type: group
+                      fields:
+                        - name: closed
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.closed
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.count
+                        - name: decode
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.decode
+                        - name: forbidden
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.forbidden
+                        - name: internal
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.internal
+                        - name: invalidquery
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.invalidquery
+                        - name: method
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.method
+                        - name: notfound
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.notfound
+                        - name: queue
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.queue
+                        - name: ratelimit
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.ratelimit
+                        - name: timeout
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.timeout
+                        - name: toolarge
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.toolarge
+                        - name: unauthorized
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.unauthorized
+                        - name: unavailable
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.unavailable
+                        - name: validate
+                          type: alias
+                          path: beat.stats.apm_server.root.response.errors.validate
+                    - name: valid
+                      type: group
+                      fields:
+                        - name: accepted
+                          type: alias
+                          path: beat.stats.apm_server.root.response.valid.accepted
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.root.response.valid.count
+                        - name: notmodified
+                          type: alias
+                          path: beat.stats.apm_server.root.response.valid.notmodified
+                        - name: ok
+                          type: alias
+                          path: beat.stats.apm_server.root.response.valid.ok
+                - name: unset
+                  type: alias
+                  path: beat.stats.apm_server.root.unset
+            - name: sampling.transactions_dropped
+              type: alias
+              path: beat.stats.apm_server.sampling.transactions_dropped
             - name: server
               type: group
               fields:
                 - name: request.count
                   type: alias
                   path: beat.stats.apm_server.server.request.count
-                - name: concurrent.wait.ms
-                  type: alias
-                  path: beat.stats.apm_server.server.concurrent.wait.ms
                 - name: response
                   type: group
                   fields:
                     - name: count
                       type: alias
                       path: beat.stats.apm_server.server.response.count
+                    - name: errors
+                      type: group
+                      fields:
+                        - name: closed
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.closed
+                        - name: count
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.count
+                        - name: decode
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.decode
+                        - name: forbidden
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.forbidden
+                        - name: internal
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.internal
+                        - name: invalidquery
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.invalidquery
+                        - name: method
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.method
+                        - name: notfound
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.notfound
+                        - name: queue
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.queue
+                        - name: ratelimit
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.ratelimit
+                        - name: timeout
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.timeout
+                        - name: toolarge
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.toolarge
+                        - name: unauthorized
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.unauthorized
+                        - name: unavailable
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.unavailable
+                        - name: validate
+                          type: alias
+                          path: beat.stats.apm_server.server.response.errors.validate
                     - name: valid
                       type: group
                       fields:
-                        - name: ok
-                          type: alias
-                          path: beat.stats.apm_server.server.response.valid.ok
                         - name: accepted
                           type: alias
                           path: beat.stats.apm_server.server.response.valid.accepted
                         - name: count
                           type: alias
                           path: beat.stats.apm_server.server.response.valid.count
-                    - name: errors
-                      type: group
-                      fields:
-                        - name: count
+                        - name: notmodified
                           type: alias
-                          path: beat.stats.apm_server.server.response.errors.count
-                        - name: toolarge
+                          path: beat.stats.apm_server.server.response.valid.notmodified
+                        - name: ok
                           type: alias
-                          path: beat.stats.apm_server.server.response.errors.toolarge
-                        - name: validate
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.validate
-                        - name: ratelimit
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.ratelimit
-                        - name: queue
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.queue
-                        - name: closed
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.closed
-                        - name: forbidden
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.forbidden
-                        - name: concurrency
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.concurrency
-                        - name: unauthorized
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.unauthorized
-                        - name: internal
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.internal
-                        - name: decode
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.decode
-                        - name: method
-                          type: alias
-                          path: beat.stats.apm_server.server.response.errors.method
-            - name: acm.request.count
-              type: alias
-              path: beat.stats.apm_server.acm.request.count
-            - name: acm.response
-              type: group
-              fields:
-                - name: request.count
-                  type: alias
-                  path: beat.stats.apm_server.acm.response.request.count
+                          path: beat.stats.apm_server.server.response.valid.ok
                 - name: unset
                   type: alias
-                  path: beat.stats.apm_server.acm.response.unset
-                - name: count
-                  type: alias
-                  path: beat.stats.apm_server.acm.response.count
-                - name: valid
-                  type: group
-                  fields:
-                    - name: notmodified
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.valid.notmodified
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.valid.count
-                    - name: ok
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.valid.ok
-                    - name: accepted
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.valid.accepted
-                - name: errors
-                  type: group
-                  fields:
-                    - name: validate
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.validate
-                    - name: internal
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.internal
-                    - name: queue
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.queue
-                    - name: count
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.count
-                    - name: decode
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.decode
-                    - name: toolarge
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.toolarge
-                    - name: unavailable
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.unavailable
-                    - name: forbidden
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.forbidden
-                    - name: method
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.method
-                    - name: notfound
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.notfound
-                    - name: invalidquery
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.invalidquery
-                    - name: ratelimit
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.ratelimit
-                    - name: closed
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.closed
-                    - name: unauthorized
-                      type: alias
-                      path: beat.stats.apm_server.acm.response.errors.unauthorized
+                  path: beat.stats.apm_server.server.unset
         - name: beat
           type: group
           fields:
@@ -544,6 +802,33 @@
                       type: alias
                       path: beat.stats.cpu.user.time.ms
 
+        - name: output
+          type: group
+          fields:
+            - name: elasticsearch
+              type: group
+              fields:
+                - name: bulk_requests
+                  type: group
+                  fields:
+                    - name: available
+                      type: alias
+                      path: beat.stats.output.elasticsearch.bulk_requests.available
+                    - name: completed
+                      type: alias
+                      path: beat.stats.output.elasticsearch.bulk_requests.completed
+                - name: indexers
+                  type: group
+                  fields:
+                    - name: active
+                      type: alias
+                      path: beat.stats.output.elasticsearch.indexers.active
+                    - name: created
+                      type: alias
+                      path: beat.stats.output.elasticsearch.indexers.created
+                    - name: destroyed
+                      type: alias
+                      path: beat.stats.output.elasticsearch.indexers.destroyed
     - name: beats_state
       type: group
       fields:

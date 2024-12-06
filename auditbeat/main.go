@@ -19,11 +19,9 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/auditbeat/cmd"
-
-	// Register includes.
-	_ "github.com/elastic/beats/v7/auditbeat/include"
 )
 
 func main() {

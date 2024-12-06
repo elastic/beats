@@ -97,7 +97,7 @@ func newDNS(store *eventStore, verbose bool) *dnsPlugin {
 	if verbose {
 		level = logp.DebugLevel
 	}
-	_ = logp.DevelopmentSetup(
+	logp.DevelopmentSetup(
 		logp.WithLevel(level),
 		logp.WithSelectors("dns"),
 	)

@@ -28,11 +28,12 @@ import (
 )
 
 func TestPublisherMetadataStore(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Not needed.
+	logp.TestingSetup()
 
 	s, err := NewPublisherMetadataStore(
 		NilHandle,
 		"Microsoft-Windows-Security-Auditing",
+		0,
 		logp.NewLogger("metadata"))
 	if err != nil {
 		t.Fatal(err)

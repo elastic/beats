@@ -57,7 +57,7 @@ func TestTLSSANIPConnection(t *testing.T) {
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "ssl", ip, port),
 		)),
 		event.Fields,
@@ -77,7 +77,7 @@ func TestTLSHostname(t *testing.T) {
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
-			hbtest.SummaryChecks(1, 0),
+			hbtest.SummaryStateChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "ssl", hostname, port),
 			hbtest.ResolveChecks(ip),
 		)),
@@ -103,7 +103,7 @@ func TestTLSInvalidCert(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", mismatchedHostname, port),
 			hbtest.ResolveChecks(ip),
 			lookslike.MustCompile(map[string]interface{}{
@@ -137,7 +137,7 @@ func TestTLSExpiredCert(t *testing.T) {
 		lookslike.Strict(lookslike.Compose(
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "down", "tcp"),
-			hbtest.SummaryChecks(0, 1),
+			hbtest.SummaryStateChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "ssl", host, port),
 			hbtest.ResolveChecks(ip),
 			hbtest.ExpiredCertChecks(cert),

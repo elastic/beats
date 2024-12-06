@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var canInstallNpcapTests = []struct {
@@ -210,10 +211,9 @@ func TestCanInstallNpcap(t *testing.T) {
 				t.Fatalf("unexpected error: %v", err)
 			}
 			b := &beat.Beat{
-				BeatConfig: cfg,
-				Manager:    boolManager{managed: test.managed},
+				Manager: boolManager{managed: test.managed},
 			}
-			got, err := canInstallNpcap(b)
+			got, err := canInstallNpcap(b, cfg, logp.NewLogger("npcap_install_test"))
 			if err != nil {
 				t.Errorf("unexpected error from canInstallNpcap: %v", err)
 			}

@@ -96,7 +96,8 @@ func Test_runPublishJob(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			pipel := &MockPipeline{}
-			client := pipel.ConnectSync()
+			client, err := pipel.Connect()
+			require.NoError(t, err)
 			queue := runPublishJob(tc.job, client)
 			for {
 				if len(queue) == 0 {
@@ -107,8 +108,7 @@ func Test_runPublishJob(t *testing.T) {
 				conts := tf(context.Background())
 				queue = append(queue, conts...)
 			}
-			client.Wait()
-			err := client.Close()
+			err = client.Close()
 			require.NoError(t, err)
 
 			require.Len(t, pipel.PublishedEvents(), len(tc.validators))

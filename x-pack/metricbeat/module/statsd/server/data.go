@@ -33,7 +33,15 @@ type statsdMetric struct {
 
 func splitTags(rawTags, kvSep []byte) map[string]string {
 	tags := map[string]string{}
-	for _, kv := range bytes.Split(rawTags, []byte(",")) {
+	var tagSplit [][]byte
+
+	if bytes.Contains(rawTags, []byte(",")) {
+		tagSplit = bytes.Split(rawTags, []byte(","))
+	} else {
+		tagSplit = bytes.Split(rawTags, []byte(";"))
+	}
+
+	for _, kv := range tagSplit {
 		kvSplit := bytes.SplitN(kv, kvSep, 2)
 		if len(kvSplit) != 2 {
 			logger.Warn("could not parse tags")
@@ -47,6 +55,7 @@ func splitTags(rawTags, kvSep []byte) map[string]string {
 func parseSingle(b []byte) (statsdMetric, error) {
 	// format: <metric name>:<value>|<type>[|@samplerate][|#<k>:<v>,<k>:<v>]
 	// alternative: <metric name>[,<k>=<v>,<k>=<v>]:<value>|<type>[|@samplerate]
+	// alternative: <metric name>[;<k>=<v>;<k>=<v>]:<value>|<type>[|@samplerate]
 	s := statsdMetric{}
 
 	parts := bytes.SplitN(b, []byte("|"), 4)
@@ -73,7 +82,15 @@ func parseSingle(b []byte) (statsdMetric, error) {
 		return s, errInvalidPacket
 	}
 
-	nameTagsSplit := bytes.SplitN(nameSplit[0], []byte(","), 2)
+	// Metric tags could be separated by `,` or `;`
+	// We split here based on the separator
+	var nameTagsSplit [][]byte
+	if bytes.Contains(nameSplit[0], []byte(",")) {
+		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(","), 2)
+	} else {
+		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(";"), 2)
+	}
+
 	s.name = string(nameTagsSplit[0])
 	if len(nameTagsSplit) > 1 {
 		s.tags = splitTags(nameTagsSplit[1], []byte("="))
@@ -102,18 +119,18 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, metricSetFields mapstr.M, mappings map[string]StatsdMapping) {
+func eventMapping(metricName string, metricValue interface{}, mappings map[string]StatsdMapping) mapstr.M {
+	m := mapstr.M{}
 	if len(mappings) == 0 {
-		metricSetFields[common.DeDot(metricName)] = metricValue
-		return
+		m[common.DeDot(metricName)] = metricValue
+		return m
 	}
 
 	for _, mapping := range mappings {
 		// The metricname match the one with no labels in mappings
-		// Let's insert it dedotted and continue
 		if metricName == mapping.Metric {
-			metricSetFields[mapping.Value.Field] = metricValue
-			return
+			m[mapping.Value.Field] = metricValue
+			return m
 		}
 
 		res := mapping.regex.FindStringSubmatch(metricName)
@@ -121,7 +138,7 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 		// Not all labels match
 		// Skip and continue to next mapping
 		if len(res) != (len(mapping.Labels) + 1) {
-			logger.Debug("not all labels match in statsd.mapping, skipped")
+			logger.Debug("not all labels match in statsd.mappings, skipped")
 			continue
 		}
 
@@ -133,13 +150,15 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 					continue
 				}
 
-				metricSetFields[label.Field] = res[i]
+				m[label.Field] = res[i]
 			}
 		}
 
 		// Let's add the metric with the value field
-		metricSetFields[mapping.Value.Field] = metricValue
+		m[mapping.Value.Field] = metricValue
+		break
 	}
+	return m
 }
 
 func newMetricProcessor(ttl time.Duration) *metricProcessor {

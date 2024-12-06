@@ -262,7 +262,7 @@ Configure escaping of HTML in strings. Set to `true` to enable escaping.
 
 The default value is `false`.
 
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers per configured host publishing events to {ls}. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
@@ -286,7 +286,7 @@ list of configured hosts over time, use this option in conjunction with the
 `ttl` setting to close the connection at the configured interval and choose
 a new target host.
 
-The default value is `true`.
+The default value is `false`.
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -381,9 +381,8 @@ endif::[]
 
 The maximum number of events to bulk in a single {ls} request. The default is 2048.
 
-If the Beat sends single events, the events are collected into batches. If the Beat publishes
-a large batch of events (larger than the value specified by `bulk_max_size`), the batch is
-split.
+Events can be collected into batches. {beatname_uc} will split batches read from the queue which are
+larger than `bulk_max_size` into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in

@@ -7,6 +7,7 @@ package pipereader
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"syscall"
@@ -14,7 +15,6 @@ import (
 	"github.com/containerd/fifo"
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
-	"github.com/pkg/errors"
 )
 
 // PipeReader reads from the FIFO pipe we get from the docker container
@@ -30,7 +30,7 @@ type PipeReader struct {
 func NewReaderFromPath(file string) (*PipeReader, error) {
 	inputFile, err := fifo.OpenFifo(context.Background(), file, syscall.O_RDONLY, 0700)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
+		return nil, fmt.Errorf("error opening logger fifo: %q: %w", file, err)
 	}
 
 	return &PipeReader{fifoPipe: inputFile, byteOrder: binary.BigEndian, lenFrameBuf: make([]byte, 4), bodyBuf: nil, maxSize: 2e6}, nil
@@ -63,7 +63,7 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 		// 2) we have a too-large message. Disregard length bytes
 		_, err = io.CopyBuffer(ioutil.Discard, io.LimitReader(reader.fifoPipe, int64(lenFrame)), reader.bodyBuf)
 		if err != nil {
-			return errors.Wrap(err, "error emptying buffer")
+			return fmt.Errorf("error emptying buffer: %w", err)
 		}
 	}
 
@@ -71,7 +71,7 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 	readBuf := reader.setBuffer(lenFrame)
 	_, err = io.ReadFull(reader.fifoPipe, readBuf[:lenFrame])
 	if err != nil {
-		return errors.Wrap(err, "error reading buffer")
+		return fmt.Errorf("error reading buffer: %w", err)
 	}
 	return proto.Unmarshal(readBuf[:lenFrame], log)
 

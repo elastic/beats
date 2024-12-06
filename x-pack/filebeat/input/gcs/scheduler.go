@@ -6,7 +6,10 @@ package gcs
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -33,12 +36,17 @@ type scheduler struct {
 	state     *state
 	log       *logp.Logger
 	limiter   *limiter
+	metrics   *inputMetrics
 }
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
-	state *state, log *logp.Logger,
+	state *state, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
+	if metrics == nil {
+		// metrics are optional, initialize a stub if not provided
+		metrics = newInputMetrics("", nil)
+	}
 	return &scheduler{
 		publisher: publisher,
 		bucket:    bucket,
@@ -47,6 +55,7 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		state:     state,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
+		metrics:   metrics,
 	}
 }
 
@@ -93,11 +102,13 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
+			s.metrics.errorsTotal.Inc()
 			return err
 		}
 		numObs += len(objects)
 		jobs := s.createJobs(objects, s.log)
 		s.log.Debugf("scheduler: %d objects fetched for current batch", len(objects))
+		s.metrics.gcsObjectsListedTotal.Add(uint64(len(objects)))
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
@@ -107,6 +118,7 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			}
 		}
 		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
+		s.metrics.gcsJobsScheduledAfterValidation.Update(int64(len(jobs)))
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
@@ -141,9 +153,17 @@ func fetchJobID(workerId int, bucketName string, objectName string) string {
 }
 
 func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger) []*job {
+	//nolint:prealloc // No need to preallocate the slice
 	var jobs []*job
-
 	for _, obj := range objects {
+		// if file selectors are present, then only select the files that match the regex
+		if len(s.src.FileSelectors) != 0 && !s.isFileSelected(obj.Name) {
+			continue
+		}
+		// date filter is applied on last updated time of the object
+		if s.src.TimeStampEpoch != nil && obj.Updated.Unix() < *s.src.TimeStampEpoch {
+			continue
+		}
 		// check required to ignore directories & sub folders, since there is no inbuilt option to
 		// do so. In gcs all the directories are emulated and represented by a prefix, we can
 		// define specific prefix's & delimiters to ignore known directories but there is no generic
@@ -154,7 +174,7 @@ func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger)
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, log, false)
+		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -173,49 +193,23 @@ func (s *scheduler) fetchObjectPager(ctx context.Context, pageSize int) *iterato
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	var latestJobs []*job
-	jobsToReturn := make([]*job, 0)
-	counter := 0
-	flag := false
-	ignore := false
+	cp := s.state.checkpoint()
+	jobs = slices.DeleteFunc(jobs, func(j *job) bool {
+		return !(j.Timestamp().After(cp.LatestEntryTime) || j.Name() > cp.ObjectName)
+	})
 
-	for _, job := range jobs {
-		switch offset, isPartial := s.state.cp.LastProcessedOffset[job.object.Name]; {
-		case isPartial:
-			job.offset = offset
-			latestJobs = append(latestJobs, job)
-		case job.Timestamp().After(s.state.checkpoint().LatestEntryTime):
-			latestJobs = append(latestJobs, job)
-		case job.Name() == s.state.checkpoint().ObjectName:
-			flag = true
-		case job.Name() > s.state.checkpoint().ObjectName:
-			flag = true
-			counter--
-		case job.Name() <= s.state.checkpoint().ObjectName && (!ignore):
-			ignore = true
-		}
-		counter++
-	}
-
-	if flag && (counter < len(jobs)-1) {
-		jobsToReturn = jobs[counter+1:]
-	} else if !flag && !ignore {
-		jobsToReturn = jobs
-	}
-
-	// in a senario where there are some jobs which have a later time stamp
+	// In a scenario where there are some jobs which have a greater timestamp
 	// but lesser lexicographic order and some jobs have greater lexicographic order
-	// than the current checkpoint or if partially completed jobs are present
-	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
-		jobsToReturn = append(latestJobs, jobsToReturn...)
-	}
-
-	return jobsToReturn
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint
+	// timestamp.
+	sort.SliceStable(jobs, func(i, _ int) bool {
+		return jobs[i].Timestamp().After(cp.LatestEntryTime)
+	})
+	return jobs
 }
 
 func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 	jobMap := make(map[string]bool)
-
 	for _, j := range jobs {
 		jobMap[j.Name()] = true
 	}
@@ -227,15 +221,34 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 		if !jobMap[name] {
 			obj, err := s.bucket.Object(name).Attrs(ctx)
 			if err != nil {
-				s.log.Errorf("adding failed job %s to job list caused an error: %w", err)
+				if errors.Is(err, storage.ErrObjectNotExist) {
+					// if the object is not found in the bucket, then remove it from the failed job list
+					s.state.deleteFailedJob(name, s.metrics)
+					s.log.Debugf("scheduler: failed job %s not found in bucket %s", name, s.src.BucketName)
+				} else {
+					// if there is an error while validating the object,
+					// then update the failed job retry count and work towards natural removal
+					s.state.updateFailedJobs(name, s.metrics)
+					s.log.Errorf("scheduler: adding failed job %s to job list caused an error: %v", name, err)
+				}
+				continue
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.log, true)
+			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, s.log, true)
 			jobs = append(jobs, job)
 			s.log.Debugf("scheduler: adding failed job number %d with name %s to job current list", fj, job.Name())
 			fj++
 		}
 	}
 	return jobs
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex.MatchString(name) {
+			return true
+		}
+	}
+	return false
 }

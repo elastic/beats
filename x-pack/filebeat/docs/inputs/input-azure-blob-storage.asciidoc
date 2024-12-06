@@ -9,8 +9,6 @@
 <titleabbrev>Azure Blob Storage</titleabbrev>
 ++++
 
-Beta[Input]
-
 Use the `azure blob storage input` to read content from files stored in containers which reside on your Azure Cloud.
 The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
 perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
@@ -28,8 +26,8 @@ even though it can get expensive with dealing with a very large number of files.
     describing said error.
 
 [id="supported-types"]
-NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
-As for authentication types, we currently have support for `shared access keys` and `connection strings`.
+NOTE: `JSON`, `NDJSON` and `CSV` are supported blob/file formats. Blobs/files may be also be gzip compressed.
+`shared access keys`, `connection strings` and `Microsoft Entra ID RBAC` authentication types are supported.
 
 [id="basic-config"]
 *A sample configuration with detailed explanation for each field is given below :-*
@@ -130,14 +128,18 @@ Now let's explore the configuration attributes a bit more elaborately.
 *Supported Attributes :-*
 
     1. <<attrib-account-name,account_name>>
-    2. <<attrib-auth-shared-account-key,auth.shared_credentials.account_key>>
-    3. <<attrib-auth-connection-string,auth.connection_string.uri>>
-    4. <<attrib-storage-url,storage_url>>
-    5. <<attrib-containers,containers>>
-    6. <<attrib-container-name,name>>
-    7. <<attrib-max_workers,max_workers>>
-    8. <<attrib-poll,poll>>
-    9. <<attrib-poll_interval,poll_interval>>
+    2. <<attrib-auth-oauth2,auth.oauth2>>
+    3. <<attrib-auth-shared-account-key,auth.shared_credentials.account_key>>
+    4. <<attrib-auth-connection-string,auth.connection_string.uri>>
+    5. <<attrib-storage-url,storage_url>>
+    6. <<attrib-containers,containers>>
+    7. <<attrib-container-name,name>>
+    8. <<attrib-max_workers,max_workers>>
+    9. <<attrib-poll,poll>>
+   10. <<attrib-poll_interval,poll_interval>>
+   11. <<attrib-file_selectors,file_selectors>>
+   12. <<attrib-expand_event_list_from_field,expand_event_list_from_field>>
+   13. <<attrib-timestamp_epoch,timestamp_epoch>>
 
 
 [id="attrib-account-name"]
@@ -146,6 +148,37 @@ Now let's explore the configuration attributes a bit more elaborately.
 
 This attribute is required for various internal operations with respect to authentication, creating service clients and blob clients which are used internally
 for various processing purposes.
+
+[id="attrib-auth-oauth2"]
+[float]
+==== `auth.oauth2`
+
+This attribute contains the Microsoft Entra ID RBAC authentication credentials for a secure connection to the Azure Blob Storage. The `auth.oauth2` attribute contains the following sub-attributes:
+
+    1. `client_id`: The client ID of the Azure Entra ID application.
+    2. `client_secret`: The client secret of the Azure Entra ID application.
+    3. `tenant_id`: The tenant ID of the Azure Entra ID application.
+
+A sample configuration with `auth.oauth2` is given below:
+
+["source","yaml"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  account_name: some_account
+  auth.oauth2:
+    client_id: "some_client_id"
+    client_secret: "some_client_secret"
+    tenant_id: "some_tenant_id"
+  containers:
+  - name: container_1
+    max_workers: 3
+    poll: true
+    poll_interval: 10s
+----
+How to setup the `auth.oauth2` credentials can be found in the Azure documentation https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app[here]
+
+NOTE: According to our internal testing it seems that we require at least an access level of **blobOwner** for the service principle to be able to read the blobs. If you are facing any issues with the access level, ensure that the access level is set to **blobOwner**.
 
 [id="attrib-auth-shared-account-key"]
 [float]
@@ -191,10 +224,14 @@ This is a specific subfield of a container. It specifies the container name.
 [float]
 ==== `max_workers`
 
-This attribute defines the maximum number of workers (go routines / lightweight threads) are allocated in the worker pool (thread pool) for processing jobs 
-which read contents of file. More number of workers equals a greater amount of concurrency achieved. There is an upper cap of `5000` workers per container that 
-can be defined due to internal sdk constraints. This attribute can be specified both at the root level of the configuration as well at the container level. 
-The container level values will always take priority and override the root level values if both are specified.
+This attribute defines the maximum number of workers allocated to the worker pool for processing jobs which read file contents. It can be specified both at the root level of the configuration, and at the container level. Container level values override root level values if both are specified. Larger number of workers do not necessarily improve throughput, and this should be carefully tuned based on the number of files, the size of the files being processed and resources available. Increasing `max_workers` to very high values may cause resource utilization problems and may lead to bottlenecks in processing. Usually a maximum of `2000` workers is recommended. A very low `max_worker` count will drastically increase the number of network calls required to fetch the blobs, which may cause a bottleneck in processing.
+
+The batch size for workload distribution is calculated by the input to ensure that there is an even workload across all workers. This means that for a given `max_workers` parameter value, the input will calculate the optimal batch size for that setting. The `max_workers` value should be configured based on factors such as the total number of files to be processed, available system resources and network bandwidth.
+
+Example:
+
+- Setting `max_workers=3` would result in each request fetching `3 blobs` (batch size = 3), which are then distributed among `3 workers`.
+- Setting `max_workers=100` would fetch `100 blobs` (batch size = 100) per request, distributed among `100 workers`.
 
 [id="attrib-poll"]
 [float]
@@ -214,6 +251,147 @@ Example : `10s` would mean we would like the polling to occur every 10 seconds. 
 This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always 
 take priority and override the root level values if both are specified.
 
+[id="input-{type}-encoding"]
+[float]
+==== `encoding`
+
+The file encoding to use for reading data that contains international
+characters. This only applies to non-JSON logs. See <<_encoding_3>>.
+
+[id="input-{type}-decoding"]
+[float]
+==== `decoding`
+
+The file decoding option is used to specify a codec that will be used to
+decode the file contents. This can apply to any file stream data.
+An example config is shown below:
+
+Currently supported codecs are given below:-
+
+    1. <<attrib-decoding-csv-azureblobstorage,CSV>>: This codec decodes RFC 4180 CSV data streams.
+
+[id="attrib-decoding-csv-azureblobstorage"]
+[float]
+==== `the CSV codec`
+The `CSV` codec is used to decode RFC 4180 CSV data streams.
+Enabling the codec without other options will use the default codec options.
+
+[source,yaml]
+----
+  decoding.codec.csv.enabled: true
+----
+
+The CSV codec supports five sub attributes to control aspects of CSV decoding.
+The `comma` attribute specifies the field separator character used by the CSV
+format. If it is not specified, the comma character '`,`' is used. The `comment`
+attribute specifies the character that should be interpreted as a comment mark.
+If it is specified, lines starting with the character will be ignored. Both
+`comma` and `comment` must be single characters. The `lazy_quotes` attribute
+controls how quoting in fields is handled. If `lazy_quotes` is true, a quote may
+appear in an unquoted field and a non-doubled quote may appear in a quoted field.
+The `trim_leading_space` attribute specifies that leading white space should be
+ignored, even if the `comma` character is white space. For complete details
+of the preceding configuration attribute behaviors, see the CSV decoder
+https://pkg.go.dev/encoding/csv#Reader[documentation] The `fields_names`
+attribute can be used to specify the column names for the data. If it is
+absent, the field names are obtained from the first non-comment line of
+data. The number of fields must match the number of field names.
+
+An example config is shown below:
+
+[source,yaml]
+----
+  decoding.codec.csv.enabled: true
+  decoding.codec.csv.comma: "\t"
+  decoding.codec.csv.comment: "#"
+----
+
+[id="attrib-file_selectors"]
+[float]
+==== `file_selectors`
+
+If the Azure blob storage container will have blobs that correspond to files that {beatname_uc} shouldn't process, `file_selectors` can be used to limit
+the files that are downloaded. This is a list of selectors which are based on a `regex` pattern. The `regex` should match the blob name or should be a part of the blob name (ideally a prefix). The `regex` syntax is the same as used in the Go programming language. Files that don't match any configured regex won't be processed.This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+[source, yml]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    file_selectors:
+    - regex: '/Monitoring/'
+    - regex: 'docs/'
+    - regex: '/Security-Logs/'
+----
+
+The `file_selectors` operation is performed within the agent locally. The agent will download all the files and then filter them based on the `file_selectors`. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
+
+[id="attrib-expand_event_list_from_field"]
+[float]
+==== `expand_event_list_from_field`
+
+If the file-set using this input expects to receive multiple messages bundled under a specific field or an array of objects then the config option for `expand_event_list_from_field` can be specified. This setting will be able to split the messages under the group value into separate events. For example, if 
+you have logs that are in JSON format and events are found under the JSON object "Records". To split the events into separate events, the config option `expand_event_list_from_field` can be set to "Records". This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+["source","json"]
+----
+{
+    "Records": [
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:51:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLE8-9621-4d00-b913-beca2EXAMPLE",
+        },
+        {
+            "eventVersion": "1.07",
+            "eventTime": "2019-11-14T00:52:00Z",
+            "region": "us-east-1",
+            "eventID": "EXAMPLEc-28be-486c-8928-49ce6EXAMPLE",
+        }
+    ]
+}
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    expand_event_list_from_field: Records
+----
+
+NOTE: This attribute is only applicable for JSON file formats. You do not require to specify this attribute if the file has an array of objects at the root level. Root level array of objects are automatically split into separate events. If failures occur or the input crashes due to some unexpected error, the processing will resume from the last successfully processed file/blob.
+
+[id="attrib-timestamp_epoch"]
+[float]
+==== `timestamp_epoch`
+
+This attribute can be used to filter out files/blobs which have a timestamp older than the specified value. The value of this attribute should be in unix `epoch` (seconds) format. The timestamp value is compared with the `LastModified Timestamp` obtained from the blob metadata. This attribute can be specified both at the root level of the configuration as well at the container level. The container level values will always take priority and override the root level values if both are specified.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    timestamp_epoch: 1627233600
+----
+
+The Azure Blob Storage APIs don't provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
 [id="container-overrides"]
 *The sample configs below will explain the container level overriding of attributes a bit further :-*
@@ -277,4 +455,4 @@ In this configuration even though we have specified `max_workers = 10`, `poll = 
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
 
-NOTE: Since this is a beta input, any feedback is welcome, which will help us optimise and make it better going forward. 
+NOTE: Any feedback is welcome which will help us further optimize this input. Please feel free to open a github issue for any bugs or feature requests.

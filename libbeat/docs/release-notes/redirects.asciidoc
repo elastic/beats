@@ -3,3 +3,33 @@
 
 This page has moved. Please see {observability-guide}/whats-new.html[What's new
 in Observability {minor-version}].
+
+[role="exclude",id="breaking-changes-8.5"]
+== Breaking changes in 8.5
+
+This page no longer exists.
+There are no notable breaking changes for 8.5.
+
+[role="exclude",id="breaking-changes-8.4"]
+== Breaking changes in 8.4
+
+This page no longer exists.
+There are no notable breaking changes for 8.4.
+
+[role="exclude",id="breaking-changes-8.3"]
+== Breaking changes in 8.3
+
+This page no longer exists.
+There are no notable breaking changes for 8.3.
+
+[role="exclude",id="breaking-changes-8.2"]
+== Breaking changes in 8.2
+
+This page no longer exists.
+There are no notable breaking changes for 8.2.
+
+[role="exclude",id="breaking-changes-8.1"]
+== Breaking changes in 8.1
+
+This page no longer exists.
+There are no notable breaking changes for 8.1.

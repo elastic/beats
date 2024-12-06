@@ -71,3 +71,8 @@ func (b *EqualJitterBackoff) Wait() bool {
 		return true
 	}
 }
+
+// Last returns the time when the last call to Wait returned
+func (b *EqualJitterBackoff) Last() time.Time {
+	return b.last
+}

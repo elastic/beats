@@ -1,0 +1,938 @@
+# HELP aggregator_discovery_aggregation_count_total [ALPHA] Counter of number of times discovery was aggregated
+# TYPE aggregator_discovery_aggregation_count_total counter
+aggregator_discovery_aggregation_count_total 0
+# HELP apiserver_audit_event_total [ALPHA] Counter of audit events generated and sent to the audit backend.
+# TYPE apiserver_audit_event_total counter
+apiserver_audit_event_total 0
+# HELP apiserver_audit_requests_rejected_total [ALPHA] Counter of apiserver requests rejected due to an error in audit logging backend.
+# TYPE apiserver_audit_requests_rejected_total counter
+apiserver_audit_requests_rejected_total 0
+# HELP apiserver_client_certificate_expiration_seconds [ALPHA] Distribution of the remaining lifetime on the certificate used to authenticate a request.
+# TYPE apiserver_client_certificate_expiration_seconds histogram
+apiserver_client_certificate_expiration_seconds_bucket{le="0"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="1800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="3600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="7200"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="21600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="43200"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="86400"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="172800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="345600"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="604800"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="2.592e+06"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="7.776e+06"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="1.5552e+07"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="3.1104e+07"} 0
+apiserver_client_certificate_expiration_seconds_bucket{le="+Inf"} 0
+apiserver_client_certificate_expiration_seconds_sum 0
+apiserver_client_certificate_expiration_seconds_count 0
+# HELP apiserver_envelope_encryption_dek_cache_fill_percent [ALPHA] Percent of the cache slots currently occupied by cached DEKs.
+# TYPE apiserver_envelope_encryption_dek_cache_fill_percent gauge
+apiserver_envelope_encryption_dek_cache_fill_percent 0
+# HELP apiserver_storage_data_key_generation_duration_seconds [ALPHA] Latencies in seconds of data encryption key(DEK) generation operations.
+# TYPE apiserver_storage_data_key_generation_duration_seconds histogram
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="5e-06"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="1e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="2e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="4e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="8e-05"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00016"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00032"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00064"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00128"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00256"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.00512"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.01024"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.02048"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="0.04096"} 0
+apiserver_storage_data_key_generation_duration_seconds_bucket{le="+Inf"} 0
+apiserver_storage_data_key_generation_duration_seconds_sum 0
+apiserver_storage_data_key_generation_duration_seconds_count 0
+# HELP apiserver_storage_data_key_generation_failures_total [ALPHA] Total number of failed data encryption key(DEK) generation operations.
+# TYPE apiserver_storage_data_key_generation_failures_total counter
+apiserver_storage_data_key_generation_failures_total 0
+# HELP apiserver_storage_envelope_transformation_cache_misses_total [ALPHA] Total number of cache misses while accessing key decryption key(KEK).
+# TYPE apiserver_storage_envelope_transformation_cache_misses_total counter
+apiserver_storage_envelope_transformation_cache_misses_total 0
+# HELP apiserver_webhooks_x509_insecure_sha1_total [ALPHA] Counts the number of requests to servers with insecure SHA1 signatures in their serving certificate OR the number of connection failures due to the insecure SHA1 signatures (either/or, based on the runtime environment)
+# TYPE apiserver_webhooks_x509_insecure_sha1_total counter
+apiserver_webhooks_x509_insecure_sha1_total 0
+# HELP apiserver_webhooks_x509_missing_san_total [ALPHA] Counts the number of requests to servers missing SAN extension in their serving certificate OR the number of connection failures due to the lack of x509 certificate SAN extension missing (either/or, based on the runtime environment)
+# TYPE apiserver_webhooks_x509_missing_san_total counter
+apiserver_webhooks_x509_missing_san_total 0
+# HELP cardinality_enforcement_unexpected_categorizations_total [ALPHA] The count of unexpected categorizations during cardinality enforcement.
+# TYPE cardinality_enforcement_unexpected_categorizations_total counter
+cardinality_enforcement_unexpected_categorizations_total 0
+# HELP disabled_metrics_total [BETA] The count of disabled metrics.
+# TYPE disabled_metrics_total counter
+disabled_metrics_total 0
+# HELP go_cgo_go_to_c_calls_calls_total Count of calls made from Go to C by the current process.
+# TYPE go_cgo_go_to_c_calls_calls_total counter
+go_cgo_go_to_c_calls_calls_total 0
+# HELP go_cpu_classes_gc_mark_assist_cpu_seconds_total Estimated total CPU time goroutines spent performing GC tasks to assist the GC and prevent it from falling behind the application. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_assist_cpu_seconds_total counter
+go_cpu_classes_gc_mark_assist_cpu_seconds_total 0.003119684
+# HELP go_cpu_classes_gc_mark_dedicated_cpu_seconds_total Estimated total CPU time spent performing GC tasks on processors (as defined by GOMAXPROCS) dedicated to those tasks. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_dedicated_cpu_seconds_total counter
+go_cpu_classes_gc_mark_dedicated_cpu_seconds_total 0.162652665
+# HELP go_cpu_classes_gc_mark_idle_cpu_seconds_total Estimated total CPU time spent performing GC tasks on spare CPU resources that the Go scheduler could not otherwise find a use for. This should be subtracted from the total GC CPU time to obtain a measure of compulsory GC CPU time. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_mark_idle_cpu_seconds_total counter
+go_cpu_classes_gc_mark_idle_cpu_seconds_total 0.016001078
+# HELP go_cpu_classes_gc_pause_cpu_seconds_total Estimated total CPU time spent with the application paused by the GC. Even if only one thread is running during the pause, this is computed as GOMAXPROCS times the pause latency because nothing else can be executing. This is the exact sum of samples in /gc/pause:seconds if each sample is multiplied by GOMAXPROCS at the time it is taken. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_gc_pause_cpu_seconds_total counter
+go_cpu_classes_gc_pause_cpu_seconds_total 0.070784224
+# HELP go_cpu_classes_gc_total_cpu_seconds_total Estimated total CPU time spent performing GC tasks. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes/gc.
+# TYPE go_cpu_classes_gc_total_cpu_seconds_total counter
+go_cpu_classes_gc_total_cpu_seconds_total 0.252557651
+# HELP go_cpu_classes_idle_cpu_seconds_total Estimated total available CPU time not spent executing any Go or Go runtime code. In other words, the part of /cpu/classes/total:cpu-seconds that was unused. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_idle_cpu_seconds_total counter
+go_cpu_classes_idle_cpu_seconds_total 37920.812157493
+# HELP go_cpu_classes_scavenge_assist_cpu_seconds_total Estimated total CPU time spent returning unused memory to the underlying platform in response eagerly in response to memory pressure. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_scavenge_assist_cpu_seconds_total counter
+go_cpu_classes_scavenge_assist_cpu_seconds_total 2.97e-07
+# HELP go_cpu_classes_scavenge_background_cpu_seconds_total Estimated total CPU time spent performing background tasks to return unused memory to the underlying platform. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_scavenge_background_cpu_seconds_total counter
+go_cpu_classes_scavenge_background_cpu_seconds_total 0.000712602
+# HELP go_cpu_classes_scavenge_total_cpu_seconds_total Estimated total CPU time spent performing tasks that return unused memory to the underlying platform. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes/scavenge.
+# TYPE go_cpu_classes_scavenge_total_cpu_seconds_total counter
+go_cpu_classes_scavenge_total_cpu_seconds_total 0.000712899
+# HELP go_cpu_classes_total_cpu_seconds_total Estimated total available CPU time for user Go code or the Go runtime, as defined by GOMAXPROCS. In other words, GOMAXPROCS integrated over the wall-clock duration this process has been executing for. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics. Sum of all metrics in /cpu/classes.
+# TYPE go_cpu_classes_total_cpu_seconds_total counter
+go_cpu_classes_total_cpu_seconds_total 37922.372021296
+# HELP go_cpu_classes_user_cpu_seconds_total Estimated total CPU time spent running user Go code. This may also include some small amount of time spent in the Go runtime. This metric is an overestimate, and not directly comparable to system CPU time measurements. Compare only with other /cpu/classes metrics.
+# TYPE go_cpu_classes_user_cpu_seconds_total counter
+go_cpu_classes_user_cpu_seconds_total 1.306593253
+# HELP go_gc_cycles_automatic_gc_cycles_total Count of completed GC cycles generated by the Go runtime.
+# TYPE go_gc_cycles_automatic_gc_cycles_total counter
+go_gc_cycles_automatic_gc_cycles_total 25
+# HELP go_gc_cycles_forced_gc_cycles_total Count of completed GC cycles forced by the application.
+# TYPE go_gc_cycles_forced_gc_cycles_total counter
+go_gc_cycles_forced_gc_cycles_total 0
+# HELP go_gc_cycles_total_gc_cycles_total Count of all completed GC cycles.
+# TYPE go_gc_cycles_total_gc_cycles_total counter
+go_gc_cycles_total_gc_cycles_total 25
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 5.8243e-05
+go_gc_duration_seconds{quantile="0.25"} 8.9039e-05
+go_gc_duration_seconds{quantile="0.5"} 0.000126473
+go_gc_duration_seconds{quantile="0.75"} 0.000239056
+go_gc_duration_seconds{quantile="1"} 0.000538357
+go_gc_duration_seconds_sum 0.004424014
+go_gc_duration_seconds_count 25
+# HELP go_gc_gogc_percent Heap size target percentage configured by the user, otherwise 100. This value is set by the GOGC environment variable, and the runtime/debug.SetGCPercent function.
+# TYPE go_gc_gogc_percent gauge
+go_gc_gogc_percent 100
+# HELP go_gc_gomemlimit_bytes Go runtime memory limit configured by the user, otherwise math.MaxInt64. This value is set by the GOMEMLIMIT environment variable, and the runtime/debug.SetMemoryLimit function.
+# TYPE go_gc_gomemlimit_bytes gauge
+go_gc_gomemlimit_bytes 9.223372036854776e+18
+# HELP go_gc_heap_allocs_by_size_bytes Distribution of heap allocations by approximate size. Bucket counts increase monotonically. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_allocs_by_size_bytes histogram
+go_gc_heap_allocs_by_size_bytes_bucket{le="8.999999999999998"} 7807
+go_gc_heap_allocs_by_size_bytes_bucket{le="24.999999999999996"} 66656
+go_gc_heap_allocs_by_size_bytes_bucket{le="64.99999999999999"} 96713
+go_gc_heap_allocs_by_size_bytes_bucket{le="144.99999999999997"} 131856
+go_gc_heap_allocs_by_size_bytes_bucket{le="320.99999999999994"} 137866
+go_gc_heap_allocs_by_size_bytes_bucket{le="704.9999999999999"} 140885
+go_gc_heap_allocs_by_size_bytes_bucket{le="1536.9999999999998"} 142512
+go_gc_heap_allocs_by_size_bytes_bucket{le="3200.9999999999995"} 143108
+go_gc_heap_allocs_by_size_bytes_bucket{le="6528.999999999999"} 143479
+go_gc_heap_allocs_by_size_bytes_bucket{le="13568.999999999998"} 143591
+go_gc_heap_allocs_by_size_bytes_bucket{le="27264.999999999996"} 143685
+go_gc_heap_allocs_by_size_bytes_bucket{le="+Inf"} 143764
+go_gc_heap_allocs_by_size_bytes_sum 2.6836248e+07
+go_gc_heap_allocs_by_size_bytes_count 143764
+# HELP go_gc_heap_allocs_bytes_total Cumulative sum of memory allocated to the heap by the application.
+# TYPE go_gc_heap_allocs_bytes_total counter
+go_gc_heap_allocs_bytes_total 2.6836248e+07
+# HELP go_gc_heap_allocs_objects_total Cumulative count of heap allocations triggered by the application. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_allocs_objects_total counter
+go_gc_heap_allocs_objects_total 143764
+# HELP go_gc_heap_frees_by_size_bytes Distribution of freed heap allocations by approximate size. Bucket counts increase monotonically. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_frees_by_size_bytes histogram
+go_gc_heap_frees_by_size_bytes_bucket{le="8.999999999999998"} 5771
+go_gc_heap_frees_by_size_bytes_bucket{le="24.999999999999996"} 56577
+go_gc_heap_frees_by_size_bytes_bucket{le="64.99999999999999"} 79311
+go_gc_heap_frees_by_size_bytes_bucket{le="144.99999999999997"} 111096
+go_gc_heap_frees_by_size_bytes_bucket{le="320.99999999999994"} 115045
+go_gc_heap_frees_by_size_bytes_bucket{le="704.9999999999999"} 117274
+go_gc_heap_frees_by_size_bytes_bucket{le="1536.9999999999998"} 118654
+go_gc_heap_frees_by_size_bytes_bucket{le="3200.9999999999995"} 119079
+go_gc_heap_frees_by_size_bytes_bucket{le="6528.999999999999"} 119360
+go_gc_heap_frees_by_size_bytes_bucket{le="13568.999999999998"} 119418
+go_gc_heap_frees_by_size_bytes_bucket{le="27264.999999999996"} 119489
+go_gc_heap_frees_by_size_bytes_bucket{le="+Inf"} 119540
+go_gc_heap_frees_by_size_bytes_sum 1.8566944e+07
+go_gc_heap_frees_by_size_bytes_count 119540
+# HELP go_gc_heap_frees_bytes_total Cumulative sum of heap memory freed by the garbage collector.
+# TYPE go_gc_heap_frees_bytes_total counter
+go_gc_heap_frees_bytes_total 1.8566944e+07
+# HELP go_gc_heap_frees_objects_total Cumulative count of heap allocations whose storage was freed by the garbage collector. Note that this does not include tiny objects as defined by /gc/heap/tiny/allocs:objects, only tiny blocks.
+# TYPE go_gc_heap_frees_objects_total counter
+go_gc_heap_frees_objects_total 119540
+# HELP go_gc_heap_goal_bytes Heap size target for the end of the GC cycle.
+# TYPE go_gc_heap_goal_bytes gauge
+go_gc_heap_goal_bytes 1.7035896e+07
+# HELP go_gc_heap_live_bytes Heap memory occupied by live objects that were marked by the previous GC.
+# TYPE go_gc_heap_live_bytes gauge
+go_gc_heap_live_bytes 8.239392e+06
+# HELP go_gc_heap_objects_objects Number of objects, live or unswept, occupying heap memory.
+# TYPE go_gc_heap_objects_objects gauge
+go_gc_heap_objects_objects 24224
+# HELP go_gc_heap_tiny_allocs_objects_total Count of small allocations that are packed together into blocks. These allocations are counted separately from other allocations because each individual allocation is not tracked by the runtime, only their block. Each block is already accounted for in allocs-by-size and frees-by-size.
+# TYPE go_gc_heap_tiny_allocs_objects_total counter
+go_gc_heap_tiny_allocs_objects_total 16640
+# HELP go_gc_limiter_last_enabled_gc_cycle GC cycle the last time the GC CPU limiter was enabled. This metric is useful for diagnosing the root cause of an out-of-memory error, because the limiter trades memory for CPU time when the GC's CPU time gets too high. This is most likely to occur with use of SetMemoryLimit. The first GC cycle is cycle 1, so a value of 0 indicates that it was never enabled.
+# TYPE go_gc_limiter_last_enabled_gc_cycle gauge
+go_gc_limiter_last_enabled_gc_cycle 0
+# HELP go_gc_pauses_seconds Distribution of individual GC-related stop-the-world pause latencies. Bucket counts increase monotonically.
+# TYPE go_gc_pauses_seconds histogram
+go_gc_pauses_seconds_bucket{le="6.399999999999999e-08"} 0
+go_gc_pauses_seconds_bucket{le="6.399999999999999e-07"} 0
+go_gc_pauses_seconds_bucket{le="7.167999999999999e-06"} 1
+go_gc_pauses_seconds_bucket{le="8.191999999999999e-05"} 34
+go_gc_pauses_seconds_bucket{le="0.0009175039999999999"} 50
+go_gc_pauses_seconds_bucket{le="0.010485759999999998"} 50
+go_gc_pauses_seconds_bucket{le="0.11744051199999998"} 50
+go_gc_pauses_seconds_bucket{le="+Inf"} 50
+go_gc_pauses_seconds_sum 0.0015479040000000001
+go_gc_pauses_seconds_count 50
+# HELP go_gc_scan_globals_bytes The total amount of global variable space that is scannable.
+# TYPE go_gc_scan_globals_bytes gauge
+go_gc_scan_globals_bytes 440104
+# HELP go_gc_scan_heap_bytes The total amount of heap space that is scannable.
+# TYPE go_gc_scan_heap_bytes gauge
+go_gc_scan_heap_bytes 3.58176e+06
+# HELP go_gc_scan_stack_bytes The number of bytes of stack that were scanned last GC cycle.
+# TYPE go_gc_scan_stack_bytes gauge
+go_gc_scan_stack_bytes 117008
+# HELP go_gc_scan_total_bytes The total amount space that is scannable. Sum of all metrics in /gc/scan.
+# TYPE go_gc_scan_total_bytes gauge
+go_gc_scan_total_bytes 4.138872e+06
+# HELP go_gc_stack_starting_size_bytes The stack size of new goroutines.
+# TYPE go_gc_stack_starting_size_bytes gauge
+go_gc_stack_starting_size_bytes 4096
+# HELP go_godebug_non_default_behavior_execerrdot_events_total The number of non-default behaviors executed by the os/exec package due to a non-default GODEBUG=execerrdot=... setting.
+# TYPE go_godebug_non_default_behavior_execerrdot_events_total counter
+go_godebug_non_default_behavior_execerrdot_events_total 0
+# HELP go_godebug_non_default_behavior_gocachehash_events_total The number of non-default behaviors executed by the cmd/go package due to a non-default GODEBUG=gocachehash=... setting.
+# TYPE go_godebug_non_default_behavior_gocachehash_events_total counter
+go_godebug_non_default_behavior_gocachehash_events_total 0
+# HELP go_godebug_non_default_behavior_gocachetest_events_total The number of non-default behaviors executed by the cmd/go package due to a non-default GODEBUG=gocachetest=... setting.
+# TYPE go_godebug_non_default_behavior_gocachetest_events_total counter
+go_godebug_non_default_behavior_gocachetest_events_total 0
+# HELP go_godebug_non_default_behavior_gocacheverify_events_total The number of non-default behaviors executed by the cmd/go package due to a non-default GODEBUG=gocacheverify=... setting.
+# TYPE go_godebug_non_default_behavior_gocacheverify_events_total counter
+go_godebug_non_default_behavior_gocacheverify_events_total 0
+# HELP go_godebug_non_default_behavior_http2client_events_total The number of non-default behaviors executed by the net/http package due to a non-default GODEBUG=http2client=... setting.
+# TYPE go_godebug_non_default_behavior_http2client_events_total counter
+go_godebug_non_default_behavior_http2client_events_total 0
+# HELP go_godebug_non_default_behavior_http2server_events_total The number of non-default behaviors executed by the net/http package due to a non-default GODEBUG=http2server=... setting.
+# TYPE go_godebug_non_default_behavior_http2server_events_total counter
+go_godebug_non_default_behavior_http2server_events_total 0
+# HELP go_godebug_non_default_behavior_installgoroot_events_total The number of non-default behaviors executed by the go/build package due to a non-default GODEBUG=installgoroot=... setting.
+# TYPE go_godebug_non_default_behavior_installgoroot_events_total counter
+go_godebug_non_default_behavior_installgoroot_events_total 0
+# HELP go_godebug_non_default_behavior_jstmpllitinterp_events_total The number of non-default behaviors executed by the html/template package due to a non-default GODEBUG=jstmpllitinterp=... setting.
+# TYPE go_godebug_non_default_behavior_jstmpllitinterp_events_total counter
+go_godebug_non_default_behavior_jstmpllitinterp_events_total 0
+# HELP go_godebug_non_default_behavior_multipartmaxheaders_events_total The number of non-default behaviors executed by the mime/multipart package due to a non-default GODEBUG=multipartmaxheaders=... setting.
+# TYPE go_godebug_non_default_behavior_multipartmaxheaders_events_total counter
+go_godebug_non_default_behavior_multipartmaxheaders_events_total 0
+# HELP go_godebug_non_default_behavior_multipartmaxparts_events_total The number of non-default behaviors executed by the mime/multipart package due to a non-default GODEBUG=multipartmaxparts=... setting.
+# TYPE go_godebug_non_default_behavior_multipartmaxparts_events_total counter
+go_godebug_non_default_behavior_multipartmaxparts_events_total 0
+# HELP go_godebug_non_default_behavior_multipathtcp_events_total The number of non-default behaviors executed by the net package due to a non-default GODEBUG=multipathtcp=... setting.
+# TYPE go_godebug_non_default_behavior_multipathtcp_events_total counter
+go_godebug_non_default_behavior_multipathtcp_events_total 0
+# HELP go_godebug_non_default_behavior_panicnil_events_total The number of non-default behaviors executed by the runtime package due to a non-default GODEBUG=panicnil=... setting.
+# TYPE go_godebug_non_default_behavior_panicnil_events_total counter
+go_godebug_non_default_behavior_panicnil_events_total 0
+# HELP go_godebug_non_default_behavior_randautoseed_events_total The number of non-default behaviors executed by the math/rand package due to a non-default GODEBUG=randautoseed=... setting.
+# TYPE go_godebug_non_default_behavior_randautoseed_events_total counter
+go_godebug_non_default_behavior_randautoseed_events_total 0
+# HELP go_godebug_non_default_behavior_tarinsecurepath_events_total The number of non-default behaviors executed by the archive/tar package due to a non-default GODEBUG=tarinsecurepath=... setting.
+# TYPE go_godebug_non_default_behavior_tarinsecurepath_events_total counter
+go_godebug_non_default_behavior_tarinsecurepath_events_total 0
+# HELP go_godebug_non_default_behavior_tlsmaxrsasize_events_total The number of non-default behaviors executed by the crypto/tls package due to a non-default GODEBUG=tlsmaxrsasize=... setting.
+# TYPE go_godebug_non_default_behavior_tlsmaxrsasize_events_total counter
+go_godebug_non_default_behavior_tlsmaxrsasize_events_total 0
+# HELP go_godebug_non_default_behavior_x509sha1_events_total The number of non-default behaviors executed by the crypto/x509 package due to a non-default GODEBUG=x509sha1=... setting.
+# TYPE go_godebug_non_default_behavior_x509sha1_events_total counter
+go_godebug_non_default_behavior_x509sha1_events_total 0
+# HELP go_godebug_non_default_behavior_x509usefallbackroots_events_total The number of non-default behaviors executed by the crypto/x509 package due to a non-default GODEBUG=x509usefallbackroots=... setting.
+# TYPE go_godebug_non_default_behavior_x509usefallbackroots_events_total counter
+go_godebug_non_default_behavior_x509usefallbackroots_events_total 0
+# HELP go_godebug_non_default_behavior_zipinsecurepath_events_total The number of non-default behaviors executed by the archive/zip package due to a non-default GODEBUG=zipinsecurepath=... setting.
+# TYPE go_godebug_non_default_behavior_zipinsecurepath_events_total counter
+go_godebug_non_default_behavior_zipinsecurepath_events_total 0
+# HELP go_goroutines Number of goroutines that currently exist.
+# TYPE go_goroutines gauge
+go_goroutines 51
+# HELP go_info Information about the Go environment.
+# TYPE go_info gauge
+go_info{version="go1.21.5"} 1
+# HELP go_memory_classes_heap_free_bytes Memory that is completely free and eligible to be returned to the underlying system, but has not been. This metric is the runtime's estimate of free address space that is backed by physical memory.
+# TYPE go_memory_classes_heap_free_bytes gauge
+go_memory_classes_heap_free_bytes 5.3248e+06
+# HELP go_memory_classes_heap_objects_bytes Memory occupied by live objects and dead objects that have not yet been marked free by the garbage collector.
+# TYPE go_memory_classes_heap_objects_bytes gauge
+go_memory_classes_heap_objects_bytes 8.269304e+06
+# HELP go_memory_classes_heap_released_bytes Memory that is completely free and has been returned to the underlying system. This metric is the runtime's estimate of free address space that is still mapped into the process, but is not backed by physical memory.
+# TYPE go_memory_classes_heap_released_bytes gauge
+go_memory_classes_heap_released_bytes 2.015232e+06
+# HELP go_memory_classes_heap_stacks_bytes Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use. Currently, this represents all stack memory for goroutines. It also includes all OS thread stacks in non-cgo programs. Note that stacks may be allocated differently in the future, and this may change.
+# TYPE go_memory_classes_heap_stacks_bytes gauge
+go_memory_classes_heap_stacks_bytes 1.835008e+06
+# HELP go_memory_classes_heap_unused_bytes Memory that is reserved for heap objects but is not currently used to hold heap objects.
+# TYPE go_memory_classes_heap_unused_bytes gauge
+go_memory_classes_heap_unused_bytes 3.527176e+06
+# HELP go_memory_classes_metadata_mcache_free_bytes Memory that is reserved for runtime mcache structures, but not in-use.
+# TYPE go_memory_classes_metadata_mcache_free_bytes gauge
+go_memory_classes_metadata_mcache_free_bytes 12000
+# HELP go_memory_classes_metadata_mcache_inuse_bytes Memory that is occupied by runtime mcache structures that are currently being used.
+# TYPE go_memory_classes_metadata_mcache_inuse_bytes gauge
+go_memory_classes_metadata_mcache_inuse_bytes 19200
+# HELP go_memory_classes_metadata_mspan_free_bytes Memory that is reserved for runtime mspan structures, but not in-use.
+# TYPE go_memory_classes_metadata_mspan_free_bytes gauge
+go_memory_classes_metadata_mspan_free_bytes 23016
+# HELP go_memory_classes_metadata_mspan_inuse_bytes Memory that is occupied by runtime mspan structures that are currently being used.
+# TYPE go_memory_classes_metadata_mspan_inuse_bytes gauge
+go_memory_classes_metadata_mspan_inuse_bytes 254016
+# HELP go_memory_classes_metadata_other_bytes Memory that is reserved for or used to hold runtime metadata.
+# TYPE go_memory_classes_metadata_other_bytes gauge
+go_memory_classes_metadata_other_bytes 4.555416e+06
+# HELP go_memory_classes_os_stacks_bytes Stack memory allocated by the underlying operating system. In non-cgo programs this metric is currently zero. This may change in the future.In cgo programs this metric includes OS thread stacks allocated directly from the OS. Currently, this only accounts for one stack in c-shared and c-archive build modes, and other sources of stacks from the OS are not measured. This too may change in the future.
+# TYPE go_memory_classes_os_stacks_bytes gauge
+go_memory_classes_os_stacks_bytes 0
+# HELP go_memory_classes_other_bytes Memory used by execution trace buffers, structures for debugging the runtime, finalizer and profiler specials, and more.
+# TYPE go_memory_classes_other_bytes gauge
+go_memory_classes_other_bytes 2.958809e+06
+# HELP go_memory_classes_profiling_buckets_bytes Memory that is used by the stack trace hash map used for profiling.
+# TYPE go_memory_classes_profiling_buckets_bytes gauge
+go_memory_classes_profiling_buckets_bytes 1.456271e+06
+# HELP go_memory_classes_total_bytes All memory mapped by the Go runtime into the current process as read-write. Note that this does not include memory mapped by code called via cgo or via the syscall package. Sum of all metrics in /memory/classes.
+# TYPE go_memory_classes_total_bytes gauge
+go_memory_classes_total_bytes 3.0250248e+07
+# HELP go_memstats_alloc_bytes Number of bytes allocated and still in use.
+# TYPE go_memstats_alloc_bytes gauge
+go_memstats_alloc_bytes 8.269304e+06
+# HELP go_memstats_alloc_bytes_total Total number of bytes allocated, even if freed.
+# TYPE go_memstats_alloc_bytes_total counter
+go_memstats_alloc_bytes_total 2.6836248e+07
+# HELP go_memstats_buck_hash_sys_bytes Number of bytes used by the profiling bucket hash table.
+# TYPE go_memstats_buck_hash_sys_bytes gauge
+go_memstats_buck_hash_sys_bytes 1.456271e+06
+# HELP go_memstats_frees_total Total number of frees.
+# TYPE go_memstats_frees_total counter
+go_memstats_frees_total 136180
+# HELP go_memstats_gc_sys_bytes Number of bytes used for garbage collection system metadata.
+# TYPE go_memstats_gc_sys_bytes gauge
+go_memstats_gc_sys_bytes 4.555416e+06
+# HELP go_memstats_heap_alloc_bytes Number of heap bytes allocated and still in use.
+# TYPE go_memstats_heap_alloc_bytes gauge
+go_memstats_heap_alloc_bytes 8.269304e+06
+# HELP go_memstats_heap_idle_bytes Number of heap bytes waiting to be used.
+# TYPE go_memstats_heap_idle_bytes gauge
+go_memstats_heap_idle_bytes 7.340032e+06
+# HELP go_memstats_heap_inuse_bytes Number of heap bytes that are in use.
+# TYPE go_memstats_heap_inuse_bytes gauge
+go_memstats_heap_inuse_bytes 1.179648e+07
+# HELP go_memstats_heap_objects Number of allocated objects.
+# TYPE go_memstats_heap_objects gauge
+go_memstats_heap_objects 24224
+# HELP go_memstats_heap_released_bytes Number of heap bytes released to OS.
+# TYPE go_memstats_heap_released_bytes gauge
+go_memstats_heap_released_bytes 2.015232e+06
+# HELP go_memstats_heap_sys_bytes Number of heap bytes obtained from system.
+# TYPE go_memstats_heap_sys_bytes gauge
+go_memstats_heap_sys_bytes 1.9136512e+07
+# HELP go_memstats_last_gc_time_seconds Number of seconds since 1970 of last garbage collection.
+# TYPE go_memstats_last_gc_time_seconds gauge
+go_memstats_last_gc_time_seconds 1.7048971623253e+09
+# HELP go_memstats_lookups_total Total number of pointer lookups.
+# TYPE go_memstats_lookups_total counter
+go_memstats_lookups_total 0
+# HELP go_memstats_mallocs_total Total number of mallocs.
+# TYPE go_memstats_mallocs_total counter
+go_memstats_mallocs_total 160404
+# HELP go_memstats_mcache_inuse_bytes Number of bytes in use by mcache structures.
+# TYPE go_memstats_mcache_inuse_bytes gauge
+go_memstats_mcache_inuse_bytes 19200
+# HELP go_memstats_mcache_sys_bytes Number of bytes used for mcache structures obtained from system.
+# TYPE go_memstats_mcache_sys_bytes gauge
+go_memstats_mcache_sys_bytes 31200
+# HELP go_memstats_mspan_inuse_bytes Number of bytes in use by mspan structures.
+# TYPE go_memstats_mspan_inuse_bytes gauge
+go_memstats_mspan_inuse_bytes 254016
+# HELP go_memstats_mspan_sys_bytes Number of bytes used for mspan structures obtained from system.
+# TYPE go_memstats_mspan_sys_bytes gauge
+go_memstats_mspan_sys_bytes 277032
+# HELP go_memstats_next_gc_bytes Number of heap bytes when next garbage collection will take place.
+# TYPE go_memstats_next_gc_bytes gauge
+go_memstats_next_gc_bytes 1.7035896e+07
+# HELP go_memstats_other_sys_bytes Number of bytes used for other system allocations.
+# TYPE go_memstats_other_sys_bytes gauge
+go_memstats_other_sys_bytes 2.958809e+06
+# HELP go_memstats_stack_inuse_bytes Number of bytes in use by the stack allocator.
+# TYPE go_memstats_stack_inuse_bytes gauge
+go_memstats_stack_inuse_bytes 1.835008e+06
+# HELP go_memstats_stack_sys_bytes Number of bytes obtained from system for stack allocator.
+# TYPE go_memstats_stack_sys_bytes gauge
+go_memstats_stack_sys_bytes 1.835008e+06
+# HELP go_memstats_sys_bytes Number of bytes obtained from system.
+# TYPE go_memstats_sys_bytes gauge
+go_memstats_sys_bytes 3.0250248e+07
+# HELP go_sched_gomaxprocs_threads The current runtime.GOMAXPROCS setting, or the number of operating system threads that can execute user-level Go code simultaneously.
+# TYPE go_sched_gomaxprocs_threads gauge
+go_sched_gomaxprocs_threads 16
+# HELP go_sched_goroutines_goroutines Count of live goroutines.
+# TYPE go_sched_goroutines_goroutines gauge
+go_sched_goroutines_goroutines 51
+# HELP go_sched_latencies_seconds Distribution of the time goroutines have spent in the scheduler in a runnable state before actually running. Bucket counts increase monotonically.
+# TYPE go_sched_latencies_seconds histogram
+go_sched_latencies_seconds_bucket{le="6.399999999999999e-08"} 1278
+go_sched_latencies_seconds_bucket{le="6.399999999999999e-07"} 1370
+go_sched_latencies_seconds_bucket{le="7.167999999999999e-06"} 1495
+go_sched_latencies_seconds_bucket{le="8.191999999999999e-05"} 1738
+go_sched_latencies_seconds_bucket{le="0.0009175039999999999"} 1803
+go_sched_latencies_seconds_bucket{le="0.010485759999999998"} 1804
+go_sched_latencies_seconds_bucket{le="0.11744051199999998"} 1804
+go_sched_latencies_seconds_bucket{le="+Inf"} 1804
+go_sched_latencies_seconds_sum 0.008070016
+go_sched_latencies_seconds_count 1804
+# HELP go_sync_mutex_wait_total_seconds_total Approximate cumulative time goroutines have spent blocked on a sync.Mutex or sync.RWMutex. This metric is useful for identifying global changes in lock contention. Collect a mutex or block profile using the runtime/pprof package for more detailed contention data.
+# TYPE go_sync_mutex_wait_total_seconds_total counter
+go_sync_mutex_wait_total_seconds_total 0.000555248
+# HELP go_threads Number of OS threads created.
+# TYPE go_threads gauge
+go_threads 18
+# HELP hidden_metrics_total [BETA] The count of hidden metrics.
+# TYPE hidden_metrics_total counter
+hidden_metrics_total 0
+# HELP kubeproxy_network_programming_duration_seconds [ALPHA] In Cluster Network Programming Latency in seconds
+# TYPE kubeproxy_network_programming_duration_seconds histogram
+kubeproxy_network_programming_duration_seconds_bucket{le="0"} 0
+kubeproxy_network_programming_duration_seconds_bucket{le="0.25"} 0
+kubeproxy_network_programming_duration_seconds_bucket{le="0.5"} 1
+kubeproxy_network_programming_duration_seconds_bucket{le="1"} 1
+kubeproxy_network_programming_duration_seconds_bucket{le="2"} 1
+kubeproxy_network_programming_duration_seconds_bucket{le="3"} 1
+kubeproxy_network_programming_duration_seconds_bucket{le="4"} 1
+kubeproxy_network_programming_duration_seconds_bucket{le="5"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="6"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="7"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="8"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="9"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="10"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="11"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="12"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="13"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="14"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="15"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="16"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="17"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="18"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="19"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="20"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="21"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="22"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="23"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="24"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="25"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="26"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="27"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="28"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="29"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="30"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="31"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="32"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="33"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="34"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="35"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="36"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="37"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="38"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="39"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="40"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="41"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="42"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="43"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="44"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="45"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="46"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="47"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="48"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="49"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="50"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="51"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="52"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="53"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="54"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="55"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="56"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="57"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="58"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="59"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="60"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="65"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="70"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="75"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="80"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="85"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="90"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="95"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="100"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="105"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="110"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="115"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="120"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="150"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="180"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="210"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="240"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="270"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="300"} 2
+kubeproxy_network_programming_duration_seconds_bucket{le="+Inf"} 2
+kubeproxy_network_programming_duration_seconds_sum 4.633884953
+kubeproxy_network_programming_duration_seconds_count 2
+# HELP kubeproxy_sync_full_proxy_rules_duration_seconds [ALPHA] SyncProxyRules latency in seconds for full resyncs
+# TYPE kubeproxy_sync_full_proxy_rules_duration_seconds histogram
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.001"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.002"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.004"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.008"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.016"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.032"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.064"} 0
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.128"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.256"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="0.512"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="1.024"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="2.048"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="4.096"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="8.192"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="16.384"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_bucket{le="+Inf"} 2
+kubeproxy_sync_full_proxy_rules_duration_seconds_sum 0.24495503000000002
+kubeproxy_sync_full_proxy_rules_duration_seconds_count 2
+# HELP kubeproxy_sync_partial_proxy_rules_duration_seconds [ALPHA] SyncProxyRules latency in seconds for partial resyncs
+# TYPE kubeproxy_sync_partial_proxy_rules_duration_seconds histogram
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.001"} 0
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.002"} 0
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.004"} 0
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.008"} 0
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.016"} 0
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.032"} 1
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.064"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.128"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.256"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="0.512"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="1.024"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="2.048"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="4.096"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="8.192"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="16.384"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_bucket{le="+Inf"} 2
+kubeproxy_sync_partial_proxy_rules_duration_seconds_sum 0.052629146
+kubeproxy_sync_partial_proxy_rules_duration_seconds_count 2
+# HELP kubeproxy_sync_proxy_rules_duration_seconds [ALPHA] SyncProxyRules latency in seconds
+# TYPE kubeproxy_sync_proxy_rules_duration_seconds histogram
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.001"} 0
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.002"} 0
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.004"} 0
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.008"} 0
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.016"} 0
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.032"} 1
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.064"} 2
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.128"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.256"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="0.512"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="1.024"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="2.048"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="4.096"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="8.192"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="16.384"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_bucket{le="+Inf"} 4
+kubeproxy_sync_proxy_rules_duration_seconds_sum 0.297575151
+kubeproxy_sync_proxy_rules_duration_seconds_count 4
+# HELP kubeproxy_sync_proxy_rules_endpoint_changes_pending [ALPHA] Pending proxy rules Endpoint changes
+# TYPE kubeproxy_sync_proxy_rules_endpoint_changes_pending gauge
+kubeproxy_sync_proxy_rules_endpoint_changes_pending 0
+# HELP kubeproxy_sync_proxy_rules_endpoint_changes_total [ALPHA] Cumulative proxy rules Endpoint changes
+# TYPE kubeproxy_sync_proxy_rules_endpoint_changes_total counter
+kubeproxy_sync_proxy_rules_endpoint_changes_total 8
+# HELP kubeproxy_sync_proxy_rules_iptables_last [ALPHA] Number of iptables rules written by kube-proxy in last sync
+# TYPE kubeproxy_sync_proxy_rules_iptables_last gauge
+kubeproxy_sync_proxy_rules_iptables_last{table="filter"} 4
+kubeproxy_sync_proxy_rules_iptables_last{table="nat"} 30
+# HELP kubeproxy_sync_proxy_rules_iptables_partial_restore_failures_total [ALPHA] Cumulative proxy iptables partial restore failures
+# TYPE kubeproxy_sync_proxy_rules_iptables_partial_restore_failures_total counter
+kubeproxy_sync_proxy_rules_iptables_partial_restore_failures_total 0
+# HELP kubeproxy_sync_proxy_rules_iptables_restore_failures_total [ALPHA] Cumulative proxy iptables restore failures
+# TYPE kubeproxy_sync_proxy_rules_iptables_restore_failures_total counter
+kubeproxy_sync_proxy_rules_iptables_restore_failures_total 0
+# HELP kubeproxy_sync_proxy_rules_iptables_total [ALPHA] Total number of iptables rules owned by kube-proxy
+# TYPE kubeproxy_sync_proxy_rules_iptables_total gauge
+kubeproxy_sync_proxy_rules_iptables_total{table="filter"} 4
+kubeproxy_sync_proxy_rules_iptables_total{table="nat"} 34
+# HELP kubeproxy_sync_proxy_rules_last_queued_timestamp_seconds [ALPHA] The last time a sync of proxy rules was queued
+# TYPE kubeproxy_sync_proxy_rules_last_queued_timestamp_seconds gauge
+kubeproxy_sync_proxy_rules_last_queued_timestamp_seconds 1.704894799314416e+09
+# HELP kubeproxy_sync_proxy_rules_last_timestamp_seconds [ALPHA] The last time proxy rules were successfully synced
+# TYPE kubeproxy_sync_proxy_rules_last_timestamp_seconds gauge
+kubeproxy_sync_proxy_rules_last_timestamp_seconds 1.704894799332805e+09
+# HELP kubeproxy_sync_proxy_rules_no_local_endpoints_total [ALPHA] Number of services with a Local traffic policy and no endpoints
+# TYPE kubeproxy_sync_proxy_rules_no_local_endpoints_total gauge
+kubeproxy_sync_proxy_rules_no_local_endpoints_total{traffic_policy="external"} 0
+kubeproxy_sync_proxy_rules_no_local_endpoints_total{traffic_policy="internal"} 0
+# HELP kubeproxy_sync_proxy_rules_service_changes_pending [ALPHA] Pending proxy rules Service changes
+# TYPE kubeproxy_sync_proxy_rules_service_changes_pending gauge
+kubeproxy_sync_proxy_rules_service_changes_pending 0
+# HELP kubeproxy_sync_proxy_rules_service_changes_total [ALPHA] Cumulative proxy rules Service changes
+# TYPE kubeproxy_sync_proxy_rules_service_changes_total counter
+kubeproxy_sync_proxy_rules_service_changes_total 12
+# HELP kubernetes_build_info [ALPHA] A metric with a constant '1' value labeled by major, minor, git version, git commit, git tree state, build date, Go version, and compiler from which Kubernetes was built, and platform on which it is running.
+# TYPE kubernetes_build_info gauge
+kubernetes_build_info{build_date="2023-12-14T19:18:17Z",compiler="gc",git_commit="3f7a50f38688eb332e2a1b013678c6435d539ae6",git_tree_state="clean",git_version="v1.29.0",go_version="go1.21.5",major="1",minor="29",platform="linux/amd64"} 1
+# HELP kubernetes_feature_enabled [BETA] This metric records the data about the stage and enablement of a k8s feature.
+# TYPE kubernetes_feature_enabled gauge
+kubernetes_feature_enabled{name="APIListChunking",stage=""} 1
+kubernetes_feature_enabled{name="APIPriorityAndFairness",stage=""} 1
+kubernetes_feature_enabled{name="APIResponseCompression",stage="BETA"} 1
+kubernetes_feature_enabled{name="APISelfSubjectReview",stage=""} 1
+kubernetes_feature_enabled{name="APIServerIdentity",stage="BETA"} 1
+kubernetes_feature_enabled{name="APIServerTracing",stage="BETA"} 1
+kubernetes_feature_enabled{name="AdmissionWebhookMatchConditions",stage="BETA"} 1
+kubernetes_feature_enabled{name="AggregatedDiscoveryEndpoint",stage="BETA"} 1
+kubernetes_feature_enabled{name="AllAlpha",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="AllBeta",stage="BETA"} 0
+kubernetes_feature_enabled{name="AllowServiceLBStatusOnNonLB",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="AnyVolumeDataSource",stage="BETA"} 1
+kubernetes_feature_enabled{name="AppArmor",stage="BETA"} 1
+kubernetes_feature_enabled{name="CPUManager",stage=""} 1
+kubernetes_feature_enabled{name="CPUManagerPolicyAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CPUManagerPolicyBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="CPUManagerPolicyOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="CRDValidationRatcheting",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CSIMigrationAzureFile",stage=""} 1
+kubernetes_feature_enabled{name="CSIMigrationPortworx",stage="BETA"} 0
+kubernetes_feature_enabled{name="CSIMigrationRBD",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="CSINodeExpandSecret",stage=""} 1
+kubernetes_feature_enabled{name="CSIVolumeHealth",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CloudControllerManagerWebhook",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CloudDualStackNodeIPs",stage="BETA"} 1
+kubernetes_feature_enabled{name="ClusterTrustBundle",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ClusterTrustBundleProjection",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ComponentSLIs",stage="BETA"} 1
+kubernetes_feature_enabled{name="ConsistentHTTPGetHandlers",stage=""} 1
+kubernetes_feature_enabled{name="ConsistentListFromCache",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ContainerCheckpoint",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ContextualLogging",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CronJobsScheduledAnnotation",stage="BETA"} 1
+kubernetes_feature_enabled{name="CrossNamespaceVolumeDataSource",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CustomCPUCFSQuotaPeriod",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="CustomResourceValidationExpressions",stage=""} 1
+kubernetes_feature_enabled{name="DefaultHostNetworkHostPortsInPodTemplates",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="DevicePluginCDIDevices",stage="BETA"} 1
+kubernetes_feature_enabled{name="DisableCloudProviders",stage="BETA"} 1
+kubernetes_feature_enabled{name="DisableKubeletCloudCredentialProviders",stage="BETA"} 1
+kubernetes_feature_enabled{name="DisableNodeKubeProxyVersion",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="DynamicResourceAllocation",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="EfficientWatchResumption",stage=""} 1
+kubernetes_feature_enabled{name="ElasticIndexedJob",stage="BETA"} 1
+kubernetes_feature_enabled{name="EventedPLEG",stage="BETA"} 0
+kubernetes_feature_enabled{name="ExecProbeTimeout",stage=""} 1
+kubernetes_feature_enabled{name="ExpandedDNSConfig",stage=""} 1
+kubernetes_feature_enabled{name="ExperimentalHostUserNamespaceDefaulting",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="GracefulNodeShutdown",stage="BETA"} 1
+kubernetes_feature_enabled{name="GracefulNodeShutdownBasedOnPodPriority",stage="BETA"} 1
+kubernetes_feature_enabled{name="HPAContainerMetrics",stage="BETA"} 1
+kubernetes_feature_enabled{name="HPAScaleToZero",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="HonorPVReclaimPolicy",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="IPTablesOwnershipCleanup",stage=""} 1
+kubernetes_feature_enabled{name="ImageMaximumGCAge",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InPlacePodVerticalScaling",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAWSUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAzureDiskUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginAzureFileUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginGCEUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginOpenStackUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginPortworxUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="InTreePluginRBDUnregister",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="InTreePluginvSphereUnregister",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="JobBackoffLimitPerIndex",stage="BETA"} 1
+kubernetes_feature_enabled{name="JobPodFailurePolicy",stage="BETA"} 1
+kubernetes_feature_enabled{name="JobPodReplacementPolicy",stage="BETA"} 1
+kubernetes_feature_enabled{name="JobReadyPods",stage=""} 1
+kubernetes_feature_enabled{name="KMSv1",stage="DEPRECATED"} 0
+kubernetes_feature_enabled{name="KMSv2",stage=""} 1
+kubernetes_feature_enabled{name="KMSv2KDF",stage=""} 1
+kubernetes_feature_enabled{name="KubeProxyDrainingTerminatingNodes",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletCgroupDriverFromCRI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletInUserNamespace",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResources",stage=""} 1
+kubernetes_feature_enabled{name="KubeletPodResourcesDynamicResources",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResourcesGet",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletPodResourcesGetAllocatable",stage=""} 1
+kubernetes_feature_enabled{name="KubeletSeparateDiskGC",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="KubeletTracing",stage="BETA"} 1
+kubernetes_feature_enabled{name="LegacyServiceAccountTokenCleanUp",stage="BETA"} 1
+kubernetes_feature_enabled{name="LegacyServiceAccountTokenTracking",stage=""} 1
+kubernetes_feature_enabled{name="LoadBalancerIPMode",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LocalStorageCapacityIsolationFSQuotaMonitoring",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LogarithmicScaleDown",stage="BETA"} 1
+kubernetes_feature_enabled{name="LoggingAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="LoggingBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="MatchLabelKeysInPodAffinity",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MatchLabelKeysInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="MaxUnavailableStatefulSet",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MemoryManager",stage="BETA"} 1
+kubernetes_feature_enabled{name="MemoryQoS",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="MinDomainsInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="MinimizeIPTablesRestore",stage=""} 1
+kubernetes_feature_enabled{name="MultiCIDRServiceAllocator",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="NFTablesProxyMode",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="NewVolumeManagerReconstruction",stage="BETA"} 1
+kubernetes_feature_enabled{name="NodeInclusionPolicyInPodTopologySpread",stage="BETA"} 1
+kubernetes_feature_enabled{name="NodeLogQuery",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="NodeOutOfServiceVolumeDetach",stage=""} 1
+kubernetes_feature_enabled{name="NodeSwap",stage="BETA"} 0
+kubernetes_feature_enabled{name="OpenAPIEnums",stage="BETA"} 1
+kubernetes_feature_enabled{name="PDBUnhealthyPodEvictionPolicy",stage="BETA"} 1
+kubernetes_feature_enabled{name="PersistentVolumeLastPhaseTransitionTime",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodAndContainerStatsFromCRI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodDeletionCost",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodDisruptionConditions",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodHostIPs",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodIndexLabel",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodLifecycleSleepAction",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="PodReadyToStartContainersCondition",stage="BETA"} 1
+kubernetes_feature_enabled{name="PodSchedulingReadiness",stage="BETA"} 1
+kubernetes_feature_enabled{name="ProcMountType",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ProxyTerminatingEndpoints",stage=""} 1
+kubernetes_feature_enabled{name="QOSReserved",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ReadWriteOncePod",stage=""} 1
+kubernetes_feature_enabled{name="RecoverVolumeExpansionFailure",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="RemainingItemCount",stage=""} 1
+kubernetes_feature_enabled{name="RemoveSelfLink",stage=""} 1
+kubernetes_feature_enabled{name="RotateKubeletServerCertificate",stage="BETA"} 1
+kubernetes_feature_enabled{name="RuntimeClassInImageCriApi",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="SELinuxMountReadWriteOncePod",stage="BETA"} 1
+kubernetes_feature_enabled{name="SchedulerQueueingHints",stage="BETA"} 0
+kubernetes_feature_enabled{name="SecurityContextDeny",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="SeparateTaintEvictionController",stage="BETA"} 1
+kubernetes_feature_enabled{name="ServerSideApply",stage=""} 1
+kubernetes_feature_enabled{name="ServerSideFieldValidation",stage=""} 1
+kubernetes_feature_enabled{name="ServiceAccountTokenJTI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ServiceAccountTokenNodeBinding",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ServiceAccountTokenNodeBindingValidation",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ServiceAccountTokenPodNodeInfo",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ServiceNodePortStaticSubrange",stage=""} 1
+kubernetes_feature_enabled{name="SidecarContainers",stage="BETA"} 1
+kubernetes_feature_enabled{name="SizeMemoryBackedVolumes",stage="BETA"} 1
+kubernetes_feature_enabled{name="SkipReadOnlyValidationGCE",stage="DEPRECATED"} 1
+kubernetes_feature_enabled{name="StableLoadBalancerNodeSet",stage="BETA"} 1
+kubernetes_feature_enabled{name="StatefulSetAutoDeletePVC",stage="BETA"} 1
+kubernetes_feature_enabled{name="StatefulSetStartOrdinal",stage="BETA"} 1
+kubernetes_feature_enabled{name="StorageVersionAPI",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="StorageVersionHash",stage="BETA"} 1
+kubernetes_feature_enabled{name="StructuredAuthenticationConfiguration",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="StructuredAuthorizationConfiguration",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="TopologyAwareHints",stage="BETA"} 1
+kubernetes_feature_enabled{name="TopologyManagerPolicyAlphaOptions",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="TopologyManagerPolicyBetaOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="TopologyManagerPolicyOptions",stage="BETA"} 1
+kubernetes_feature_enabled{name="TranslateStreamCloseWebsocketRequests",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="UnauthenticatedHTTP2DOSMitigation",stage="BETA"} 1
+kubernetes_feature_enabled{name="UnknownVersionInteroperabilityProxy",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="UserNamespacesPodSecurityStandards",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="UserNamespacesSupport",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="ValidatingAdmissionPolicy",stage="BETA"} 0
+kubernetes_feature_enabled{name="VolumeAttributesClass",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="VolumeCapacityPriority",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WatchBookmark",stage=""} 1
+kubernetes_feature_enabled{name="WatchList",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WinDSR",stage="ALPHA"} 0
+kubernetes_feature_enabled{name="WinOverlay",stage="BETA"} 1
+kubernetes_feature_enabled{name="WindowsHostNetwork",stage="ALPHA"} 1
+kubernetes_feature_enabled{name="ZeroLimitedNominalConcurrencyShares",stage="BETA"} 0
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1.06
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 11
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 6.4688128e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.70489479177e+09
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.315946496e+09
+# HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+# TYPE process_virtual_memory_max_bytes gauge
+process_virtual_memory_max_bytes 1.8446744073709552e+19
+# HELP registered_metrics_total [BETA] The count of registered metrics broken by stability level and deprecation version.
+# TYPE registered_metrics_total counter
+registered_metrics_total{deprecated_version="",stability_level="ALPHA"} 88
+registered_metrics_total{deprecated_version="",stability_level="BETA"} 4
+registered_metrics_total{deprecated_version="",stability_level="STABLE"} 5
+# HELP rest_client_exec_plugin_certificate_rotation_age [ALPHA] Histogram of the number of seconds the last auth exec plugin client certificate lived before being rotated. If auth exec plugin client certificates are unused, histogram will contain no data.
+# TYPE rest_client_exec_plugin_certificate_rotation_age histogram
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="600"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1800"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="3600"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="14400"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="86400"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="604800"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="2.592e+06"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="7.776e+06"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1.5552e+07"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="3.1104e+07"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="1.24416e+08"} 0
+rest_client_exec_plugin_certificate_rotation_age_bucket{le="+Inf"} 0
+rest_client_exec_plugin_certificate_rotation_age_sum 0
+rest_client_exec_plugin_certificate_rotation_age_count 0
+# HELP rest_client_exec_plugin_ttl_seconds [ALPHA] Gauge of the shortest TTL (time-to-live) of the client certificate(s) managed by the auth exec plugin. The value is in seconds until certificate expiry (negative if already expired). If auth exec plugins are unused or manage no TLS certificates, the value will be +INF.
+# TYPE rest_client_exec_plugin_ttl_seconds gauge
+rest_client_exec_plugin_ttl_seconds +Inf
+# HELP rest_client_rate_limiter_duration_seconds [ALPHA] Client side rate limiter latency in seconds. Broken down by verb, and host.
+# TYPE rest_client_rate_limiter_duration_seconds histogram
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.005"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.025"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.1"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.25"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.5"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="1"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="2"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="4"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="8"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="15"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="30"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="60"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="+Inf"} 4
+rest_client_rate_limiter_duration_seconds_sum{host="kind-control-plane:6443",verb="GET"} 1.4624e-05
+rest_client_rate_limiter_duration_seconds_count{host="kind-control-plane:6443",verb="GET"} 4
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.005"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.025"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.1"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.25"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.5"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="1"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="2"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="4"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="8"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="15"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="30"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="60"} 1
+rest_client_rate_limiter_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="+Inf"} 1
+rest_client_rate_limiter_duration_seconds_sum{host="kind-control-plane:6443",verb="POST"} 2.725e-06
+rest_client_rate_limiter_duration_seconds_count{host="kind-control-plane:6443",verb="POST"} 1
+# HELP rest_client_request_duration_seconds [ALPHA] Request latency in seconds. Broken down by verb, and host.
+# TYPE rest_client_request_duration_seconds histogram
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.005"} 3
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.025"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.1"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.25"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="0.5"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="1"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="2"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="4"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="8"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="15"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="30"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="60"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="GET",le="+Inf"} 4
+rest_client_request_duration_seconds_sum{host="kind-control-plane:6443",verb="GET"} 0.025656880000000003
+rest_client_request_duration_seconds_count{host="kind-control-plane:6443",verb="GET"} 4
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.005"} 0
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.025"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.1"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.25"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="0.5"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="1"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="2"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="4"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="8"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="15"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="30"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="60"} 1
+rest_client_request_duration_seconds_bucket{host="kind-control-plane:6443",verb="POST",le="+Inf"} 1
+rest_client_request_duration_seconds_sum{host="kind-control-plane:6443",verb="POST"} 0.018671026
+rest_client_request_duration_seconds_count{host="kind-control-plane:6443",verb="POST"} 1
+# HELP rest_client_request_size_bytes [ALPHA] Request size in bytes. Broken down by verb and host.
+# TYPE rest_client_request_size_bytes histogram
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="64"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="256"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="512"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1024"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="4096"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="16384"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="65536"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="262144"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1.048576e+06"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="4.194304e+06"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1.6777216e+07"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="+Inf"} 4
+rest_client_request_size_bytes_sum{host="kind-control-plane:6443",verb="GET"} 0
+rest_client_request_size_bytes_count{host="kind-control-plane:6443",verb="GET"} 4
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="64"} 0
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="256"} 0
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="512"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1024"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="4096"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="16384"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="65536"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="262144"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1.048576e+06"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="4.194304e+06"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1.6777216e+07"} 1
+rest_client_request_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="+Inf"} 1
+rest_client_request_size_bytes_sum{host="kind-control-plane:6443",verb="POST"} 259
+rest_client_request_size_bytes_count{host="kind-control-plane:6443",verb="POST"} 1
+# HELP rest_client_requests_total [ALPHA] Number of HTTP requests, partitioned by status code, method, and host.
+# TYPE rest_client_requests_total counter
+rest_client_requests_total{code="200",host="kind-control-plane:6443",method="GET"} 22
+rest_client_requests_total{code="201",host="kind-control-plane:6443",method="POST"} 1
+# HELP rest_client_response_size_bytes [ALPHA] Response size in bytes. Broken down by verb and host.
+# TYPE rest_client_response_size_bytes histogram
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="64"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="256"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="512"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1024"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="4096"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="16384"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="65536"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="262144"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1.048576e+06"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="4.194304e+06"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="1.6777216e+07"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="GET",le="+Inf"} 4
+rest_client_response_size_bytes_sum{host="kind-control-plane:6443",verb="GET"} 10814
+rest_client_response_size_bytes_count{host="kind-control-plane:6443",verb="GET"} 4
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="64"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="256"} 0
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="512"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1024"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="4096"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="16384"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="65536"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="262144"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1.048576e+06"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="4.194304e+06"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="1.6777216e+07"} 1
+rest_client_response_size_bytes_bucket{host="kind-control-plane:6443",verb="POST",le="+Inf"} 1
+rest_client_response_size_bytes_sum{host="kind-control-plane:6443",verb="POST"} 503
+rest_client_response_size_bytes_count{host="kind-control-plane:6443",verb="POST"} 1
+# HELP rest_client_transport_cache_entries [ALPHA] Number of transport entries in the internal cache.
+# TYPE rest_client_transport_cache_entries gauge
+rest_client_transport_cache_entries 0
+# HELP rest_client_transport_create_calls_total [ALPHA] Number of calls to get a new transport, partitioned by the result of the operation hit: obtained from the cache, miss: created and added to the cache, uncacheable: created and not cached
+# TYPE rest_client_transport_create_calls_total counter
+rest_client_transport_create_calls_total{result="miss"} 1

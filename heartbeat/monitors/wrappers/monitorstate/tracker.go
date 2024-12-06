@@ -56,33 +56,52 @@ type Tracker struct {
 // other than ES if necessary
 type StateLoader func(stdfields.StdMonitorFields) (*State, error)
 
-func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus) (ms *State) {
+func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateStatus, isFinalAttempt bool) (ms *State) {
 	//note: the return values have no concurrency controls, they may be unsafely read unless
 	//copied to the stack, copying the structs before  returning
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.getCurrentState(sf)
+	state := t.GetCurrentState(sf, RetryConfig{})
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
 		t.states[sf.ID] = state
 	} else {
-		state.recordCheck(sf, newStatus)
+		state.recordCheck(sf, newStatus, isFinalAttempt)
 	}
 	// return a copy since the state itself is a pointer that is frequently mutated
 	return state.copy()
 }
 
-func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+func (t *Tracker) GetCurrentStatus(sf stdfields.StdMonitorFields) StateStatus {
+	s := t.GetCurrentState(sf, RetryConfig{})
+	if s == nil {
+		return StatusEmpty
+	}
+	return s.Status
+}
+
+type RetryConfig struct {
+	attempts int
+	waitFn   func() time.Duration
+}
+
+func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig) (state *State) {
 	if state, ok := t.states[sf.ID]; ok {
 		return state
 	}
 
-	tries := 3
+	// Default number of attempts
+	attempts := 3
+	if rc.attempts != 0 {
+		attempts = rc.attempts
+	}
+
 	var loadedState *State
 	var err error
-	for i := 0; i < tries; i++ {
+	var i int
+	for i = 1; i <= attempts; i++ {
 		loadedState, err = t.stateLoader(sf)
 		if err == nil {
 			if loadedState != nil {
@@ -90,19 +109,30 @@ func (t *Tracker) getCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 			}
 			break
 		}
+		var loaderError LoaderError
+		if errors.As(err, &loaderError) && !loaderError.Retry {
+			logp.L().Warnf("failed to load previous monitor state: %v", loaderError)
+			break
+		}
 
+		// last attempt, exit and log error without sleeping
+		if i == attempts {
+			logp.L().Warnf("failed to load previous monitor state: %s after %d attempts: %v", sf.ID, i, err)
+			break
+		}
+
+		// Default sleep time
 		sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
-		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
+		if rc.waitFn != nil {
+			sleepFor = rc.waitFn()
+		}
+		logp.L().Warnf("could not load previous monitor state, retrying in %d milliseconds: %v", sleepFor.Milliseconds(), err)
 		time.Sleep(sleepFor)
-	}
-	if err != nil {
-		logp.L().Warn("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)
 	}
 
 	if loadedState != nil {
 		t.states[sf.ID] = loadedState
 	}
-
 	// Return what we found, even if nil
 	return loadedState
 }

@@ -25,11 +25,13 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
 type managedInput struct {
 	userID           string
+	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
@@ -52,6 +54,7 @@ func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
 ) (err error) {
+	ctx.UpdateStatus(status.Starting, "")
 	groupStore := inp.manager.getRetainedStore()
 	defer groupStore.Release()
 
@@ -60,6 +63,9 @@ func (inp *managedInput) Run(
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
+
+	metrics := NewMetrics(inp.metricsID)
+	defer metrics.Close()
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
@@ -74,11 +80,16 @@ func (inp *managedInput) Run(
 			time.Minute, // magic number
 			ctx.Logger,
 			"harvester:"),
+		metrics: metrics,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
 	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+
+	// Mark it as running for now.
+	// Any errors encountered by harverter will change state to Degraded
+	ctx.UpdateStatus(status.Running, "")
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 

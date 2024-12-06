@@ -21,21 +21,24 @@ package wineventlog
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/windows"
+	"golang.org/x/sys/windows/registry"
+	"golang.org/x/sys/windows/svc/eventlog"
 )
 
 const (
 	winlogbeatTestLogName = "WinEventLogTestGo"
 
 	security4752File      = "testdata/4752.evtx"
+	security4738File      = "testdata/4738.evtx"
 	sysmon9File           = "testdata/sysmon-9.01.evtx"
 	winErrorReportingFile = "testdata/application-windows-error-reporting.evtx"
 )
@@ -49,7 +52,7 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	const name = winlogbeatTestLogName
 	const source = "wineventlog_test"
 
-	existed, err := eventlog.InstallAsEventCreate(name, source, eventlog.Error|eventlog.Warning|eventlog.Info)
+	existed, err := installAsEventCreate(name, source, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		t.Fatalf("eventlog.InstallAsEventCreate failed: %v", err)
 	}
@@ -60,8 +63,8 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 
 	log, err = eventlog.Open(source)
 	if err != nil {
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 		t.Fatalf("eventlog.Open failed: %v", err)
 	}
 
@@ -70,18 +73,18 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	tearDown = func() {
 		log.Close()
 		EvtClearLog(NilHandle, name, "")
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 	}
 
 	return log, tearDown
 }
 
-func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+func safeWriteEvent(t testing.TB, log *eventlog.Log, eid uint32, msg string) {
 	t.Helper()
 	deadline := time.Now().Add(time.Second * 10)
 	for {
-		err := log.Report(etype, eid, msgs)
+		err := log.Info(eid, msg)
 		if err == nil {
 			return
 		}
@@ -172,4 +175,72 @@ func assertEqualIgnoreCase(t *testing.T, expected, actual string) {
 		strings.ToLower(expected),
 		strings.ToLower(actual),
 	)
+}
+
+const Application = "Application"
+
+const eventLogKeyName = `SYSTEM\CurrentControlSet\Services\EventLog`
+
+// removeSource deletes all registry elements installed for an event logging source.
+func removeSource(provider, src string) error {
+	providerKeyName := fmt.Sprintf("%s\\%s", eventLogKeyName, provider)
+	pk, err := registry.OpenKey(registry.LOCAL_MACHINE, providerKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer pk.Close()
+	return registry.DeleteKey(pk, src)
+}
+
+// removeProvider deletes all registry elements installed for an event logging provider.
+// Only use this method if you have installed a custom provider.
+func removeProvider(provider string) error {
+	// Protect against removing Application.
+	if provider == Application {
+		return fmt.Errorf("%s cannot be removed. Only custom providers can be removed.", provider)
+	}
+
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer eventLogKey.Close()
+	return registry.DeleteKey(eventLogKey, provider)
+}
+
+func installAsEventCreate(provider, src string, eventsSupported uint32) (bool, error) {
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.CREATE_SUB_KEY)
+	if err != nil {
+		return false, err
+	}
+	defer eventLogKey.Close()
+
+	pk, _, err := registry.CreateKey(eventLogKey, provider, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer pk.Close()
+
+	sk, alreadyExist, err := registry.CreateKey(pk, src, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer sk.Close()
+	if alreadyExist {
+		return true, nil
+	}
+
+	err = sk.SetDWordValue("CustomSource", 1)
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetExpandStringValue("EventMessageFile", "%SystemRoot%\\System32\\EventCreate.exe")
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetDWordValue("TypesSupported", eventsSupported)
+	if err != nil {
+		return false, err
+	}
+	return false, nil
 }

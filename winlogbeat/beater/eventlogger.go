@@ -177,15 +177,15 @@ runLoop:
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
 				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
 				}
 				continue runLoop
 			}
 			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
 				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
 				}
 				continue runLoop
 			}

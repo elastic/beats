@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/active/dialchain/tlsmeta"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -130,7 +130,7 @@ func (jf *jobFactory) makeJobs() ([]jobs.Job, error) {
 			if err != nil {
 				return nil, err
 			}
-			jobs = append(jobs, wrappers.WithURLField(url, endpointJob))
+			jobs = append(jobs, wraputil.WithURLField(url, endpointJob))
 		}
 
 	}
@@ -174,7 +174,7 @@ func (jf *jobFactory) makeDirectEndpointJob(endpointURL *url.URL) (jobs.Job, err
 
 // makeSocksLookupEndpointJob makes jobs that use a Socks5 proxy to perform DNS lookups
 func (jf *jobFactory) makeSocksLookupEndpointJob(endpointURL *url.URL) jobs.Job {
-	return wrappers.WithURLField(endpointURL,
+	return wraputil.WithURLField(endpointURL,
 		jobs.MakeSimpleJob(func(event *beat.Event) error {
 			hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
 			return jf.dial(event, hostPort, endpointURL)

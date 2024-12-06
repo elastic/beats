@@ -82,7 +82,7 @@ var (
 )
 
 func TestParseDHCPRequest(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	p, err := newPlugin(true, nil, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		t.Fatal(err)

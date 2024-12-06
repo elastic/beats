@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4738",
-      "ingested": "2022-06-08T06:21:08.368099900Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -57,8 +56,8 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
+          "USER_NORMAL_ACCOUNT",
+          "USER_DONT_EXPIRE_PASSWORD"
         ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x210",
@@ -114,7 +113,6 @@
         "iam"
       ],
       "code": "4738",
-      "ingested": "2022-06-08T06:21:08.368122700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -161,8 +159,8 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "LOCKOUT",
-          "NORMAL_ACCOUNT"
+          "USER_NORMAL_ACCOUNT",
+          "USER_DONT_EXPIRE_PASSWORD"
         ],
         "NewUacValue": "0x210",
         "OldUacValue": "0x10",

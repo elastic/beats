@@ -27,6 +27,14 @@ func TestConf_Validate(t *testing.T) {
 			},
 			WantErr: "sync_interval must be longer than update_interval",
 		},
+		"err-invalid-dataset": {
+			In: conf{
+				SyncInterval:   defaultSyncInterval,
+				UpdateInterval: defaultUpdateInterval,
+				Dataset:        "everything",
+			},
+			WantErr: "dataset must be 'all', 'users', 'devices' or empty",
+		},
 	}
 
 	for name, tc := range tests {

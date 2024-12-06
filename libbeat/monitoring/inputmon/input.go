@@ -18,9 +18,10 @@
 package inputmon
 
 import (
+	"encoding/json"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -58,7 +59,7 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	// logs during support interactions.
 	log := logp.NewLogger("metric_registry")
 	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	uuid := uuid.New().String()
+	uuid := uuid.Must(uuid.NewV4()).String()
 	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
 
 	reg = parentRegistry.NewRegistry(key)
@@ -77,4 +78,10 @@ func sanitizeID(id string) string {
 
 func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
+}
+
+// MetricSnapshotJSON returns a snapshot of the input metric values from the
+// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
+func MetricSnapshotJSON() ([]byte, error) {
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
 }

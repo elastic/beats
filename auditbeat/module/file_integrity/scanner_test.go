@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -164,32 +163,29 @@ func TestScanner(t *testing.T) {
 }
 
 func setupTestDir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "audit-file-scan")
-	if err != nil {
+	dir := t.TempDir()
+
+	if err := os.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "a"), []byte("file a"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "b"), []byte("file b"), 0o600); err != nil {
+	if err := os.Symlink(filepath.Join(dir, "b"), filepath.Join(dir, "link_to_b")); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = os.Symlink(filepath.Join(dir, "b"), filepath.Join(dir, "link_to_b")); err != nil {
+	if err := os.Mkdir(filepath.Join(dir, "subdir"), 0o700); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = os.Mkdir(filepath.Join(dir, "subdir"), 0o700); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ioutil.WriteFile(filepath.Join(dir, "subdir", "c"), []byte("file c"), 0o600); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = os.Symlink(filepath.Join(dir, "subdir"), filepath.Join(dir, "link_to_subdir")); err != nil {
+	if err := os.Symlink(filepath.Join(dir, "subdir"), filepath.Join(dir, "link_to_subdir")); err != nil {
 		t.Fatal(err)
 	}
 

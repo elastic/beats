@@ -1,5 +1,5 @@
 # Module: kibana
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kibana.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-kibana.html
 
 - module: kibana
   #metricsets:
@@ -9,3 +9,4 @@
   #basepath: ""
   #username: "user"
   #password: "secret"
+  #api_key: "foo:bar"
