@@ -34,7 +34,6 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
-	counters         map[string]string
 }
 
 // WorkerProcess struct contains the worker process details
