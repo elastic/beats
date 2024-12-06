@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
@@ -328,6 +329,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		})
 	}
 
+	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
+	if err != nil {
+		logp.Err("invalid filestream configuration: %+v", err)
+		return err
+	}
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
 		logp.Err("Failed to attempt filestream state take over: %+v", err)

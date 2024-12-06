@@ -28,23 +28,27 @@ type states struct {
 	// storeLock must be held to access store.
 	store     *statestore.Store
 	storeLock sync.Mutex
+
+	// Accepted prefixes of state keys of this registry
+	keyPrefix string
 }
 
 // newStates generates a new states registry.
-func newStates(log *logp.Logger, stateStore beater.StateStore) (*states, error) {
+func newStates(log *logp.Logger, stateStore beater.StateStore, listPrefix string) (*states, error) {
 	store, err := stateStore.Access("")
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
 	}
 
-	stateTable, err := loadS3StatesFromRegistry(log, store)
+	stateTable, err := loadS3StatesFromRegistry(log, store, listPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
 
 	return &states{
-		store:  store,
-		states: stateTable,
+		store:     store,
+		states:    stateTable,
+		keyPrefix: listPrefix,
 	}, nil
 }
 
@@ -57,6 +61,12 @@ func (s *states) IsProcessed(state state) bool {
 }
 
 func (s *states) AddState(state state) error {
+	if !strings.HasPrefix(state.Key, s.keyPrefix) {
+		// Note - This failure should not happen since we create a dedicated state instance per input.
+		// Yet, this is here to avoid any wiring errors within the component.
+		return fmt.Errorf("expected prefix %s in key %s, skipping state registering", s.keyPrefix, state.Key)
+	}
+
 	id := state.ID()
 	// Update in-memory copy
 	s.statesLock.Lock()
@@ -79,7 +89,9 @@ func (s *states) Close() {
 	s.storeLock.Unlock()
 }
 
-func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store) (map[string]state, error) {
+// loadS3StatesFromRegistry loads a copy of the registry states.
+// If prefix is set, entries will match the provided prefix(including empty prefix)
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store, prefix string) (map[string]state, error) {
 	stateTable := map[string]state{}
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
@@ -103,7 +115,11 @@ func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store) (map[st
 			return true, nil
 		}
 
-		stateTable[st.ID()] = st
+		// filter based on prefix and add entry to local copy
+		if strings.HasPrefix(st.Key, prefix) {
+			stateTable[st.ID()] = st
+		}
+
 		return true, nil
 	})
 	if err != nil {

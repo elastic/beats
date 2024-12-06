@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -62,14 +63,14 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		},
 		"not existing state": {
 			statesEdit: func(states *states) {
-				states.AddState(testState2)
+				_ = states.AddState(testState2)
 			},
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"existing state": {
 			statesEdit: func(states *states) {
-				states.AddState(testState1)
+				_ = states.AddState(testState1)
 			},
 			state:               testState1,
 			expectedIsProcessed: true,
@@ -78,7 +79,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			statesEdit: func(states *states) {
 				state := testState1
 				state.Stored = true
-				states.AddState(state)
+				_ = states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -88,7 +89,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			statesEdit: func(states *states) {
 				state := testState1
 				state.Failed = true
-				states.AddState(state)
+				_ = states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -96,7 +97,7 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		},
 		"existing unprocessed state is not persisted": {
 			statesEdit: func(states *states) {
-				states.AddState(testState1)
+				_ = states.AddState(testState1)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -108,13 +109,13 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
-			states, err := newStates(nil, store)
+			states, err := newStates(nil, store, "")
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
 				test.statesEdit(states)
 			}
 			if test.shouldReload {
-				states, err = newStates(nil, store)
+				states, err = newStates(nil, store, "")
 				require.NoError(t, err, "states creation must succeed")
 			}
 
@@ -122,4 +123,78 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			assert.Equal(t, test.expectedIsProcessed, isProcessed)
 		})
 	}
+}
+
+func TestStatesPrefixHandling(t *testing.T) {
+	logger := logp.NewLogger("state-prefix-testing")
+
+	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
+		// given
+		registry := openTestStatestore()
+
+		// when - registry with prefix
+		st, err := newStates(logger, registry, "staging-")
+		require.NoError(t, err)
+
+		// then - fail for non prefixed
+		err = st.AddState(newState("bucket", "production-logA", "etag", time.Now()))
+		require.Error(t, err)
+
+		// then - pass for correctly prefixed
+		err = st.AddState(newState("bucket", "staging-logA", "etag", time.Now()))
+		require.NoError(t, err)
+	})
+
+	t.Run("states store only load entries matching the given prefix", func(t *testing.T) {
+		// given
+		registry := openTestStatestore()
+
+		sA := newState("bucket", "A", "etag", time.Unix(1733221244, 0))
+		sA.Stored = true
+		sStagingA := newState("bucket", "staging-A", "etag", time.Unix(1733224844, 0))
+		sStagingA.Stored = true
+		sProdB := newState("bucket", "production/B", "etag", time.Unix(1733228444, 0))
+		sProdB.Stored = true
+		sSpace := newState("bucket", "  B", "etag", time.Unix(1733230444, 0))
+		sSpace.Stored = true
+
+		// add various states first with no prefix
+		st, err := newStates(logger, registry, "")
+		require.NoError(t, err)
+
+		_ = st.AddState(sA)
+		_ = st.AddState(sStagingA)
+		_ = st.AddState(sProdB)
+		_ = st.AddState(sSpace)
+
+		// Reload states and validate
+
+		// when - no prefix reload
+		stNoPrefix, err := newStates(logger, registry, "")
+		require.NoError(t, err)
+
+		require.True(t, stNoPrefix.IsProcessed(sA))
+		require.True(t, stNoPrefix.IsProcessed(sStagingA))
+		require.True(t, stNoPrefix.IsProcessed(sProdB))
+		require.True(t, stNoPrefix.IsProcessed(sSpace))
+
+		// when - with prefix `staging-`
+		st, err = newStates(logger, registry, "staging-")
+		require.NoError(t, err)
+
+		require.False(t, st.IsProcessed(sA))
+		require.True(t, st.IsProcessed(sStagingA))
+		require.False(t, st.IsProcessed(sProdB))
+		require.False(t, st.IsProcessed(sSpace))
+
+		// when - with prefix `production/`
+		st, err = newStates(logger, registry, "production/")
+		require.NoError(t, err)
+
+		require.False(t, st.IsProcessed(sA))
+		require.False(t, st.IsProcessed(sStagingA))
+		require.True(t, st.IsProcessed(sProdB))
+		require.False(t, st.IsProcessed(sSpace))
+	})
+
 }
