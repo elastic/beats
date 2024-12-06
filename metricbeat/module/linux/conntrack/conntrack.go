@@ -19,6 +19,7 @@ package conntrack
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/prometheus/procfs"
 
@@ -68,6 +69,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 	conntrackStats, err := newFS.ConntrackStat()
 	if err != nil {
+		if os.IsNotExist(err) {
+			err = mb.PartialMetricsError{Err: fmt.Errorf("nf_conntrack kernel module not loaded: %w", err)}
+		}
 		return fmt.Errorf("error fetching conntrack stats: %w", err)
 	}
 
