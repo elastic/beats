@@ -20,6 +20,7 @@ package index
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/joeshaw/multierror"
 
@@ -42,6 +43,8 @@ type Index struct {
 
 	Index  string     `json:"index"`
 	Status string     `json:"status"`
+	TierPreference string     `json:"tier_preference"`
+	CreationDate   int        `json:"creation_date"`
 	Shards shardStats `json:"shards"`
 }
 
@@ -185,6 +188,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
+	indexSettingsPattern := "*,.*"
+	indexSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indexSettingsPattern)
+	if err != nil {
+		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
+	}
+
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
@@ -201,6 +210,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
+			continue
+		}
+
+		err = addIndexSettings(&idx, indexSettings)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("failure adding index settings: %w", err))
 			continue
 		}
 
@@ -269,6 +284,45 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	}
 	idx.Shards = *shardStats
 	return nil
+}
+
+func addIndexSettings(idx *Index, indexSettings mapstr.M) error {
+
+	indexCreationDate, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.creation_date")
+	if err != nil {
+		return fmt.Errorf("failed to get index creation date: %w", err)
+	}
+
+	idx.CreationDate, err = strconv.Atoi(indexCreationDate)
+	if err != nil {
+		return fmt.Errorf("failed to convert index creation date to int: %w", err)
+	}
+
+	indexTierPreference, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.require._tier_preference")
+	if err != nil {
+		indexTierPreference, err = getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.include._tier_preference")
+		if err != nil {
+			return fmt.Errorf("failed to get index tier preference: %w", err)
+		}
+	}
+
+	idx.TierPreference = indexTierPreference
+
+	return nil
+}
+
+func getIndexSettingForIndex(indexSettings mapstr.M, index, settingKey string) (string, error) {
+	fieldKey := index + ".settings." + settingKey
+	value, err := indexSettings.GetValue(fieldKey)
+	if err != nil {
+		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	setting, ok := value.(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return setting, nil
 }
 
 func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey string) (mapstr.M, error) {
