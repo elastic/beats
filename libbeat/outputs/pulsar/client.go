@@ -104,7 +104,7 @@ func (c *client) Publish(ctx context.Context, batch publisher.Batch) error {
 		msg, err := c.getPulsarMessage(event)
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
-			c.observer.WriteError(err)
+			c.observer.PermanentErrors(1)
 			continue
 		}
 		c.producer.SendAsync(ctx, msg, c.handleSendFailed)
@@ -137,6 +137,6 @@ func (c *client) handleSendFailed(id pulsar.MessageID, _ *pulsar.ProducerMessage
 	if err != nil {
 		c.observer.WriteError(err)
 	} else {
-		c.observer.NewBatch(size)
+		c.observer.AckedEvents(size)
 	}
 }
