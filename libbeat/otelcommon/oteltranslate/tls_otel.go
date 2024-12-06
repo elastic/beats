@@ -25,6 +25,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/mitchellh/mapstructure"
+	"go.opentelemetry.io/collector/config/configtls"
 )
 
 // currently unsupported parameters
@@ -133,5 +135,21 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		"cipher_suites":                ciphersuites,              // ssl.cipher_suites
 	}
 
+	// For type safety check only
+	// the returned valued should match `clienttls.Config` type.
+	// it throws an error if non existing key names  are set
+	var result configtls.ClientConfig
+	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Squash:      true,
+		Result:      &result,
+		ErrorUnused: true,
+	})
+
+	err = d.Decode(otelTLSConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Check required fields are set on the returned value
 	return otelTLSConfig, nil
 }

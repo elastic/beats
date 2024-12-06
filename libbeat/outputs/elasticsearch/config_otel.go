@@ -28,6 +28,8 @@ import (
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelcommon/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/mitchellh/mapstructure"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 )
 
 // TODO: add  following params to below struct
@@ -35,6 +37,7 @@ import (
 // pipelines
 // parameters
 // preset
+// setup.ilm.* -> supported but the logic is not in place yet
 type unsupportedConfig struct {
 	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
@@ -42,6 +45,7 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
+	Pipeline           string            `config:"pipeline"`
 }
 
 // toOTelConfig converts a Beat config into an OTel elasticsearch exporter config
@@ -140,6 +144,28 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
 		},
 	}
+
+	// For type safety check only
+	// the returned valued should match `elasticsearchexporter.Config` type.
+	// it throws an error if non existing key names  are set
+	var result elasticsearchexporter.Config
+	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Squash:      true,
+		Result:      &result,
+		ErrorUnused: true,
+	})
+
+	err = d.Decode(otelYAMLCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO:
+	// // validates all required fields are set
+	// err = result.Validate()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return otelYAMLCfg, nil
 }
