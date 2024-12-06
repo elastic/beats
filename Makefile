@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/agentbeat x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/functionbeat x-pack/heartbeat x-pack/metricbeat x-pack/osquerybeat x-pack/packetbeat x-pack/winlogbeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/agentbeat x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/osquerybeat x-pack/packetbeat x-pack/winlogbeat
 PROJECTS=libbeat x-pack/libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
