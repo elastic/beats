@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"sync"
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -32,6 +33,12 @@ type ttlBatch struct {
 	// The callback to inform the queue (and possibly the producer)
 	// that this batch has been acknowledged.
 	done func()
+
+	// If a batch is retried in parallel, there may be multiple batches
+	// containing the same event. In this case, they share the same Once
+	// object, so the done callback isn't invoked repeatedly if both
+	// copies are ingested.
+	doneOnce *sync.Once
 
 	// The internal hook back to the eventConsumer, used to implement the
 	// publisher.Batch retry interface.
@@ -55,6 +62,10 @@ type batchSplitData struct {
 	// The original done callback, to be invoked when all split batches
 	// descending from it have been completed.
 	originalDone func()
+
+	// The original Once object ensuring the done callback isn't
+	// invoked repeatedly during parallel retries.
+	originalDoneOnce *sync.Once
 
 	// The number of events awaiting acknowledgment from the original
 	// batch. When this reaches zero, originalDone should be invoked.
@@ -80,10 +91,11 @@ func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	original.FreeEntries()
 
 	b := &ttlBatch{
-		done:    original.Done,
-		retryer: retryer,
-		ttl:     ttl,
-		events:  events,
+		done:     original.Done,
+		doneOnce: &sync.Once{},
+		retryer:  retryer,
+		ttl:      ttl,
+		events:   events,
 	}
 	return b
 }
@@ -95,13 +107,13 @@ func (b *ttlBatch) Events() []publisher.Event {
 func (b *ttlBatch) ACK() {
 	// Help the garbage collector clean up the event data a little faster
 	b.events = nil
-	b.done()
+	b.doneOnce.Do(b.done)
 }
 
 func (b *ttlBatch) Drop() {
 	// Help the garbage collector clean up the event data a little faster
 	b.events = nil
-	b.done()
+	b.doneOnce.Do(b.done)
 }
 
 // SplitRetry is called by the output to report that the batch is
@@ -117,7 +129,8 @@ func (b *ttlBatch) SplitRetry() bool {
 	if splitData == nil {
 		// Splitting a previously unsplit batch, create the metadata
 		splitData = &batchSplitData{
-			originalDone: b.done,
+			originalDone:     b.done,
+			originalDoneOnce: b.doneOnce,
 		}
 		// Initialize to the number of events in the original batch
 		splitData.outstandingEvents.Add(int64(len(b.events)))
@@ -126,18 +139,20 @@ func (b *ttlBatch) SplitRetry() bool {
 	events1 := b.events[:splitIndex]
 	events2 := b.events[splitIndex:]
 	b.retryer.retry(&ttlBatch{
-		events:  events1,
-		done:    splitData.doneCallback(len(events1)),
-		retryer: b.retryer,
-		ttl:     b.ttl,
-		split:   splitData,
+		events:   events1,
+		done:     splitData.doneCallback(len(events1)),
+		doneOnce: &sync.Once{},
+		retryer:  b.retryer,
+		ttl:      b.ttl,
+		split:    splitData,
 	}, false)
 	b.retryer.retry(&ttlBatch{
-		events:  events2,
-		done:    splitData.doneCallback(len(events2)),
-		retryer: b.retryer,
-		ttl:     b.ttl,
-		split:   splitData,
+		events:   events2,
+		done:     splitData.doneCallback(len(events2)),
+		doneOnce: &sync.Once{},
+		retryer:  b.retryer,
+		ttl:      b.ttl,
+		split:    splitData,
 	}, false)
 	return true
 }
@@ -148,7 +163,7 @@ func (splitData *batchSplitData) doneCallback(eventCount int) func() {
 	return func() {
 		remaining := splitData.outstandingEvents.Add(-int64(eventCount))
 		if remaining == 0 {
-			splitData.originalDone()
+			splitData.originalDoneOnce.Do(splitData.originalDone)
 		}
 	}
 }
@@ -164,6 +179,17 @@ func (b *ttlBatch) Cancelled() {
 func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.events = events
 	b.Retry()
+}
+
+func (b *ttlBatch) LogstashParallelRetry(events []publisher.Event) {
+	newBatch := &ttlBatch{
+		done:     b.done,
+		doneOnce: b.doneOnce,
+		retryer:  b.retryer,
+		ttl:      b.ttl,
+		events:   events,
+	}
+	b.retryer.retry(newBatch, false)
 }
 
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'
@@ -217,9 +243,10 @@ func NewBatchForTesting(
 	done func(),
 ) publisher.Batch {
 	return &ttlBatch{
-		events:  events,
-		done:    done,
-		retryer: testingRetryer{retryCallback},
+		events:   events,
+		done:     done,
+		doneOnce: &sync.Once{},
+		retryer:  testingRetryer{retryCallback},
 	}
 }
 

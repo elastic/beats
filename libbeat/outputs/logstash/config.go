@@ -44,6 +44,7 @@ type Config struct {
 	Backoff          Backoff               `config:"backoff"`
 	EscapeHTML       bool                  `config:"escape_html"`
 	Queue            config.Namespace      `config:"queue"`
+	ResendTimeout    time.Duration         `config:"resend_timeout"    validate:"min=0"`
 }
 
 type Backoff struct {
