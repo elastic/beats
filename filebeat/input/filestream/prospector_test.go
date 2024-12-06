@@ -23,11 +23,13 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -159,11 +161,83 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
-
+			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
+			require.NoError(t, err, "prospector Init must succeed")
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
 	}
+}
+
+func TestMigrateRegistryToFingerprint(t *testing.T) {
+	fullPath, err := filepath.Abs(filepath.Join("testdata", "log.log"))
+	if err != nil {
+		t.Fatalf("cannot get absolute path from test file: %s", err)
+	}
+	f, err := os.Open(fullPath)
+	if err != nil {
+		t.Fatalf("cannot open test file")
+	}
+	defer f.Close()
+	tmpFileName := f.Name()
+	fi, err := f.Stat()
+
+	fd := loginp.FileDescriptor{
+		Filename:    tmpFileName,
+		Info:        file.ExtendFileInfo(fi),
+		Fingerprint: "the fingerprint from this file",
+	}
+
+	inodeIdentifier, _ := newINodeDeviceIdentifier(nil)
+	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
+	newIDFunc := func(s loginp.Source) string {
+		return "test-input-" + s.Name()
+	}
+	fsEvent := loginp.FSEvent{
+		OldPath:    fullPath,
+		NewPath:    fullPath,
+		Op:         loginp.OpCreate,
+		Descriptor: fd,
+	}
+
+	registryKey := newIDFunc(inodeIdentifier.GetSource(fsEvent))
+	expectedKey := newIDFunc(fingerprintIdentifier.GetSource(fsEvent))
+
+	entries := map[string]loginp.Value{
+		registryKey: &mockUnpackValue{
+			key: registryKey,
+			fileMeta: fileMeta{
+				Source:         fullPath,
+				IdentifierName: nativeName,
+			},
+		},
+	}
+
+	testStore := newMockProspectorCleaner(entries)
+
+	filesOnDisk := map[string]loginp.FileDescriptor{
+		tmpFileName: fd,
+	}
+
+	p := fileProspector{
+		logger:      logp.L(),
+		identifier:  fingerprintIdentifier,
+		filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
+	}
+
+	err = p.Init(
+		testStore,
+		newMockProspectorCleaner(nil),
+		newIDFunc,
+	)
+	require.NoError(t, err, "prospector Init must succeed")
+	// testStore.updatedKeys is in the format
+	// oldKey -> newKey
+	assert.Equal(
+		t,
+		map[string]string{
+			registryKey: "test-input-fingerprint::the fingerprint from this file"},
+		testStore.updatedKeys,
+		expectedKey)
 }
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
