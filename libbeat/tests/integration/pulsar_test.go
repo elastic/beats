@@ -29,6 +29,7 @@ import (
 	"time"
 )
 
+// TestPulsarOutput tests the pulsar output with a running pulsar container.
 func TestPulsarOutput(t *testing.T) {
 	c, err := pulsar.Run(context.Background(), "apachepulsar/pulsar:2.10.2",
 		testcontainers.WithEnv(map[string]string{"PULSAR_MEM": "-Xmx256m"}))
