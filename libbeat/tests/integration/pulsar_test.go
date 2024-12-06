@@ -22,11 +22,12 @@ package integration
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/pulsar"
-	"testing"
-	"time"
 )
 
 // TestPulsarOutput tests the pulsar output with a running pulsar container.
