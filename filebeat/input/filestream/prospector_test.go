@@ -22,7 +22,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"sync"
 	"testing"
@@ -54,7 +53,8 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		"prospector init with clean_removed disabled with entries": {
 			entries: map[string]loginp.Value{
 				"key1": &mockUnpackValue{
-					fileMeta{
+					key: "key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "path",
 					},
@@ -67,7 +67,8 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		"prospector init with clean_removed enabled with entries": {
 			entries: map[string]loginp.Value{
 				"key1": &mockUnpackValue{
-					fileMeta{
+					key: "key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "path",
 					},
@@ -97,7 +98,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 }
 
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {
-	f, err := ioutil.TempFile("", "existing_file")
+	f, err := os.CreateTemp("", "existing_file")
 	if err != nil {
 		t.Fatalf("cannot create temp file")
 	}
@@ -118,12 +119,12 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			entries:             nil,
 			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
-			newKey:              "foo", // it isn't used but it must not be empty
 		},
 		"prospector init does not update keys of not existing files": {
 			entries: map[string]loginp.Value{
 				"not_path::key1": &mockUnpackValue{
-					fileMeta{
+					key: "not_path::key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "not_path",
 					},
@@ -131,12 +132,12 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			},
 			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
-			newKey:              "foo", // it isn't used but it must not be empty
 		},
-		"prospector init updates keys of existing files": {
+		"prospector init does not update keys if new file identity is not fingerprint": {
 			entries: map[string]loginp.Value{
 				"not_path::key1": &mockUnpackValue{
-					fileMeta{
+					key: "not_path::key1",
+					fileMeta: fileMeta{
 						Source:         tmpFileName,
 						IdentifierName: "not_path",
 					},
@@ -145,8 +146,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			filesOnDisk: map[string]loginp.FileDescriptor{
 				tmpFileName: {Info: file.ExtendFileInfo(fi)},
 			},
-			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
-			newKey:              "path::" + tmpFileName,
+			expectedUpdatedKeys: map[string]string{},
 		},
 	}
 
@@ -604,10 +604,15 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 
 type mockUnpackValue struct {
 	fileMeta
+	key string
 }
 
 func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, u.fileMeta)
+}
+
+func (u *mockUnpackValue) Key() string {
+	return u.key
 }
 
 type mockProspectorCleaner struct {
