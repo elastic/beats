@@ -42,6 +42,7 @@ type WebSocketHandler func(*testing.T, *websocket.Conn, []string)
 var inputTests = []struct {
 	name          string
 	server        func(*testing.T, WebSocketHandler, map[string]interface{}, []string)
+	proxyServer   func(*testing.T, WebSocketHandler, map[string]interface{}, []string) *httptest.Server
 	handler       WebSocketHandler
 	config        map[string]interface{}
 	response      []string
@@ -461,6 +462,7 @@ var inputTests = []struct {
 					"events": [inner_body],
 				})`,
 			"ssl": map[string]interface{}{
+				"enabled":                 true,
 				"certificate_authorities": []string{"testdata/certs/ca.crt"},
 				"certificate":             "testdata/certs/cert.pem",
 				"key":                     "testdata/certs/key.pem",
@@ -492,6 +494,70 @@ var inputTests = []struct {
 				},
 				"id": "ZeYGULpZmL5N0151HN1OyA"
 		   }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name:        "basic_proxy_forwarding",
+		proxyServer: newWebSocketProxyTestServer,
+		handler:     defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
 		want: []map[string]interface{}{
 			{
 				"pps": map[string]interface{}{
@@ -629,6 +695,9 @@ func TestInput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.server != nil {
 				test.server(t, test.handler, test.config, test.response)
+			}
+			if test.proxyServer != nil {
+				test.proxyServer(t, test.handler, test.config, test.response)
 			}
 
 			cfg := conf.MustNewConfigFrom(test.config)
@@ -841,7 +910,7 @@ func webSocketServerWithRetry(serve func(http.Handler) *httptest.Server) func(*t
 	}
 }
 
-// webSocketServerWithTLS returns a function that creates a WebSocket server with TLS.
+// webSocketServerWithTLS simulates a WebSocket server with TLS based authentication.
 func webSocketServerWithTLS(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
 	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
 		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -889,4 +958,74 @@ func defaultHandler(t *testing.T, conn *websocket.Conn, response []string) {
 			t.Fatalf("error writing message to WebSocket: %v", err)
 		}
 	}
+}
+
+// webSocketTestServer creates a WebSocket target server that communicates with the proxy handler.
+func webSocketTestServer(t *testing.T, handler WebSocketHandler, response []string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		}
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			t.Fatalf("failed to upgrade WebSocket connection: %v", err)
+			return
+		}
+		handler(t, conn, response)
+	}))
+}
+
+// webSocketProxyHandler forwards WebSocket connections to the target server.
+//
+//nolint:errcheck //we can safely ignore errors checks here
+func webSocketProxyHandler(targetURL string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Response.Body.Close()
+		//nolint:bodyclose // we can ignore the body close here
+		targetConn, _, err := websocket.DefaultDialer.Dial(targetURL, nil)
+		if err != nil {
+			http.Error(w, "failed to connect to backend WebSocket server", http.StatusBadGateway)
+			return
+		}
+		defer targetConn.Close()
+
+		upgrader := websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		}
+		clientConn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, "failed to upgrade client connection", http.StatusInternalServerError)
+			return
+		}
+		defer clientConn.Close()
+		// forward messages between client and target server
+		go func() {
+			for {
+				messageType, message, err := targetConn.ReadMessage()
+				if err != nil {
+					break
+				}
+				clientConn.WriteMessage(messageType, message)
+			}
+		}()
+		for {
+			messageType, message, err := clientConn.ReadMessage()
+			if err != nil {
+				break
+			}
+			targetConn.WriteMessage(messageType, message)
+		}
+	}
+}
+
+// newWebSocketProxyTestServer creates a proxy server forwarding WebSocket traffic.
+func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) *httptest.Server {
+	backendServer := webSocketTestServer(t, handler, response)
+	config["url"] = "ws" + backendServer.URL[4:]
+	config["proxy_url"] = "ws" + backendServer.URL[4:]
+	return httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
 }

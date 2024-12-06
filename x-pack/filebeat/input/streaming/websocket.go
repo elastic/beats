@@ -235,6 +235,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 			if err == nil {
 				return conn, response, nil
 			}
+			//nolint:errorlint // it will never be a wrapped error at this point
 			if err == websocket.ErrBadHandshake {
 				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
 				continue
@@ -280,15 +281,10 @@ func (s *websocketStream) Close() error {
 func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 	var tlsConfig *tls.Config
 	dialer := &websocket.Dialer{
-		// set default handshake timeout of 20 seconds
-		HandshakeTimeout: 20 * time.Second,
-		// no proxy by default
-		Proxy: http.ProxyFromEnvironment,
+		HandshakeTimeout: cfg.Transport.HandShakeTimeOut,
+		Proxy:            http.ProxyFromEnvironment,
 	}
-	// override handshake timeout if timeout is set in the transport config
-	if cfg.Transport.Timeout != 0 {
-		dialer.HandshakeTimeout = cfg.Transport.Timeout
-	}
+
 	// load proxy configuration if available
 	if cfg.Transport.Proxy.URL != nil {
 		var proxy func(*http.Request) (*url.URL, error)
@@ -300,6 +296,9 @@ func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 		proxyTransport := &http.Transport{
 			Proxy:              http.ProxyURL(proxyURL.URI()),
 			ProxyConnectHeader: cfg.Transport.Proxy.Headers.Headers(),
+			DialContext: (&net.Dialer{
+				Timeout: cfg.Transport.HTTPTransportSettings.Timeout,
+			}).DialContext,
 		}
 		dialer.NetDialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 			return proxyTransport.DialContext(ctx, network, addr)
