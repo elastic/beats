@@ -214,6 +214,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 
 *Auditbeat*
 
