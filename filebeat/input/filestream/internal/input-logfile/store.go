@@ -253,14 +253,19 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
-			s.store.writeState(r) // writeState only writes to the log file
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
+			s.store.writeState(r)
 
 			// Add the new resource to the ephemeralStore so the rest of the
 			// codebase can have access to the new value
 			s.store.ephemeralStore.table[newKey] = r
 
 			// Remove the old key from the store
-			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
+			// aka delete. This is also synchronously
+			// written to the disk.
+			// See store.remove for details
+			s.store.UpdateTTL(res, 0)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
