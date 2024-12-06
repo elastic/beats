@@ -357,6 +357,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 
 *Auditbeat*
 
