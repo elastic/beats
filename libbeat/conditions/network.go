@@ -176,7 +176,7 @@ func (c *Network) Check(event ValuesMap) bool {
 
 	}
 
-	return true
+	return false
 }
 
 // String returns a string representation of the Network condition.

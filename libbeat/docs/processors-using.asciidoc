@@ -312,9 +312,10 @@ range:
 ===== `network`
 
 The `network` condition checks if the field is in a certain IP network range.
-Both IPv4 and IPv6 addresses are supported. The network range may be specified
-using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
-these named ranges:
+Both IPv4 and IPv6 addresses are supported. 
+If the field contains multiple IPs, only one IP needs to match the conditional.
+The network range may be specified using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", 
+or by using one of these named ranges:
 
 - `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
   `::1/128`.
