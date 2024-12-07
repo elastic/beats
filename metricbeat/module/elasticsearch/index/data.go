@@ -362,8 +362,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
@@ -411,8 +418,15 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				primaries++
