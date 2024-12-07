@@ -188,8 +188,8 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
-	indexSettingsPattern := "*,.*"
-	indexSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indexSettingsPattern)
+	indicesSettingsPattern := "*,.*"
+	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern)
 	if err != nil {
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
 	}
@@ -213,7 +213,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 			continue
 		}
 
-		err = addIndexSettings(&idx, indexSettings)
+		err = addIndexSettings(&idx, indicesSettings)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("failure adding index settings: %w", err))
 			continue
@@ -286,7 +286,18 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	return nil
 }
 
-func addIndexSettings(idx *Index, indexSettings mapstr.M) error {
+func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
+
+	// Recover the index settings for our specific index
+	indexSettingsValue, err := indicesSettings.GetValue(idx.Index)
+	if err != nil {
+		return fmt.Errorf("failed to get index settings for index %s: %w", idx.Index, err)
+	}
+
+	indexSettings, ok := indexSettingsValue.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("index settings is not a map for index: %s", idx.Index)
+	}
 
 	indexCreationDate, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.creation_date")
 	if err != nil {
@@ -312,7 +323,7 @@ func addIndexSettings(idx *Index, indexSettings mapstr.M) error {
 }
 
 func getIndexSettingForIndex(indexSettings mapstr.M, index, settingKey string) (string, error) {
-	fieldKey := index + ".settings." + settingKey
+	fieldKey := "settings." + settingKey
 	value, err := indexSettings.GetValue(fieldKey)
 	if err != nil {
 		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
