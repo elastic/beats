@@ -118,7 +118,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			w.Write(input)
 		}))
 
-	mux.Handle("/_cluster/state/metadata,routing_table", http.HandlerFunc(
+	mux.Handle("/_cluster/state/routing_table,metadata", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
 			w.Write(input)

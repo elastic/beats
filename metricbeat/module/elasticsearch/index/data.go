@@ -20,6 +20,7 @@ package index
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/joeshaw/multierror"
 
@@ -40,9 +41,11 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index  string     `json:"index"`
-	Status string     `json:"status"`
-	Shards shardStats `json:"shards"`
+	Index          string     `json:"index"`
+	Status         string     `json:"status"`
+	TierPreference string     `json:"tier_preference"`
+	CreationDate   int        `json:"creation_date"`
+	Shards         shardStats `json:"shards"`
 }
 
 type primaries struct {
@@ -179,8 +182,18 @@ type bulkStats struct {
 }
 
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
-	clusterStateMetrics := []string{"routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterStateMetrics := []string{"routing_table", "metadata"}
+	filterPaths := []string{
+		"routing_table",
+		"metadata.indices.**.settings.index.**._tier_preference",
+		"metadata.indices.**.settings.index.creation_date",
+	}
+	clusterState, err := elasticsearch.GetClusterState(
+		httpClient,
+		httpClient.GetURI(),
+		clusterStateMetrics,
+		filterPaths,
+	)
 	if err != nil {
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
@@ -249,6 +262,23 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
+	indexMetadata, err := getClusterStateMetricForIndex(clusterState, idx.Index, "metadata")
+	if err != nil {
+		return fmt.Errorf("failed to get index metadata from cluster state: %w", err)
+	}
+
+	indexTierPreference, err := getIndexTierPreferenceFromMetadata(indexMetadata)
+	if err == nil {
+		// Tier preference is optional, so only set it if it exists
+		idx.TierPreference = indexTierPreference
+	}
+
+	indexCreationDate, err := getIndexCreationDateFromMetadata(indexMetadata)
+	if err != nil {
+		return fmt.Errorf("failed to get index creation date from metadata: %w", err)
+	}
+	idx.CreationDate = indexCreationDate
+
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
 		return fmt.Errorf("failed to get shards from routing table: %w", err)
@@ -285,6 +315,38 @@ func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey strin
 	return mapstr.M(metric), nil
 }
 
+func getIndexTierPreferenceFromMetadata(indexMetadata mapstr.M) (string, error) {
+	fieldKey := "settings.index.routing.allocation.include._tier_preference"
+	value, err := indexMetadata.GetValue(fieldKey)
+	if err != nil {
+		fieldKey = "settings.index.routing.allocation.require._tier_preference"
+		value, err = indexMetadata.GetValue(fieldKey)
+		if err != nil {
+			return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+		}
+	}
+
+	tierPreference, ok := value.(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return tierPreference, nil
+}
+
+func getIndexCreationDateFromMetadata(indexMetadata mapstr.M) (int, error) {
+	fieldKey := "settings.index.creation_date"
+	value, err := indexMetadata.GetValue(fieldKey)
+	if err != nil {
+		return 0, fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	creationDate, err := strconv.Atoi(value.(string))
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse index creation date: %w", err)
+	}
+	return creationDate, nil
+}
+
 func getIndexStatus(shards map[string]interface{}) (string, error) {
 	if len(shards) == 0 {
 		// No shards, index is red
@@ -308,8 +370,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
@@ -357,8 +426,15 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				primaries++
