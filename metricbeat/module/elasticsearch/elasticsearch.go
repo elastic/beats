@@ -288,21 +288,13 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 }
 
 // GetClusterState returns cluster state information.
-func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filterPaths []string) (mapstr.M, error) {
-	queryParams := []string{"local=true"}
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
 	clusterStateURI := "_cluster/state"
 	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	if len(filterPaths) > 0 {
-		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
-		queryParams = append(queryParams, filterPathQueryParam)
-	}
-
-	queryString := strings.Join(queryParams, "&")
-
-	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
+	content, err := fetchPath(http, resetURI, clusterStateURI, "local=true")
 	if err != nil {
 		return nil, err
 	}
@@ -312,19 +304,10 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filte
 	return clusterState, err
 }
 
-func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string, filterPaths []string) (mapstr.M, error) {
-
-	queryParams := []string{"local=true", "expand_wildcards=hidden,all"}
+func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string) (mapstr.M, error) {
 	indicesSettingsURI := indexPattern + "/_settings"
 
-	if len(filterPaths) > 0 {
-		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
-		queryParams = append(queryParams, filterPathQueryParam)
-	}
-
-	queryString := strings.Join(queryParams, "&")
-
-	content, err := fetchPath(http, resetURI, indicesSettingsURI, queryString)
+	content, err := fetchPath(http, resetURI, indicesSettingsURI, "local=true&expand_wildcards=hidden,all")
 	if err != nil {
 		return nil, err
 	}

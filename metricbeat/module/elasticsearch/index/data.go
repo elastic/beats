@@ -183,15 +183,13 @@ type bulkStats struct {
 
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	clusterStateMetrics := []string{"routing_table"}
-	clusterStateFilterPaths := []string{"routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
 	indicesSettingsPattern := "*,.*"
-	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference"}
-	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
+	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern)
 	if err != nil {
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
 	}
