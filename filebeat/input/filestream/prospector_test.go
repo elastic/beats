@@ -22,13 +22,14 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -54,7 +55,8 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		"prospector init with clean_removed disabled with entries": {
 			entries: map[string]loginp.Value{
 				"key1": &mockUnpackValue{
-					fileMeta{
+					key: "key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "path",
 					},
@@ -67,7 +69,8 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		"prospector init with clean_removed enabled with entries": {
 			entries: map[string]loginp.Value{
 				"key1": &mockUnpackValue{
-					fileMeta{
+					key: "key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "path",
 					},
@@ -97,7 +100,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 }
 
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {
-	f, err := ioutil.TempFile("", "existing_file")
+	f, err := os.CreateTemp("", "existing_file")
 	if err != nil {
 		t.Fatalf("cannot create temp file")
 	}
@@ -112,6 +115,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		entries             map[string]loginp.Value
 		filesOnDisk         map[string]loginp.FileDescriptor
 		expectedUpdatedKeys map[string]string
+		newKey              string
 	}{
 		"prospector init does not update keys if there are no entries": {
 			entries:             nil,
@@ -121,7 +125,8 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		"prospector init does not update keys of not existing files": {
 			entries: map[string]loginp.Value{
 				"not_path::key1": &mockUnpackValue{
-					fileMeta{
+					key: "not_path::key1",
+					fileMeta: fileMeta{
 						Source:         "/no/such/path",
 						IdentifierName: "not_path",
 					},
@@ -130,10 +135,11 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			filesOnDisk:         nil,
 			expectedUpdatedKeys: map[string]string{},
 		},
-		"prospector init updates keys of existing files": {
+		"prospector init does not update keys if new file identity is not fingerprint": {
 			entries: map[string]loginp.Value{
 				"not_path::key1": &mockUnpackValue{
-					fileMeta{
+					key: "not_path::key1",
+					fileMeta: fileMeta{
 						Source:         tmpFileName,
 						IdentifierName: "not_path",
 					},
@@ -142,7 +148,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			filesOnDisk: map[string]loginp.FileDescriptor{
 				tmpFileName: {Info: file.ExtendFileInfo(fi)},
 			},
-			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
+			expectedUpdatedKeys: map[string]string{},
 		},
 	}
 
@@ -155,11 +161,83 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
-
+			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
+			require.NoError(t, err, "prospector Init must succeed")
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
 	}
+}
+
+func TestMigrateRegistryToFingerprint(t *testing.T) {
+	fullPath, err := filepath.Abs(filepath.Join("testdata", "log.log"))
+	if err != nil {
+		t.Fatalf("cannot get absolute path from test file: %s", err)
+	}
+	f, err := os.Open(fullPath)
+	if err != nil {
+		t.Fatalf("cannot open test file")
+	}
+	defer f.Close()
+	tmpFileName := f.Name()
+	fi, err := f.Stat()
+
+	fd := loginp.FileDescriptor{
+		Filename:    tmpFileName,
+		Info:        file.ExtendFileInfo(fi),
+		Fingerprint: "the fingerprint from this file",
+	}
+
+	inodeIdentifier, _ := newINodeDeviceIdentifier(nil)
+	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
+	newIDFunc := func(s loginp.Source) string {
+		return "test-input-" + s.Name()
+	}
+	fsEvent := loginp.FSEvent{
+		OldPath:    fullPath,
+		NewPath:    fullPath,
+		Op:         loginp.OpCreate,
+		Descriptor: fd,
+	}
+
+	registryKey := newIDFunc(inodeIdentifier.GetSource(fsEvent))
+	expectedKey := newIDFunc(fingerprintIdentifier.GetSource(fsEvent))
+
+	entries := map[string]loginp.Value{
+		registryKey: &mockUnpackValue{
+			key: registryKey,
+			fileMeta: fileMeta{
+				Source:         fullPath,
+				IdentifierName: nativeName,
+			},
+		},
+	}
+
+	testStore := newMockProspectorCleaner(entries)
+
+	filesOnDisk := map[string]loginp.FileDescriptor{
+		tmpFileName: fd,
+	}
+
+	p := fileProspector{
+		logger:      logp.L(),
+		identifier:  fingerprintIdentifier,
+		filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
+	}
+
+	err = p.Init(
+		testStore,
+		newMockProspectorCleaner(nil),
+		newIDFunc,
+	)
+	require.NoError(t, err, "prospector Init must succeed")
+	// testStore.updatedKeys is in the format
+	// oldKey -> newKey
+	assert.Equal(
+		t,
+		map[string]string{
+			registryKey: "test-input-fingerprint::the fingerprint from this file"},
+		testStore.updatedKeys,
+		expectedKey)
 }
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
@@ -600,10 +678,15 @@ func (mu *mockMetadataUpdater) Remove(s loginp.Source) error {
 
 type mockUnpackValue struct {
 	fileMeta
+	key string
 }
 
 func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, u.fileMeta)
+}
+
+func (u *mockUnpackValue) Key() string {
+	return u.key
 }
 
 type mockProspectorCleaner struct {
