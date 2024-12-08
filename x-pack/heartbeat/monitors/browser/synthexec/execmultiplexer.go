@@ -5,12 +5,10 @@
 
 package synthexec
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-)
+import "sync/atomic"
 
 type ExecMultiplexer struct {
-	eventCounter *atomic.Int
+	eventCounter *atomic.Int64
 	synthEvents  chan *SynthEvent
 	done         chan struct{}
 }
@@ -27,7 +25,7 @@ func (e *ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 	if se.Type == JourneyStart {
 		e.eventCounter.Store(-1)
 	}
-	se.index = e.eventCounter.Inc()
+	se.index = int(e.eventCounter.Add(1))
 
 	e.synthEvents <- se
 }
@@ -48,8 +46,10 @@ func (e *ExecMultiplexer) Wait() {
 }
 
 func NewExecMultiplexer() *ExecMultiplexer {
+	c := &atomic.Int64{}
+	c.Store(-1) // Start from -1 so first call to Inc returns 0
 	return &ExecMultiplexer{
-		eventCounter: atomic.NewInt(-1), // Start from -1 so first call to Inc returns 0
+		eventCounter: c,
 		synthEvents:  make(chan *SynthEvent),
 		done:         make(chan struct{}),
 	}
