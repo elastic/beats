@@ -18,6 +18,7 @@ import (
 
 // stateManager handles the storage and retrieval of state data with key hashing and caching capabilities
 type stateManager struct {
+	mu        sync.RWMutex
 	store     *stateStore
 	keyPrefix string
 	hashCache sync.Map
@@ -25,8 +26,8 @@ type stateManager struct {
 
 // stateStore handles persistence of key-value pairs using the filesystem
 type stateStore struct {
-	sync.RWMutex        // Protects access to the state store
-	Dir          string // Base directory for storing state files
+	Dir string // Base directory for storing state files
+	mu  sync.RWMutex
 }
 
 // newStateManager creates a new state manager instance with the given storage path
@@ -41,6 +42,7 @@ func newStateManager(storePath string) (*stateManager, error) {
 	}
 
 	return &stateManager{
+		mu:        sync.RWMutex{},
 		store:     store,
 		keyPrefix: "state_",
 		hashCache: sync.Map{},
@@ -64,8 +66,8 @@ func (s *stateStore) getStatePath(name string) string {
 
 // Put stores a value in a file named by the key
 func (s *stateStore) Put(key, value string) error {
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	filePath := s.getStatePath(key)
 
@@ -90,8 +92,8 @@ func (s *stateStore) Put(key, value string) error {
 
 // Get retrieves the value stored in the file named by the key
 func (s *stateStore) Get(key string) (string, error) {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	filePath := s.getStatePath(key)
 	data, err := os.ReadFile(filePath)
@@ -103,8 +105,8 @@ func (s *stateStore) Get(key string) (string, error) {
 
 // Has checks if a state exists for the given key
 func (s *stateStore) Has(key string) bool {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	filePath := s.getStatePath(key)
 	_, err := os.Stat(filePath)
@@ -113,8 +115,8 @@ func (s *stateStore) Has(key string) bool {
 
 // Remove deletes the state file for the given key
 func (s *stateStore) Remove(key string) error {
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	filePath := s.getStatePath(key)
 	if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
@@ -125,8 +127,8 @@ func (s *stateStore) Remove(key string) error {
 
 // Clear removes all state files by deleting and recreating the state directory
 func (s *stateStore) Clear() error {
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if err := os.RemoveAll(s.Dir); err != nil {
 		return fmt.Errorf("clearing state directory: %w", err)
@@ -136,6 +138,9 @@ func (s *stateStore) Clear() error {
 
 // GetLastProcessedDate retrieves and parses the last processed date for a given API key
 func (s *stateManager) GetLastProcessedDate(apiKey string) (time.Time, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	stateKey := s.GetStateKey(apiKey)
 
 	if !s.store.Has(stateKey) {
@@ -148,6 +153,15 @@ func (s *stateManager) GetLastProcessedDate(apiKey string) (time.Time, error) {
 	}
 
 	return time.Parse(dateFormatForStateStore, dateStr)
+}
+
+// SaveState saves the last processed date for a given API key
+func (sm *stateManager) SaveState(apiKey, dateStr string) error {
+	sm.mu.Lock()
+	defer sm.mu.Unlock()
+
+	stateKey := sm.GetStateKey(apiKey)
+	return sm.store.Put(stateKey, dateStr)
 }
 
 // hashKey generates and caches a SHA-256 hash of the provided API key
@@ -167,6 +181,7 @@ func (s *stateManager) hashKey(apiKey string) string {
 	return hashedKey
 }
 
+// GetStateKey generates a unique state key for a given API key
 func (s *stateManager) GetStateKey(apiKey string) string {
 	return s.keyPrefix + s.hashKey(apiKey)
 }

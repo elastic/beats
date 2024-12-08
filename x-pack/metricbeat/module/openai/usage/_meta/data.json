@@ -16,13 +16,13 @@
             "api_key_redacted": null,
             "api_key_type": null,
             "data": {
+                "cached_context_tokens_total": 0,
+                "context_tokens_total": 118,
                 "email": null,
-                "n_cached_context_tokens_total": 0,
-                "n_context_tokens_total": 118,
-                "n_generated_tokens_total": 35,
-                "n_requests": 1,
+                "generated_tokens_total": 35,
                 "operation": "completion-realtime",
                 "request_type": "",
+                "requests_total": 1,
                 "snapshot_id": "gpt-4o-realtime-preview-2024-10-01"
             },
             "organization_id": "org-dummy",

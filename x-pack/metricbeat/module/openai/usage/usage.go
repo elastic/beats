@@ -117,9 +117,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // 5. Handles errors per day without failing entire range
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
 	for _, apiKey := range m.config.APIKeys {
-		// stateKey using stateManager's key prefix and hashing apiKey
-		stateKey := m.stateManager.GetStateKey(apiKey.Key)
-
 		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
 		if err == nil {
 			// We have previous state, adjust start date
@@ -135,7 +132,8 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 				m.logger.Errorf("Error fetching data for date %s: %v", dateStr, err)
 				continue
 			}
-			if err := m.stateManager.store.Put(stateKey, dateStr); err != nil {
+
+			if err := m.stateManager.SaveState(apiKey.Key, dateStr); err != nil {
 				m.logger.Errorf("Error storing state for API key: %v", err)
 			}
 		}
@@ -193,27 +191,21 @@ func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
 		return fmt.Errorf("error decoding response: %w", err)
 	}
 
-	m.logger.Infof("Fetched usage metrics for date: %s", dateStr)
+	m.logger.Infof("Fetching usage metrics for date: %s", dateStr)
 
-	events := make([]mb.Event, 0, len(usageResponse.Data)+
-		len(usageResponse.DalleApiData)+
-		len(usageResponse.WhisperApiData)+
-		len(usageResponse.TtsApiData),
-	)
-
-	m.processUsageData(events, usageResponse.Data)
-	m.processDalleData(events, usageResponse.DalleApiData)
-	m.processWhisperData(events, usageResponse.WhisperApiData)
-	m.processTTSData(events, usageResponse.TtsApiData)
+	m.processUsageData(usageResponse.Data)
+	m.processDalleData(usageResponse.DalleApiData)
+	m.processWhisperData(usageResponse.WhisperApiData)
+	m.processTTSData(usageResponse.TtsApiData)
 
 	// Process additional data.
 	//
 	// NOTE(shmsr): During testing, could not get the usage data for the following
 	// and found no documentation, example responses, etc. That's why let's store them
 	// as it is so that we can use processors later on to process them as needed.
-	m.processFTData(events, usageResponse.FtData)
-	m.processAssistantCodeInterpreterData(events, usageResponse.AssistantCodeInterpreterData)
-	m.processRetrievalStorageData(events, usageResponse.RetrievalStorageData)
+	m.processFTData(usageResponse.FtData)
+	m.processAssistantCodeInterpreterData(usageResponse.AssistantCodeInterpreterData)
+	m.processRetrievalStorageData(usageResponse.RetrievalStorageData)
 
 	return nil
 }
@@ -231,20 +223,21 @@ func getBaseFields(data BaseData) mapstr.M {
 	}
 }
 
-func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
+func (m *MetricSet) processUsageData(data []UsageData) {
+	events := make([]mb.Event, 0, len(data))
 	for _, usage := range data {
 		event := mb.Event{
 			Timestamp: time.Unix(usage.AggregationTimestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"data": mapstr.M{
-					"n_requests":                    usage.NRequests,
-					"operation":                     usage.Operation,
-					"snapshot_id":                   usage.SnapshotID,
-					"n_context_tokens_total":        usage.NContextTokensTotal,
-					"n_generated_tokens_total":      usage.NGeneratedTokensTotal,
-					"email":                         usage.Email,
-					"request_type":                  usage.RequestType,
-					"n_cached_context_tokens_total": usage.NCachedContextTokensTotal,
+					"requests_total":              usage.NRequests,
+					"operation":                   usage.Operation,
+					"snapshot_id":                 usage.SnapshotID,
+					"context_tokens_total":        usage.NContextTokensTotal,
+					"generated_tokens_total":      usage.NGeneratedTokensTotal,
+					"email":                       usage.Email,
+					"request_type":                usage.RequestType,
+					"cached_context_tokens_total": usage.NCachedContextTokensTotal,
 				},
 			},
 		}
@@ -254,18 +247,19 @@ func (m *MetricSet) processUsageData(events []mb.Event, data []UsageData) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
+func (m *MetricSet) processDalleData(data []DalleData) {
+	events := make([]mb.Event, 0, len(data))
 	for _, dalle := range data {
 		event := mb.Event{
 			Timestamp: time.Unix(dalle.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"dalle": mapstr.M{
-					"num_images":   dalle.NumImages,
-					"num_requests": dalle.NumRequests,
-					"image_size":   dalle.ImageSize,
-					"operation":    dalle.Operation,
-					"user_id":      dalle.UserID,
-					"model_id":     dalle.ModelID,
+					"num_images":     dalle.NumImages,
+					"requests_total": dalle.NumRequests,
+					"image_size":     dalle.ImageSize,
+					"operation":      dalle.Operation,
+					"user_id":        dalle.UserID,
+					"model_id":       dalle.ModelID,
 				},
 			},
 		}
@@ -275,16 +269,17 @@ func (m *MetricSet) processDalleData(events []mb.Event, data []DalleData) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
+func (m *MetricSet) processWhisperData(data []WhisperData) {
+	events := make([]mb.Event, 0, len(data))
 	for _, whisper := range data {
 		event := mb.Event{
 			Timestamp: time.Unix(whisper.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
 			MetricSetFields: mapstr.M{
 				"whisper": mapstr.M{
-					"model_id":     whisper.ModelID,
-					"num_seconds":  whisper.NumSeconds,
-					"num_requests": whisper.NumRequests,
-					"user_id":      whisper.UserID,
+					"model_id":       whisper.ModelID,
+					"num_seconds":    whisper.NumSeconds,
+					"requests_total": whisper.NumRequests,
+					"user_id":        whisper.UserID,
 				},
 			},
 		}
@@ -294,7 +289,8 @@ func (m *MetricSet) processWhisperData(events []mb.Event, data []WhisperData) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
+func (m *MetricSet) processTTSData(data []TtsData) {
+	events := make([]mb.Event, 0, len(data))
 	for _, tts := range data {
 		event := mb.Event{
 			Timestamp: time.Unix(tts.Timestamp, 0).UTC(), // epoch time to time.Time (UTC)
@@ -302,7 +298,7 @@ func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 				"tts": mapstr.M{
 					"model_id":       tts.ModelID,
 					"num_characters": tts.NumCharacters,
-					"num_requests":   tts.NumRequests,
+					"requests_total": tts.NumRequests,
 					"user_id":        tts.UserID,
 				},
 			},
@@ -314,7 +310,8 @@ func (m *MetricSet) processTTSData(events []mb.Event, data []TtsData) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processFTData(events []mb.Event, data []interface{}) {
+func (m *MetricSet) processFTData(data []interface{}) {
+	events := make([]mb.Event, 0, len(data))
 	for _, ft := range data {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
@@ -328,7 +325,8 @@ func (m *MetricSet) processFTData(events []mb.Event, data []interface{}) {
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processAssistantCodeInterpreterData(events []mb.Event, data []interface{}) {
+func (m *MetricSet) processAssistantCodeInterpreterData(data []interface{}) {
+	events := make([]mb.Event, 0, len(data))
 	for _, aci := range data {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
@@ -342,7 +340,8 @@ func (m *MetricSet) processAssistantCodeInterpreterData(events []mb.Event, data 
 	m.processEvents(events)
 }
 
-func (m *MetricSet) processRetrievalStorageData(events []mb.Event, data []interface{}) {
+func (m *MetricSet) processRetrievalStorageData(data []interface{}) {
+	events := make([]mb.Event, 0, len(data))
 	for _, rs := range data {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
@@ -357,10 +356,10 @@ func (m *MetricSet) processRetrievalStorageData(events []mb.Event, data []interf
 }
 
 func (m *MetricSet) processEvents(events []mb.Event) {
-	if len(events) > 0 {
-		for i := range events {
-			m.report.Event(events[i])
-		}
+	if len(events) == 0 {
+		return
 	}
-	clear(events)
+	for i := range events {
+		m.report.Event(events[i])
+	}
 }

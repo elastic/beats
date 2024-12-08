@@ -4,21 +4,39 @@
   description: >
     OpenAI API usage metrics and statistics
   fields:
+    # Common base fields at root level
+    - name: organization_id
+      type: keyword
+      description: Organization identifier
+    - name: organization_name
+      type: keyword
+      description: Organization name
+    - name: api_key_id
+      type: keyword
+      description: API key identifier
+    - name: api_key_name
+      type: keyword
+      description: API key name
+    - name: api_key_redacted
+      type: keyword
+      description: Redacted API key
+    - name: api_key_type
+      type: keyword
+      description: Type of API key
+    - name: project_id
+      type: keyword
+      description: Project identifier
+    - name: project_name
+      type: keyword
+      description: Project name
+
+    # Completion/Chat usage data
     - name: data
       type: group
       description: >
         General usage data metrics
       fields:
-        - name: organization_id
-          type: keyword
-          description: Organization identifier
-        - name: organization_name
-          type: keyword
-          description: Organization name
-        - name: aggregation_timestamp
-          type: date
-          description: Timestamp of data aggregation
-        - name: n_requests
+        - name: requests_total
           type: long
           description: Number of requests made
         - name: operation
@@ -27,52 +45,32 @@
         - name: snapshot_id
           type: keyword
           description: Snapshot identifier
-        - name: n_context_tokens_total
+        - name: context_tokens_total
           type: long
           description: Total number of context tokens used
-        - name: n_generated_tokens_total
+        - name: generated_tokens_total
           type: long
           description: Total number of generated tokens
-        - name: n_cached_context_tokens_total
+        - name: cached_context_tokens_total
           type: long
           description: Total number of cached context tokens
         - name: email
           type: keyword
           description: User email
-        - name: api_key_id
-          type: keyword
-          description: API key identifier
-        - name: api_key_name
-          type: keyword
-          description: API key name
-        - name: api_key_redacted
-          type: keyword
-          description: Redacted API key
-        - name: api_key_type
-          type: keyword
-          description: Type of API key
-        - name: project_id
-          type: keyword
-          description: Project identifier
-        - name: project_name
-          type: keyword
-          description: Project name
         - name: request_type
           type: keyword
           description: Type of request
 
+    # DALL-E image generation metrics
     - name: dalle
       type: group
       description: >
         DALL-E API usage metrics
       fields:
-        - name: timestamp
-          type: date
-          description: Timestamp of request
         - name: num_images
           type: long
           description: Number of images generated
-        - name: num_requests
+        - name: requests_total
           type: long
           description: Number of requests
         - name: image_size
@@ -84,124 +82,49 @@
         - name: user_id
           type: keyword
           description: User identifier
-        - name: organization_id
-          type: keyword
-          description: Organization identifier
-        - name: api_key_id
-          type: keyword
-          description: API key identifier
-        - name: api_key_name
-          type: keyword
-          description: API key name
-        - name: api_key_redacted
-          type: keyword
-          description: Redacted API key
-        - name: api_key_type
-          type: keyword
-          description: Type of API key
-        - name: organization_name
-          type: keyword
-          description: Organization name
         - name: model_id
           type: keyword
           description: Model identifier
-        - name: project_id
-          type: keyword
-          description: Project identifier
-        - name: project_name
-          type: keyword
-          description: Project name
 
+    # Whisper speech-to-text metrics
     - name: whisper
       type: group
       description: >
         Whisper API usage metrics
       fields:
-        - name: timestamp
-          type: date
-          description: Timestamp of request
         - name: model_id
           type: keyword
           description: Model identifier
         - name: num_seconds
           type: long
           description: Number of seconds processed
-        - name: num_requests
+        - name: requests_total
           type: long
           description: Number of requests
         - name: user_id
           type: keyword
           description: User identifier
-        - name: organization_id
-          type: keyword
-          description: Organization identifier
-        - name: api_key_id
-          type: keyword
-          description: API key identifier
-        - name: api_key_name
-          type: keyword
-          description: API key name
-        - name: api_key_redacted
-          type: keyword
-          description: Redacted API key
-        - name: api_key_type
-          type: keyword
-          description: Type of API key
-        - name: organization_name
-          type: keyword
-          description: Organization name
-        - name: project_id
-          type: keyword
-          description: Project identifier
-        - name: project_name
-          type: keyword
-          description: Project name
 
+    # Text-to-Speech metrics
     - name: tts
       type: group
       description: >
         Text-to-Speech API usage metrics
       fields:
-        - name: timestamp
-          type: date
-          description: Timestamp of request
         - name: model_id
           type: keyword
           description: Model identifier
         - name: num_characters
           type: long
           description: Number of characters processed
-        - name: num_requests
+        - name: requests_total
           type: long
           description: Number of requests
         - name: user_id
           type: keyword
           description: User identifier
-        - name: organization_id
-          type: keyword
-          description: Organization identifier
-        - name: api_key_id
-          type: keyword
-          description: API key identifier
-        - name: api_key_name
-          type: keyword
-          description: API key name
-        - name: api_key_redacted
-          type: keyword
-          description: Redacted API key
-        - name: api_key_type
-          type: keyword
-          description: Type of API key
-        - name: organization_name
-          type: keyword
-          description: Organization name
-        - name: project_id
-          type: keyword
-          description: Project identifier
-        - name: project_name
-          type: keyword
-          description: Project name
 
+    # Additional data types (raw storage)
     - name: ft_data
       type: group
       description: >
