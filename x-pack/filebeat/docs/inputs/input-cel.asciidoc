@@ -815,6 +815,13 @@ dump is configured, it is recommended that data input sizes be reduced to avoid 
 making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to
 false without unsetting the filename option.
 
+[[cel-record-coverage]]
+[float]
+==== `record_coverage`
+
+This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a
+developer-only option.
+
 [float]
 === Metrics
 
