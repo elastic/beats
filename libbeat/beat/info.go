@@ -22,6 +22,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Info stores a beats instance meta data.
@@ -41,9 +43,10 @@ type Info struct {
 
 	// Monitoring-related fields
 	Monitoring struct {
-		DefaultUsername string // The default username to be used to connect to Elasticsearch Monitoring
+		DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
+		Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
 	}
-	LogConsumer consumer.Logs //otel log consumer
+	LogConsumer consumer.Logs // otel log consumer
 
 }
 

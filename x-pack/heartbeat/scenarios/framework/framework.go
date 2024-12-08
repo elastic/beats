@@ -30,11 +30,13 @@ import (
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-type ScenarioRun func(t *testing.T) (config mapstr.M, meta ScenarioRunMeta, close func(), err error)
-type ScenarioRunMeta struct {
-	URL    *url.URL
-	Status monitorstate.StateStatus
-}
+type (
+	ScenarioRun     func(t *testing.T) (config mapstr.M, meta ScenarioRunMeta, close func(), err error)
+	ScenarioRunMeta struct {
+		URL    *url.URL
+		Status monitorstate.StateStatus
+	}
+)
 
 type Scenario struct {
 	Name         string
@@ -155,7 +157,6 @@ func NewScenarioDB() *ScenarioDB {
 		ByTag:    map[string][]Scenario{},
 		All:      []Scenario{},
 	}
-
 }
 
 func (sdb *ScenarioDB) Init() {
@@ -250,7 +251,9 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, 
 
 	mIface, err := f.Create(pipe, conf)
 	require.NoError(t, err)
-	mtr.monitor = mIface.(*monitors.Monitor)
+	mon, ok := mIface.(*monitors.Monitor)
+	require.True(t, ok, "type assertion didn't succeed")
+	mtr.monitor = mon
 	require.NotNil(t, mtr.monitor, "could not convert to monitor %v", mIface)
 	mtr.Events = pipe.PublishedEvents
 
@@ -281,12 +284,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
-		Monitoring: struct {
-			DefaultUsername string
-		}{
-			DefaultUsername: "test",
-		},
 	}
+	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
