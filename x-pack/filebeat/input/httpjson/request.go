@@ -465,7 +465,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 		}
 	}
 
-	rf.log.Debugf("new request: %#v", req)
+	rf.log.Debugw("new request", "req", redact{value: mapstrM(req), fields: []string{"header.Authorization"}})
 
 	return req, nil
 }
