@@ -19,9 +19,8 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -190,7 +189,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
@@ -234,7 +233,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func parseAPIResponse(content []byte, indicesStats *stats) error {
@@ -308,8 +307,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[primary] is not a bool", indexName)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[state] is not a string", indexName)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
@@ -357,8 +363,15 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[primary] is not a bool", indexName)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[state] is not a string", indexName)
+			}
 
 			if isPrimary {
 				primaries++
