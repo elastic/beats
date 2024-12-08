@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
 - Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 - Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
 
 *Heartbeat*
 
