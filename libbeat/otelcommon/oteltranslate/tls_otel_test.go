@@ -214,17 +214,8 @@ me1zqwZ6EX7XHaa6j1mx9tcX
 				require.NoError(t, err)
 				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
 
-				// For type safety check only
-				// the returned valued should match `clienttls.Config` type.
-				// it throws an error if non existing key names  are set
 				var result configtls.ClientConfig
-				d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-					Squash:      true,
-					Result:      &result,
-					ErrorUnused: true,
-				})
-
-				err = d.Decode(got)
+				err = mapstructure.Decode(got, &result)
 				require.NoError(t, err, "incorrect fields were set")
 
 				// validates

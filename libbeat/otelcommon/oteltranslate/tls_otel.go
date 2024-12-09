@@ -25,6 +25,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/mitchellh/mapstructure"
+	"go.opentelemetry.io/collector/config/configtls"
 )
 
 // currently unsupported parameters
@@ -69,14 +71,8 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		return nil, err
 	}
 
-	// TODO:
-	// if ssl.verification_mode:none
 	if tlscfg.VerificationMode == tlscommon.VerifyNone {
 		insecureSkipVerify = true
-		return map[string]any{
-			"insecure_skip_verify": insecureSkipVerify, // ssl.verirication_mode
-		}, nil
-
 	}
 
 	// unpacks -> ssl.certificate_authorities
@@ -96,6 +92,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	// We only include the system certificates if no CA is defined
 	includeSystemCACertsPool := len(caCerts) == 0
 
+	// TODO: Check if certificate.key is set before attempting to read from it
 	// unpacks ->  ssl.key
 	certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
 	if err != nil {
@@ -103,6 +100,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	}
 	certKeyPem := string(certKeyBytes)
 
+	// TODO: Check is certificate.certificate is set before attempting to read from it
 	// unpacks ->  ssl.certificate
 	certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
 	if err != nil {
@@ -132,6 +130,25 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		"cert_pem":                     certPem,                   // ssl.certificate
 		"key_pem":                      certKeyPem,                // ssl.key
 		"cipher_suites":                ciphersuites,              // ssl.cipher_suites
+	}
+
+	// For type safety check only
+	// the returned valued should match `clienttls.Config` type.
+	// it throws an error if non existing key name is used in the returned map structure
+	var result configtls.ClientConfig
+	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Squash:      true,
+		Result:      &result,
+		ErrorUnused: true,
+	})
+
+	if err := d.Decode(otelTLSConfig); err != nil {
+		return nil, err
+	}
+
+	// Also validate the translated config
+	if err := result.Validate(); err != nil {
+		return nil, err
 	}
 
 	return otelTLSConfig, nil
