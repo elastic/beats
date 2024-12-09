@@ -14,7 +14,7 @@ receivers:
         password: changeme
         index: form-otel-exporter
         ssl:
-          verification_mode: none
+          enabled: false
     setup:
       dashboards:
         index: form-otel-exporter*
@@ -22,7 +22,7 @@ receivers:
         host: https://localhost:5601
         password: changeme
         ssl:
-          verification_mode: none
+          enabled: false
         username: elastic
       template:
         name: form-otel-exporter

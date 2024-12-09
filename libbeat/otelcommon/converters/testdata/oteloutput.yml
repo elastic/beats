@@ -19,7 +19,7 @@ exporters:
       max_interval: 1m0s
     timeout: 1m30s
     tls:
-      insecure_skip_verify: true
+      insecure: true
     user: elastic
 
 receivers:
@@ -40,7 +40,7 @@ receivers:
         host: https://localhost:5601
         password: changeme
         ssl:
-          verification_mode: none
+          enabled: false
         username: elastic
       template:
         name: form-otel-exporter

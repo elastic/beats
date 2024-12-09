@@ -14,7 +14,7 @@ receivers:
         password: changeme
         index: form-otel-exporter
         ssl:
-          verification_mode: none
+          enabled: false
     path:
       config: .
       data: ./data
