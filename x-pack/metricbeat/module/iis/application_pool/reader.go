@@ -69,11 +69,11 @@ var appPoolCounters = map[string]string{
 	"net_clr.memory.time_in_gc_perc":         "\\.NET CLR Memory(w3wp*)\\% Time in GC",
 
 	// .NET CLR Exceptions
-	"net_clr.exceptions.total_thrown":                 "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
-	"net_clr.exceptions.thrown_per_sec":               "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
-	"net_clr.exceptions.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
-	"net_clr.exceptions.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
-	"net_clr.exceptions.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
+	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
+	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
+	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
+	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
+	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
 
 	// .NET CLR LocksAndThreads
 	"net_clr.locks_and_threads.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",

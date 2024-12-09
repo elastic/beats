@@ -54,31 +54,26 @@
       description: >
         Common Language Runtime overview.
       fields:
-        - name: exceptions
-          type: group
+        - name: finallys_per_sec
+          type: float
           description: >
-            Exceptions overview.
-          fields:
-            - name: finallys_per_sec
-              type: float
-              description: >
-                The number of finallys per sec.
-            - name: throw_to_catch_depth_per_sec
-              type: float
-              description: >
-                Throw to catch depth count per sec.
-            - name: total_thrown
-              type: long
-              description: >
-                Total number of exceptions thrown.
-            - name: filters_per_sec
-              type: float
-              description: >
-                Number of filters per sec.
-            - name: thrown_per_sec
-              type: float
-              description: >
-                Number of Exceps Thrown / sec.
+            The number of finallys per sec.
+        - name: throw_to_catch_depth_per_sec
+          type: float
+          description: >
+            Throw to catch depth count per sec.
+        - name: total_exceptions_thrown
+          type: long
+          description: >
+            Total number of exceptions thrown.
+        - name: filters_per_sec
+          type: float
+          description: >
+            Number of filters per sec.
+        - name: exceptions_thrown_per_sec
+          type: float
+          description: >
+            Number of Exceps Thrown / sec.
         - name: memory
           type: group
           description: >
