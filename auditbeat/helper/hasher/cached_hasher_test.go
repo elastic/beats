@@ -95,6 +95,7 @@ func doTestCachedHasher(t *testing.T, ch *CachedHasher) {
 
 	// Prove changing mtime invalides the entry, and causes a miss
 	ostat, err := file.Stat()
+	require.NoError(t, err)
 	mtime := ostat.ModTime().Add(time.Hour)
 	require.NoError(t, os.Chtimes(file.Name(), mtime, mtime))
 	ch.checkState(t, file.Name(), patternA, CachedHasherStats{Misses: 2, Hits: 2, Invalidations: 1})
