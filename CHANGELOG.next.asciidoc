@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
+- Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
 
 *Auditbeat*
 
@@ -187,6 +188,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix missing key in streaming input logging. {pull}41600[41600]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
 - Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
 
 *Heartbeat*
 
@@ -356,6 +359,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
+- The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
 
 *Auditbeat*
 
@@ -409,6 +414,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
 
 *Metricbeat*
+- Add benchmark module {pull}41801[41801]
 
 
 *Osquerybeat*
@@ -427,6 +433,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Language setting also added to decode xml wineventlog processor {pull}41525[41525]
 - Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
+- Make the experimental API GA and rename it to winlogbeat-raw {issue}39580[39580] {pull}41770[41770]
 
 
 *Functionbeat*

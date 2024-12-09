@@ -1,0 +1,10 @@
+- key: benchmark
+  title: "Benchmark"
+  release: beta
+  description: >
+    benchmark module
+  fields:
+    - name: benchmark
+      type: group
+      description: >
+      fields:
