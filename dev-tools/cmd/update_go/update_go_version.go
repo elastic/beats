@@ -34,7 +34,6 @@ var files = []string{
 	"libbeat/docs/version.asciidoc",
 	"metricbeat/Dockerfile",
 	"metricbeat/module/http/_meta/Dockerfile",
-	"x-pack/functionbeat/Dockerfile",
 	"x-pack/libbeat/Dockerfile",
 }
 
