@@ -56675,14 +56675,7 @@ OpenAI API usage metrics and statistics
 
 
 
-[float]
-=== data
-
-General usage data metrics
-
-
-
-*`openai.usage.data.organization_id`*::
+*`openai.usage.organization_id`*::
 +
 --
 Organization identifier
@@ -56691,7 +56684,7 @@ type: keyword
 
 --
 
-*`openai.usage.data.organization_name`*::
+*`openai.usage.organization_name`*::
 +
 --
 Organization name
@@ -56700,16 +56693,68 @@ type: keyword
 
 --
 
-*`openai.usage.data.aggregation_timestamp`*::
+*`openai.usage.api_key_id`*::
 +
 --
-Timestamp of data aggregation
+API key identifier
 
-type: date
+type: keyword
 
 --
 
-*`openai.usage.data.n_requests`*::
+*`openai.usage.api_key_name`*::
++
+--
+API key name
+
+type: keyword
+
+--
+
+*`openai.usage.api_key_redacted`*::
++
+--
+Redacted API key
+
+type: keyword
+
+--
+
+*`openai.usage.api_key_type`*::
++
+--
+Type of API key
+
+type: keyword
+
+--
+
+*`openai.usage.project_id`*::
++
+--
+Project identifier
+
+type: keyword
+
+--
+
+*`openai.usage.project_name`*::
++
+--
+Project name
+
+type: keyword
+
+--
+
+[float]
+=== data
+
+General usage data metrics
+
+
+
+*`openai.usage.data.requests_total`*::
 +
 --
 Number of requests made
@@ -56736,7 +56781,7 @@ type: keyword
 
 --
 
-*`openai.usage.data.n_context_tokens_total`*::
+*`openai.usage.data.context_tokens_total`*::
 +
 --
 Total number of context tokens used
@@ -56745,7 +56790,7 @@ type: long
 
 --
 
-*`openai.usage.data.n_generated_tokens_total`*::
+*`openai.usage.data.generated_tokens_total`*::
 +
 --
 Total number of generated tokens
@@ -56754,7 +56799,7 @@ type: long
 
 --
 
-*`openai.usage.data.n_cached_context_tokens_total`*::
+*`openai.usage.data.cached_context_tokens_total`*::
 +
 --
 Total number of cached context tokens
@@ -56767,60 +56812,6 @@ type: long
 +
 --
 User email
-
-type: keyword
-
---
-
-*`openai.usage.data.api_key_id`*::
-+
---
-API key identifier
-
-type: keyword
-
---
-
-*`openai.usage.data.api_key_name`*::
-+
---
-API key name
-
-type: keyword
-
---
-
-*`openai.usage.data.api_key_redacted`*::
-+
---
-Redacted API key
-
-type: keyword
-
---
-
-*`openai.usage.data.api_key_type`*::
-+
---
-Type of API key
-
-type: keyword
-
---
-
-*`openai.usage.data.project_id`*::
-+
---
-Project identifier
-
-type: keyword
-
---
-
-*`openai.usage.data.project_name`*::
-+
---
-Project name
 
 type: keyword
 
@@ -56842,15 +56833,6 @@ DALL-E API usage metrics
 
 
 
-*`openai.usage.dalle.timestamp`*::
-+
---
-Timestamp of request
-
-type: date
-
---
-
 *`openai.usage.dalle.num_images`*::
 +
 --
@@ -56860,7 +56842,7 @@ type: long
 
 --
 
-*`openai.usage.dalle.num_requests`*::
+*`openai.usage.dalle.requests_total`*::
 +
 --
 Number of requests
@@ -56896,82 +56878,10 @@ type: keyword
 
 --
 
-*`openai.usage.dalle.organization_id`*::
-+
---
-Organization identifier
-
-type: keyword
-
---
-
-*`openai.usage.dalle.api_key_id`*::
-+
---
-API key identifier
-
-type: keyword
-
---
-
-*`openai.usage.dalle.api_key_name`*::
-+
---
-API key name
-
-type: keyword
-
---
-
-*`openai.usage.dalle.api_key_redacted`*::
-+
---
-Redacted API key
-
-type: keyword
-
---
-
-*`openai.usage.dalle.api_key_type`*::
-+
---
-Type of API key
-
-type: keyword
-
---
-
-*`openai.usage.dalle.organization_name`*::
-+
---
-Organization name
-
-type: keyword
-
---
-
 *`openai.usage.dalle.model_id`*::
 +
 --
 Model identifier
-
-type: keyword
-
---
-
-*`openai.usage.dalle.project_id`*::
-+
---
-Project identifier
-
-type: keyword
-
---
-
-*`openai.usage.dalle.project_name`*::
-+
---
-Project name
 
 type: keyword
 
@@ -56983,15 +56893,6 @@ type: keyword
 Whisper API usage metrics
 
 
-
-*`openai.usage.whisper.timestamp`*::
-+
---
-Timestamp of request
-
-type: date
-
---
 
 *`openai.usage.whisper.model_id`*::
 +
@@ -57011,7 +56912,7 @@ type: long
 
 --
 
-*`openai.usage.whisper.num_requests`*::
+*`openai.usage.whisper.requests_total`*::
 +
 --
 Number of requests
@@ -57029,93 +56930,12 @@ type: keyword
 
 --
 
-*`openai.usage.whisper.organization_id`*::
-+
---
-Organization identifier
-
-type: keyword
-
---
-
-*`openai.usage.whisper.api_key_id`*::
-+
---
-API key identifier
-
-type: keyword
-
---
-
-*`openai.usage.whisper.api_key_name`*::
-+
---
-API key name
-
-type: keyword
-
---
-
-*`openai.usage.whisper.api_key_redacted`*::
-+
---
-Redacted API key
-
-type: keyword
-
---
-
-*`openai.usage.whisper.api_key_type`*::
-+
---
-Type of API key
-
-type: keyword
-
---
-
-*`openai.usage.whisper.organization_name`*::
-+
---
-Organization name
-
-type: keyword
-
---
-
-*`openai.usage.whisper.project_id`*::
-+
---
-Project identifier
-
-type: keyword
-
---
-
-*`openai.usage.whisper.project_name`*::
-+
---
-Project name
-
-type: keyword
-
---
-
 [float]
 === tts
 
 Text-to-Speech API usage metrics
 
 
-
-*`openai.usage.tts.timestamp`*::
-+
---
-Timestamp of request
-
-type: date
-
---
 
 *`openai.usage.tts.model_id`*::
 +
@@ -57135,7 +56955,7 @@ type: long
 
 --
 
-*`openai.usage.tts.num_requests`*::
+*`openai.usage.tts.requests_total`*::
 +
 --
 Number of requests
@@ -57148,78 +56968,6 @@ type: long
 +
 --
 User identifier
-
-type: keyword
-
---
-
-*`openai.usage.tts.organization_id`*::
-+
---
-Organization identifier
-
-type: keyword
-
---
-
-*`openai.usage.tts.api_key_id`*::
-+
---
-API key identifier
-
-type: keyword
-
---
-
-*`openai.usage.tts.api_key_name`*::
-+
---
-API key name
-
-type: keyword
-
---
-
-*`openai.usage.tts.api_key_redacted`*::
-+
---
-Redacted API key
-
-type: keyword
-
---
-
-*`openai.usage.tts.api_key_type`*::
-+
---
-Type of API key
-
-type: keyword
-
---
-
-*`openai.usage.tts.organization_name`*::
-+
---
-Organization name
-
-type: keyword
-
---
-
-*`openai.usage.tts.project_id`*::
-+
---
-Project identifier
-
-type: keyword
-
---
-
-*`openai.usage.tts.project_name`*::
-+
---
-Project name
 
 type: keyword
 
