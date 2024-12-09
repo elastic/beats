@@ -35,6 +35,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -169,11 +170,23 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 }
 
 func TestMigrateRegistryToFingerprint(t *testing.T) {
-	fullPath, err := filepath.Abs(filepath.Join("testdata", "log.log"))
+	const mockFingerprint = "the fingerprint from this file"
+	const mockInputPrefix = "test-input"
+
+	// We need an empty file as inode marker for the
+	// 'inode marker' file identity
+	inodeMarkerFile, err := os.CreateTemp(t.TempDir(), "test-inode-marker")
+	if err != nil {
+		t.Fatalf("cannot create inode marker: '%s'", err)
+	}
+	inodeMarkerPath := inodeMarkerFile.Name()
+	inodeMarkerFile.Close()
+
+	logFileFullPath, err := filepath.Abs(filepath.Join("testdata", "log.log"))
 	if err != nil {
 		t.Fatalf("cannot get absolute path from test file: %s", err)
 	}
-	f, err := os.Open(fullPath)
+	f, err := os.Open(logFileFullPath)
 	if err != nil {
 		t.Fatalf("cannot open test file")
 	}
@@ -184,60 +197,120 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 	fd := loginp.FileDescriptor{
 		Filename:    tmpFileName,
 		Info:        file.ExtendFileInfo(fi),
-		Fingerprint: "the fingerprint from this file",
+		Fingerprint: mockFingerprint,
 	}
 
-	inodeIdentifier, _ := newINodeDeviceIdentifier(nil)
 	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
+	nativeIdentifier, _ := newINodeDeviceIdentifier(nil)
+	pathIdentifier, _ := newPathIdentifier(nil)
+	inodeIdentifier, err := newINodeMarkerIdentifier(
+		conf.MustNewConfigFrom(map[string]any{
+			"path": inodeMarkerPath,
+		}),
+	)
+
 	newIDFunc := func(s loginp.Source) string {
-		return "test-input-" + s.Name()
+		return mockInputPrefix + "-" + s.Name()
 	}
+
 	fsEvent := loginp.FSEvent{
-		OldPath:    fullPath,
-		NewPath:    fullPath,
+		OldPath:    logFileFullPath,
+		NewPath:    logFileFullPath,
 		Op:         loginp.OpCreate,
 		Descriptor: fd,
 	}
 
-	registryKey := newIDFunc(inodeIdentifier.GetSource(fsEvent))
-	expectedKey := newIDFunc(fingerprintIdentifier.GetSource(fsEvent))
+	expectedNewKey := newIDFunc(fingerprintIdentifier.GetSource(fsEvent))
 
-	entries := map[string]loginp.Value{
-		registryKey: &mockUnpackValue{
-			key: registryKey,
-			fileMeta: fileMeta{
-				Source:         fullPath,
-				IdentifierName: nativeName,
-			},
+	if err != nil {
+		t.Fatalf("cannot create inodeMarkerIdentifier: %s", err)
+	}
+
+	testCases := map[string]struct {
+		oldIdentifier           fileIdentifier
+		newIdentifier           fileIdentifier
+		expectRegistryMigration bool
+	}{
+		"inode to fingerprint succeeds": {
+			oldIdentifier:           nativeIdentifier,
+			newIdentifier:           fingerprintIdentifier,
+			expectRegistryMigration: true,
+		},
+		"path to fingerprint succeeds": {
+			oldIdentifier:           pathIdentifier,
+			newIdentifier:           fingerprintIdentifier,
+			expectRegistryMigration: true,
+		},
+		"inode marker to fingerprint fails": {
+			oldIdentifier: inodeIdentifier,
+			newIdentifier: fingerprintIdentifier,
+		},
+		"fingerprint to fingerprint fails": {
+			oldIdentifier: fingerprintIdentifier,
+			newIdentifier: fingerprintIdentifier,
+		},
+
+		// If the new identifier is not fingerprint, it will always fail.
+		// So we only test a couple of combinations
+		"fingerprint to native fails": {
+			oldIdentifier: fingerprintIdentifier,
+			newIdentifier: nativeIdentifier,
+		},
+		"path to native fails": {
+			oldIdentifier: pathIdentifier,
+			newIdentifier: nativeIdentifier,
 		},
 	}
 
-	testStore := newMockProspectorCleaner(entries)
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			oldKey := newIDFunc(tc.oldIdentifier.GetSource(fsEvent))
+			entries := map[string]loginp.Value{
+				oldKey: &mockUnpackValue{
+					key: oldKey,
+					fileMeta: fileMeta{
+						Source:         logFileFullPath,
+						IdentifierName: tc.oldIdentifier.Name(),
+					},
+				},
+			}
 
-	filesOnDisk := map[string]loginp.FileDescriptor{
-		tmpFileName: fd,
+			testStore := newMockProspectorCleaner(entries)
+			filesOnDisk := map[string]loginp.FileDescriptor{
+				tmpFileName: fd,
+			}
+
+			p := fileProspector{
+				logger:      logp.L(),
+				identifier:  tc.newIdentifier,
+				filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
+			}
+
+			err = p.Init(
+				testStore,
+				newMockProspectorCleaner(nil),
+				newIDFunc,
+			)
+			require.NoError(t, err, "prospector Init must succeed")
+			// testStore.updatedKeys is in the format
+			// oldKey -> newKey
+
+			if tc.expectRegistryMigration {
+				assert.Equal(
+					t,
+					map[string]string{
+						oldKey: expectedNewKey},
+					testStore.updatedKeys,
+					"the registry entries were not correctly migrated")
+			} else {
+				assert.Equal(
+					t,
+					map[string]string{},
+					testStore.updatedKeys,
+					"expecting no migration")
+			}
+		})
 	}
-
-	p := fileProspector{
-		logger:      logp.L(),
-		identifier:  fingerprintIdentifier,
-		filewatcher: newMockFileWatcherWithFiles(filesOnDisk),
-	}
-
-	err = p.Init(
-		testStore,
-		newMockProspectorCleaner(nil),
-		newIDFunc,
-	)
-	require.NoError(t, err, "prospector Init must succeed")
-	// testStore.updatedKeys is in the format
-	// oldKey -> newKey
-	assert.Equal(
-		t,
-		map[string]string{
-			registryKey: "test-input-fingerprint::the fingerprint from this file"},
-		testStore.updatedKeys,
-		expectedKey)
 }
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
