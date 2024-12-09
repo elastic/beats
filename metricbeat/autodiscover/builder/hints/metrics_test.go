@@ -34,6 +34,8 @@ import (
 
 func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestGenerateHints(t *testing.T) {

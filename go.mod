@@ -82,7 +82,6 @@ require (
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v24.3.25+incompatible
@@ -183,7 +182,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.17.3
+	github.com/elastic/elastic-agent-libs v0.17.4
 	github.com/elastic/elastic-agent-system-metrics v0.11.4
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-quark v0.2.0
@@ -222,7 +221,6 @@ require (
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.14.0
 	go.opentelemetry.io/collector/component v0.114.0
-	go.opentelemetry.io/collector/config/configopaque v1.20.0
 	go.opentelemetry.io/collector/config/configtls v1.20.0
 	go.opentelemetry.io/collector/confmap v1.20.0
 	go.opentelemetry.io/collector/consumer v0.114.0
@@ -232,6 +230,7 @@ require (
 	go.opentelemetry.io/collector/otelcol v0.114.0
 	go.opentelemetry.io/collector/pdata v1.20.0
 	go.opentelemetry.io/collector/receiver v0.114.0
+	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.26.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -400,6 +399,7 @@ require (
 	go.opentelemetry.io/collector/config/configauth v0.114.0 // indirect
 	go.opentelemetry.io/collector/config/configcompression v1.20.0 // indirect
 	go.opentelemetry.io/collector/config/confighttp v0.114.0 // indirect
+	go.opentelemetry.io/collector/config/configopaque v1.20.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.20.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.114.0 // indirect
 	go.opentelemetry.io/collector/config/internal v0.114.0 // indirect
