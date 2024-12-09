@@ -1,3 +1,6 @@
+## TODO: restore before merging and add this config to the PR when explaining how
+## to test the PR
+
 filebeat.config.inputs:
   enabled: true
   path: inputs.d/*.yml
