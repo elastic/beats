@@ -230,14 +230,15 @@ and descriptions.
 
 A whitelist and blacklist of event IDs. The value is a comma-separated list. The
 accepted values are single event IDs to include (e.g. 4624), a range of event
-IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735).
+IDs to include (e.g. 4700-4800), single event IDs to exclude (e.g. -4735),
+and a range of event IDs to exclude (e.g. -4701-4710).
 *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: Security
-    event_id: 4624, 4625, 4700-4800, -4735
+    event_id: 4624, 4625, 4700-4800, -4735, -4701-4710
 --------------------------------------------------------------------------------
 
 [WARNING]
@@ -499,24 +500,19 @@ example of how to read from an `.evtx` file in the <<reading-from-evtx,FAQ>>.
 ==== `event_logs.api`
 
 This selects the event log reader implementation that is used to read events
-from the Windows APIs. You should only set this option when testing experimental
-features. When the value is set to `wineventlog-experimental` Winlogbeat will
-replace the default event log reader with the **experimental** implementation.
-We are evaluating this implementation to see if it can provide increased
-performance and reduce CPU usage. *{vista_and_newer}*
+from the Windows APIs. When the value is set to `wineventlog-raw` Winlogbeat will
+replace the default XML event log reader with a more performant implementation.
+*{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: ForwardedEvents
-    api: wineventlog-experimental
+    api: wineventlog-raw
 --------------------------------------------------------------------------------
 
-There are a few notable differences in the events:
-
-* Events that contained data under `winlog.user_data` will now have it under
-  `winlog.event_data`.
-* Setting `include_xml: true` has no effect.
+* If `include_xml` is `true` the performance will be the same as the default API,
+as performance improvements are lost when parsing the XML.
 
 
 [float]
