@@ -23,9 +23,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	lru "github.com/hashicorp/golang-lru/v2"
 	"golang.org/x/sys/unix"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // CachedHasher is a metadata aware FileHasher with a LRU cache on top of it.
