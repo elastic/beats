@@ -381,9 +381,9 @@ func TestLocal(t *testing.T) {
 			// retrieve the rate.Limiter parameters for the one endpoint
 			var limit rate.Limit
 			var burst int
-			for _, l := range limiter {
-				limit = l.Limit()
-				burst = l.Burst()
+			for _, e := range limiter {
+				limit = e.limiter.Limit()
+				burst = e.limiter.Burst()
 				break
 			}
 

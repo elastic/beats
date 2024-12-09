@@ -20,68 +20,84 @@ func TestRateLimiter(t *testing.T) {
 
 	t.Run("separation by endpoint", func(t *testing.T) {
 		r := NewRateLimiter()
-		limiter1 := r.limiter("/foo")
-		limiter2 := r.limiter("/bar")
+		e1 := r.endpoint("/foo")
+		e2 := r.endpoint("/bar")
 
-		limiter1.SetBurst(1000)
+		e1.limiter.SetBurst(1000)
 
-		if limiter2.Burst() == 1000 {
+		if e2.limiter.Burst() == 1000 {
 			t.Errorf("changes to one endpoint's limits affected another")
 		}
 	})
 
 	t.Run("Update stops requests when none are remaining", func(t *testing.T) {
 		r := NewRateLimiter()
-
 		const endpoint = "/foo"
-		limiter := r.limiter(endpoint)
+		const window = time.Minute
+		url, _ := url.Parse(endpoint)
+		ctx := context.Background()
+		log := logp.L()
+		e := r.endpoint(endpoint)
 
-		if !limiter.Allow() {
+		if !e.limiter.Allow() {
 			t.Errorf("doesn't allow an initial request")
 		}
 
+		// update to none remaining, reset soon
 		now := time.Now().Unix()
-		reset := now + 30
-
+		resetSoon := now + 30
 		headers := http.Header{
 			"X-Rate-Limit-Limit":     []string{"60"},
 			"X-Rate-Limit-Remaining": []string{"0"},
-			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(reset, 10)},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(resetSoon, 10)},
 		}
-		window := time.Minute
-
 		err := r.Update(endpoint, headers, window, logp.L())
 		if err != nil {
 			t.Errorf("unexpected error from Update(): %v", err)
 		}
-		limiter = r.limiter(endpoint)
+		e = r.endpoint(endpoint)
 
-		if limiter.Allow() {
+		if e.limiter.Allow() {
 			t.Errorf("allowed a request when none are remaining")
 		}
-
-		if limiter.AllowN(time.Unix(reset-1, 999999999), 1) {
+		if e.limiter.AllowN(time.Unix(resetSoon-1, 999999999), 1) {
 			t.Errorf("allowed a request before reset, when none are remaining")
 		}
 
-		if !limiter.AllowN(time.Unix(reset+1, 0), 1) {
-			t.Errorf("doesn't allow requests to resume after reset")
+		// update to none remaining, reset now
+		headers = http.Header{
+			"X-Rate-Limit-Limit":     []string{"60"},
+			"X-Rate-Limit-Remaining": []string{"0"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(now, 10)},
+		}
+		err = r.Update(endpoint, headers, window, logp.L())
+		if err != nil {
+			t.Errorf("unexpected error from Update(): %v", err)
+		}
+		e = r.endpoint(endpoint)
+
+		start := time.Now()
+		r.Wait(ctx, endpoint, url, log)
+		wait := time.Since(start)
+
+		if wait > 1010*time.Millisecond {
+			t.Errorf("doesn't allow requests to resume after reset. had to wait %d milliseconds", wait.Milliseconds())
+		}
+		if e.limiter.Limit() != 1.0 {
+			t.Errorf("unexpected rate following reset (not 60 requests / 60 seconds): %f", e.limiter.Limit())
+		}
+		if e.limiter.Burst() != 1 {
+			t.Errorf("unexpected burst following reset (not 1): %d", e.limiter.Burst())
 		}
 
-		if limiter.Limit() != 1.0 {
-			t.Errorf("unexpected rate following reset (not 60 requests / 60 seconds): %f", limiter.Limit())
-		}
+		e.limiter.SetBurst(100) // increase bucket size to check token accumulation
+		tokens := e.limiter.TokensAt(time.Unix(0, time.Now().Add(30*time.Second).UnixNano()))
+		target := 30.0
+		buffer := 0.01
 
-		if limiter.Burst() != 1 {
-			t.Errorf("unexpected burst following reset (not 1): %d", limiter.Burst())
+		if tokens < target-buffer || tokens > target+buffer {
+			t.Errorf("tokens don't accumulate at the expected rate over 30s: %f", tokens)
 		}
-
-		limiter.SetBurstAt(time.Unix(reset, 0), 100) // increase bucket size to check token accumulation
-		tokens := limiter.TokensAt(time.Unix(reset+30, 0))
-		if tokens < 29.5 || tokens > 30.0 {
-			t.Errorf("tokens don't accumulate at the expected rate. tokens 30s after reset: %f", tokens)
-		}
-
 	})
 
 	t.Run("Very long waits are considered errors", func(t *testing.T) {

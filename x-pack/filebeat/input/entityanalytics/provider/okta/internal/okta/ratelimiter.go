@@ -16,7 +16,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type RateLimiter map[string]*rate.Limiter
+type RateLimiter map[string]endpointRateLimiter
+
+type endpointRateLimiter struct {
+	limiter *rate.Limiter
+	ready   chan struct{}
+}
 
 const waitDeadline = 30 * time.Minute
 
@@ -25,28 +30,35 @@ func NewRateLimiter() RateLimiter {
 	return r
 }
 
-func (r RateLimiter) limiter(path string) *rate.Limiter {
+func (r RateLimiter) endpoint(path string) endpointRateLimiter {
 	if existing, ok := r[path]; ok {
 		return existing
 	}
-	initial := rate.NewLimiter(1, 1) // Allow a single fetch operation to obtain limits from the API
-	r[path] = initial
-	return initial
+	limiter := rate.NewLimiter(1, 1) // Allow a single fetch operation to obtain limits from the API
+	ready := make(chan struct{})
+	close(ready)
+	newEndpointRateLimiter := endpointRateLimiter{
+		limiter: limiter,
+		ready:   ready,
+	}
+	r[path] = newEndpointRateLimiter
+	return r[path]
 }
 
 func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
-	limiter := r.limiter(endpoint)
-	log.Debugw("rate limit", "limit", limiter.Limit(), "burst", limiter.Burst(), "url", url.String())
+	e := r.endpoint(endpoint)
+	<-e.ready
+	log.Debugw("rate limit", "limit", e.limiter.Limit(), "burst", e.limiter.Burst(), "url", url.String())
 	ctxWithDeadline, cancel := context.WithDeadline(ctx, time.Now().Add(waitDeadline))
 	defer cancel()
-	return limiter.Wait(ctxWithDeadline)
+	return e.limiter.Wait(ctxWithDeadline)
 }
 
 // Update implements the Okta rate limit policy translation.
 //
 // See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
 func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration, log *logp.Logger) error {
-	limiter := r.limiter(endpoint)
+	e := r.endpoint(endpoint)
 	limit := h.Get("X-Rate-Limit-Limit")
 	remaining := h.Get("X-Rate-Limit-Remaining")
 	reset := h.Get("X-Rate-Limit-Reset")
@@ -82,20 +94,33 @@ func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration
 	if rateLimit <= 0 {
 		// Reset limiter to block requests until reset
 		limiter := rate.NewLimiter(0, 0)
-		r[endpoint] = limiter
+		ready := make(chan struct{})
+		newEndpointRateLimiter := endpointRateLimiter{
+			limiter: limiter,
+			ready:   ready,
+		}
+		r[endpoint] = newEndpointRateLimiter
+
+		resetTimeUTC := resetTime.UTC()
+		log.Debugw("rate limit block until reset", "reset_time", resetTimeUTC)
 
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
 		// permissible API request.
 		next := rate.Limit(lim / window.Seconds())
-		waitUntil := resetTime.UTC()
-		limiter.SetLimitAt(waitUntil, next)
-		limiter.SetBurstAt(waitUntil, burst)
-		log.Debugw("rate limit reset", "reset_time", waitUntil, "next_rate", next, "next_burst", burst)
+		waitFor := time.Until(resetTimeUTC)
+
+		time.AfterFunc(waitFor, func() {
+			limiter.SetLimit(next)
+			limiter.SetBurst(burst)
+			close(ready)
+			log.Debugw("rate limit reset", "reset_time", resetTimeUTC, "reset_rate", next, "reset_burst", burst)
+		})
+
 		return nil
 	}
-	limiter.SetLimit(rateLimit)
-	limiter.SetBurst(burst)
+	e.limiter.SetLimit(rateLimit)
+	e.limiter.SetBurst(burst)
 	log.Debugw("rate limit adjust", "set_rate", rateLimit, "set_burst", burst)
 	return nil
 }
