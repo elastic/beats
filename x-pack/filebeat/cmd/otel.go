@@ -8,9 +8,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/otelcol"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func OtelCmd() *cobra.Command {
