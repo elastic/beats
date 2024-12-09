@@ -40,7 +40,8 @@ func ImageSelector(platform string) (string, error) {
 	}
 	return image, nil
 }
-func CopyNCAPInstaller() error {
+
+func CopyNPCAPInstaller() error {
 	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
 		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
 		if err != nil {
