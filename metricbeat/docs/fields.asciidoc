@@ -40886,14 +40886,7 @@ Common Language Runtime overview.
 
 
 
-[float]
-=== exceptions
-
-Exceptions overview.
-
-
-
-*`iis.application_pool.net_clr.exceptions.finallys_per_sec`*::
+*`iis.application_pool.net_clr.finallys_per_sec`*::
 +
 --
 The number of finallys per sec.
@@ -40903,7 +40896,7 @@ type: float
 
 --
 
-*`iis.application_pool.net_clr.exceptions.throw_to_catch_depth_per_sec`*::
+*`iis.application_pool.net_clr.throw_to_catch_depth_per_sec`*::
 +
 --
 Throw to catch depth count per sec.
@@ -40913,7 +40906,7 @@ type: float
 
 --
 
-*`iis.application_pool.net_clr.exceptions.total_thrown`*::
+*`iis.application_pool.net_clr.total_exceptions_thrown`*::
 +
 --
 Total number of exceptions thrown.
@@ -40923,7 +40916,7 @@ type: long
 
 --
 
-*`iis.application_pool.net_clr.exceptions.filters_per_sec`*::
+*`iis.application_pool.net_clr.filters_per_sec`*::
 +
 --
 Number of filters per sec.
@@ -40933,7 +40926,7 @@ type: float
 
 --
 
-*`iis.application_pool.net_clr.exceptions.thrown_per_sec`*::
+*`iis.application_pool.net_clr.exceptions_thrown_per_sec`*::
 +
 --
 Number of Exceps Thrown / sec.
