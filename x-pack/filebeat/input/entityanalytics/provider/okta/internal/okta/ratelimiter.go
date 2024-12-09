@@ -18,6 +18,8 @@ import (
 
 type RateLimiter map[string]*rate.Limiter
 
+const waitDeadline = 30 * time.Minute
+
 func NewRateLimiter() RateLimiter {
 	r := make(RateLimiter)
 	return r
@@ -35,7 +37,9 @@ func (r RateLimiter) limiter(path string) *rate.Limiter {
 func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
 	limiter := r.limiter(endpoint)
 	log.Debugw("rate limit", "limit", limiter.Limit(), "burst", limiter.Burst(), "url", url.String())
-	return limiter.Wait(ctx)
+	ctxWithDeadline, cancel := context.WithDeadline(ctx, time.Now().Add(waitDeadline))
+	defer cancel()
+	return limiter.Wait(ctxWithDeadline)
 }
 
 // Update implements the Okta rate limit policy translation.

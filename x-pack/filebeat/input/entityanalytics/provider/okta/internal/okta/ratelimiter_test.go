@@ -5,7 +5,9 @@
 package okta
 
 import (
+	"context"
 	"net/http"
+	"net/url"
 	"strconv"
 	"testing"
 	"time"
@@ -80,5 +82,34 @@ func TestRateLimiter(t *testing.T) {
 			t.Errorf("tokens don't accumulate at the expected rate. tokens 30s after reset: %f", tokens)
 		}
 
+	})
+
+	t.Run("Very long waits are considered errors", func(t *testing.T) {
+		r := NewRateLimiter()
+
+		const endpoint = "/foo"
+
+		url, _ := url.Parse(endpoint)
+		reset := time.Now().Add(31 * time.Minute).Unix()
+		headers := http.Header{
+			"X-Rate-Limit-Limit":     []string{"60"},
+			"X-Rate-Limit-Remaining": []string{"1"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(reset, 10)},
+		}
+		window := time.Minute
+		log := logp.L()
+		ctx := context.Background()
+
+		r.Wait(ctx, endpoint, url, log)          // consume the initial request
+		r.Update(endpoint, headers, window, log) // update to a slow rate
+
+		err := r.Wait(ctx, endpoint, url, log)
+
+		const expectedErr = "rate: Wait(n=1) would exceed context deadline"
+		if err == nil {
+			t.Errorf("expected error message %q, but got no error", expectedErr)
+		} else if err.Error() != expectedErr {
+			t.Errorf("expected error message %q, but got %q", expectedErr, err.Error())
+		}
 	})
 }
