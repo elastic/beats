@@ -13,7 +13,10 @@ Users can make use of the `azure-eventhub` input in order to read messages from 
 The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
 State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
 
-
+Users can enable internal logs tracing for this input by setting the environment
+variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled,
+this input will log additional information to the logs. Additional information
+includes partition ownership, blob lease information, and other internal state.
 
 
 Example configuration:
