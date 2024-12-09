@@ -32,11 +32,12 @@ import (
 type syncClient struct {
 	log *logp.Logger
 	*transport.Client
-	client   *v2.SyncClient
-	observer outputs.Observer
-	win      *window
-	ttl      time.Duration
-	ticker   *time.Ticker
+	client        *v2.SyncClient
+	observer      outputs.Observer
+	win           *window
+	ttl           time.Duration
+	ticker        *time.Ticker
+	resendTimeout time.Duration
 }
 
 func newSyncClient(
@@ -47,10 +48,11 @@ func newSyncClient(
 ) (*syncClient, error) {
 	log := logp.NewLogger("logstash")
 	c := &syncClient{
-		log:      log,
-		Client:   conn,
-		observer: observer,
-		ttl:      config.TTL,
+		log:           log,
+		Client:        conn,
+		observer:      observer,
+		ttl:           config.TTL,
+		resendTimeout: config.ResendTimeout,
 	}
 
 	if config.SlowStart {
@@ -113,6 +115,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
+	resendListener := newResendListener(c.resendTimeout, batch)
+	defer resendListener.close()
 	for len(events) > 0 {
 
 		// check if we need to reconnect
@@ -150,13 +154,11 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 
 		events = events[n:]
 		st.AckedEvents(n)
+		resendListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)
 
-			if c.win != nil {
-				c.win.shrinkWindow()
-			}
 			_ = c.Close()
 
 			c.log.Errorf("Failed to publish events caused by: %+v", err)
@@ -186,6 +188,7 @@ func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 
 	n, err := c.sendEvents(events)
 	if err != nil {
+		c.win.shrinkWindow()
 		return n, err
 	}
 
