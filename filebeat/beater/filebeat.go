@@ -318,6 +318,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			// agentless-state-<input id>, for example httpjson-okta.system-028ecf4b-babe-44c6-939e-9e3096af6959
 			apiKey := os.Getenv("AGENTLESS_ELASTICSEARCH_APIKEY")
 			if apiKey != "" {
+				logp.Debug("modules", "The Elasticsearch output ApiKey override is specified with AGENTLESS_ELASTICSEARCH_APIKEY environment variable")
 				err := outCfg.Config().SetString("api_key", -1, apiKey)
 				if err != nil {
 					return fmt.Errorf("failed to overwrite api_key: %w", err)
