@@ -20,9 +20,9 @@
   # - "k2: v2"
   ## Rate Limiting Configuration
   # rate_limit:
-  #   limit: 12 # requests per second
-  #   burst: 1  # burst size
-  # ## Request timeout duration
+  #   limit: 12 # seconds between requests
+  #   burst: 1  # max concurrent requests
+  # ## Request Timeout Duration
   # timeout: 30s
 
   # # Data Collection Configuration
