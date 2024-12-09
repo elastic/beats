@@ -304,6 +304,19 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (maps
 	return clusterState, err
 }
 
+func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string) (mapstr.M, error) {
+	indicesSettingsURI := indexPattern + "/_settings"
+
+	content, err := fetchPath(http, resetURI, indicesSettingsURI, "local=true&expand_wildcards=hidden,all")
+	if err != nil {
+		return nil, err
+	}
+
+	var indicesSettings map[string]interface{}
+	err = json.Unmarshal(content, &indicesSettings)
+	return indicesSettings, err
+}
+
 // GetClusterSettingsWithDefaults returns cluster settings.
 func GetClusterSettingsWithDefaults(http *helper.HTTP, resetURI string, filterPaths []string) (mapstr.M, error) {
 	return GetClusterSettings(http, resetURI, true, filterPaths)
