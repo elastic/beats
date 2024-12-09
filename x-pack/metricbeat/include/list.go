@@ -21,6 +21,8 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/monitor"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/azure/storage"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/benchmark"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/benchmark/info"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry/container"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry/counter"
