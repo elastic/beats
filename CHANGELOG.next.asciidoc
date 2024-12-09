@@ -115,8 +115,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
 - Add `translate_ldap_attribute` processor. {pull}41472[41472]
 - Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
+- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
+- Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
 
 *Auditbeat*
