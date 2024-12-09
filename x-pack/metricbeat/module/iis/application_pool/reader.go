@@ -56,28 +56,28 @@ var appPoolCounters = map[string]string{
 	"process.io_write_operations_per_sec": "\\Process(w3wp*)\\IO Write Operations/sec",
 
 	// .NET CLR Memory
-	"net_clr.bytes_in_all_heaps":      "\\.NET CLR Memory(w3wp*)\\# Bytes in all Heaps",
-	"net_clr.gen_0_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 0 Collections",
-	"net_clr.gen_1_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 1 Collections",
-	"net_clr.gen_2_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 2 Collections",
-	"net_clr.total_committed_bytes":   "\\.NET CLR Memory(w3wp*)\\# Total committed Bytes",
-	"net_clr.allocated_bytes_per_sec": "\\.NET CLR Memory(w3wp*)\\Allocated Bytes/sec",
-	"net_clr.gen_0_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 0 heap size",
-	"net_clr.gen_1_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 1 heap size",
-	"net_clr.gen_2_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 2 heap size",
-	"net_clr.large_object_heap_size":  "\\.NET CLR Memory(w3wp*)\\Large Object Heap size",
-	"net_clr.time_in_gc_perc":         "\\.NET CLR Memory(w3wp*)\\% Time in GC",
+	"net_clr.memory.bytes_in_all_heaps":      "\\.NET CLR Memory(w3wp*)\\# Bytes in all Heaps",
+	"net_clr.memory.gen_0_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 0 Collections",
+	"net_clr.memory.gen_1_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 1 Collections",
+	"net_clr.memory.gen_2_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 2 Collections",
+	"net_clr.memory.total_committed_bytes":   "\\.NET CLR Memory(w3wp*)\\# Total committed Bytes",
+	"net_clr.memory.allocated_bytes_per_sec": "\\.NET CLR Memory(w3wp*)\\Allocated Bytes/sec",
+	"net_clr.memory.gen_0_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 0 heap size",
+	"net_clr.memory.gen_1_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 1 heap size",
+	"net_clr.memory.gen_2_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 2 heap size",
+	"net_clr.memory.large_object_heap_size":  "\\.NET CLR Memory(w3wp*)\\Large Object Heap size",
+	"net_clr.memory.time_in_gc_perc":         "\\.NET CLR Memory(w3wp*)\\% Time in GC",
 
 	// .NET CLR Exceptions
-	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
-	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
-	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
-	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
-	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
+	"net_clr.exceptions.total_thrown":                 "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
+	"net_clr.exceptions.thrown_per_sec":               "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
+	"net_clr.exceptions.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
+	"net_clr.exceptions.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
+	"net_clr.exceptions.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
 
 	// .NET CLR LocksAndThreads
-	"net_clr.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",
-	"net_clr.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
+	"net_clr.locks_and_threads.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",
+	"net_clr.locks_and_threads.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
 }
 
 // newReader creates a new instance of Reader.
