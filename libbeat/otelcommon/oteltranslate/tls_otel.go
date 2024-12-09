@@ -54,6 +54,10 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	logger := logp.L().Named("tls-to-otel")
 	insecureSkipVerify := false
 
+	if tlscfg == nil {
+		return nil, nil
+	}
+
 	if !tlscfg.IsEnabled() {
 		return map[string]any{
 			"insecure": true,
