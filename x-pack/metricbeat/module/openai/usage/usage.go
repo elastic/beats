@@ -14,6 +14,7 @@ import (
 	"path"
 	"time"
 
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -116,33 +117,49 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // 4. Updates state store with latest processed date
 // 5. Handles errors per day without failing entire range
 func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLHTTPClient) error {
-	for _, apiKey := range m.config.APIKeys {
-		lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
-		if err == nil {
-			// We have previous state, adjust start date
-			startDate = lastProcessedDate.AddDate(0, 0, 1)
-			if startDate.After(endDate) {
-				continue
-			}
-		}
+	g, ctx := errgroup.WithContext(context.TODO())
 
-		for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
-			dateStr := d.Format("2006-01-02")
-			if err := m.fetchSingleDay(dateStr, apiKey.Key, httpClient); err != nil {
-				m.logger.Errorf("Error fetching data for date %s: %v", dateStr, err)
-				continue
+	for i := range m.config.APIKeys {
+		apiKey := m.config.APIKeys[i]
+		apiKeyIdx := i + 1
+		g.Go(func() error {
+			lastProcessedDate, err := m.stateManager.GetLastProcessedDate(apiKey.Key)
+			if err == nil {
+				currentStartDate := lastProcessedDate.AddDate(0, 0, 1)
+				if currentStartDate.After(endDate) {
+					return nil
+				}
+				startDate = currentStartDate
 			}
 
-			if err := m.stateManager.SaveState(apiKey.Key, dateStr); err != nil {
-				m.logger.Errorf("Error storing state for API key: %v", err)
+			for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+					dateStr := d.Format("2006-01-02")
+					if err := m.fetchSingleDay(apiKeyIdx, dateStr, apiKey.Key, httpClient); err != nil {
+						m.logger.Errorf("Error fetching data (api key #%d) for date %s: %v", apiKeyIdx, dateStr, err)
+						continue
+					}
+					if err := m.stateManager.SaveState(apiKey.Key, dateStr); err != nil {
+						m.logger.Errorf("Error storing state for API key: %v at index %d", err, apiKeyIdx)
+					}
+				}
 			}
-		}
+			return nil
+		})
 	}
+
+	if err := g.Wait(); err != nil {
+		m.logger.Errorf("Error fetching data: %v", err)
+	}
+
 	return nil
 }
 
 // fetchSingleDay retrieves usage data for a specific date and API key.
-func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPClient) error {
+func (m *MetricSet) fetchSingleDay(apiKeyIdx int, dateStr, apiKey string, httpClient *RLHTTPClient) error {
 	req, err := m.createRequest(dateStr, apiKey)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
@@ -162,7 +179,7 @@ func (m *MetricSet) fetchSingleDay(dateStr, apiKey string, httpClient *RLHTTPCli
 		return fmt.Errorf("error response from API: status=%s", resp.Status)
 	}
 
-	return m.processResponse(resp, dateStr)
+	return m.processResponse(apiKeyIdx, resp, dateStr)
 }
 
 // createRequest builds an HTTP request for the OpenAI usage API.
@@ -185,13 +202,13 @@ func (m *MetricSet) createRequest(dateStr, apiKey string) (*http.Request, error)
 }
 
 // processResponse handles the API response and processes the usage data.
-func (m *MetricSet) processResponse(resp *http.Response, dateStr string) error {
+func (m *MetricSet) processResponse(apiKeyIdx int, resp *http.Response, dateStr string) error {
 	var usageResponse UsageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&usageResponse); err != nil {
 		return fmt.Errorf("error decoding response: %w", err)
 	}
 
-	m.logger.Infof("Fetching usage metrics for date: %s", dateStr)
+	m.logger.Infof("Fetching usage metrics (api key #%d) for date: %s", apiKeyIdx, dateStr)
 
 	m.processUsageData(usageResponse.Data)
 	m.processDalleData(usageResponse.DalleApiData)

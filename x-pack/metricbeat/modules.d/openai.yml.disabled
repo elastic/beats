@@ -1,3 +1,6 @@
+# Module: openai
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-openai.html
+
 - module: openai
   metricsets: ["usage"]
   enabled: false

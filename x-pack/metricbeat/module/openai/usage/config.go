@@ -39,8 +39,8 @@ func defaultConfig() Config {
 		APIURL:  "https://api.openai.com/v1/usage",
 		Timeout: 30 * time.Second,
 		RateLimit: &rateLimitConfig{
-			Limit: ptr(60),
-			Burst: ptr(5),
+			Limit: ptr(12),
+			Burst: ptr(1),
 		},
 		Collection: collectionConfig{
 			LookbackDays: 0,     // 0 days
