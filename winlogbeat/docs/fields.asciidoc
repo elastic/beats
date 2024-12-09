@@ -16282,7 +16282,7 @@ All fields specific to the Windows Event Log are defined here.
 *`winlog.api`*::
 +
 --
-The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "wineventlog-experimental" for its experimental implementation.
+The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log XML reader or "wineventlog-raw" for its more performant implementation.
 
 
 required: True
