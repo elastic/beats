@@ -219,7 +219,7 @@ indices. To minimize the privileges required by the writer role, use the
 assumes that you've run the setup.
 
 ifndef::no_ilm[]
-When using ILM, turn off the ILM setup check in the {beatname_uc} config file before
+When using {ref}/index-lifecycle-management.html[index lifecycle management (ILM)], turn off the ILM setup check in the {beatname_uc} config file before
 running {beatname_uc} to publish events:
 
 [source,yaml]
