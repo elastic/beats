@@ -8,6 +8,7 @@ package azureeventhub
 
 import (
 	"context"
+	"os"
 
 	"github.com/devigned/tab"
 
@@ -15,7 +16,12 @@ import (
 )
 
 func init() {
-	tab.Register(new(logsOnlyTracer))
+	// Register the logs tracer only if the environment variable is
+	// set to avoid the overhead of the tracer in environments where
+	// it's not needed.
+	if os.Getenv("BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED") == "true" {
+		tab.Register(new(logsOnlyTracer))
+	}
 }
 
 // logsOnlyTracer manages the creation of the required
