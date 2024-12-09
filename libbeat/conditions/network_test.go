@@ -79,6 +79,26 @@ network:
 
 		testYAMLConfig(t, true, evt, yaml)
 	})
+
+	t.Run("IP list", func(t *testing.T) {
+		const yaml = `
+network:
+  ip:
+    client: [loopback]
+    server: [loopback]
+    host: 10.10.0.0/8
+`
+
+		evt := &beat.Event{Fields: mapstr.M{
+			"ip": mapstr.M{
+				"client": "127.0.0.1",
+				"server": "127.0.0.1",
+				"host":   []string{"10.10.0.83", "fe80::4001:aff:fe9a:53"},
+			},
+		}}
+
+		testYAMLConfig(t, true, evt, yaml)
+	})
 }
 
 func TestNetworkCreate(t *testing.T) {
@@ -166,6 +186,22 @@ func TestNetworkCheck(t *testing.T) {
 		})
 	})
 
+	t.Run("multiple IPs field single match", func(t *testing.T) {
+		testConfig(t, true, httpResponseEventIPList, &Config{
+			Network: map[string]interface{}{
+				"host.ip": "10.1.0.0/24",
+			},
+		})
+	})
+
+	t.Run("multiple IPs field negative match", func(t *testing.T) {
+		testConfig(t, false, httpResponseEventIPList, &Config{
+			Network: map[string]interface{}{
+				"host.ip": "127.0.0.0/24",
+			},
+		})
+	})
+
 	// Multiple conditions are treated as an implicit AND.
 	t.Run("multiple fields negative match", func(t *testing.T) {
 		testConfig(t, false, httpResponseTestEvent, &Config{
@@ -188,6 +224,22 @@ func TestNetworkCheck(t *testing.T) {
 		testConfig(t, true, httpResponseTestEvent, &Config{
 			Network: map[string]interface{}{
 				"client_ip": []interface{}{"public", "loopback"},
+			},
+		})
+	})
+
+	t.Run("multiple values multiple IPs match", func(t *testing.T) {
+		testConfig(t, true, httpResponseEventIPList, &Config{
+			Network: map[string]interface{}{
+				"host.ip": []interface{}{"10.1.0.0/24", "127.0.0.0/24"},
+			},
+		})
+	})
+
+	t.Run("multiple values multiple IPs no match", func(t *testing.T) {
+		testConfig(t, false, httpResponseEventIPList, &Config{
+			Network: map[string]interface{}{
+				"host.ip": []interface{}{"12.1.0.0/24", "127.0.0.0/24"},
 			},
 		})
 	})
