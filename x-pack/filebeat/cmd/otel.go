@@ -8,15 +8,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/otelcol"
 )
 
 func OtelCmd() *cobra.Command {
 	command := &cobra.Command{
-		Short: "Run this to start filebeat with otel collector",
-		Use:   "otel",
+		Short:  "Run this to start filebeat with otel collector",
+		Use:    "otel",
+		Hidden: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger := logp.NewLogger("filebeat-otel-mode")
+			logger.Info("This mode is experimental and unsupported")
+
 			// get filebeat configuration file
 			filebeatCfg, _ := cmd.Flags().GetString("config")
 			// adds scheme name as prefix

@@ -19,6 +19,7 @@ package fbprovider
 
 import (
 	"context"
+	_ "embed"
 	"path/filepath"
 	"testing"
 
@@ -31,43 +32,23 @@ import (
 func TestFileBeatProvider(t *testing.T) {
 	p := provider{}
 
-	tests := []struct {
-		name      string
-		input     string
-		expOutput string
-		experr    bool
-	}{
-		{ // change oteloutput.yml as more configurations are supported - so it gets covered by this test
-			name:      "correct input type",
-			input:     "supported.yml",
-			expOutput: "oteloutput.yml",
-			experr:    false,
-		},
-	}
+	t.Run("test filebeat provider", func(t *testing.T) {
+		// prefix file path with fb:
+		ret, err := p.Retrieve(context.Background(), "fb:"+filepath.Join("testdata", "supported.yml"), nil)
+		require.NoError(t, err)
+		retValue, err := ret.AsRaw()
+		require.NoError(t, err)
+		expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", "oteloutput.yml"))
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			// prefix file path with fb:
-			ret, err := p.Retrieve(context.Background(), "fb:"+filepath.Join("testdata", test.input), nil)
-			if test.experr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				retValue, err := ret.AsRaw()
-				require.NoError(t, err)
-				expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
+		// convert both expected and actual output to same format
+		expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
+		require.NoError(t, err)
 
-				// convert both expected and actual output to same format
-				expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
-				require.NoError(t, err)
+		retYAML, err := yaml.Marshal(retValue)
+		require.NoError(t, err)
 
-				retYAML, err := yaml.Marshal(retValue)
-				require.NoError(t, err)
-
-				assert.Equal(t, string(expectedYAML), string(retYAML))
-				assert.NoError(t, p.Shutdown(context.Background()))
-			}
-		})
-	}
+		assert.Equal(t, string(expectedYAML), string(retYAML))
+		assert.NoError(t, p.Shutdown(context.Background()))
+	})
 
 }

@@ -20,8 +20,6 @@ package elasticsearch
 import (
 	"fmt"
 
-	"go.opentelemetry.io/collector/config/configopaque"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 
@@ -33,7 +31,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-// TODO: add  following params to below struct
+// TODO: add  following unuspported params to below struct
 // indices
 // pipelines
 // parameters
@@ -46,10 +44,9 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
-	Pipeline           string            `config:"pipeline"`
 }
 
-// toOTelConfig converts a Beat config into an OTel elasticsearch exporter config
+// ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
 func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	// Handle cloud.id the same way Beats does, this will also handle
 	// extracting the Kibana URL (which is required to handle ILM on
@@ -73,7 +70,12 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
 	}
 
+	// unpack and validate ES config
 	if err := esRawCfg.Unpack(&escfg); err != nil {
+		return nil, fmt.Errorf("failed unpacking config. %w", err)
+	}
+
+	if err := escfg.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -97,16 +99,11 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		hosts = append(hosts, esURL)
 	}
 
-	// The workers config is can be configured using two keys, so we leverage
+	// The workers config  can be configured using two keys, so we leverage
 	// the already existing code to handle it by using `output.HostWorkerCfg`.
 	workersCfg := outputs.HostWorkerCfg{}
 	if err := esRawCfg.Unpack(&workersCfg); err != nil {
 		return nil, fmt.Errorf("cannot read worker/workers from Elasticsearch config: %w", err)
-	}
-
-	headers := make(map[string]configopaque.String, len(escfg.Headers))
-	for k, v := range escfg.Headers {
-		headers[k] = configopaque.String(v)
 	}
 
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
@@ -127,7 +124,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 
 		// ClientConfig
 		"proxy_url":         esToOTelOptions.ProxyURL,         // proxy_url
-		"headers":           headers,                          // headers
+		"headers":           escfg.Headers,                    // headers
 		"timeout":           escfg.Transport.Timeout,          // timeout
 		"idle_conn_timeout": &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
 		"tls":               otelTLSConfg,                     // tls config

@@ -1,0 +1,33 @@
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    paths:
+      - /tmp/flog.log
+
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+      - localhost:9300
+    protocol: http
+    # path: /foo/bar
+    username: elastic
+    password: changeme
+    ## api_key and username/password cannot be set together
+    # api_key: "my super secret key"
+    index: "some-index"
+    pipeline: "some-ingest-pipeline"
+    proxy_url: "https://proxy.url"
+    bulk_max_size: 42
+    backoff:
+      init: 42s
+      max: 420s
+    workers: 30
+    headers:
+      X-Header-1: foo
+      X-Bar-Header: bar
+
+## elastic.co$es-hostname$kibana-hostname
+# cloud.id: ZWxhc3RpYy5jbyRlcy1ob3N0bmFtZSRraWJhbmEtaG9zdG5hbWU=
+# cloud.auth: elastic-cloud:password

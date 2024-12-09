@@ -15,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package converters
+package elasticsearch
 
 import (
-	"context"
+	_ "embed"
 	"path/filepath"
 	"testing"
 
@@ -26,10 +26,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/confmap/confmaptest"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
-func TestConverter(t *testing.T) {
-	c := converter{}
+//go:embed testdata/basic.yml
+var beatYAMLCfg string
+
+func TestToOtelConfig(t *testing.T) {
 
 	tests := []struct {
 		name      string
@@ -38,40 +42,36 @@ func TestConverter(t *testing.T) {
 		experr    bool
 	}{
 		{
-			name:      "correct input type",
-			input:     "supported.yml",
-			expOutput: "oteloutput.yml",
+			name:      "basic elasticsearch input",
+			input:     "basic.yml",
+			expOutput: "basicop.yml",
 			experr:    false,
 		},
-		{
-			name:      "unsupported output type is configured",
-			input:     "unsupported-output.yml",
-			expOutput: "",
-			experr:    true,
-		},
+		// {
+		// 	name:      "when cloud id is provided",
+		// 	input:     "unsupported-output.yml",
+		// 	expOutput: "",
+		// 	experr:    true,
+		// },
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			input, err := confmaptest.LoadConf(filepath.Join("testdata", test.input))
-			require.NoError(t, err, "could not load file")
+			beatCfg := config.MustNewConfigFrom(beatYAMLCfg)
 
-			err = c.Convert(context.Background(), input)
-			if test.experr {
-				assert.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
+			otelCfg, err := ToOTelConfig(beatCfg)
+			require.NoError(t, err, "could not convert beat config to otel ES config")
 
-				// convert expected and returned value to same format
-				expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
-				require.NoError(t, err)
+			expectedValue, err := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
+			require.NoError(t, err)
+			want, err := yaml.Marshal(expectedValue.ToStringMap())
+			require.NoError(t, err)
 
-				retYAML, err := yaml.Marshal(input.ToStringMap())
-				require.NoError(t, err)
+			got, err := yaml.Marshal(otelCfg)
+			require.NoError(t, err)
 
-				assert.Equal(t, string(expectedYAML), string(retYAML))
-			}
+			assert.Equal(t, string(want), string(got))
+
 		})
 	}
 

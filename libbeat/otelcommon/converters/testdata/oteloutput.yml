@@ -19,7 +19,6 @@ exporters:
       max_interval: 1m0s
     timeout: 1m30s
     tls:
-      insecure: true
       insecure_skip_verify: true
     user: elastic
 
