@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,7 +43,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	type stateTestCase struct {
 		// An initialization callback to invoke on the (initially empty) states.
-		statesEdit func(states *states)
+		statesEdit func(states *states) error
 
 		// The state to call IsProcessed on and the expected result
 		state               state
@@ -62,42 +63,42 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			expectedIsProcessed: false,
 		},
 		"not existing state": {
-			statesEdit: func(states *states) {
-				_ = states.AddState(testState2)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState2)
 			},
 			state:               testState1,
 			expectedIsProcessed: false,
 		},
 		"existing state": {
-			statesEdit: func(states *states) {
-				_ = states.AddState(testState1)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			expectedIsProcessed: true,
 		},
 		"existing stored state is persisted": {
-			statesEdit: func(states *states) {
+			statesEdit: func(states *states) error {
 				state := testState1
 				state.Stored = true
-				_ = states.AddState(state)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing failed state is persisted": {
-			statesEdit: func(states *states) {
+			statesEdit: func(states *states) error {
 				state := testState1
 				state.Failed = true
-				_ = states.AddState(state)
+				return states.AddState(state)
 			},
 			state:               testState1,
 			shouldReload:        true,
 			expectedIsProcessed: true,
 		},
 		"existing unprocessed state is not persisted": {
-			statesEdit: func(states *states) {
-				_ = states.AddState(testState1)
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
 			state:               testState1,
 			shouldReload:        true,
@@ -112,7 +113,8 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			states, err := newStates(nil, store, "")
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
-				test.statesEdit(states)
+				err = test.statesEdit(states)
+				require.NoError(t, err, "states edit must succeed")
 			}
 			if test.shouldReload {
 				states, err = newStates(nil, store, "")
@@ -123,6 +125,76 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			assert.Equal(t, test.expectedIsProcessed, isProcessed)
 		})
 	}
+}
+
+func TestStatesCleanUp(t *testing.T) {
+	bucketName := "test-bucket"
+	lModifiedTime := time.Unix(0, 0)
+	stateA := newState(bucketName, "a", "a-etag", lModifiedTime)
+	stateB := newState(bucketName, "b", "b-etag", lModifiedTime)
+	stateC := newState(bucketName, "c", "c-etag", lModifiedTime)
+
+	tests := []struct {
+		name       string
+		initStates []state
+		knownIDs   []string
+		expectIDs  []string
+	}{
+		{
+			name:       "No cleanup if not missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID(), stateB.ID(), stateC.ID()},
+			expectIDs:  []string{stateA.ID(), stateB.ID(), stateC.ID()},
+		},
+		{
+			name:       "Clean up if missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID()},
+			expectIDs:  []string{stateA.ID()},
+		},
+		{
+			name:       "Clean up everything",
+			initStates: []state{stateA, stateC}, // given A, C
+			knownIDs:   []string{stateB.ID()},   // but known B
+			expectIDs:  []string{},              // empty state & store
+		},
+		{
+			name:       "Empty known IDs are valid",
+			initStates: []state{stateA}, // given A
+			knownIDs:   []string{},      // Known nothing
+			expectIDs:  []string{},      // empty state & store
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			store := openTestStatestore()
+			statesInstance, err := newStates(nil, store, "")
+			require.NoError(t, err, "states creation must succeed")
+
+			for _, s := range test.initStates {
+				err := statesInstance.AddState(s)
+				require.NoError(t, err, "state initialization must succeed")
+			}
+
+			// perform cleanup
+			err = statesInstance.CleanUp(test.knownIDs)
+			require.NoError(t, err, "state cleanup must succeed")
+
+			// validate
+			for _, id := range test.expectIDs {
+				// must be in local state
+				_, ok := statesInstance.states[id]
+				require.True(t, ok, fmt.Errorf("expected id %s in state, but got missing", id))
+
+				// must be in store
+				ok, err := statesInstance.store.Has(getStoreKey(id))
+				require.NoError(t, err, "state has must succeed")
+				require.True(t, ok, fmt.Errorf("expected id %s in store, but got missing", id))
+			}
+		})
+	}
+
 }
 
 func TestStatesPrefixHandling(t *testing.T) {
