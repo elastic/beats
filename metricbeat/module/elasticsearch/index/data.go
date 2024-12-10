@@ -45,7 +45,7 @@ type Index struct {
 	Status         string     `json:"status"`
 	TierPreference string     `json:"tier_preference"`
 	CreationDate   int        `json:"creation_date"`
-	Version        int        `json:"version.created"`
+	Version        string     `json:"index_version"`
 	Shards         shardStats `json:"shards"`
 }
 
@@ -325,7 +325,7 @@ func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
 		return fmt.Errorf("failed to get index version: %w", err)
 	}
 
-	idx.Version, err = strconv.Atoi(indexVersion)
+	idx.Version = indexVersion
 
 	return nil
 }
