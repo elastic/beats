@@ -190,19 +190,11 @@ func (l *Listener) handleConnection(conn net.Conn) {
 	defer cancel()
 
 	// Track number of clients.
-<<<<<<< HEAD
-	l.clientsCount.Inc()
-	log.Debugw("New client connection.", "active_clients", l.clientsCount.Load())
-	defer func() {
-		l.clientsCount.Dec()
-		log.Debugw("Client disconnected.", "active_clients", l.clientsCount.Load())
-=======
 	l.clientsCount.Add(1)
 	log.Debugw("New client connection", "active_clients", l.clientsCount.Load())
 	defer func() {
 		l.clientsCount.Add(-1)
 		log.Debugw("Client disconnected", "active_clients", l.clientsCount.Load())
->>>>>>> 296b83b6c5 (feat: replace custom atomic with sync/atomic (#40132))
 	}()
 
 	handler := l.handlerFactory(*l.config)
