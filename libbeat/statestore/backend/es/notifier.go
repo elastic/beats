@@ -24,12 +24,13 @@ import (
 )
 
 type OnConfigUpdateFunc func(c *conf.C)
+type UnsubscribeFunc func()
 
 type Notifier struct {
 	mx sync.RWMutex
 
 	listeners map[int]OnConfigUpdateFunc
-	counter   int
+	id        int
 }
 
 func NewNotifier() *Notifier {
@@ -39,24 +40,22 @@ func NewNotifier() *Notifier {
 	return n
 }
 
-func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) int {
+func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 	n.mx.Lock()
 	defer n.mx.Unlock()
 
-	id := n.counter
-	n.counter++
+	id := n.id
+	n.id++
 	n.listeners[id] = fn
 
-	return id
+	return func() {
+		n.mx.Lock()
+		defer n.mx.Unlock()
+		delete(n.listeners, id)
+	}
 }
 
-func (n *Notifier) Unsubscribe(id int) {
-	n.mx.Lock()
-	defer n.mx.Unlock()
-	delete(n.listeners, id)
-}
-
-func (n *Notifier) NotifyConfigUpdate(c *conf.C) {
+func (n *Notifier) Notify(c *conf.C) {
 	n.mx.RLock()
 	defer n.mx.RUnlock()
 

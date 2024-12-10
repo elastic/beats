@@ -75,14 +75,14 @@ func openStore(ctx context.Context, log *logp.Logger, name string, notifier *Not
 
 	chCfg := make(chan *conf.C)
 
-	id := s.notifier.Subscribe(func(c *conf.C) {
+	unsubFn := s.notifier.Subscribe(func(c *conf.C) {
 		select {
 		case chCfg <- c:
 		case <-ctx.Done():
 		}
 	})
 
-	go s.loop(ctx, cn, id, chCfg)
+	go s.loop(ctx, cn, unsubFn, chCfg)
 
 	return s, nil
 }
@@ -320,10 +320,11 @@ func (s *store) configure(ctx context.Context, c *conf.C) {
 
 }
 
-func (s *store) loop(ctx context.Context, cn context.CancelFunc, subId int, chCfg chan *conf.C) {
+func (s *store) loop(ctx context.Context, cn context.CancelFunc, unsubFn UnsubscribeFunc, chCfg chan *conf.C) {
 	defer cn()
 
-	defer s.notifier.Unsubscribe(subId)
+	// Unsubscribe on exit
+	defer unsubFn()
 
 	defer s.log.Debug("ES store exit main loop")
 
