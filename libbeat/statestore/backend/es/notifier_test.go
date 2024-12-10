@@ -230,6 +230,11 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 			wgSub.Done()
 		}()
 	}
+	defer func() {
+		for _, unsubfn := range unsubFns {
+			unsubfn()
+		}
+	}()
 
 	// Wait for all subscribers to be added
 	wgSub.Wait()
