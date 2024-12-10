@@ -362,7 +362,7 @@ logging:
 				"../../filebeat.test",
 			)
 			workDir := filebeat.TempDir()
-
+			outputFile := filepath.Join(workDir, "output-file*")
 			logFilepath := filepath.Join(workDir, "log.log")
 			integration.GenerateLogFile(t, logFilepath, 25, false)
 
@@ -373,10 +373,7 @@ logging:
 			// Wait for the file to be fully ingested
 			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
-			publishedEvents := filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
-			if publishedEvents != 25 {
-				t.Fatalf("expecting 25 published events, got %d instead", publishedEvents)
-			}
+			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
 
 			if err := os.Truncate(filebeat.ConfigFilePath(), 0); err != nil {
@@ -397,19 +394,13 @@ logging:
 				filebeat.WaitForLogs(migratingMsg, time.Second*5, "prospector did not migrate registry entry")
 				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
-				if publishedEvents != 25 {
-					t.Fatalf("expecting 25 published events after file migration, got %d instead", publishedEvents)
-				}
+				requirePublishedEvents(t, filebeat, 25, outputFile)
 
 				// Ingest more data to ensure the offset was migrated
 				integration.GenerateLogFile(t, logFilepath, 17, true)
 				filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
-				publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
-				if publishedEvents != 42 {
-					t.Fatalf("expecting 42 published events after file migration, got %d instead", publishedEvents)
-				}
-
+				requirePublishedEvents(t, filebeat, 42, outputFile)
 				return
 			}
 
@@ -423,23 +414,13 @@ logging:
 			// the file has been fully re-ingested because the file identity
 			// changed
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
-			publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
-			if publishedEvents != 50 {
-				t.Fatalf("expecting 50 published when there was no migration, got %d instead", publishedEvents)
-			}
+			requirePublishedEvents(t, filebeat, 50, outputFile)
 
 			// Ingest more data to ensure the offset is correctly tracked
 			integration.GenerateLogFile(t, logFilepath, 10, true)
 			filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
-			publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
-			if publishedEvents != 60 {
-				t.Fatalf(
-					"expecting 60 published events after re-ingestion and more"+
-						" data being added, got %d instead",
-					publishedEvents,
-				)
-			}
+			requirePublishedEvents(t, filebeat, 60, outputFile)
 		})
 	}
 }
@@ -522,20 +503,21 @@ logging:
 	filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 	filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
 
-	assertPublishedEvents(t, filebeat, 200, outputFile)
+	requirePublishedEvents(t, filebeat, 200, outputFile)
 	// Ingest more data to ensure the offset was migrated
 	integration.GenerateLogFile(t, logFilepath, 20, true)
 	filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
-	assertPublishedEvents(t, filebeat, 220, outputFile)
+	requirePublishedEvents(t, filebeat, 220, outputFile)
 }
 
-func assertPublishedEvents(
+func requirePublishedEvents(
 	t *testing.T,
 	filebeat *integration.BeatProc,
 	expected int,
 	outputFile string) {
 
+	t.Helper()
 	publishedEvents := filebeat.CountFileLines(outputFile)
 	if publishedEvents != expected {
 		t.Fatalf("expecting %d published events after file migration, got %d instead", expected, publishedEvents)
@@ -548,6 +530,7 @@ func createFileAndWaitIngestion(
 	fb *integration.BeatProc,
 	n, outputTotal int) {
 
+	t.Helper()
 	_, err := os.Stat(logFilepath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("cannot stat log file: %s", err)
@@ -563,5 +546,5 @@ func createFileAndWaitIngestion(
 
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
-	assertPublishedEvents(t, fb, outputTotal, outputFilepath)
+	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
