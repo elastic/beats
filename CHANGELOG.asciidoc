@@ -2894,6 +2894,7 @@ https://github.com/elastic/beats/compare/v7.17.0\...v8.0.0[View commits]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use `process.args` to store program arguments instead of `auditd.log.aNNN` fields. {pull}29601[29601]
 - Remove deprecated old `awscloudwatch` input name. {pull}29844[29844]
+- Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
 
 *Metricbeat*
 
