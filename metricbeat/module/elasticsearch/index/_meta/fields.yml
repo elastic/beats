@@ -21,7 +21,7 @@
       type: keyword
     - name: creation_date
       type: date
-    - name: index_version
+    - name: version
       type: keyword
     - name: name
       type: keyword

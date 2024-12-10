@@ -32175,7 +32175,7 @@ type: date
 
 --
 
-*`elasticsearch.index.index_version`*::
+*`elasticsearch.index.version`*::
 +
 --
 type: keyword
