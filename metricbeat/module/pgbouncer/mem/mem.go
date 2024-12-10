@@ -54,10 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It publishes the event which is then forwarded to the output. In case of an error, an error is reported.
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	// Create a new context for this operation.
-	ctx := context.Background()
-
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	// Execute the "SHOW MEM;" query against the database.
 	results, err := m.QueryStats(ctx, "SHOW MEM;")
 	if err != nil {
