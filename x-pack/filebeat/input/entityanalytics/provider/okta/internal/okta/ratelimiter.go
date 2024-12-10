@@ -16,7 +16,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type RateLimiter map[string]endpointRateLimiter
+type RateLimiter struct {
+	window     time.Duration
+	fixedLimit *int
+	byEndpoint map[string]endpointRateLimiter
+}
 
 type endpointRateLimiter struct {
 	limiter *rate.Limiter
@@ -25,24 +29,34 @@ type endpointRateLimiter struct {
 
 const waitDeadline = 30 * time.Minute
 
-func NewRateLimiter() RateLimiter {
-	r := make(RateLimiter)
-	return r
+func NewRateLimiter(window time.Duration, fixedLimit *int) *RateLimiter {
+	endpoints := make(map[string]endpointRateLimiter)
+	r := RateLimiter{
+		window:     window,
+		fixedLimit: fixedLimit,
+		byEndpoint: endpoints,
+	}
+	r.fixedLimit = fixedLimit
+	return &r
 }
 
 func (r RateLimiter) endpoint(path string) endpointRateLimiter {
-	if existing, ok := r[path]; ok {
+	if existing, ok := r.byEndpoint[path]; ok {
 		return existing
 	}
-	limiter := rate.NewLimiter(1, 1) // Allow a single fetch operation to obtain limits from the API
+	limit := rate.Limit(1)
+	if r.fixedLimit != nil {
+		limit = rate.Limit(float64(*r.fixedLimit) / r.window.Seconds())
+	}
+	limiter := rate.NewLimiter(limit, 1) // Allow a single fetch operation to obtain limits from the API
 	ready := make(chan struct{})
 	close(ready)
 	newEndpointRateLimiter := endpointRateLimiter{
 		limiter: limiter,
 		ready:   ready,
 	}
-	r[path] = newEndpointRateLimiter
-	return r[path]
+	r.byEndpoint[path] = newEndpointRateLimiter
+	return newEndpointRateLimiter
 }
 
 func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
@@ -57,7 +71,10 @@ func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, lo
 // Update implements the Okta rate limit policy translation.
 //
 // See https://developer.okta.com/docs/reference/rl-best-practices/ for details.
-func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration, log *logp.Logger) error {
+func (r RateLimiter) Update(endpoint string, h http.Header, log *logp.Logger) error {
+	if r.fixedLimit != nil {
+		return nil
+	}
 	e := r.endpoint(endpoint)
 	limit := h.Get("X-Rate-Limit-Limit")
 	remaining := h.Get("X-Rate-Limit-Remaining")
@@ -99,7 +116,7 @@ func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration
 			limiter: limiter,
 			ready:   ready,
 		}
-		r[endpoint] = newEndpointRateLimiter
+		r.byEndpoint[endpoint] = newEndpointRateLimiter
 
 		resetTimeUTC := resetTime.UTC()
 		log.Debugw("rate limit block until reset", "reset_time", resetTimeUTC)
@@ -107,7 +124,7 @@ func (r RateLimiter) Update(endpoint string, h http.Header, window time.Duration
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
 		// permissible API request.
-		next := rate.Limit(lim / window.Seconds())
+		next := rate.Limit(lim / r.window.Seconds())
 		waitFor := time.Until(resetTimeUTC)
 
 		time.AfterFunc(waitFor, func() {

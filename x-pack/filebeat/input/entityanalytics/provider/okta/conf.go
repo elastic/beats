@@ -27,6 +27,7 @@ func defaultConfig() conf {
 		SyncInterval:   24 * time.Hour,
 		UpdateInterval: 15 * time.Minute,
 		LimitWindow:    time.Minute,
+		LimitFixed:     nil,
 		Request: &requestConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
@@ -67,6 +68,10 @@ type conf struct {
 	// LimitWindow is the time between Okta
 	// API limit resets.
 	LimitWindow time.Duration `config:"limit_window"`
+
+	// LimitFixed is a number of requests to allow in each LimitWindow,
+	// overriding the guidance in API responses.
+	LimitFixed *int `config:"limit_fixed"`
 
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
