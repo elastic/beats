@@ -137,7 +137,7 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 				case <-ctx.Done():
 					return ctx.Err()
 				default:
-					dateStr := d.Format("2006-01-02")
+					dateStr := d.Format(dateFormatForStateStore)
 					if err := m.fetchSingleDay(apiKeyIdx, dateStr, apiKey.Key, httpClient); err != nil {
 						m.logger.Errorf("Error fetching data (api key #%d) for date %s: %v", apiKeyIdx, dateStr, err)
 						continue
