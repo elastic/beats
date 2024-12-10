@@ -37,11 +37,10 @@ import (
 	"unsafe"
 
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // Get is the OpenBSD implementation of get
-func Get(_ resolve.Resolver) (CPUMetrics, error) {
+func Get(m *Monitor) (CPUMetrics, error) {
 
 	// see man 2 sysctl
 	loadGlobal := [C.CPUSTATES]C.long{

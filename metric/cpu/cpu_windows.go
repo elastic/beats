@@ -67,6 +67,14 @@ func buildQuery() (*pdh.Query, error) {
 	if err := q.Open(); err != nil {
 		return nil, fmt.Errorf("failed to open query: %w", err)
 	}
-	// TODO: implement performance counters as a follow up
+	if err := q.AddCounter(totalKernelTimeCounter, "", "", true, true); err != nil {
+		return nil, fmt.Errorf("error calling AddCounter for kernel counter: %w", err)
+	}
+	if err := q.AddCounter(totalUserTimeCounter, "", "", true, true); err != nil {
+		return nil, fmt.Errorf("error calling AddCounter for user counter: %w", err)
+	}
+	if err := q.AddCounter(totalIdleTimeCounter, "", "", true, true); err != nil {
+		return nil, fmt.Errorf("error calling AddCounter for idle counter: %w", err)
+	}
 	return &q, nil
 }

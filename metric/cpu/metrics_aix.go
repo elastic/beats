@@ -37,7 +37,6 @@ import (
 	"os"
 
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -58,7 +57,7 @@ func tick2msec(val uint64) uint64 {
 }
 
 // Get returns a metrics object for CPU data
-func Get(_ resolve.Resolver) (CPUMetrics, error) {
+func Get(m *Monitor) (CPUMetrics, error) {
 
 	totals, err := getCPUTotals()
 	if err != nil {

@@ -26,12 +26,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // Get returns a metrics object for CPU data
-func Get(procfs resolve.Resolver) (CPUMetrics, error) {
+func Get(m *Monitor) (CPUMetrics, error) {
+	procfs := m.Hostfs
+
 	path := procfs.ResolveHostFS("/proc/stat")
 	fd, err := os.Open(path)
 	defer func() {

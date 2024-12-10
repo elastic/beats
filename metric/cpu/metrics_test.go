@@ -43,12 +43,12 @@ func TestMonitorSample(t *testing.T) {
 }
 
 func TestCoresMonitorSample(t *testing.T) {
-
-	cpuMetrics, err := Get(systemtests.DockerTestResolver())
-	assert.NoError(t, err, "error in Get()")
-
 	cores, err := New(systemtests.DockerTestResolver())
 	require.NoError(t, err)
+
+	cpuMetrics, err := Get(cores)
+	assert.NoError(t, err, "error in Get()")
+
 	cores.lastSample = CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}
 	sample, err := cores.FetchCores()
 	require.NoError(t, err)

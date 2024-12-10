@@ -84,8 +84,8 @@ type option struct {
 
 type OptionFunc func(*option)
 
-// Note: WithPerformanceCounter option is only effective for windows and is ineffective if used by other OS'.
-func WithPerformanceCounter() OptionFunc {
+// Note: WithWindowsPerformanceCounter option is only effective for windows and is ineffective if used by other OS'.
+func WithWindowsPerformanceCounter() OptionFunc {
 	return func(o *option) {
 		o.usePerformanceCounter = true
 	}
@@ -94,7 +94,7 @@ func WithPerformanceCounter() OptionFunc {
 // Fetch collects a new sample of the CPU usage metrics.
 // This will overwrite the currently stored samples.
 func (m *Monitor) Fetch() (Metrics, error) {
-	metric, err := Get(m.Hostfs)
+	metric, err := Get(m)
 	if err != nil {
 		return Metrics{}, fmt.Errorf("error fetching CPU metrics: %w", err)
 	}
@@ -108,8 +108,7 @@ func (m *Monitor) Fetch() (Metrics, error) {
 // FetchCores collects a new sample of CPU usage metrics per-core
 // This will overwrite the currently stored samples.
 func (m *Monitor) FetchCores() ([]Metrics, error) {
-
-	metric, err := Get(m.Hostfs)
+	metric, err := Get(m)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching CPU metrics: %w", err)
 	}

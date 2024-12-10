@@ -23,11 +23,10 @@ import (
 	"github.com/shirou/gopsutil/v4/cpu"
 
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // Get is the Darwin implementation of Get
-func Get(_ resolve.Resolver) (CPUMetrics, error) {
+func Get(m *Monitor) (CPUMetrics, error) {
 	// We're using the gopsutil library here.
 	// The code used by both gosigar and go-sysinfo appears to be
 	// the same code as gopsutil, including copy-pasted comments.
