@@ -60,12 +60,8 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
-		Monitoring: struct {
-			DefaultUsername string
-		}{
-			DefaultUsername: "test",
-		},
 	}
+	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
@@ -246,7 +242,8 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 
 				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, nil
 			},
-			Stats: plugin.NewPluginCountersRecorder("test", reg)},
+			Stats: plugin.NewPluginCountersRecorder("test", reg),
+		},
 		built,
 		closed
 }
