@@ -94,7 +94,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // 3. Fetches usage data for each day in the range
 // 4. Reports collected metrics through the mb.ReporterV2
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	endDate := time.Now().UTC()
+	endDate := time.Now().UTC().Truncate(time.Hour * 24) // truncate to day as we only collect daily data
 
 	if !m.config.Collection.Realtime {
 		// If we're not collecting realtime data, then just pull until
@@ -127,10 +127,13 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 			if err == nil {
 				currentStartDate := lastProcessedDate.AddDate(0, 0, 1)
 				if currentStartDate.After(endDate) {
+					m.logger.Infof("Skipping API key #%d as current start date (%s) is after end date (%s)", apiKeyIdx, currentStartDate, endDate)
 					return nil
 				}
 				startDate = currentStartDate
 			}
+
+			m.logger.Debugf("Fetching data for API key #%d from %s to %s", apiKeyIdx, startDate, endDate)
 
 			for d := startDate; !d.After(endDate); d = d.AddDate(0, 0, 1) {
 				select {
@@ -139,6 +142,8 @@ func (m *MetricSet) fetchDateRange(startDate, endDate time.Time, httpClient *RLH
 				default:
 					dateStr := d.Format(dateFormatForStateStore)
 					if err := m.fetchSingleDay(apiKeyIdx, dateStr, apiKey.Key, httpClient); err != nil {
+						// If there's an error, log it and continue to the next day.
+						// In this case, we are not saving the state.
 						m.logger.Errorf("Error fetching data (api key #%d) for date %s: %v", apiKeyIdx, dateStr, err)
 						continue
 					}
