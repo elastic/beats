@@ -20,7 +20,6 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -103,30 +102,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
 	if err != nil {
-		// If the batch is too large, the elasticsearchexporter will
-		// return a 413 error.
-		//
-		// At the moment, the exporter does not support batch splitting
-		// on error so we do it here.
-		//
-		// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36163.
-		if strings.Contains(err.Error(), "Request Entity Too Large") {
-			// Try and split the batch into smaller batches and retry
-			if batch.SplitRetry() {
-				st.BatchSplit()
-				st.RetryableErrors(len(events))
-			} else {
-				// If the batch could not be split, there is no option left but
-				// to drop it and log the error state.
-				batch.Drop()
-				st.PermanentErrors(len(events))
-				out.log.Errorf("the batch is too large to be sent: %v", err)
-			}
-
-			// Don't propagate the error, the batch was split and retried.
-			return nil
-		}
-
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
