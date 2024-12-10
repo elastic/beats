@@ -50,8 +50,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It publishes the event which is then forwarded to the output. In case of an error, an error is reported.
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	ctx := context.Background()
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	results, err := m.QueryStats(ctx, "SHOW POOLS;")
 	if err != nil {
 		return fmt.Errorf("error in QueryStats: %w", err)
