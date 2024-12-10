@@ -44,6 +44,7 @@ func TestData(t *testing.T) {
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
+	fmt.Printf("no-op change")
 
 	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
