@@ -281,8 +281,7 @@ func (s *websocketStream) Close() error {
 func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 	var tlsConfig *tls.Config
 	dialer := &websocket.Dialer{
-		HandshakeTimeout: cfg.Transport.HandShakeTimeOut,
-		Proxy:            http.ProxyFromEnvironment,
+		Proxy: http.ProxyFromEnvironment,
 	}
 
 	// load proxy configuration if available
@@ -297,7 +296,7 @@ func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
 			Proxy:              http.ProxyURL(proxyURL.URI()),
 			ProxyConnectHeader: cfg.Transport.Proxy.Headers.Headers(),
 			DialContext: (&net.Dialer{
-				Timeout: cfg.Transport.HTTPTransportSettings.Timeout,
+				Timeout: cfg.Transport.Timeout,
 			}).DialContext,
 		}
 		dialer.NetDialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {

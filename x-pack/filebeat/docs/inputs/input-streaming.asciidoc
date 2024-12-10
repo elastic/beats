@@ -350,12 +350,8 @@ The minimum time to wait between retries. This ensures that retries are spaced o
 The maximum time to wait between retries. This prevents the retry mechanism from becoming too slow, ensuring that the client does not wait indefinitely between retries. This is crucial in systems where timeouts or user experience are critical. For example, `wait_max` might be set to 10 seconds, meaning that even if the calculated backoff is greater than this, the client will wait at most 10 seconds before retrying.
 
 [float]
-==== `handshake_timeout`
-This specifies the time to wait for the `websocket` handshake and the `http.Upgrade()` operation to complete. This timeout occurs at the application layer and not at the TCP layer. The `default value` is `20` seconds. This setting is specific to the `websocket` streaming input type only.
-
-[float]
 === `timeout`
-This specifies the timeout that occurs after the initial handshake has taken place. This timeout occurs at the TCP layer and deals with the time taken to establish the actual tcp connection. The `default value` is `90` seconds.
+Timeout is the maximum amount of time the websocket dialer will wait for a connection to be established. The default value is `180` seconds.
 
 [float]
 ==== `proxy_url`
