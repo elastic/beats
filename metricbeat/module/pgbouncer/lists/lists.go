@@ -65,9 +65,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if !ok {
 			return fmt.Errorf("expected string type for 'list' but got something else")
 		}
-		key := listValue
-		value := s["items"]
-		resultMap[key] = value
+		resultMap[listValue] = s["items"]
 	}
 	data, err := schema.Apply(resultMap)
 	if err != nil {
