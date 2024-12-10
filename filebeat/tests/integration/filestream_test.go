@@ -21,6 +21,7 @@ package integration
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
 	"testing"
@@ -270,4 +271,178 @@ logging:
 		"Input 'filestream' starting",
 		10*time.Second,
 		"Filebeat did log a validation error")
+}
+
+func TestFilestreamCanMigrateIdentity(t *testing.T) {
+	cfgTemplate := `
+filebeat.inputs:
+  - type: filestream
+    id: "test-migrate-ID"
+    paths:
+      - %s
+%s
+
+filebeat.registry:
+  flush: 0s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.filestream.prospector
+  metrics:
+    enabled: false
+`
+
+	nativeCfg := `
+    file_identity.native: ~
+`
+	pathCfg := `
+    file_identity.path: ~
+`
+	fingerprintCfg := `
+    file_identity.fingerprint: ~
+    prospector:
+      scanner:
+        fingerprint.enabled: true
+        check_interval: 0.1s
+`
+	inodeMarkerPath, err := filepath.Abs(filepath.Join("testdata", "inodeMarker"))
+	if err != nil {
+		t.Fatalf("cannot get absolute path from inode marker: %s", err)
+	}
+	inodeMarkerCfg := "    file_identity.inode_marker.path: " + inodeMarkerPath + "\n"
+
+	testCases := map[string]struct {
+		oldIdentityCfg  string
+		newIdentityCfg  string
+		notMigrateMsg   string
+		expectMigration bool
+	}{
+		"native to fingerprint": {
+			oldIdentityCfg:  nativeCfg,
+			newIdentityCfg:  fingerprintCfg,
+			expectMigration: true,
+		},
+
+		"path to fingerprint": {
+			oldIdentityCfg:  pathCfg,
+			newIdentityCfg:  fingerprintCfg,
+			expectMigration: true,
+		},
+
+		"inode marker to fingerprint": {
+			oldIdentityCfg:  inodeMarkerCfg,
+			newIdentityCfg:  fingerprintCfg,
+			expectMigration: false,
+		},
+
+		"path to native": {
+			oldIdentityCfg:  pathCfg,
+			newIdentityCfg:  nativeCfg,
+			expectMigration: false,
+			notMigrateMsg:   "file identity is 'native', will not migrate registry",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFilepath := filepath.Join(workDir, "log.log")
+			integration.GenerateLogFile(t, logFilepath, 25, false)
+
+			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			// Wait for the file to be fully ingested
+			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
+			publishedEvents := filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
+			if publishedEvents != 25 {
+				t.Fatalf("expecting 25 published events, got %d instead", publishedEvents)
+			}
+			filebeat.Stop()
+
+			if err := os.Truncate(filebeat.ConfigFilePath(), 0); err != nil {
+				t.Fatalf("cannot truncate Filebeat's configuration file: %s", err)
+			}
+
+			newCfg := fmt.Sprintf(cfgTemplate, logFilepath, tc.newIdentityCfg, workDir)
+			if err := os.WriteFile(filebeat.ConfigFilePath(), []byte(newCfg), 0o644); err != nil {
+				t.Fatalf("cannot write new configuration file: %s", err)
+			}
+
+			filebeat.Start()
+
+			// The happy path is to migrate keys, so we assert it first
+			if tc.expectMigration {
+				// Test the case where the registry migration happens
+				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+				filebeat.WaitForLogs(migratingMsg, time.Second*5, "prospector did not migrate registry entry")
+				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
+				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
+				if publishedEvents != 25 {
+					t.Fatalf("expecting 25 published events after file migration, got %d instead", publishedEvents)
+				}
+
+				// Ingest more data to ensure the offset was migrated
+				integration.GenerateLogFile(t, logFilepath, 17, true)
+				filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
+
+				publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
+				if publishedEvents != 42 {
+					t.Fatalf("expecting 42 published events after file migration, got %d instead", publishedEvents)
+				}
+
+				return
+			}
+
+			// Another option is for no keys to be migrated because the current
+			// file identity is not fingerprint
+			if tc.notMigrateMsg != "" {
+				filebeat.WaitForLogs(tc.notMigrateMsg, time.Second*5, "the registry should not have been migrated")
+			}
+
+			// The last thing to test when there is no migration is to assert
+			// the file has been fully re-ingested because the file identity
+			// changed
+			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
+			publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
+			if publishedEvents != 50 {
+				t.Fatalf("expecting 50 published when there was no migration, got %d instead", publishedEvents)
+			}
+
+			// Ingest more data to ensure the offset is correctly tracked
+			integration.GenerateLogFile(t, logFilepath, 10, true)
+			filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
+
+			publishedEvents = filebeat.CountFileLines(filepath.Join(workDir, "output-file*"))
+			if publishedEvents != 60 {
+				t.Fatalf(
+					"expecting 60 published events after re-ingestion and more"+
+						" data being added, got %d instead",
+					publishedEvents,
+				)
+			}
+		})
+	}
 }
