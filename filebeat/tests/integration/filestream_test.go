@@ -282,9 +282,6 @@ filebeat.inputs:
       - %s
 %s
 
-filebeat.registry:
-  flush: 0s
-
 queue.mem:
   flush.timeout: 0s
 
