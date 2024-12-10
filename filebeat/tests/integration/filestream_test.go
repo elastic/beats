@@ -20,6 +20,7 @@
 package integration
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -301,7 +302,6 @@ logging:
   metrics:
     enabled: false
 `
-
 	nativeCfg := `
     file_identity.native: ~
 `
@@ -442,4 +442,126 @@ logging:
 			}
 		})
 	}
+}
+
+func TestFilestreamMigrateIdentityCornerCases(t *testing.T) {
+	cfgTemplate := `
+filebeat.inputs:
+  - type: filestream
+    id: "test-migrate-ID"
+    paths:
+      - %s
+%s
+
+queue.mem:
+  flush.timeout: 0s
+
+path.home: %s
+
+output.file:
+  path: ${path.home}
+  filename: "output-file"
+  rotate_on_startup: false
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.filestream.prospector
+  metrics:
+    enabled: false
+`
+	nativeCfg := `
+    file_identity.native: ~
+    prospector:
+      scanner:
+        check_interval: 0.1s
+`
+	fingerprintCfg := `
+    file_identity.fingerprint: ~
+    prospector:
+      scanner:
+        fingerprint.enabled: true
+        check_interval: 0.1s
+`
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+
+	logFilepath := filepath.Join(workDir, "log.log")
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, nativeCfg, workDir)
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Create and ingest 4 different files, all with the same path
+	// to simulate log rotation
+	createFileAndWaitIngestion(t, logFilepath, outputFile, filebeat, 50, 50)
+	createFileAndWaitIngestion(t, logFilepath, outputFile, filebeat, 50, 100)
+	createFileAndWaitIngestion(t, logFilepath, outputFile, filebeat, 50, 150)
+	createFileAndWaitIngestion(t, logFilepath, outputFile, filebeat, 50, 200)
+
+	filebeat.Stop()
+	cfgYAML = fmt.Sprintf(cfgTemplate, logFilepath, fingerprintCfg, workDir)
+	if err := os.WriteFile(filebeat.ConfigFilePath(), []byte(cfgYAML), 0666); err != nil {
+		t.Fatalf("cannot write config file: %s", err)
+	}
+
+	filebeat.Start()
+
+	migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+
+	filebeat.WaitForLogs(migratingMsg, time.Second*10, "prospector did not migrate registry entry")
+	filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
+	filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
+
+	assertPublishedEvents(t, filebeat, 200, outputFile)
+	// Ingest more data to ensure the offset was migrated
+	integration.GenerateLogFile(t, logFilepath, 20, true)
+	filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
+
+	assertPublishedEvents(t, filebeat, 220, outputFile)
+}
+
+func assertPublishedEvents(
+	t *testing.T,
+	filebeat *integration.BeatProc,
+	expected int,
+	outputFile string) {
+
+	publishedEvents := filebeat.CountFileLines(outputFile)
+	if publishedEvents != expected {
+		t.Fatalf("expecting %d published events after file migration, got %d instead", expected, publishedEvents)
+	}
+}
+
+func createFileAndWaitIngestion(
+	t *testing.T,
+	logFilepath, outputFilepath string,
+	fb *integration.BeatProc,
+	n, outputTotal int) {
+
+	_, err := os.Stat(logFilepath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		t.Fatalf("cannot stat log file: %s", err)
+	}
+	// Remove the file if it exists
+	if err == nil {
+		if err := os.Remove(logFilepath); err != nil {
+			t.Fatalf("cannot remove log file: %s", err)
+		}
+	}
+
+	integration.GenerateLogFile(t, logFilepath, n, false)
+
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
+	assertPublishedEvents(t, fb, outputTotal, outputFilepath)
 }
