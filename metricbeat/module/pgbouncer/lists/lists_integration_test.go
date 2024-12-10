@@ -44,9 +44,9 @@ func TestMetricSet_Fetch(t *testing.T) {
 	assert.Contains(t, event, "peers")
 	assert.Contains(t, event, "pools")
 	assert.Contains(t, event, "peer_pools")
-	assert.Contains(t, event, "clients.used")
-	assert.Contains(t, event, "servers.free")
-	assert.Contains(t, event, "servers.used")
+	assert.Contains(t, event["clients"], "used")
+	assert.Contains(t, event["servers"], "free")
+	assert.Contains(t, event["servers"], "used")
 }
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{

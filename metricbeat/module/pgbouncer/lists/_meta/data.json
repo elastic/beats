@@ -11,18 +11,23 @@
     },
     "pgbouncer": {
         "lists": {
-            "databases": 1,
-            "free_clients": 48,
-            "free_servers": 0,
-            "users": 4,
-            "dns_zones": 0,
+            "users": 2,
+            "clients": {
+                "free": 47,
+                "used": 3,
+                "login": 0
+            },
             "peers": 0,
             "peer_pools": 0,
-            "login_clients": 0,
-            "pools": 1,
-            "used_clients": 2,
-            "used_servers": 0,
-            "dns_names": 0
+            "dns_queries": 0,
+            "databases": 1,
+            "dns_names": 0,
+            "servers": {
+                "free": 0,
+                "used": 0
+            },
+            "dns_zones": 0,
+            "pools": 1
         }
     },
     "service": {
