@@ -28,7 +28,7 @@ import (
 )
 
 func TestCounterLength(t *testing.T) {
-	monitor, err := New(systemtests.DockerTestResolver())
+	monitor, err := New(systemtests.DockerTestResolver(), WithWindowsPerformanceCounter())
 	require.NoError(t, err)
 	require.NoError(t, monitor.query.CollectData())
 
@@ -51,4 +51,10 @@ func TestCounterLength(t *testing.T) {
 	for i := 0; i < len(kernelRawData); i++ {
 		require.Equal(t, kernelRawData[i].InstanceName, idleRawData[i].InstanceName, "InstanceName should be equal")
 	}
+}
+
+func TestCounterDisabled(t *testing.T) {
+	monitor, err := New(systemtests.DockerTestResolver())
+	require.NoError(t, err)
+	require.Nil(t, monitor.query)
 }

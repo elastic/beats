@@ -50,7 +50,7 @@ func New(hostfs resolve.Resolver, opts ...OptionFunc) (*Monitor, error) {
 	for _, o := range opts {
 		o(&op)
 	}
-	if !op.usePerformanceCounter {
+	if op.usePerformanceCounter {
 		if query, err = buildQuery(); err != nil {
 			return nil, err
 		}
