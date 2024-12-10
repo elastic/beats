@@ -59,10 +59,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
 	sys := base.Module().(resolve.Resolver)
+	cpuOpts := make([]metrics.OptionFunc, 0)
+	if config.UserPerformanceCounters {
+		cpuOpts = append(cpuOpts, metrics.WithWindowsPerformanceCounter())
+	}
+	cpu, err := metrics.New(sys, cpuOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cores:         metrics.New(sys),
+		cores:         cpu,
 	}, nil
 }
 
