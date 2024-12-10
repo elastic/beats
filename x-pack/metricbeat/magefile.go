@@ -71,16 +71,6 @@ func CrossBuild() error {
 	return devtools.CrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
-}
-
 // UnitTest executes the unit tests (Go and Python).
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -164,7 +154,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
