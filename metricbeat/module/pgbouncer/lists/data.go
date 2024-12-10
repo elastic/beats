@@ -23,16 +23,21 @@ import (
 )
 
 var schema = s.Schema{
-	"databases":     c.Int("databases"),
-	"users":         c.Int("users"),
-	"peers":         c.Int("peers"),
-	"pools":         c.Int("pools"),
-	"peer_pools":    c.Int("peer_pools"),
-	"free_clients":  c.Int("free_clients"),
-	"used_clients":  c.Int("used_clients"),
-	"login_clients": c.Int("login_clients"),
-	"free_servers":  c.Int("free_servers"),
-	"used_servers":  c.Int("used_servers"),
-	"dns_names":     c.Int("dns_names"),
-	"dns_zones":     c.Int("dns_zones"),
+	"databases":  c.Int("databases"),
+	"users":      c.Int("users"),
+	"peers":      c.Int("peers"),
+	"pools":      c.Int("pools"),
+	"peer_pools": c.Int("peer_pools"),
+	"clients": s.Object{
+		"free":  c.Int("free_clients"),
+		"used":  c.Int("used_clients"),
+		"login": c.Int("login_clients"),
+	},
+	"servers": s.Object{
+		"free": c.Int("free_servers"),
+		"used": c.Int("used_servers"),
+	},
+	"dns_names":   c.Int("dns_names"),
+	"dns_zones":   c.Int("dns_zones"),
+	"dns_queries": c.Int("dns_queries"),
 }
