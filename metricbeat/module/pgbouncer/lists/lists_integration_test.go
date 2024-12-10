@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
@@ -35,19 +36,17 @@ func TestMetricSet_Fetch(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
 	event := events[0].MetricSetFields
 	assert.Contains(t, event, "databases")
 	assert.Contains(t, event, "users")
 	assert.Contains(t, event, "peers")
 	assert.Contains(t, event, "pools")
 	assert.Contains(t, event, "peer_pools")
-	assert.Contains(t, event, "used_clients")
-	assert.Contains(t, event, "free_servers")
-	assert.Contains(t, event, "used_servers")
+	assert.Contains(t, event, "clients.used")
+	assert.Contains(t, event, "servers.free")
+	assert.Contains(t, event, "servers.used")
 }
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{

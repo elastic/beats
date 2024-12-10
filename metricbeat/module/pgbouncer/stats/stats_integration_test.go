@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
@@ -35,10 +36,8 @@ func TestMetricSet_Fetch(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
+	require.Empty(t, errs, "Expected no errors during fetch")
+	require.NotEmpty(t, events, "Expected to receive at least one event")
 	event := events[0].MetricSetFields
 	assert.Contains(t, event, "total_xact_count")
 	assert.Contains(t, event, "total_server_assignment_count")
