@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -323,24 +324,28 @@ logging:
 
 	testCases := map[string]struct {
 		oldIdentityCfg  string
+		oldIdentityName string
 		newIdentityCfg  string
 		notMigrateMsg   string
 		expectMigration bool
 	}{
 		"native to fingerprint": {
 			oldIdentityCfg:  nativeCfg,
+			oldIdentityName: "native",
 			newIdentityCfg:  fingerprintCfg,
 			expectMigration: true,
 		},
 
 		"path to fingerprint": {
 			oldIdentityCfg:  pathCfg,
+			oldIdentityName: "path",
 			newIdentityCfg:  fingerprintCfg,
 			expectMigration: true,
 		},
 
 		"inode marker to fingerprint": {
 			oldIdentityCfg:  inodeMarkerCfg,
+			oldIdentityName: "inode_marker",
 			newIdentityCfg:  fingerprintCfg,
 			expectMigration: false,
 		},
@@ -348,6 +353,7 @@ logging:
 		"path to native": {
 			oldIdentityCfg:  pathCfg,
 			newIdentityCfg:  nativeCfg,
+			oldIdentityName: "path",
 			expectMigration: false,
 			notMigrateMsg:   "file identity is 'native', will not migrate registry",
 		},
@@ -401,6 +407,7 @@ logging:
 				filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
 				requirePublishedEvents(t, filebeat, 42, outputFile)
+				requireNativeEntryRemoved(t, workDir, tc.oldIdentityName)
 				return
 			}
 
@@ -419,7 +426,6 @@ logging:
 			// Ingest more data to ensure the offset is correctly tracked
 			integration.GenerateLogFile(t, logFilepath, 10, true)
 			filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
-
 			requirePublishedEvents(t, filebeat, 60, outputFile)
 		})
 	}
@@ -509,6 +515,25 @@ logging:
 	filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
+	requireNativeEntryRemoved(t, workDir, "native")
+}
+
+func requireNativeEntryRemoved(t *testing.T, workDir, identity string) {
+	t.Helper()
+
+	registryLogFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries := readFilestreamRegistryLog(t, registryLogFile)
+	nativeEntries := []registryEntry{}
+	for _, currentEntry := range entries {
+		if strings.Contains(currentEntry.Key, identity) {
+			nativeEntries = append(nativeEntries, currentEntry)
+		}
+	}
+
+	lastNativeEntry := nativeEntries[len(nativeEntries)-1]
+	if lastNativeEntry.TTL != 0 {
+		t.Errorf("'%s' has not been removed from the registry", lastNativeEntry.Key)
+	}
 }
 
 func requirePublishedEvents(
