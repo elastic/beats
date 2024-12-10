@@ -41,6 +41,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	opts  metrics.MetricOpts
 	cores *metrics.Monitor
+	sys   resolve.Resolver
 }
 
 // New returns a new core MetricSet.
@@ -76,6 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		opts:          opts,
 		cores:         cpu,
+		sys:           sys,
 	}, nil
 }
 
@@ -122,6 +124,5 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) getDiagData() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
-	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/stat")
 }
