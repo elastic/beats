@@ -128,6 +128,7 @@ filebeat.inputs:
 - Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 
+
 [[release-notes-8.15.5]]
 === Beats version 8.15.5
 https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
