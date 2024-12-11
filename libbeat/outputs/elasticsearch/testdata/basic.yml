@@ -24,9 +24,7 @@ output:
       init: 42s
       max: 420s
     workers: 30
-    headers:
-      X-Header-1: foo
-      X-Bar-Header: bar
+
 
 ## elastic.co$es-hostname$kibana-hostname
 # cloud.id: ZWxhc3RpYy5jbyRlcy1ob3N0bmFtZSRraWJhbmEtaG9zdG5hbWU=
