@@ -61,6 +61,10 @@ type config struct {
 
 	// FailureDump configures failure dump behaviour.
 	FailureDump *dumpConfig `config:"failure_dump"`
+
+	// RecordCoverage indicates whether a program should
+	// record and log execution coverage.
+	RecordCoverage bool `config:"record_coverage"`
 }
 
 type redact struct {
@@ -86,9 +90,13 @@ func (t *dumpConfig) enabled() bool {
 }
 
 func (c config) Validate() error {
+	if c.RecordCoverage {
+		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
 	if c.Redact == nil {
 		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
 	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
@@ -106,7 +114,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
