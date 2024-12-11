@@ -101,7 +101,7 @@ func TestRateLimiter(t *testing.T) {
 		target := 30.0
 		buffer := 0.01
 
-		if tokens < target-buffer || tokens > target+buffer {
+		if tokens < target-buffer || target+buffer < tokens {
 			t.Errorf("tokens don't accumulate at the expected rate over 30s: %f", tokens)
 		}
 	})
