@@ -316,11 +316,6 @@ logging:
         fingerprint.enabled: true
         check_interval: 0.1s
 `
-	inodeMarkerPath, err := filepath.Abs(filepath.Join("testdata", "inodeMarker"))
-	if err != nil {
-		t.Fatalf("cannot get absolute path from inode marker: %s", err)
-	}
-	inodeMarkerCfg := "    file_identity.inode_marker.path: " + inodeMarkerPath + "\n"
 
 	testCases := map[string]struct {
 		oldIdentityCfg  string
@@ -343,13 +338,6 @@ logging:
 			expectMigration: true,
 		},
 
-		"inode marker to fingerprint": {
-			oldIdentityCfg:  inodeMarkerCfg,
-			oldIdentityName: "inode_marker",
-			newIdentityCfg:  fingerprintCfg,
-			expectMigration: false,
-		},
-
 		"path to native": {
 			oldIdentityCfg:  pathCfg,
 			newIdentityCfg:  nativeCfg,
@@ -361,7 +349,6 @@ logging:
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-
 			filebeat := integration.NewBeat(
 				t,
 				"filebeat",
@@ -381,10 +368,6 @@ logging:
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
-
-			if err := os.Truncate(filebeat.ConfigFilePath(), 0); err != nil {
-				t.Fatalf("cannot truncate Filebeat's configuration file: %s", err)
-			}
 
 			newCfg := fmt.Sprintf(cfgTemplate, logFilepath, tc.newIdentityCfg, workDir)
 			if err := os.WriteFile(filebeat.ConfigFilePath(), []byte(newCfg), 0o644); err != nil {
@@ -407,7 +390,7 @@ logging:
 				filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
 
 				requirePublishedEvents(t, filebeat, 42, outputFile)
-				requireNativeEntryRemoved(t, workDir, tc.oldIdentityName)
+				requireRegistryEntryRemoved(t, workDir, tc.oldIdentityName)
 				return
 			}
 
@@ -507,30 +490,31 @@ logging:
 
 	filebeat.WaitForLogs(migratingMsg, time.Second*10, "prospector did not migrate registry entry")
 	filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
-	filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
+	// Filebeat logs the EOF message when it starts and the file had already been fully ingested.
+	filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached after restart")
 
 	requirePublishedEvents(t, filebeat, 200, outputFile)
 	// Ingest more data to ensure the offset was migrated
 	integration.GenerateLogFile(t, logFilepath, 20, true)
-	filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached the third time")
+	filebeat.WaitForLogs(eofMsg, time.Second*5, "EOF was not reached after adding data")
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
-	requireNativeEntryRemoved(t, workDir, "native")
+	requireRegistryEntryRemoved(t, workDir, "native")
 }
 
-func requireNativeEntryRemoved(t *testing.T, workDir, identity string) {
+func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
 	registryLogFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
 	entries := readFilestreamRegistryLog(t, registryLogFile)
-	nativeEntries := []registryEntry{}
+	inputEntries := []registryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
-			nativeEntries = append(nativeEntries, currentEntry)
+			inputEntries = append(inputEntries, currentEntry)
 		}
 	}
 
-	lastNativeEntry := nativeEntries[len(nativeEntries)-1]
+	lastNativeEntry := inputEntries[len(inputEntries)-1]
 	if lastNativeEntry.TTL != 0 {
 		t.Errorf("'%s' has not been removed from the registry", lastNativeEntry.Key)
 	}

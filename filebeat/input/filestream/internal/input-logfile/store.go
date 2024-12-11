@@ -261,10 +261,11 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// codebase can have access to the new value
 			s.store.ephemeralStore.table[newKey] = r
 
-			// Remove the old key from the store
-			// aka delete. This is also synchronously
-			// written to the disk.
-			// See store.remove for details
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
 			s.store.UpdateTTL(res, 0)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
@@ -458,10 +459,12 @@ func (r *resource) UnpackCursor(to interface{}) error {
 	return typeconv.Convert(to, r.activeCursor())
 }
 
+// UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
 func (r *resource) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, r.cursorMeta)
 }
 
+// Key returns the resource's key
 func (r *resource) Key() string {
 	return r.key
 }

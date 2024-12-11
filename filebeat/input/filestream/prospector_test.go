@@ -270,14 +270,15 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 				newIDFunc,
 			)
 			require.NoError(t, err, "prospector Init must succeed")
+
 			// testStore.updatedKeys is in the format
 			// oldKey -> newKey
-
 			if tc.expectRegistryMigration {
 				assert.Equal(
 					t,
 					map[string]string{
-						oldKey: expectedNewKey},
+						oldKey: expectedNewKey,
+					},
 					testStore.updatedKeys,
 					"the registry entries were not correctly migrated")
 			} else {
