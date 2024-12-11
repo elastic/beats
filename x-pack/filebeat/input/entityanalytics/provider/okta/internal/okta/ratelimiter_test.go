@@ -37,7 +37,10 @@ func TestRateLimiter(t *testing.T) {
 		var fixedLimit *int = nil
 		r := NewRateLimiter(window, fixedLimit)
 		const endpoint = "/foo"
-		url, _ := url.Parse(endpoint)
+		url, err := url.Parse(endpoint)
+		if err != nil {
+			t.Errorf("unexpected error from url.Parse(): %v", err)
+		}
 		ctx := context.Background()
 		log := logp.L()
 		e := r.endpoint(endpoint)
@@ -54,7 +57,7 @@ func TestRateLimiter(t *testing.T) {
 			"X-Rate-Limit-Remaining": []string{"0"},
 			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(resetSoon, 10)},
 		}
-		err := r.Update(endpoint, headers, logp.L())
+		err = r.Update(endpoint, headers, logp.L())
 		if err != nil {
 			t.Errorf("unexpected error from Update(): %v", err)
 		}
@@ -110,7 +113,10 @@ func TestRateLimiter(t *testing.T) {
 
 		const endpoint = "/foo"
 
-		url, _ := url.Parse(endpoint)
+		url, err := url.Parse(endpoint)
+		if err != nil {
+			t.Errorf("unexpected error from url.Parse(): %v", err)
+		}
 		reset := time.Now().Add(31 * time.Minute).Unix()
 		headers := http.Header{
 			"X-Rate-Limit-Limit":     []string{"60"},
@@ -123,7 +129,7 @@ func TestRateLimiter(t *testing.T) {
 		r.Wait(ctx, endpoint, url, log)  // consume the initial request
 		r.Update(endpoint, headers, log) // update to a slow rate
 
-		err := r.Wait(ctx, endpoint, url, log)
+		err = r.Wait(ctx, endpoint, url, log)
 
 		const expectedErr = "rate: Wait(n=1) would exceed context deadline"
 		if err == nil {
