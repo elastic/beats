@@ -53256,11 +53256,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/ginkgo/v2
-Version: v2.17.1
+Version: v2.16.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo/v2@v2.17.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo/v2@v2.16.0/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -53286,11 +53286,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/gomega
-Version: v1.33.0
+Version: v1.32.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.33.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.32.0/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
