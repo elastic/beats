@@ -87,7 +87,7 @@ func TestRateLimiter(t *testing.T) {
 		wait := time.Since(start)
 
 		if wait > 1010*time.Millisecond {
-			t.Errorf("doesn't allow requests to resume after reset. had to wait %d milliseconds", wait.Milliseconds())
+			t.Errorf("doesn't allow requests to resume after reset. had to wait %s", wait)
 		}
 		if e.limiter.Limit() != 1.0 {
 			t.Errorf("unexpected rate following reset (not 60 requests / 60 seconds): %f", e.limiter.Limit())
