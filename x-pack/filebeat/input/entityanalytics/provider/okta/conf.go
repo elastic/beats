@@ -27,7 +27,6 @@ func defaultConfig() conf {
 		SyncInterval:   24 * time.Hour,
 		UpdateInterval: 15 * time.Minute,
 		LimitWindow:    time.Minute,
-		LimitFixed:     nil,
 		Request: &requestConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
