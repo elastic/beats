@@ -3,6 +3,88 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.17.0]]
+=== Beats version 8.17.0
+https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31. {pull}41402[41402]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Ensure Elasticsearch output can always recover from network errors. {pull}40794[40794]
+- Add `translate_ldap_attribute` processor. {pull}41472[41472]
+- Remove unnecessary debug logs during idle connection teardown. {issue}40824[40824]
+- Remove unnecessary reload for Elastic Agent managed beats when APM tracing config changes from nil to nil. {pull}41794[41794]
+
+*Auditbeat*
+
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
+
+*Filebeat*
+
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider. {pull}41393[41393]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+
+*Metricbeat*
+
+- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+
+*Winlogbeat*
+
+- Fix message handling in the experimental API. {issue}19338[19338] {pull}41730[41730]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
+- Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
+- Replace `compress/gzip` with https://github.com/klauspost/compress/gzip library for gzip compression. {pull}41584[41584]
+
+*Auditbeat*
+
+- Split module/system/process into common and provider bits. {pull}41868[41868]
+
+*Filebeat*
+
+- Improved Azure Blob Storage input documentation. {pull}41252[41252]
+- Make ETW input GA. {pull}41389[41389]
+- Added input metrics to GCS input. {issue}36640[36640] {pull}41505[41505]
+- Add support for Okta entity analytics provider to collect role and factor data for users. {pull}41460[41460]
+- Add support for Journald in the System module. {pull}41555[41555]
+- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
+- The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
+
+*Libbeat*
+
+- Enrich events with EC2 tags in add_cloud_metadata processor. {pull}41477[41477]
+
+*Metricbeat*
+
+- Add `id` field to all the vSphere metricsets. {pull}41097[41097]
+- Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module. {pull}41233[41233]
+- Add support for region/zone for Vertex AI service in GCP module. {pull}41551[41551]
+- Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
+
+*Winlogbeat*
+
+- Add handling for missing `EvtVarType`s in experimental API. {issue}19337[19337] {pull}41418[41418]
+- Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
+
+
 [[release-notes-8.16.1]]
 === Beats version 8.16.1
 https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
