@@ -20,6 +20,7 @@ package index
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/joeshaw/multierror"
 
@@ -40,9 +41,12 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index  string     `json:"index"`
-	Status string     `json:"status"`
-	Shards shardStats `json:"shards"`
+	Index          string     `json:"index"`
+	Status         string     `json:"status"`
+	TierPreference string     `json:"tier_preference"`
+	CreationDate   int        `json:"creation_date"`
+	Version        string     `json:"version"`
+	Shards         shardStats `json:"shards"`
 }
 
 type primaries struct {
@@ -180,9 +184,17 @@ type bulkStats struct {
 
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	clusterStateMetrics := []string{"routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterStateFilterPaths := []string{"routing_table"}
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
 	if err != nil {
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
+	}
+
+	indicesSettingsPattern := "*,.*"
+	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
+	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
+	if err != nil {
+		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
 	}
 
 	var indicesStats stats
@@ -201,6 +213,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
+			continue
+		}
+
+		err = addIndexSettings(&idx, indicesSettings)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("failure adding index settings: %w", err))
 			continue
 		}
 
@@ -271,6 +289,63 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	return nil
 }
 
+func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
+
+	// Recover the index settings for our specific index
+	indexSettingsValue, err := indicesSettings.GetValue(idx.Index)
+	if err != nil {
+		return fmt.Errorf("failed to get index settings for index %s: %w", idx.Index, err)
+	}
+
+	indexSettings, ok := indexSettingsValue.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("index settings is not a map for index: %s", idx.Index)
+	}
+
+	indexCreationDate, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.creation_date")
+	if err != nil {
+		return fmt.Errorf("failed to get index creation date: %w", err)
+	}
+
+	idx.CreationDate, err = strconv.Atoi(indexCreationDate)
+	if err != nil {
+		return fmt.Errorf("failed to convert index creation date to int: %w", err)
+	}
+
+	indexTierPreference, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.require._tier_preference")
+	if err != nil {
+		indexTierPreference, err = getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.include._tier_preference")
+		if err != nil {
+			return fmt.Errorf("failed to get index tier preference: %w", err)
+		}
+	}
+
+	idx.TierPreference = indexTierPreference
+
+	indexVersion, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.version.created")
+	if err != nil {
+		return fmt.Errorf("failed to get index version: %w", err)
+	}
+
+	idx.Version = indexVersion
+
+	return nil
+}
+
+func getIndexSettingForIndex(indexSettings mapstr.M, index, settingKey string) (string, error) {
+	fieldKey := "settings." + settingKey
+	value, err := indexSettings.GetValue(fieldKey)
+	if err != nil {
+		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	setting, ok := value.(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return setting, nil
+}
+
 func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey string) (mapstr.M, error) {
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
@@ -308,8 +383,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
@@ -357,8 +439,15 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				primaries++
