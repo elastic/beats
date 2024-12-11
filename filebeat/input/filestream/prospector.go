@@ -53,7 +53,7 @@ func init() {
 	// Initialise a default identifier
 	for name, factory := range identifierFactories {
 		if name == inodeMarkerName {
-			// inode marker requries an specific config we cannot infer.
+			// inode marker requires an specific config we cannot infer.
 			continue
 		}
 
