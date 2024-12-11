@@ -81,10 +81,14 @@ func (r RateLimiter) endpoint(path string) endpointRateLimiter {
 
 func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, log *logp.Logger) (err error) {
 	e := r.endpoint(endpoint)
-	<-e.ready
 	log.Debugw("rate limit", "limit", e.limiter.Limit(), "burst", e.limiter.Burst(), "url", url.String())
 	ctxWithDeadline, cancel := context.WithDeadline(ctx, time.Now().Add(maxWait))
 	defer cancel()
+	select {
+	case <-e.ready:
+	case <-ctxWithDeadline.Done():
+		return ctxWithDeadline.Err()
+	}
 	return e.limiter.Wait(ctxWithDeadline)
 }
 
