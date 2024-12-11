@@ -22,6 +22,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"go.opentelemetry.io/collector/config/configopaque"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -37,6 +38,8 @@ import (
 // parameters
 // preset
 // setup.ilm.* -> supported but the logic is not in place yet
+// proxy_disable -> supported but the logic is not in place yet
+// proxy_headers
 type unsupportedConfig struct {
 	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
@@ -44,6 +47,7 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
+	MaxRetries         int               `config:"max_retries"`
 }
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
@@ -106,6 +110,11 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot read worker/workers from Elasticsearch config: %w", err)
 	}
 
+	headers := make(map[string]configopaque.String, len(escfg.Headers))
+	for k, v := range escfg.Headers {
+		headers[k] = configopaque.String(v)
+	}
+
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
@@ -124,7 +133,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 
 		// ClientConfig
 		"proxy_url":         esToOTelOptions.ProxyURL,         // proxy_url
-		"headers":           escfg.Headers,                    // headers
+		"headers":           headers,                          // headers
 		"timeout":           escfg.Transport.Timeout,          // timeout
 		"idle_conn_timeout": &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
 		"tls":               otelTLSConfg,                     // tls config

@@ -11,7 +11,7 @@ output:
     username: elastic
     password: changeme
     index: form-otel-exporter
-    ssl.verification_mode: none
+
 
 
 setup.template.name: form-otel-exporter
