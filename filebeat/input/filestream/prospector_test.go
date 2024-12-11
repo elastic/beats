@@ -35,7 +35,6 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -175,15 +174,6 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 	const mockFingerprint = "the fingerprint from this file"
 	const mockInputPrefix = "test-input"
 
-	// We need an empty file as inode marker for the
-	// 'inode marker' file identity
-	inodeMarkerFile, err := os.CreateTemp(t.TempDir(), "test-inode-marker")
-	if err != nil {
-		t.Fatalf("cannot create inode marker: '%s'", err)
-	}
-	inodeMarkerPath := inodeMarkerFile.Name()
-	inodeMarkerFile.Close()
-
 	logFileFullPath, err := filepath.Abs(filepath.Join("testdata", "log.log"))
 	if err != nil {
 		t.Fatalf("cannot get absolute path from test file: %s", err)
@@ -205,12 +195,6 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 	fingerprintIdentifier, _ := newFingerprintIdentifier(nil)
 	nativeIdentifier, _ := newINodeDeviceIdentifier(nil)
 	pathIdentifier, _ := newPathIdentifier(nil)
-	inodeIdentifier, err := newINodeMarkerIdentifier(
-		conf.MustNewConfigFrom(map[string]any{
-			"path": inodeMarkerPath,
-		}),
-	)
-
 	newIDFunc := func(s loginp.Source) string {
 		return mockInputPrefix + "-" + s.Name()
 	}
@@ -223,10 +207,6 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 	}
 
 	expectedNewKey := newIDFunc(fingerprintIdentifier.GetSource(fsEvent))
-
-	if err != nil {
-		t.Fatalf("cannot create inodeMarkerIdentifier: %s", err)
-	}
 
 	testCases := map[string]struct {
 		oldIdentifier           fileIdentifier
@@ -242,10 +222,6 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 			oldIdentifier:           pathIdentifier,
 			newIdentifier:           fingerprintIdentifier,
 			expectRegistryMigration: true,
-		},
-		"inode marker to fingerprint fails": {
-			oldIdentifier: inodeIdentifier,
-			newIdentifier: fingerprintIdentifier,
 		},
 		"fingerprint to fingerprint fails": {
 			oldIdentifier: fingerprintIdentifier,

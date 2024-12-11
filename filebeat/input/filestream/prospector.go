@@ -56,11 +56,14 @@ func init() {
 			// inode marker requries an specific config we cannot infer.
 			continue
 		}
-		var err error
-		identifiersMap[name], err = factory(nil)
+
+		identifier, err := factory(nil)
 		if err != nil {
-			panic(fmt.Errorf("cannot create identifier '%s': %w", name, err))
+			// Skip identifiers we cannot create. E.g: inode_marker is not
+			// supported on Windows
+			continue
 		}
+		identifiersMap[name] = identifier
 	}
 }
 
