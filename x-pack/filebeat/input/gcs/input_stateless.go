@@ -54,7 +54,6 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		source = &Source{
 			ProjectId:                in.config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
