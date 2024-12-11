@@ -23,7 +23,7 @@ The input can be configured to work with and without polling, though if polling 
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
 
-**Config Option Removal Notice** : The `bucket_timeout` config option has been removed from the google cloud storage input. The intention behind this removal is to simplify the configuration and to make it more user friendly. The `bucket_timeout` option was used to specify the timeout for the individual bucket operations. But this proved counter-intuitive because bucket operations could slow down due to a lot of external factors like network latency, file size, back pressure etc. This could lead to the input not being able to process the files in time, which would then lead to a context cancellation error. This error would then cause gaps in the ingested data. To avoid this, the `bucket_timeout` option has been removed. The input now uses the parent program context to handle the contexts for bucket operations. This ensures that the input is able to process the files in a timely manner and avoid most context cancellation errors.
+**Config Option Removal Notice** : The `bucket_timeout` config option has been removed from the google cloud storage input. The intention behind this removal is to simplify the configuration and to make it more user friendly. The `bucket_timeout` option was confusing and had the potential to let users malconfigure the input, which could lead to unexpected behavior. The input now uses a more robust and efficient way to handle the bucket timeout internally.
 
 [id="supported-types-gcs"]
 NOTE: Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may be also be gzip compressed. 
