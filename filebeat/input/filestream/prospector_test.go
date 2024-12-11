@@ -108,7 +108,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 	}
 	defer f.Close()
 	tmpFileName := f.Name()
-	fi, err := f.Stat()
+	fi, err := f.Stat() // nolint:typecheck // It is used on L151
 	if err != nil {
 		t.Fatalf("cannot stat test file: %v", err)
 	}
