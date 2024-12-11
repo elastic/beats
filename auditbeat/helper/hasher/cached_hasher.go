@@ -89,6 +89,11 @@ func (ch *CachedHasher) HashFile(path string) (map[HashType]Digest, error) {
 	if entry, ok := ch.hashLRU.Get(path); ok {
 		statx, err := ch.statxFromPath(path)
 		if err != nil {
+			// No point in keeping an entry if we can't compare
+			if !ch.hashLRU.Remove(path) {
+				err := errors.New("can't remove existing entry, this is a bug")
+				ch.log.Error(err)
+			}
 			return nil, err
 		}
 		// If metadata didn't change, this is a good entry, if not fall and rehash
