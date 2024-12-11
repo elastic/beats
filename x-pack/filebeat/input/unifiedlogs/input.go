@@ -153,7 +153,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 
 				// to avoid race conditions updating the cursor, and to be able to
 				// resume from the oldest point in time, we only update cursor
-				// from the streaming gorouting once backfilling is done.
+				// from the streaming goroutine once backfilling is done.
 				defer wrappedPub.startUpdatingCursor()
 			}
 			logCmd := newLogShowCmd(ctx, input.config)

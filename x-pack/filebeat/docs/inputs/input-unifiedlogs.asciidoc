@@ -16,12 +16,9 @@ telemetry across all levels of the system. This system centralizes the storage o
 log data in memory and on disk, rather than writing that data to a text-based log file.
 
 The input interacts with the `log` command-line tool to provide access to the events.
-It can process events in some different ways:
 
-- Streaming new, incoming events. This is the default.
-- Start processing events from a start date. This happens when the input is restarted,
-or when a specific start date is provided.
-- Start processing events since the beginning of time, by setting the `backill` option.
+The input starts streaming events from the current point in time unless a start date or
+the `backfill` options are set. When restarted it will continue where it left off.
 
 Alternatively, it can also do one off operations, such as:
 
