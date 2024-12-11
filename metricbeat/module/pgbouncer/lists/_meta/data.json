@@ -1,0 +1,37 @@
+{
+    "@timestamp": "2024-08-04T16:40:51.299Z",
+    "event": {
+        "dataset": "pgbouncer.lists",
+        "duration": 3184900,
+        "module": "pgbouncer"
+    },
+    "metricset": {
+        "name": "lists",
+        "period": 10000
+    },
+    "pgbouncer": {
+        "lists": {
+            "users": 2,
+            "clients": {
+                "free": 47,
+                "used": 3,
+                "login": 0
+            },
+            "peers": 0,
+            "peer_pools": 0,
+            "dns_queries": 0,
+            "databases": 1,
+            "dns_names": 0,
+            "servers": {
+                "free": 0,
+                "used": 0
+            },
+            "dns_zones": 0,
+            "pools": 1
+        }
+    },
+    "service": {
+        "address": "postgresql://localhost:6432/pgbouncer?connect_timeout=10&sslmode=disable",
+        "type": "pgbouncer"
+    }
+}
