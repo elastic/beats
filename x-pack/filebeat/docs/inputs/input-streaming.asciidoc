@@ -350,6 +350,28 @@ The minimum time to wait between retries. This ensures that retries are spaced o
 The maximum time to wait between retries. This prevents the retry mechanism from becoming too slow, ensuring that the client does not wait indefinitely between retries. This is crucial in systems where timeouts or user experience are critical. For example, `wait_max` might be set to 10 seconds, meaning that even if the calculated backoff is greater than this, the client will wait at most 10 seconds before retrying.
 
 [float]
+=== `timeout`
+Timeout is the maximum amount of time the websocket dialer will wait for a connection to be established. The default value is `180` seconds.
+
+[float]
+==== `proxy_url`
+This specifies the forward proxy URL to use for the connection. The `proxy_url` configuration is optional and can be used to configure the proxy settings for the connection. The `proxy_url` default value is set by `http.ProxyFromEnvironment` which reads the `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` environment variables.
+
+[float]
+==== `proxy_headers`
+This specifies the headers to be sent to the proxy server. The `proxy_headers` configuration is optional and can be used to configure the headers to be sent to the proxy server.
+
+[float]
+==== `ssl`
+This specifies the SSL configuration for the connection. The `ssl` configuration is optional and can be used to configure the SSL settings for the connection. The `ssl` configuration has the following subfields:
+
+  - `certificate_authorities`: A list of root certificates to use for verifying the server's certificate.   
+  - `certificate`: The (PEM encoded) certificate to use for client authentication.
+  - `key`: The (PEM encoded) private key to use for client authentication.
+
+If this is a self-signed certificate, the `certificate_authorities` field should be set to the certificate itself.
+
+[float]
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.

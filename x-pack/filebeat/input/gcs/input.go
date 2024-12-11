@@ -63,7 +63,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			ProjectId:                config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -92,9 +91,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	}
 	if b.ParseJSON == nil {
 		b.ParseJSON = &cfg.ParseJSON
-	}
-	if b.BucketTimeOut == nil {
-		b.BucketTimeOut = &cfg.BucketTimeOut
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
