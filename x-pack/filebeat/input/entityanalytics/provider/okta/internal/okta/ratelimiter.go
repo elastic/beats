@@ -58,6 +58,10 @@ func NewRateLimiter(window time.Duration, fixedLimit *int) *RateLimiter {
 	return &r
 }
 
+var immediatelyReady = make(chan struct{})
+
+func init() { close(immediatelyReady) }
+
 func (r RateLimiter) endpoint(path string) endpointRateLimiter {
 	if existing, ok := r.byEndpoint[path]; ok {
 		return existing
@@ -67,11 +71,9 @@ func (r RateLimiter) endpoint(path string) endpointRateLimiter {
 		limit = rate.Limit(float64(*r.fixedLimit) / r.window.Seconds())
 	}
 	limiter := rate.NewLimiter(limit, 1) // Allow a single fetch operation to obtain limits from the API
-	ready := make(chan struct{})
-	close(ready)
 	newEndpointRateLimiter := endpointRateLimiter{
 		limiter: limiter,
-		ready:   ready,
+		ready:   immediatelyReady,
 	}
 	r.byEndpoint[path] = newEndpointRateLimiter
 	return newEndpointRateLimiter
