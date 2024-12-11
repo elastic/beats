@@ -50,6 +50,8 @@ type config struct {
 	ExpandEventListFromField string `config:"expand_event_list_from_field"`
 	// This field is only used for system test purposes, to override the HTTP endpoint.
 	AlternativeHost string `config:"alternative_host"`
+	// Retry - Defines the retry configuration for the input.
+	Retry retryConfig `config:"retry"`
 }
 
 // bucket contains the config for each specific object storage bucket in the root account
@@ -92,6 +94,19 @@ type jsonCredentialsConfig struct {
 	AccountKey string `config:"account_key"`
 }
 
+type retryConfig struct {
+	// MaxAttempts configures the maximum number of times an API call can be made in the case of retryable errors.
+	// For example, if you set MaxAttempts(5), the operation will be attempted up to 5 times total (initial call plus 4 retries).
+	// If you set MaxAttempts(1), the operation will be attempted only once and there will be no retries. This setting defaults to 3.
+	MaxAttempts int `config:"max_attempts" validate:"min=1"`
+	// InitialBackOffDuration is the initial value of the retry period, defaults to 1 second.
+	InitialBackOffDuration time.Duration `config:"initial_backoff_duration" validate:"min=1"`
+	// MaxBackOffDuration is the maximum value of the retry period, defaults to 30 seconds.
+	MaxBackOffDuration time.Duration `config:"max_backoff_duration" validate:"min=2"`
+	// BackOffMultiplier is the factor by which the retry period increases. It should be greater than 1 and defaults to 2.
+	BackOffMultiplier float64 `config:"backoff_multiplier" validate:"min=1.1"`
+}
+
 func (c authConfig) Validate() error {
 	// credentials_file
 	if c.CredentialsFile != nil {
@@ -126,5 +141,11 @@ func defaultConfig() config {
 		PollInterval:  5 * time.Minute,
 		BucketTimeOut: 120 * time.Second,
 		ParseJSON:     false,
+		Retry: retryConfig{
+			MaxAttempts:            3,
+			InitialBackOffDuration: time.Second,
+			MaxBackOffDuration:     30 * time.Second,
+			BackOffMultiplier:      2,
+		},
 	}
 }
