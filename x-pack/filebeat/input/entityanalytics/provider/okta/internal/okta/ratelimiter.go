@@ -16,19 +16,37 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// RateLimiter holds rate limiting information for an API.
+//
+// Each API endpoint has its own rate limit, which can be dynamically updated
+// using response headers. If a fixed limit is set, it takes precedence over any
+// information from response headers.
 type RateLimiter struct {
 	window     time.Duration
 	fixedLimit *int
 	byEndpoint map[string]endpointRateLimiter
 }
 
+// endpointRateLimiter represents rate limiting information for a single API endpoint.
 type endpointRateLimiter struct {
 	limiter *rate.Limiter
 	ready   chan struct{}
 }
 
-const waitDeadline = 30 * time.Minute
+// maxWait defines the maximum wait duration allowed for rate limiting.
+// Longer waits are considered errors.
+const maxWait = 30 * time.Minute
 
+// NewRateLimiter constructs a new RateLimiter.
+//
+// Parameters:
+//   - `window`: The time between API limit resets. Used for setting an initial
+//     target rate.
+//   - `fixedLimit`: A fixed number of requests to allow in each `window`,
+//     overriding the guidance in API responses.
+//
+// Returns:
+//   - A pointer to a new RateLimiter instance.
 func NewRateLimiter(window time.Duration, fixedLimit *int) *RateLimiter {
 	endpoints := make(map[string]endpointRateLimiter)
 	r := RateLimiter{
@@ -63,7 +81,7 @@ func (r RateLimiter) Wait(ctx context.Context, endpoint string, url *url.URL, lo
 	e := r.endpoint(endpoint)
 	<-e.ready
 	log.Debugw("rate limit", "limit", e.limiter.Limit(), "burst", e.limiter.Burst(), "url", url.String())
-	ctxWithDeadline, cancel := context.WithDeadline(ctx, time.Now().Add(waitDeadline))
+	ctxWithDeadline, cancel := context.WithDeadline(ctx, time.Now().Add(maxWait))
 	defer cancel()
 	return e.limiter.Wait(ctxWithDeadline)
 }
