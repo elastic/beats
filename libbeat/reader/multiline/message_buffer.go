@@ -18,8 +18,15 @@
 package multiline
 
 import (
+	"golang.org/x/time/rate"
+
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+// truncatedLogRate is a rate limiter for the log message that is
+// printed when a multiline message is too large.
+var truncatedLogRate = rate.Sometimes{First: 1, Every: 1000}
 
 type messageBuffer struct {
 	maxBytes       int // bytes stored in content
@@ -32,6 +39,7 @@ type messageBuffer struct {
 	truncated      int
 	err            error // last seen error
 	message        reader.Message
+	logger         *logp.Logger
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -42,6 +50,7 @@ func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool
 		skipNewline: skipNewline,
 		message:     reader.Message{},
 		err:         nil,
+		logger:      logp.NewLogger("reader_multiline"),
 	}
 }
 
@@ -120,11 +129,18 @@ func (b *messageBuffer) addLine(m reader.Message) {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (b *messageBuffer) finalize() reader.Message {
 	if b.truncated > 0 {
-		b.message.AddFlagsWithKey("log.flags", "truncated")
+		truncatedLogRate.Do(func() {
+			b.logger.Warnf("The multiline message is too large and has been truncated to the limit of %d lines or %d bytes. This log is sampled, and the number of truncated messages is likely higher than the number of times this log message appears.", b.maxLines, b.maxBytes)
+		})
+		if err := b.message.AddFlagsWithKey("log.flags", "truncated"); err != nil {
+			b.logger.Errorf("Failed to add truncated flag: %v", err)
+		}
 	}
 
 	if b.numLines > 1 {
-		b.message.AddFlagsWithKey("log.flags", "multiline")
+		if err := b.message.AddFlagsWithKey("log.flags", "multiline"); err != nil {
+			b.logger.Errorf("Failed to add multiline flag: %v", err)
+		}
 	}
 
 	// Copy message from existing content
