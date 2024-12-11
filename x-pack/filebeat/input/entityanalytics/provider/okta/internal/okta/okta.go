@@ -185,13 +185,13 @@ func (o Response) String() string {
 // Parts of the response may be omitted using the omit parameter.
 //
 // The provided rate limiter must allow at least request and will be updated with the
-// response's X-Rate-Limit headers considering the rate limit window time. Details
-// for rate limits are available at https://help.okta.com/en-us/Content/Topics/Security/API-rate-limits.htm
+// response's X-Rate-Limit headers. Details for rate limits are available at
+// https://help.okta.com/en-us/Content/Topics/Security/API-rate-limits.htm
 // and account rate limits and windows can be seen on the Okta admin dashboard at
 // https://${yourOktaDomain}/reports/rate-limit.
 //
 // See https://developer.okta.com/docs/reference/api/users/#list-users for details.
-func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
+func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user string, query url.Values, omit Response, lim *RateLimiter, log *logp.Logger) ([]User, http.Header, error) {
 	var endpoint, path string
 	if user == "" {
 		endpoint = "/api/v1/users"
@@ -207,7 +207,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	return getDetails[User](ctx, cli, u, endpoint, key, user == "", omit, lim, window, log)
+	return getDetails[User](ctx, cli, u, endpoint, key, user == "", omit, lim, log)
 }
 
 // GetUserFactors returns Okta group roles using the groups API endpoint. host is the
@@ -216,7 +216,7 @@ func GetUserDetails(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/UserFactor/#tag/UserFactor/operation/listFactors.
-func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Factor, http.Header, error) {
+func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, log *logp.Logger) ([]Factor, http.Header, error) {
 	if user == "" {
 		return nil, nil, errors.New("no user specified")
 	}
@@ -229,7 +229,7 @@ func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user strin
 		Host:   host,
 		Path:   path,
 	}
-	return getDetails[Factor](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+	return getDetails[Factor](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
 // GetUserRoles returns Okta group roles using the groups API endpoint. host is the
@@ -238,7 +238,7 @@ func GetUserFactors(ctx context.Context, cli *http.Client, host, key, user strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
-func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, log *logp.Logger) ([]Role, http.Header, error) {
 	if user == "" {
 		return nil, nil, errors.New("no user specified")
 	}
@@ -251,7 +251,7 @@ func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string,
 		Host:   host,
 		Path:   path,
 	}
-	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
 // GetUserGroupDetails returns Okta group details using the users API endpoint. host is the
@@ -260,7 +260,7 @@ func GetUserRoles(ctx context.Context, cli *http.Client, host, key, user string,
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/reference/api/users/#request-parameters-8 (no anchor exists on the page for this endpoint) for details.
-func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Group, http.Header, error) {
+func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user string, lim *RateLimiter, log *logp.Logger) ([]Group, http.Header, error) {
 	if user == "" {
 		return nil, nil, errors.New("no user specified")
 	}
@@ -273,7 +273,7 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 		Host:   host,
 		Path:   path,
 	}
-	return getDetails[Group](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+	return getDetails[Group](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
 // GetGroupRoles returns Okta group roles using the groups API endpoint. host is the
@@ -282,7 +282,7 @@ func GetUserGroupDetails(ctx context.Context, cli *http.Client, host, key, user 
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/RoleAssignmentBGroup/#tag/RoleAssignmentBGroup/operation/listGroupAssignedRoles.
-func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Role, http.Header, error) {
+func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group string, lim *RateLimiter, log *logp.Logger) ([]Role, http.Header, error) {
 	if group == "" {
 		return nil, nil, errors.New("no group specified")
 	}
@@ -295,7 +295,7 @@ func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group strin
 		Host:   host,
 		Path:   path,
 	}
-	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, window, log)
+	return getDetails[Role](ctx, cli, u, endpoint, key, true, OmitNone, lim, log)
 }
 
 // GetDeviceDetails returns Okta device details using the list devices API endpoint. host is the
@@ -305,7 +305,7 @@ func GetGroupRoles(ctx context.Context, cli *http.Client, host, key, group strin
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDevices for details.
-func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim RateLimiter, window time.Duration, log *logp.Logger) ([]Device, http.Header, error) {
+func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, lim *RateLimiter, log *logp.Logger) ([]Device, http.Header, error) {
 	var endpoint string
 	var path string
 	if device == "" {
@@ -322,7 +322,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	return getDetails[Device](ctx, cli, u, endpoint, key, device == "", OmitNone, lim, window, log)
+	return getDetails[Device](ctx, cli, u, endpoint, key, device == "", OmitNone, lim, log)
 }
 
 // GetDeviceUsers returns Okta user details for users associated with the provided device identifier
@@ -332,7 +332,7 @@ func GetDeviceDetails(ctx context.Context, cli *http.Client, host, key, device s
 // See GetUserDetails for details of the query and rate limit parameters.
 //
 // See https://developer.okta.com/docs/api/openapi/okta-management/management/tag/Device/#tag/Device/operation/listDeviceUsers for details.
-func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]User, http.Header, error) {
+func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device string, query url.Values, omit Response, lim *RateLimiter, log *logp.Logger) ([]User, http.Header, error) {
 	if device == "" {
 		// No user associated with a null device. Not an error.
 		return nil, nil, nil
@@ -347,7 +347,7 @@ func GetDeviceUsers(ctx context.Context, cli *http.Client, host, key, device str
 		Path:     path,
 		RawQuery: query.Encode(),
 	}
-	du, h, err := getDetails[devUser](ctx, cli, u, endpoint, key, true, omit, lim, window, log)
+	du, h, err := getDetails[devUser](ctx, cli, u, endpoint, key, true, omit, lim, log)
 	if err != nil {
 		return nil, h, err
 	}
@@ -372,7 +372,7 @@ type devUser struct {
 // for the specific user are returned, otherwise a list of all users is returned.
 //
 // See GetUserDetails for details of the query and rate limit parameters.
-func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, endpoint string, key string, all bool, omit Response, lim RateLimiter, window time.Duration, log *logp.Logger) ([]E, http.Header, error) {
+func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, endpoint string, key string, all bool, omit Response, lim *RateLimiter, log *logp.Logger) ([]E, http.Header, error) {
 	url := u.String()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -395,7 +395,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
-	err = lim.Update(endpoint, resp.Header, window, log)
+	err = lim.Update(endpoint, resp.Header, log)
 	if err != nil {
 		io.Copy(io.Discard, resp.Body)
 		return nil, nil, err
