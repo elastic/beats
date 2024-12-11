@@ -9,7 +9,28 @@
         "application_pool": {
             "name": "test.local",
             "net_clr": {
-                "total_exceptions_thrown": 0
+                "total_exceptions_thrown": 0,
+                "finallys_per_sec": 0,
+                "exceptions_thrown_per_sec": 0,
+                "locks_and_threads": {
+                    "current_queue_length": 0,
+                    "contention_rate_per_sec": 0
+                },
+                "memory": {
+                    "gen_2_heap_size": 0,
+                    "large_object_heap_size": 0,
+                    "gen_1_heap_size": 0,
+                    "gen_1_collections": 0,
+                    "gen_0_heap_size": 0,
+                    "bytes_in_all_heaps": 0,
+                    "total_committed_bytes": 0,
+                    "gen_0_collections": 0,
+                    "gen_2_collections": 0,
+                    "allocated_bytes_per_sec": 0,
+                    "time_in_gc_perc": 0
+                },
+                "filters_per_sec": 0,
+                "throw_to_catch_depth_per_sec": 0
             },
             "process": {
                 "handle_count": 532,
