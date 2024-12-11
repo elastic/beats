@@ -12,7 +12,6 @@ import (
 // Source, it is the cursor source
 type Source struct {
 	BucketName               string
-	BucketTimeOut            time.Duration
 	ProjectId                string
 	MaxWorkers               int
 	Poll                     bool
