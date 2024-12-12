@@ -20,11 +20,11 @@ package scheduler
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -35,7 +35,7 @@ type schedJob struct {
 	wg          *sync.WaitGroup
 	entrypoint  TaskFunc
 	jobLimitSem *semaphore.Weighted
-	activeTasks atomic.Int
+	activeTasks atomic.Int64
 }
 
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
@@ -48,7 +48,6 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 		scheduler:   s,
 		jobLimitSem: s.jobLimitSem[jobType],
 		entrypoint:  task,
-		activeTasks: atomic.MakeInt(0),
 		wg:          &sync.WaitGroup{},
 	}
 }
@@ -59,7 +58,7 @@ func newSchedJob(ctx context.Context, s *Scheduler, id string, jobType string, t
 // The wait group passed into this function expects to already have its count incremented by one.
 func (sj *schedJob) run() (startedAt time.Time) {
 	sj.wg.Add(1)
-	sj.activeTasks.Inc()
+	sj.activeTasks.Add(1)
 	if sj.jobLimitSem != nil {
 		err := sj.jobLimitSem.Acquire(sj.ctx, 1)
 		// Defer release only if acquired
@@ -82,7 +81,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 // The wait group passed into this function expects to already have its count incremented by one.
 func (sj *schedJob) runTask(task TaskFunc) time.Time {
 	defer sj.wg.Done()
-	defer sj.activeTasks.Dec()
+	defer sj.activeTasks.Add(-1)
 
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
@@ -113,7 +112,7 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 		sj.scheduler.stats.activeTasks.Dec()
 
 		sj.wg.Add(len(continuations))
-		sj.activeTasks.Add(len(continuations))
+		sj.activeTasks.Add(int64(len(continuations)))
 		for _, cont := range continuations {
 			// Run continuations in parallel, note that these each will acquire their own slots
 			// We can discard the started at times for continuations as those are
