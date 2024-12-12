@@ -17,8 +17,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/libbeat/otelbeat"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"

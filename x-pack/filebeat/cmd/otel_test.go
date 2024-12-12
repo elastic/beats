@@ -9,8 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/otelbeat"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 )
 
 func TestOtel(t *testing.T) {
