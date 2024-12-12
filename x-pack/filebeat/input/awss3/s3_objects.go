@@ -158,13 +158,12 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	if err != nil {
 		return err
 	}
-	var evtOffset int64
 	switch dec := dec.(type) {
 	case valueDecoder:
 		defer dec.close()
 
 		for dec.next() {
-			val, err := dec.decodeValue()
+			evtOffset, val, err := dec.decodeValue()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
 					return nil
@@ -183,6 +182,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	case decoder:
 		defer dec.close()
 
+		var evtOffset int64
 		for dec.next() {
 			data, err := dec.decode()
 			if err != nil {
@@ -420,6 +420,10 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
+// createEvent constructs a beat.Event from message and offset. The value of
+// message populates the event message field, and offset is used to set the
+// log.offset field and, if offset is non-negative, with the object's ARN and
+// key, the @metadata._id field.
 func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
@@ -448,7 +452,9 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 			},
 		},
 	}
-	event.SetID(objectID(p.s3ObjHash, offset))
+	if offset >= 0 {
+		event.SetID(objectID(p.s3ObjHash, offset))
+	}
 
 	if len(p.s3Metadata) > 0 {
 		_, _ = event.Fields.Put("aws.s3.metadata", p.s3Metadata)
