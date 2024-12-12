@@ -12,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 )
@@ -201,7 +202,7 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 4,
 			Minor: 64,
 		},
@@ -225,7 +226,7 @@ func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 4,
 			Minor: 62,
 		},
@@ -255,7 +256,7 @@ func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 			Sid:  pid,
 			Ppid: 1,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -294,7 +295,7 @@ func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 			Sid:  bashPID,
 			Ppid: ssmPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -329,7 +330,7 @@ func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 			Sid:  bashPID,
 			Ppid: sshdPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -364,7 +365,7 @@ func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 			Sid:  bashPID,
 			Ppid: containerdShimPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -400,7 +401,7 @@ func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 			Sid:  bashPID,
 			Ppid: runcPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -428,7 +429,7 @@ func TestSingleProcessEmptyProcess(t *testing.T) {
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -471,7 +472,7 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 			Sid:  ssmPID,
 			Ppid: ssmPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -492,7 +493,7 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 			Sid:  bashPID,
 			Ppid: ssmPID,
 		},
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
