@@ -19,7 +19,7 @@ package cfgfile
 
 import (
 	"io/ioutil"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"testing"
@@ -30,7 +30,7 @@ import (
 
 func TestGlobWatcher(t *testing.T) {
 	// Create random temp directory
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	dir, err := ioutil.TempDir("", id)
 	defer os.RemoveAll(dir)
 	assert.NoError(t, err)

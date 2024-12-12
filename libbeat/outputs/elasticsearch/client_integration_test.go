@@ -22,7 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -472,6 +472,6 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 		panic("no elasticsearch client")
 	}
 
-	client := grp.Clients[rand.Intn(L)]
+	client := grp.Clients[rand.IntN(L)]
 	return client.(outputs.NetworkClient)
 }

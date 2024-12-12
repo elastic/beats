@@ -24,7 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -44,10 +44,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type testTemplate struct {
 	t      *testing.T
