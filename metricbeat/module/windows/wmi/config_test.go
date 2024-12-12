@@ -100,9 +100,10 @@ func TestCompileQueries(t *testing.T) {
 // TestQueryCompile ensures individual query compilation works correctly.
 func TestQueryCompile(t *testing.T) {
 	tests := []struct {
-		name          string
-		queryConfig   QueryConfig
-		expectedQuery string
+		name                 string
+		queryConfig          QueryConfig
+		expectedQuery        string
+		expectedFieldsLength int
 	}{
 		{
 			name: "Simple query with WHERE clause",
@@ -111,7 +112,8 @@ func TestQueryCompile(t *testing.T) {
 				Fields: []string{"Name", "ProcessId"},
 				Where:  "Name = 'notepad.exe'",
 			},
-			expectedQuery: "SELECT Name,ProcessId FROM Win32_Process WHERE Name = 'notepad.exe'",
+			expectedQuery:        "SELECT Name,ProcessId FROM Win32_Process WHERE Name = 'notepad.exe'",
+			expectedFieldsLength: 2,
 		},
 		{
 			name: "Query with multiple fields and no WHERE clause",
@@ -120,7 +122,8 @@ func TestQueryCompile(t *testing.T) {
 				Fields: []string{"Name", "State", "StartMode"},
 				Where:  "",
 			},
-			expectedQuery: "SELECT Name,State,StartMode FROM Win32_Service",
+			expectedQuery:        "SELECT Name,State,StartMode FROM Win32_Service",
+			expectedFieldsLength: 3,
 		},
 		{
 			name: "Query with wildcard (*) for fields",
@@ -129,7 +132,8 @@ func TestQueryCompile(t *testing.T) {
 				Fields: []string{},
 				Where:  "Manufacturer = 'Dell'",
 			},
-			expectedQuery: "SELECT * FROM Win32_ComputerSystem WHERE Manufacturer = 'Dell'",
+			expectedQuery:        "SELECT * FROM Win32_ComputerSystem WHERE Manufacturer = 'Dell'",
+			expectedFieldsLength: 0,
 		},
 		{
 			name: "Query with wildcard (*) and no WHERE clause",
@@ -138,7 +142,8 @@ func TestQueryCompile(t *testing.T) {
 				Fields: []string{"*"},
 				Where:  "",
 			},
-			expectedQuery: "SELECT * FROM Win32_BIOS",
+			expectedQuery:        "SELECT * FROM Win32_BIOS",
+			expectedFieldsLength: 0, // The normalization process make sure that ['*'] and [] are the same case
 		},
 	}
 
@@ -146,6 +151,7 @@ func TestQueryCompile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.queryConfig.compileQuery()
 			assert.Equal(t, tt.expectedQuery, tt.queryConfig.QueryStr, "QueryStr should match the expected query string")
+			assert.Equal(t, tt.expectedFieldsLength, len(tt.queryConfig.Fields))
 		})
 	}
 }
