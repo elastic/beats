@@ -42,6 +42,8 @@ filebeat.inputs:
     paths:
       - %s
 
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     clean_inactive: 3s
     ignore_older: 2s
     close.on_state_change.inactive: 1s
@@ -446,6 +448,7 @@ logging:
     file_identity.native: ~
     prospector:
       scanner:
+        fingerprint.enabled: false
         check_interval: 0.1s
 `
 	fingerprintCfg := `
