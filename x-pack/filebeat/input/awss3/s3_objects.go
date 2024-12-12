@@ -422,15 +422,15 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 // createEvent constructs a beat.Event from message and offset. The value of
 // message populates the event message field, and offset is used to set the
-// log.offset field and, if offset is non-negative, with the object's ARN and
-// key, the @metadata._id field.
+// log.offset field and, with the object's ARN and key, the @metadata._id field.
+// If offset is negative, it is ignored and omitted from @metadata._id field
+// construction and the log.offset field is not set.
 func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: mapstr.M{
 			"message": message,
 			"log": mapstr.M{
-				"offset": offset,
 				"file": mapstr.M{
 					"path": p.s3RequestURL,
 				},
@@ -453,6 +453,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 		},
 	}
 	if offset >= 0 {
+		event.Fields.Put("log.offset", offset)
 		event.SetID(objectID(p.s3ObjHash, offset))
 	}
 
