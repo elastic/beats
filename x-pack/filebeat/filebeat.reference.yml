@@ -4591,7 +4591,7 @@ logging.files:
   #path: /var/log/filebeat
 
   # The name of the files where the logs are written to.
-  #name: filebeat-event-data
+  #name: filebeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
