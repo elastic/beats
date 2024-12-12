@@ -8,7 +8,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	wmiquery "github.com/microsoft/wmi/pkg/base/query"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 )
 
@@ -26,7 +25,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config WmibeatConfig
+	config Config
 }
 
 const WMIDefaultNamespace = "root\\cimv2"
@@ -41,15 +40,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	err := config.ValidateConnectionParameters()
+	if err != nil {
+		return nil, err
+	}
+
+	err = config.CompileQueries()
+	if err != nil {
+		return nil, err
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-	}
-
-	// Compiling the Query once
-	for i := range m.config.Queries {
-		q := m.config.Queries[i]
-		m.config.Queries[i].Query = wmiquery.NewWmiQueryWithSelectList(q.Class, q.Fields, q.Where...)
 	}
 
 	return m, nil
@@ -78,7 +81,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for _, queryConfig := range m.config.Queries {
 
-		rows, err := session.QueryInstances(queryConfig.Query.String())
+		query := queryConfig.QueryStr
+
+		rows, err := session.QueryInstances(query)
 		if err != nil {
 			logp.Warn("Could not execute query %v", err)
 			continue
@@ -89,18 +94,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				MetricSetFields: mapstr.M{
 					"class":     queryConfig.Class,
 					"namespace": m.config.Namespace,
+					"host":      m.config.Host,
 				},
 			}
 
 			if m.config.IncludeQueries {
-				event.MetricSetFields.Put(".query", queryConfig.Query)
+				event.MetricSetFields.Put("query", query)
 			}
 
 			// Get only the required properites
 			properties := queryConfig.Fields
 
-			// With special array, we retrive all properties
-			if len(queryConfig.Fields) == 1 && queryConfig.Fields[0] == "*" {
+			// If the Fields array is empty we retrieve all fields
+			if len(queryConfig.Fields) == 0 {
 				properties = instance.GetClass().GetPropertiesNames()
 			}
 
@@ -110,7 +116,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					logp.Err("Unable to get propery by name: %v", err)
 					continue
 				}
-
+				// If the user decides to ignore properties with nil values, we skip them
 				if !m.config.IncludeNull && fieldValue == nil {
 					continue
 				}
