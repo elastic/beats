@@ -60,13 +60,8 @@ CHANGELOG*
 /libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
-<<<<<<< HEAD
-/libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
-/libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
-=======
 /libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
 /libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
->>>>>>> 8daf34822 (Update CODEOWNERS according to k8s ownership transfer plan (#41858))
 /libbeat/processors/cache/ @elastic/security-service-integrations
 /libbeat/processors/community_id/ @elastic/sec-deployment-and-devices
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
