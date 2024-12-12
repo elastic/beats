@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix && !darwin && !windows
+//go:build darwin
 
 package inputs
 
@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/salesforce"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/streaming"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/unifiedlogs"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -48,5 +49,6 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		streaming.PluginWebsocketAlias(log, store),
 		netflow.Plugin(log),
 		benchmark.Plugin(),
+		unifiedlogs.Plugin(log, store),
 	}
 }
