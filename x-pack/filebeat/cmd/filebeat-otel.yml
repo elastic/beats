@@ -13,7 +13,6 @@ output:
     index: form-otel-exporter
 
 
-
 setup.template.name: form-otel-exporter
 setup.template.pattern: form-otel-exporter
 setup.dashboards.index: "form-otel-exporter*"

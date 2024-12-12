@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/otelbeat"
 
 	// Register the includes.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -40,7 +41,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(filebeatCfg)
 	}
-	command.AddCommand(OtelCmd())
+	command.AddCommand(otelbeat.OTelCmd(fbcmd.Name))
 	return command
 }
 
