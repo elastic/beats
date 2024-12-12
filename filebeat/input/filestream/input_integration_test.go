@@ -179,10 +179,12 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                id,
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "24h",
-		"close.reader.on_eof":               "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"close.reader.on_eof":                    "true",
 	})
 
 	testlines := []byte("first log line\n")
