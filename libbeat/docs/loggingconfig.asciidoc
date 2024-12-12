@@ -320,7 +320,7 @@ the <<directory-layout>> section for details.
 [float]
 ==== `logging.event_data.files.name`
 
-The name of the file that logs are written to. The default is '{beatname_lc}'-event-data.
+The name of the file that logs are written to. The default is '{beatname_lc}'-events-data.
 
 [float]
 ==== `logging.event_data.files.rotateeverybytes`
