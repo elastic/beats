@@ -441,6 +441,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Functionbeat*
 
+- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}41506[41506]
+
 *Elastic Log Driver*
 *Elastic Logging Plugin*
 
@@ -452,6 +454,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Removed `bucket_timeout` config option for GCS input and replaced bucket context with parent program context. {issue}41107[41107] {pull}41970[41970]
 
 *Heartbeat*
 
