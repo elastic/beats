@@ -13,8 +13,8 @@ import (
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/otelcommon/converters"
-	"github.com/elastic/beats/v7/libbeat/otelcommon/providers/fbprovider"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/converters"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
 	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
 )
 

@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	oteltranslate "github.com/elastic/beats/v7/libbeat/otelcommon/oteltranslate"
+	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -121,7 +121,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index":  esToOTelOptions.Index,    // index
+		// "logs_index":  esToOTelOptions.Index,    // index
 		"pipeline":    esToOTelOptions.Pipeline, // pipeline
 		"endpoints":   hosts,                    // hosts, protocol, path, port
 		"num_workers": workersCfg.NumWorkers(),  // worker/workers
