@@ -121,7 +121,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		// "logs_index":  esToOTelOptions.Index,    // index
+		"logs_index":  esToOTelOptions.Index,    // index
 		"pipeline":    esToOTelOptions.Pipeline, // pipeline
 		"endpoints":   hosts,                    // hosts, protocol, path, port
 		"num_workers": workersCfg.NumWorkers(),  // worker/workers
