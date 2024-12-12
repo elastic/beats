@@ -1,19 +1,26 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2024-12-12T15:46:39.622Z",
+    "event": {
+        "dataset": "windows.wmi",
+        "duration": 58982500,
+        "module": "windows"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"windows",
-        "name":"wmi",
-        "rtt":44269
+    "metricset": {
+        "name": "wmi",
+        "period": 10000
     },
-    "windows":{
-        "wmi":{
-            "example": "wmi"
+    "service": {
+        "type": "windows"
+    },
+    "windows": {
+        "wmi": {
+            "FreePhysicalMemory": "7537796",
+            "FreeSpaceInPagingFiles": "2257908",
+            "FreeVirtualMemory": "9694064",
+            "NumberOfUsers": 1,
+            "class": "Win32_OperatingSystem",
+            "host": "localhost",
+            "namespace": "root\\cimv2"
         }
-    },
-    "type":"metricsets"
+    }
 }
