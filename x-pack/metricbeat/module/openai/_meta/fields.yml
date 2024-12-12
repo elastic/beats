@@ -1,0 +1,10 @@
+- key: openai
+  title: "openai"
+  release: beta
+  description: >
+    openai module
+  fields:
+    - name: openai
+      type: group
+      description: >
+      fields:
