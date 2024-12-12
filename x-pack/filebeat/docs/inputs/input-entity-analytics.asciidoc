@@ -1015,7 +1015,21 @@ shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 [float]
-==== `tracer.enabled`
+===== `limit_window`
+
+The time between Okta API rate limit resets.
+Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
+
+[float]
+===== `limit_fixed`
+
+The number of requests to allow in each limit window, if set.
+This parameter should only be set in exceptional cases. When it is set, rate
+limit information in API responses will be ignored in favor of the fixed limit.
+The limit is applied separately to each endopint. Defaults to unset.
+
+[float]
+===== `tracer.enabled`
 
 It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations.
 This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value.
@@ -1025,7 +1039,7 @@ to false without unsetting the filename option.
 Enabling this option compromises security and should only be used for debugging.
 
 [float]
-==== `tracer.filename`
+===== `tracer.filename`
 
 To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
