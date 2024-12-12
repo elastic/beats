@@ -114,9 +114,9 @@ type NonFatalErr struct {
 
 func (c NonFatalErr) Error() string {
 	if c.Err != nil {
-		return "Not enough privileges to fetch information: " + c.Err.Error()
+		return "non fatal error; reporting partial metrics: " + c.Err.Error()
 	}
-	return "Not enough privileges to fetch information"
+	return "non fatal error"
 }
 
 func (c NonFatalErr) Is(other error) bool {

@@ -40,6 +40,8 @@ import (
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
+var errFetchingPIDs = "error fetching PID metrics for %d processes, most likely a \"permission denied\" error. Enable debug logging to determine the exact cause."
+
 // ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
 func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	init := Stats{
@@ -54,11 +56,15 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	}
 
 	// actually fetch the PIDs from the OS-specific code
-	_, plist, err := init.FetchPids()
+	pidMap, plist, err := init.FetchPids()
 	if err != nil && !isNonFatal(err) {
 		return nil, fmt.Errorf("error gathering PIDs: %w", err)
 	}
-
+	failedPIDs := extractFailedPIDs(pidMap)
+	if err != nil && len(failedPIDs) > 0 {
+		init.logger.Debugf("error fetching process metrics: %v", err)
+		return plist, NonFatalErr{Err: fmt.Errorf(errFetchingPIDs, len(failedPIDs))}
+	}
 	return plist, toNonFatal(err)
 }
 
@@ -96,6 +102,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 	if wrappedErr != nil && !isNonFatal(wrappedErr) {
 		return nil, nil, fmt.Errorf("error gathering PIDs: %w", wrappedErr)
 	}
+	failedPIDs := extractFailedPIDs(pidMap)
 	// We use this to track processes over time.
 	procStats.ProcsMap.SetMap(pidMap)
 
@@ -133,8 +140,11 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		procs = append(procs, proc)
 		rootEvents = append(rootEvents, rootMap)
 	}
-
-	return procs, rootEvents, toNonFatal(wrappedErr)
+	if len(failedPIDs) > 0 {
+		procStats.logger.Debugf("error fetching process metrics: %v", wrappedErr)
+		return procs, rootEvents, NonFatalErr{Err: fmt.Errorf(errFetchingPIDs, len(failedPIDs))}
+	}
+	return procs, rootEvents, nil
 }
 
 // GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
@@ -197,6 +207,7 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 	status, saved, err := procStats.pidFill(pid, true)
 	var nonFatalErr error
 	if err != nil {
+		procMap[pid] = ProcState{Failed: true}
 		if !errors.Is(err, NonFatalErr{}) {
 			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
 			// While monitoring a set of processes, some processes might get killed after we get all the PIDs
@@ -206,7 +217,7 @@ func (procStats *Stats) pidIter(pid int, procMap ProcsMap, proclist []ProcState)
 			}
 			return procMap, proclist, err
 		}
-		nonFatalErr = fmt.Errorf("non fatal error fetching PID some info for %d, metrics are valid, but partial: %w", pid, err)
+		nonFatalErr = fmt.Errorf("error for pid %d: %w", pid, err)
 		procStats.logger.Debugf(err.Error())
 	}
 	if !saved {
@@ -252,7 +263,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		if !errors.Is(err, NonFatalErr{}) {
 			return status, true, fmt.Errorf("FillPidMetrics failed for PID %d: %w", pid, err)
 		}
-		wrappedErr = errors.Join(wrappedErr, fmt.Errorf("non-fatal error fetching PID metrics for %d, metrics are valid, but partial: %w", pid, err))
+		wrappedErr = errors.Join(wrappedErr, err)
 		procStats.logger.Debugf(wrappedErr.Error())
 	}
 
@@ -408,4 +419,16 @@ func (procStats *Stats) isWhitelistedEnvVar(varName string) bool {
 		}
 	}
 	return false
+}
+
+func extractFailedPIDs(procMap ProcsMap) []int {
+	list := make([]int, 0)
+	for pid, state := range procMap {
+		if state.Failed {
+			list = append(list, pid)
+			// delete the failed state so we don't return the state to caller
+			delete(procMap, pid)
+		}
+	}
+	return list
 }

@@ -56,6 +56,9 @@ type ProcState struct {
 
 	// meta
 	SampleTime time.Time `struct:"-,omitempty"`
+
+	// boolean to indicate that given PID has failed due to some error.
+	Failed bool `struct:"-,omitempty"`
 }
 
 // ProcCPUInfo is the main struct for CPU metrics
