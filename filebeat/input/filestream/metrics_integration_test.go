@@ -38,9 +38,20 @@ func TestFilestreamMetrics(t *testing.T) {
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "100ms",
 		"close.on_state_change.inactive":       "2s",
+		"parsers": []map[string]interface{}{
+			{
+				"multiline": map[string]interface{}{
+					"type":      "pattern",
+					"pattern":   "^multiline",
+					"negate":    true,
+					"match":     "after",
+					"max_lines": 1,
+				},
+			},
+		},
 	})
 
-	testlines := []byte("first line\nsecond line\nthird line\n")
+	testlines := []byte("first line\nsecond line\nthird line\nmultiline first line\nmultiline second line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
@@ -51,13 +62,14 @@ func TestFilestreamMetrics(t *testing.T) {
 	env.waitUntilHarvesterIsDone()
 
 	checkMetrics(t, "fake-ID", expectedMetrics{
-		FilesOpened:      1,
-		FilesClosed:      1,
-		FilesActive:      0,
-		MessagesRead:     3,
-		BytesProcessed:   34,
-		EventsProcessed:  3,
-		ProcessingErrors: 0,
+		FilesOpened:       1,
+		FilesClosed:       1,
+		FilesActive:       0,
+		MessagesRead:      3,
+		MessagesTruncated: 1,
+		BytesProcessed:    77,
+		EventsProcessed:   3,
+		ProcessingErrors:  0,
 	})
 
 	cancelInput()
@@ -65,13 +77,14 @@ func TestFilestreamMetrics(t *testing.T) {
 }
 
 type expectedMetrics struct {
-	FilesOpened      uint64
-	FilesClosed      uint64
-	FilesActive      uint64
-	MessagesRead     uint64
-	BytesProcessed   uint64
-	EventsProcessed  uint64
-	ProcessingErrors uint64
+	FilesOpened       uint64
+	FilesClosed       uint64
+	FilesActive       uint64
+	MessagesRead      uint64
+	MessagesTruncated uint64
+	BytesProcessed    uint64
+	EventsProcessed   uint64
+	ProcessingErrors  uint64
 }
 
 func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
@@ -82,6 +95,7 @@ func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
 	require.Equal(t, expected.FilesOpened, reg.Get("files_opened_total").(*monitoring.Uint).Get(), "files_opened_total")
 	require.Equal(t, expected.FilesClosed, reg.Get("files_closed_total").(*monitoring.Uint).Get(), "files_closed_total")
 	require.Equal(t, expected.MessagesRead, reg.Get("messages_read_total").(*monitoring.Uint).Get(), "messages_read_total")
+	require.Equal(t, expected.MessagesTruncated, reg.Get("messages_truncated_total").(*monitoring.Uint).Get(), "messages_truncated_total")
 	require.Equal(t, expected.BytesProcessed, reg.Get("bytes_processed_total").(*monitoring.Uint).Get(), "bytes_processed_total")
 	require.Equal(t, expected.EventsProcessed, reg.Get("events_processed_total").(*monitoring.Uint).Get(), "events_processed_total")
 	require.Equal(t, expected.ProcessingErrors, reg.Get("processing_errors_total").(*monitoring.Uint).Get(), "processing_errors_total")
