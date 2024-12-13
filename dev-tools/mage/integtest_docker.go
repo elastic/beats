@@ -102,18 +102,20 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod")
 	dockerGoPkgCache := "/go/pkg/mod"
 
+	dockerComposeBinary, args := initDockerCompose()
+
 	// Execute the inside of docker-compose.
-	args := []string{"-p", DockerComposeProjectName(), "run",
-		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + DockerComposeProjectName(),
+	args = append(args, "-p", DockerComposeProjectName(), "run",
+		"-e", "DOCKER_COMPOSE_PROJECT_NAME="+DockerComposeProjectName(),
 		// Disable strict.perms because we mount host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
 		"-e", "BEAT_STRICT_PERMS=false",
 		// compose.EnsureUp needs to know the environment type.
-		"-e", "STACK_ENVIRONMENT=" + StackEnvironment,
-		"-e", "TESTING_ENVIRONMENT=" + StackEnvironment,
+		"-e", "STACK_ENVIRONMENT="+StackEnvironment,
+		"-e", "TESTING_ENVIRONMENT="+StackEnvironment,
 		// Use the host machine's pkg cache to minimize external downloads.
-		"-v", goPkgCache + ":" + dockerGoPkgCache,
-	}
+		"-v", goPkgCache+":"+dockerGoPkgCache,
+	)
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
 		return err
@@ -136,7 +138,7 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
+		dockerComposeBinary,
 		args...,
 	)
 
@@ -281,16 +283,28 @@ func PythonIntegTestFromHost(params PythonTestArgs) error {
 	return testErr
 }
 
+func initDockerCompose() (string, []string) {
+	var args []string
+	dockerComposeBinary := `docker-compose`
+	if runtime.GOOS == "windows" {
+		dockerComposeBinary = "docker"
+		args = append(args, "compose")
+	}
+
+	return dockerComposeBinary, args
+}
+
 // dockerComposeBuildImages builds all images in the docker-compose.yml file.
 func BuildIntegTestContainers() error {
 	fmt.Println(">> Building docker images")
 
+	dockerComposeBinary, args := initDockerCompose()
 	composeEnv, err := integTestDockerComposeEnvVars()
 	if err != nil {
 		return err
 	}
 
-	args := []string{"-p", DockerComposeProjectName(), "build", "--force-rm"}
+	args = append(args, "-p", DockerComposeProjectName(), "build", "--force-rm")
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
 	}
@@ -308,7 +322,7 @@ func BuildIntegTestContainers() error {
 		composeEnv,
 		out,
 		os.Stderr,
-		"docker-compose", args...,
+		dockerComposeBinary, args...,
 	)
 
 	// This sleep is to avoid hitting the docker build issues when resources are not available.
@@ -319,7 +333,7 @@ func BuildIntegTestContainers() error {
 			composeEnv,
 			out,
 			os.Stderr,
-			"docker-compose", args...,
+			dockerComposeBinary, args...,
 		)
 	}
 	return err
@@ -329,10 +343,11 @@ func StartIntegTestContainers() error {
 	// Start the docker-compose services and wait for them to become healthy.
 	// Using --detach causes the command to exit successfully only if the proxy_dep for health
 	// completed successfully.
-	args := []string{"-p", DockerComposeProjectName(),
+	dockerComposeBinary, args := initDockerCompose()
+	args = append(args, "-p", DockerComposeProjectName(),
 		"up",
 		"--detach",
-	}
+	)
 
 	composeEnv, err := integTestDockerComposeEnvVars()
 	if err != nil {
@@ -343,7 +358,7 @@ func StartIntegTestContainers() error {
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
+		dockerComposeBinary,
 		args...,
 	)
 	return err
@@ -361,11 +376,12 @@ func StopIntegTestContainers() error {
 		return err
 	}
 
+	dockerComposeBinary, _ := initDockerCompose()
 	_, err = sh.Exec(
 		composeEnv,
 		io.Discard,
 		out,
-		"docker-compose",
+		dockerComposeBinary,
 		"-p", DockerComposeProjectName(),
 		"rm", "--stop", "--force",
 	)
@@ -419,11 +435,12 @@ func saveDockerComposeLogs(rootDir string, mageTarget string) error {
 	}
 	defer composeLogFile.Close()
 
+	dockerComposeBinary, _ := initDockerCompose()
 	_, err = sh.Exec(
 		composeEnv,
 		composeLogFile, // stdout
 		composeLogFile, // stderr
-		"docker-compose",
+		dockerComposeBinary,
 		"-p", DockerComposeProjectName(),
 		"logs",
 		"--no-color",
