@@ -171,5 +171,10 @@ func defaultConfig() config {
 		Transport: httpcommon.HTTPTransportSettings{
 			Timeout: 180 * time.Second,
 		},
+		Retry: &retry{
+			MaxAttempts: 5,
+			WaitMin:     1 * time.Second,
+			WaitMax:     30 * time.Second,
+		},
 	}
 }
