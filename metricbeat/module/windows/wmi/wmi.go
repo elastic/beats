@@ -88,11 +88,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	session, err := sm.GetSession(m.config.Namespace, m.config.Host, "", m.config.User, m.config.Password)
 
 	if err != nil {
-		return fmt.Errorf("could not initialize session %v", err)
+		return fmt.Errorf("could not initialize session %w", err)
 	}
 	_, err = session.Connect()
 	if err != nil {
-		return fmt.Errorf("could not connect session %v", err)
+		return fmt.Errorf("could not connect session %w", err)
 	}
 	defer session.Dispose()
 
