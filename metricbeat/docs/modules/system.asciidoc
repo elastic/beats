@@ -265,6 +265,11 @@ metricbeat.modules:
 
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
+
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: true
 ----
 
 [float]
