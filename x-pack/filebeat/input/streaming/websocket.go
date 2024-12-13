@@ -261,6 +261,10 @@ func calculateWaitTime(waitMin, waitMax time.Duration, attempt int) time.Duratio
 	jitter := rand.Float64() * maxJitter
 
 	waitTime := time.Duration(backoff + jitter)
+	// caps the wait time to the maximum wait time
+	if waitTime > waitMax {
+		waitTime = waitMax
+	}
 
 	return waitTime
 }
