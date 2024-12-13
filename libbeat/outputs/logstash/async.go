@@ -36,10 +36,9 @@ import (
 type asyncClient struct {
 	log *logp.Logger
 	*transport.Client
-	observer      outputs.Observer
-	client        *v2.AsyncClient
-	win           *window
-	resendTimeout time.Duration
+	observer outputs.Observer
+	client   *v2.AsyncClient
+	win      *window
 
 	connect func() error
 
@@ -47,14 +46,14 @@ type asyncClient struct {
 }
 
 type msgRef struct {
-	client         *asyncClient
-	count          atomic.Uint32
-	batch          publisher.Batch
-	slice          []publisher.Event
-	err            error
-	win            *window
-	batchSize      int
-	resendListener *resendListener
+	client           *asyncClient
+	count            atomic.Uint32
+	batch            publisher.Batch
+	slice            []publisher.Event
+	err              error
+	win              *window
+	batchSize        int
+	deadlockListener *deadlockListener
 }
 
 func newAsyncClient(
@@ -66,10 +65,9 @@ func newAsyncClient(
 
 	log := logp.NewLogger("logstash")
 	c := &asyncClient{
-		log:           log,
-		Client:        conn,
-		observer:      observer,
-		resendTimeout: config.ResendTimeout,
+		log:      log,
+		Client:   conn,
+		observer: observer,
 	}
 
 	if config.SlowStart {
@@ -149,14 +147,14 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ref := &msgRef{
-		client:         c,
-		count:          atomic.MakeUint32(1),
-		batch:          batch,
-		slice:          events,
-		batchSize:      len(events),
-		win:            c.win,
-		err:            nil,
-		resendListener: newResendListener(c.resendTimeout, batch),
+		client:           c,
+		count:            atomic.MakeUint32(1),
+		batch:            batch,
+		slice:            events,
+		batchSize:        len(events),
+		win:              c.win,
+		err:              nil,
+		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout, batch),
 	}
 	defer ref.dec()
 
@@ -236,7 +234,7 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 func (r *msgRef) callback(n uint32, err error) {
 	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
-	r.resendListener.ack(int(n))
+	r.deadlockListener.ack(int(n))
 	if r.err == nil {
 		r.err = err
 	}
@@ -257,7 +255,7 @@ func (r *msgRef) dec() {
 		return
 	}
 
-	r.resendListener.close()
+	r.deadlockListener.close()
 
 	if L := len(r.slice); L > 0 {
 		r.client.observer.RetryableErrors(L)

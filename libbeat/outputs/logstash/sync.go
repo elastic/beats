@@ -32,12 +32,11 @@ import (
 type syncClient struct {
 	log *logp.Logger
 	*transport.Client
-	client        *v2.SyncClient
-	observer      outputs.Observer
-	win           *window
-	ttl           time.Duration
-	ticker        *time.Ticker
-	resendTimeout time.Duration
+	client   *v2.SyncClient
+	observer outputs.Observer
+	win      *window
+	ttl      time.Duration
+	ticker   *time.Ticker
 }
 
 func newSyncClient(
@@ -48,11 +47,10 @@ func newSyncClient(
 ) (*syncClient, error) {
 	log := logp.NewLogger("logstash")
 	c := &syncClient{
-		log:           log,
-		Client:        conn,
-		observer:      observer,
-		ttl:           config.TTL,
-		resendTimeout: config.ResendTimeout,
+		log:      log,
+		Client:   conn,
+		observer: observer,
+		ttl:      config.TTL,
 	}
 
 	if config.SlowStart {
@@ -115,8 +113,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
-	resendListener := newResendListener(c.resendTimeout, batch)
-	defer resendListener.close()
+	deadlockListener := newDeadlockListener(c.log, logstashDeadlockTimeout, batch)
+	defer deadlockListener.close()
 	for len(events) > 0 {
 
 		// check if we need to reconnect
@@ -154,7 +152,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 
 		events = events[n:]
 		st.AckedEvents(n)
-		resendListener.ack(n)
+		deadlockListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)

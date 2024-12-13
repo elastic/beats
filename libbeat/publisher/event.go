@@ -43,11 +43,6 @@ type Batch interface {
 	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
-	// Upstream host is possibly deadlocked, try sending a copy of these events
-	// through another worker. This workaround should only be used by the
-	// Logstash output.
-	LogstashParallelRetry(events []Event)
-
 	// Split this batch's events into two smaller batches and retry them both.
 	// If SplitRetry returns false, the batch could not be split, and the
 	// caller is responsible for reporting the error (including calling

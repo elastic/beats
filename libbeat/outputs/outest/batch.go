@@ -72,9 +72,6 @@ func (b *Batch) RetryEvents(events []publisher.Event) {
 	b.doSignal(BatchSignal{Tag: BatchRetryEvents, Events: events})
 }
 
-func (b *Batch) LogstashParallelRetry(events []publisher.Event) {
-}
-
 func (b *Batch) SplitRetry() bool {
 	b.doSignal(BatchSignal{Tag: BatchSplitRetry})
 	return len(b.events) > 1

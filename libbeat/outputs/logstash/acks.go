@@ -21,9 +21,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type resendListener struct {
+type deadlockListener struct {
+	log     *logp.Logger
 	timeout time.Duration
 	batch   publisher.Batch
 	ticker  *time.Ticker
@@ -34,11 +36,13 @@ type resendListener struct {
 	doneChan chan struct{}
 }
 
-func newResendListener(timeout time.Duration, batch publisher.Batch) *resendListener {
+const logstashDeadlockTimeout = 5 * time.Minute
+
+func newDeadlockListener(log *logp.Logger, timeout time.Duration, batch publisher.Batch) *deadlockListener {
 	if timeout <= 0 {
 		return nil
 	}
-	r := &resendListener{
+	r := &deadlockListener{
 		timeout: timeout,
 		batch:   batch,
 		ticker:  time.NewTicker(timeout),
@@ -50,7 +54,7 @@ func newResendListener(timeout time.Duration, batch publisher.Batch) *resendList
 	return r
 }
 
-func (r *resendListener) run() {
+func (r *deadlockListener) run() {
 	defer r.ticker.Stop()
 	defer close(r.doneChan)
 	for {
@@ -66,16 +70,15 @@ func (r *resendListener) run() {
 				r.ticker.Reset(r.timeout)
 			}
 		case <-r.ticker.C:
-			// No progress was made within the timeout, hand unacknowledged events
-			// back to the pipeline and close the listener.
-			events := r.batch.Events()
-			r.batch.LogstashParallelRetry(events[r.acked:])
+			// No progress was made within the timeout, log error so users
+			// know there is likely a problem with the upstream host
+			r.log.Errorf("Logstash batch hasn't reported progress in the last %v, the Logstash host may be stalled", r.timeout)
 			return
 		}
 	}
 }
 
-func (r *resendListener) ack(n int) {
+func (r *deadlockListener) ack(n int) {
 	if r == nil {
 		return
 	}
@@ -87,7 +90,7 @@ func (r *resendListener) ack(n int) {
 	}
 }
 
-func (r *resendListener) close() {
+func (r *deadlockListener) close() {
 	if r == nil {
 		return
 	}

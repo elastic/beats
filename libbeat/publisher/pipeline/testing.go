@@ -86,8 +86,6 @@ func (b *mockBatch) RetryEvents(events []publisher.Event) {
 	signalFn(b.onRetry)
 }
 
-func (b *mockBatch) LogstashParallelRetry(events []publisher.Event) {}
-
 func (b *mockBatch) updateEvents(events []publisher.Event) {
 	b.mu.Lock()
 	defer b.mu.Unlock()

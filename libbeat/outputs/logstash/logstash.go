@@ -51,11 +51,6 @@ func makeLogstash(
 		return outputs.Fail(err)
 	}
 
-	if len(hosts) == 1 {
-		// Resend timeout only applies when there is more than one host to send to
-		lsConfig.ResendTimeout = 0
-	}
-
 	tls, err := tlscommon.LoadTLSConfig(lsConfig.TLS)
 	if err != nil {
 		return outputs.Fail(err)
