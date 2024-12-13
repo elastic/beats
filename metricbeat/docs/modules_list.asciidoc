@@ -242,6 +242,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-nats-subscriptions,subscriptions>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
+|<<metricbeat-module-openai,openai>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-openai-usage,usage>> beta[]  
 |<<metricbeat-module-openmetrics,Openmetrics>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-openmetrics-collector,collector>> beta[]  
 |<<metricbeat-module-oracle,Oracle>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -384,6 +386,7 @@ include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/openai.asciidoc[]
 include::modules/openmetrics.asciidoc[]
 include::modules/oracle.asciidoc[]
 include::modules/panw.asciidoc[]
