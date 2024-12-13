@@ -195,6 +195,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
 - Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
 - Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Fixed a scenario in the streaming input where CEL would process invalid/empty messages in case of a websocket error.  {pull}42036[42036]
 
 *Heartbeat*
 
