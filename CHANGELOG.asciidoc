@@ -129,6 +129,27 @@ filebeat.inputs:
 - Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
 
 
+[[release-notes-8.15.5]]
+=== Beats version 8.15.5
+https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Expire source port mappings. {pull}41581[41581]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+
+*Filebeat*
+
+- Fix AWS region in `aws-s3` input S3 polling mode.  {pull}41572[41572]
+
+
 [[release-notes-8.15.4]]
 === Beats version 8.15.4
 https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
@@ -420,6 +441,11 @@ filebeat.inputs:
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
+
 ==== Bugfixes
 
 *Filebeat*
@@ -449,6 +475,11 @@ https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 [[release-notes-8.14.2]]
 === Beats version 8.14.2
 https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
 
 ==== Breaking changes
 
@@ -486,6 +517,11 @@ https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
+
 ==== Bugfixes
 
 *Heartbeat*
@@ -496,6 +532,11 @@ https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 [[release-notes-8.14.0]]
 === Beats version 8.14.0
 https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
 
 ==== Breaking changes
 
@@ -2890,6 +2931,7 @@ https://github.com/elastic/beats/compare/v7.17.0\...v8.0.0[View commits]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use `process.args` to store program arguments instead of `auditd.log.aNNN` fields. {pull}29601[29601]
 - Remove deprecated old `awscloudwatch` input name. {pull}29844[29844]
+- Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
 
 *Metricbeat*
 

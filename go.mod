@@ -10,7 +10,7 @@ require (
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	github.com/Azure/azure-event-hubs-go/v3 v3.6.1
-	github.com/Azure/azure-sdk-for-go v65.0.0+incompatible
+	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Azure/go-autorest/autorest v0.11.29
 	github.com/Azure/go-autorest/autorest/date v0.3.0
@@ -18,12 +18,10 @@ require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/PaesslerAG/gval v1.2.2
 	github.com/PaesslerAG/jsonpath v0.1.1
-	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v1.2.1
 	github.com/akavel/rsrc v0.8.0 // indirect
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
-	github.com/aws/aws-lambda-go v1.44.0
 	github.com/aws/aws-sdk-go-v2 v1.30.5
 	github.com/aws/aws-sdk-go-v2/config v1.27.29
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.29
@@ -40,7 +38,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.34.5
 	github.com/aws/aws-sdk-go-v2/service/sts v1.30.5
 	github.com/blakesmith/ar v0.0.0-20150311145944-8bd4349a67f2
-	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
 	github.com/cavaliergopher/rpm v1.2.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
@@ -49,7 +46,6 @@ require (
 	github.com/containerd/fifo v1.1.0
 	github.com/coreos/go-systemd/v22 v22.5.0
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f
-	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2
 	github.com/digitalocean/go-libvirt v0.0.0-20240709142323-d8406205c752
 	github.com/docker/docker v27.3.1+incompatible
@@ -60,7 +56,7 @@ require (
 	github.com/dop251/goja v0.0.0-20200831102558-9af81ddcf0e1
 	github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/dustin/go-humanize v1.0.1
-	github.com/eapache/go-resiliency v1.2.0
+	github.com/eapache/go-resiliency v1.7.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.15.0
 	github.com/elastic/go-concert v0.3.0
@@ -68,8 +64,8 @@ require (
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
-	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
-	github.com/elastic/go-seccomp-bpf v1.4.0
+	github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8
+	github.com/elastic/go-seccomp-bpf v1.5.0
 	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.15.0
 	github.com/elastic/go-ucfg v0.8.8
@@ -85,7 +81,6 @@ require (
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v24.3.25+incompatible
@@ -146,10 +141,6 @@ require (
 	google.golang.org/grpc v1.66.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
-	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
-	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
 	howett.net/plist v1.0.1
@@ -180,23 +171,20 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
 	github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8
-	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5
 	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
-	github.com/aws/aws-sdk-go-v2/service/kinesis v1.29.5
 	github.com/aws/smithy-go v1.20.4
-	github.com/awslabs/goformation/v7 v7.14.9
-	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/dgraph-io/badger/v4 v4.4.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.17.3
-	github.com/elastic/elastic-agent-system-metrics v0.11.4
+	github.com/elastic/elastic-agent-libs v0.17.4
+	github.com/elastic/elastic-agent-system-metrics v0.11.5
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.16.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -210,8 +198,10 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/icholy/digest v0.1.22
+	github.com/jcmturner/gokrb5/v8 v8.4.4
 	github.com/klauspost/compress v1.17.11
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
+	github.com/microsoft/go-mssqldb v1.7.2
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.21
 	github.com/pkg/xattr v0.4.9
@@ -228,6 +218,7 @@ require (
 	go.opentelemetry.io/collector/consumer v0.109.0
 	go.opentelemetry.io/collector/pdata v1.15.0
 	go.opentelemetry.io/collector/receiver v0.109.0
+	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.25.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -282,7 +273,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
-	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
+	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
 	github.com/elastic/go-windows v1.0.2 // indirect
@@ -305,7 +296,7 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
-	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
+	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -321,14 +312,14 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
-	github.com/hashicorp/go-uuid v1.0.2 // indirect
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
-	github.com/jcmturner/gofork v1.0.0 // indirect
-	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
+	github.com/jcmturner/gofork v1.7.6 // indirect
+	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -357,9 +348,10 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
+	github.com/onsi/ginkgo/v2 v2.17.1 // indirect
+	github.com/onsi/gomega v1.33.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
-	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/prometheus/client_golang v1.20.2 // indirect
@@ -407,13 +399,10 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
-	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 )
 
 replace (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption => github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0-elastic
-
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3
 	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
 	github.com/dop251/goja => github.com/elastic/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
@@ -421,5 +410,4 @@ replace (
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
-	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
 )
