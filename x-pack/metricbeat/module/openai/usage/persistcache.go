@@ -156,12 +156,12 @@ func (s *stateManager) GetLastProcessedDate(apiKey string) (time.Time, error) {
 }
 
 // SaveState saves the last processed date for a given API key
-func (sm *stateManager) SaveState(apiKey, dateStr string) error {
-	sm.mu.Lock()
-	defer sm.mu.Unlock()
+func (s *stateManager) SaveState(apiKey, dateStr string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	stateKey := sm.GetStateKey(apiKey)
-	return sm.store.Put(stateKey, dateStr)
+	stateKey := s.GetStateKey(apiKey)
+	return s.store.Put(stateKey, dateStr)
 }
 
 // hashKey generates and caches a SHA-256 hash of the provided API key
