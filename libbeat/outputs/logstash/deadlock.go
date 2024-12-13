@@ -40,6 +40,7 @@ func newDeadlockListener(log *logp.Logger, timeout time.Duration) *deadlockListe
 		return nil
 	}
 	r := &deadlockListener{
+		log:     log,
 		timeout: timeout,
 		ticker:  time.NewTicker(timeout),
 
