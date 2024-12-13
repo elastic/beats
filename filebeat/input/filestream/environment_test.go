@@ -386,6 +386,7 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
+	e.t.Helper()
 	msg := &strings.Builder{}
 	require.Eventuallyf(e.t, func() bool {
 		msg.Reset()

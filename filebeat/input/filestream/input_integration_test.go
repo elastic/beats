@@ -55,9 +55,9 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 		"id":                                     id,
 		"paths":                                  []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":      "10ms",
-		"prospector.scanner.fingerprint.enabled": false,
 		"close.on_state_change.check_interval":   "1ms",
 		"close.on_state_change.renamed":          "true",
+		"prospector.scanner.fingerprint.enabled": false,
 		"file_identity.native":                   map[string]any{},
 	})
 
@@ -540,11 +540,13 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   id,
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "1ms",
-		"close.on_state_change.check_interval": "10ms",
-		"close.on_state_change.inactive":       "100ms",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": "false",
+		"prospector.scanner.check_interval":      "1ms",
+		"close.on_state_change.check_interval":   "10ms",
+		"close.on_state_change.inactive":         "100ms",
 		// reader is not stopped when file is removed to see if the reader can still detect
 		// if the file has been inactive even if it have been removed in the meantime
 		"close.on_state_change.removed": "false",
@@ -707,10 +709,12 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	testlogName := "test.log"
 	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 id,
-		"paths":                              []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":  "5s",
-		"prospector.scanner.resend_on_touch": "true",
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "5s",
+		"prospector.scanner.resend_on_touch":     "true",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
