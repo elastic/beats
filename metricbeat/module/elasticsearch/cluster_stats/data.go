@@ -231,7 +231,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, []string{})
 	if err != nil {
 		return fmt.Errorf("failed to get cluster state from Elasticsearch: %w", err)
 	}

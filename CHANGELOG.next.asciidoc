@@ -128,6 +128,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Split common tty definitions. {pull}42004[42004]
 
 *Filebeat*
 
@@ -193,6 +194,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 - Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
 - Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
+- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 
 *Heartbeat*
 
@@ -365,6 +367,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 - The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
+- Rate limiting operability improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 
 *Auditbeat*
 
@@ -416,6 +419,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 - Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
+- Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
+- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
