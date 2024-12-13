@@ -351,10 +351,6 @@ func (service *MonitorService) QueryResources(
 		//ResultType: &resultTypeData,
 	}
 
-	//if namespace != "" {
-	//	opts.Metricnamespace = &namespace
-	//}
-
 	resp := []azmetrics.MetricData{}
 
 	// len(resourceIDs) 5, 50, 500

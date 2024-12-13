@@ -107,6 +107,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	client.Resources = []Resource{}
 	for _, resource := range client.Config.Resources {
 		// retrieve azure resources information
+		client.Log.Infof("EEEEEEEEEE resource.Id is %v & resource.Group is %v & resource.Type is %v & resource.Query is %v", resource.Id, resource.Group, resource.Type, resource.Query)
 		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
 		if err != nil {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
@@ -407,6 +408,7 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 
 func (client *Client) GroupAndStoreMetrics(metricsDefinitions []Metric, referenceTime time.Time, store map[ResDefGroupingCriteria]*MetricStore) {
 	for _, metric := range metricsDefinitions {
+
 		criteria := ResDefGroupingCriteria{
 			Namespace:      metric.Namespace,
 			SubscriptionID: metric.SubscriptionId,
@@ -486,7 +488,7 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, location, subscriptionId, namespace, metricNames, key, dim, timeGrain))
+		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, namespace, location, subscriptionId, metricNames, key, dim, timeGrain))
 	}
 
 	return clientMetrics

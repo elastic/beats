@@ -238,7 +238,7 @@ func getDimensionKey(dimensions []Dimension) string {
 func getResourceIDs(metrics []Metric) []string {
 	var resourceIDs []string
 	for _, metric := range metrics {
-		resourceIDs = append(resourceIDs, metric.ResourceId)
+		resourceIDs = append(resourceIDs, metric.ResourceSubId)
 	}
 	return resourceIDs
 }

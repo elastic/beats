@@ -178,7 +178,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
 				// Process each metric definition as it arrives
-				m.Client.Log.Infof("MetricDefinitionsChan channel got %+v", resMetricDefinition)
+				m.Client.Log.Infof("AAAAAAAAAAAAAAA MetricDefinitionsChan channel got %+v", resMetricDefinition)
 				if len(resMetricDefinition) == 0 {
 					return fmt.Errorf("error mapping metrics to events: %w", err)
 				}

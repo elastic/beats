@@ -86,7 +86,7 @@ func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string
 					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 				}
 
-				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, resourceID, namespace, location, subscriptionId, dimensions, time)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, location, subscriptionId, resourceID, namespace, dimensions, time)...)
 			}
 		}
 	}
