@@ -102,7 +102,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	http, err := pc.GetHttp()
 	if err != nil {
-		return nil, fmt.Errorf("the http conection is not valid")
+		return nil, fmt.Errorf("the http connection is not valid")
 	}
 	ms := &MetricSet{
 		BaseMetricSet:      base,
