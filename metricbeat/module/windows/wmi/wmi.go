@@ -119,7 +119,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				event.MetricSetFields.Put("query", query)
 			}
 
-			// Get only the required properites
+			// Get only the required properties
 			properties := queryConfig.Fields
 
 			// If the Fields array is empty we retrieve all fields
