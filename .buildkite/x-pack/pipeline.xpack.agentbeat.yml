@@ -99,3 +99,30 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Integration tests"
+      - label: ":windows: Agentbeat/Integration tests Windows"
+        key: "mandatory-win-2022-system-tests"
+        command: |
+          Set-Location -Path x-pack/agentbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/agentbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Integration tests Windows"
