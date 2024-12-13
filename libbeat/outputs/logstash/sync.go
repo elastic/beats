@@ -113,7 +113,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
-	deadlockListener := newDeadlockListener(c.log, logstashDeadlockTimeout, batch)
+	deadlockListener := newDeadlockListener(c.log, logstashDeadlockTimeout)
 	defer deadlockListener.close()
 	for len(events) > 0 {
 

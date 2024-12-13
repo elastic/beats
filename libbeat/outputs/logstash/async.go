@@ -154,7 +154,7 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		batchSize:        len(events),
 		win:              c.win,
 		err:              nil,
-		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout, batch),
+		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
 	}
 	defer ref.dec()
 

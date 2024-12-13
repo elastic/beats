@@ -20,31 +20,27 @@ package logstash
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type deadlockListener struct {
 	log     *logp.Logger
 	timeout time.Duration
-	batch   publisher.Batch
 	ticker  *time.Ticker
 
 	ackChan chan int
-	acked   int
 
 	doneChan chan struct{}
 }
 
 const logstashDeadlockTimeout = 5 * time.Minute
 
-func newDeadlockListener(log *logp.Logger, timeout time.Duration, batch publisher.Batch) *deadlockListener {
+func newDeadlockListener(log *logp.Logger, timeout time.Duration) *deadlockListener {
 	if timeout <= 0 {
 		return nil
 	}
 	r := &deadlockListener{
 		timeout: timeout,
-		batch:   batch,
 		ticker:  time.NewTicker(timeout),
 
 		ackChan:  make(chan int),
@@ -64,7 +60,6 @@ func (r *deadlockListener) run() {
 				// Listener has been closed
 				return
 			}
-			r.acked += n
 			if n > 0 {
 				// If progress was made, reset the countdown.
 				r.ticker.Reset(r.timeout)
