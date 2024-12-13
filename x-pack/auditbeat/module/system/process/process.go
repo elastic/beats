@@ -100,7 +100,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	if runtime.GOOS == "linux" && ms.config.Backend == "quark" {
 		if qm, err := NewFromQuark(base, ms); err == nil {
-			return qm, err
+			return qm, nil
 		} else {
 			ms.log.Errorf("can't use quark, falling back to sysinfo: %w", err)
 		}

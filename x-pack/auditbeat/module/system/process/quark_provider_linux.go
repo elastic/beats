@@ -89,10 +89,15 @@ MainLoop:
 			ms.log.Debugf("getevents took %v", time.Since(x))
 		}
 		if err != nil {
-			panic(err)
+			ms.log.Error("quark GetEvents, unrecoverable error", err)
+			break MainLoop
 		}
 		if len(quarkEvents) == 0 {
-			ms.queue.Block()
+			err = ms.queue.Block()
+			if err != nil {
+				ms.log.Error("quark Block, unrecoverable error", err)
+				break MainLoop
+			}
 			continue
 		}
 		for _, quarkEvent := range quarkEvents {
@@ -205,7 +210,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 			processErr = fmt.Errorf("failed to hash executable %v for PID %v: %w",
 				process.Filename, process.Pid, err)
 			ms.log.Error(processErr.Error())
-		} else if hashes != nil {
+		} else {
 			for hashType, digest := range hashes {
 				fieldName := "process.hash." + string(hashType)
 				event.RootFields.Put(fieldName, digest)
