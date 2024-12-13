@@ -116,6 +116,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			return ctx.Err()
 		default:
 			_, message, err := c.ReadMessage()
+			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				if isRetryableError(err) {
@@ -137,15 +138,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
-			}
-			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
-			state["response"] = message
-			s.log.Debugw("received websocket message", logp.Namespace("websocket"), "msg", string(message))
-			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
-			if err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.log.Errorw("failed to process and publish data", "error", err)
-				return err
+			} else {
+				state["response"] = message
+				s.log.Debugw("received websocket message", logp.Namespace("websocket"), "msg", string(message))
+				err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("failed to process and publish data", "error", err)
+					return err
+				}
 			}
 		}
 	}
