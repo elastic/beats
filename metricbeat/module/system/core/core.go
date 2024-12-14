@@ -70,7 +70,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	cpu, err := metrics.New(sys, cpuOpts...)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+		if config.UserPerformanceCounters {
+			base.Logger().Warnf("Error using performance counters, possibly due to being disabled or insufficient permissions: %v", err)
+			// switch to default method i.e without any options
+			cpu, err = metrics.New(sys)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+		}
 	}
 
 	return &MetricSet{
