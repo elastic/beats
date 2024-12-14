@@ -31,6 +31,8 @@ import (
 
 func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestTokenAppender(t *testing.T) {

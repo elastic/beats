@@ -66,7 +66,7 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store)
+	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
@@ -115,8 +115,19 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Start reading data and wait for its processing to be done
-	in.readerLoop(ctx, workChan)
+	ids, ok := in.readerLoop(ctx, workChan)
 	workerWg.Wait()
+
+	if !ok {
+		in.log.Warn("skipping state registry cleanup as object reading ended with a non-ok return")
+		return
+	}
+
+	// Perform state cleanup operation
+	err := in.states.CleanUp(ids)
+	if err != nil {
+		in.log.Errorf("failed to cleanup states: %v", err.Error())
+	}
 }
 
 func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
@@ -183,7 +194,10 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	}
 }
 
-func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) {
+// readerLoop performs the S3 object listing and emit state to work listeners if object needs to be processed.
+// Returns all tracked state IDs correlates to all tracked S3 objects iff listing is successful.
+// These IDs are intended to be used for state clean-up.
+func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, ok bool) {
 	defer close(workChan)
 
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
@@ -202,7 +216,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 				circuitBreaker++
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
-					break
+					return nil, false
 				}
 			}
 			// add a backoff delay and try again
@@ -219,6 +233,8 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
+			knownStateIDSlice = append(knownStateIDSlice, state.ID())
+
 			if in.states.IsProcessed(state) {
 				in.log.Debugw("skipping state.", "state", state)
 				continue
@@ -229,6 +245,8 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 			in.metrics.s3ObjectsProcessedTotal.Inc()
 		}
 	}
+
+	return knownStateIDSlice, true
 }
 
 func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {

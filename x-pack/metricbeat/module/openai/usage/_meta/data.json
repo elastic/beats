@@ -1,0 +1,37 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "openai.usage",
+        "duration": 115000,
+        "module": "openai"
+    },
+    "metricset": {
+        "name": "usage",
+        "period": 10000
+    },
+    "openai": {
+        "usage": {
+            "api_key_id": null,
+            "api_key_name": null,
+            "api_key_redacted": null,
+            "api_key_type": null,
+            "data": {
+                "cached_context_tokens_total": 0,
+                "context_tokens_total": 118,
+                "email": null,
+                "generated_tokens_total": 35,
+                "operation": "completion-realtime",
+                "request_type": "",
+                "requests_total": 1,
+                "snapshot_id": "gpt-4o-realtime-preview-2024-10-01"
+            },
+            "organization_id": "org-dummy",
+            "organization_name": "Personal",
+            "project_id": null,
+            "project_name": null
+        }
+    },
+    "service": {
+        "type": "openai"
+    }
+}
