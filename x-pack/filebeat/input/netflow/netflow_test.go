@@ -125,7 +125,6 @@ func TestNetFlow(t *testing.T) {
 
 			f, err := os.Open(file)
 			require.NoError(t, err)
-
 			defer f.Close()
 
 			r, err := pcapgo.NewReader(f)
