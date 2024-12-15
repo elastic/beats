@@ -219,7 +219,6 @@ func TestNetFlowIntegration(t *testing.T) {
 
 	f, err := os.Open("testdata/integration/test.pcap")
 	require.NoError(t, err, "failed to open pcap file")
-
 	defer f.Close()
 
 	r, err := pcapgo.NewReader(f)
