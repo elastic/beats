@@ -33,9 +33,10 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
-	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -104,11 +105,13 @@ func typeCodeCode(tc uint16) uint8 {
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 	t.Helper()
 
-	r, err := pcap.OpenOffline(pcapFile)
-	if err != nil {
-		t.Fatal(err, name)
-	}
-	defer r.Close()
+	f, err := os.Open(pcapFile)
+	require.NoError(t, err)
+
+	defer f.Close()
+
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
 
 	packetSource := gopacket.NewPacketSource(r, r.LinkType())
 	var flows []string
