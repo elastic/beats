@@ -57347,7 +57347,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.free_clients`*::
+*`pgbouncer.lists.clients.free`*::
 +
 --
 Count of free clients. These are clients that are disconnected, but PgBouncer keeps the memory around that was allocated for them so it can be reused for future clients to avoid allocations.
@@ -57357,7 +57357,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.used_clients`*::
+*`pgbouncer.lists.clients.used`*::
 +
 --
 Count of used clients.
@@ -57367,7 +57367,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.login_clients`*::
+*`pgbouncer.lists.clients.login`*::
 +
 --
 Count of clients in login state.
@@ -57377,7 +57377,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.free_servers`*::
+*`pgbouncer.lists.servers.free`*::
 +
 --
 Count of free servers. These are servers that are disconnected, but PgBouncer keeps the memory around that was allocated for them so it can be reused for future servers to avoid allocations.
@@ -57387,7 +57387,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.used_servers`*::
+*`pgbouncer.lists.servers.used`*::
 +
 --
 Count of used servers.
