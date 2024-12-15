@@ -21,9 +21,13 @@ package testutil
 
 import (
 	"flag"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -37,5 +41,32 @@ func SeedPRNG(t *testing.T) {
 	}
 
 	t.Logf("reproduce test with `go test ... -seed %v`", seed)
-	rand.Seed(seed)
+	rand.New(rand.NewSource(seed))
+}
+
+func GenerateEvents(numEvents, fieldsPerLevel, depth int) []beat.Event {
+	events := make([]beat.Event, numEvents)
+	for i := 0; i < numEvents; i++ {
+		event := &beat.Event{Fields: mapstr.M{}}
+		generateFields(event, fieldsPerLevel, depth)
+		events[i] = *event
+	}
+	return events
+}
+
+func generateFields(event *beat.Event, fieldsPerLevel, depth int) {
+	if depth == 0 {
+		return
+	}
+
+	for j := 1; j <= fieldsPerLevel; j++ {
+		var key string
+		for d := 1; d <= depth; d++ {
+			key += fmt.Sprintf("level%dfield%d", d, j)
+			key += "."
+		}
+		event.Fields.Put(key, "value")
+		key = ""
+	}
+
 }

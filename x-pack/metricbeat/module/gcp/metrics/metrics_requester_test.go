@@ -128,6 +128,13 @@ func TestGetFilterForMetric(t *testing.T) {
 			metricsRequester{config: config{Region: "foobar", Regions: []string{"foo", "bar"}}, logger: logger},
 			"metric.type=\"dummy\" AND resource.labels.zone = starts_with(\"foobar\")",
 		},
+		{
+			"aiplatform service with configured region and zone",
+			"aiplatform",
+			"",
+			metricsRequester{config: config{Region: "foo", Zone: "bar", LocationLabel: "resource.label.location"}, logger: logger},
+			"metric.type=\"dummy\" AND resource.label.location = starts_with(\"foo\")",
+		},
 	}
 
 	for _, c := range cases {

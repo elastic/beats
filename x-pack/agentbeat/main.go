@@ -42,7 +42,7 @@ into a single agentbeat binary.`,
 		prepareCommand(auditbeat.RootCmd),
 		prepareCommand(filebeat.Filebeat()),
 		prepareCommand(heartbeat.RootCmd),
-		prepareCommand(metricbeat.RootCmd),
+		prepareCommand(metricbeat.Initialize()),
 		prepareCommand(osquerybeat.RootCmd),
 		prepareCommand(packetbeat.RootCmd),
 	)
