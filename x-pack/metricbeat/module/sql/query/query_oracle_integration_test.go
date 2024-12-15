@@ -16,11 +16,12 @@ import (
 	// Drivers
 	_ "github.com/godror/godror"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/godror/godror/dsn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/tests/compose"
 )
 
 func TestOracle(t *testing.T) {
