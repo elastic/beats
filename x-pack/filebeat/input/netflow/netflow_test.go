@@ -344,11 +344,12 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	t.Helper()
 
-	r, err := pcap.OpenOffline(pcapFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
+	f, err := os.Open(pcapFile)
+	require.NoError(t, err)
+	defer f.Close()
+
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
 
 	config := decoder.NewConfig().
 		WithProtocols(protocol.Registry.All()...).
