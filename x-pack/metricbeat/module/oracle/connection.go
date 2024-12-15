@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -25,7 +24,7 @@ type ConnectionDetails struct {
 // HostParser parses host and extracts connection information and returns it to HostData
 // HostData can then be used to make connection to SQL
 func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
-	params, err := godror.ParseDSN(rawURL)
+	params, err := dsn.Parse(rawURL)
 	if err != nil {
 		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}
@@ -51,25 +50,6 @@ func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
 		User:         params.Username,
 		Password:     params.Password.Secret(),
 	}, nil
-}
-
-func init() {
-	// Register the ModuleFactory function for the "oracle" module.
-	if err := mb.Registry.AddModule("oracle", newModule); err != nil {
-		panic(err)
-	}
-}
-
-// newModule adds validation that hosts is non-empty, a requirement to use the
-// Oracle module.
-func newModule(base mb.BaseModule) (mb.Module, error) {
-	// Validate that at least one host has been specified.
-	config := ConnectionDetails{}
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("error parsing config module: %w", err)
-	}
-
-	return &base, nil
 }
 
 func NewConnection(connString string) (*sql.DB, error) {
