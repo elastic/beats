@@ -22,6 +22,7 @@ package wmi
 
 import (
 	"fmt"
+	"time"
 
 	wmiquery "github.com/microsoft/wmi/pkg/base/query"
 )
@@ -34,6 +35,7 @@ type Config struct {
 	Password       string        `config:"wmi.password"`        // Password for the Remote WMI
 	Namespace      string        `config:"wmi.namespace"`       // Namespace for the queries
 	Queries        []QueryConfig `config:"wmi.queries"`         // List of query definitions
+	Timeout        time.Duration `config:"wmi.timeout"`         // Timeout for the execution of a single Query
 }
 
 type QueryConfig struct {
