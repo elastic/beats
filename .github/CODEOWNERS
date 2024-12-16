@@ -12,19 +12,23 @@
 # https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 CHANGELOG*
 
+# Top-level files ownership
+/catalog-info.yaml @elastic/ingest-eng-prod
 # The tech leads of the teams working in Beats share ownership of the Go module dependencies and related files.
-/.github/CODEOWNERS @elastic/beats-tech-leads
 /go.mod @elastic/beats-tech-leads
 /go.sum @elastic/beats-tech-leads
 /NOTICE.txt @elastic/beats-tech-leads
 
+# Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
+/.buildkite @elastic/ingest-eng-prod
 /.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
 /.github/ @elastic/ingest-eng-prod
+/.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
-/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
-/dev-tools/kubernetes @elastic/obs-ds-hosted-services
+/dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /docs/ @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -53,8 +57,11 @@ CHANGELOG*
 /heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
+/libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
 /libbeat/processors/community_id/ @elastic/sec-deployment-and-devices
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
@@ -63,9 +70,8 @@ CHANGELOG*
 /libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
 /libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
-/libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
-/libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
 /libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/scripts @elastic/ingest-eng-prod
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -227,9 +233,3 @@ CHANGELOG*
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
-
-# Ownership of CI or related files by the Ingest Eng Prod team
-/.buildkite @elastic/ingest-eng-prod
-/catalog-info.yaml @elastic/ingest-eng-prod
-/libbeat/scripts @elastic/ingest-eng-prod
-/metricbeat/tests @elastic/ingest-eng-prod
