@@ -113,6 +113,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
+- Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
 
 *Auditbeat*
@@ -411,6 +412,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
 - Add support for podman metrics in docker module. {pull}41889[41889]
 - Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
+- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]

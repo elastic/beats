@@ -35,8 +35,9 @@ const (
 
 // Config for the system cpu metricset.
 type Config struct {
-	Metrics  []string `config:"cpu.metrics"`
-	CPUTicks *bool    `config:"cpu_ticks"` // Deprecated.
+	Metrics                 []string `config:"cpu.metrics"`
+	CPUTicks                *bool    `config:"cpu_ticks"` // Deprecated.
+	UserPerformanceCounters bool     `config:"use_performance_counters"`
 }
 
 // Validate validates the cpu config.
@@ -69,10 +70,6 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 }
 
 var defaultConfig = Config{
-<<<<<<< HEAD
-	Metrics: []string{percentages, normalizedPercentages},
-=======
 	Metrics:                 []string{percentages, normalizedPercentages},
 	UserPerformanceCounters: false,
->>>>>>> f3a063f1d (chore: disable performance counters (#42041))
 }
