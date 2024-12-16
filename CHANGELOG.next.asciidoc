@@ -127,6 +127,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
 - auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Split common tty definitions. {pull}42004[42004]
 
 *Filebeat*
 
@@ -192,6 +194,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 - Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
 - Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
+- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 
 *Heartbeat*
 
@@ -357,12 +360,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Update CEL mito extensions to v1.16.0. {pull}41727[41727]
+- Add `unifiedlogs` input for MacOS. {pull}41791[41791]
 - Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
 - The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
+- Rate limiting operability improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
 
 *Auditbeat*
 
@@ -414,6 +420,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 - Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
+- Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
+- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
