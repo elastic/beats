@@ -18,6 +18,7 @@
 package memlog
 
 import (
+	"errors"
 	"io"
 	"os"
 	"runtime"
@@ -63,7 +64,7 @@ func (e *ensureWriter) Write(p []byte) (int, error) {
 }
 
 func isRetryErr(err error) bool {
-	return err == syscall.EINTR || err == syscall.EAGAIN
+	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }
 
 // trySyncPath provides a best-effort fsync on path (directory). The fsync is required by some
@@ -75,6 +76,7 @@ func trySyncPath(path string) {
 		return // ignore error, sync on dir must not be necessarily supported by the FS
 	}
 	defer f.Close()
+	//nolint:errcheck // ignore error
 	f.Sync()
 }
 
