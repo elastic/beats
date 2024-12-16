@@ -217,7 +217,7 @@ func (s *diskstore) Close() error {
 		// always sync log file on ordinary shutdown.
 		err := s.logBuf.Flush()
 		if err == nil {
-			err = syncFile(s.logFile)
+			err = s.logFile.Sync()
 		}
 		s.logFile.Close()
 		s.logFile = nil
@@ -380,7 +380,7 @@ func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) 
 		return "", err
 	}
 
-	if err = syncFile(f); err != nil {
+	if err = f.Sync(); err != nil {
 		return "", err
 	}
 
@@ -658,7 +658,7 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		return err
 	}
 
-	if err := syncFile(f); err != nil {
+	if err := f.Sync(); err != nil {
 		return err
 	}
 

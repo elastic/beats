@@ -75,7 +75,7 @@ func trySyncPath(path string) {
 		return // ignore error, sync on dir must not be necessarily supported by the FS
 	}
 	defer f.Close()
-	syncFile(f)
+	f.Sync()
 }
 
 // pathEnsurePermissions checks if the file permissions for the given file match wantPerm.
