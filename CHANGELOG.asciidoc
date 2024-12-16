@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.17.1]]
 === Beats version 8.17.1
 https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
@@ -13,6 +14,158 @@ https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
 
 - Default Docker base image was reverted to Ubuntu 20.04 due to incompatability issues with glibc {pull}42144[42144]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
+=======
+[[release-notes-8.16.2]]
+=== Beats version 8.16.2
+https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
+
+==== Breaking changes
+
+==== Added
+
+- In this release we've introduced an image based on the hardened https://wolfi.dev/[Wolfi] image to provide secure containers to our self-managed customers, help with compliance regulations, and improve our supply chain security posture.
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+
+*Osquerybeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
+- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
+
+*Auditbeat*
+
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
+
+*Filebeat*
+
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix missing key in streaming input logging. {pull}41600[41600]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Log bad handshake details when websocket connection fails {pull}41300[41300]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+- Split module/system/process into common and provider bits. {pull}41868[41868]
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
+- The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
+- Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add `id` field to all the vSphere metricsets. {pull}41097[41097]
+- Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+>>>>>>> 0c4a33658 (docs: Prepare Changelog for 8.16.2 (#42063))
 
 *Auditbeat*
 
@@ -20,8 +173,58 @@ https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
 *Filebeat*
 
 
+<<<<<<< HEAD
 
 *Heartbeat*
+=======
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[[release-notes-8.16.1]]
+=== Beats version 8.16.1
+https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
+>>>>>>> 0c4a33658 (docs: Prepare Changelog for 8.16.2 (#42063))
 
 
 *Metricbeat*
