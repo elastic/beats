@@ -19,9 +19,7 @@ package cfgfile
 
 import (
 	"io/ioutil"
-	"math/rand/v2"
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
@@ -30,16 +28,13 @@ import (
 
 func TestGlobWatcher(t *testing.T) {
 	// Create random temp directory
-	id := strconv.Itoa(rand.Int())
-	dir, err := ioutil.TempDir("", id)
-	defer os.RemoveAll(dir)
-	assert.NoError(t, err)
+	dir := t.TempDir()
 	glob := dir + "/*.yml"
 
 	gcd := NewGlobWatcher(glob)
 
 	content := []byte("test\n")
-	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err := ioutil.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
 	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
