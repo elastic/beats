@@ -69,5 +69,10 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 }
 
 var defaultConfig = Config{
+<<<<<<< HEAD
 	Metrics: []string{percentages, normalizedPercentages},
+=======
+	Metrics:                 []string{percentages, normalizedPercentages},
+	UserPerformanceCounters: false,
+>>>>>>> f3a063f1d (chore: disable performance counters (#42041))
 }

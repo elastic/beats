@@ -21,4 +21,8 @@ metricbeat.modules:
 - module: system
   metricsets: [core]
   core.metrics: [percentages, ticks]
+<<<<<<< HEAD
+=======
+  #use_performance_counters: false
+>>>>>>> f3a063f1d (chore: disable performance counters (#42041))
 ----
