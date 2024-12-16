@@ -72,7 +72,7 @@ containers:
   args: [
     "-c", "/etc/metricbeat.yml",
     "-e",
-    "-system.hostfs=/hostfs",
+    "--system.hostfs=/hostfs",
   ]
   ports:
     - containerPort: 56268
