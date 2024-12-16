@@ -9,6 +9,10 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 ==== Breaking changes
 
+==== Added
+
+- In this release we've introduced an image based on the hardened https://wolfi.dev/[Wolfi] image to provide secure containers to our self-managed customers, help with compliance regulations, and improve our supply chain security posture.
+
 *Affecting all Beats*
 
 
