@@ -36,8 +36,6 @@ type config struct {
 	// ParseJSON - Informs the publisher whether to parse & objectify json data or not. By default this is set to
 	// false, since it can get expensive dealing with highly nested json data.
 	ParseJSON bool `config:"parse_json"`
-	// BucketTimeOut - Defines the maximum time that the sdk will wait for a bucket api response before timing out.
-	BucketTimeOut time.Duration `config:"bucket_timeout"`
 	// Buckets - Defines a list of buckets that will be polled for objects.
 	Buckets []bucket `config:"buckets" validate:"required"`
 	// FileSelectors - Defines a list of regex patterns that can be used to filter out objects from the bucket.
@@ -58,7 +56,6 @@ type config struct {
 type bucket struct {
 	Name                     string               `config:"name" validate:"required"`
 	MaxWorkers               *int                 `config:"max_workers" validate:"max=5000"`
-	BucketTimeOut            *time.Duration       `config:"bucket_timeout"`
 	Poll                     *bool                `config:"poll"`
 	PollInterval             *time.Duration       `config:"poll_interval"`
 	ParseJSON                *bool                `config:"parse_json"`
@@ -136,11 +133,10 @@ func (c authConfig) Validate() error {
 // defaultConfig returns the default configuration for the input
 func defaultConfig() config {
 	return config{
-		MaxWorkers:    1,
-		Poll:          true,
-		PollInterval:  5 * time.Minute,
-		BucketTimeOut: 120 * time.Second,
-		ParseJSON:     false,
+		MaxWorkers:   1,
+		Poll:         true,
+		PollInterval: 5 * time.Minute,
+		ParseJSON:    false,
 		Retry: retryConfig{
 			MaxAttempts:            3,
 			InitialBackOffDuration: time.Second,
