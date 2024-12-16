@@ -30,6 +30,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -49,8 +50,9 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	// than close.on_state_change.check_interval to make sure
 	// the Harvester detects the rename first thus allowing
 	// the output to receive the event and then close the source file.
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":    "10ms",
 		"close.on_state_change.check_interval": "1ms",
@@ -65,7 +67,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	testlogNameRotated := "test.log.rotated"
 	env.mustRenameFile(testlogName, testlogNameRotated)
@@ -78,8 +80,8 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireOffsetInRegistry(testlogNameRotated, "fake-ID", len(testlines))
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(newerTestlines))
+	env.requireOffsetInRegistry(testlogNameRotated, id, len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(newerTestlines))
 }
 
 func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
@@ -90,8 +92,9 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
+		"id":                                id,
 		"paths":                             []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval": "1ms",
 	})
@@ -103,20 +106,20 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.waitUntilMetaInRegistry(testlogName, "fake-ID", fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
+	env.waitUntilMetaInRegistry(testlogName, id, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogName, id, len(testline))
 
 	testlogNameRenamed := "test.log.renamed"
 	env.mustRenameFile(testlogName, testlogNameRenamed)
 
 	// check if the metadata is updated and cursor data stays the same
-	env.waitUntilMetaInRegistry(testlogNameRenamed, "fake-ID", fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
-	env.requireOffsetInRegistry(testlogNameRenamed, "fake-ID", len(testline))
+	env.waitUntilMetaInRegistry(testlogNameRenamed, id, fileMeta{Source: env.abspath(testlogNameRenamed), IdentifierName: "native"})
+	env.requireOffsetInRegistry(testlogNameRenamed, id, len(testline))
 
 	env.mustAppendToFile(testlogNameRenamed, testline)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogNameRenamed, "fake-ID", len(testline)*2)
+	env.requireOffsetInRegistry(testlogNameRenamed, id, len(testline)*2)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -127,8 +130,9 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName) + "*"},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "1ms",
@@ -144,7 +148,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	fi, err := os.Stat(env.abspath(testlogName))
 	if err != nil {
@@ -158,8 +162,8 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	id := getIDFromPath(env.abspath(testlogName), "fake-ID", fi)
-	env.requireOffsetInRegistryByID(id, len(testlines))
+	idFromPath := getIDFromPath(env.abspath(testlogName), id, fi)
+	env.requireOffsetInRegistryByID(idFromPath, len(testlines))
 }
 
 // test_close_eof from test_harvester.py
@@ -167,8 +171,9 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
+		"id":                                id,
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "24h",
 		"close.reader.on_eof":               "true",
@@ -183,7 +188,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", expectedOffset)
+	env.requireOffsetInRegistry(testlogName, id, expectedOffset)
 
 	// the second log line will not be picked up as scan_interval is set to one day.
 	env.mustWriteToFile(testlogName, []byte("first line\nsecond log line\n"))
@@ -194,7 +199,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", expectedOffset)
+	env.requireOffsetInRegistry(testlogName, id, expectedOffset)
 }
 
 // test_empty_lines from test_harvester.py
@@ -202,8 +207,9 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
+		"id":                                id,
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 	})
@@ -215,7 +221,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	moreTestlines := []byte("\nafter an empty line\n")
 	env.mustAppendToFile(testlogName, moreTestlines)
@@ -230,7 +236,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreTestlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines)+len(moreTestlines))
 }
 
 // test_empty_lines_only from test_harvester.py
@@ -240,8 +246,9 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
+		"id":                                id,
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 	})
@@ -255,7 +262,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireNoEntryInRegistry(testlogName, "fake-ID")
+	env.requireNoEntryInRegistry(testlogName, id)
 }
 
 // test_bom_utf8 from test_harvester.py
@@ -263,8 +270,9 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":    "fake-ID",
+		"id":    id,
 		"paths": []string{env.abspath(testlogName)},
 	})
 
@@ -305,8 +313,9 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			testlogName := "test.log"
+			id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 			inp := env.mustCreateInput(map[string]interface{}{
-				"id":       "fake-ID",
+				"id":       id,
 				"paths":    []string{env.abspath(testlogName)},
 				"encoding": name,
 			})
@@ -337,8 +346,9 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "100ms",
@@ -352,7 +362,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
 	env.mustWriteToFile(testlogName, []byte("first line\nsecond log line\n"))
@@ -362,7 +372,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 }
 
 // test_close_inactive from test_input.py
@@ -370,8 +380,9 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "100ms",
@@ -385,7 +396,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
 	cancelInput()
@@ -397,8 +408,9 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "10ms",
@@ -415,7 +427,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	env.mustRemoveFile(testlogName)
 
@@ -429,8 +441,9 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "10ms",
@@ -447,7 +460,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	newFileName := "test_rotated.log"
 	env.mustRenameFile(testlogName, newFileName)
@@ -463,8 +476,9 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "10ms",
@@ -481,7 +495,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	newFileName := "test_rotated.log"
 	env.mustRenameFile(testlogName, newFileName)
@@ -498,8 +512,9 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
+		"id":                                   id,
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "1ms",
 		"close.on_state_change.check_interval": "10ms",
@@ -516,7 +531,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	newFileName := "test_rotated.log"
 	env.mustRenameFile(testlogName, newFileName)
@@ -541,8 +556,9 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
+		"id":                                 id,
 		"paths":                              []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":  "1ms",
 		"prospector.scanner.resend_on_touch": "true",
@@ -555,7 +571,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	env.mustTruncateFile(testlogName, 0)
 	time.Sleep(5 * time.Millisecond)
@@ -566,7 +582,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
+	env.requireOffsetInRegistry(testlogName, id, len(truncatedTestLines))
 }
 
 // test_truncated_file_closed from test_harvester.py
@@ -574,8 +590,9 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
+		"id":                                 id,
 		"paths":                              []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":  "1ms",
 		"prospector.scanner.resend_on_touch": "true",
@@ -589,7 +606,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	env.waitUntilHarvesterIsDone()
 
@@ -602,7 +619,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines))
+	env.requireOffsetInRegistry(testlogName, id, len(truncatedTestLines))
 }
 
 // test_truncate from test_harvester.py
@@ -611,8 +628,9 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "fake-ID",
+		"id": id,
 		"paths": []string{
 			env.abspath(testlogName),
 			env.abspath(symlinkName),
@@ -632,18 +650,18 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(lines))
+	env.requireOffsetInRegistry(testlogName, id, len(lines))
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
 
 	env.waitUntilEventCount(5)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(moreLines))
+	env.requireOffsetInRegistry(testlogName, id, len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -655,8 +673,9 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
+		"id":                                 id,
 		"paths":                              []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":  "5s",
 		"prospector.scanner.resend_on_touch": "true",
@@ -669,7 +688,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	env.mustTruncateFile(testlogName, 0)
 
@@ -686,8 +705,9 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                 "fake-ID",
+		"id":                                 id,
 		"paths":                              []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":  "1ms",
 		"prospector.scanner.resend_on_touch": "true",
@@ -700,11 +720,11 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -715,8 +735,9 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline = &mockPipelineConnector{blocking: true}
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
+		"id":                                id,
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "200ms",
 	})
@@ -734,7 +755,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.pipeline.clients[0].canceler()
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 
 	// extra lines are appended after first line is processed
 	// so it can interfere with the truncation of the file
@@ -742,7 +763,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 
 	env.mustTruncateFile(testlogName, 0)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	// all newly started client has to be cancelled so events can be processed
 	env.pipeline.cancelAllClients()
@@ -753,7 +774,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.mustWriteToFile(testlogName, truncatedTestLines)
 
 	env.waitUntilEventCount(3)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(truncatedTestLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, len(truncatedTestLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -765,8 +786,9 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "fake-ID",
+		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
@@ -786,7 +808,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	cancelInput()
 	env.waitUntilInputStops()
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 }
 
 // test_symlink_rotated from test_harvester.py
@@ -796,8 +818,9 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	firstTestlogName := "test1.log"
 	secondTestlogName := "test2.log"
 	symlinkName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "fake-ID",
+		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
@@ -820,7 +843,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.waitUntilEventCount(1)
 
 	expectedOffset := len(commonLine) + 2
-	env.requireOffsetInRegistry(firstTestlogName, "fake-ID", expectedOffset)
+	env.requireOffsetInRegistry(firstTestlogName, id, expectedOffset)
 
 	// rotate symlink
 	env.mustRemoveFile(symlinkName)
@@ -830,8 +853,8 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.mustAppendToFile(secondTestlogName, []byte(moreLines))
 
 	env.waitUntilEventCount(4)
-	env.requireOffsetInRegistry(firstTestlogName, "fake-ID", expectedOffset)
-	env.requireOffsetInRegistry(secondTestlogName, "fake-ID", expectedOffset+len(moreLines))
+	env.requireOffsetInRegistry(firstTestlogName, id, expectedOffset)
+	env.requireOffsetInRegistry(secondTestlogName, id, expectedOffset+len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -845,8 +868,9 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "fake-ID",
+		"id": id,
 		"paths": []string{
 			env.abspath(symlinkName),
 		},
@@ -866,7 +890,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 
 	env.waitUntilEventCount(1)
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(line))
+	env.requireOffsetInRegistry(testlogName, id, len(line))
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
@@ -874,7 +898,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	env.mustAppendToFile(testlogName, line)
 
 	env.waitUntilEventCount(2)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", 2*len(line))
+	env.requireOffsetInRegistry(testlogName, id, 2*len(line))
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -888,8 +912,9 @@ func TestFilestreamTruncate(t *testing.T) {
 
 	testlogName := "test.log"
 	symlinkName := "test.log.symlink"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "fake-ID",
+		"id": id,
 		"paths": []string{
 			env.abspath("*"),
 		},
@@ -908,12 +933,12 @@ func TestFilestreamTruncate(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(lines))
+	env.requireOffsetInRegistry(testlogName, id, len(lines))
 
 	// remove symlink
 	env.mustRemoveFile(symlinkName)
 	env.mustTruncateFile(testlogName, 0)
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", 0, 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, 0, 10*time.Second)
 
 	// recreate symlink
 	env.mustSymlink(testlogName, symlinkName)
@@ -921,7 +946,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteToFile(testlogName, moreLines)
 
-	env.waitUntilOffsetInRegistry(testlogName, "fake-ID", len(moreLines), 10*time.Second)
+	env.waitUntilOffsetInRegistry(testlogName, id, len(moreLines), 10*time.Second)
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -982,8 +1007,9 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "my-id",
+		"id": id,
 		"paths": []string{
 			env.abspath("*"),
 		},
@@ -1028,8 +1054,9 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := "fake-ID-" + uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id": "my-id",
+		"id": id,
 		"paths": []string{
 			env.abspath("*"),
 		},

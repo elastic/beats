@@ -23,8 +23,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"io"
+	"regexp"
 	"strconv"
-	"sync"
+	"strings"
+	"syscall"
 	"text/template"
 	"time"
 	"unsafe"
@@ -38,21 +41,27 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type RenderConfig struct {
+	IsForwarded bool
+	Locale      uint32
+}
+
+type EventRenderer interface {
+	Render(handle EvtHandle) (event *winevent.Event, xml string, err error)
+	Close() error
+}
+
 // Renderer is used for converting event log handles into complete events.
 type Renderer struct {
-	// Mutex to guard the metadataCache. The other members are immutable.
-	mutex sync.RWMutex
-	// Cache of publisher metadata. Maps publisher names to stored metadata.
-	metadataCache map[string]*PublisherMetadataStore
-
-	session       EvtHandle // Session handle if working with remote log.
+	conf          RenderConfig
+	metadataCache *publisherMetadataCache
 	systemContext EvtHandle // Render context for system values.
 	userContext   EvtHandle // Render context for user values (event data).
 	log           *logp.Logger
 }
 
 // NewRenderer returns a new Renderer.
-func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
+func NewRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) (*Renderer, error) {
 	systemContext, err := _EvtCreateRenderContext(0, nil, EvtRenderContextSystem)
 	if err != nil {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for system context: %w", err)
@@ -63,12 +72,14 @@ func NewRenderer(session EvtHandle, log *logp.Logger) (*Renderer, error) {
 		return nil, fmt.Errorf("failed in EvtCreateRenderContext for user context: %w", err)
 	}
 
+	rlog := log.Named("renderer")
+
 	return &Renderer{
-		metadataCache: map[string]*PublisherMetadataStore{},
-		session:       session,
+		conf:          conf,
+		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
 		systemContext: systemContext,
 		userContext:   userContext,
-		log:           log.Named("renderer"),
+		log:           rlog,
 	}, nil
 }
 
@@ -77,24 +88,19 @@ func (r *Renderer) Close() error {
 	if r == nil {
 		return errors.New("closing nil renderer")
 	}
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-
-	errs := []error{r.systemContext.Close(), r.userContext.Close()}
-	for _, md := range r.metadataCache {
-		if err := md.Close(); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return multierr.Combine(errs...)
+	return multierr.Combine(
+		r.metadataCache.close(),
+		r.systemContext.Close(),
+		r.userContext.Close(),
+	)
 }
 
 // Render renders the event handle into an Event.
-func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
+func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
 	event := &winevent.Event{}
 
 	if err := r.renderSystem(handle, event); err != nil {
-		return nil, fmt.Errorf("failed to render system properties: %w", err)
+		return nil, "", fmt.Errorf("failed to render system properties: %w", err)
 	}
 
 	// From this point on it will return both the event and any errors. It's
@@ -102,15 +108,19 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	var errs []error
 
 	// This always returns a non-nil value (even on error).
-	md, err := r.getPublisherMetadata(event.Provider.Name)
+	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
 	if err != nil {
 		errs = append(errs, err)
 	}
 
 	// Associate raw system properties to names (e.g. level=2 to Error).
 	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
+	if event.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		event.Level = EventLevel(event.LevelRaw).String()
+	}
 
-	eventData, fingerprint, err := r.renderUser(handle, event)
+	eventData, fingerprint, err := r.renderUser(md, handle, event)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("failed to render event data: %w", err))
 	}
@@ -121,54 +131,14 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, error) {
 	// Associate key names with the event data values.
 	r.addEventData(eventMeta, eventData, event)
 
-	if event.Message, err = r.formatMessage(md, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
+	if event.Message, err = r.formatMessage(md.Metadata, eventMeta, handle, eventData, uint16(event.EventIdentifier.ID)); err != nil {
 		errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
 	}
 
 	if len(errs) > 0 {
-		return event, multierr.Combine(errs...)
+		return event, "", multierr.Combine(errs...)
 	}
-	return event, nil
-}
-
-// getPublisherMetadata return a PublisherMetadataStore for the provider. It
-// never returns nil, but may return an error if it couldn't open a publisher.
-func (r *Renderer) getPublisherMetadata(publisher string) (*PublisherMetadataStore, error) {
-	var err error
-
-	// NOTE: This code uses double-check locking to elevate to a write-lock
-	// when a cache value needs initialized.
-	r.mutex.RLock()
-
-	// Lookup cached value.
-	md, found := r.metadataCache[publisher]
-	if !found {
-		// Elevate to write lock.
-		r.mutex.RUnlock()
-		r.mutex.Lock()
-		defer r.mutex.Unlock()
-
-		// Double-check if the condition changed while upgrading the lock.
-		md, found = r.metadataCache[publisher]
-		if found {
-			return md, nil
-		}
-
-		// Load metadata from the publisher.
-		md, err = NewPublisherMetadataStore(r.session, publisher, r.log)
-		if err != nil {
-			// Return an empty store on error (can happen in cases where the
-			// log was forwarded and the provider doesn't exist on collector).
-			md = NewEmptyPublisherMetadataStore(publisher, r.log)
-			err = fmt.Errorf("failed to load publisher metadata for %v "+
-				"(returning an empty metadata store): %w", publisher, err)
-		}
-		r.metadataCache[publisher] = md
-	} else {
-		r.mutex.RUnlock()
-	}
-
-	return md, err
+	return event, "", nil
 }
 
 // renderSystem writes all the system context properties into the event.
@@ -242,7 +212,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 // renderUser returns the event/user data values. This does not provide the
 // parameter names. It computes a fingerprint of the values types to help the
 // caller match the correct names to the returned values.
-func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
+func (r *Renderer) renderUser(mds *PublisherMetadataStore, handle EvtHandle, event *winevent.Event) (values []interface{}, fingerprint uint64, err error) {
 	bb, propertyCount, err := r.render(r.userContext, handle)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get user values: %w", err)
@@ -277,9 +247,25 @@ func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values [
 				"error", err,
 			)
 		}
+		if str, ok := values[i].(string); ok {
+			values[i] = expandMessageIDs(mds, str)
+		}
 	}
 
 	return values, argumentHash.Sum64(), nil
+}
+
+var messageIDsRegexp = regexp.MustCompile(`%%\d+`)
+
+func expandMessageIDs(mds *PublisherMetadataStore, v string) string {
+	// Replace each occurrence by finding a message based on its value
+	return messageIDsRegexp.ReplaceAllStringFunc(v, func(match string) string {
+		messageID, err := strconv.Atoi(strings.Trim(match, `%`))
+		if err != nil {
+			return match
+		}
+		return mds.getMessageByID(uint32(messageID))
+	})
 }
 
 // render uses EvtRender to event data. The caller must free() the returned when
@@ -342,6 +328,7 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 		return "param" + strconv.Itoa(idx)
 	}
 
+	pairs := make([]winevent.KeyValue, len(values))
 	for i, v := range values {
 		var strVal string
 		switch t := v.(type) {
@@ -353,15 +340,21 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 			strVal = fmt.Sprintf("%v", v)
 		}
 
-		event.EventData.Pairs = append(event.EventData.Pairs, winevent.KeyValue{
+		pairs[i] = winevent.KeyValue{
 			Key:   paramName(i),
 			Value: strVal,
-		})
+		}
+	}
+
+	if evtMeta != nil && evtMeta.HasUserData {
+		event.UserData.Pairs = pairs
+	} else {
+		event.EventData.Pairs = pairs
 	}
 }
 
 // formatMessage adds the message to the event.
-func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
+func (r *Renderer) formatMessage(publisherMeta *PublisherMetadata,
 	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
 	eventID uint16) (string, error,
 ) {
@@ -375,11 +368,13 @@ func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
 
 	// Fallback to the trying EvtFormatMessage mechanism.
 	// This is the path for forwarded events in RenderedText mode where the
-	// local publisher metadata is not present. NOTE that if the local publisher
-	// metadata exists it will be preferred over the RenderedText. A config
-	// option might be desirable to control this behavior.
+	// local publisher metadata is not present.
 	r.log.Debugf("Falling back to EvtFormatMessage for event ID %d.", eventID)
-	return getMessageString(publisherMeta.Metadata, eventHandle, 0, nil)
+	metadata := publisherMeta
+	if r.conf.IsForwarded {
+		metadata = nil
+	}
+	return getMessageString(metadata, eventHandle, 0, nil)
 }
 
 // formatMessageFromTemplate creates the message by executing the stored Go
@@ -393,4 +388,120 @@ func (r *Renderer) formatMessageFromTemplate(msgTmpl *template.Template, values 
 	}
 
 	return string(bb.Bytes()), nil
+}
+
+// XMLRenderer is used for converting event log handles into complete events.
+type XMLRenderer struct {
+	conf          RenderConfig
+	metadataCache *publisherMetadataCache
+	renderBuf     []byte
+	outBuf        *sys.ByteBuffer
+
+	render func(event EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+
+	log *logp.Logger
+}
+
+// NewXMLRenderer returns a new Renderer.
+func NewXMLRenderer(conf RenderConfig, session EvtHandle, log *logp.Logger) *XMLRenderer {
+	const renderBufferSize = 1 << 19 // 512KB, 256K wide characters
+	rlog := log.Named("xml_renderer")
+	r := &XMLRenderer{
+		conf:          conf,
+		renderBuf:     make([]byte, renderBufferSize),
+		outBuf:        sys.NewByteBuffer(renderBufferSize),
+		metadataCache: newPublisherMetadataCache(session, conf.Locale, rlog),
+		log:           rlog,
+	}
+	// Forwarded events should be rendered using RenderEventXML. It is more
+	// efficient and does not attempt to use local message files for rendering
+	// the event's message.
+	switch conf.IsForwarded {
+	case true:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			return RenderEventXML(event, r.renderBuf, out)
+		}
+	case false:
+		r.render = func(event EvtHandle, out io.Writer) error {
+			get := func(providerName string) EvtHandle {
+				md, _ := r.metadataCache.getPublisherStore(providerName)
+				if md.Metadata != nil {
+					return md.Metadata.Handle
+				}
+				return NilHandle
+			}
+			return RenderEvent(event, conf.Locale, r.renderBuf, get, out)
+		}
+	}
+	return r
+}
+
+// Close closes all handles held by the Renderer.
+func (r *XMLRenderer) Close() error {
+	if r == nil {
+		return errors.New("closing nil renderer")
+	}
+	return r.metadataCache.close()
+}
+
+// Render renders the event handle into an Event.
+func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
+	// From this point on it will return both the event and any errors. It's
+	// critical to not drop data.
+	var errs []error
+
+	r.outBuf.Reset()
+	err := r.render(handle, r.outBuf)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	outBytes := r.outBuf.Bytes()
+	event := r.buildEventFromXML(outBytes, err)
+
+	// This always returns a non-nil value (even on error).
+	md, err := r.metadataCache.getPublisherStore(event.Provider.Name)
+	if err != nil {
+		errs = append(errs, err)
+	}
+
+	// Associate raw system properties to names (e.g. level=2 to Error).
+	winevent.EnrichRawValuesWithNames(&md.WinMeta, event)
+	if event.Level == "" {
+		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
+		event.Level = EventLevel(event.LevelRaw).String()
+	}
+
+	if event.Message == "" && !r.conf.IsForwarded {
+		if event.Message, err = getMessageString(md.Metadata, handle, 0, nil); err != nil {
+			errs = append(errs, fmt.Errorf("failed to get the event message string: %w", err))
+		}
+	}
+
+	if len(errs) > 0 {
+		return event, string(outBytes), multierr.Combine(errs...)
+	}
+	return event, string(outBytes), nil
+}
+
+func (r *XMLRenderer) buildEventFromXML(x []byte, recoveredErr error) *winevent.Event {
+	e, err := winevent.UnmarshalXML(x)
+	if err != nil {
+		e.RenderErr = append(e.RenderErr, err.Error())
+	}
+
+	err = winevent.PopulateAccount(&e.User)
+	if err != nil {
+		r.log.Debugf("SID %s account lookup failed. %v",
+			e.User.Identifier, err)
+	}
+
+	if e.RenderErrorCode != 0 {
+		// Convert the render error code to an error message that can be
+		// included in the "error.message" field.
+		e.RenderErr = append(e.RenderErr, syscall.Errno(e.RenderErrorCode).Error())
+	} else if recoveredErr != nil {
+		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
+	}
+
+	return &e
 }

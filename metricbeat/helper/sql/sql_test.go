@@ -22,7 +22,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
-	"math"
+	"strconv"
 	"testing"
 	"time"
 
@@ -43,10 +43,10 @@ type mockVariableMode struct {
 }
 
 func (m *mockVariableMode) Scan(dest ...interface{}) error {
-	d1 := dest[0].(*string)
+	d1 := dest[0].(*string) //nolint:errcheck // false positive
 	*d1 = m.results[m.index].k
 
-	d2 := dest[1].(*interface{})
+	d2 := dest[1].(*interface{}) //nolint:errcheck // false positive
 	*d2 = m.results[m.index].v
 
 	m.index++
@@ -73,7 +73,7 @@ type mockTableMode struct {
 
 func (m *mockTableMode) Scan(dest ...interface{}) error {
 	for i, d := range dest {
-		d1 := d.(*interface{})
+		d1 := d.(*interface{}) //nolint:errcheck // false positive
 		*d1 = m.results[i].v
 	}
 
@@ -87,7 +87,11 @@ func (m *mockTableMode) Next() bool {
 }
 
 func (m *mockTableMode) Columns() ([]string, error) {
-	return []string{"hello", "integer", "signed_integer", "unsigned_integer", "float64", "float32", "null", "boolean", "array", "byte_array", "time"}, nil
+	cols := make([]string, len(m.results))
+	for i, r := range m.results {
+		cols[i] = r.k
+	}
+	return cols, nil
 }
 
 func (m mockTableMode) Err() error {
@@ -95,6 +99,8 @@ func (m mockTableMode) Err() error {
 }
 
 var results = []kv{
+	{k: "string", v: "000400"},
+	{k: "varchar", v: "00100"},
 	{k: "hello", v: "world"},
 	{k: "integer", v: int(10)},
 	{k: "signed_integer", v: int(-10)},
@@ -137,52 +143,63 @@ func TestFetchTableMode(t *testing.T) {
 }
 
 func checkValue(t *testing.T, res kv, ms mapstr.M) {
+	t.Helper()
+
+	actual := ms[res.k]
 	switch v := res.v.(type) {
-	case string, bool:
-		if ms[res.k] != v {
-			t.Fail()
+	case string, bool, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+		if actual != v {
+			t.Errorf("key %q: expected %v (%T), got %v (%T)", res.k, v, v, actual, actual)
 		}
 	case nil:
-		if ms[res.k] != nil {
-			t.Fail()
-		}
-	case int:
-		if ms[res.k] != float64(v) {
-			t.Fail()
-		}
-	case uint:
-		if ms[res.k] != float64(v) {
-			t.Fail()
-		}
-	case float32:
-		if math.Abs(float64(ms[res.k].(float64)-float64(v))) > 1 {
-			t.Fail()
-		}
-	case float64:
-		if ms[res.k] != v {
-			t.Fail()
+		if actual != nil {
+			t.Errorf("key %q: expected nil, got %v (%T)", res.k, actual, actual)
 		}
 	case []interface{}:
+		actualSlice := actual.([]interface{})
+		if len(v) != len(actualSlice) {
+			t.Errorf("key %q: slice length mismatch: expected %d, got %d", res.k, len(v), len(actualSlice))
+			return
+		}
 		for i, val := range v {
-			if ms[res.k].([]interface{})[i] != val {
-				t.Fail()
+			if actualSlice[i] != val {
+				t.Errorf("key %q: slice mismatch at index %d: expected %v, got %v", res.k, i, val, actualSlice[i])
 			}
 		}
 	case []byte:
-		ar := ms[res.k].(string)
-		if ar != string(v) {
-			t.Fail()
+		actualStr := actual.(string)
+		if actualStr != string(v) {
+			t.Errorf("key %q: expected %q (string), got %q", res.k, string(v), actualStr)
 		}
 	case time.Time:
-		ar := ms[res.k].(string)
-		if v.Format(time.RFC3339Nano) != ar {
-			t.Fail()
+		actualStr := actual.(string)
+		expectedStr := v.Format(time.RFC3339Nano)
+		if expectedStr != actualStr {
+			t.Errorf("key %q: expected time %q, got %q", res.k, expectedStr, actualStr)
+		}
+	case CustomType:
+		// Handle custom types that should be converted to string
+		expectedStr := fmt.Sprint(v)
+		if num, err := strconv.ParseFloat(expectedStr, 64); err == nil {
+			if actual != num {
+				t.Errorf("key %q: expected %v (float64), got %v (%T)", res.k, num, actual, actual)
+			}
+		} else {
+			actualStr := actual.(string)
+			if actualStr != expectedStr {
+				t.Errorf("key %q: expected %q (string), got %q", res.k, expectedStr, actualStr)
+			}
 		}
 	default:
-		if ms[res.k] != res.v {
-			t.Fail()
+		if actual != res.v {
+			t.Errorf("key %q: expected %v (%T), got %v (%T)", res.k, res.v, res.v, actual, actual)
 		}
 	}
+}
+
+// CustomType for testing custom type handling
+type CustomType struct {
+	value string //nolint:unused // unused checker is buggy
 }
 
 func TestToDotKeys(t *testing.T) {

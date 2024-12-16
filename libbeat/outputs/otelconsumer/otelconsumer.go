@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
@@ -42,6 +43,7 @@ type otelConsumer struct {
 	observer     outputs.Observer
 	logsConsumer consumer.Logs
 	beatInfo     beat.Info
+	log          *logp.Logger
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -50,6 +52,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		observer:     observer,
 		logsConsumer: beat.LogConsumer,
 		beatInfo:     beat,
+		log:          logp.NewLogger("otelconsumer"),
 	}
 
 	ocConfig := defaultConfig()
