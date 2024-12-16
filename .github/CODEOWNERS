@@ -223,6 +223,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
