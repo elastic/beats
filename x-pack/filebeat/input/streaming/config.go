@@ -41,9 +41,8 @@ type config struct {
 	Redact *redact `config:"redact"`
 	// Retry is the configuration for retrying failed connections.
 	Retry *retry `config:"retry"`
-
+	// Transport is the common the transport config.
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-
 	// CrowdstrikeAppID is the value used to set the
 	// appId request parameter in the FalconHose stream
 	// discovery request.
@@ -164,5 +163,18 @@ func checkURLScheme(c config) error {
 		}
 	default:
 		return fmt.Errorf("unknown stream type: %s", c.Type)
+	}
+}
+
+func defaultConfig() config {
+	return config{
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 180 * time.Second,
+		},
+		Retry: &retry{
+			MaxAttempts: 5,
+			WaitMin:     1 * time.Second,
+			WaitMax:     30 * time.Second,
+		},
 	}
 }

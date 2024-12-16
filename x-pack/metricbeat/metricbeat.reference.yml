@@ -521,6 +521,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
+
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
@@ -3084,7 +3087,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
