@@ -507,6 +507,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: openai/metrics
+    description: "OpenAI metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: panw/metrics
     description: "Palo Alto Networks metrics"
     platforms: *platforms
