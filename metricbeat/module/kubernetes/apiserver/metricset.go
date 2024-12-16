@@ -85,7 +85,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			if err != nil {
 				time.Sleep(m.mod.Config().Period)
 				count--
-				continue
 			} else {
 				break
 			}
