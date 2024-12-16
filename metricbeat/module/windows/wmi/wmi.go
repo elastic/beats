@@ -19,6 +19,7 @@ package wmi
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -67,6 +68,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	if config.Timeout == 0*time.Second {
+		config.Timeout = base.Module().Config().Period
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
@@ -100,7 +105,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		query := queryConfig.QueryStr
 
-		rows, err := session.QueryInstances(query)
+		rows, err := ExecuteGuardedQueryInstances(session, query, m.config.Timeout)
+
 		if err != nil {
 			logp.Warn("Could not execute query %v", err)
 			continue
