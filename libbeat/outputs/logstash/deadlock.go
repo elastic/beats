@@ -68,7 +68,7 @@ func (r *deadlockListener) run() {
 		case <-r.ticker.C:
 			// No progress was made within the timeout, log error so users
 			// know there is likely a problem with the upstream host
-			r.log.Errorf("Logstash batch hasn't reported progress in the last %v, the Logstash host may be stalled", r.timeout)
+			r.log.Errorf("Logstash batch hasn't reported progress in the last %v, the Logstash host may be stalled. This problem can be prevented by configuring Logstash to use PipelineBusV1 or by upgrading Logstash to 8.17+, for details see https://github.com/elastic/logstash/issues/16657", r.timeout)
 			return
 		}
 	}
