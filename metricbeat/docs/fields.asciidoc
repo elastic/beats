@@ -40951,7 +40951,7 @@ type: float
 *`iis.application_pool.net_clr.exceptions_thrown_per_sec`*::
 +
 --
-Number of Exceps Thrown / sec.
+Number of Exceptions Thrown / sec.
 
 
 type: float
