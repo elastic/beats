@@ -124,8 +124,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 - Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
 - Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
-- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
-- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
 
 *Heartbeat*
