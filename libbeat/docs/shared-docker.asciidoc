@@ -63,7 +63,7 @@ The following checks were performed on each of these signatures:
 
 ==== Run the {beatname_uc} setup
 
-IMPORTANT: Due to a link:https://github.com/elastic/beats/issues/42038[known issue] in version 8.17.0, in that release standalone Beats Docker images will not start if a `-e` option is not added. The `-e` option makes {beatname_uc} log to stderr, which is the correct behaviour when running on Docker.
+IMPORTANT: A link:https://github.com/elastic/beats/issues/42038[known issue] in version 8.17.0 prevents {beats} Docker images from starting when no options are provided. When running an image on that version, add an `--environment` parameter to avoid the problem. This is planned to be addressed in link:https://github.com/elastic/beats/pull/42060[issue #42060].
 
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations
