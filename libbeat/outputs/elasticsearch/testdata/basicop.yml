@@ -1,7 +1,4 @@
 api_key: ""
-batcher:
-  enabled: true
-  max_size_items: 42
 endpoints:
   - http://localhost:9200
   - http://localhost:9300

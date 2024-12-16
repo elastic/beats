@@ -1,9 +1,6 @@
 exporters:
   elasticsearch:
     api_key: ""
-    batcher:
-      enabled: true
-      max_size_items: 0
     endpoints:
       - https://localhost:9200
     headers: {}

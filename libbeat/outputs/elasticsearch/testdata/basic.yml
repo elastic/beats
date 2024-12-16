@@ -19,7 +19,6 @@ output:
     index: "some-index"
     pipeline: "some-ingest-pipeline"
     proxy_url: "https://proxy.url"
-    bulk_max_size: 42
     backoff:
       init: 42s
       max: 420s

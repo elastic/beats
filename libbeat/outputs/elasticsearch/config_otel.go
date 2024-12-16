@@ -48,6 +48,7 @@ type unsupportedConfig struct {
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
 	MaxRetries         int               `config:"max_retries"`
+	BulkMaxSize        int               `config:"bulk_max_size"`
 }
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
@@ -145,11 +146,11 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
 		},
 
-		// Batcher
-		"batcher": map[string]any{
-			"enabled":        true,
-			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-		},
+		// Batcher is experimental and by not setting it, we are using the exporter's default batching mechanism
+		// "batcher": map[string]any{
+		// 	"enabled":        true,
+		// 	"max_size_items": escfg.BulkMaxSize, // bulk_max_size
+		// },
 	}
 
 	// For type safety check only
