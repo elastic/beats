@@ -73,7 +73,7 @@
         - name: exceptions_thrown_per_sec
           type: float
           description: >
-            Number of Exceps Thrown / sec.
+            Number of Exceptions Thrown / sec.
         - name: memory
           type: group
           description: >
