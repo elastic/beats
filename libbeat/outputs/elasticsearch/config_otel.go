@@ -159,7 +159,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 
 	// For type safety check only
 	// the returned valued should match `elasticsearchexporter.Config` type.
-	// it throws an error if non existing key names  are set
+	// it throws an error if non existing key names are set
 	var result elasticsearchexporter.Config
 	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Squash:      true,
