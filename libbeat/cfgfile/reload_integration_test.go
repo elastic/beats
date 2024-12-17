@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,9 +37,16 @@ import (
 func TestReloader(t *testing.T) {
 	// Create random temp directory
 	dir, err := os.MkdirTemp("", "libbeat-reloader")
-	defer os.RemoveAll(dir)
+	defer func() {
+		if t.Failed() {
+			t.Logf("test failed, temp dir '%s' was kept", dir)
+			return
+		}
+		os.RemoveAll(dir)
+	}()
+
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("could not create temp dir: %s", err)
 	}
 	glob := filepath.Join(dir, "*.yml")
 
@@ -50,7 +58,7 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
-	reloader := NewReloader(logp.L(), nil, config)
+	reloader := NewReloader(logp.L().Named("cfgfile-test.reload"), nil, config)
 	retryCount := 10
 
 	go reloader.Run(nil)
@@ -71,7 +79,13 @@ func TestReloader(t *testing.T) {
 
 	// The first scan should cause a reload, but additional ones should not,
 	// so configReloads should still be 1.
-	assert.Equal(t, int64(1), configReloads.Get())
+	require.Equalf(
+		t,
+		int64(1),
+		configReloads.Get(),
+		"config reload should be called once, but it was called %d times",
+		configReloads.Get(),
+	)
 
 	// Write a file to the reloader path to trigger a real reload
 	content := []byte("test\n")

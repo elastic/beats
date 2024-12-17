@@ -220,9 +220,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			// propagate details any further.
 			forceReload = isReloadable(err)
 			if forceReload {
-				rl.logger.Debugf("error '%s' can be retried. Will try again in %s", err, rl.config.Reload.Period.String())
+				rl.logger.Debugf("error '%v' can be retried. Will try again in %s", err, rl.config.Reload.Period.String())
 			} else {
-				rl.logger.Debugf("error '%s' cannot retried. Modify any input file to reload.")
+				rl.logger.Debugf("error '%v' cannot retried. Modify any input file to reload.", err)
 			}
 		}
 
@@ -237,6 +237,10 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 }
 
 func isReloadable(err error) bool {
+	if err == nil {
+		return false
+	}
+
 	type unwrapList interface {
 		Unwrap() []error
 	}

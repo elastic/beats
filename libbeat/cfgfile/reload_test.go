@@ -30,6 +30,10 @@ func TestIsReloadable(t *testing.T) {
 		err      error
 		expected bool
 	}{
+		"nil error is not retriable": {
+			err:      nil,
+			expected: false,
+		},
 		"simple error": {
 			err:      errors.New("a generic error"),
 			expected: true,
@@ -57,7 +61,7 @@ func TestIsReloadable(t *testing.T) {
 			reloadable := isReloadable(tc.err)
 			if reloadable != tc.expected {
 				t.Errorf(
-					"expecting isReloadable to return %t, but got %t for: '%s'",
+					"expecting isReloadable to return %t, but got %t for: '%v'",
 					tc.expected,
 					reloadable,
 					tc.err,
