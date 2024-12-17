@@ -19,7 +19,6 @@ package multiline
 
 import (
 	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type messageBuffer struct {
@@ -33,7 +32,6 @@ type messageBuffer struct {
 	truncated      int
 	err            error // last seen error
 	message        reader.Message
-	logger         *logp.Logger
 }
 
 func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool) *messageBuffer {
@@ -44,7 +42,6 @@ func newMessageBuffer(maxBytes, maxLines int, separator []byte, skipNewline bool
 		skipNewline: skipNewline,
 		message:     reader.Message{},
 		err:         nil,
-		logger:      logp.NewLogger("reader_multiline"),
 	}
 }
 
@@ -123,15 +120,11 @@ func (b *messageBuffer) addLine(m reader.Message) {
 // finalize writes the existing content into the returned message and resets all reader variables.
 func (b *messageBuffer) finalize() reader.Message {
 	if b.truncated > 0 {
-		if err := b.message.AddFlagsWithKey("log.flags", "truncated"); err != nil {
-			b.logger.Errorf("Failed to add truncated flag: %v", err)
-		}
+		b.message.AddFlagsWithKey("log.flags", "truncated") //nolint:errcheck // It is safe to ignore the error.
 	}
 
 	if b.numLines > 1 {
-		if err := b.message.AddFlagsWithKey("log.flags", "multiline"); err != nil {
-			b.logger.Errorf("Failed to add multiline flag: %v", err)
-		}
+		b.message.AddFlagsWithKey("log.flags", "multiline") //nolint:errcheck // It is safe to ignore the error.
 	}
 
 	// Copy message from existing content
