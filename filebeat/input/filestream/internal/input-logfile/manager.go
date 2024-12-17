@@ -178,12 +178,19 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		}
 
 		cim.Logger.Errorw(
-			fmt.Sprintf("filestream input '%s' is duplicated: input will NOT start",
-				settings.ID),
-			"input", duplicatedInput)
+			fmt.Sprintf(
+				"filestream input '%s' is duplicated: input will NOT start",
+				settings.ID,
+			),
+			"input.cfg", conf.DebugString(config, true))
+
 		cim.idsMux.Unlock()
-		return nil, &common.ErrNonReloadable{Err: fmt.Errorf("filestream input with ID '%s' already exists, this "+
-			"will lead to data duplication, please use a different ID", settings.ID)}
+		return nil, &common.ErrNonReloadable{
+			Err: fmt.Errorf(
+				"filestream input with ID '%s' already exists, this "+
+					"will lead to data duplication, please use a different ID",
+				settings.ID,
+			)}
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.

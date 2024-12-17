@@ -224,7 +224,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
+			modulesLoader := cfgfile.NewReloader(logp.L().Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
 

@@ -18,6 +18,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -36,8 +37,17 @@ type ErrNonReloadable struct {
 	Err error
 }
 
-func (e *ErrNonReloadable) Error() string {
-	return e.Err.Error()
+func (e ErrNonReloadable) Error() string {
+	return fmt.Sprintf("ErrNonReloadable: %v", e.Err)
 }
 
-func (e *ErrNonReloadable) Unwrap() error { return e.Err }
+func (e ErrNonReloadable) Unwrap() error { return e.Err }
+
+func (e ErrNonReloadable) Is(err error) bool {
+	switch err.(type) {
+	case ErrNonReloadable:
+		return true
+	default:
+		return errors.Is(e.Err, err)
+	}
+}

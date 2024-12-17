@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -71,8 +70,7 @@ func (r *RunnerList) Runners() []Runner {
 //
 // Runners might fail to start, it's the callers responsibility to
 // handle any error. During execution, any encountered errors are
-// accumulated in a `multierror.Errors` and returned as
-// a `multierror.MultiError` upon completion.
+// accumulated in a []errors and returned as errors.Join(errs) upon completion.
 //
 // While the stopping of runners occurs on separate goroutines,
 // Reload will wait for all runners to finish before starting any new runners.
@@ -85,7 +83,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs multierror.Errors
+	var errs []error
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -140,9 +138,6 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 			// If InputUnitID is not empty, then we're running under Elastic-Agent
 			// and we need to report the errors per unit.
-			// TODO: from what I saw it's the BeatV2Manager which handles those
-			// errors. It that case, it makes sense to report back a duplicated ID
-			// error.
 			if config.InputUnitID != "" {
 				err = UnitError{
 					Err:    err,
@@ -155,11 +150,8 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 			// it'll be logging the error as often as `reload.period`. Which might
 			// flood the logs with the error.
 			// perhaps the test to check if the error on non-reloadable should be here https://github.com/elastic/beats/blob/bf39c9a6e3e76ed1d3789d35a69c7bd9aba82eb1/libbeat/cfgfile/reload.go#L214
-			if !errors.As(err, new(*common.ErrNonReloadable)) {
-				errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
-			} else {
-				r.logger.Debugf("error creating runner isn't reloadable, not reporting the error: %s ", err)
-			}
+
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
@@ -191,7 +183,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Stop all runners

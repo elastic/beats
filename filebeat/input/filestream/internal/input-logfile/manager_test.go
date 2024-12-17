@@ -51,9 +51,7 @@ func (m noopProspector) Init(_, _ ProspectorCleaner, _ func(Source) string) erro
 	return nil
 }
 
-func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {
-	return
-}
+func (m noopProspector) Run(_ v2.Context, _ StateMetadataUpdater, _ HarvesterGroup) {}
 
 func (m noopProspector) Test() error {
 	return nil
@@ -216,7 +214,7 @@ func TestInputManager_Create(t *testing.T) {
 				"already exists")
 		})
 
-	t.Run("does not start an iput with duplicated ID", func(t *testing.T) {
+	t.Run("does not start an input with duplicated ID", func(t *testing.T) {
 		tcs := []struct {
 			name string
 			id   string
@@ -241,43 +239,38 @@ func TestInputManager_Create(t *testing.T) {
 
 						return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
 					}}
-				cfg1, err := config.NewConfigFrom(fmt.Sprintf(`
+				cfg1 := config.MustNewConfigFrom(fmt.Sprintf(`
 type: filestream
 id: %s
 paths:
-  - /var/log/messages
-  - /var/log/*.log
+  - /var/log/foo
 `, tc.id))
-				require.NoError(t, err, "could not create config")
 
 				// Create a different 2nd config with duplicated ID to ensure
 				// the ID itself is the only requirement to prevent the 2nd input
 				// from being created.
-				paths := []string{"/var/log/messages/2", "/var/log/*.log"}
-				cfg2, err := config.NewConfigFrom(fmt.Sprintf(`
+				cfg2 := config.MustNewConfigFrom(fmt.Sprintf(`
 type: filestream
 id: %s
 paths:
-  - %s
-  - %s
-`, tc.id, paths[0], paths[1]))
-				require.NoError(t, err, "could not create config")
+  - /var/log/bar
+`, tc.id))
 
 				_, err = cim.Create(cfg1)
-				require.NoError(t, err, "1st inout should have been created")
+				require.NoError(t, err, "1st input should have been created")
 
 				// Attempt to create an input with a duplicated ID
 				_, err = cim.Create(cfg2)
 				require.Error(t, err, "filestream should not have created an input with a duplicated ID")
 
 				logs := buff.String()
+				// Assert the logs contain the correct log message
 				assert.Contains(t, logs,
-					fmt.Sprintf("filestream input with ID '%s'", tc.id))
-				assert.Contains(t, logs,
-					"already exists")
-				assert.Contains(t, logs, "input")
-				assert.Contains(t, logs, paths[0])
-				assert.Contains(t, logs, paths[1])
+					fmt.Sprintf("filestream input '%s' is duplicated:", tc.id))
+
+				// Assert the error contains the correct text
+				assert.Contains(t, err.Error(),
+					fmt.Sprintf("filestream input with ID '%s' already exists", tc.id))
 			})
 		}
 	})
