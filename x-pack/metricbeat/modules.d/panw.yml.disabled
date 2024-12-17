@@ -1,5 +1,5 @@
 # Module: panw
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-panw.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.x/metricbeat-module-panw.html
 
 - module: panw
   metricsets: ["licenses"]
