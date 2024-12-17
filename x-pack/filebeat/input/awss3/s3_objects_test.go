@@ -465,7 +465,7 @@ func Test_s3ObjectHash(t *testing.T) {
 			}{Key: "test-obj", LastModified: lastModified},
 		},
 	})
-	assert.Equal(t, "fe8a230c26", objHash)
+	assert.Equal(t, "414903f3f1", objHash)
 }
 
 // newMockS3Pager returns a s3Pager that paginates the given s3Objects based on

@@ -487,7 +487,7 @@ func s3ObjectHash(obj s3EventV2) string {
 	h := sha256.New()
 	h.Write([]byte(obj.S3.Bucket.ARN))
 	h.Write([]byte(obj.S3.Object.Key))
-	h.Write([]byte(obj.S3.Object.LastModified.String()))
+	h.Write([]byte(fmt.Sprintf("%d", obj.S3.Object.LastModified.UnixMilli())))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
 }
