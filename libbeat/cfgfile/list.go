@@ -145,12 +145,6 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 				}
 			}
 
-			// if the error is returned, the broken config will be reloaded indefinitely.
-			// That means, for the use-case where the user configured it manually,
-			// it'll be logging the error as often as `reload.period`. Which might
-			// flood the logs with the error.
-			// perhaps the test to check if the error on non-reloadable should be here https://github.com/elastic/beats/blob/bf39c9a6e3e76ed1d3789d35a69c7bd9aba82eb1/libbeat/cfgfile/reload.go#L214
-
 			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
