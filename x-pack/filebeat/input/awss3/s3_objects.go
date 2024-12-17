@@ -117,7 +117,8 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	p.eventCallback = eventCallback
 	log = log.With(
 		"bucket_arn", p.s3Obj.S3.Bucket.Name,
-		"object_key", p.s3Obj.S3.Object.Key)
+		"object_key", p.s3Obj.S3.Object.Key,
+		"last_modified", p.s3Obj.S3.Object.LastModified)
 
 	// Metrics and Logging
 	log.Debug("Begin S3 object processing.")
