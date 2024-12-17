@@ -26,5 +26,5 @@ metricbeat.modules:
 - module: system
   metricsets: [cpu]
   cpu.metrics: [percentages, normalized_percentages, ticks]
-  #use_performance_counters: true
+  #use_performance_counters: false
 ----
