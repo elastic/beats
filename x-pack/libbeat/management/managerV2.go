@@ -824,8 +824,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
-		merror := &multierror.MultiError{}
-		realErrors := multierror.Errors{}
+		realErrors := []error{}
 
 		// At the moment this logic is tightly bound to the current RunnerList
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
@@ -833,8 +832,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// If they change the way they report errors, this will break.
 		// TODO (Tiago): update all layers to use the most recent features from
 		// the standard library errors package.
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+		type unwrapList interface {
+			Unwrap() []error
+		}
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,
@@ -855,7 +858,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		}
 
 		if len(realErrors) != 0 {
-			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+			return fmt.Errorf("failed to reload inputs: %w", errors.Join(realErrors...))
 		}
 	} else {
 		// If there was no error reloading input and forceReload was
