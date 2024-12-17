@@ -26,3 +26,4 @@ metricbeat.modules:
   metricsets: [core]
   core.metrics: [percentages, ticks]
   #use_performance_counters: false
+----
