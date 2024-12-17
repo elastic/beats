@@ -231,6 +231,8 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 		}()
 	}
 	allStarted := waitUntilTrue(time.Second, func() bool {
+		controller.queueLock.Lock()
+		defer controller.queueLock.Unlock()
 		return len(controller.pendingRequests) == producerCount
 	})
 	assert.True(t, allStarted, "All queueProducer requests should be saved as pending requests by outputController")
