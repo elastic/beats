@@ -59,6 +59,7 @@ func TestOptionTemplates(t *testing.T) {
 		opt := s.GetTemplate(999)
 		assert.NotNil(t, opt)
 		assert.True(t, opt.ScopeFields > 0)
+		assert.False(t, v9proto.shareTemplates)
 	})
 
 	t.Run("Multiple options template", func(t *testing.T) {
@@ -96,6 +97,15 @@ func TestOptionTemplates(t *testing.T) {
 			assert.NotNil(t, opt)
 			assert.True(t, opt.ScopeFields > 0)
 		}
+
+		t.Run("with template sharing enabled", func(t *testing.T) {
+			cfg := config.Defaults()
+			cfg.WithSharedTemplates(true)
+			proto := New(cfg)
+			v9proto, ok := proto.(*NetflowV9Protocol)
+			assert.True(t, ok)
+			assert.True(t, v9proto.shareTemplates)
+		})
 	})
 
 	t.Run("records discarded", func(t *testing.T) {
