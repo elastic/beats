@@ -5,8 +5,8 @@
 package mbreceiver
 
 import (
-	"bytes"
 	"context"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -45,24 +46,20 @@ func TestNewReceiver(t *testing.T) {
 		},
 	}
 
-	var zapLogs bytes.Buffer
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.AddSync(&zapLogs),
-		zapcore.DebugLevel)
+	core, logs := observer.New(zapcore.DebugLevel)
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
 
-	var countLogs int
+	var countLogs atomic.Int64
 	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
-		countLogs = countLogs + ld.LogRecordCount()
+		countLogs.Add(int64(ld.LogRecordCount()))
 		return nil
 	})
 	require.NoError(t, err, "Error creating log consumer")
 
 	r, err := createReceiver(context.Background(), receiverSettings, &config, logConsumer)
-	require.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", zapLogs.String())
+	require.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", logs.All())
 	err = r.Start(context.Background(), nil)
 	require.NoError(t, err, "Error starting metricbeatreceiver")
 
@@ -75,10 +72,10 @@ func TestNewReceiver(t *testing.T) {
 	for tick := ticker.C; ; {
 		select {
 		case <-timer.C:
-			t.Fatalf("consumed logs didn't increase\nCount: %d\nLogs: %s\n", countLogs, zapLogs.String())
+			t.Fatalf("consumed logs didn't increase\nCount: %d\nLogs: %v\n", countLogs.Load(), logs.All())
 		case <-tick:
 			tick = nil
-			go func() { ch <- countLogs > 0 }()
+			go func() { ch <- countLogs.Load() > 0 }()
 		case v := <-ch:
 			if v {
 				goto found
