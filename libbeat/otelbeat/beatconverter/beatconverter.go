@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package converters
+package beatconverter
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 )
 
 // list of supported beatreceivers
-var supportedReceivers = []string{"filebeatreceiver", "metricbeatreceiver"} // Add more beat receivers to this list when we add support
+var supportedReceivers = []string{"filebeatreceiver"} // Add more beat receivers to this list when we add support
 
 type converter struct {
 	logger *zap.Logger
@@ -46,7 +46,7 @@ func newConverter(set confmap.ConverterSettings) confmap.Converter {
 	}
 }
 
-// [beatreceiver].output is unpacked to OTel config here
+// Convert converts [beatreceiver].output to OTel config here
 func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 	for _, receiverbeat := range supportedReceivers {
@@ -85,7 +85,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			}
 		}
 
-		// Replace output.elasticsearch with output.otelconsumer
+		// Replace output.[configured-output] with output.otelconsumer
 		out = map[string]any{
 			"receivers::" + receiverbeat + "::output": nil,
 		}

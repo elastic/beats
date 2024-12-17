@@ -32,6 +32,7 @@ const schemeName = "fb"
 
 type provider struct{}
 
+// The Provider provides configuration, and allows to watch/monitor for changes.
 func NewFactory() confmap.ProviderFactory {
 	return confmap.NewProviderFactory(newProvider)
 }
@@ -40,6 +41,7 @@ func newProvider(confmap.ProviderSettings) confmap.Provider {
 	return &provider{}
 }
 
+// Retrieve retrieves the beat configuration file and constructs otel config
 func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFunc) (*confmap.Retrieved, error) {
 	if !strings.HasPrefix(uri, schemeName+":") {
 		return nil, fmt.Errorf("%q uri is not supported by %q provider", uri, schemeName)

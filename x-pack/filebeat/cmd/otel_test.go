@@ -25,7 +25,7 @@ func TestOtel(t *testing.T) {
 	// Run the command in a goroutine
 	errCh := make(chan error, 1)
 	go func() {
-		err := cmd.RunE(cmd, []string{})
+		err := cmd.RunE(cmd, []string{"--config", "../filebeat-otel.yml"})
 		errCh <- err
 	}()
 

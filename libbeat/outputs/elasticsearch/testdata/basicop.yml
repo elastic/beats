@@ -13,6 +13,8 @@ retry:
   enabled: true
   initial_interval: 42s
   max_interval: 7m0s
+  max_retries: 3
 timeout: 1m30s
 tls: {}
 user: elastic
+compression: gzip

@@ -14,10 +14,12 @@ exporters:
       enabled: true
       initial_interval: 1s
       max_interval: 1m0s
+      max_retries: 3
     timeout: 1m30s
     tls:
       insecure: true
     user: elastic
+    compression: gzip
 
 receivers:
   filebeatreceiver:

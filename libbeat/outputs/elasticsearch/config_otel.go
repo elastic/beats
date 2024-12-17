@@ -47,7 +47,6 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
-	MaxRetries         int               `config:"max_retries"`
 	BulkMaxSize        int               `config:"bulk_max_size"`
 }
 
@@ -144,7 +143,12 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 			"enabled":          true,
 			"initial_interval": escfg.Backoff.Init, // backoff.init
 			"max_interval":     escfg.Backoff.Max,  // backoff.max
+			"max_retries":      escfg.MaxRetries,   // max_retries
+
 		},
+
+		// we don't have a corresponfing paramater in beats.
+		"compression": "gzip", // Required field
 
 		// Batcher is experimental and by not setting it, we are using the exporter's default batching mechanism
 		// "batcher": map[string]any{
@@ -168,12 +172,10 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
-	// TODO:
-	// // validates all required fields are set
-	// err = result.Validate()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	err = result.Validate()
+	if err != nil {
+		return nil, err
+	}
 
 	return otelYAMLCfg, nil
 }
