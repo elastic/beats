@@ -38,6 +38,7 @@ func TestFilestreamMetrics(t *testing.T) {
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "100ms",
 		"close.on_state_change.inactive":       "2s",
+		"message_max_bytes":                    20,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -46,12 +47,13 @@ func TestFilestreamMetrics(t *testing.T) {
 					"negate":    true,
 					"match":     "after",
 					"max_lines": 1,
+					"timeout":   "1s",
 				},
 			},
 		},
 	})
 
-	testlines := []byte("first line\nsecond line\nthird line\nmultiline first line\nmultiline second line\n")
+	testlines := []byte("first line\nsecond line\nthird line\nthis is a very long line exceeding message_max_bytes\nmultiline first line\nmultiline second line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
@@ -66,8 +68,8 @@ func TestFilestreamMetrics(t *testing.T) {
 		FilesClosed:       1,
 		FilesActive:       0,
 		MessagesRead:      3,
-		MessagesTruncated: 1,
-		BytesProcessed:    77,
+		MessagesTruncated: 2,
+		BytesProcessed:    130,
 		EventsProcessed:   3,
 		ProcessingErrors:  0,
 	})
