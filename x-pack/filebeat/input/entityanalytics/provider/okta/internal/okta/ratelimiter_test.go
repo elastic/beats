@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"golang.org/x/time/rate"
 )
 
 func TestRateLimiter(t *testing.T) {
@@ -164,6 +165,55 @@ func TestRateLimiter(t *testing.T) {
 
 		if e.limiter.Limit() != 120/60 {
 			t.Errorf("unexpected rate following Update() (for fixed 120 reqs / 60 secs): %f", e.limiter.Limit())
+		}
+	})
+
+	t.Run("A concurrent rate limit should not set a new rate of zero", func(t *testing.T) {
+		const window = time.Minute
+		r := NewRateLimiter(window, nil)
+		const endpoint = "/foo"
+		url, err := url.Parse(endpoint)
+		if err != nil {
+			t.Errorf("unexpected error from url.Parse(): %v", err)
+		}
+		ctx := context.Background()
+		log := logp.L()
+		e := r.endpoint(endpoint)
+
+		// update to 30 requests remaining, reset in 30s
+		headers := http.Header{
+			"X-Rate-Limit-Limit":     []string{"60"},
+			"X-Rate-Limit-Remaining": []string{"30"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(time.Now().Unix()+30, 10)},
+		}
+		err = r.Update(endpoint, headers, logp.L())
+		if err != nil {
+			t.Errorf("unexpected error from Update(): %v", err)
+		}
+
+		// update to concurrent rate limit, reset now
+		headers = http.Header{
+			"X-Rate-Limit-Limit":     []string{"0"},
+			"X-Rate-Limit-Remaining": []string{"0"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(time.Now().Unix(), 10)},
+		}
+		err = r.Update(endpoint, headers, logp.L())
+		if err != nil {
+			t.Errorf("unexpected error from Update(): %v", err)
+		}
+
+		// Wait to make the new rate become active
+		err = r.Wait(ctx, endpoint, url, log)
+		if err != nil {
+			t.Errorf("unexpected error from Wait(): %v", err)
+		}
+
+		e = r.endpoint(endpoint)
+
+		newLimit := e.limiter.Limit()
+		expectedNewLimit := rate.Limit(1)
+		if newLimit != expectedNewLimit {
+			t.Errorf("expected rate %f, but got %f, after exceeding the concurrent rate limit", expectedNewLimit, newLimit)
 		}
 	})
 }
