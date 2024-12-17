@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
-- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 
 
 *Heartbeat*
@@ -36,7 +35,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
-- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 
 *Osquerybeat*
 
@@ -76,15 +74,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
-- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 
 *Auditbeat*
 
-- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
-- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
-- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
-- hasher: Geneneral improvements and fixes. {pull}41863[41863]
 
 *Filebeat*
 
@@ -114,16 +106,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
-- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
-- Fix missing key in streaming input logging. {pull}41600[41600]
-- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
-- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
-- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
-- Log bad handshake details when websocket connection fails {pull}41300[41300]
-- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
-- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
-- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
-- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
 
 *Heartbeat*
 
@@ -174,7 +156,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
-- Split module/system/process into common and provider bits. {pull}41868[41868]
 
 *Auditbeat*
 
@@ -214,11 +195,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
-- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
-- Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
-- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
-- The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
-- Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
 
 *Auditbeat*
 
@@ -244,9 +220,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-- Add `id` field to all the vSphere metricsets. {pull}41097[41097]
-- Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
-- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 *Metricbeat*
 
@@ -297,6 +270,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
