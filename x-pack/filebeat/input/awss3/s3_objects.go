@@ -449,7 +449,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 			},
 		},
 	}
-	event.SetID(objectID(p.s3ObjHash, offset))
+	event.SetID(objectID(p.s3Obj.S3.Object.LastModified, p.s3ObjHash, offset))
 
 	if len(p.s3Metadata) > 0 {
 		_, _ = event.Fields.Put("aws.s3.metadata", p.s3Metadata)
@@ -478,8 +478,8 @@ func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	return nil
 }
 
-func objectID(objectHash string, offset int64) string {
-	return fmt.Sprintf("%s-%012d", objectHash, offset)
+func objectID(lastModified time.Time, objectHash string, offset int64) string {
+	return fmt.Sprintf("%d-%s-%012d", lastModified.UnixNano(), objectHash, offset)
 }
 
 // s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
@@ -487,7 +487,6 @@ func s3ObjectHash(obj s3EventV2) string {
 	h := sha256.New()
 	h.Write([]byte(obj.S3.Bucket.ARN))
 	h.Write([]byte(obj.S3.Object.Key))
-	h.Write([]byte(fmt.Sprintf("%d", obj.S3.Object.LastModified.UnixMilli())))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
 }

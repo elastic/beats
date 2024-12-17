@@ -14,7 +14,6 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -439,33 +438,6 @@ func TestNewMockS3Pager(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{"foo", "bar", "baz"}, keys)
-}
-
-// Test_s3ObjectHash verifies that s3ObjectHash function produces correct value
-func Test_s3ObjectHash(t *testing.T) {
-	lastModified, _ := time.Parse("2006-01-02 15:04:05 -0700", "2022-10-07 12:44:22 +0530")
-	objHash := s3ObjectHash(s3EventV2{
-		S3: struct {
-			Bucket struct {
-				Name string `json:"name"`
-				ARN  string `json:"arn"`
-			} `json:"bucket"`
-			Object struct {
-				Key          string    `json:"key"`
-				LastModified time.Time `json:"lastModified"`
-			} `json:"object"`
-		}{
-			Bucket: struct {
-				Name string `json:"name"`
-				ARN  string `json:"arn"`
-			}{Name: "test", ARN: "arn:aws:s3:::test"},
-			Object: struct {
-				Key          string    `json:"key"`
-				LastModified time.Time `json:"lastModified"`
-			}{Key: "test-obj", LastModified: lastModified},
-		},
-	})
-	assert.Equal(t, "414903f3f1", objHash)
 }
 
 // newMockS3Pager returns a s3Pager that paginates the given s3Objects based on
