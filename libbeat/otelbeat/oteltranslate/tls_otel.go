@@ -41,7 +41,7 @@ import (
 // ssl.verification_mode: All modes are not distinctly mapped yet
 func validateUnsupportedConfig(tlscfg *tlscommon.Config) error {
 	if len(tlscfg.CurveTypes) > 0 {
-		return errors.New("setting ssl.curve_types is currently is currently not supported")
+		return errors.New("setting ssl.curve_types is currently not supported")
 	}
 	if tlscfg.CATrustedFingerprint != "" {
 		return errors.New("setting ssl.ca_trusted_fingerprint is currently not supported")

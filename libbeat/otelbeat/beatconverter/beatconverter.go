@@ -79,7 +79,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 					return err
 				}
 			case "kafka", "logstash":
-				return fmt.Errorf("%s is currently unsupported in otel mode", key)
+				return fmt.Errorf("output type %q is unsupported in OTel mode", key)
 			default:
 				return fmt.Errorf("%s is unsupported output", key)
 			}
