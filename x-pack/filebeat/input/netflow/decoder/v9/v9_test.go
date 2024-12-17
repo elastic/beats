@@ -59,7 +59,6 @@ func TestOptionTemplates(t *testing.T) {
 		opt := s.GetTemplate(999)
 		assert.NotNil(t, opt)
 		assert.True(t, opt.ScopeFields > 0)
-		assert.False(t, v9proto.shareTemplates)
 	})
 
 	t.Run("Multiple options template", func(t *testing.T) {
@@ -97,15 +96,6 @@ func TestOptionTemplates(t *testing.T) {
 			assert.NotNil(t, opt)
 			assert.True(t, opt.ScopeFields > 0)
 		}
-
-		t.Run("with template sharing enabled", func(t *testing.T) {
-			cfg := config.Defaults()
-			cfg.WithSharedTemplates(true)
-			proto := New(cfg)
-			v9proto, ok := proto.(*NetflowV9Protocol)
-			assert.True(t, ok)
-			assert.True(t, v9proto.shareTemplates)
-		})
 	})
 
 	t.Run("records discarded", func(t *testing.T) {
@@ -258,4 +248,60 @@ func TestCustomFields(t *testing.T) {
 	assert.Len(t, flows, 1)
 	assert.Contains(t, flows[0].Fields, "customField")
 	assert.Equal(t, flows[0].Fields["customField"], "Hello :)")
+}
+
+func TestSharedTemplates(t *testing.T) {
+	const sourceID = 1234
+	addr := test.MakeAddress(t, "127.0.0.1:12345")
+	templatePacket := []uint16{
+		// Header
+		// Version, Count, Uptime, Ts, SeqNo, Source
+		9, 1, 11, 11, 22, 22, 33, 33, 0, 1234,
+		// Set #1 (template)
+		0, 20, /*len of set*/
+		999, 3, /*len*/
+		1, 4, // Fields
+		2, 4,
+		3, 4,
+	}
+
+	t.Run("Template sharing enabled", func(t *testing.T) {
+		sharedTemplates := true
+		key := MakeSessionKey(addr, sourceID, sharedTemplates)
+		cfg := config.Defaults()
+		cfg.WithSharedTemplates(sharedTemplates)
+		proto := New(cfg)
+		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
+		assert.NoError(t, err)
+		assert.Empty(t, flows)
+
+		v9proto, ok := proto.(*NetflowV9Protocol)
+		assert.True(t, ok)
+		assert.True(t, v9proto.shareTemplates)
+
+		assert.Len(t, v9proto.Session.Sessions, 1)
+		s, found := v9proto.Session.Sessions[key]
+		assert.True(t, found)
+		assert.Len(t, s.Templates, 1)
+	})
+
+	t.Run("Template sharing disabled", func(t *testing.T) {
+		sharedTemplates := false
+		key := MakeSessionKey(addr, sourceID, sharedTemplates)
+		cfg := config.Defaults()
+		cfg.WithSharedTemplates(sharedTemplates)
+		proto := New(cfg)
+		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
+		assert.NoError(t, err)
+		assert.Empty(t, flows)
+
+		v9proto, ok := proto.(*NetflowV9Protocol)
+		assert.True(t, ok)
+		assert.False(t, v9proto.shareTemplates)
+
+		assert.Len(t, v9proto.Session.Sessions, 1)
+		s, found := v9proto.Session.Sessions[key]
+		assert.True(t, found)
+		assert.Len(t, s.Templates, 1)
+	})
 }
