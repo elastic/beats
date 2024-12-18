@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"sync"
@@ -218,7 +217,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			// can be retried.
 			// Errors are already logged by list.Reload, so we don't need to
 			// propagate details any further.
-			forceReload = isReloadable(err)
+			forceReload = common.IsInputReloadable(err)
 			if forceReload {
 				rl.logger.Debugf("error '%v' can be retried. Will try again in %s", err, rl.config.Reload.Period.String())
 			} else {
@@ -234,29 +233,6 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			return
 		}
 	}
-}
-
-func isReloadable(err error) bool {
-	if err == nil {
-		return false
-	}
-
-	type unwrapList interface {
-		Unwrap() []error
-	}
-
-	errList, isErrList := err.(unwrapList)
-	if !isErrList {
-		return !errors.Is(err, common.ErrNonReloadable{})
-	}
-
-	for _, e := range errList.Unwrap() {
-		if !errors.Is(e, common.ErrNonReloadable{}) {
-			return true
-		}
-	}
-
-	return false
 }
 
 // Load loads configuration files once.

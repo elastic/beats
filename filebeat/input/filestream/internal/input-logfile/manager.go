@@ -181,9 +181,12 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		// Keep old behaviour so users can upgrade to 9.0 without
 		// having their inputs not starting.
 		if settings.AllowIDDuplication {
-			cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
-				"will lead to data duplication, please use a different ID. Metrics "+
-				"collection has been disabled on this input.", settings.ID)
+			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
+				"this will lead to data duplication, please use a different "+
+				"ID. Metrics collection has been disabled on this input. The "+
+				" input will start only because "+
+				"'allow_deprecated_id_duplication' is set to true",
+				settings.ID)
 			metricsID = ""
 		} else {
 			cim.Logger.Errorw(

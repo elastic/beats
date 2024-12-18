@@ -51,3 +51,31 @@ func (e ErrNonReloadable) Is(err error) bool {
 		return errors.Is(e.Err, err)
 	}
 }
+
+// IsInputReloadable returns true if err, or any error wrapped
+// by err can be retried.
+//
+// Effectively, it will only return false if ALL
+// errors are ErrNonReloadable.
+func IsInputReloadable(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	type unwrapList interface {
+		Unwrap() []error
+	}
+
+	errList, isErrList := err.(unwrapList)
+	if !isErrList {
+		return !errors.Is(err, ErrNonReloadable{})
+	}
+
+	for _, e := range errList.Unwrap() {
+		if !errors.Is(e, ErrNonReloadable{}) {
+			return true
+		}
+	}
+
+	return false
+}

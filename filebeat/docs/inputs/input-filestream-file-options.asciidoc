@@ -34,6 +34,9 @@ input with the same ID. This is intended to add backwards
 compatibility with the behaviour prior to 9.0. It defaults to `false`
 and is **not recommended** in new configurations.
 
+This setting is per input, so make sure to enable it in all {type}
+inputs that use duplicated IDs.
+
 WARNING: Duplicated IDs will lead to data duplication and some input
 instances will not produce any metrics.
 
