@@ -36,7 +36,6 @@ import (
 )
 
 func TestFileWatcher(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/41209")
 	dir := t.TempDir()
 	paths := []string{filepath.Join(dir, "*.log")}
 	cfgStr := `
@@ -261,10 +260,10 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())

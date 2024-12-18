@@ -17,9 +17,9 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -287,6 +287,76 @@ func TestS3ObjectProcessor(t *testing.T) {
 	t.Run("text file without end of line marker but with newline", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/no-eol-twolines.txt", "text/plain", 2)
 	})
+}
+
+func TestProcessObjectMetricCollection(t *testing.T) {
+	logger := logp.NewLogger("testing-s3-processor-metrics")
+
+	tests := []struct {
+		name        string
+		filename    string
+		contentType string
+		objectSize  int64
+	}{
+		{
+			name:        "simple text - octet-stream",
+			filename:    "testdata/log.txt",
+			contentType: "application/octet-stream",
+			objectSize:  18,
+		},
+		{
+			name:        "json text",
+			filename:    "testdata/log.json",
+			contentType: "application/json",
+			objectSize:  199,
+		},
+		{
+			name:        "gzip with json text",
+			filename:    "testdata/multiline.json.gz",
+			contentType: "application/x-gzip",
+			objectSize:  175,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// given
+			ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+			defer cancel()
+
+			ctrl, ctx := gomock.WithContext(ctx, t)
+			defer ctrl.Finish()
+
+			s3Event, s3Resp := newS3Object(t, test.filename, test.contentType)
+			mockS3API := NewMockS3API(ctrl)
+			gomock.InOrder(
+				mockS3API.EXPECT().
+					GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+					Return(s3Resp, nil),
+			)
+
+			// metric recorder with zero workers
+			metricRecorder := newInputMetrics(test.name, nil, 0)
+			objFactory := newS3ObjectProcessorFactory(metricRecorder, mockS3API, nil, backupConfig{})
+			objHandler := objFactory.Create(ctx, s3Event)
+
+			// when
+			err := objHandler.ProcessS3Object(logger, func(_ beat.Event) {})
+
+			// then
+			require.NoError(t, err)
+
+			require.Equal(t, uint64(1), metricRecorder.s3ObjectsRequestedTotal.Get())
+			require.Equal(t, uint64(0), metricRecorder.s3ObjectsInflight.Get())
+
+			values := metricRecorder.s3ObjectSizeInBytes.Values()
+			require.Equal(t, 1, len(values))
+
+			// since we processed a single object, total and current process size is same
+			require.Equal(t, test.objectSize, values[0])
+			require.Equal(t, uint64(test.objectSize), metricRecorder.s3BytesProcessedTotal.Get())
+		})
+	}
 }
 
 func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {

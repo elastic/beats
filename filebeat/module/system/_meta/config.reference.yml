@@ -7,18 +7,10 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Force using journald to collect system logs
-    #var.use_journald: true|false
+    # Use journald to collect system logs
+    #var.use_journald: false
 
-    # Force using log files to collect system logs
-    #var.use_files: true|false
-
-    # If use_journald and use_files are false, then
-    # Filebeat will autodetect whether use to journald
-    # to collect system logs.
-
-    # Input configuration (advanced).
-    # Any input configuration option
+    # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
 
@@ -30,22 +22,8 @@
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-    # Force using journald to collect system logs
-    #var.use_journald: true|false
-
-    # Force using log files to collect system logs
-    #var.use_files: true|false
-
-    # If use_journald and use_files are false, then
-    # Filebeat will autodetect whether use to journald
-    # to collect system logs.
-
-    # A list of tags to include in events. Including 'forwarded'
-    # indicates that the events did not originate on this host and
-    # causes host.name to not be added to events. Include
-    # 'preserve_orginal_event' causes the pipeline to retain the raw log
-    # in event.original. Defaults to [].
-    #var.tags: []
+    # Use journald to collect auth logs
+    #var.use_journald: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.

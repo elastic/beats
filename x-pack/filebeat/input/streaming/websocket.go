@@ -7,6 +7,7 @@ package streaming
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"math/rand/v2"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -22,6 +24,8 @@ import (
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type websocketStream struct {
@@ -114,29 +118,29 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
-				if isRetryableError(err) {
-					s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-					// close the old connection and reconnect
-					if err := c.Close(); err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
-					}
-					// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-					c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
-					handleConnectionResponse(resp, s.metrics, s.log)
-					if err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.log.Errorw("failed to reconnect websocket connection", "error", err)
-						return err
-					}
-				} else {
+				if !isRetryableError(err) {
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
+				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
+				// close the old connection and reconnect
+				if err := c.Close(); err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+				}
+				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
+				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+				handleConnectionResponse(resp, s.metrics, s.log)
+				if err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("failed to reconnect websocket connection", "error", err)
+					return err
+				}
+				continue
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
-			s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
+			s.log.Debugw("received websocket message", logp.Namespace("websocket"), "msg", string(message))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
@@ -220,14 +224,18 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 	var response *http.Response
 	var err error
 	headers := formHeader(cfg)
-
+	dialer, err := createWebSocketDialer(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
 	if cfg.Retry != nil {
 		retryConfig := cfg.Retry
 		for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
-			conn, response, err = websocket.DefaultDialer.DialContext(ctx, url, headers)
+			conn, response, err = dialer.DialContext(ctx, url, headers)
 			if err == nil {
 				return conn, response, nil
 			}
+			//nolint:errorlint // it will never be a wrapped error at this point
 			if err == websocket.ErrBadHandshake {
 				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
 				continue
@@ -239,7 +247,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 	}
 
-	return websocket.DefaultDialer.DialContext(ctx, url, headers)
+	return dialer.DialContext(ctx, url, headers)
 }
 
 // calculateWaitTime calculates the wait time for the next attempt based on the exponential backoff algorithm.
@@ -253,6 +261,10 @@ func calculateWaitTime(waitMin, waitMax time.Duration, attempt int) time.Duratio
 	jitter := rand.Float64() * maxJitter
 
 	waitTime := time.Duration(backoff + jitter)
+	// caps the wait time to the maximum wait time
+	if waitTime > waitMax {
+		waitTime = waitMax
+	}
 
 	return waitTime
 }
@@ -268,4 +280,43 @@ func (s *websocketStream) now() time.Time {
 func (s *websocketStream) Close() error {
 	s.metrics.Close()
 	return nil
+}
+
+func createWebSocketDialer(cfg config) (*websocket.Dialer, error) {
+	var tlsConfig *tls.Config
+	dialer := &websocket.Dialer{
+		Proxy: http.ProxyFromEnvironment,
+	}
+
+	// load proxy configuration if available
+	if cfg.Transport.Proxy.URL != nil {
+		var proxy func(*http.Request) (*url.URL, error)
+		proxyURL, err := httpcommon.NewProxyURIFromString(cfg.Transport.Proxy.URL.String())
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse proxy URL: %w", err)
+		}
+		// create a custom HTTP Transport with proxy configuration
+		proxyTransport := &http.Transport{
+			Proxy:              http.ProxyURL(proxyURL.URI()),
+			ProxyConnectHeader: cfg.Transport.Proxy.Headers.Headers(),
+			DialContext: (&net.Dialer{
+				Timeout: cfg.Transport.Timeout,
+			}).DialContext,
+		}
+		dialer.NetDialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return proxyTransport.DialContext(ctx, network, addr)
+		}
+		dialer.Proxy = proxy
+	}
+	// load TLS config if available
+	if cfg.Transport.TLS != nil {
+		TLSConfig, err := tlscommon.LoadTLSConfig(cfg.Transport.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load TLS config: %w", err)
+		}
+		tlsConfig = TLSConfig.ToConfig()
+		dialer.TLSClientConfig = tlsConfig
+	}
+
+	return dialer, nil
 }

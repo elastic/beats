@@ -18,14 +18,106 @@
 package otelconsumer
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
+	"go.opentelemetry.io/collector/pdata/plog"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestPublish(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	event1 := beat.Event{Fields: mapstr.M{"field": 1}}
+	event2 := beat.Event{Fields: mapstr.M{"field": 2}}
+	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
+
+	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
+		t.Helper()
+
+		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
+
+		logConsumer, err := consumer.NewLogs(consumeFn)
+		assert.NoError(t, err)
+		consumer := &otelConsumer{
+			observer:     outputs.NewNilObserver(),
+			logsConsumer: logConsumer,
+			beatInfo:     beat.Info{},
+			log:          logp.NewLogger("otelconsumer"),
+		}
+		return consumer
+	}
+
+	t.Run("ack batch on consumer success", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		var countLogs int
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			countLogs = countLogs + ld.LogRecordCount()
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+	})
+
+	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return errors.New("consume error")
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.Error(t, err)
+		assert.False(t, consumererror.IsPermanent(err))
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("drop batch on permanent consumer error", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return consumererror.NewPermanent(errors.New("consumer error"))
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.Error(t, err)
+		assert.True(t, consumererror.IsPermanent(err))
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchDrop, batch.Signals[0].Tag)
+	})
+
+	t.Run("retries on context cancelled", func(t *testing.T) {
+		batch := outest.NewBatch(event1, event2, event3)
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			return context.Canceled
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.Error(t, err)
+		assert.ErrorIs(t, err, context.Canceled)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+}
 
 func TestMapstrToPcommonMapString(t *testing.T) {
 	tests := map[string]struct {

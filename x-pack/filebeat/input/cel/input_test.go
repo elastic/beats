@@ -45,6 +45,7 @@ var inputTests = []struct {
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
 	wantErr       error
+	prepare       func() error
 	wantFile      string
 	wantNoFile    string
 }{
@@ -54,6 +55,20 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+	},
+	{
+		name: "hello_world_sprintf",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
 			"state":    nil,
 			"resource": map[string]interface{}{
 				"url": "",
@@ -1671,6 +1686,131 @@ var inputTests = []struct {
 			},
 		}},
 	},
+	{
+		name: "dump_no_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+	{
+		name: "dump_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+	{
+		name: "dump_error_delete",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  false, // We have a name but are disabled, so delete.
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		prepare: func() error {
+			// Make a file that the configuration should delete.
+			err := os.MkdirAll("failure_dumps", 0o700)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+		},
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+
+	// Coverage
+	{
+		name: "coverage",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `int(state.n).as(n, {
+							"events": [{"n": n+1}],
+							"n":          n+1,
+							"want_more":  n+1 < 5,
+							"probe":      n < 2 ?
+								"little"
+							:
+								"big",
+							"fail_probe": n < 0 ?
+								"negative"
+							:
+								"non-negative",
+						})`,
+			"record_coverage": true,
+			"state":           map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		// The program will be evaluated five times in the first periodic
+		// run and then once for all subsequent runs. We depend here on
+		// the test construction that asks that we get at least as many
+		// results from the input as there are elements in the want slice
+		// and then stop.
+		want: []map[string]interface{}{
+			// First periodic run.
+			{"n": float64(1)},
+			{"n": float64(2)},
+			{"n": float64(3)},
+			{"n": float64(4)},
+			{"n": float64(5)},
+			// Second and subsequent periodic runs.
+			{"n": float64(6)},
+			{"n": float64(7)},
+		},
+	},
 
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
@@ -1694,6 +1834,11 @@ func TestInput(t *testing.T) {
 	os.Setenv("CELTESTENVVAR", "TESTVALUE")
 	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
 
+	err := os.RemoveAll("failure_dumps")
+	if err != nil {
+		t.Fatalf("failed to remove failure_dumps directory: %v", err)
+	}
+
 	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
@@ -1702,6 +1847,13 @@ func TestInput(t *testing.T) {
 			}
 			if test.remote && !*runRemote {
 				t.Skip("skipping remote endpoint test")
+			}
+
+			if test.prepare != nil {
+				err := test.prepare()
+				if err != nil {
+					t.Fatalf("unexpected from prepare(): %v", err)
+				}
 			}
 
 			if test.server != nil {
@@ -1756,6 +1908,20 @@ func TestInput(t *testing.T) {
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
+				}
+			}
 			if test.wantErr != nil {
 				return
 			}
@@ -1786,20 +1952,6 @@ func TestInput(t *testing.T) {
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
-				}
-			}
-			if test.wantFile != "" {
-				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
-					t.Errorf("expected log file not found: %v", err)
-				}
-			}
-			if test.wantNoFile != "" {
-				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
-				if err != nil {
-					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
-				}
-				if len(paths) != 0 {
-					t.Errorf("unexpected files found: %v", paths)
 				}
 			}
 		})
