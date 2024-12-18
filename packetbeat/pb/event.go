@@ -418,6 +418,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 	typ := val.Type()
 	for i := 0; i < typ.NumField(); i++ {
 		structField := typ.Field(i)
+
 		tag := getTag(structField)
 		if tag == "" {
 			continue
@@ -444,6 +445,11 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 
 		if inline {
 			if err := marshalStruct(m, key, fieldValue); err != nil {
+				return err
+			}
+			// assume a pointer is a struct or other object we can marshal
+		} else if structField.Type.Kind() == reflect.Ptr {
+			if err := marshalStruct(m, key+"."+tag, fieldValue); err != nil {
 				return err
 			}
 		} else {

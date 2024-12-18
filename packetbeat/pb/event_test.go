@@ -32,6 +32,15 @@ import (
 func TestMarshalMapStr(t *testing.T) {
 	f := NewFields()
 	f.Source = &ecs.Source{IP: "127.0.0.1"}
+	// make sure recursion works properly
+	f.Process = &ecs.Process{
+		Parent: &ecs.Process{
+			Name: "Foo",
+			Parent: &ecs.Process{
+				Name: "Bar",
+			},
+		},
+	}
 
 	m := mapstr.M{}
 	if err := f.MarshalMapStr(m); err != nil {
@@ -45,6 +54,14 @@ func TestMarshalMapStr(t *testing.T) {
 			"type":     []string{"connection", "protocol"},
 		},
 		"source": mapstr.M{"ip": "127.0.0.1"},
+		"process": mapstr.M{
+			"parent": mapstr.M{
+				"name": "Foo",
+				"parent": mapstr.M{
+					"name": "Bar",
+				},
+			},
+		},
 	}, m)
 }
 
