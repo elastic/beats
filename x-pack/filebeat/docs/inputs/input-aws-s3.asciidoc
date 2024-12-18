@@ -130,14 +130,15 @@ An example config is shown below:
 
 Currently supported codecs are given below:-
 
-    1. <<attrib-decoding-csv,CSV>>: This codec decodes RFC 4180 CSV data streams.
-    2. <<attrib-decoding-parquet,Parquet>>: This codec decodes parquet compressed data streams.
+    1. <<attrib-decoding-csv,csv>>: This codec decodes RFC 4180 CSV data streams.
+    2. <<attrib-decoding-parquet,parquet>>: This codec decodes Apache Parquet
+       data streams.
 
 [id="attrib-decoding-csv"]
 [float]
-==== `the CSV codec`
+===== `csv`
 
-The `CSV` codec is used to decode RFC 4180 CSV data streams.
+The CSV codec is used to decode RFC 4180 CSV data streams.
 Enabling the codec without other options will use the default codec options.
 
 [source,yaml]
@@ -145,7 +146,7 @@ Enabling the codec without other options will use the default codec options.
   decoding.codec.csv.enabled: true
 ----
 
-The CSV codec supports five sub attributes to control aspects of CSV decoding.
+The `csv` codec supports five sub attributes to control aspects of CSV decoding.
 The `comma` attribute specifies the field separator character used by the CSV
 format. If it is not specified, the comma character '`,`' is used. The
 `comment` attribute specifies the character that should be interpreted as a
@@ -173,27 +174,33 @@ An example config is shown below:
 
 [id="attrib-decoding-parquet"]
 [float]
-==== `the parquet codec`
+===== `parquet`
 
-The `parquet` codec is used to decode parquet compressed data streams.
-Only enabling the codec will use the default codec options.
+The `parquet` codec is used to decode the
+https://en.wikipedia.org/wiki/Apache_Parquet[Apache Parquet] data storage
+format. Enabling the codec without other options will use the default codec
+options.
 
 [source,yaml]
 ----
   decoding.codec.parquet.enabled: true
 ----
 
-The parquet codec supports two sub attributes which can make parquet decoding
-more efficient. The `batch_size` attribute and the `process_parallel`
-attribute. The `batch_size` attribute can be used to specify the number of
-records to read from the parquet stream at a time. By default the `batch
-size` is set to `1` and `process_parallel` is set to `false`. If the
-`process_parallel` attribute is set to `true` then functions which read
-multiple columns will read those columns in parallel from the parquet stream
-with a number of readers equal to the number of columns. Setting
-`process_parallel` to `true` will greatly increase the rate of processing at
-the cost of increased memory usage. Having a larger `batch_size` also helps
-to increase the rate of processing.
+The Parquet codec supports two attributes, batch_size and process_parallel,
+to improve decoding performance:
+
+* `batch_size`: This attribute specifies the number of records to read from the
+  Parquet stream at a time. By default, batch_size is set to 1. Increasing the
+  batch size can boost processing speed by reading more records in each
+  operation.
+* `process_parallel`: When set to true, this attribute allows Filebeat to read
+  multiple columns from the Parquet stream in parallel, using as many readers
+  as there are columns. Enabling parallel processing can significantly increase
+  throughput, but it will also result in higher memory usage. By default,
+  process_parallel is set to false.
+
+By adjusting both batch_size and process_parallel, you can fine-tune the
+trade-off between processing speed and memory consumption.
 
 An example config is shown below:
 
