@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"time"
 
@@ -335,7 +335,7 @@ func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Durat
 		// apply about equaly distributed jitter in second half of the interval, such that the wait
 		// time falls into the interval [dur/2, dur]
 		limit := int64(dur / 2)
-		jitter := rand.Int63n(limit + 1)
+		jitter := rand.Int64N(limit + 1)
 		return time.Duration(limit + jitter)
 	}
 }
