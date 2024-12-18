@@ -20,35 +20,125 @@ package fbprovider
 import (
 	"context"
 	_ "embed"
-	"path/filepath"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/confmap/confmaptest"
+	"go.opentelemetry.io/collector/confmap"
+
 	"gopkg.in/yaml.v2"
 )
+
+var beatsConfig = `
+filebeat.inputs:
+  - type: filestream
+    id: filestream-input-id
+    enabled: true
+    paths:
+      - /tmp/flog.log
+
+output:
+  elasticsearch:
+    hosts: ["https://localhost:9200"]
+    username: elastic
+    password: changeme
+    index: form-otel-exporter
+    ssl.enabled: false
+
+setup.template.name: form-otel-exporter
+setup.template.pattern: form-otel-exporter
+setup.dashboards.index: "form-otel-exporter*"
+
+setup.kibana:
+  host: https://localhost:5601
+  username: elastic
+  password: changeme
+  ssl.verification_mode: none
+`
+
+var expectedOutput = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+          type: filestream
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+        ssl:
+          enabled: false
+    path:
+      config: .
+      data: ./data
+      home: .
+      logs: ./logs
+    setup:
+      dashboards:
+        index: form-otel-exporter*
+      kibana:
+        host: https://localhost:5601
+        password: changeme
+        ssl:
+          verification_mode: none
+        username: elastic
+      template:
+        name: form-otel-exporter
+        pattern: form-otel-exporter
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
 
 func TestFileBeatProvider(t *testing.T) {
 	p := provider{}
 
 	t.Run("test filebeat provider", func(t *testing.T) {
+
+		tempFile, err := os.CreateTemp("", "filebeat.yml")
+		require.NoError(t, err, "error creating temp file")
+		defer os.Remove(tempFile.Name()) // Clean up the file after we're done
+		defer tempFile.Close()
+
+		content := []byte(beatsConfig)
+		_, err = tempFile.Write(content)
+		require.NoError(t, err, "error creating temp file")
+
 		// prefix file path with fb:
-		ret, err := p.Retrieve(context.Background(), "fb:"+filepath.Join("testdata", "supported.yml"), nil)
+		ret, err := p.Retrieve(context.Background(), "fb:"+tempFile.Name(), nil)
 		require.NoError(t, err)
+
 		retValue, err := ret.AsRaw()
 		require.NoError(t, err)
-		expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", "oteloutput.yml"))
+		expOutput := newFromYamlString(t, expectedOutput)
 
-		// convert both expected and actual output to same format
-		expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
+		// convert it into a common type
+		want, err := yaml.Marshal(expOutput.ToStringMap())
+		require.NoError(t, err)
+		got, err := yaml.Marshal(retValue)
 		require.NoError(t, err)
 
-		retYAML, err := yaml.Marshal(retValue)
-		require.NoError(t, err)
-
-		assert.Equal(t, string(expectedYAML), string(retYAML))
+		assert.Equal(t, string(want), string(got))
 		assert.NoError(t, p.Shutdown(context.Background()))
 	})
 
+}
+
+func newFromYamlString(t *testing.T, input string) *confmap.Conf {
+	t.Helper()
+	var rawConf map[string]any
+	err := yaml.Unmarshal([]byte(input), &rawConf)
+	require.NoError(t, err)
+
+	return confmap.NewFromStringMap(rawConf)
 }

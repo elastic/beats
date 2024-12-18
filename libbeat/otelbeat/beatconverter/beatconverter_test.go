@@ -126,16 +126,18 @@ func TestConverter(t *testing.T) {
 		require.NoError(t, err, "error converting beats output config")
 
 		expOutput := newFromYamlString(t, expectedOutput)
-		want, _ := yaml.Marshal(expOutput.ToStringMap())
-		got, _ := yaml.Marshal(input.ToStringMap())
 
 		// convert it to a common type
+		want, err := yaml.Marshal(expOutput.ToStringMap())
+		require.NoError(t, err)
+		got, err := yaml.Marshal(input.ToStringMap())
+		require.NoError(t, err)
+
 		assert.Equal(t, string(want), string(got))
 
 	})
 
 	t.Run("test failure if unsupported config is provided", func(t *testing.T) {
-
 		input := newFromYamlString(t, unsupportedOutputConfig)
 		err := c.Convert(context.Background(), input)
 		require.ErrorContains(t, err, "output type \"kafka\" is unsupported in OTel mode")
