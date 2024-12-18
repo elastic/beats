@@ -25,7 +25,10 @@ type decoder interface {
 type valueDecoder interface {
 	decoder
 
-	decodeValue() (any, error)
+	// decodeValue returns the current value, and its offset
+	// in the stream. If the receiver is unable to provide
+	// a unique offset for the value, offset will be negative.
+	decodeValue() (offset int64, val any, _ error)
 }
 
 // newDecoder creates a new decoder based on the codec type.
