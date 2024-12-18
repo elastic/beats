@@ -179,7 +179,6 @@ func TestRateLimiter(t *testing.T) {
 		}
 		ctx := context.Background()
 		log := logp.L()
-		e := r.endpoint(endpoint)
 
 		// update to 30 requests remaining, reset in 30s
 		headers := http.Header{
@@ -209,7 +208,7 @@ func TestRateLimiter(t *testing.T) {
 			t.Errorf("unexpected error from Wait(): %v", err)
 		}
 
-		e = r.endpoint(endpoint)
+		e := r.endpoint(endpoint)
 
 		newLimit := e.limiter.Limit()
 		expectedNewLimit := rate.Limit(1)
