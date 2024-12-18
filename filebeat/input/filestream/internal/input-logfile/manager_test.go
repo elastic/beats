@@ -274,6 +274,54 @@ paths:
 			})
 		}
 	})
+
+	t.Run("allow duplicated IDs setting", func(t *testing.T) {
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+
+		log, buff := newBufferLogger()
+
+		cim := &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(_ *config.C) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			}}
+		cfg1 := config.MustNewConfigFrom(`
+type: filestream
+id: duplicated-id
+allow_deprecated_id_duplication: true
+paths:
+  - /var/log/foo
+`)
+
+		// Create a different 2nd config with duplicated ID to ensure
+		// the ID itself is the only requirement to prevent the 2nd input
+		// from being created.
+		cfg2 := config.MustNewConfigFrom(`
+type: filestream
+id: duplicated-id
+allow_deprecated_id_duplication: true
+paths:
+  - /var/log/bar
+`)
+		_, err = cim.Create(cfg1)
+		require.NoError(t, err, "1st input should have been created")
+		// Create an input with a duplicated ID
+		_, err = cim.Create(cfg2)
+		require.NoError(t, err, "filestream should not have created an input with a duplicated ID")
+
+		logs := buff.String()
+		// Assert the logs contain the correct log message
+		assert.Contains(t, logs,
+			"filestream input with ID 'duplicated-id' already exists, this "+
+				"will lead to data duplication, please use a different ID. Metrics "+
+				"collection has been disabled on this input.",
+			"did not find the expected message about the duplicated input ID")
+	})
 }
 
 func newBufferLogger() (*logp.Logger, *bytes.Buffer) {

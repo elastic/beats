@@ -156,9 +156,10 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id"`
-		CleanInactive  time.Duration `config:"clean_inactive"`
-		HarvesterLimit uint64        `config:"harvester_limit"`
+		ID                 string        `config:"id"`
+		CleanInactive      time.Duration `config:"clean_inactive"`
+		HarvesterLimit     uint64        `config:"harvester_limit"`
+		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
 	}{CleanInactive: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
@@ -177,20 +178,29 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			duplicatedInput["error"] = fmt.Errorf("failed to umpack dupliucated input config: %w", unpackErr).Error()
 		}
 
-		cim.Logger.Errorw(
-			fmt.Sprintf(
-				"filestream input '%s' is duplicated: input will NOT start",
-				settings.ID,
-			),
-			"input.cfg", conf.DebugString(config, true))
+		// Keep old behaviour so users can upgrade to 9.0 without
+		// having their inputs not starting.
+		if settings.AllowIDDuplication {
+			cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
+				"will lead to data duplication, please use a different ID. Metrics "+
+				"collection has been disabled on this input.", settings.ID)
+			metricsID = ""
+		} else {
+			cim.Logger.Errorw(
+				fmt.Sprintf(
+					"filestream input '%s' is duplicated: input will NOT start",
+					settings.ID,
+				),
+				"input.cfg", conf.DebugString(config, true))
 
-		cim.idsMux.Unlock()
-		return nil, &common.ErrNonReloadable{
-			Err: fmt.Errorf(
-				"filestream input with ID '%s' already exists, this "+
-					"will lead to data duplication, please use a different ID",
-				settings.ID,
-			)}
+			cim.idsMux.Unlock()
+			return nil, &common.ErrNonReloadable{
+				Err: fmt.Errorf(
+					"filestream input with ID '%s' already exists, this "+
+						"will lead to data duplication, please use a different ID",
+					settings.ID,
+				)}
+		}
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.
