@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -15,8 +16,11 @@ import (
 )
 
 func TestOtel(t *testing.T) {
+	rootDir, _ := filepath.Abs("../filebeat-otel.yml")
+
 	// Create the command
 	cmd := otelbeat.OTelCmd("filebeat")
+	cmd.SetArgs([]string{"otel", "--config", rootDir})
 
 	// Set up a context with a timeout to avoid indefinite blocking
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -25,7 +29,7 @@ func TestOtel(t *testing.T) {
 	// Run the command in a goroutine
 	errCh := make(chan error, 1)
 	go func() {
-		err := cmd.RunE(cmd, []string{"--config", "../filebeat-otel.yml"})
+		err := cmd.Execute()
 		errCh <- err
 	}()
 
