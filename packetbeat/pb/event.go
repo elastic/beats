@@ -424,6 +424,12 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 		}
 		return nil
 	}
+
+	// NumField() will panic if we don't have a struct
+	if val.Type().Kind() != reflect.Struct {
+		return fmt.Errorf("value must be a struct or a pointer to a struct, but got %v at key %s", val.Type(), key)
+	}
+
 	for i := 0; i < typ.NumField(); i++ {
 		structField := typ.Field(i)
 
@@ -455,8 +461,10 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 			if err := marshalStruct(m, key, fieldValue); err != nil {
 				return err
 			}
-			// assume a pointer is a struct or other object we can marshal
-		} else if structField.Type.Kind() == reflect.Ptr || structField.Type.Kind() == reflect.Struct {
+			// look for a struct or pointer to a struct
+			// that reflect.Ptr check is needed so Elem() doesn't panic
+		} else if (structField.Type.Kind() == reflect.Ptr && fieldValue.Elem().Kind() == reflect.Struct) ||
+			structField.Type.Kind() == reflect.Struct {
 			if err := marshalStruct(m, key+"."+tag, fieldValue); err != nil {
 				return err
 			}
