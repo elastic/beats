@@ -448,7 +448,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 				return err
 			}
 			// assume a pointer is a struct or other object we can marshal
-		} else if structField.Type.Kind() == reflect.Ptr {
+		} else if structField.Type.Kind() == reflect.Ptr || structField.Type.Kind() == reflect.Struct {
 			if err := marshalStruct(m, key+"."+tag, fieldValue); err != nil {
 				return err
 			}
