@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.22.8
+=======
+FROM golang:1.22.10
+>>>>>>> 3cdd8564f ([Automation] Bump Golang version to 1.22.10 (#42095))
 
 COPY test/main.go main.go
 

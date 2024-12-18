@@ -1,8 +1,12 @@
 module github.com/elastic/beats/v7
 
+<<<<<<< HEAD
 go 1.22.8
 
 toolchain go1.22.9
+=======
+go 1.22.10
+>>>>>>> 3cdd8564f ([Automation] Bump Golang version to 1.22.10 (#42095))
 
 require (
 	cloud.google.com/go/bigquery v1.62.0

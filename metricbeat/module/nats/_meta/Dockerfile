@@ -2,7 +2,11 @@ ARG NATS_VERSION=2.0.4
 FROM nats:$NATS_VERSION
 
 # build stage
+<<<<<<< HEAD
 FROM golang:1.22.8 AS build-env
+=======
+FROM golang:1.22.10 AS build-env
+>>>>>>> 3cdd8564f ([Automation] Bump Golang version to 1.22.10 (#42095))
 RUN apt-get install git mercurial gcc
 RUN git clone https://github.com/nats-io/nats.go.git /nats-go
 RUN cd /nats-go/examples/nats-bench && git checkout tags/v1.10.0 && go build .
