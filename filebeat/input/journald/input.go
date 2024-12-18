@@ -73,7 +73,7 @@ const pluginName = "journald"
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",
