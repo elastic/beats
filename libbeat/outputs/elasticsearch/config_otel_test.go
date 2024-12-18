@@ -19,6 +19,8 @@ package elasticsearch
 
 import (
 	_ "embed"
+	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -29,9 +31,6 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 )
-
-//go:embed testdata/basic.yml
-var beatYAMLCfg string
 
 func TestToOtelConfig(t *testing.T) {
 
@@ -44,20 +43,22 @@ func TestToOtelConfig(t *testing.T) {
 		{
 			name:      "basic elasticsearch input",
 			input:     "basic.yml",
-			expOutput: "basicop.yml",
+			expOutput: "basic-op.yml",
 			experr:    false,
 		},
-		// {
-		// 	name:      "when cloud id is provided",
-		// 	input:     "unsupported-output.yml",
-		// 	expOutput: "",
-		// 	experr:    true,
-		// },
+		{
+			name:      "when cloud id is provided",
+			input:     "es-service.yml",
+			expOutput: "es-service-op.yml",
+			experr:    true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			beatCfg := config.MustNewConfigFrom(beatYAMLCfg)
+			rawConf, err := loadBeatConf(filepath.Join("testdata", test.input))
+			require.NoError(t, err)
+			beatCfg := config.MustNewConfigFrom(rawConf)
 
 			otelCfg, err := ToOTelConfig(beatCfg)
 			require.NoError(t, err, "could not convert beat config to otel ES config")
@@ -75,4 +76,19 @@ func TestToOtelConfig(t *testing.T) {
 		})
 	}
 
+}
+
+func loadBeatConf(fileName string) (map[string]any, error) {
+	// Clean the path before using it.
+	content, err := os.ReadFile(filepath.Clean(fileName))
+	if err != nil {
+		return nil, fmt.Errorf("unable to read the file %v: %w", fileName, err)
+	}
+
+	var rawConf map[string]any
+	if err = yaml.Unmarshal(content, &rawConf); err != nil {
+		return nil, err
+	}
+
+	return rawConf, nil
 }

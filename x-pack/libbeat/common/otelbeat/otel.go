@@ -50,7 +50,7 @@ func OTelCmd(beatname string) *cobra.Command {
 		},
 	}
 
-	command.Flags().StringP("config", "c", beatname+"-otel.yml", "path to filebeat config file")
+	command.Flags().String("config", beatname+"-otel.yml", "path to filebeat config file")
 	return command
 }
 

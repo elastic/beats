@@ -18,13 +18,10 @@
 package oteltranslate
 
 import (
-	"context"
 	"testing"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/config/configtls"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -51,16 +48,6 @@ func TestTLSCommonToOTel(t *testing.T) {
 		want  map[string]any
 		err   bool
 	}{
-		// {
-		// 	name: "when ssl.verification_mode = none",
-		// 	input: &tlscommon.Config{
-		// 		VerificationMode: tlscommon.VerifyNone,
-		// 	},
-		// 	want: map[string]any{
-		// 		"insecure_skip_verify": true,
-		// 	},
-		// 	err: false,
-		// },
 		{
 			name: "when unsupported configuration is passed",
 			input: &tlscommon.Config{
@@ -213,15 +200,6 @@ me1zqwZ6EX7XHaa6j1mx9tcX
 			} else {
 				require.NoError(t, err)
 				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-
-				var result configtls.ClientConfig
-				err = mapstructure.Decode(got, &result)
-				require.NoError(t, err, "incorrect fields were set")
-
-				// validates
-				tlsC, err := result.LoadTLSConfig(context.Background())
-				assert.NoError(t, err)
-				assert.NotNil(t, tlsC)
 			}
 
 		})

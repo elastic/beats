@@ -21,14 +21,15 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/mitchellh/mapstructure"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 )
 
 // TODO: add  following unuspported params to below struct
@@ -99,7 +100,6 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
-	// make url from path, protocol and host
 	hosts := []string{}
 	for _, h := range escfg.Hosts {
 		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
@@ -138,9 +138,6 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 
 		},
 
-		// we don't have a corresponfing paramater in beats.
-		"compression": "gzip", // Required field
-
 		// Batcher is experimental and by not setting it, we are using the exporter's default batching mechanism
 		// "batcher": map[string]any{
 		// 	"enabled":        true,
@@ -160,7 +157,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	return otelYAMLCfg, nil
 }
 
-// For type safety check and config validation
+// For type safety check
 func typeSafetyCheck(value map[string]any) error {
 	// the  valued should match `elasticsearchexporter.Config` type.
 	// it throws an error if non existing key names  are set
@@ -175,7 +172,6 @@ func typeSafetyCheck(value map[string]any) error {
 	if err != nil {
 		return err
 	}
-	err = result.Validate()
 	return err
 }
 

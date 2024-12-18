@@ -15,7 +15,6 @@ retry:
   max_retries: 3
 timeout: 1m30s
 user: elastic
-compression: gzip
 headers:
   X-Header-1: foo
   X-Bar-Header: bar    

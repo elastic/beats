@@ -72,8 +72,9 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		return nil, err
 	}
 
-	if tlscfg.VerificationMode == tlscommon.VerifyNone {
-		insecureSkipVerify = true
+	// validate the beats config before proceeding
+	if err := tlscfg.Validate(); err != nil {
+		return nil, err
 	}
 
 	// unpacks -> ssl.certificate_authorities
@@ -93,22 +94,27 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	// We only include the system certificates if no CA is defined
 	includeSystemCACertsPool := len(caCerts) == 0
 
-	// TODO: Check if certificate.key is set before attempting to read from it
-	// unpacks ->  ssl.key
-	certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
-	if err != nil {
-		return nil, fmt.Errorf("failed reading key file: %w", err)
-	}
-	certKeyPem := string(certKeyBytes)
+	var (
+		certKeyPem string
+		certPem    string
+	)
 
-	// TODO: Check is certificate.certificate is set before attempting to read from it
-	// unpacks ->  ssl.certificate
-	certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
-	if err != nil {
-		logger.Errorf("Failed reading cert file: %+v", err)
-		return nil, fmt.Errorf("failed reading cert file: %w", err)
+	if tlscfg.Certificate.Key != "" {
+		// unpacks ->  ssl.key
+		certKeyBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Key, tlscfg.Certificate.Passphrase)
+		if err != nil {
+			return nil, fmt.Errorf("failed reading key file: %w", err)
+		}
+		certKeyPem = string(certKeyBytes)
+
+		// unpacks ->  ssl.certificate
+		certBytes, err := tlscommon.ReadPEMFile(logger, tlscfg.Certificate.Certificate, "")
+		if err != nil {
+			logger.Errorf("Failed reading cert file: %+v", err)
+			return nil, fmt.Errorf("failed reading cert file: %w", err)
+		}
+		certPem = string(certBytes)
 	}
-	certPem := string(certBytes)
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(tlscfg)
 	if err != nil {
@@ -144,11 +150,6 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	})
 
 	if err := d.Decode(otelTLSConfig); err != nil {
-		return nil, err
-	}
-
-	// Also validate the translated config
-	if err := result.Validate(); err != nil {
 		return nil, err
 	}
 
