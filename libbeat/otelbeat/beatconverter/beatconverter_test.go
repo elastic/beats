@@ -19,60 +19,136 @@ package beatconverter
 
 import (
 	"context"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/confmap/confmaptest"
+	"go.opentelemetry.io/collector/confmap"
 	"gopkg.in/yaml.v2"
 )
 
+var supportedInput = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+        - type: log
+          enabled: true
+          paths:
+            - /var/log/*.log			
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+var expectedOutput = `
+exporters:
+  elasticsearch:
+    api_key: ""
+    endpoints:
+      - https://localhost:9200
+    idle_conn_timeout: 3s
+    logs_index: form-otel-exporter
+    num_workers: 0
+    password: changeme
+    retry:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 1m0s
+      max_retries: 3
+    user: elastic
+    timeout: 1m30s
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+          type: filestream
+        - type: log
+          enabled: true
+          paths:
+            - /var/log/*.log		  
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - elasticsearch
+      receivers:
+        - filebeatreceiver
+`
+
+var unsupportedOutputConfig = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log		
+    output:
+      kafka: 
+        enabled: true 
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
 func TestConverter(t *testing.T) {
 	c := converter{}
+	t.Run("test converter functionality", func(t *testing.T) {
 
-	tests := []struct {
-		name      string
-		input     string
-		expOutput string
-		experr    bool
-	}{
-		{
-			name:      "correct input type",
-			input:     "supported.yml",
-			expOutput: "oteloutput.yml",
-			experr:    false,
-		},
-		{
-			name:      "unsupported output type is configured",
-			input:     "unsupported-output.yml",
-			expOutput: "",
-			experr:    true,
-		},
-	}
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats output config")
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			input, err := confmaptest.LoadConf(filepath.Join("testdata", test.input))
-			require.NoError(t, err, "could not load file")
+		expOutput := newFromYamlString(t, expectedOutput)
+		want, _ := yaml.Marshal(expOutput.ToStringMap())
+		got, _ := yaml.Marshal(input.ToStringMap())
 
-			err = c.Convert(context.Background(), input)
-			if test.experr {
-				assert.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				expectedValue, _ := confmaptest.LoadConf(filepath.Join("testdata", test.expOutput))
+		// convert it to a common type
+		assert.Equal(t, string(want), string(got))
 
-				// convert expected and returned value to same format
-				expectedYAML, err := yaml.Marshal(expectedValue.ToStringMap())
-				require.NoError(t, err)
+	})
 
-				retYAML, err := yaml.Marshal(input.ToStringMap())
-				require.NoError(t, err)
+	t.Run("test failure if unsupported config is provided", func(t *testing.T) {
 
-				assert.Equal(t, string(expectedYAML), string(retYAML))
-			}
-		})
-	}
+		input := newFromYamlString(t, unsupportedOutputConfig)
+		err := c.Convert(context.Background(), input)
+		require.ErrorContains(t, err, "output type \"kafka\" is unsupported in OTel mode")
 
+	})
+
+}
+
+func newFromYamlString(t *testing.T, input string) *confmap.Conf {
+	t.Helper()
+	var rawConf map[string]any
+	err := yaml.Unmarshal([]byte(input), &rawConf)
+	require.NoError(t, err)
+
+	return confmap.NewFromStringMap(rawConf)
 }
