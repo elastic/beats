@@ -416,6 +416,14 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 	}
 
 	typ := val.Type()
+	// pre-emptively handle time
+	if reflect.TypeOf(time.Time{}) == typ {
+		_, err := m.Put(key, val.Interface())
+		if err != nil {
+			return fmt.Errorf("error creating time value: %w", err)
+		}
+		return nil
+	}
 	for i := 0; i < typ.NumField(); i++ {
 		structField := typ.Field(i)
 
@@ -432,7 +440,7 @@ func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 				case "inline":
 					inline = true
 				default:
-					return fmt.Errorf("Unsupported flag %q in tag %q of type %s", flag, tag, typ)
+					return fmt.Errorf("unsupported flag %q in tag %q of type %s", flag, tag, typ)
 				}
 			}
 			tag = tags[0]
