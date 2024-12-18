@@ -4,7 +4,7 @@
 
 TOPIC="foo-`date '+%s-%N'`"
 
-${KAFKA_HOME}/bin/kafka-topics.sh --bootstrap-server localhost:9091--create --partitions 1 --topic "${TOPIC}" --replication-factor 1
+${KAFKA_HOME}/bin/kafka-topics.sh --bootstrap-server localhost:9091 --create --partitions 1 --topic "${TOPIC}" --replication-factor 1
 rc=$?
 if [[ $rc != 0 ]]; then
 	exit $rc
