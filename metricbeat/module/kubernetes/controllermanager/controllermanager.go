@@ -118,9 +118,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch gathers information from the apiserver and reports events with this information.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
-	error_string := fmt.Sprintf("%s", err)
+	errorString := fmt.Sprintf("%s", err)
 	errorUnauthorisedMsg := fmt.Sprintf("unexpected status code %d", http.StatusUnauthorized)
-	if err != nil && strings.Contains(error_string, errorUnauthorisedMsg) {
+	if err != nil && strings.Contains(errorString, errorUnauthorisedMsg) {
 		count := 2 // We retry twice to refresh the Authorisation token in case of http.StatusUnauthorize = 401 Error
 		for count > 0 {
 			if _, errAuth := m.http.RefreshAuthorizationHeader(); errAuth == nil {
