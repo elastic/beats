@@ -12,8 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/time/rate"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestRateLimiter(t *testing.T) {
