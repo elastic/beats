@@ -14,7 +14,7 @@
 Use the `aws-s3` input to retrieve logs from S3 objects that are pointed to by
 S3 notification events read from an SQS queue or directly polling list of S3
 objects in an S3 bucket.  The use of SQS notification is preferred: polling
-list of S3 objects is expensive in terms of performance and costs and should be
+lists of S3 objects is expensive in terms of performance and costs and should be
 preferably used only when no SQS notification can be attached to the S3
 buckets. This input can, for example, be used to receive S3 access logs to
 monitor detailed records for the requests that are made to a bucket. This input
@@ -22,19 +22,20 @@ also supports S3 notification from SNS to SQS.
 
 SQS notification method is enabled setting `queue_url` configuration value.  S3
 bucket list polling method is enabled setting `bucket_arn` configuration value.
-Both value cannot be set at the same time, at least one of the two value must
+Both values cannot be set at the same time, at least one of the values must
 be set.
 
-When using the SQS notification method this input depends on S3 notifications
+When using the SQS notification method, this input depends on S3 notifications
 delivered to an SQS queue for `s3:ObjectCreated:*` events. You must create an
 SQS queue and configure S3 to publish events to the queue.
 
-When processing a S3 object which pointed by a SQS message, if half of the set
-visibility timeout passed and the processing is still ongoing, then the
-visibility timeout of that SQS message will be reset to make sure the message
-does not go back to the queue in the middle of the processing. If there are
-errors happening during the processing of the S3 object, then the process will
-be stopped and the SQS message will be returned back to the queue.
+The S3 input manages SQS message visibility to prevent messages from being
+reprocessed while the S3 object is still being processed. If the processing
+takes longer than half of the visibility timeout, the timeout is reset to ensure
+the message doesn't return to the queue before processing is complete.
+
+If an error occurs during the processing of the S3 object, the processing will
+be stopped, and the SQS message will be returned to the queue for reprocessing.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -50,7 +51,7 @@ When using the direct polling list of S3 objects in an S3 buckets,
 a number of workers that will process the S3 objects listed must be set
 through the `number_of_workers` config.
 Listing of the S3 bucket will be polled according the time interval defined by
-`bucket_list_interval` config. Default value is 120secs.
+`bucket_list_interval` config. The default value is 120 sec.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -63,8 +64,8 @@ Listing of the S3 bucket will be polled according the time interval defined by
   expand_event_list_from_field: Records
 ----
 
-The `aws-s3` input can also poll 3rd party S3 compatible services such as the
-self hosted Minio.  Using non-AWS S3 compatible buckets requires the use of
+The `aws-s3` input can also poll third party S3-compatible services such as the
+Minio. Using non-AWS S3 compatible buckets requires the use of
 `access_key_id` and `secret_access_key` for authentication.  To specify the S3
 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be
 set to replace the default API endpoint.  `endpoint` should be a full URI in
@@ -102,7 +103,7 @@ The API timeout must be longer than the `sqs.wait_time` value.
 [float]
 ==== `buffer_size`
 
-The size in bytes of the buffer that each harvester uses when fetching a file.
+The size  of the buffer in bytes that each harvester uses when fetching a file.
 This only applies to non-JSON logs. The default is `16 KiB`.
 
 [id="input-{type}-content_type"]
@@ -110,7 +111,7 @@ This only applies to non-JSON logs. The default is `16 KiB`.
 ==== `content_type`
 
 A standard MIME type describing the format of the object data.  This
-can be set to override the MIME type that was given to the object when
+can be set to override the MIME type given to the object when
 it was uploaded. For example: `application/json`.
 
 [id="input-{type}-encoding"]
@@ -305,8 +306,8 @@ Moved to <<aws-credentials-config,AWS credentials options>>.
 ==== `include_s3_metadata`
 
 This input can include S3 object metadata in the generated events for use in
-follow-on processing. You must specify the list of keys to include. By default
-none are included. If the key exists in the S3 response then it will be
+follow-on processing. You must specify the list of keys to include. By default,
+none are included. If the key exists in the S3 response, then it will be
 included in the event as `aws.s3.metadata.<key>` where the key name as been
 normalized to all lowercase.
 
@@ -378,7 +379,7 @@ takes precedence over the region name obtained from the `queue_url` value.
 [float]
 ==== `visibility_timeout`
 
-The duration that the received SQS messages are hidden from subsequent retrieve
+The duration that the received SQS messages are hidden from retrieve
 requests after being retrieved by a `ReceiveMessage` request. The default
 visibility timeout is `300s`. The maximum is `12h`. {beatname_uc} will
 automatically reset the visibility timeout of a message after 1/2 of the
@@ -394,7 +395,7 @@ received but can't be processed) from consuming resources. The number of times
 a message has been received is tracked using the `ApproximateReceiveCount` SQS
 attribute. The default value is 5.
 
-If you have configured a dead letter queue then you can set this value to
+If you have configured a dead letter queue, then you can set this value to
 `-1` to disable deletion on failure.
 
 [float]
@@ -472,13 +473,13 @@ sqs.notification_parsing_script:
 This sets an execution timeout for the `process` function. When
 the `process` function takes longer than the `timeout` period the function
 is interrupted. You can set this option to prevent a script from running for
-too long (like preventing an infinite `while` loop). By default there is no
+too long (like preventing an infinite `while` loop). By default, there is no
 timeout.
 
 [float]
 ==== `sqs.notification_parsing_script.max_cached_sessions`
 
-This sets the maximum number of Javascript VM sessions
+This sets the maximum number of JavaScript VM sessions
 that will be cached to avoid reallocation.
 
 [float]
@@ -504,9 +505,9 @@ set).
 [float]
 ==== `non_aws_bucket_name`
 
-Name of the S3 bucket that will be polled for list operation. Required for 3rd
-party S3 compatible services. (Required when `queue_url` and `bucket_arn` are
-not set).
+Name of the S3 bucket that will be polled for list operation. Required for
+third-party S3 compatible services. (Required when `queue_url` and `bucket_arn`
+are not set).
 
 [float]
 ==== `bucket_list_interval`
@@ -528,8 +529,9 @@ to 5.
 [float]
 ==== `provider`
 
-Name of the 3rd party S3 bucket provider like backblaze or GCP.
+Name of the third-party S3 bucket provider like backblaze or GCP.
 The following endpoints/providers will be detected automatically:
+
 |===
 |Domain |Provider
 |amazonaws.com, amazonaws.com.cn, c2s.sgov.gov, c2s.ic.gov |aws
@@ -558,20 +560,20 @@ The following endpoints/providers will be detected automatically:
 Enabling this option sets the bucket name as a path in the API call instead of
 a subdomain. When enabled https://<bucket-name>.s3.<region>.<provider>.com
 becomes https://s3.<region>.<provider>.com/<bucket-name>.  This is only
-supported with 3rd party S3 providers.  AWS does not support path style.
+supported with third-party S3 providers.  AWS does not support path style.
 
 [float]
 ==== `aws credentials`
 
-In order to make AWS API calls, `aws-s3` input requires AWS credentials. Please
+To make AWS API calls, `aws-s3` input requires AWS credentials. Please
 see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
 ==== `backup_to_bucket_arn`
 
-The bucket ARN to backup processed files to. This will copy the processed file
-after it was fully read.  When using the `non_aws_bucket_name`, please use
-`non_aws_backup_to_bucket_name` accordingly.
+The ARN of the S3 bucket where processed files are copied. The copy is created
+after the S3 object is fully processed. When using the `non_aws_bucket_name`,
+please use `non_aws_backup_to_bucket_name` accordingly.
 
 Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
@@ -584,9 +586,10 @@ This prefix will be prepended to the object key when backing it up to another
 [float]
 ==== `non_aws_backup_to_bucket_name`
 
-The bucket name to backup processed files to. Use this parameter when not using
-AWS buckets. This will copy the processed file after it was fully read.  When
-using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
+The name of the non-AWS bucket where processed files are copied. Use this
+parameter when not using AWS buckets. The copy is created after the S3 object is
+fully processed.  When using the `bucket_arn`, please use `backup_to_bucket_arn`
+accordingly.
 
 Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
@@ -595,7 +598,7 @@ Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
 Controls whether fully processed files will be deleted from the bucket.
 
-Can only be used together with the backup functionality.
+This option can only be used together with the backup functionality.
 
 [float]
 === AWS Permissions
@@ -647,7 +650,7 @@ To configure SQS notifications for an existing S3 bucket, you can follow
 https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
 guide.
 
-Alternatively, you can follow steps given which utilize a CloudFormation
+Alternatively, you can follow steps given which use a CloudFormation
 template to create a S3 bucket connected to a SQS with object creation
 notifications already enabled.
 
@@ -767,7 +770,7 @@ filebeat.inputs:
 ----
 +
 
-With this configuration, filebeat avoids polling and utilizes SQS notifications
+With this configuration, {beatname_uc} avoids polling and uses SQS notifications
 to extract logs from the S3 bucket.
 
 [float]
@@ -787,7 +790,7 @@ to the SNS topic].
 Amazon S3 can alternatively
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html[send
 events to EventBridge], which can then be used to route these events to SQS.
-While the S3 input will filter for 'Object Created' events it's more efficient
+While the S3 input will filter for 'Object Created' events, it is more efficient
 to configure EventBridge to only forward the 'Object Created' events.
 
 [float]
@@ -825,16 +828,16 @@ S3 bucket objects method, scaling should be vertical, with a single bigger
 [float]
 === SQS Custom Notification Parsing Script
 
-Under some circumstances you might want to listen to events that are not
+Under some circumstances, you might want to listen to events that are not
 following the standard SQS notifications format. To be able to parse them, it
 is possible to define a custom script that will take care of processing them
 and generating the required list of S3 Events used to download the files.
 
-The `sqs.notification_parsing_script` executes Javascript code to process an
+The `sqs.notification_parsing_script` executes JavaScript code to process an
 event.  It uses a pure Go implementation of ECMAScript 5.1 and has no external
 dependencies.
 
-It can be configured by embedding Javascript in your configuration file or by
+It can be configured by embedding JavaScript in your configuration file or by
 pointing the processor at external file(s). Only one of the options
 `sqs.notification_parsing_script.source`,
 `sqs.notification_parsing_script.file`, and
@@ -936,10 +939,9 @@ The `S3EventV2` object returned by the `parse` method.
 
 |===
 
-In order to be able to retrieve an S3 object successfully, at least
-`S3.Object.Key` and `S3.Bucket.Name` properties must be set (using the provided
-setters). The other properties will be used as metadata in the resulting event
-when available.
+To be able to retrieve an S3 object successfully, at least `S3.Object.Key` and
+`S3.Bucket.Name` properties must be set (using the provided setters). The other
+properties will be used as metadata in the resulting event when available.
 
 [float]
 ==== XMLDecoder API
@@ -985,12 +987,12 @@ Will produce the following output:
 *Example*: `var dec = new XMLDecoder(n);`
 
 |`PrependHyphenToAttr()`
-|Causes the Decoder to prepend a hyphen (`-`) to to all XML attribute names.
+|Causes the Decoder to prepend a hyphen (`-`) to all XML attribute names.
 
 *Example*: `dec.PrependHyphenToAttr();`
 
 |`LowercaseKeys()`
-|Causes the Decoder to transform all key name to lowercase.
+|Causes the Decoder to transform all key names to lowercase.
 
 *Example*: `dec.LowercaseKeys();`
 
@@ -1004,7 +1006,7 @@ Will produce the following output:
 [float]
 === Metrics
 
-This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+This input exposes metrics under the <<http-endpoint,HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
@@ -1014,10 +1016,10 @@ observe the activity of the input.
 | `sqs_messages_received_total`             | Number of SQS messages received (not necessarily processed fully).
 | `sqs_visibility_timeout_extensions_total` | Number of SQS visibility timeout extensions.
 | `sqs_messages_inflight_gauge`             | Number of SQS messages inflight (gauge).
-| `sqs_messages_returned_total`             | Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
+| `sqs_messages_returned_total`             | Number of SQS messages returned to queue (happens on errors implicitly after visibility timeout passes).
 | `sqs_messages_deleted_total`              | Number of SQS messages deleted.
 | `sqs_messages_waiting_gauge`              | Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html<GetQueueAttributes>. A value of `-1` indicates the metric is uninitialized or could not be collected due to an error.
-| `sqs_worker_utilization`                  | Rate of SQS worker utilization over previous 5 seconds. 0 indicates idle, 1 indicates all workers utilized.
+| `sqs_worker_utilization`                  | Rate of SQS worker utilization over the previous 5 seconds. 0 indicates idle, 1 indicates all workers utilized.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 | `sqs_lag_time`                            | Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
