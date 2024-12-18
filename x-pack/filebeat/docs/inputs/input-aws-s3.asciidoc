@@ -12,20 +12,22 @@
 ++++
 
 Use the `aws-s3` input to retrieve logs from S3 objects that are pointed to by
-S3 notification events read from an SQS queue or directly polling list of S3 objects in an S3 bucket.
-The use of SQS notification is preferred: polling list of S3 objects is expensive
-in terms of performance and costs and should be preferably used only when no SQS
-notification can be attached to the S3 buckets. This input can, for example, be
-used to receive S3 access logs to monitor detailed records for the requests that
-are made to a bucket. This input also supports S3 notification from SNS to SQS.
+S3 notification events read from an SQS queue or directly polling list of S3
+objects in an S3 bucket.  The use of SQS notification is preferred: polling
+list of S3 objects is expensive in terms of performance and costs and should be
+preferably used only when no SQS notification can be attached to the S3
+buckets. This input can, for example, be used to receive S3 access logs to
+monitor detailed records for the requests that are made to a bucket. This input
+also supports S3 notification from SNS to SQS.
 
-SQS notification method is enabled setting `queue_url` configuration value.
-S3 bucket list polling method is enabled setting `bucket_arn` configuration value.
-Both value cannot be set at the same time, at least one of the two value must be set.
+SQS notification method is enabled setting `queue_url` configuration value.  S3
+bucket list polling method is enabled setting `bucket_arn` configuration value.
+Both value cannot be set at the same time, at least one of the two value must
+be set.
 
-When using the SQS notification method this input depends on S3 notifications delivered
-to an SQS queue for `s3:ObjectCreated:*` events. You must create an SQS queue and configure S3
-to publish events to the queue.
+When using the SQS notification method this input depends on S3 notifications
+delivered to an SQS queue for `s3:ObjectCreated:*` events. You must create an
+SQS queue and configure S3 to publish events to the queue.
 
 When processing a S3 object which pointed by a SQS message, if half of the set
 visibility timeout passed and the processing is still ongoing, then the
@@ -61,13 +63,16 @@ Listing of the S3 bucket will be polled according the time interval defined by
   expand_event_list_from_field: Records
 ----
 
-
-The `aws-s3` input can also poll 3rd party S3 compatible services such as the self hosted Minio.
-Using non-AWS S3 compatible buckets requires the use of `access_key_id` and `secret_access_key` for authentication.
-To specify the S3 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
-`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>` in the case of `non_aws_bucket_name`, that will be used as the API endpoint of the service.
-No `endpoint` is needed if using the native AWS S3 service hosted at `amazonaws.com`.
-Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS domains that require a different endpoint.
+The `aws-s3` input can also poll 3rd party S3 compatible services such as the
+self hosted Minio.  Using non-AWS S3 compatible buckets requires the use of
+`access_key_id` and `secret_access_key` for authentication.  To specify the S3
+bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be
+set to replace the default API endpoint.  `endpoint` should be a full URI in
+the form of `https(s)://<s3 endpoint>` in the case of `non_aws_bucket_name`,
+that will be used as the API endpoint of the service.  No `endpoint` is needed
+if using the native AWS S3 service hosted at `amazonaws.com`.  Please see
+<<aws-credentials-config,Configuration parameters>> for alternate AWS domains
+that require a different endpoint.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -88,8 +93,8 @@ The `aws-s3` input supports the following configuration options plus the
 [float]
 ==== `api_timeout`
 
-The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
-call will be interrupted. The default AWS API timeout is `120s`.
+The maximum duration of the AWS API call. If it exceeds the timeout, the AWS
+API call will be interrupted. The default AWS API timeout is `120s`.
 
 The API timeout must be longer than the `sqs.wait_time` value.
 
@@ -131,6 +136,7 @@ Currently supported codecs are given below:-
 [id="attrib-decoding-csv"]
 [float]
 ==== `the CSV codec`
+
 The `CSV` codec is used to decode RFC 4180 CSV data streams.
 Enabling the codec without other options will use the default codec options.
 
@@ -141,19 +147,20 @@ Enabling the codec without other options will use the default codec options.
 
 The CSV codec supports five sub attributes to control aspects of CSV decoding.
 The `comma` attribute specifies the field separator character used by the CSV
-format. If it is not specified, the comma character '`,`' is used. The `comment`
-attribute specifies the character that should be interpreted as a comment mark.
-If it is specified, lines starting with the character will be ignored. Both
-`comma` and `comment` must be single characters. The `lazy_quotes` attribute
-controls how quoting in fields is handled. If `lazy_quotes` is true, a quote may
-appear in an unquoted field and a non-doubled quote may appear in a quoted field.
-The `trim_leading_space` attribute specifies that leading white space should be
-ignored, even if the `comma` character is white space. For complete details
-of the preceding configuration attribute behaviors, see the CSV decoder
+format. If it is not specified, the comma character '`,`' is used. The
+`comment` attribute specifies the character that should be interpreted as a
+comment mark.  If it is specified, lines starting with the character will be
+ignored. Both `comma` and `comment` must be single characters. The
+`lazy_quotes` attribute controls how quoting in fields is handled. If
+`lazy_quotes` is true, a quote may appear in an unquoted field and a
+non-doubled quote may appear in a quoted field.  The `trim_leading_space`
+attribute specifies that leading white space should be ignored, even if the
+`comma` character is white space. For complete details of the preceding
+configuration attribute behaviors, see the CSV decoder
 https://pkg.go.dev/encoding/csv#Reader[documentation] The `fields_names`
 attribute can be used to specify the column names for the data. If it is
-absent, the field names are obtained from the first non-comment line of
-data. The number of fields must match the number of field names.
+absent, the field names are obtained from the first non-comment line of data.
+The number of fields must match the number of field names.
 
 An example config is shown below:
 
@@ -167,6 +174,7 @@ An example config is shown below:
 [id="attrib-decoding-parquet"]
 [float]
 ==== `the parquet codec`
+
 The `parquet` codec is used to decode parquet compressed data streams.
 Only enabling the codec will use the default codec options.
 
@@ -200,12 +208,14 @@ An example config is shown below:
 ==== `expand_event_list_from_field`
 
 If the fileset using this input expects to receive multiple messages bundled
-under a specific field or an array of objects then the config option `expand_event_list_from_field`
-value can be assigned the name of the field or `.[]`. This setting will be able to split
-the messages under the group value into separate events. For example, CloudTrail
-logs are in JSON format and events are found under the JSON object "Records".
+under a specific field or an array of objects then the config option
+`expand_event_list_from_field` value can be assigned the name of the field or
+`.[]`. This setting will be able to split the messages under the group value
+into separate events. For example, CloudTrail logs are in JSON format and
+events are found under the JSON object "Records".
 
-NOTE: When using `expand_event_list_from_field`, `content_type` config parameter has to be set to `application/json`.
+NOTE: When using `expand_event_list_from_field`, `content_type` config
+parameter has to be set to `application/json`.
 
 ["source","json"]
 ----
@@ -227,8 +237,8 @@ NOTE: When using `expand_event_list_from_field`, `content_type` config parameter
 }
 ----
 
-Or when `expand_event_list_from_field` is set to `.[]`, an array of objects will be split
-into separate events.
+Or when `expand_event_list_from_field` is set to `.[]`, an array of objects
+will be split into separate events.
 
 ["source","json"]
 ----
@@ -246,8 +256,9 @@ into separate events.
 
 Note: When `expand_event_list_from_field` parameter is given in the config,
 aws-s3 input will assume the logs are in JSON format and decode them as JSON.
-Content type will not be checked. If a file has "application/json" content-type,
-`expand_event_list_from_field` becomes required to read the JSON file.
+Content type will not be checked. If a file has "application/json"
+content-type, `expand_event_list_from_field` becomes required to read the JSON
+file.
 
 [float]
 ==== `file_selectors`
@@ -288,9 +299,9 @@ Moved to <<aws-credentials-config,AWS credentials options>>.
 
 This input can include S3 object metadata in the generated events for use in
 follow-on processing. You must specify the list of keys to include. By default
-none are included. If the key exists in the S3 response then it will be included
-in the event as `aws.s3.metadata.<key>` where the key name as been normalized
-to all lowercase.
+none are included. If the key exists in the S3 response then it will be
+included in the event as `aws.s3.metadata.<key>` where the key name as been
+normalized to all lowercase.
 
 ----
 include_s3_metadata:
@@ -304,8 +315,8 @@ include_s3_metadata:
 
 The maximum number of bytes that a single log message can have. All bytes after
 `max_bytes` are discarded and not sent. This setting is especially useful for
-multiline log messages, which can get large. This only applies to non-JSON logs.
-The default is `10 MiB`.
+multiline log messages, which can get large. This only applies to non-JSON
+logs.  The default is `10 MiB`.
 
 [id="input-{type}-parsers"]
 [float]
@@ -319,8 +330,8 @@ Available parsers:
 
 * `multiline`
 
-In this example, {beatname_uc} is reading multiline messages that
-consist of XML that start with the `<Event>` tag.
+In this example, {beatname_uc} is reading multiline messages that consist of
+XML that start with the `<Event>` tag.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -348,7 +359,8 @@ configuring multiline options.
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn`, `access_point_arn`, and `non_aws_bucket_name` are not set).
+URL of the AWS SQS queue that messages will be received from. (Required when
+`bucket_arn`, `access_point_arn`, and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `region`
@@ -472,17 +484,22 @@ value is `20s`.
 [float]
 ==== `bucket_arn`
 
-ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url`, `access_point_arn, and `non_aws_bucket_name` are not set).
+ARN of the AWS S3 bucket that will be polled for list operation. (Required when
+`queue_url`, `access_point_arn, and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `access_point_arn`
 
-ARN of the AWS S3 Access Point that will be polled for list operation. (Required when `queue_url`, `bucket_arn`, and `non_aws_bucket_name` are not set).
+ARN of the AWS S3 Access Point that will be polled for list operation.
+(Required when `queue_url`, `bucket_arn`, and `non_aws_bucket_name` are not
+set).
 
 [float]
 ==== `non_aws_bucket_name`
 
-Name of the S3 bucket that will be polled for list operation. Required for 3rd party S3 compatible services. (Required when `queue_url` and `bucket_arn` are not set).
+Name of the S3 bucket that will be polled for list operation. Required for 3rd
+party S3 compatible services. (Required when `queue_url` and `bucket_arn` are
+not set).
 
 [float]
 ==== `bucket_list_interval`
@@ -497,8 +514,9 @@ Prefix to apply for the list request to the S3 bucket. Default empty.
 [float]
 ==== `number_of_workers`
 
-Number of workers that will process the S3 or SQS objects listed. Required when `bucket_arn` or `access_point_arn` is set, otherwise (in the SQS case) defaults to 5.
-
+Number of workers that will process the S3 or SQS objects listed. Required when
+`bucket_arn` or `access_point_arn` is set, otherwise (in the SQS case) defaults
+to 5.
 
 [float]
 ==== `provider`
@@ -530,10 +548,10 @@ The following endpoints/providers will be detected automatically:
 [float]
 ==== `path_style`
 
-Enabling this option sets the bucket name as a path in the API call instead of a subdomain. When enabled
-https://<bucket-name>.s3.<region>.<provider>.com becomes https://s3.<region>.<provider>.com/<bucket-name>.
-This is only supported with 3rd party S3 providers.  AWS does not support path style.
-
+Enabling this option sets the bucket name as a path in the API call instead of
+a subdomain. When enabled https://<bucket-name>.s3.<region>.<provider>.com
+becomes https://s3.<region>.<provider>.com/<bucket-name>.  This is only
+supported with 3rd party S3 providers.  AWS does not support path style.
 
 [float]
 ==== `aws credentials`
@@ -544,21 +562,24 @@ see <<aws-credentials-config,AWS credentials options>> for more details.
 [float]
 ==== `backup_to_bucket_arn`
 
-The bucket ARN to backup processed files to. This will copy the processed file after it was fully read.
-When using the `non_aws_bucket_name`, please use `non_aws_backup_to_bucket_name` accordingly.
+The bucket ARN to backup processed files to. This will copy the processed file
+after it was fully read.  When using the `non_aws_bucket_name`, please use
+`non_aws_backup_to_bucket_name` accordingly.
 
 Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
 [float]
 ==== `backup_to_bucket_prefix`
 
-This prefix will be prepended to the object key when backing it up to another (or the same) bucket.
+This prefix will be prepended to the object key when backing it up to another
+(or the same) bucket.
 
 [float]
 ==== `non_aws_backup_to_bucket_name`
 
-The bucket name to backup processed files to. Use this parameter when not using AWS buckets. This will copy the processed file after it was fully read.
-When using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
+The bucket name to backup processed files to. Use this parameter when not using
+AWS buckets. This will copy the processed file after it was fully read.  When
+using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
 
 Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
 
@@ -572,8 +593,8 @@ Can only be used together with the backup functionality.
 [float]
 === AWS Permissions
 
-Specific AWS permissions are required for IAM user to access SQS and S3
-when using the SQS notifications method:
+Specific AWS permissions are required for IAM user to access SQS and S3 when
+using the SQS notifications method:
 
 ----
 s3:GetObject
@@ -582,8 +603,8 @@ sqs:ChangeMessageVisibility
 sqs:DeleteMessage
 ----
 
-Reduced specific S3 AWS permissions are required for IAM user to access S3
-when using the polling list of S3 bucket objects:
+Reduced specific S3 AWS permissions are required for IAM user to access S3 when
+using the polling list of S3 bucket objects:
 
 ----
 s3:GetObject
@@ -591,17 +612,23 @@ s3:ListBucket
 s3:GetBucketLocation
 ----
 
-In case `backup_to_bucket_arn` or `non_aws_backup_to_bucket_name` are set the following permission is required as well:
+In case `backup_to_bucket_arn` or `non_aws_backup_to_bucket_name` are set the
+following permission is required as well:
+
 ----
 s3:PutObject
 ----
 
-In case `delete_after_backup` is set the following permission is required as well:
+In case `delete_after_backup` is set the following permission is required as
+well:
+
 ----
 s3:DeleteObject
 ----
 
-In case optional SQS metric `sqs_messages_waiting_gauge` is desired, the following permission is required:
+In case optional SQS metric `sqs_messages_waiting_gauge` is desired, the
+following permission is required:
+
 ----
 sqs:GetQueueAttributes
 ----
@@ -610,11 +637,15 @@ sqs:GetQueueAttributes
 === S3 and SQS setup
 
 To configure SQS notifications for an existing S3 bucket, you can follow
-https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification] guide.
+https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
+guide.
 
-Alternatively, you can follow steps given which utilize a CloudFormation template to create a S3 bucket connected to a SQS with object creation notifications already enabled.
+Alternatively, you can follow steps given which utilize a CloudFormation
+template to create a S3 bucket connected to a SQS with object creation
+notifications already enabled.
 
-. First copy the CloudFormation template given below to a desired location. For example, to file `awsCloudFormation.yaml`
+. First copy the CloudFormation template given below to a desired location. For
+example, to file `awsCloudFormation.yaml`
 
 +
 [%collapsible]
@@ -704,8 +735,9 @@ aws cloudformation create-stack --stack-name <STACK_NAME> --template-body file:/
 . Then, obtain the S3 bucket ARN and SQS queue url using stack's output
 
 +
-For this, you can describe the stack created above. The S3 ARN is set to `S3BucketArn` output and SQS url is set to `SQSUrl` output.
-The output will be populated once the `StackStatus` is set to `CREATE_COMPLETE`.
+For this, you can describe the stack created above. The S3 ARN is set to
+`S3BucketArn` output and SQS url is set to `SQSUrl` output.  The output will be
+populated once the `StackStatus` is set to `CREATE_COMPLETE`.
 +
 
 +
@@ -728,75 +760,87 @@ filebeat.inputs:
 ----
 +
 
-With this configuration, filebeat avoids polling and utilizes SQS notifications to extract logs from the S3 bucket.
+With this configuration, filebeat avoids polling and utilizes SQS notifications
+to extract logs from the S3 bucket.
 
 [float]
 === S3 -> SNS -> SQS setup
-If you would like to use the bucket notification in multiple different consumers
-(others than {beatname_lc}), you should use an SNS topic for the bucket notification.
-Please see https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sns-topic-for-notification[create-SNS-topic-for-notification]
+
+If you would like to use the bucket notification in multiple different
+consumers (others than {beatname_lc}), you should use an SNS topic for the
+bucket notification.  Please see
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sns-topic-for-notification[create-SNS-topic-for-notification]
 for more details. SQS queue will be configured as a
-https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html[subscriber to the SNS topic].
+https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html[subscriber
+to the SNS topic].
 
 [float]
 === S3 -> EventBridge -> SQS setup
-Amazon S3 can alternatively https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html[send events to EventBridge],
-which can then be used to route these events to SQS. While the S3 input will
-filter for 'Object Created' events it's more efficient to configure EventBridge
-to only forward the 'Object Created' events.
+
+Amazon S3 can alternatively
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html[send
+events to EventBridge], which can then be used to route these events to SQS.
+While the S3 input will filter for 'Object Created' events it's more efficient
+to configure EventBridge to only forward the 'Object Created' events.
 
 [float]
 === Parallel Processing
 
-When using the SQS notifications method, multiple {beatname_uc} instances can read from the same SQS queues at the same time.
-To horizontally scale processing when there are large amounts of log data
-flowing into an S3 bucket, you can run multiple {beatname_uc} instances that
-read from the same SQS queues at the same time. No additional configuration is
-required.
+When using the SQS notifications method, multiple {beatname_uc} instances can
+read from the same SQS queues at the same time.  To horizontally scale
+processing when there are large amounts of log data flowing into an S3 bucket,
+you can run multiple {beatname_uc} instances that read from the same SQS queues
+at the same time. No additional configuration is required.
 
 Using SQS ensures that each message in the queue is processed only once even
 when multiple {beatname_uc} instances are running in parallel. To prevent
 {beatname_uc} from receiving and processing the message more than once, set the
 visibility timeout.
 
-The visibility timeout begins when SQS returns a message to {beatname_uc}. During
-this time, {beatname_uc} processes and deletes the message. However, if {beatname_uc}
-fails before deleting the message and your system doesn't call the DeleteMessage
-action for that message before the visibility timeout expires, the message
-becomes visible to other {beatname_uc} instances, and the message is received
-again. By default, the visibility timeout is set to 5 minutes for aws-s3 input
-in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read SQS
-messages and process related s3 log files.
+The visibility timeout begins when SQS returns a message to {beatname_uc}.
+During this time, {beatname_uc} processes and deletes the message. However, if
+{beatname_uc} fails before deleting the message and your system doesn't call
+the DeleteMessage action for that message before the visibility timeout
+expires, the message becomes visible to other {beatname_uc} instances, and the
+message is received again. By default, the visibility timeout is set to 5
+minutes for aws-s3 input in {beatname_uc}. 5 minutes is sufficient time for
+{beatname_uc} to read SQS messages and process related s3 log files.
 
-When using the polling list of S3 bucket objects method be aware that if running multiple {beatname_uc} instances,
-they can list the same S3 bucket at the same time. Since the state of the ingested S3 objects is persisted
-(upon processing a single list operation) in the `path.data` configuration
-and multiple {beatname_uc} cannot share the same `path.data` this will produce repeated
-ingestion of the S3 object.
-Therefore, when using the polling list of S3 bucket objects method, scaling should be
-vertical, with a single bigger {beatname_uc} instance and higher `number_of_workers`
-config value.
+When using the polling list of S3 bucket objects method be aware that if
+running multiple {beatname_uc} instances, they can list the same S3 bucket at
+the same time. Since the state of the ingested S3 objects is persisted (upon
+processing a single list operation) in the `path.data` configuration and
+multiple {beatname_uc} cannot share the same `path.data` this will produce
+repeated ingestion of the S3 object.  Therefore, when using the polling list of
+S3 bucket objects method, scaling should be vertical, with a single bigger
+{beatname_uc} instance and higher `number_of_workers` config value.
 
 [float]
 === SQS Custom Notification Parsing Script
 
-Under some circumstances you might want to listen to events that are not following
-the standard SQS notifications format. To be able to parse them, it is possible to
-define a custom script that will take care of processing them and generating the
-required list of S3 Events used to download the files.
+Under some circumstances you might want to listen to events that are not
+following the standard SQS notifications format. To be able to parse them, it
+is possible to define a custom script that will take care of processing them
+and generating the required list of S3 Events used to download the files.
 
-The `sqs.notification_parsing_script` executes Javascript code to process an event.
-It uses a pure Go implementation of ECMAScript 5.1 and has no external dependencies.
+The `sqs.notification_parsing_script` executes Javascript code to process an
+event.  It uses a pure Go implementation of ECMAScript 5.1 and has no external
+dependencies.
 
-It can be configured by embedding Javascript in your configuration file or by pointing
-the processor at external file(s). Only one of the options `sqs.notification_parsing_script.source`, `sqs.notification_parsing_script.file`, and `sqs.notification_parsing_script.files`
-can be set at the same time.
+It can be configured by embedding Javascript in your configuration file or by
+pointing the processor at external file(s). Only one of the options
+`sqs.notification_parsing_script.source`,
+`sqs.notification_parsing_script.file`, and
+`sqs.notification_parsing_script.files` can be set at the same time.
 
-The script requires a `parse(notification)` function that receives the notification as
-a raw string and returns a list of `S3EventV2` objects. This raw string can then be
-processed as needed, e.g.: `JSON.parse(n)` or the provided helper for XML `new XMLDecoder(n)`.
+The script requires a `parse(notification)` function that receives the
+notification as a raw string and returns a list of `S3EventV2` objects. This
+raw string can then be processed as needed, e.g.: `JSON.parse(n)` or the
+provided helper for XML `new XMLDecoder(n)`.
 
-If the script defines a `test()` function it will be invoked when it is loaded. Any exceptions thrown will cause the processor to fail to load. This can be used to make assertions about the behavior of the script.
+If the script defines a `test()` function it will be invoked when it is loaded.
+Any exceptions thrown will cause the processor to fail to load. This can be
+used to make assertions about the behavior of the script.
 
 [source,javascript]
 ----
@@ -885,9 +929,10 @@ The `S3EventV2` object returned by the `parse` method.
 
 |===
 
-In order to be able to retrieve an S3 object successfully, at least `S3.Object.Key`
-and `S3.Bucket.Name` properties must be set (using the provided setters). The other
-properties will be used as metadata in the resulting event when available.
+In order to be able to retrieve an S3 object successfully, at least
+`S3.Object.Key` and `S3.Bucket.Name` properties must be set (using the provided
+setters). The other properties will be used as metadata in the resulting event
+when available.
 
 [float]
 ==== XMLDecoder API
