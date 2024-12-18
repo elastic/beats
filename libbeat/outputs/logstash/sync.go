@@ -113,6 +113,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
+	deadlockListener := newDeadlockListener(c.log, logstashDeadlockTimeout)
+	defer deadlockListener.close()
 	for len(events) > 0 {
 		// check if we need to reconnect
 		if c.ticker != nil {
@@ -146,14 +148,16 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 			n, len(events), c.Host())
 
 		events = events[n:]
+<<<<<<< HEAD
 		st.Acked(n)
+=======
+		st.AckedEvents(n)
+		deadlockListener.ack(n)
+>>>>>>> 0e62bf8f0 (Add upstream deadlock warning to the logstash output (#41960))
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)
 
-			if c.win != nil {
-				c.win.shrinkWindow()
-			}
 			_ = c.Close()
 
 			c.log.Errorf("Failed to publish events caused by: %+v", err)
@@ -182,6 +186,7 @@ func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 
 	n, err := c.sendEvents(events)
 	if err != nil {
+		c.win.shrinkWindow()
 		return n, err
 	}
 
