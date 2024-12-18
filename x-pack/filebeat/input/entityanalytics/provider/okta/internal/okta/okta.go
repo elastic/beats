@@ -382,7 +382,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 			return nil, nil, fmt.Errorf("maximum retries (%d) finished without success", maxRetries)
 		}
 		if retryCount > 0 {
-			log.Warnf("retrying... (%d/%d)", retryCount, maxRetries)
+			log.Warnw("retrying...", "retry", retryCount, "max", maxRetries)
 		}
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -413,7 +413,7 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, end
 		}
 
 		if resp.StatusCode == http.StatusTooManyRequests {
-			log.Warnf("received 429 Too Many Requests")
+			log.Warnw("received 429 Too Many Requests")
 			retryCount++
 			continue
 		}
