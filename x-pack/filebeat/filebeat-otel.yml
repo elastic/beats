@@ -10,11 +10,8 @@ output:
     hosts: ["https://localhost:9200"]
     username: elastic
     password: changeme
-    index: form-otel-exporter
-
 
 setup.kibana:
   host: https://localhost:5601
   username: elastic
   password: changeme
-  ssl.verification_mode: none
