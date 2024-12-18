@@ -612,18 +612,18 @@ GROUP BY
 	mapStr := m.fetchRowsWithRowCounter(query, reporter, counter)
 
 	result := make([]mapstr.M, 0)
+	var (
+		dbTotalSpace   int64
+		dbUsedSpace    int64
+		dbUnusedSpace  int64
+		dbSpaceUsedPct float64 = 0.00
+	)
 	for key, item := range mapStr {
 		keys := strings.SplitN(key, "-", 2)
 		if len(keys) != 2 {
 			continue
 		}
 		dbName, tblName := keys[0], keys[1]
-		var (
-			dbTotalSpace   int64
-			dbUsedSpace    int64
-			dbUnusedSpace  int64
-			dbSpaceUsedPct float64 = 0.00
-		)
 		for metricName, val := range item.(mapstr.M) {
 			result = append(result, mapstr.M{
 				metricName:   val,
@@ -650,26 +650,26 @@ GROUP BY
 				}
 			}
 		}
+	}
 
+	result = append(result, mapstr.M{
+		"used_space": fmt.Sprintf("%v", dbUsedSpace),
+		"db_name":    dbName,
+	})
+	result = append(result, mapstr.M{
+		"unused_space": fmt.Sprintf("%v", dbUnusedSpace),
+		"db_name":      dbName,
+	})
+	result = append(result, mapstr.M{
+		"total_space": fmt.Sprintf("%v", dbTotalSpace),
+		"db_name":     dbName,
+	})
+	if dbTotalSpace != 0 {
+		dbSpaceUsedPct = float64(dbUsedSpace) / float64(dbTotalSpace)
 		result = append(result, mapstr.M{
-			"used_space": fmt.Sprintf("%v", dbUsedSpace),
-			"db_name":    dbName,
+			"space_used_pct": fmt.Sprintf("%v", dbSpaceUsedPct),
+			"db_name":        dbName,
 		})
-		result = append(result, mapstr.M{
-			"unused_space": fmt.Sprintf("%v", dbUnusedSpace),
-			"db_name":      dbName,
-		})
-		result = append(result, mapstr.M{
-			"total_space": fmt.Sprintf("%v", dbTotalSpace),
-			"db_name":     dbName,
-		})
-		if dbTotalSpace != 0 {
-			dbSpaceUsedPct = float64(dbUsedSpace) / float64(dbTotalSpace)
-			result = append(result, mapstr.M{
-				"space_used_pct": fmt.Sprintf("%v", dbSpaceUsedPct),
-				"db_name":        dbName,
-			})
-		}
 	}
 
 	return result
