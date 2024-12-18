@@ -4,7 +4,7 @@ output:
       - localhost:9200
       - localhost:9300
     protocol: http
-    # path: /foo/bar
+    path: /foo/bar
     username: elastic
     password: changeme
     ## api_key and username/password cannot be set together
@@ -16,6 +16,9 @@ output:
       init: 42s
       max: 420s
     workers: 30
+    headers:
+      X-Header-1: foo
+      X-Bar-Header: bar    
 
 
 ## elastic.co$es-hostname$kibana-hostname

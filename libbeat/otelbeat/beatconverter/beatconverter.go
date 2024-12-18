@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"go.opentelemetry.io/collector/confmap"
-	"go.uber.org/zap"
 
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -31,9 +30,7 @@ import (
 // list of supported beatreceivers
 var supportedReceivers = []string{"filebeatreceiver"} // Add more beat receivers to this list when we add support
 
-type converter struct {
-	logger *zap.Logger
-}
+type converter struct{}
 
 // NewFactory returns a factory for a  confmap.Converter,
 func NewFactory() confmap.ConverterFactory {
@@ -41,9 +38,7 @@ func NewFactory() confmap.ConverterFactory {
 }
 
 func newConverter(set confmap.ConverterSettings) confmap.Converter {
-	return converter{
-		logger: set.Logger,
-	}
+	return converter{}
 }
 
 // Convert converts [beatreceiver].output to OTel config here

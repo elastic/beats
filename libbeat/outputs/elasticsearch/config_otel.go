@@ -19,10 +19,7 @@ package elasticsearch
 
 import (
 	"fmt"
-
-	"github.com/mitchellh/mapstructure"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
-	"go.opentelemetry.io/collector/config/configopaque"
+	"reflect"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,6 +27,8 @@ import (
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/mitchellh/mapstructure"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 )
 
 // TODO: add  following unuspported params to below struct
@@ -50,6 +49,23 @@ type unsupportedConfig struct {
 	BulkMaxSize        int               `config:"bulk_max_size"`
 }
 
+type esToOTelOptions struct {
+	ElasticsearchConfig   `config:",inline"`
+	outputs.HostWorkerCfg `config:",inline"`
+
+	Index    string `config:"index"`
+	Pipeline string `config:"pipeline"`
+	ProxyURL string `config:"proxy_url"`
+}
+
+var defaultOptions = esToOTelOptions{
+	ElasticsearchConfig: defaultConfig,
+
+	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
+	Pipeline: "",
+	ProxyURL: "",
+}
+
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
 func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	// Handle cloud.id the same way Beats does, this will also handle
@@ -63,14 +79,14 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not parse Elasticsearch output configuration: %w", err)
 	}
-	escfg := defaultConfig
+	escfg := defaultOptions
 
 	// check if unsupported configuration is provided
 	temp := unsupportedConfig{}
 	if err := esRawCfg.Unpack(&temp); err != nil {
 		return nil, err
 	}
-	if temp != (unsupportedConfig{}) {
+	if !isStructEmpty(temp) {
 		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
 	}
 
@@ -83,19 +99,9 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
-	esToOTelOptions := struct {
-		Index    string   `config:"index"`
-		Pipeline string   `config:"pipeline"`
-		ProxyURL string   `config:"proxy_url"`
-		Hosts    []string `config:"hosts"  validate:"required"`
-	}{}
-
-	if err := esRawCfg.Unpack(&esToOTelOptions); err != nil {
-		return nil, fmt.Errorf("cannot parse Elasticsearch config: %w", err)
-	}
-
+	// make url from path, protocol and host
 	hosts := []string{}
-	for _, h := range esToOTelOptions.Hosts {
+	for _, h := range escfg.Hosts {
 		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
 		if err != nil {
 			return nil, fmt.Errorf("cannot generate ES URL from host %w", err)
@@ -103,28 +109,16 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		hosts = append(hosts, esURL)
 	}
 
-	// The workers config  can be configured using two keys, so we leverage
-	// the already existing code to handle it by using `output.HostWorkerCfg`.
-	workersCfg := outputs.HostWorkerCfg{}
-	if err := esRawCfg.Unpack(&workersCfg); err != nil {
-		return nil, fmt.Errorf("cannot read worker/workers from Elasticsearch config: %w", err)
-	}
-
-	headers := make(map[string]configopaque.String, len(escfg.Headers))
-	for k, v := range escfg.Headers {
-		headers[k] = configopaque.String(v)
-	}
-
+	// convert ssl configuration
 	otelTLSConfg, err := oteltranslate.TLSCommonToOTel(escfg.Transport.TLS)
 	if err != nil {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index":  esToOTelOptions.Index,    // index
-		"pipeline":    esToOTelOptions.Pipeline, // pipeline
-		"endpoints":   hosts,                    // hosts, protocol, path, port
-		"num_workers": workersCfg.NumWorkers(),  // worker/workers
+		"logs_index":  escfg.Index,        // index
+		"endpoints":   hosts,              // hosts, protocol, path, port
+		"num_workers": escfg.NumWorkers(), // worker/workers
 
 		// Authentication
 		"user":     escfg.Username, // username
@@ -132,11 +126,8 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		"api_key":  escfg.APIKey,   // api_key
 
 		// ClientConfig
-		"proxy_url":         esToOTelOptions.ProxyURL,         // proxy_url
-		"headers":           headers,                          // headers
-		"timeout":           escfg.Transport.Timeout,          // timeout
-		"idle_conn_timeout": &escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
-		"tls":               otelTLSConfg,                     // tls config
+		"timeout":           escfg.Transport.Timeout,         // timeout
+		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
 
 		// Retry
 		"retry": map[string]any{
@@ -157,9 +148,22 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		// },
 	}
 
-	// For type safety check only
-	// the returned valued should match `elasticsearchexporter.Config` type.
-	// it throws an error if non existing key names are set
+	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
+	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config
+	setIfNotNil(otelYAMLCfg, "proxy_url", escfg.ProxyURL) // proxy_url
+	setIfNotNil(otelYAMLCfg, "pipeline", escfg.Pipeline)  // pipeline
+
+	if err := typeSafetyCheck(otelYAMLCfg); err != nil {
+		return nil, err
+	}
+
+	return otelYAMLCfg, nil
+}
+
+// For type safety check and config validation
+func typeSafetyCheck(value map[string]any) error {
+	// the  valued should match `elasticsearchexporter.Config` type.
+	// it throws an error if non existing key names  are set
 	var result elasticsearchexporter.Config
 	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Squash:      true,
@@ -167,15 +171,41 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 		ErrorUnused: true,
 	})
 
-	err = d.Decode(otelYAMLCfg)
+	err := d.Decode(value)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
 	err = result.Validate()
-	if err != nil {
-		return nil, err
+	return err
+}
+
+// Helper function to check if a struct is empty
+func isStructEmpty(s any) bool {
+	return reflect.DeepEqual(s, reflect.Zero(reflect.TypeOf(s)).Interface())
+}
+
+// Helper function to conditionally add fields to the map
+func setIfNotNil(m map[string]any, key string, value any) {
+	if value == nil {
+		return
 	}
 
-	return otelYAMLCfg, nil
+	v := reflect.ValueOf(value)
+
+	switch v.Kind() {
+	case reflect.String:
+		if v.String() != "" {
+			m[key] = value
+		}
+	case reflect.Map, reflect.Slice:
+		if v.Len() > 0 {
+			m[key] = value
+		}
+	case reflect.Struct:
+		if !isStructEmpty(value) {
+			m[key] = value
+		}
+	default:
+		m[key] = value
+	}
 }
