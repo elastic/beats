@@ -66,6 +66,7 @@ func IsInputReloadable(err error) bool {
 		Unwrap() []error
 	}
 
+	//nolint:errorlint // we only want to check that specific error, not all errors in the chain
 	errList, isErrList := err.(unwrapList)
 	if !isErrList {
 		return !errors.Is(err, ErrNonReloadable{})

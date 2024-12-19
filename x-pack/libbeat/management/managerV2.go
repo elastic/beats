@@ -688,6 +688,8 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		type unwrapList interface {
 			Unwrap() []error
 		}
+
+		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
 		errList, isErrList := err.(unwrapList)
 		if isErrList {
 			for _, err := range errList.Unwrap() {
@@ -841,7 +843,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		type unwrapList interface {
 			Unwrap() []error
 		}
-		errList, isErrList := err.(unwrapList)
+		errList, isErrList := err.(unwrapList) //nolint:errorlint // see the comment above
 		if isErrList {
 			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
