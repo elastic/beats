@@ -13,9 +13,9 @@ import (
 )
 
 type config struct {
-	showConfig
-	commonConfig
-	Backfill bool `config:"backfill"`
+	ShowConfig   showConfig   `config:",inline"`
+	CommonConfig commonConfig `config:",inline"`
+	Backfill     bool         `config:"backfill"`
 }
 
 type showConfig struct {
@@ -38,17 +38,17 @@ type commonConfig struct {
 }
 
 func (c config) Validate() error {
-	if err := checkDateFormat(c.Start); err != nil {
+	if err := checkDateFormat(c.ShowConfig.Start); err != nil {
 		return fmt.Errorf("start date is not valid: %w", err)
 	}
-	if err := checkDateFormat(c.End); err != nil {
+	if err := checkDateFormat(c.ShowConfig.End); err != nil {
 		return fmt.Errorf("end date is not valid: %w", err)
 	}
-	if c.ArchiveFile != "" && !strings.HasSuffix(c.ArchiveFile, ".logarchive") {
-		return fmt.Errorf("archive_file %v has the wrong extension", c.ArchiveFile)
+	if c.ShowConfig.ArchiveFile != "" && !strings.HasSuffix(c.ShowConfig.ArchiveFile, ".logarchive") {
+		return fmt.Errorf("archive_file %v has the wrong extension", c.ShowConfig.ArchiveFile)
 	}
-	if c.TraceFile != "" && !strings.HasSuffix(c.TraceFile, ".tracev3") {
-		return fmt.Errorf("trace_file %v has the wrong extension", c.TraceFile)
+	if c.ShowConfig.TraceFile != "" && !strings.HasSuffix(c.ShowConfig.TraceFile, ".tracev3") {
+		return fmt.Errorf("trace_file %v has the wrong extension", c.ShowConfig.TraceFile)
 	}
 	return nil
 }
