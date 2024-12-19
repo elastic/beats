@@ -19,21 +19,22 @@ package beater
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 )
 
 func TestMatchRegistryFiles(t *testing.T) {
 	positiveMatches := []string{
-		"registry/filebeat/49855.json",
-		"registry/filebeat/active.dat",
-		"registry/filebeat/meta.json",
-		"registry/filebeat/log.json",
+		filepath.Join("registry", "filebeat", "49855.json"),
+		filepath.Join("registry", "filebeat", "active.dat"),
+		filepath.Join("registry", "filebeat", "meta.json"),
+		filepath.Join("registry", "filebeat", "log.json"),
 	}
 	negativeMatches := []string{
-		"registry/filebeat/bar.dat",
-		"registry/filebeat/log.txt",
-		"registry/42.json",
-		"nop/active.dat",
+		filepath.Join("registry", "filebeat", "bar.dat"),
+		filepath.Join("registry", "filebeat", "log.txt"),
+		filepath.Join("registry", "42.json"),
+		filepath.Join("nop", "active.dat"),
 	}
 
 	testFn := func(t *testing.T, path string, match bool) {

@@ -33,6 +33,27 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+func init() {
+	preFilesList := [][]string{
+		[]string{"^registry$"},
+		[]string{"^registry", "filebeat$"},
+		[]string{"^registry", "filebeat", "meta\\.json$"},
+		[]string{"^registry", "filebeat", "log\\.json$"},
+		[]string{"^registry", "filebeat", "active\\.dat$"},
+		[]string{"^registry", "filebeat", "[[:digit:]]*\\.json$"},
+	}
+
+	for _, lst := range preFilesList {
+		var path string
+		if filepath.Separator == '\\' {
+			path = strings.Join(lst, `\\`)
+		} else {
+			path = filepath.Join(lst...)
+		}
+		registryFileRegExps = append(registryFileRegExps, regexp.MustCompile(path))
+	}
+}
+
 func gzipRegistry() []byte {
 	logger := logp.L().Named("diagnostics")
 	buf := bytes.Buffer{}
@@ -161,15 +182,9 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 }
 
 // We use regexps here because globs do not support specifying a character
-// range like we do in the checkpoint file
-var registryFileRegExps = []*regexp.Regexp{
-	regexp.MustCompile(filepath.Join([]string{"^registry$"}...)),
-	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat$"}...)),
-	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "meta\\.json$"}...)),
-	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "log\\.json$"}...)),
-	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "active\\.dat$"}...)),
-	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "[[:digit:]]*\\.json$"}...)),
-}
+// range like we do in the checkpoint file. This slice is populated in the
+// `init` function because Windows path separators need to be escaped.
+var registryFileRegExps = []*regexp.Regexp{}
 
 func matchRegistyFiles(path string) bool {
 	for _, regExp := range registryFileRegExps {
