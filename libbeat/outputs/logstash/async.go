@@ -147,15 +147,6 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ref := &msgRef{
-<<<<<<< HEAD
-		client:    c,
-		count:     atomic.MakeUint32(1),
-		batch:     batch,
-		slice:     events,
-		batchSize: len(events),
-		win:       c.win,
-		err:       nil,
-=======
 		client:           c,
 		batch:            batch,
 		slice:            events,
@@ -163,7 +154,6 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		win:              c.win,
 		err:              nil,
 		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
->>>>>>> 0e62bf8f0 (Add upstream deadlock warning to the logstash output (#41960))
 	}
 	defer ref.dec()
 
