@@ -1,0 +1,6 @@
+mockbeat:
+name: TestTLSVersions
+output.elasticsearch:
+    hosts: ["localhost:9200"]
+    ssl:
+      enabled: true

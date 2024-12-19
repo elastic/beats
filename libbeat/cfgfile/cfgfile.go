@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Evil package level globals
@@ -68,6 +69,7 @@ func Initialize() {
 		AddAllowedBackwardsCompatibleFlag("path.data")
 		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
 		AddAllowedBackwardsCompatibleFlag("path.logs")
+		tlscommon.SetInsecureDefaults()
 	})
 }
 
