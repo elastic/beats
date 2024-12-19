@@ -18,10 +18,9 @@
 package util
 
 import (
+	"errors"
 	"net"
 	"sort"
-
-	"github.com/joeshaw/multierror"
 )
 
 // GetNetInfo returns lists of IPs and MACs for the machine it is executed on.
@@ -33,7 +32,7 @@ func GetNetInfo() (ipList []string, hwList []string, err error) {
 	}
 
 	// Keep track of all errors
-	var errs multierror.Errors
+	var errs []error
 
 	for _, i := range ifaces {
 		// Skip loopback interfaces
@@ -62,7 +61,7 @@ func GetNetInfo() (ipList []string, hwList []string, err error) {
 		}
 	}
 
-	return ipList, unique(hwList), errs.Err()
+	return ipList, unique(hwList), errors.Join(errs...)
 }
 
 // formatHardwareAddr formats hardware addresses according to the ECS spec.
