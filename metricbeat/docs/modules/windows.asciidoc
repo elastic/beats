@@ -63,8 +63,12 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-windows-service,service>>
 
+* <<metricbeat-metricset-windows-wmi,wmi>>
+
 include::windows/perfmon.asciidoc[]
 
 include::windows/service.asciidoc[]
+
+include::windows/wmi.asciidoc[]
 
 :edit_url!:

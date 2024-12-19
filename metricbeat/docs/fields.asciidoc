@@ -69179,6 +69179,23 @@ format: duration
 
 --
 
+[float]
+=== wmi
+
+wmi
+
+
+
+*`windows.wmi.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
