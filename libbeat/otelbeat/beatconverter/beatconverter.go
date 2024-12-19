@@ -19,7 +19,6 @@ package beatconverter
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"go.opentelemetry.io/collector/confmap"
@@ -107,8 +106,6 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		if err != nil {
 			return err
 		}
-		s, _ := json.MarshalIndent(conf.ToStringMap(), "", " ")
-		fmt.Println(string(s))
 	}
 
 	return nil
