@@ -29,6 +29,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
@@ -110,8 +113,6 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
 	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
 }
-<<<<<<< HEAD
-=======
 
 func TestFilestreamValidationPreventsFilebeatStart(t *testing.T) {
 	duplicatedIDs := `
@@ -559,4 +560,3 @@ func createFileAndWaitIngestion(
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
->>>>>>> 78fe7a5b7 (Use `fingerprint` file identity by default and migrate file state from `native` or `path` (#41762))
