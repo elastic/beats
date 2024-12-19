@@ -202,6 +202,7 @@ require (
 	github.com/klauspost/compress v1.17.11
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.7.2
+	github.com/microsoft/wmi v0.25.1
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.21
 	github.com/pkg/xattr v0.4.9
