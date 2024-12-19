@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
@@ -547,14 +546,14 @@ func TestErrorPerUnit(t *testing.T) {
 	r.MustRegisterOutput(output)
 	inputs := &mockReloadable{
 		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
-			errs := multierror.Errors{}
+			errs := []error{}
 			for _, input := range configs {
 				errs = append(errs, cfgfile.UnitError{
 					UnitID: input.InputUnitID,
 					Err:    errors.New(errorMessages[input.InputUnitID]),
 				})
 			}
-			return errs.Err()
+			return errors.Join(errs...)
 		},
 	}
 	r.MustRegisterInput(inputs)
