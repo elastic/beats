@@ -27,7 +27,7 @@ import (
 )
 
 func TestDeadlockListener(t *testing.T) {
-	const timeout = 5 * time.Millisecond
+	const timeout = 25 * time.Millisecond
 	log := logp.NewLogger("test")
 	listener := newDeadlockListener(log, timeout)
 

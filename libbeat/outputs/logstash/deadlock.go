@@ -75,7 +75,7 @@ func (r *deadlockListener) run() {
 }
 
 func (r *deadlockListener) ack(n int) {
-	if r == nil {
+	if r == nil || n <= 0 {
 		return
 	}
 	// Send the new ack to the run loop, unless it has already shut down in
