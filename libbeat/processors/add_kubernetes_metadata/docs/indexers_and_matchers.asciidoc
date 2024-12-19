@@ -74,6 +74,27 @@ processors:
           lookup_fields: ['destination.ip', 'server.ip']
 -------------------------------------------------------------------------------
 
+It's also possible to extract the matching key from fields using a regex pattern.
+The optional `regex_pattern` field can be used to set the pattern. The pattern
+*must* contain a capture group named `key`, whose value will be used as the matching key.
+
+For example, the following configuration uses the `container` indexer to identify
+containers by their id, and extracts the matching key from the cgroup id field added
+to system process metrics. This field has the form `cri-containerd-<id>.scope`, so
+we need a regex pattern to obtain the container id.
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+  - add_kubernetes_metadata:
+      indexers:
+        - container:
+      matchers:
+        - fields:
+            lookup_fields: ['system.process.cgroup.id']
+            regex_pattern: 'cri-containerd-(?P<key>[0-9a-z]+)\.scope'
+-------------------------------------------------------------------------------
+
 ifdef::has_kubernetes_logs_path_matcher[]
 ===== `logs_path`
 
