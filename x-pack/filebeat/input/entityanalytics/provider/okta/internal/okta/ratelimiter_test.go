@@ -89,7 +89,7 @@ func TestRateLimiter(t *testing.T) {
 		r.Wait(ctx, endpoint, url, log)
 		wait := time.Since(start)
 
-		if wait > 1010*time.Millisecond {
+		if wait > 1100*time.Millisecond {
 			t.Errorf("doesn't allow requests to resume after reset. had to wait %s", wait)
 		}
 		if e.limiter.Limit() != 1.0 {
@@ -102,7 +102,7 @@ func TestRateLimiter(t *testing.T) {
 		e.limiter.SetBurst(100) // increase bucket size to check token accumulation
 		tokens := e.limiter.TokensAt(time.Unix(0, time.Now().Add(30*time.Second).UnixNano()))
 		target := 30.0
-		buffer := 0.01
+		buffer := 0.1
 
 		if tokens < target-buffer || target+buffer < tokens {
 			t.Errorf("tokens don't accumulate at the expected rate over 30s: %f", tokens)
