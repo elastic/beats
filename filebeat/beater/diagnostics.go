@@ -61,6 +61,12 @@ func gzipRegistry() []byte {
 		logger.Errorw("cannot gzip Filebeat's registry", "error.message", err)
 	}
 
+	// if the final file is too large, skip it
+	if buf.Len() >= 20_000_000 { // 20 Mb
+		logger.Warnf("registry is too large for diagnostics, %dmb bytes > 20mb", buf.Len()/1_000_000)
+		return nil
+	}
+
 	return buf.Bytes()
 }
 

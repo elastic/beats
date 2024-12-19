@@ -115,11 +115,13 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 
 					if len(dr.Content) == 0 {
 						t.Errorf("registry cannot be an empty file")
+						return
 					}
 
 					gzipReader, err := gzip.NewReader(bytes.NewReader(dr.Content))
 					if err != nil {
 						t.Errorf("cannot create gzip reader: '%s'", err)
+						return
 					}
 					defer gzipReader.Close()
 
@@ -202,7 +204,7 @@ func validateLastRegistryEntry(t *testing.T, reader io.Reader, expectedSize int,
 	}{}
 
 	if err := json.Unmarshal(lastLine, &entry); err != nil {
-		t.Fatalf("cannot unmarshal last registry entry: %s", err)
+		t.Errorf("cannot unmarshal last registry entry: %s", err)
 	}
 
 	if entry.Data.Meta.Path != expectedPath {
