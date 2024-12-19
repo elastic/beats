@@ -1,0 +1,74 @@
+- name: stats
+  type: group
+  description: >
+    Shows statistics since the process start.
+  release: ga
+  fields:
+    - name: database
+      type: keyword
+      description: >
+        Name of the database this backend is connected to.
+    - name: total_query_count
+      type: long
+      description: >
+        Total number of SQL commands pooled by pgbouncer.
+    - name: total_server_assignment_count
+      type: long
+      description: >
+        Total times a server was assigned to a client.
+    - name: total_received
+      type: long
+      description: >
+        Total volume in bytes of network traffic received by pgbouncer.
+    - name: total_sent
+      type: long
+      description: >
+        Total volume in bytes of network traffic sent by pgbouncer.
+    - name: total_xact_time
+      type: long
+      description: >
+        Total number of microseconds spent by pgbouncer when connected to PostgreSQL in a transaction, either idle in transaction or executing queries.
+    - name: total_query_time
+      type: long
+      description: >
+        Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL, executing queries.
+    - name: total_wait_time
+      type: long
+      description: >
+        Time spent by clients waiting for a server, in microseconds. Updated when a client connection is assigned a backend connection.
+    - name: total_xact_count
+      type: long
+      description: >
+        Total number of SQL transactions pooled by pgbouncer.
+    - name: avg_xact_count
+      type: long
+      description: >
+        Average transactions per second in last stat period.
+    - name: avg_query_count
+      type: long
+      description: >
+        Average queries per second in last stat period.
+    - name: avg_server_assignment_count
+      type: long
+      description: >
+        Average number of times a server as assigned to a client per second in the last stat period.
+    - name: avg_recv
+      type: long
+      description: >
+        Average received (from clients) bytes per second.
+    - name: avg_sent
+      type: long
+      description: >
+        Average sent (to clients) bytes per second.
+    - name: avg_xact_time
+      type: long
+      description: >
+        Average transaction duration, in microseconds.
+    - name: avg_query_time
+      type: long
+      description: >
+        Average query duration, in microseconds.
+    - name: avg_wait_time
+      type: long
+      description: >
+        Time spent by clients waiting for a server, in microseconds (average of the wait times for clients assigned a backend during the current stats_period).
