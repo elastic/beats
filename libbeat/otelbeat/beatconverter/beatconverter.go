@@ -19,10 +19,12 @@ package beatconverter
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"go.opentelemetry.io/collector/confmap"
 
+	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -44,33 +46,40 @@ func newConverter(set confmap.ConverterSettings) confmap.Converter {
 // Convert converts [beatreceiver].output to OTel config here
 func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
-	for _, receiverbeat := range supportedReceivers {
+	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
 
 		// check if supported beat receiver is configured. Skip translation logic if not
-		if v := conf.Get("receivers::" + receiverbeat); v == nil {
+		if v := conf.Get("receivers::" + beatreceiver); v == nil {
 			continue
 		}
 
-		receiverCfg, _ := conf.Sub("receivers::" + receiverbeat)
-		outputs, _ := receiverCfg.Sub("output")
+		// handle cloud id if set
+		if conf.IsSet("receivers::" + beatreceiver + "::cloud") {
+			if err := handleCloudId(beatreceiver, conf); err != nil {
+				return fmt.Errorf("error handling cloud id %w", err)
+			}
+		}
 
-		if len(outputs.ToStringMap()) > 1 {
+		receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+		output, _ := receiverCfg.Sub("output")
+
+		if len(output.ToStringMap()) > 1 {
 			return fmt.Errorf("multiple outputs are not supported")
 		}
 
-		for key := range outputs.ToStringMap() {
+		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
-				escfg := config.MustNewConfigFrom(receiverCfg.ToStringMap())
-				esCfg, err := elasticsearch.ToOTelConfig(escfg)
+				esConfig := config.MustNewConfigFrom(output)
+				esOTelConfig, err := elasticsearch.ToOTelConfig(esConfig)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
 				out = map[string]any{
 					"service::pipelines::logs::exporters": []string{"elasticsearch"},
 					"exporters": map[string]any{
-						"elasticsearch": esCfg,
+						"elasticsearch": esOTelConfig,
 					},
 				}
 				err = conf.Merge(confmap.NewFromStringMap(out))
@@ -84,19 +93,59 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 		// Replace output.[configured-output] with output.otelconsumer
 		out = map[string]any{
-			"receivers::" + receiverbeat + "::output": nil,
+			"receivers::" + beatreceiver + "::output": nil,
 		}
 		err := conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
 			return err
 		}
 		out = map[string]any{
-			"receivers::" + receiverbeat + "::output::otelconsumer": nil,
+			"receivers::" + beatreceiver + "::output::otelconsumer": nil,
 		}
+
 		err = conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
 			return err
 		}
+		s, _ := json.MarshalIndent(conf.ToStringMap(), "", " ")
+		fmt.Println(string(s))
+	}
+
+	return nil
+}
+
+func handleCloudId(beatreceiver string, conf *confmap.Conf) error {
+
+	receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+	beatCfg := config.MustNewConfigFrom(receiverCfg.ToStringMap())
+
+	// Handle cloud.id the same way Beats does, this will also handle
+	// extracting the Kibana URL
+	if err := cloudid.OverwriteSettings(beatCfg); err != nil {
+		return fmt.Errorf("cannot read cloudid: %w", err)
+	}
+
+	var beatOutput map[string]any
+	err := beatCfg.Unpack(&beatOutput)
+	if err != nil {
+		return err
+	}
+
+	out := map[string]any{
+		"receivers::" + beatreceiver: beatOutput,
+	}
+	err = conf.Merge(confmap.NewFromStringMap(out))
+	if err != nil {
+		return err
+	}
+
+	// we set this to nil to ensure cloudid check does not throw error when output is next set to otelconsumer
+	out = map[string]any{
+		"receivers::" + beatreceiver + "::cloud": nil,
+	}
+	err = conf.Merge(confmap.NewFromStringMap(out))
+	if err != nil {
+		return err
 	}
 
 	return nil

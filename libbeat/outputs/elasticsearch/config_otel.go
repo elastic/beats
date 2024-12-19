@@ -24,7 +24,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 
-	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
@@ -68,23 +67,12 @@ var defaultOptions = esToOTelOptions{
 }
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
-func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
-	// Handle cloud.id the same way Beats does, this will also handle
-	// extracting the Kibana URL (which is required to handle ILM on
-	// Beats side (currently not supported by ES OTel exporter).
-	if err := cloudid.OverwriteSettings(beatCfg); err != nil {
-		return nil, fmt.Errorf("cannot read cloudid: %w", err)
-	}
-
-	esRawCfg, err := beatCfg.Child("output.elasticsearch", -1)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse Elasticsearch output configuration: %w", err)
-	}
+// Ensure cloudid is handled before calling this method
+func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
-
 	// check if unsupported configuration is provided
 	temp := unsupportedConfig{}
-	if err := esRawCfg.Unpack(&temp); err != nil {
+	if err := output.Unpack(&temp); err != nil {
 		return nil, err
 	}
 	if !isStructEmpty(temp) {
@@ -92,7 +80,7 @@ func ToOTelConfig(beatCfg *config.C) (map[string]any, error) {
 	}
 
 	// unpack and validate ES config
-	if err := esRawCfg.Unpack(&escfg); err != nil {
+	if err := output.Unpack(&escfg); err != nil {
 		return nil, fmt.Errorf("failed unpacking config. %w", err)
 	}
 

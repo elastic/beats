@@ -1,22 +1,20 @@
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-      - localhost:9300
-    protocol: http
-    path: /foo/bar
-    username: elastic
-    password: changeme
-    index: "some-index"
-    pipeline: "some-ingest-pipeline"
-    proxy_url: "https://proxy.url"
-    backoff:
-      init: 42s
-      max: 420s
-    workers: 30
-    headers:
-      X-Header-1: foo
-      X-Bar-Header: bar    
+hosts:
+  - localhost:9200
+  - localhost:9300
+protocol: http
+path: /foo/bar
+username: elastic
+password: changeme
+index: "some-index"
+pipeline: "some-ingest-pipeline"
+proxy_url: "https://proxy.url"
+backoff:
+  init: 42s
+  max: 420s
+workers: 30
+headers:
+  X-Header-1: foo
+  X-Bar-Header: bar    
 
 
 ## elastic.co$es-hostname$kibana-hostname

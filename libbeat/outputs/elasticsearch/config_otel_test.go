@@ -46,12 +46,6 @@ func TestToOtelConfig(t *testing.T) {
 			expOutput: "basic-op.yml",
 			experr:    false,
 		},
-		{
-			name:      "when cloud id is provided",
-			input:     "es-service.yml",
-			expOutput: "es-service-op.yml",
-			experr:    true,
-		},
 	}
 
 	for _, test := range tests {

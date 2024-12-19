@@ -144,6 +144,7 @@ func TestConverter(t *testing.T) {
 
 	})
 
+	// TODO: Add a test case with cloud id set
 }
 
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
