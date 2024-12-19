@@ -278,7 +278,7 @@ func defaultFileScannerConfig() fileScannerConfig {
 		Symlinks:      false,
 		RecursiveGlob: true,
 		Fingerprint: fingerprintConfig{
-			Enabled: true,
+			Enabled: false,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
 		},
