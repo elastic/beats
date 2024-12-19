@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/meta"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -169,7 +170,10 @@ func (a *Autodiscover) worker() {
 				updated = false
 
 				// On error, make sure the next run also updates because some runners were not properly loaded
-				retry = err != nil
+				retry = common.IsInputReloadable(err)
+				if err != nil && !retry {
+					a.logger.Errorw("all new inputs failed to start with a non-retriable error", err)
+				}
 				if retry {
 					// The recoverable errors that can lead to retry are related
 					// to the harvester state, so we need to give the publishing
