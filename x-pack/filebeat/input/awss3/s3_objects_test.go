@@ -11,7 +11,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -317,10 +316,6 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 			contentType: "application/x-gzip",
 			objectSize:  175,
 		},
-	}
-
-	if runtime.GOOS == "windows" {
-		tests[0].objectSize = 20
 	}
 
 	for _, test := range tests {
