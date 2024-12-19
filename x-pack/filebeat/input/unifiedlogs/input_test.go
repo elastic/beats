@@ -82,7 +82,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "Archive not found",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: "notfound.logarchive",
 				},
 			},
@@ -93,7 +93,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "Archived file",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 				},
 			},
@@ -104,7 +104,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "Trace file",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					TraceFile: path.Join(archivePath, "logdata.LiveData.tracev3"),
 				},
 			},
@@ -115,7 +115,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "With start date",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 					Start:       "2024-12-04 13:46:00+0200",
 				},
@@ -127,7 +127,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "With start and end dates",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 					Start:       "2024-12-04 13:45:00+0200",
 					End:         "2024-12-04 13:46:00+0200",
@@ -140,7 +140,7 @@ func TestInput(t *testing.T) {
 		{
 			name: "With end date",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 					End:         "2024-12-04 13:46:00+0200",
 				},
@@ -152,10 +152,10 @@ func TestInput(t *testing.T) {
 		{
 			name: "With predicate",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 				},
-				commonConfig: commonConfig{
+				CommonConfig: commonConfig{
 					Predicate: []string{
 						`processImagePath == "/kernel"`,
 					},
@@ -168,10 +168,10 @@ func TestInput(t *testing.T) {
 		{
 			name: "With process",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 				},
-				commonConfig: commonConfig{
+				CommonConfig: commonConfig{
 					Process: []string{
 						"0",
 					},
@@ -184,10 +184,10 @@ func TestInput(t *testing.T) {
 		{
 			name: "With optional flags",
 			cfg: config{
-				showConfig: showConfig{
+				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
 				},
-				commonConfig: commonConfig{
+				CommonConfig: commonConfig{
 					Info:               true,
 					Debug:              true,
 					Backtrace:          true,
@@ -253,10 +253,10 @@ func TestBackfillAndStream(t *testing.T) {
 
 	cfg := config{
 		Backfill: true,
-		showConfig: showConfig{
+		ShowConfig: showConfig{
 			Start: time.Now().Add(-5 * time.Second).Format("2006-01-02 15:04:05"),
 		},
-		commonConfig: commonConfig{
+		CommonConfig: commonConfig{
 			Info:               true,
 			Debug:              true,
 			Backtrace:          true,
@@ -350,7 +350,7 @@ func filterLogCmdLine(buf []byte, cmd, cmdPrefix string) string {
 			continue
 		}
 
-		trimmed := strings.TrimPrefix(parts[3], cmdStartPrefix)
+		trimmed := strings.TrimPrefix(parts[3], cmdPrefix)
 		if strings.HasPrefix(trimmed, cmd) {
 			return trimmed
 		}
