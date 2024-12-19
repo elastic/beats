@@ -851,7 +851,8 @@ filebeat.inputs:
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
   #file_identity.fingerprint: ~
 
   # Optional additional fields. These fields can be freely picked
