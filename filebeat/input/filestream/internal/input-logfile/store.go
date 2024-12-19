@@ -212,13 +212,28 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
-// FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
-func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
 	for key, res := range s.store.ephemeralStore.table {
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
+		//
+		//  - res.internalState.TTL == 0: entry has been deleted
+		//  - res.internalState.TTL == -1: entry will never be removed by TTL
+		//  - res.internalState.TTL > 0: entry will be removed once its TTL
+		//    is reached
+		//
+		// If the entry has been deleted, skip it
+		if res.internalState.TTL == 0 {
+			continue
+		}
+
 		if !s.identifier.MatchesInput(key) {
 			continue
 		}
@@ -229,68 +244,30 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 		}
 
 		newKey, updatedMeta := getNewID(res)
-		if len(newKey) > 0 && res.internalState.TTL > 0 {
+		if len(newKey) > 0 {
 			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
 				res.lock.Unlock()
 				continue
 			}
 
-			// Pending updates due to events that have not yet been ACKed
-			// are not included in the copy. Collection on
-			// the copy start from the last known ACKed position.
-			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed position using the new key
-			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
 			s.store.writeState(r)
 
 			// Add the new resource to the ephemeralStore so the rest of the
 			// codebase can have access to the new value
 			s.store.ephemeralStore.table[newKey] = r
 
-			// Remove the old key from the store
-			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
-			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
-		}
-
-		res.lock.Unlock()
-	}
-}
-
-// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
-// for removal.
-func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
-	s.store.ephemeralStore.mu.Lock()
-	defer s.store.ephemeralStore.mu.Unlock()
-
-	for key, res := range s.store.ephemeralStore.table {
-		if !s.identifier.MatchesInput(key) {
-			continue
-		}
-
-		if !res.lock.TryLock() {
-			continue
-		}
-
-		newKey, updatedMeta := getNewID(res)
-		if len(newKey) > 0 && res.internalState.TTL > 0 {
-			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
-				res.lock.Unlock()
-				continue
-			}
-
-			// Pending updates due to events that have not yet been ACKed
-			// are not included in the copy. Collection on
-			// the copy start from the last known ACKed position.
-			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed position using the new key
-			// and the pending updates will affect the entry with the oldKey.
-			r := res.copyWithNewKey(newKey)
-			r.cursorMeta = updatedMeta
-			r.stored = false
-			s.store.writeState(r)
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
+			s.store.UpdateTTL(res, 0)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
 		res.lock.Unlock()
@@ -482,8 +459,14 @@ func (r *resource) UnpackCursor(to interface{}) error {
 	return typeconv.Convert(to, r.activeCursor())
 }
 
+// UnpackCursorMeta unpacks the cursor metadata's into the provided struct.
 func (r *resource) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, r.cursorMeta)
+}
+
+// Key returns the resource's key
+func (r *resource) Key() string {
+	return r.key
 }
 
 // syncStateSnapshot returns the current insync state based on already ACKed update operations.
