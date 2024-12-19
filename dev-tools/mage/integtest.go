@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/joeshaw/multierror"
 	"github.com/magefile/mage/mg"
 )
 
@@ -115,7 +114,7 @@ func (steps IntegrationTestSteps) Teardown(env map[string]string) error {
 }
 
 func (steps IntegrationTestSteps) teardownFrom(start int, env map[string]string) error {
-	var errs multierror.Errors
+	var errs []error
 	for i := start; i >= 0; i-- {
 		if mg.Verbose() {
 			fmt.Printf("Teardown %s...\n", steps[i].Name())
@@ -124,7 +123,7 @@ func (steps IntegrationTestSteps) teardownFrom(start int, env map[string]string)
 			errs = append(errs, fmt.Errorf("%s teardown failed: %w", steps[i].Name(), err))
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // IntegrationTester is interface used by the actual test runner.
@@ -287,7 +286,9 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 	inTeardown := false
 	defer func() {
 		if recoverErr := recover(); recoverErr != nil {
-			err = recoverErr.(error)
+			if rerr, ok := recoverErr.(error); ok {
+				err = rerr
+			}
 			if !inTeardown {
 				// ignore errors
 				_ = r.steps.Teardown(r.env)
@@ -317,13 +318,13 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 
 // Test runs the test on each runner and collects the errors.
 func (r IntegrationRunners) Test(mageTarget string, test func() error) error {
-	var errs multierror.Errors
+	var errs []error
 	for _, runner := range r {
 		if err := runner.Test(mageTarget, test); err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func passThroughEnvs(env map[string]string, passthrough ...string) {

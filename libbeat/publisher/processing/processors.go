@@ -18,12 +18,11 @@
 package processing
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -90,14 +89,14 @@ func (p *group) Close() error {
 	if p == nil {
 		return nil
 	}
-	var errs multierror.Errors
+	var errs []error
 	for _, processor := range p.list {
 		err := processors.Close(processor)
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (p *group) String() string {
