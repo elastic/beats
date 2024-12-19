@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 	"github.com/stretchr/testify/require"
 )
 
@@ -217,17 +217,21 @@ func TestNetFlowIntegration(t *testing.T) {
 	conn, err := net.DialUDP("udp", nil, udpAddr)
 	require.NoError(t, err, "failed to open UDP connection")
 
-	// for more info look testdata/integration/test.md
-	f, err := pcap.OpenOffline("testdata/integration/test.pcap")
+	f, err := os.Open("testdata/integration/test.pcap")
 	require.NoError(t, err, "failed to open pcap file")
 	defer f.Close()
+
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
+
+	// for more info look testdata/integration/test.md
 	expectedEventsNumbers := 32
 
 	var totalBytes, totalPackets int
 	rateLimit := 3000
 	limiter := rate.NewLimiter(rate.Limit(rateLimit), rateLimit)
 
-	packetSource := gopacket.NewPacketSource(f, f.LinkType())
+	packetSource := gopacket.NewPacketSource(r, r.LinkType())
 	for pkt := range packetSource.Packets() {
 
 		if totalPackets%rateLimit == 0 {
