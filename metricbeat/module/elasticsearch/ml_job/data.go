@@ -43,6 +43,9 @@ var (
 		"model_size": c.Dict("model_size_stats", s.Schema{
 			"memory_status": c.Str("memory_status"),
 		}),
+		"model_size_stats": c.Dict("model_size_stats", s.Schema{
+			"model_bytes": c.Int("model_bytes"),
+		}),
 		"forecasts_stats": c.Dict("forecasts_stats", s.Schema{
 			"total": c.Int("total"),
 		}),
