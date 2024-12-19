@@ -374,55 +374,73 @@ type devUser struct {
 // See GetUserDetails for details of the query and rate limit parameters.
 func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, endpoint string, key string, all bool, omit Response, lim *RateLimiter, log *logp.Logger) ([]E, http.Header, error) {
 	url := u.String()
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	contentType := "application/json"
-	if omit != OmitNone {
-		contentType += "; " + omit.String()
-	}
-	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
+	retryCount := 0
+	const maxRetries = 5
 
-	err = lim.Wait(ctx, endpoint, u, log)
-	if err != nil {
-		return nil, nil, err
-	}
-	resp, err := cli.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-	err = lim.Update(endpoint, resp.Header, log)
-	if err != nil {
-		io.Copy(io.Discard, resp.Body)
-		return nil, nil, err
-	}
+	for {
+		if retryCount > maxRetries {
+			return nil, nil, fmt.Errorf("maximum retries (%d) finished without success", maxRetries)
+		}
+		if retryCount > 0 {
+			log.Warnw("retrying...", "retry", retryCount, "max", maxRetries)
+		}
 
-	var body bytes.Buffer
-	n, err := io.Copy(&body, resp.Body)
-	if n == 0 || err != nil {
-		return nil, nil, err
-	}
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return nil, nil, err
+		}
+		req.Header.Set("Accept", "application/json")
+		contentType := "application/json"
+		if omit != OmitNone {
+			contentType += "; " + omit.String()
+		}
+		req.Header.Set("Content-Type", contentType)
+		req.Header.Set("Authorization", fmt.Sprintf("SSWS %s", key))
 
-	if all {
-		// List all entities.
-		var e []E
-		err = json.Unmarshal(body.Bytes(), &e)
+		err = lim.Wait(ctx, endpoint, u, log)
+		if err != nil {
+			return nil, nil, err
+		}
+		resp, err := cli.Do(req)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer resp.Body.Close()
+		err = lim.Update(endpoint, resp.Header, log)
+		if err != nil {
+			io.Copy(io.Discard, resp.Body)
+			return nil, nil, err
+		}
+
+		if resp.StatusCode == http.StatusTooManyRequests {
+			log.Warnw("received 429 Too Many Requests")
+			retryCount++
+			continue
+		}
+
+		var body bytes.Buffer
+		n, err := io.Copy(&body, resp.Body)
+		if n == 0 || err != nil {
+			return nil, nil, err
+		}
+
+		if all {
+			// List all entities.
+			var e []E
+			err = json.Unmarshal(body.Bytes(), &e)
+			if err != nil {
+				err = recoverError(body.Bytes())
+			}
+			return e, resp.Header, err
+		}
+		// Get single entity's details.
+		var e [1]E
+		err = json.Unmarshal(body.Bytes(), &e[0])
 		if err != nil {
 			err = recoverError(body.Bytes())
 		}
-		return e, resp.Header, err
+		return e[:], resp.Header, err
 	}
-	// Get single entity's details.
-	var e [1]E
-	err = json.Unmarshal(body.Bytes(), &e[0])
-	if err != nil {
-		err = recoverError(body.Bytes())
-	}
-	return e[:], resp.Header, err
 }
 
 // recoverError returns an error based on the returned Okta API error. Error
