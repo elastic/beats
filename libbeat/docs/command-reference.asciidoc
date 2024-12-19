@@ -926,7 +926,7 @@ messages.
 *`-e, --e`*::
 Logs to stderr and disables syslog/file output.
 
-*`-environment`*::
+*`--environment`*::
 For logging purposes, specifies the environment that {beatname_uc} is running in.
 This setting is used to select a default log output when no log output is configured.
 Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`.
