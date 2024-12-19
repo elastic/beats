@@ -33,6 +33,7 @@ func TestRateLimiter(t *testing.T) {
 	})
 
 	t.Run("Update stops requests when none are remaining", func(t *testing.T) {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/42059")
 		const window = time.Minute
 		var fixedLimit *int = nil
 		r := NewRateLimiter(window, fixedLimit)
