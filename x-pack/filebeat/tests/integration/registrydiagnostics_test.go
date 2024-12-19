@@ -127,6 +127,7 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 					for {
 						header, err := tarReader.Next()
 						if errors.Is(err, io.EOF) {
+							t.Error("registry log file not found in tar archive")
 							return
 						}
 
@@ -136,8 +137,10 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 
 						validateLastRegistryEntry(t, tarReader, 100, logfile)
 						testDone <- struct{}{}
+						return
 					}
 				}
+				t.Error("diagnostics do not contain a valid registry")
 			},
 		}
 	}
@@ -164,9 +167,8 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 		return &checkinExpected
 	}
 
-	server.Port = 3000
 	if err := server.Start(); err != nil {
-		t.Error(err)
+		t.Fatalf("cannot start gRPC server: %s", err)
 	}
 
 	filebeat.Start(

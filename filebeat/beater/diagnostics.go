@@ -26,6 +26,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -120,11 +121,15 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 			return prevErr
 		}
 
+		pathInTar := filepath.Join(baseDir, strings.TrimPrefix(path, src))
+		if !matchRegistyFiles(pathInTar) {
+			return nil
+		}
 		header, err := tar.FileInfoHeader(info, info.Name())
 		if err != nil {
 			return fmt.Errorf("cannot create tar info header: '%w'", err)
 		}
-		header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, src))
+		header.Name = pathInTar
 
 		if err := tarWriter.WriteHeader(header); err != nil {
 			return fmt.Errorf("cannot write tar header for '%s': '%w'", path, err)
@@ -147,4 +152,24 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 
 		return nil
 	})
+}
+
+// We use regexps here because globs do not support specifying a character
+// range like we do in the checkpoint file
+var registryFileRegExps = []*regexp.Regexp{
+	regexp.MustCompile(filepath.Join([]string{"^registry$"}...)),
+	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat$"}...)),
+	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "meta\\.json$"}...)),
+	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "log\\.json$"}...)),
+	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "active\\.dat$"}...)),
+	regexp.MustCompile(filepath.Join([]string{"^registry", "filebeat", "[[:digit:]]*\\.json$"}...)),
+}
+
+func matchRegistyFiles(path string) bool {
+	for _, regExp := range registryFileRegExps {
+		if regExp.MatchString(path) {
+			return true
+		}
+	}
+	return false
 }

@@ -159,19 +159,6 @@ func (r *runner) Stop() {
 	r.statusReporter = nil
 }
 
-// func (r *runner) Diagnostics() []diagnostics.DiagnosticSetup {
-// 	fmt.Println("================================================== Diagnostics called!")
-// 	setup := diagnostics.DiagnosticSetup{
-// 		Name:        "registry collector",
-// 		Description: "Collect Filebeat's registry",
-// 		Filename:    "registry.tar.gz",
-// 		ContentType: "application/octet-stream",
-// 		Callback:    getRegistry,
-// 	}
-
-// 	return []diagnostics.DiagnosticSetup{setup}
-// }
-
 func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`
