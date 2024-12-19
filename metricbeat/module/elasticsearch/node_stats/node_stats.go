@@ -35,8 +35,10 @@ func init() {
 }
 
 const (
-	nodeLocalStatsPath = "/_nodes/_local/stats"
-	nodesAllStatsPath  = "/_nodes/_all/stats"
+	nodeLocalStatsPath   = "/_nodes/_local/stats"
+	nodesAllStatsPath    = "/_nodes/_all/stats"
+	metricsToGather      = "jvm,indices,fs,os,process,thread_pool,indexing_pressure,ingest"
+	indexMetricsToGather = "bulk,docs,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -94,6 +96,7 @@ func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
 	if scope == elasticsearch.ScopeCluster {
 		u.Path = nodesAllStatsPath
 	}
+	u.Path += "/" + metricsToGather + "/" + indexMetricsToGather
 
 	return u.String(), nil
 }
