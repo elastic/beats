@@ -249,3 +249,53 @@ func TestCustomFields(t *testing.T) {
 	assert.Contains(t, flows[0].Fields, "customField")
 	assert.Equal(t, flows[0].Fields["customField"], "Hello :)")
 }
+
+func TestSharedTemplates(t *testing.T) {
+	templateAddr := test.MakeAddress(t, "127.0.0.1:12345")
+	flowsAddr := test.MakeAddress(t, "127.0.0.2:21234")
+	templatePacket := []uint16{
+		// Header
+		// Version, Count, Uptime, Ts, SeqNo, Source
+		9, 1, 11, 11, 22, 22, 33, 33, 0, 1234,
+		// Set #1 (template)
+		0, 20, /*len of set*/
+		999, 3, /*len*/
+		1, 4, // Fields
+		2, 4,
+		3, 4,
+	}
+	flowsPacket := []uint16{
+		// Header
+		// Version, Count, Uptime, Ts, SeqNo, Source
+		9, 1, 11, 11, 22, 22, 33, 34, 0, 1234,
+		// Set #1 (template)
+		999, 16, /*len of set*/
+		1, 1,
+		2, 2,
+		3, 3,
+	}
+
+	t.Run("Template sharing enabled", func(t *testing.T) {
+		cfg := config.Defaults()
+		cfg.WithSharedTemplates(true)
+		proto := New(cfg)
+		flows, err := proto.OnPacket(test.MakePacket(templatePacket), templateAddr)
+		assert.NoError(t, err)
+		assert.Empty(t, flows)
+		flows, err = proto.OnPacket(test.MakePacket(flowsPacket), flowsAddr)
+		assert.NoError(t, err)
+		assert.Len(t, flows, 1)
+	})
+
+	t.Run("Template sharing disabled", func(t *testing.T) {
+		cfg := config.Defaults()
+		cfg.WithSharedTemplates(false)
+		proto := New(cfg)
+		flows, err := proto.OnPacket(test.MakePacket(templatePacket), templateAddr)
+		assert.NoError(t, err)
+		assert.Empty(t, flows)
+		flows, err = proto.OnPacket(test.MakePacket(flowsPacket), flowsAddr)
+		assert.NoError(t, err)
+		assert.Empty(t, flows)
+	})
+}
