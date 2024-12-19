@@ -37,15 +37,26 @@ the message doesn't return to the queue before processing is complete.
 If an error occurs during the processing of the S3 object, the processing will
 be stopped, and the SQS message will be returned to the queue for reprocessing.
 
+[float]
+=== Configuration Examples
+
+[float]
+==== SQS with JSON files
+
+This example reads s3:ObjectCreated notifications from SQS, and assumes that
+all the S3 objects have a `Content-Type` of `application/json`.
+It splits the `Records` array in the JSON into separate events.
+
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: aws-s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  credential_profile_name: elastic-beats
   expand_event_list_from_field: Records
 ----
 
+[float]
+==== S3 bucket listing
 
 When using the direct polling list of S3 objects in an S3 buckets,
 a number of workers that will process the S3 objects listed must be set
@@ -63,6 +74,9 @@ Listing of the S3 bucket will be polled according the time interval defined by
   credential_profile_name: elastic-beats
   expand_event_list_from_field: Records
 ----
+
+[float]
+==== S3-compatible services
 
 The `aws-s3` input can also poll third party S3-compatible services such as the
 Minio. Using non-AWS S3 compatible buckets requires the use of
