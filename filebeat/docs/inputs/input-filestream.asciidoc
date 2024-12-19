@@ -165,7 +165,7 @@ include::../inputs/input-filestream-reader-options.asciidoc[]
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to
-observe the activity of the input.
+observe the activity of the input. Note that metrics from processors are not included.
 
 [options="header"]
 |=======
