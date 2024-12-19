@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -829,4 +831,222 @@ func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
 
 	_, err = w.Write(infoBytes)
 	require.NoError(t, err, "failed to write connection information")
+}
+
+// Response structure for JSON
+type response struct {
+	Message string `json:"message"`
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	response := response{Message: "Hello"}
+	json.NewEncoder(w).Encode(response)
+}
+
+func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T) {
+	// First things first, ensure ES is running and we can connect to it.
+	// If ES is not running, the test will timeout and the only way to know
+	// what caused it is going through Filebeat's logs.
+	integration.EnsureESIsRunning(t)
+
+	// Create a test httpjson server for httpjson input
+	tserv := httptest.NewServer(http.HandlerFunc(helloHandler))
+	defer tserv.Close()
+
+	filebeat := NewFilebeat(t, `AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES="httpjson,cel"`)
+
+	var units = [][]*proto.UnitExpected{
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "default",
+					Type: "elasticsearch",
+					Name: "elasticsearch",
+					Source: integration.RequireNewStruct(t,
+						map[string]interface{}{
+							"type":                 "elasticsearch",
+							"hosts":                []interface{}{"http://localhost:9200"},
+							"username":             "admin",
+							"password":             "testing",
+							"protocol":             "http",
+							"enabled":              true,
+							"allow_older_versions": true,
+						}),
+				},
+			},
+			{
+				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+					Type: "httpjson",
+					Name: "httpjson-1",
+					Streams: []*proto.Stream{
+						{
+							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
+								"enabled":        true,
+								"type":           "httpjson",
+								"interval":       "1m",
+								"request.url":    tserv.URL,
+								"request.method": "GET",
+								"cursor": map[string]any{
+									"published": map[string]any{
+										"value": "[[.last_event.published]]",
+									},
+								},
+							}),
+						},
+					},
+				},
+			},
+		},
+		{
+			{
+				Id:             "output-unit",
+				Type:           proto.UnitType_OUTPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "default",
+					Type: "elasticsearch",
+					Name: "elasticsearch",
+					Source: integration.RequireNewStruct(t,
+						map[string]interface{}{
+							"type":                 "elasticsearch",
+							"hosts":                []interface{}{"server.URL"},
+							"username":             "admin",
+							"password":             "testing",
+							"protocol":             "http",
+							"enabled":              true,
+							"allow_older_versions": true,
+						}),
+				},
+			},
+			{
+				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
+				Type:           proto.UnitType_INPUT,
+				ConfigStateIdx: 1,
+				State:          proto.State_HEALTHY,
+				LogLevel:       proto.UnitLogLevel_DEBUG,
+				Config: &proto.UnitExpectedConfig{
+					Id:   "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
+					Type: "httpjson",
+					Name: "httpjson-2",
+					Streams: []*proto.Stream{
+						{
+							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
+							Source: integration.RequireNewStruct(t, map[string]interface{}{
+								"enabled":        true,
+								"type":           "httpjson",
+								"interval":       "1m",
+								"request.url":    tserv.URL,
+								"request.method": "GET",
+								"cursor": map[string]any{
+									"published": map[string]any{
+										"value": "[[.last_event.published]]",
+									},
+								},
+							}),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	idx := 0
+	waiting := false
+	when := time.Now()
+
+	var mx sync.Mutex
+	final := false
+
+	nextState := func() {
+		if waiting {
+			if time.Now().After(when) {
+				idx = (idx + 1) % len(units)
+				waiting = false
+				return
+			}
+			return
+		}
+		waiting = true
+		when = time.Now().Add(10 * time.Second)
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if len(observed.Units) == 0 {
+				fmt.Println("Zero units")
+			} else {
+				for i, u := range observed.Units {
+					fmt.Printf("Unit [%d]: %s\n", i, u.String())
+				}
+			}
+			if management.DoesStateMatch(observed, units[idx], 0) {
+				if idx < len(units)-1 {
+					nextState()
+				} else {
+					mx.Lock()
+					final = true
+					mx.Unlock()
+				}
+			}
+			for _, unit := range observed.GetUnits() {
+				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
+					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+				}
+			}
+			return &proto.CheckinExpected{
+				Units: units[idx],
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	require.NoError(t, server.Start())
+	t.Cleanup(server.Stop)
+
+	filebeat.Start(
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+	)
+
+	// waitDeadlineOr5Mins looks at the test deadline
+	// and returns a reasonable value of waiting for a
+	// condition to be met. The possible values are:
+	// - if no test deadline is set, return 5 minutes
+	// - if a deadline is set and there is less than
+	//   0.5 second left, return the time left
+	// - otherwise return the time left minus 0.5 second.
+	waitDeadlineOr5Min := func() time.Duration {
+		deadline, deadileSet := t.Deadline()
+		if deadileSet {
+			left := time.Until(deadline)
+			final := left - 500*time.Millisecond
+			if final <= 0 {
+				return left
+			}
+			return final
+		}
+		return 5 * time.Minute
+	}
+
+	require.Eventually(t, func() bool {
+		mx.Lock()
+		defer mx.Unlock()
+		return final
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+		"Failed to reach the final state")
 }
