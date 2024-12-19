@@ -46,13 +46,14 @@ type asyncClient struct {
 }
 
 type msgRef struct {
-	client    *asyncClient
-	count     atomic.Uint32
-	batch     publisher.Batch
-	slice     []publisher.Event
-	err       error
-	win       *window
-	batchSize int
+	client           *asyncClient
+	count            atomic.Uint32
+	batch            publisher.Batch
+	slice            []publisher.Event
+	err              error
+	win              *window
+	batchSize        int
+	deadlockListener *deadlockListener
 }
 
 func newAsyncClient(
@@ -146,12 +147,13 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ref := &msgRef{
-		client:    c,
-		batch:     batch,
-		slice:     events,
-		batchSize: len(events),
-		win:       c.win,
-		err:       nil,
+		client:           c,
+		batch:            batch,
+		slice:            events,
+		batchSize:        len(events),
+		win:              c.win,
+		err:              nil,
+		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
 	}
 	ref.count.Store(1)
 	defer ref.dec()
@@ -229,34 +231,21 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 	return client
 }
 
-func (r *msgRef) callback(seq uint32, err error) {
-	if err != nil {
-		r.fail(seq, err)
-	} else {
-		r.done(seq)
-	}
-}
-
-func (r *msgRef) done(n uint32) {
+func (r *msgRef) callback(n uint32, err error) {
 	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
-	if r.win != nil {
-		r.win.tryGrowWindow(r.batchSize)
-	}
-	r.dec()
-}
-
-func (r *msgRef) fail(n uint32, err error) {
+	r.deadlockListener.ack(int(n))
 	if r.err == nil {
 		r.err = err
 	}
-	r.slice = r.slice[n:]
+	// If publishing is windowed, update the window size.
 	if r.win != nil {
-		r.win.shrinkWindow()
+		if err != nil {
+			r.win.shrinkWindow()
+		} else {
+			r.win.tryGrowWindow(r.batchSize)
+		}
 	}
-
-	r.client.observer.AckedEvents(int(n))
-
 	r.dec()
 }
 
@@ -265,6 +254,8 @@ func (r *msgRef) dec() {
 	if i > 0 {
 		return
 	}
+
+	r.deadlockListener.close()
 
 	if L := len(r.slice); L > 0 {
 		r.client.observer.RetryableErrors(L)
