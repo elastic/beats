@@ -50,6 +50,8 @@ type terraformOutputData struct {
 	QueueURL         string `yaml:"queue_url"`
 	BucketNameForSNS string `yaml:"bucket_name_for_sns"`
 	QueueURLForSNS   string `yaml:"queue_url_for_sns"`
+	BucketNameForEB  string `yaml:"bucket_name_for_eventbridge"`
+	QueueURLForEB    string `yaml:"queue_url_for_eventbridge"`
 }
 
 func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
@@ -255,16 +257,16 @@ func TestInputRunSQSOnLocalstack(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
-	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
-	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 8)
-	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0x13))
-	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
-	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
+	assert.EqualValues(t, 8, s3Input.metrics.sqsMessagesReceivedTotal.Get()) // S3 could batch notifications.
+	assert.EqualValues(t, 0, s3Input.metrics.sqsMessagesInflight.Get())
+	assert.EqualValues(t, 7, s3Input.metrics.sqsMessagesDeletedTotal.Get())
+	assert.EqualValues(t, 1, s3Input.metrics.sqsMessagesReturnedTotal.Get()) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, 0, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get())
+	assert.EqualValues(t, 0, s3Input.metrics.s3ObjectsInflight.Get())
+	assert.EqualValues(t, 8, s3Input.metrics.s3ObjectsRequestedTotal.Get())
+	assert.EqualValues(t, uint64(0x13), s3Input.metrics.s3EventsCreatedTotal.Get())
+	assert.Greater(t, 0.0, s3Input.metrics.sqsLagTime.Mean())
+	assert.EqualValues(t, 0.0, s3Input.metrics.sqsWorkerUtilization.Get()) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
 func TestInputRunSQSWithConfig(t *testing.T) {
@@ -474,16 +476,16 @@ func TestInputRunSQS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesInflight.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesDeletedTotal.Get(), 7)
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assert.EqualValues(t, sqsInput.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.s3ObjectsRequestedTotal.Get(), 7)
-	assert.EqualValues(t, sqsInput.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.EqualValues(t, 8, sqsInput.metrics.sqsMessagesReceivedTotal.Get()) // S3 could batch notifications.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsMessagesInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.sqsMessagesDeletedTotal.Get())
+	assert.EqualValues(t, 1, sqsInput.metrics.sqsMessagesReturnedTotal.Get()) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsVisibilityTimeoutExtensionsTotal.Get())
+	assert.EqualValues(t, 0, sqsInput.metrics.s3ObjectsInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.s3ObjectsRequestedTotal.Get())
+	assert.EqualValues(t, 12, sqsInput.metrics.s3EventsCreatedTotal.Get())
 	assert.Greater(t, sqsInput.metrics.sqsLagTime.Mean(), 0.0)
-	assert.EqualValues(t, sqsInput.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
+	assert.EqualValues(t, 0.0, sqsInput.metrics.sqsWorkerUtilization.Get()) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
 func TestInputRunS3(t *testing.T) {
@@ -522,12 +524,12 @@ func TestInputRunS3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsListedTotal.Get(), 8)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsProcessedTotal.Get(), 7)
-	assert.EqualValues(t, s3Input.metrics.s3ObjectsAckedTotal.Get(), 7)
-	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.EqualValues(t, 0, s3Input.metrics.s3ObjectsInflight.Get())
+	assert.EqualValues(t, 7, s3Input.metrics.s3ObjectsRequestedTotal.Get())
+	assert.EqualValues(t, 8, s3Input.metrics.s3ObjectsListedTotal.Get())
+	assert.EqualValues(t, 7, s3Input.metrics.s3ObjectsProcessedTotal.Get())
+	assert.EqualValues(t, 7, s3Input.metrics.s3ObjectsAckedTotal.Get())
+	assert.EqualValues(t, 12, s3Input.metrics.s3EventsCreatedTotal.Get())
 }
 
 func uploadS3TestFiles(t *testing.T, region, bucket string, s3Client *s3.Client, filenames ...string) {
@@ -784,14 +786,65 @@ func TestInputRunSNS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesInflight.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesDeletedTotal.Get(), 7)
-	assert.EqualValues(t, sqsInput.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assert.EqualValues(t, sqsInput.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.s3ObjectsInflight.Get(), 0)
-	assert.EqualValues(t, sqsInput.metrics.s3ObjectsRequestedTotal.Get(), 7)
-	assert.EqualValues(t, sqsInput.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.EqualValues(t, 8, sqsInput.metrics.sqsMessagesReceivedTotal.Get()) // S3 could batch notifications.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsMessagesInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.sqsMessagesDeletedTotal.Get())
+	assert.EqualValues(t, 1, sqsInput.metrics.sqsMessagesReturnedTotal.Get()) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsVisibilityTimeoutExtensionsTotal.Get())
+	assert.EqualValues(t, 0, sqsInput.metrics.s3ObjectsInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.s3ObjectsRequestedTotal.Get())
+	assert.EqualValues(t, 12, sqsInput.metrics.s3EventsCreatedTotal.Get())
 	assert.Greater(t, sqsInput.metrics.sqsLagTime.Mean(), 0.0)
-	assert.EqualValues(t, sqsInput.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
+	assert.EqualValues(t, 0.0, sqsInput.metrics.sqsWorkerUtilization.Get()) // Workers are reset after processing and hence utilization should be 0 at the end
+}
+
+func TestInputRunEventbridgeSQS(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to set up S3 and SQS and must be executed manually.
+	tfConfig := getTerraformOutputs(t, false)
+	awsCfg := makeAWSConfig(t, tfConfig.AWSRegion)
+
+	// Ensure SQS is empty before testing.
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.BucketNameForEB, awsCfg)
+
+	s3Client := s3.NewFromConfig(awsCfg)
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForEB, s3Client,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
+	sqsInput := createSQSInput(t, makeTestConfigSQS(tfConfig.QueueURLForEB))
+
+	inputCtx, cancel := newV2Context()
+	t.Cleanup(cancel)
+	time.AfterFunc(15*time.Second, func() {
+		cancel()
+	})
+
+	var errGroup errgroup.Group
+	errGroup.Go(func() error {
+		return sqsInput.Run(inputCtx, &fakePipeline{})
+	})
+
+	if err := errGroup.Wait(); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, 8, sqsInput.metrics.sqsMessagesReceivedTotal.Get()) // S3 could batch notifications.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsMessagesInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.sqsMessagesDeletedTotal.Get())
+	assert.EqualValues(t, 1, sqsInput.metrics.sqsMessagesReturnedTotal.Get()) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, 0, sqsInput.metrics.sqsVisibilityTimeoutExtensionsTotal.Get())
+	assert.EqualValues(t, 0, sqsInput.metrics.s3ObjectsInflight.Get())
+	assert.EqualValues(t, 7, sqsInput.metrics.s3ObjectsRequestedTotal.Get())
+	assert.EqualValues(t, 12, sqsInput.metrics.s3EventsCreatedTotal.Get())
+	assert.Greater(t, sqsInput.metrics.sqsLagTime.Mean(), 0.0)
+	assert.EqualValues(t, 0.0, sqsInput.metrics.sqsWorkerUtilization.Get()) // Workers are reset after processing and hence utilization should be 0 at the end
 }
