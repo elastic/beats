@@ -1079,6 +1079,9 @@ Will produce the following output:
 
 |===
 
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
 [float]
 === Metrics
 
@@ -1107,8 +1110,5 @@ observe the activity of the input.
 | `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).
 | `s3_object_processing_time`               | Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
 |=======
-
-[id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 :type!:
