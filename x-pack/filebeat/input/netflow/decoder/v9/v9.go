@@ -43,12 +43,25 @@ func New(config config.Config) protocol.Protocol {
 }
 
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
+<<<<<<< HEAD
 	return &NetflowV9Protocol{
 		decoder:     decoder,
 		Session:     NewSessionMap(logger),
 		logger:      logger,
 		timeout:     config.ExpirationTimeout(),
 		detectReset: config.SequenceResetEnabled(),
+=======
+	ctx, cancel := context.WithCancel(context.Background())
+	pd := &NetflowV9Protocol{
+		ctx:            ctx,
+		cancel:         cancel,
+		decoder:        decoder,
+		logger:         logger,
+		Session:        NewSessionMap(logger, config.ActiveSessionsMetric()),
+		timeout:        config.ExpirationTimeout(),
+		detectReset:    config.SequenceResetEnabled(),
+		shareTemplates: config.ShareTemplatesEnabled(),
+>>>>>>> 323c69eb7 ([filebeat][netflow]: fix template sharing (#42079))
 	}
 }
 

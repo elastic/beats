@@ -102,6 +102,11 @@ func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
 }
 
+// ShareTemplatesEnabled returns if template sharing is enabled.
+func (c *Config) ShareTemplatesEnabled() bool {
+	return c.sharedTemplates
+}
+
 // Fields returns the configured fields.
 func (c *Config) Fields() fields.FieldDict {
 	if c.fields == nil {
