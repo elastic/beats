@@ -785,6 +785,13 @@ https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html[subscriber
 to the SNS topic].
 
 [float]
+=== S3 -> EventBridge -> SQS setup
+Amazon S3 can alternatively https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html[send events to EventBridge],
+which can then be used to route these events to SQS. While the S3 input will
+filter for 'Object Created' events it's more efficient to configure EventBridge
+to only forward the 'Object Created' events.
+
+[float]
 === Parallel Processing
 
 When using the SQS notifications method, multiple {beatname_uc} instances can
