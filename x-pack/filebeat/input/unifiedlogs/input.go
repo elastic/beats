@@ -66,7 +66,7 @@ type source struct {
 }
 
 func newSource(config config) source {
-	if config.ArchiveFile != "" || config.TraceFile != "" {
+	if config.ShowConfig.ArchiveFile != "" || config.ShowConfig.TraceFile != "" {
 		return source{name: srcArchiveName}
 	}
 	return source{name: srcPollName}
@@ -116,7 +116,7 @@ func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor in
 		return err
 	}
 	if startFrom != "" {
-		input.Start = startFrom
+		input.ShowConfig.Start = startFrom
 	}
 
 	return input.runWithMetrics(stdCtx, pub, log)
@@ -135,7 +135,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 	// backfilling process.
 	if input.mustStream() {
 		g.Go(func() error {
-			logCmd := newLogStreamCmd(ctx, input.commonConfig)
+			logCmd := newLogStreamCmd(ctx, input.CommonConfig)
 			return input.runLogCmd(ctx, logCmd, wrappedPub, log)
 		})
 	}
@@ -149,7 +149,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 				// To avoid potentially losing data we move the end forward one second,
 				// since it is preferable to have some duplicated events.
 				t = t.Add(time.Second)
-				input.End = t.Format(cursorDateLayout)
+				input.ShowConfig.End = t.Format(cursorDateLayout)
 
 				// to avoid race conditions updating the cursor, and to be able to
 				// resume from the oldest point in time, we only update cursor
@@ -171,14 +171,14 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 // mustStream returns true in case a stream command is needed.
 // This is the default case and the only exceptions are when an archive file or an end date are set.
 func (input *input) mustStream() bool {
-	return !(input.ArchiveFile != "" || input.TraceFile != "" || input.End != "")
+	return !(input.ShowConfig.ArchiveFile != "" || input.ShowConfig.TraceFile != "" || input.ShowConfig.End != "")
 }
 
 // mustBackfill returns true in case a show command is needed.
 // This happens when start or end dates are set (for example when resuming filebeat), when an archive file is used,
 // or when user forces it via the backfill config.
 func (input *input) mustBackfill() bool {
-	return input.Backfill || input.ArchiveFile != "" || input.TraceFile != "" || input.Start != "" || input.End != ""
+	return input.Backfill || input.ShowConfig.ArchiveFile != "" || input.ShowConfig.TraceFile != "" || input.ShowConfig.Start != "" || input.ShowConfig.End != ""
 }
 
 func (input *input) runLogCmd(ctx context.Context, logCmd *exec.Cmd, pub inputcursor.Publisher, log *logp.Logger) error {
@@ -318,53 +318,53 @@ func newLogShowCmd(ctx context.Context, cfg config) *exec.Cmd {
 }
 
 func newLogStreamCmd(ctx context.Context, cfg commonConfig) *exec.Cmd {
-	return exec.CommandContext(ctx, "log", newLogCmdArgs("stream", config{commonConfig: cfg})...) // #nosec G204
+	return exec.CommandContext(ctx, "log", newLogCmdArgs("stream", config{CommonConfig: cfg})...) // #nosec G204
 }
 
 func newLogCmdArgs(subcmd string, config config) []string {
 	args := []string{subcmd, "--style", "ndjson"}
-	if config.ArchiveFile != "" {
-		args = append(args, "--archive", config.ArchiveFile)
+	if config.ShowConfig.ArchiveFile != "" {
+		args = append(args, "--archive", config.ShowConfig.ArchiveFile)
 	}
-	if config.TraceFile != "" {
-		args = append(args, "--file", config.TraceFile)
+	if config.ShowConfig.TraceFile != "" {
+		args = append(args, "--file", config.ShowConfig.TraceFile)
 	}
-	if len(config.Predicate) > 0 {
-		for _, p := range config.Predicate {
+	if len(config.CommonConfig.Predicate) > 0 {
+		for _, p := range config.CommonConfig.Predicate {
 			args = append(args, "--predicate", p)
 		}
 	}
-	if len(config.Process) > 0 {
-		for _, p := range config.Process {
+	if len(config.CommonConfig.Process) > 0 {
+		for _, p := range config.CommonConfig.Process {
 			args = append(args, "--process", p)
 		}
 	}
-	if config.Source {
+	if config.CommonConfig.Source {
 		args = append(args, "--source")
 	}
-	if config.Info {
+	if config.CommonConfig.Info {
 		args = append(args, "--info")
 	}
-	if config.Debug {
+	if config.CommonConfig.Debug {
 		args = append(args, "--debug")
 	}
-	if config.Backtrace {
+	if config.CommonConfig.Backtrace {
 		args = append(args, "--backtrace")
 	}
-	if config.Signpost {
+	if config.CommonConfig.Signpost {
 		args = append(args, "--signpost")
 	}
-	if config.Unreliable {
+	if config.CommonConfig.Unreliable {
 		args = append(args, "--unreliable")
 	}
-	if config.MachContinuousTime {
+	if config.CommonConfig.MachContinuousTime {
 		args = append(args, "--mach-continuous-time")
 	}
-	if config.Start != "" {
-		args = append(args, "--start", config.Start)
+	if config.ShowConfig.Start != "" {
+		args = append(args, "--start", config.ShowConfig.Start)
 	}
-	if config.End != "" {
-		args = append(args, "--end", config.End)
+	if config.ShowConfig.End != "" {
+		args = append(args, "--end", config.ShowConfig.End)
 	}
 	return args
 }
