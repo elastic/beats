@@ -18,10 +18,9 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -148,14 +147,14 @@ func (procs *Processors) All() []beat.Processor {
 }
 
 func (procs *Processors) Close() error {
-	var errs multierror.Errors
+	var errs []error
 	for _, p := range procs.List {
 		err := Close(p)
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Run executes the all processors serially and returns the event and possibly

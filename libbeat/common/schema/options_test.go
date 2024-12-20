@@ -22,7 +22,6 @@ import (
 
 	"errors"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,19 +31,19 @@ func TestApplyOptions(t *testing.T) {
 	cases := []struct {
 		Description string
 		Options     []ApplyOption
-		Errors      multierror.Errors
+		Errors      []error
 		ExpectError bool
 	}{
 		{
 			"all fields required, no error",
 			[]ApplyOption{AllRequired},
-			multierror.Errors{},
+			nil,
 			false,
 		},
 		{
 			"all fields required, an error",
 			[]ApplyOption{AllRequired},
-			multierror.Errors{
+			[]error{
 				NewKeyNotFoundError("foo"),
 			},
 			true,
@@ -52,7 +51,7 @@ func TestApplyOptions(t *testing.T) {
 		{
 			"all fields required, some other error, it should fail",
 			[]ApplyOption{AllRequired},
-			multierror.Errors{
+			[]error{
 				errors.New("something bad happened"),
 			},
 			true,
@@ -60,7 +59,7 @@ func TestApplyOptions(t *testing.T) {
 		{
 			"all fields required, an error, collecting missing keys doesn't alter result",
 			[]ApplyOption{NotFoundKeys(func([]string) {}), AllRequired},
-			multierror.Errors{
+			[]error{
 				NewKeyNotFoundError("foo"),
 			},
 			true,
@@ -68,7 +67,7 @@ func TestApplyOptions(t *testing.T) {
 		{
 			"fail on required, an error, not required",
 			[]ApplyOption{FailOnRequired},
-			multierror.Errors{
+			[]error{
 				&KeyNotFoundError{errorKey: errorKey{"foo"}, Required: false},
 			},
 			false,
@@ -76,7 +75,7 @@ func TestApplyOptions(t *testing.T) {
 		{
 			"fail on required, an error, required",
 			[]ApplyOption{FailOnRequired},
-			multierror.Errors{
+			[]error{
 				&KeyNotFoundError{errorKey: errorKey{"foo"}, Required: true},
 			},
 			true,
@@ -84,7 +83,7 @@ func TestApplyOptions(t *testing.T) {
 		{
 			"fail on required, some other error, it should fail",
 			[]ApplyOption{FailOnRequired},
-			multierror.Errors{
+			[]error{
 				errors.New("something bad happened"),
 			},
 			true,
@@ -98,9 +97,9 @@ func TestApplyOptions(t *testing.T) {
 			event, errors = opt(event, errors)
 		}
 		if c.ExpectError {
-			assert.Error(t, errors.Err(), c.Description)
+			assert.NotEmpty(t, errors, c.Description)
 		} else {
-			assert.NoError(t, errors.Err(), c.Description)
+			assert.Empty(t, errors, c.Description)
 		}
 	}
 }
@@ -108,31 +107,31 @@ func TestApplyOptions(t *testing.T) {
 func TestNotFoundKeys(t *testing.T) {
 	cases := []struct {
 		Description string
-		Errors      multierror.Errors
+		Errors      []error
 		Expected    []string
 	}{
 		{
 			"empty errors, no key",
-			multierror.Errors{},
+			nil,
 			[]string{},
 		},
 		{
 			"key not found error",
-			multierror.Errors{
+			[]error{
 				NewKeyNotFoundError("foo"),
 			},
 			[]string{"foo"},
 		},
 		{
 			"only another error, so no key",
-			multierror.Errors{
+			[]error{
 				NewWrongFormatError("foo", ""),
 			},
 			[]string{},
 		},
 		{
 			"two errors, only one is key not found",
-			multierror.Errors{
+			[]error{
 				NewKeyNotFoundError("foo"),
 				NewWrongFormatError("bar", ""),
 			},

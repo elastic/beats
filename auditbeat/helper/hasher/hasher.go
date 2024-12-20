@@ -23,6 +23,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -31,7 +32,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
-	"github.com/joeshaw/multierror"
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/time/rate"
@@ -137,7 +137,7 @@ type Config struct {
 
 // Validate validates the config.
 func (c *Config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	for _, ht := range c.HashTypes {
 		if !ht.IsValid() {
@@ -159,7 +159,7 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // FileHasher hashes the contents of files.
