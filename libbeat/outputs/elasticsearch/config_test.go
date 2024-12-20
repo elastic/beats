@@ -120,7 +120,7 @@ compression_level: 0
 	assert.Equal(t, 0, elasticsearchOutputConfig.CompressionLevel, "Explicit compression level should override defaults")
 }
 
-func readConfig(cfg *conf.C) (*elasticsearchConfig, error) {
+func readConfig(cfg *conf.C) (*ElasticsearchConfig, error) {
 	c := defaultConfig
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

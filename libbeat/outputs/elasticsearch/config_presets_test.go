@@ -44,7 +44,7 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
-	esConfig := elasticsearchConfig{}
+	esConfig := ElasticsearchConfig{}
 	err = cfg.Unpack(&esConfig)
 	require.NoError(t, err, "Config should unpack successfully")
 
@@ -113,7 +113,7 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 
 	// Unpack the final config into elasticsearchConfig and verify that user
 	// fields were overridden
-	esConfig := elasticsearchConfig{}
+	esConfig := ElasticsearchConfig{}
 	err = cfg.Unpack(&esConfig)
 	require.NoError(t, err, "Valid config tree must unpack successfully")
 
@@ -167,7 +167,7 @@ func TestApplyPresetCustom(t *testing.T) {
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
-	esConfig := elasticsearchConfig{}
+	esConfig := ElasticsearchConfig{}
 	err = cfg.Unpack(&esConfig)
 	require.NoError(t, err, "Config should unpack successfully")
 
