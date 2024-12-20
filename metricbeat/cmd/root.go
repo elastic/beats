@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -59,7 +58,6 @@ func MetricbeatSettings(moduleNameSpace string) instance.Settings {
 	}
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("system.hostfs")
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,

@@ -563,9 +563,9 @@ class Test(metricbeat.BaseTest):
         output = self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["system.process.cmdline"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(

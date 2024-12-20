@@ -93,6 +93,6 @@ Using the yml file, you can export all the dashboards for a single module or for
 [source,shell]
 ----
 cd metricbeat/module/system
-go run ../../../dev-tools/cmd/dashboards/export_dashboards.go -yml module.yml
+go run ../../../dev-tools/cmd/dashboards/export_dashboards.go --yml module.yml
 ----
 

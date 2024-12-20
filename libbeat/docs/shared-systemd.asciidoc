@@ -67,7 +67,7 @@ override to change the default options.
 | Variable | Description | Default value
 | BEAT_LOG_OPTS | Log options |
 | BEAT_CONFIG_OPTS | Flags for configuration file path | +-c /etc/{beatname_lc}/{beatname_lc}.yml+
-| BEAT_PATH_OPTS | Other paths | +-path.home /usr/share/{beatname_lc} -path.config /etc/{beatname_lc} -path.data /var/lib/{beatname_lc} -path.logs /var/log/{beatname_lc}+
+| BEAT_PATH_OPTS | Other paths | +--path.home /usr/share/{beatname_lc} --path.config /etc/{beatname_lc} --path.data /var/lib/{beatname_lc} --path.logs /var/log/{beatname_lc}+
 |=======================================
 
 NOTE: You can use `BEAT_LOG_OPTS` to set debug selectors for logging. However,

@@ -95,7 +95,6 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 		// Set the configuration file path flag so the beat can read it
 		cfgfile.Initialize()
 		_ = flag.Set("c", "testdata/mockbeat.yml")
-		cfgfile.AddAllowedBackwardsCompatibleFlag("c")
 		_ = instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
 			return &mockBeat, nil
 		})

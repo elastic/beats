@@ -70,13 +70,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
         cmd = os.path.join(self.beat_path, "winlogbeat.test")
         args = [
-            cmd, "-systemTest",
+            cmd, "--systemTest",
             "-c", os.path.join(self.working_dir, config),
         ]
 
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
