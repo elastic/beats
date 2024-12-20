@@ -117,7 +117,8 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 	p.eventCallback = eventCallback
 	log = log.With(
 		"bucket_arn", p.s3Obj.S3.Bucket.Name,
-		"object_key", p.s3Obj.S3.Object.Key)
+		"object_key", p.s3Obj.S3.Object.Key,
+		"last_modified", p.s3Obj.S3.Object.LastModified)
 
 	// Metrics and Logging
 	log.Debug("Begin S3 object processing.")
@@ -454,7 +455,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 	}
 	if offset >= 0 {
 		event.Fields.Put("log.offset", offset)
-		event.SetID(objectID(p.s3ObjHash, offset))
+		event.SetID(objectID(p.s3Obj.S3.Object.LastModified, p.s3ObjHash, offset))
 	}
 
 	if len(p.s3Metadata) > 0 {
@@ -484,8 +485,8 @@ func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	return nil
 }
 
-func objectID(objectHash string, offset int64) string {
-	return fmt.Sprintf("%s-%012d", objectHash, offset)
+func objectID(lastModified time.Time, objectHash string, offset int64) string {
+	return fmt.Sprintf("%d-%s-%012d", lastModified.UnixNano(), objectHash, offset)
 }
 
 // s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
