@@ -7,13 +7,6 @@
 sudo service {beatname_pkg} start
 ----------------------------------------------------------------------
 
-// tag::initd-note[]
-NOTE: If you use an `init.d` script to start {beatname_uc}, you can't specify command
-line flags (see {beatname_url}/command-line-options.html[Command reference]). To specify flags, start {beatname_uc} in
-the foreground.
-
-// end::initd-note[]
-
 Also see {beatname_url}/running-with-systemd.html[{beatname_uc} and systemd].
 // end::deb[]
 
@@ -22,8 +15,6 @@ Also see {beatname_url}/running-with-systemd.html[{beatname_uc} and systemd].
 ----------------------------------------------------------------------
 sudo service {beatname_pkg} start
 ----------------------------------------------------------------------
-
-include::start.asciidoc[tag=initd-note]
 
 Also see {beatname_url}/running-with-systemd.html[{beatname_uc} and systemd].
 
