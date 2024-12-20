@@ -163,7 +163,7 @@ func HasTests(pkg string) (bool, error) {
 }
 
 func (goTest) WithCoverage(to string) ArgOpt {
-	return combine(flagArg("-cover", ""), flagArgIf("-test.coverprofile", to))
+	return combine(flagArg("-cover", ""), flagArgIf("--test.coverprofile", to))
 }
 func (goTest) Short(b bool) ArgOpt        { return flagBoolIf("-test.short", b) }
 func (goTest) Use(bin string) ArgOpt      { return extraArgIf("use", bin) }

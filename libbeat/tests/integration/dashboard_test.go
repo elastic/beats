@@ -173,7 +173,7 @@ queue.mem:
 		"-E", "setup.kibana.username=beats",
 		"-E", "setup.kibana.password=testing",
 		"-id", "Metricbeat-system-overview",
-		"-folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
+		"--folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
@@ -205,8 +205,8 @@ queue.mem:
 		"-E", "setup.kibana.port="+kURL.Port(),
 		"-E", "setup.kibana.username=beats",
 		"-E", "setup.kibana.password=testing",
-		"-id", "No-such-dashboard",
-		"-folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
+		"--id", "No-such-dashboard",
+		"--folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
 	procState, err := mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 1, procState.ExitCode(), "incorrect exit code")
