@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -35,12 +34,17 @@ type testFileIdentifierConfig struct {
 }
 
 func TestFileIdentifier(t *testing.T) {
-	t.Run("default file identifier", func(t *testing.T) {
-		identifier, err := newFileIdentifier(nil, "")
+	t.Run("native file identifier", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(`native: ~`)
+		ns := conf.Namespace{}
+		if err := cfg.Unpack(&ns); err != nil {
+			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
+		}
+		identifier, err := newFileIdentifier(&ns, "")
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}
@@ -59,12 +63,17 @@ func TestFileIdentifier(t *testing.T) {
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
 	})
 
-	t.Run("default file identifier with suffix", func(t *testing.T) {
-		identifier, err := newFileIdentifier(nil, "my-suffix")
+	t.Run("native file identifier with suffix", func(t *testing.T) {
+		cfg := conf.MustNewConfigFrom(`native: ~`)
+		ns := conf.Namespace{}
+		if err := cfg.Unpack(&ns); err != nil {
+			t.Fatalf("cannot unpack config into conf.Namespace: %s", err)
+		}
+		identifier, err := newFileIdentifier(&ns, "my-suffix")
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}

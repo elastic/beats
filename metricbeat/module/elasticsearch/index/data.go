@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -43,7 +42,7 @@ type Index struct {
 	Index          string     `json:"index"`
 	Status         string     `json:"status"`
 	TierPreference string     `json:"tier_preference"`
-	CreationDate   int        `json:"creation_date"`
+	CreationDate   string     `json:"creation_date"`
 	Version        string     `json:"version"`
 	Shards         shardStats `json:"shards"`
 }
@@ -306,10 +305,7 @@ func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
 		return fmt.Errorf("failed to get index creation date: %w", err)
 	}
 
-	idx.CreationDate, err = strconv.Atoi(indexCreationDate)
-	if err != nil {
-		return fmt.Errorf("failed to convert index creation date to int: %w", err)
-	}
+	idx.CreationDate = indexCreationDate
 
 	indexTierPreference, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.require._tier_preference")
 	if err != nil {
