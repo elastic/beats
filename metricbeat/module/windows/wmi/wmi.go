@@ -114,6 +114,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
+		defer wmi.CloseAllInstances(rows)
+
 		for _, instance := range rows {
 			event := mb.Event{
 				MetricSetFields: mapstr.M{
