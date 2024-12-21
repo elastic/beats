@@ -17,3 +17,25 @@
   metricsets: ["service"]
   enabled: true
   period: 60s
+
+- module: windows
+  metricsets: ["wmi"]
+  wmi:
+    include_null: false
+    include_queries: false
+    # Remote WMI's Parameters
+    # host: "myhost.domain"
+    # username: "admin"
+    # password: "admin"
+    # namespace: "root\\cimv2"
+    queries:
+    - class: Win32_OperatingSystem
+      # Leave the fields array empty to retrieve all fields
+      fields:
+       - FreePhysicalMemory
+       - FreeSpaceInPagingFiles
+       - FreeVirtualMemory
+       - 'LocalDateTime'
+       - NumberOfUsers
+      # Narrow the scope of a data
+      where: ""
