@@ -347,6 +347,7 @@ func decompress(t *testing.T, namegz string) string {
 	require.NoError(t, err)
 	defer gr.Close()
 
+	//nolint:gosec // this is used in tests
 	_, err = io.Copy(dst, gr)
 	require.NoError(t, err)
 
