@@ -37,7 +37,9 @@ var schema = s.Schema{
 		"free": c.Int("free_servers"),
 		"used": c.Int("used_servers"),
 	},
-	"dns_names":   c.Int("dns_names"),
-	"dns_zones":   c.Int("dns_zones"),
-	"dns_queries": c.Int("dns_queries"),
+	"dns": s.Object{
+		"names":   c.Int("dns_names"),
+		"zones":   c.Int("dns_zones"),
+		"queries": c.Int("dns_queries"),
+	},
 }

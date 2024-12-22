@@ -40,9 +40,9 @@ func TestMetricSet_Fetch(t *testing.T) {
 	require.NotEmpty(t, events, "Expected to receive at least one event")
 	event := events[0].MetricSetFields
 	assert.Contains(t, event, "user")
-	assert.Contains(t, event, "cl_active")
-	assert.Contains(t, event, "cl_active_cancel_req")
-	assert.Contains(t, event, "sv_idle")
+	assert.Contains(t, event["client"], "active")
+	assert.Contains(t, event["client"], "active_cancel_req")
+	assert.Contains(t, event["server"], "idle")
 	assert.Contains(t, event, "maxwait_us")
 	assert.Contains(t, event, "pool_mode")
 }

@@ -36,15 +36,15 @@
       type: long
       description: >
         Count of used servers.
-    - name: dns_names
+    - name: dns.names
       type: long
       description: >
         Count of DNS names in the cache.
-    - name: dns_zones
+    - name: dns.zones
       type: long
       description: >
         Count of DNS zones in the cache.
-    - name: dns_queries
+    - name: dns.queries
       type: long
       description: >
         Count of in-flight DNS queries.

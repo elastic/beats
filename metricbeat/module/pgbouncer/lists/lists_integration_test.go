@@ -47,6 +47,7 @@ func TestMetricSet_Fetch(t *testing.T) {
 	assert.Contains(t, event["clients"], "used")
 	assert.Contains(t, event["servers"], "free")
 	assert.Contains(t, event["servers"], "used")
+	assert.Contains(t, event["dns"], "names")
 }
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{

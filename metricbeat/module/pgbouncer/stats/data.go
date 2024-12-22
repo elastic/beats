@@ -24,21 +24,37 @@ import (
 
 // Based on pgbouncer show stats;
 var schema = s.Schema{
-	"database":                      c.Str("database"),
-	"total_query_count":             c.Int("total_query_count"),
-	"total_server_assignment_count": c.Int("total_server_assignment_count"),
-	"total_received":                c.Int("total_received"),
-	"total_sent":                    c.Int("total_sent"),
-	"total_xact_time_us":            c.Int("total_xact_time"),
-	"total_query_time_us":           c.Int("total_query_time"),
-	"total_wait_time_us":            c.Int("total_wait_time"),
-	"total_xact_count":              c.Int("total_xact_count"),
-	"avg_xact_count":                c.Int("avg_xact_count"),
-	"avg_query_count":               c.Int("avg_query_count"),
-	"avg_server_assignment_count":   c.Int("avg_server_assignment_count"),
-	"avg_recv":                      c.Int("avg_recv"),
-	"avg_sent":                      c.Int("avg_sent"),
-	"avg_xact_time_us":              c.Int("avg_xact_time"),
-	"avg_query_time_us":             c.Int("avg_query_time"),
-	"avg_wait_time_us":              c.Int("avg_wait_time"),
+	"database": c.Str("database"),
+	"query_count": s.Object{
+		"total": c.Int("total_query_count"),
+		"avg":   c.Int("avg_query_count"),
+	},
+	"server_assignment_count": s.Object{
+		"total": c.Int("total_server_assignment_count"),
+		"avg":   c.Int("avg_server_assignment_count"),
+	},
+	"received": s.Object{
+		"total": c.Int("total_received"),
+		"avg":   c.Int("avg_recv"),
+	},
+	"sent": s.Object{
+		"total": c.Int("total_sent"),
+		"avg":   c.Int("avg_sent"),
+	},
+	"xact_time_us": s.Object{
+		"total": c.Int("total_xact_time"),
+		"avg":   c.Int("avg_xact_time"),
+	},
+	"query_time_us": s.Object{
+		"total": c.Int("total_query_time"),
+		"avg":   c.Int("avg_query_time"),
+	},
+	"wait_time_us": s.Object{
+		"total": c.Int("total_wait_time"),
+		"avg":   c.Int("avg_wait_time"),
+	},
+	"xact_count": s.Object{
+		"total": c.Int("total_xact_count"),
+		"avg":   c.Int("avg_xact_count"),
+	},
 }

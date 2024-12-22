@@ -24,19 +24,23 @@ import (
 
 // Based on pgbouncer show pools;
 var schema = s.Schema{
-	"database":              c.Str("database"),
-	"user":                  c.Str("user"),
-	"cl_active":             c.Int("cl_active"),
-	"cl_waiting":            c.Int("cl_waiting"),
-	"cl_active_cancel_req":  c.Int("cl_active_cancel_req"),
-	"cl_waiting_cancel_req": c.Int("cl_waiting_cancel_req"),
-	"sv_active":             c.Int("sv_active"),
-	"sv_active_cancel":      c.Int("sv_active_cancel"),
-	"sv_being_canceled":     c.Int("sv_being_canceled"),
-	"sv_idle":               c.Int("sv_idle"),
-	"sv_used":               c.Int("sv_used"),
-	"sv_tested":             c.Int("sv_tested"),
-	"sv_login":              c.Int("sv_login"),
-	"maxwait_us":            c.Int("maxwait_us"),
-	"pool_mode":             c.Str("pool_mode"),
+	"database": c.Str("database"),
+	"user":     c.Str("user"),
+	"client": s.Object{
+		"active":             c.Int("cl_active"),
+		"waiting":            c.Int("cl_waiting"),
+		"active_cancel_req":  c.Int("cl_active_cancel_req"),
+		"waiting_cancel_req": c.Int("cl_waiting_cancel_req"),
+	},
+	"server": s.Object{
+		"active":         c.Int("sv_active"),
+		"active_cancel":  c.Int("sv_active_cancel"),
+		"being_canceled": c.Int("sv_being_canceled"),
+		"idle":           c.Int("sv_idle"),
+		"used":           c.Int("sv_used"),
+		"tested":         c.Int("sv_tested"),
+		"login":          c.Int("sv_login"),
+	},
+	"maxwait_us": c.Int("maxwait_us"),
+	"pool_mode":  c.Str("pool_mode"),
 }

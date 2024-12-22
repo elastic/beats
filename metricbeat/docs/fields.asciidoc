@@ -57816,7 +57816,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.dns_names`*::
+*`pgbouncer.lists.dns.names`*::
 +
 --
 Count of DNS names in the cache.
@@ -57826,7 +57826,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.dns_zones`*::
+*`pgbouncer.lists.dns.zones`*::
 +
 --
 Count of DNS zones in the cache.
@@ -57836,7 +57836,7 @@ type: long
 
 --
 
-*`pgbouncer.lists.dns_queries`*::
+*`pgbouncer.lists.dns.queries`*::
 +
 --
 Count of in-flight DNS queries.
@@ -58320,7 +58320,7 @@ type: keyword
 
 --
 
-*`pgbouncer.pools.cl_active`*::
+*`pgbouncer.pools.client.active`*::
 +
 --
 Client connections that are either linked to server connections or are idle with no queries waiting to be processed.
@@ -58330,7 +58330,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.cl_waiting`*::
+*`pgbouncer.pools.client.waiting`*::
 +
 --
 Client connections that have sent queries but have not yet got a server connection.
@@ -58340,7 +58340,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.cl_active_cancel_req`*::
+*`pgbouncer.pools.client.active_cancel_req`*::
 +
 --
 Client connections that have forwarded query cancellations to the server and are waiting for the server response.
@@ -58350,7 +58350,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.cl_waiting_cancel_req`*::
+*`pgbouncer.pools.client.waiting_cancel_req`*::
 +
 --
 Client connections that have not forwarded query cancellations to the server yet.
@@ -58360,7 +58360,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_active`*::
+*`pgbouncer.pools.server.active`*::
 +
 --
 Server connections that are linked to a client.
@@ -58370,7 +58370,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_active_cancel`*::
+*`pgbouncer.pools.server.active_cancel`*::
 +
 --
 Server connections that are currently forwarding a cancel request.
@@ -58380,7 +58380,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_being_canceled`*::
+*`pgbouncer.pools.server.being_canceled`*::
 +
 --
 Servers that normally could become idle but are waiting to do so until all in-flight cancel requests have completed that were sent to cancel a query on this server.
@@ -58390,7 +58390,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_idle`*::
+*`pgbouncer.pools.server.idle`*::
 +
 --
 Server connections that are unused and immediately usable for client queries.
@@ -58400,7 +58400,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_used`*::
+*`pgbouncer.pools.server.used`*::
 +
 --
 Server connections that have been idle for more than server_check_delay, so they need server_check_query to run on them before they can be used again.
@@ -58410,7 +58410,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_tested`*::
+*`pgbouncer.pools.server.tested`*::
 +
 --
 Server connections that are currently running either server_reset_query or server_check_query.
@@ -58420,7 +58420,7 @@ type: long
 
 --
 
-*`pgbouncer.pools.sv_login`*::
+*`pgbouncer.pools.server.login`*::
 +
 --
 Server connections currently in the process of logging in.
@@ -58467,7 +58467,7 @@ type: keyword
 
 --
 
-*`pgbouncer.stats.total_query_count`*::
+*`pgbouncer.stats.query_count.total`*::
 +
 --
 Total number of SQL commands pooled by pgbouncer.
@@ -58477,7 +58477,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_server_assignment_count`*::
+*`pgbouncer.stats.server_assignment_count.total`*::
 +
 --
 Total times a server was assigned to a client.
@@ -58487,7 +58487,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_received`*::
+*`pgbouncer.stats.received.total`*::
 +
 --
 Total volume in bytes of network traffic received by pgbouncer.
@@ -58497,7 +58497,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_sent`*::
+*`pgbouncer.stats.sent.total`*::
 +
 --
 Total volume in bytes of network traffic sent by pgbouncer.
@@ -58507,7 +58507,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_xact_time`*::
+*`pgbouncer.stats.xact_time.total`*::
 +
 --
 Total number of microseconds spent by pgbouncer when connected to PostgreSQL in a transaction, either idle in transaction or executing queries.
@@ -58517,7 +58517,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_query_time`*::
+*`pgbouncer.stats.query_time.total`*::
 +
 --
 Total number of microseconds spent by pgbouncer when actively connected to PostgreSQL, executing queries.
@@ -58527,7 +58527,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_wait_time`*::
+*`pgbouncer.stats.wait_time.total`*::
 +
 --
 Time spent by clients waiting for a server, in microseconds. Updated when a client connection is assigned a backend connection.
@@ -58537,7 +58537,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.total_xact_count`*::
+*`pgbouncer.stats.xact_count.total`*::
 +
 --
 Total number of SQL transactions pooled by pgbouncer.
@@ -58547,7 +58547,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_xact_count`*::
+*`pgbouncer.stats.xact_count.avg`*::
 +
 --
 Average transactions per second in last stat period.
@@ -58557,7 +58557,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_query_count`*::
+*`pgbouncer.stats.query_count.avg`*::
 +
 --
 Average queries per second in last stat period.
@@ -58567,7 +58567,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_server_assignment_count`*::
+*`pgbouncer.stats.server_assignment_count.avg`*::
 +
 --
 Average number of times a server as assigned to a client per second in the last stat period.
@@ -58577,7 +58577,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_recv`*::
+*`pgbouncer.stats.recv.avg`*::
 +
 --
 Average received (from clients) bytes per second.
@@ -58587,7 +58587,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_sent`*::
+*`pgbouncer.stats.sent.avg`*::
 +
 --
 Average sent (to clients) bytes per second.
@@ -58597,7 +58597,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_xact_time`*::
+*`pgbouncer.stats.xact_time.avg`*::
 +
 --
 Average transaction duration, in microseconds.
@@ -58607,7 +58607,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_query_time`*::
+*`pgbouncer.stats.query_time.avg`*::
 +
 --
 Average query duration, in microseconds.
@@ -58617,7 +58617,7 @@ type: long
 
 --
 
-*`pgbouncer.stats.avg_wait_time`*::
+*`pgbouncer.stats.wait_time.avg`*::
 +
 --
 Time spent by clients waiting for a server, in microseconds (average of the wait times for clients assigned a backend during the current stats_period).
