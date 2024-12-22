@@ -11,23 +11,39 @@
     },
     "pgbouncer": {
         "stats": {
-            "total_server_assignment_count": 0,
-            "total_sent": 0,
-            "avg_sent": 0,
-            "total_wait_time_us": 0,
             "database": "pgbouncer",
-            "total_xact_count": 25,
-            "total_received": 0,
-            "total_query_count": 25,
-            "avg_query_count": 0,
-            "avg_xact_time_us": 0,
-            "avg_query_time_us": 0,
-            "total_query_time_us": 0,
-            "avg_recv": 0,
-            "total_xact_time_us": 0,
-            "avg_xact_count": 0,
-            "avg_wait_time_us": 0,
-            "avg_server_assignment_count": 0
+            "server_assignment_count": {
+                "total": 0,
+                "avg": 0
+            },
+            "received": {
+                "total": 0,
+                "avg": 0
+            },
+            "query_time_us": {
+                "total": 0,
+                "avg": 0
+            },
+            "sent": {
+                "total": 0,
+                "avg": 0
+            },
+            "xact_count": {
+                "total": 5,
+                "avg": 0
+            },
+            "wait_time_us": {
+                "avg": 0,
+                "total": 0
+            },
+            "query_count": {
+                "avg": 0,
+                "total": 5
+            },
+            "xact_time_us": {
+                "avg": 0,
+                "total": 0
+            }
         }
     },
     "service": {
