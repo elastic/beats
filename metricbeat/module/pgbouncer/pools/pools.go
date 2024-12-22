@@ -59,8 +59,10 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	for _, result := range results {
 		var data mapstr.M
 
-		data, _ = schema.Apply(result)
-
+		data, err := schema.Apply(result)
+		if err != nil {
+			return fmt.Errorf("error mapping result: %w", err)
+		}
 		reporter.Event(mb.Event{
 			MetricSetFields: data,
 		})
