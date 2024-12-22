@@ -62,7 +62,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	for _, s := range results {
 		listValue, ok := s["list"].(string)
 		if !ok {
-			return fmt.Errorf("expected string type for 'list' but got something else")
+			m.Logger().Warnf("warning: expected string type for 'list', but got %T", s["list"])
+			continue
 		}
 		resultMap[listValue] = s["items"]
 	}
