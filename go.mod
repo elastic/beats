@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.22.9
+go 1.22.10
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
@@ -84,7 +84,6 @@ require (
 	github.com/godror/godror v0.33.2
 	github.com/gofrs/flock v0.8.1
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v24.3.25+incompatible
@@ -131,13 +130,13 @@ require (
 	go.etcd.io/bbolt v1.3.10
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.28.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/mod v0.21.0
 	golang.org/x/net v0.30.0
 	golang.org/x/oauth2 v0.22.0
-	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.26.0
-	golang.org/x/text v0.19.0
+	golang.org/x/sync v0.10.0
+	golang.org/x/sys v0.28.0
+	golang.org/x/text v0.21.0
 	golang.org/x/time v0.6.0
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.191.0
@@ -185,8 +184,8 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.17.3
-	github.com/elastic/elastic-agent-system-metrics v0.11.4
+	github.com/elastic/elastic-agent-libs v0.17.5
+	github.com/elastic/elastic-agent-system-metrics v0.11.5
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
@@ -225,7 +224,8 @@ require (
 	go.opentelemetry.io/collector/consumer v0.109.0
 	go.opentelemetry.io/collector/pdata v1.15.0
 	go.opentelemetry.io/collector/receiver v0.109.0
-	golang.org/x/term v0.25.0
+	go.uber.org/mock v0.5.0
+	golang.org/x/term v0.27.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )

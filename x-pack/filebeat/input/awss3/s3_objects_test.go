@@ -13,13 +13,14 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -433,6 +434,13 @@ func TestNewMockS3Pager(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{"foo", "bar", "baz"}, keys)
+}
+
+func Test_objectID(t *testing.T) {
+	lastModified, _ := time.Parse("2006-01-02 15:04:05 -0700", "2024-11-07 12:44:22 +0000")
+	objId := objectID(lastModified, "fe8a230c26", 42)
+
+	assert.Equal(t, "1730983462000000000-fe8a230c26-000000000042", objId)
 }
 
 // newMockS3Pager returns a s3Pager that paginates the given s3Objects based on
