@@ -179,7 +179,8 @@ type expectedMetrics struct {
 }
 
 func checkMetrics(t *testing.T, id string, expected expectedMetrics) {
-	reg := monitoring.GetNamespace("dataset").GetRegistry().Get(id).(*monitoring.Registry)
+	reg, ok := monitoring.GetNamespace("dataset").GetRegistry().Get(id).(*monitoring.Registry)
+	require.True(t, ok, "registry not found")
 
 	require.Equal(t, id, reg.Get("id").(*monitoring.String).Get(), "id")
 	require.Equal(t, "filestream", reg.Get("input").(*monitoring.String).Get(), "input")
