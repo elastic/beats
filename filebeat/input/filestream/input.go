@@ -384,7 +384,7 @@ func (inp *filestream) readFromSource(
 		flags, err := message.Fields.GetValue("log.flags")
 		if err == nil {
 			if flags, ok := flags.([]string); ok {
-				if slices.Contains(flags, "truncated") {
+				if slices.Contains(flags, "truncated") { //nolint:typecheck // linter fails to infer generics
 					metrics.MessagesTruncated.Add(1)
 				}
 			}
