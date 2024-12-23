@@ -37,15 +37,26 @@ the message doesn't return to the queue before processing is complete.
 If an error occurs during the processing of the S3 object, the processing will
 be stopped, and the SQS message will be returned to the queue for reprocessing.
 
+[float]
+=== Configuration Examples
+
+[float]
+==== SQS with JSON files
+
+This example reads s3:ObjectCreated notifications from SQS, and assumes that
+all the S3 objects have a `Content-Type` of `application/json`.
+It splits the `Records` array in the JSON into separate events.
+
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: aws-s3
   queue_url: https://sqs.ap-southeast-1.amazonaws.com/1234/test-s3-queue
-  credential_profile_name: elastic-beats
   expand_event_list_from_field: Records
 ----
 
+[float]
+==== S3 bucket listing
 
 When using the direct polling list of S3 objects in an S3 buckets,
 a number of workers that will process the S3 objects listed must be set
@@ -63,6 +74,9 @@ Listing of the S3 bucket will be polled according the time interval defined by
   credential_profile_name: elastic-beats
   expand_event_list_from_field: Records
 ----
+
+[float]
+==== S3-compatible services
 
 The `aws-s3` input can also poll third party S3-compatible services such as the
 Minio. Using non-AWS S3 compatible buckets requires the use of
@@ -87,6 +101,79 @@ that require a different endpoint.
   endpoint: https://s3.example.com:9000
   expand_event_list_from_field: Records
 ----
+
+[float]
+=== Document ID Generation
+
+This aws-s3 input feature prevents the duplication of events in Elasticsearch by
+generating a custom document `_id` for each event, rather than relying on
+Elasticsearch to automatically generate one. Each document in an Elasticsearch
+index must have a unique `_id`, and {beatname_uc} uses this property to avoid
+ingesting duplicate events.
+
+The custom `_id` is based on several pieces of information from the S3 object:
+the Last-Modified timestamp, the bucket ARN, the object key, and the byte
+offset of the data in the event.
+
+Duplicate prevention is particularly useful in scenarios where {beatname_uc}
+needs to retry an operation. {beatname_uc} guarantees at-least-once delivery,
+meaning it will retry any failed or incomplete operations. These retries may be
+triggered by issues with the host, `{beatname_uc}`, network connectivity, or
+services such as Elasticsearch, SQS, or S3.
+
+[float]
+==== Limitations of `_id`-Based Deduplication
+
+There are some limitations to consider when using `_id`-based deduplication in
+Elasticsearch:
+
+* Deduplication works only within a single index. The same `_id` can exist in
+  different indices, which is important if you're using data streams or index
+  aliases. When the backing index rolls over, a duplicate may be ingested.
+
+* Indexing operations in Elasticsearch may take longer when an `_id` is
+  specified. Elasticsearch needs to check if the ID already exists before
+  writing, which can increase the time required for indexing.
+
+[float]
+==== Disabling Duplicate Prevention
+
+If you want to disable the `_id`-based deduplication, you can remove the
+document `_id` using the <<drop-fields,`drop_fields`>> processor in
+{beatname_uc}.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+  - type: aws-s3
+    queue_url: https://queue.amazonaws.com/80398EXAMPLE/MyQueue
+    processors:
+      - drop_fields:
+          fields:
+            - '@metadata._id'
+          ignore_missing: true
+----
+
+Alternatively, you can remove the `_id` field using an Elasticsearch Ingest
+Node pipeline.
+
+["source","json",subs="attributes"]
+----
+{
+  "processors": [
+    {
+      "remove": {
+        "if": "ctx.input?.type == \"aws-s3\"",
+        "field": "_id",
+        "ignore_missing": true
+      }
+    }
+  ]
+}
+----
+
+[float]
+=== Configuration
 
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
@@ -600,6 +687,9 @@ Controls whether fully processed files will be deleted from the bucket.
 
 This option can only be used together with the backup functionality.
 
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
 [float]
 === AWS Permissions
 
@@ -1003,6 +1093,9 @@ Will produce the following output:
 
 |===
 
+[id="aws-credentials-config"]
+include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
 [float]
 === Metrics
 
@@ -1031,11 +1124,5 @@ observe the activity of the input.
 | `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).
 | `s3_object_processing_time`               | Histogram of the elapsed S3 object processing times in nanoseconds (start of download to completion of parsing).
 |=======
-
-[id="{beatname_lc}-input-{type}-common-options"]
-include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
-
-[id="aws-credentials-config"]
-include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
 
 :type!:

@@ -33,12 +33,14 @@ func TestFilestreamMetrics(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                   "fake-ID",
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "24h",
-		"close.on_state_change.check_interval": "100ms",
-		"close.on_state_change.inactive":       "2s",
-		"message_max_bytes":                    20,
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.on_state_change.inactive":         "2s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"message_max_bytes":                      20,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
