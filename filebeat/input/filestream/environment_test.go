@@ -416,12 +416,18 @@ func (e *inputTestingEnvironment) waitUntilEventCountCtx(ctx context.Context, co
 	select {
 	case <-ctx.Done():
 		logLines := map[string][]string{}
-		for _, e := range e.pipeline.GetAllEvents() {
-			flat := e.Fields.Flatten()
+		for _, evt := range e.pipeline.GetAllEvents() {
+			flat := evt.Fields.Flatten()
 			pathi, _ := flat.GetValue("log.file.path")
-			path := pathi.(string)
+			path, ok := pathi.(string)
+			if !ok {
+				e.t.Fatalf("waitUntilEventCountCtx: path is not a string: %v", pathi)
+			}
 			msgi, _ := flat.GetValue("message")
-			msg := msgi.(string)
+			msg, ok := msgi.(string)
+			if !ok {
+				e.t.Fatalf("waitUntilEventCountCtx: message is not a string: %v", msgi)
+			}
 			logLines[path] = append(logLines[path], msg)
 		}
 
@@ -468,7 +474,10 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 			if len(events) == checkedEventCount {
 				e.t.Fatalf("not enough expected elements")
 			}
-			message := evt.Fields["message"].(string)
+			message, ok := evt.Fields["message"].(string)
+			if !ok {
+				e.t.Fatalf("message is not string %+v", evt.Fields["message"])
+			}
 			if message == events[checkedEventCount] {
 				foundEvents[checkedEventCount] = true
 			}
