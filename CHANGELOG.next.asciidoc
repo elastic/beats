@@ -230,7 +230,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
 
-
 *Osquerybeat*
 
 
