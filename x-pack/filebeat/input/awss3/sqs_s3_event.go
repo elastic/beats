@@ -43,7 +43,7 @@ func (e *nonRetryableError) Error() string {
 }
 
 func (e *nonRetryableError) Is(err error) bool {
-	_, ok := err.(*nonRetryableError) //nolint:errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
+	_, ok := err.(*nonRetryableError) //nolint:nolintlint,errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
 	return ok
 }
 
