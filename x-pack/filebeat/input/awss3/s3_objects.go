@@ -449,14 +449,11 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 			},
 		},
 	}
-<<<<<<< HEAD
-	event.SetID(objectID(p.s3ObjHash, offset))
-=======
+
 	if offset >= 0 {
 		event.Fields.Put("log.offset", offset)
 		event.SetID(objectID(p.s3Obj.S3.Object.LastModified, p.s3ObjHash, offset))
 	}
->>>>>>> 58a536953 ([x-pack][filebeat] incorporate LastModified into s3 event _id generation (#42078))
 
 	if len(p.s3Metadata) > 0 {
 		_, _ = event.Fields.Put("aws.s3.metadata", p.s3Metadata)
