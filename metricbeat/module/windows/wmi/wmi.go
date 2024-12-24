@@ -70,8 +70,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	if config.Timeout == 0*time.Second {
-		config.Timeout = base.Module().Config().Period
+	if config.WarningThreshold == 0*time.Second {
+		config.WarningThreshold = base.Module().Config().Period
 	}
 
 	m := &MetricSet{
@@ -107,7 +107,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		query := queryConfig.QueryStr
 
-		rows, err := ExecuteGuardedQueryInstances(session, query, m.config.Timeout)
+		rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
 
 		if err != nil {
 			logp.Warn("Could not execute query %v", err)
