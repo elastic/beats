@@ -126,6 +126,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		defer session.Dispose()
 
+		// We create a shared conversion table for entries with the same schema.
+		// This avoids repeatedly fetching the schema for each individual entry, improving efficiency.
+		conversionTable := make(map[string]WmiStringConversionFunction)
+
 		for _, queryConfig := range queries {
 
 			query := queryConfig.QueryStr
@@ -171,7 +175,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						continue
 					}
 
-					event.MetricSetFields.Put(fieldName, fieldValue)
+					// The default case, we simply return what we got
+					finalValue := fieldValue
+
+					// The script API of WMI returns strings for uint64, sint64, datetime
+					// Link: https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi
+					// As a user, I want to have the right CIM_TYPE in the final document
+					//
+					// Example: in the query: SELECT * FROM Win32_OperatingSystem
+					// FreePhysicalMemory is a string, but it should be an uint64
+					if RequiresExtraConversion(fieldValue) {
+						convertFun, ok := conversionTable[fieldName]
+						// If the function is not found let us fetch it and cache it
+						if !ok {
+							convertFun, err = GetConvertFunction(instance, fieldName)
+							if err != nil {
+								logp.Warn("Skipping addition of field %s: Unable to retrieve the conversion function: %v", fieldName, err)
+								continue
+							}
+							conversionTable[fieldName] = convertFun
+						}
+						// Perform the conversion at this point it's safe to cast to string.
+						convertedValue, err := convertFun(fieldValue.(string))
+						if err != nil {
+							logp.Warn("Skipping addition of field %s. Cannot convert: %v", fieldName, err)
+							continue
+						}
+						finalValue = convertedValue
+					}
+					event.MetricSetFields.Put(fieldName, finalValue)
 				}
 				report.Event(event)
 			}
