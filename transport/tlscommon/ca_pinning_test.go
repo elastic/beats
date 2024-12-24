@@ -22,6 +22,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -335,6 +336,8 @@ func genCA() (tls.Certificate, error) {
 		return tls.Certificate{}, fmt.Errorf("fail to generate RSA key: %w", err)
 	}
 
+	ca.SubjectKeyId = generateSubjectKeyID(&caKey.PublicKey)
+
 	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caKey.PublicKey, caKey)
 	if err != nil {
 		return tls.Certificate{}, fmt.Errorf("fail to create certificate: %w", err)
@@ -404,6 +407,10 @@ func genSignedCert(
 		return tls.Certificate{}, fmt.Errorf("fail to generate RSA key: %w", err)
 	}
 
+	if isCA {
+		cert.SubjectKeyId = generateSubjectKeyID(&certKey.PublicKey)
+	}
+
 	certBytes, err := x509.CreateCertificate(
 		rand.Reader,
 		cert,
@@ -431,4 +438,14 @@ func genSignedCert(
 func serial() *big.Int {
 	ser = ser + 1
 	return big.NewInt(ser)
+}
+
+func generateSubjectKeyID(publicKey *rsa.PublicKey) []byte {
+	// SubjectKeyId generated using method 1 in RFC 7093, Section 2:
+	//   1) The keyIdentifier is composed of the leftmost 160-bits of the
+	//   SHA-256 hash of the value of the BIT STRING subjectPublicKey
+	//   (excluding the tag, length, and number of unused bits).
+	publicKeyBytes := x509.MarshalPKCS1PublicKey(publicKey)
+	h := sha256.Sum256(publicKeyBytes)
+	return h[:20]
 }

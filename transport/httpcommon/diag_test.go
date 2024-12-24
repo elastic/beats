@@ -21,6 +21,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -313,6 +314,8 @@ func genCA(t *testing.T) tls.Certificate {
 	caKey, err := rsa.GenerateKey(rand.Reader, 2048) // less secure key for quicker testing.
 	require.NoError(t, err)
 
+	ca.SubjectKeyId = generateSubjectKeyID(&caKey.PublicKey)
+
 	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caKey.PublicKey, caKey)
 	require.NoError(t, err)
 
@@ -378,6 +381,10 @@ func genSignedCert(
 	certKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	require.NoError(t, err)
 
+	if isCA {
+		cert.SubjectKeyId = generateSubjectKeyID(&certKey.PublicKey)
+	}
+
 	certBytes, err := x509.CreateCertificate(
 		rand.Reader,
 		cert,
@@ -400,4 +407,14 @@ func genSignedCert(
 func serial() *big.Int {
 	ser = ser + 1
 	return big.NewInt(ser)
+}
+
+func generateSubjectKeyID(publicKey *rsa.PublicKey) []byte {
+	// SubjectKeyId generated using method 1 in RFC 7093, Section 2:
+	//   1) The keyIdentifier is composed of the leftmost 160-bits of the
+	//   SHA-256 hash of the value of the BIT STRING subjectPublicKey
+	//   (excluding the tag, length, and number of unused bits).
+	publicKeyBytes := x509.MarshalPKCS1PublicKey(publicKey)
+	h := sha256.Sum256(publicKeyBytes)
+	return h[:20]
 }

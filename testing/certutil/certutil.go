@@ -24,6 +24,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -349,6 +350,7 @@ func newRootCert(priv crypto.PrivateKey, pub crypto.PublicKey, opts ...Option) (
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 		IsCA:                  true,
+		SubjectKeyId:          generateSubjectKeyID(pub),
 	}
 
 	rootCertRawBytes, err := x509.CreateCertificate(
@@ -404,6 +406,23 @@ func getCgf(opts []Option) configs {
 		opt(&cfg)
 	}
 	return cfg
+}
+
+func generateSubjectKeyID(pub crypto.PublicKey) []byte {
+	// SubjectKeyId generated using method 1 in RFC 7093, Section 2:
+	//   1) The keyIdentifier is composed of the leftmost 160-bits of the
+	//   SHA-256 hash of the value of the BIT STRING subjectPublicKey
+	//   (excluding the tag, length, and number of unused bits).
+	var publicKeyBytes []byte
+	switch publicKey := pub.(type) {
+	case *rsa.PublicKey:
+		publicKeyBytes = x509.MarshalPKCS1PublicKey(publicKey)
+	case *ecdsa.PublicKey:
+		//nolint:staticcheck // no alternative
+		publicKeyBytes = elliptic.Marshal(publicKey.Curve, publicKey.X, publicKey.Y)
+	}
+	h := sha256.Sum256(publicKeyBytes)
+	return h[:20]
 }
 
 // defaultChildCert generates a child certificate for localhost and 127.0.0.1.
