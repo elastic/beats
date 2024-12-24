@@ -115,7 +115,7 @@ func (c *Config) ApplyDefaultNamespaceToQueries(defaultNamespace string) error {
 	return nil
 }
 
-func (c *Config) BuildNamespaceIndex() {
+func (c *Config) BuildNamespaceQueryIndex() {
 	c.NamespaceQueryIndex = make(map[string][]QueryConfig)
 	for _, q := range c.Queries {
 		// WMI namespaces are case-insensitive. We are building a case-insensitive map

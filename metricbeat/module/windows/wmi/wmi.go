@@ -75,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	config.BuildNamespaceIndex()
+	config.BuildNamespaceQueryIndex()
 
 	if config.WarningThreshold == 0*time.Second {
 		config.WarningThreshold = base.Module().Config().Period

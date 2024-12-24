@@ -175,7 +175,7 @@ func TestQueryCompile(t *testing.T) {
 	}
 }
 
-func TestBuildNamespaceIndex(t *testing.T) {
+func TestBuildNamespaceQueryIndex(t *testing.T) {
 
 	defaultNamespace := "root\\cimv2"
 	upperCaseDefaultNamespace := "ROOT\\CIMV2"
