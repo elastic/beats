@@ -24,11 +24,12 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 	base "github.com/microsoft/wmi/go/wmi"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Utilities related to Type conversion
