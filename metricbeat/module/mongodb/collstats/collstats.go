@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -95,6 +96,10 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return errors.New("collection 'totals' are not a map")
 	}
 
+	if err = res.Err(); err != nil {
+		return fmt.Errorf("'top' command failed: %w", err)
+	}
+
 	for group, info := range totals {
 		if group == "note" {
 			continue
@@ -106,9 +111,25 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
+		names, err := splitKey(group)
+		if err != nil {
+			reporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
+			continue
+		}
+
+		collStats, err := fetchCollStats(client, names[0], names[1])
+		if err != nil {
+			reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
+			continue
+		}
+
+		for key, val := range collStats {
+			infoMap[key] = val
+		}
+
 		event, err := eventMapping(group, infoMap)
 		if err != nil {
-			reporter.Error(fmt.Errorf("mapping of the event data filed: %w", err))
+			reporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
 			continue
 		}
 
@@ -118,4 +139,15 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+	db := client.Database(dbName)
+	colStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+	var statsRes map[string]interface{}
+	if err := colStats.Decode(&statsRes); err != nil {
+		return nil, fmt.Errorf("could not decode mongo response for database=%s, collection=%s: %w", dbName, collectionName, err)
+	}
+
+	return statsRes, nil
 }

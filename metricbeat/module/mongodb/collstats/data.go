@@ -25,10 +25,10 @@ import (
 )
 
 func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
-	names := strings.SplitN(key, ".", 2)
+	names, err := splitKey(key)
 
-	if len(names) < 2 {
-		return nil, errors.New("collection name invalid")
+	if err != nil {
+		return nil, err
 	}
 
 	event := mapstr.M{
@@ -91,6 +91,7 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 			},
 			"count": mustGetMapStrValue(data, "commands.count"),
 		},
+		"totalSize": mustGetMapStrValue(data, "totalSize"),
 	}
 
 	return event, nil
@@ -99,4 +100,14 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 func mustGetMapStrValue(m mapstr.M, key string) interface{} {
 	v, _ := m.GetValue(key)
 	return v
+}
+
+func splitKey(key string) ([]string, error) {
+	names := strings.SplitN(key, ".", 2)
+
+	if len(names) < 2 {
+		return nil, errors.New("collection name invalid")
+	}
+
+	return names, nil
 }

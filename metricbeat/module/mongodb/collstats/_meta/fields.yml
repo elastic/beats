@@ -102,3 +102,7 @@
       type: long
       description: >
         Number of database commands executed.
+    - name: totalSize
+      type: long
+      description: >
+        Total collection's size.

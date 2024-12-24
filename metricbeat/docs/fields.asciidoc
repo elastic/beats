@@ -51003,6 +51003,16 @@ type: long
 
 --
 
+*`mongodb.collstats.totalSize`*::
++
+--
+Total collection's size.
+
+
+type: long
+
+--
+
 [float]
 === dbstats
 
