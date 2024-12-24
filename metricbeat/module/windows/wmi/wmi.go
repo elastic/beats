@@ -82,6 +82,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
+// This function handles the skip conditions
+func (m *MetricSet) shouldSkipNilOrEmptyValue(fieldValue interface{}) bool {
+	if fieldValue == nil {
+		if !m.config.IncludeNull {
+			return true // Skip if it's nil and IncludeNull is false
+		}
+	} else if stringValue, ok := fieldValue.(string); ok {
+		if len(stringValue) == 0 && !m.config.IncludeEmptyString {
+			return true // Skip if it's an empty string and IncludeEmptyString is false
+		}
+	}
+	return false
+}
+
 // Fetch method implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
@@ -143,8 +157,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					logp.Err("Unable to get propery by name: %v", err)
 					continue
 				}
-				// If the user decides to ignore properties with nil values, we skip them
-				if !m.config.IncludeNull && fieldValue == nil {
+
+				if m.shouldSkipNilOrEmptyValue(fieldValue) {
 					continue
 				}
 

@@ -30,14 +30,15 @@ import (
 )
 
 type Config struct {
-	IncludeQueries   bool          `config:"wmi.include_queries"`   // Whether to include the query in the document
-	IncludeNull      bool          `config:"wmi.include_null"`      // Whether to include or not nil properties
-	Host             string        `config:"wmi.host"`              // Remote WMI Host
-	User             string        `config:"wmi.username"`          // Username for the Remote WMI
-	Password         string        `config:"wmi.password"`          // Password for the Remote WMI
-	Namespace        string        `config:"wmi.namespace"`         // Namespace for the queries
-	Queries          []QueryConfig `config:"wmi.queries"`           // List of query definitions
-	WarningThreshold time.Duration `config:"wmi.warning_threshold"` // Timeout duration after which we stop waiting for the query result and we log a warning. The query will continue to run in WMI, but we will no longer wait for its completion.
+	IncludeQueries     bool          `config:"wmi.include_queries"`      // Whether to include the query in the document
+	IncludeNull        bool          `config:"wmi.include_null"`         // Whether to include or not nil properties in the final document
+	IncludeEmptyString bool          `config:"wmi.include_empty_string"` // Whether to include or not empty string properties in the final document
+	Host               string        `config:"wmi.host"`                 // Remote WMI Host
+	User               string        `config:"wmi.username"`             // Username for the Remote WMI
+	Password           string        `config:"wmi.password"`             // Password for the Remote WMI
+	Namespace          string        `config:"wmi.namespace"`            // Namespace for the queries
+	Queries            []QueryConfig `config:"wmi.queries"`              // List of query definitions
+	WarningThreshold   time.Duration `config:"wmi.warning_threshold"`    // Timeout duration after which we stop waiting for the query result and we log a warning. The query will continue to run in WMI, but we will no longer wait for its completion.
 }
 
 type QueryConfig struct {
