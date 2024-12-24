@@ -27,11 +27,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// Define an interface to allow unit-testing long-running queries
+// *wmi.wmiSession is an implementation of this interface
+type WmiQueryInterface interface {
+	QueryInstances(query string) ([]*wmi.WmiInstance, error)
+}
+
 // Wrapper of the session.QueryInstances function that execute a query for at most a timeout
 // after which we stop actively waiting.
 // Note that the underlying query will continue to run, until the query completes or the WMI Arbitrator stops the query
 // https://learn.microsoft.com/en-us/troubleshoot/windows-server/system-management-components/new-wmi-arbitrator-behavior-in-windows-server
-func ExecuteGuardedQueryInstances(session *wmi.WmiSession, query string, timeout time.Duration) ([]*wmi.WmiInstance, error) {
+func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeout time.Duration) ([]*wmi.WmiInstance, error) {
 	var rows []*wmi.WmiInstance
 	var err error
 	done := make(chan error)
