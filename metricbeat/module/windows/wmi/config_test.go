@@ -174,3 +174,78 @@ func TestQueryCompile(t *testing.T) {
 		})
 	}
 }
+
+func TestBuildNamespaceIndex(t *testing.T) {
+
+	defaultNamespace := "root\\cimv2"
+	upperCaseDefaultNamespace := "ROOT\\CIMV2"
+
+	tests := []struct {
+		name          string
+		queries       []QueryConfig
+		expectedIndex map[string][]QueryConfig
+		description   string
+	}{
+		{
+			name: "Single query, single namespace",
+			queries: []QueryConfig{
+				{Namespace: defaultNamespace},
+			},
+			expectedIndex: map[string][]QueryConfig{
+				WMIDefaultNamespace: {
+					{Namespace: defaultNamespace},
+				},
+			},
+			description: "Should build an index with a single query in the 'default' namespace",
+		},
+		{
+			name: "Multiple queries, same namespace, different spells",
+			queries: []QueryConfig{
+				{Namespace: defaultNamespace},
+				{Namespace: upperCaseDefaultNamespace},
+			},
+			expectedIndex: map[string][]QueryConfig{
+				defaultNamespace: {
+					{Namespace: defaultNamespace},
+					{Namespace: upperCaseDefaultNamespace},
+				},
+			},
+			description: "Should correctly handle multiple queries in the same namespace",
+		},
+		{
+			name: "Multiple queries, different namespaces",
+			queries: []QueryConfig{
+				{Namespace: "default"},
+				{Namespace: "custom"},
+			},
+			expectedIndex: map[string][]QueryConfig{
+				"default": {
+					{Namespace: "default"},
+				},
+				"custom": {
+					{Namespace: "custom"},
+				},
+			},
+			description: "Should correctly build separate indices for different namespaces",
+		},
+		{
+			name:          "Empty queries",
+			queries:       []QueryConfig{},
+			expectedIndex: map[string][]QueryConfig{},
+			description:   "Should return an empty index when no queries are provided",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create the config and assign queries
+			config := &Config{Queries: tt.queries}
+
+			// Build the namespace index
+			config.BuildNamespaceIndex()
+
+			// Assert that the namespace index matches the expected result
+			assert.Equal(t, tt.expectedIndex, config.NamespaceQueryIndex, tt.description)
+		})
+	}
+}

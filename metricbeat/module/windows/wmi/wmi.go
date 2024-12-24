@@ -70,6 +70,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	err = config.ApplyDefaultNamespaceToQueries(config.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	config.BuildNamespaceIndex()
+
 	if config.WarningThreshold == 0*time.Second {
 		config.WarningThreshold = base.Module().Config().Period
 	}
@@ -101,70 +108,73 @@ func (m *MetricSet) shouldSkipNilOrEmptyValue(fieldValue interface{}) bool {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
-	var err error
-
 	sm := wmi.NewWmiSessionManager()
 	defer sm.Dispose()
 
-	session, err := sm.GetSession(m.config.Namespace, m.config.Host, "", m.config.User, m.config.Password)
+	// To optimize performance and reduce overhead, we create a single session
+	// for each unique WMI namespace. This minimizes the number of session creations
+	for namespace, queries := range m.config.NamespaceQueryIndex {
 
-	if err != nil {
-		return fmt.Errorf("could not initialize session %w", err)
-	}
-	_, err = session.Connect()
-	if err != nil {
-		return fmt.Errorf("could not connect session %w", err)
-	}
-	defer session.Dispose()
-
-	for _, queryConfig := range m.config.Queries {
-
-		query := queryConfig.QueryStr
-
-		rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
+		session, err := sm.GetSession(namespace, m.config.Host, "", m.config.User, m.config.Password)
 
 		if err != nil {
-			logp.Warn("Could not execute query %v", err)
-			continue
+			return fmt.Errorf("could not initialize session %w", err)
 		}
+		_, err = session.Connect()
+		if err != nil {
+			return fmt.Errorf("could not connect session %w", err)
+		}
+		defer session.Dispose()
 
-		defer wmi.CloseAllInstances(rows)
+		for _, queryConfig := range queries {
 
-		for _, instance := range rows {
-			event := mb.Event{
-				MetricSetFields: mapstr.M{
-					"class":     queryConfig.Class,
-					"namespace": m.config.Namespace,
-					"host":      m.config.Host,
-				},
+			query := queryConfig.QueryStr
+
+			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
+
+			if err != nil {
+				logp.Warn("Could not execute query %v", err)
+				continue
 			}
 
-			if m.config.IncludeQueries {
-				event.MetricSetFields.Put("query", query)
-			}
+			defer wmi.CloseAllInstances(rows)
 
-			// Get only the required properties
-			properties := queryConfig.Fields
-
-			// If the Fields array is empty we retrieve all fields
-			if len(queryConfig.Fields) == 0 {
-				properties = instance.GetClass().GetPropertiesNames()
-			}
-
-			for _, fieldName := range properties {
-				fieldValue, err := instance.GetProperty(fieldName)
-				if err != nil {
-					logp.Err("Unable to get propery by name: %v", err)
-					continue
+			for _, instance := range rows {
+				event := mb.Event{
+					MetricSetFields: mapstr.M{
+						"class":     queryConfig.Class,
+						"namespace": m.config.Namespace,
+						"host":      m.config.Host,
+					},
 				}
 
-				if m.shouldSkipNilOrEmptyValue(fieldValue) {
-					continue
+				if m.config.IncludeQueries {
+					event.MetricSetFields.Put("query", query)
 				}
 
-				event.MetricSetFields.Put(fieldName, fieldValue)
+				// Get only the required properties
+				properties := queryConfig.Fields
+
+				// If the Fields array is empty we retrieve all fields
+				if len(queryConfig.Fields) == 0 {
+					properties = instance.GetClass().GetPropertiesNames()
+				}
+
+				for _, fieldName := range properties {
+					fieldValue, err := instance.GetProperty(fieldName)
+					if err != nil {
+						logp.Err("Unable to get propery by name: %v", err)
+						continue
+					}
+
+					if m.shouldSkipNilOrEmptyValue(fieldValue) {
+						continue
+					}
+
+					event.MetricSetFields.Put(fieldName, fieldValue)
+				}
+				report.Event(event)
 			}
-			report.Event(event)
 		}
 	}
 	return nil
