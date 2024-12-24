@@ -137,7 +137,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
 
 			if err != nil {
-				logp.Warn("Could not execute query %v", err)
+				logp.Warn("Could not execute query: %v", err)
 				continue
 			}
 

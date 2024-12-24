@@ -169,7 +169,7 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 			done <- err
 		} else {
 			timeSince := time.Since(start_time)
-			baseMessage := fmt.Sprintf("The timed out query '%s' terminated after %s", query, timeSince)
+			baseMessage := fmt.Sprintf("The query '%s' that exceeded the warning threshold terminated after %s", query, timeSince)
 			// We eventually fetched the documents, let us free them
 			if err == nil {
 				logp.Warn("%s successfully. The result will be ignored", baseMessage)
@@ -182,7 +182,7 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 
 	select {
 	case <-ctx.Done():
-		err = fmt.Errorf("the execution of the query'%s' exceeded the threshold of %s", query, timeout)
+		err = fmt.Errorf("the execution of the query '%s' exceeded the warning threshold of %s", query, timeout)
 		timedout = true
 		close(done)
 	case <-done:
