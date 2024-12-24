@@ -20,12 +20,111 @@ package wmi
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
-	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
-
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/go-ole/go-ole"
+	"github.com/go-ole/go-ole/oleutil"
+	base "github.com/microsoft/wmi/go/wmi"
+	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 )
+
+// Utilities related to Type conversion
+
+// WmiStringConversionFunction defines a function type for converting string values
+// into other data types, such as integers or timestamps.
+type WmiStringConversionFunction func(string) (interface{}, error)
+
+func ConvertUint64(v string) (interface{}, error) {
+	return strconv.ParseUint(v, 10, 64)
+}
+
+func ConvertSint64(v string) (interface{}, error) {
+	return strconv.ParseInt(v, 10, 64)
+}
+
+func ConvertDatetime(v string) (interface{}, error) {
+	layout := "20060102150405.999999-0700"
+	return time.Parse(layout, v+"0")
+}
+
+func ConvertString(v string) (interface{}, error) {
+	return v, nil
+}
+
+// Given a Property it returns its CIM Type Qualifier
+// https://learn.microsoft.com/en-us/windows/win32/wmisdk/cimtype-qualifier
+// We assume that it is **always** defined for every property to simiplifying
+// The error handling
+func getPropertyType(property *ole.IDispatch) base.WmiType {
+	rawType := oleutil.MustGetProperty(property, "CIMType")
+
+	value, err := wmi.GetVariantValue(rawType)
+	if err != nil {
+		panic("Error retrieving the wmi property type")
+	}
+
+	return base.WmiType(value.(int32))
+}
+
+// Returns the "raw" SWbemProperty containing type information for a given field.
+//
+// The microsoft/wmi library does not have a function that given an instance and a property name
+// returns the wmi.wmiProperty object. This function mimics the behavior of the `GetSystemProperty`
+// method in the wmi.wmiInstance struct and applies it on the Properties_ field
+// https://github.com/microsoft/wmi/blob/v0.25.2/pkg/wmiinstance/WmiInstance.go#L87
+//
+// Note: We are not instantiating a wmi.wmiProperty because of this issue
+// https://github.com/microsoft/wmi/issues/150
+// Once this issue is resolved, we can instantiate a wmi.WmiProperty and eliminate
+// the need for the "getPropertyType" function.
+func getProperty(instance *wmi.WmiInstance, propertyName string) (*ole.IDispatch, error) {
+	// Documentation: https://learn.microsoft.com/en-us/windows/win32/wmisdk/swbemobject-properties-
+	rawResult, err := oleutil.GetProperty(instance.GetIDispatch(), "Properties_")
+	if err != nil {
+		return nil, err
+	}
+
+	// SWbemObjectEx.Properties_ returns
+	// an SWbemPropertySet object that contains the collection
+	// of properties for the c class
+	sWbemObjectExAsIDispatch := rawResult.ToIDispatch()
+	defer rawResult.Clear()
+
+	// Get the property
+	sWbemProperty, err := oleutil.CallMethod(sWbemObjectExAsIDispatch, "Item", propertyName)
+	if err != nil {
+		return nil, err
+	}
+
+	return sWbemProperty.ToIDispatch(), nil
+}
+
+// Given an instance and a property Name, it returns the appropriate conversion function
+func GetConvertFunction(instance *wmi.WmiInstance, propertyName string) (WmiStringConversionFunction, error) {
+	rawProperty, err := getProperty(instance, propertyName)
+	if err != nil {
+		return nil, err
+	}
+	propType := getPropertyType(rawProperty)
+
+	var f WmiStringConversionFunction
+
+	switch propType {
+	case base.WbemCimtypeDatetime:
+		f = ConvertDatetime
+	case base.WbemCimtypeUint64:
+		f = ConvertUint64
+	case base.WbemCimtypeSint64:
+		f = ConvertSint64
+	default: // For all other types we return the identity function
+		f = ConvertString
+	}
+	return f, err
+}
+
+// Utilities related to Warning Threshold
 
 // Define an interface to allow unit-testing long-running queries
 // *wmi.wmiSession is an implementation of this interface
