@@ -11,7 +11,7 @@ with_go_junit_report
 
 echo "--- Go Test"
 set +e
-go test -race -v ./... > tests-report.txt
+go test -tags integration -race -v ./... > tests-report.txt
 exit_code=$?
 set -e
 

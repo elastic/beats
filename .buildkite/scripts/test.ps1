@@ -21,7 +21,7 @@ Write-Host "--- Run test"
 $ErrorActionPreference = "Continue" # set +e
 mkdir -p build
 $OUT_FILE="output-report.out"
-go test "./..." -v > $OUT_FILE
+go test -tags integration "./..." -v > $OUT_FILE
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
