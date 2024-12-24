@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"unicode"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/go-ole/go-ole"
@@ -51,6 +52,21 @@ func ConvertDatetime(v string) (interface{}, error) {
 
 func ConvertString(v string) (interface{}, error) {
 	return v, nil
+}
+
+// Function that determines if a given value requires additional conversion
+// This holds true for strings that encode uint64, sint64 and datetime format
+func RequiresExtraConversion(fieldValue interface{}) bool {
+	stringValue, isString := fieldValue.(string)
+	if !isString {
+		return false
+	}
+	isEmptyString := len(stringValue) == 0
+
+	// Heuristic to avoid fetching the raw properties for every string property
+	//   If the string is empty, no need to convert the string
+	//   If the string does not end with a digit, it's not an uint64, sint64, datetime
+	return !isEmptyString && unicode.IsDigit(rune(stringValue[len(stringValue)-1]))
 }
 
 // Given a Property it returns its CIM Type Qualifier
