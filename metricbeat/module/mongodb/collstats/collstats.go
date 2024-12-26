@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -71,10 +72,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 	}()
 
-	if err != nil {
-		return fmt.Errorf("could not get a list of databases: %w", err)
-	}
-
 	// This info is only stored in 'admin' database
 	db := client.Database("admin")
 	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "top"}})
@@ -100,6 +97,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("'top' command failed: %w", err)
 	}
 
+	wg := &sync.WaitGroup{}
+
 	for group, info := range totals {
 		if group == "note" {
 			continue
@@ -111,32 +110,39 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		names, err := splitKey(group)
-		if err != nil {
-			reporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
-			continue
-		}
+		wg.Add(1)
+		go func(eventReporter mb.ReporterV2, mongoClient *mongo.Client) {
+			defer wg.Done()
 
-		collStats, err := fetchCollStats(client, names[0], names[1])
-		if err != nil {
-			reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
-			continue
-		}
+			names, err := splitKey(group)
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
+				return
+			}
 
-		for key, val := range collStats {
-			infoMap[key] = val
-		}
+			collStats, err := fetchCollStats(mongoClient, names[0], names[1])
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
+				return
+			}
 
-		event, err := eventMapping(group, infoMap)
-		if err != nil {
-			reporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
-			continue
-		}
+			for key, val := range collStats {
+				infoMap[key] = val
+			}
 
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-		})
+			event, err := eventMapping(group, infoMap)
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
+				return
+			}
+
+			eventReporter.Event(mb.Event{
+				MetricSetFields: event,
+			})
+		}(reporter, client)
 	}
+
+	wg.Wait()
 
 	return nil
 }
