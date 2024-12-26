@@ -192,6 +192,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
 - Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
+- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
 
 *Heartbeat*
@@ -227,7 +229,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
-
 
 *Osquerybeat*
 
@@ -417,6 +418,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 - Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
 - Add support for podman metrics in docker module. {pull}41889[41889]
+- Collect .NET CLR (IIS) Memory, Exceptions and LocksAndThreads metrics {pull}41929[41929]
 - Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
 - Add new OpenAI (`openai`) module for tracking usage data. {pull}41516[41516]
 - Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
