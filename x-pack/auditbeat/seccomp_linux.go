@@ -43,5 +43,12 @@ func init() {
 		); err != nil {
 			panic(err)
 		}
+
+		// The system/process dataset uses additional syscalls
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"statx",
+		); err != nil {
+			panic(err)
+		}
 	}
 }
