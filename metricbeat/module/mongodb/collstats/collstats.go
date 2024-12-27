@@ -111,7 +111,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		wg.Add(1)
-		go func(eventReporter mb.ReporterV2, mongoClient *mongo.Client) {
+		go func(eventReporter mb.ReporterV2, mongoClient *mongo.Client, group string) {
 			defer wg.Done()
 
 			names, err := splitKey(group)
@@ -137,7 +137,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			eventReporter.Event(mb.Event{
 				MetricSetFields: event,
 			})
-		}(reporter, client)
+		}(reporter, client, group)
 	}
 
 	wg.Wait()
