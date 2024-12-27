@@ -69,6 +69,14 @@
                 "time": {
                     "us": 0
                 }
+            },
+            "stats": {
+                "avgObjSize": 59,
+                "storageSize": 20480,
+                "totalIndexSize": 20480,
+                "totalSize": 40960,
+                "size": 59,
+                "count": 1
             }
         }
     },

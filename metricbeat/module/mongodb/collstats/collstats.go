@@ -126,9 +126,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 				return
 			}
 
-			for key, val := range collStats {
-				infoMap[key] = val
-			}
+			infoMap["stats"] = collStats
 
 			event, err := eventMapping(group, infoMap)
 			if err != nil {

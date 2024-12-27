@@ -51003,10 +51003,61 @@ type: long
 
 --
 
-*`mongodb.collstats.totalSize`*::
+
+*`mongodb.collstats.stats.stats.size`*::
 +
 --
-Total collection's size.
+The total uncompressed size in memory of all records in a collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.count`*::
++
+--
+The number of objects or documents in this collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.avgObjSize`*::
++
+--
+The average size of an object in the collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.storageSize`*::
++
+--
+The total amount of storage allocated to this collection for document storage.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalIndexSize`*::
++
+--
+The total size of all indexes.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalSize`*::
++
+--
+The sum of the storageSize and totalIndexSize.
 
 
 type: long

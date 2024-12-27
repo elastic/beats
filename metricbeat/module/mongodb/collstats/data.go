@@ -91,7 +91,14 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 			},
 			"count": mustGetMapStrValue(data, "commands.count"),
 		},
-		"totalSize": mustGetMapStrValue(data, "totalSize"),
+		"stats": mapstr.M{
+			"size":           mustGetMapStrValue(data, "stats.size"),
+			"count":          mustGetMapStrValue(data, "stats.count"),
+			"avgObjSize":     mustGetMapStrValue(data, "stats.avgObjSize"),
+			"storageSize":    mustGetMapStrValue(data, "stats.storageSize"),
+			"totalIndexSize": mustGetMapStrValue(data, "stats.totalIndexSize"),
+			"totalSize":      mustGetMapStrValue(data, "stats.totalSize"),
+		},
 	}
 
 	return event, nil

@@ -102,7 +102,31 @@
       type: long
       description: >
         Number of database commands executed.
-    - name: totalSize
-      type: long
-      description: >
-        Total collection's size.
+
+    - name: stats
+      type: group
+      fields:
+        - name: stats.size
+          type: long
+          description: >
+            The total uncompressed size in memory of all records in a collection.
+        - name: stats.count
+          type: long
+          description: >
+            The number of objects or documents in this collection.
+        - name: stats.avgObjSize
+          type: long
+          description: >
+            The average size of an object in the collection.
+        - name: stats.storageSize
+          type: long
+          description: >
+            The total amount of storage allocated to this collection for document storage.
+        - name: stats.totalIndexSize
+          type: long
+          description: >
+            The total size of all indexes.
+        - name: stats.totalSize
+          type: long
+          description: >
+            The sum of the storageSize and totalIndexSize.
