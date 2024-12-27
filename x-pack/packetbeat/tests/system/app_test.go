@@ -78,7 +78,9 @@ ifcsLoop:
 		for _, addr := range addrs {
 			s := addr.String()
 			// remove the network mask suffix
-			s = s[:strings.Index(s, "/")]
+			if idx := strings.Index(s, "/"); idx > -1 {
+				s = s[:idx]
+			}
 			if strings.Contains(stdout, s) {
 				continue ifcsLoop
 			}
