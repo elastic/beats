@@ -4,7 +4,7 @@ set -euo pipefail
 
 # needed in some systems where retry is not available
 if ! declare -f retry > /dev/null; then
-  source ../scripts/retry.sh
+  source "${BUILDKITE_HOOK_PATH}/../scripts/retry.sh"
 fi
 
 # Secrets must be redacted
