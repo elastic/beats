@@ -108,6 +108,7 @@ type Stats struct {
 	cgroups      *cgroup.Reader
 	logger       *logp.Logger
 	host         types.Host
+	excludedPIDs map[uint64]struct{} // List of PIDs to ignore while calling FillMetricsRequiringMoreAccess
 }
 
 // PidState are the constants for various PID states
@@ -207,6 +208,7 @@ func (procStats *Stats) Init() error {
 		}
 		procStats.cgroups = cgReader
 	}
+	procStats.excludedPIDs = processesToIgnore()
 	return nil
 }
 

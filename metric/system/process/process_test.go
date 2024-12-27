@@ -633,6 +633,32 @@ func TestIncludeTopProcesses(t *testing.T) {
 	}
 }
 
+func TestProcessesExcluded(t *testing.T) {
+	state := Stats{
+		Procs:    []string{".*"},
+		Hostfs:   resolve.NewTestResolver("/"),
+		CPUTicks: false,
+	}
+	require.NoError(t, state.Init())
+
+	_, processes, err := state.Get()
+	assert.True(t, isNonFatal(err), fmt.Sprintf("Fatal Error: %s", err))
+
+	for _, pMap := range processes {
+		iPid, err := pMap.GetValue("process.pid")
+		require.NoError(t, err)
+		pid, ok := iPid.(int) // to avoid panics
+		require.True(t, ok)
+		if _, excluded := state.excludedPIDs[uint64(pid)]; excluded {
+			// if pid is excluded, its arglist amd commandline should be empty
+			ok, _ = pMap.HasKey("process.args")
+			require.False(t, ok)
+			ok, _ = pMap.HasKey("process.command_line")
+			require.False(t, ok)
+		}
+	}
+}
+
 // runThreads run the threads binary for the current GOOS.
 //
 //go:generate docker run --rm -v ./testdata:/app --entrypoint g++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads /app/threads.cpp

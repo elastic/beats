@@ -69,3 +69,16 @@ func TestGetInfoForPid_numThreads(t *testing.T) {
 			numThreads, want, expected)
 	}
 }
+
+func TestLsassFound(t *testing.T) {
+	processNames := []string{"lsass.exe"}
+	m := processesToIgnore()
+	require.NotEmpty(t, m)
+
+	for pid := range m {
+		state, err := GetInfoForPid(resolve.NewTestResolver("/"), int(pid))
+		if err == nil {
+			require.Contains(t, processNames, state.Name)
+		}
+	}
+}
