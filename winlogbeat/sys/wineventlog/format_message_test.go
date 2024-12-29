@@ -33,7 +33,7 @@ func TestFormatMessage(t *testing.T) {
 	evtHandle := mustNextHandle(t, log)
 	defer evtHandle.Close()
 
-	publisherMetadata, err := NewPublisherMetadata(NilHandle, "Microsoft-Windows-Security-Auditing")
+	publisherMetadata, err := NewPublisherMetadata(NilHandle, "Microsoft-Windows-Security-Auditing", 0)
 	if err != nil {
 		t.Fatal(err)
 	}

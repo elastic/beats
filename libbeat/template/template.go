@@ -35,7 +35,7 @@ import (
 var (
 	// Defaults used in the template
 	defaultDateDetection           = false
-	defaultTotalFieldsLimit        = 10000
+	defaultTotalFieldsLimit        = 12500
 	defaultMaxDocvalueFieldsSearch = 200
 
 	defaultFields []string

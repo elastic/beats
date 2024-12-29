@@ -6,28 +6,40 @@ package main
 // This file is mandatory as otherwise the metricbeat.test binary is not generated correctly.
 import (
 	"flag"
+	"os"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
+	mbcmd "github.com/elastic/beats/v7/x-pack/metricbeat/cmd"
 )
 
-var systemTest *bool
+var (
+	systemTest *bool
+	mbCommand  *cmd.BeatsRootCmd
+)
 
 func init() {
 	testing.Init()
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cmd.RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	mbCommand = mbcmd.Initialize()
+	mbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("systemTest")
+	mbCommand.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
+	cfgfile.AddAllowedBackwardsCompatibleFlag("test.coverprofile")
 }
 
 // Test started when the test binary is started. Only calls main.
 func TestSystem(t *testing.T) {
+	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
-		main()
+		if err := mbCommand.Execute(); err != nil {
+			os.Exit(1)
+		}
 	}
 }
 
 func TestTemplate(t *testing.T) {
-	template.TestTemplate(t, cmd.Name, true)
+	template.TestTemplate(t, mbCommand.Name(), true)
 }

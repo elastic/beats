@@ -6,11 +6,14 @@ package gcs
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -518,6 +521,78 @@ func Test_StorageClient(t *testing.T) {
 				mock.Gcs_test_new_object_docs_ata_json: true,
 			},
 		},
+		{
+			name: "RetryWithDefaultValues",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "1m",
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "RetryWithCustomValues",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"retry": map[string]interface{}{
+					"max_attempts":             5,
+					"initial_backoff_duration": "1s",
+					"max_backoff_duration":     "3s",
+					"backoff_multiplier":       1.4,
+				},
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected: map[string]bool{
+				mock.Gcs_test_new_object_ata_json:      true,
+				mock.Gcs_test_new_object_data3_json:    true,
+				mock.Gcs_test_new_object_docs_ata_json: true,
+			},
+		},
+		{
+			name: "RetryMinimumValueCheck",
+			baseConfig: map[string]interface{}{
+				"project_id":                 "elastic-sa",
+				"auth.credentials_file.path": "testdata/gcs_creds.json",
+				"max_workers":                1,
+				"poll":                       true,
+				"poll_interval":              "10s",
+				"retry": map[string]interface{}{
+					"max_attempts":             5,
+					"initial_backoff_duration": "1s",
+					"max_backoff_duration":     "3s",
+					"backoff_multiplier":       1,
+				},
+				"buckets": []map[string]interface{}{
+					{
+						"name": "gcs-test-new",
+					},
+				},
+			},
+			mockHandler: mock.GCSRetryServer,
+			expected:    map[string]bool{},
+			isError:     errors.New("requires value >= 1.1 accessing 'retry.backoff_multiplier'"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -533,7 +608,7 @@ func Test_StorageClient(t *testing.T) {
 
 			client, _ := storage.NewClient(context.Background(), option.WithEndpoint(serv.URL), option.WithoutAuthentication(), option.WithHTTPClient(&httpclient))
 			cfg := conf.MustNewConfigFrom(tt.baseConfig)
-			conf := config{}
+			conf := defaultConfig()
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				assert.EqualError(t, err, fmt.Sprint(tt.isError))
@@ -547,7 +622,7 @@ func Test_StorageClient(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tt.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 
 			var g errgroup.Group
@@ -556,8 +631,8 @@ func Test_StorageClient(t *testing.T) {
 			})
 
 			var timeout *time.Timer
-			if conf.PollInterval != nil {
-				timeout = time.NewTimer(1*time.Second + *conf.PollInterval)
+			if conf.PollInterval != 0 {
+				timeout = time.NewTimer(1*time.Second + conf.PollInterval)
 			} else {
 				timeout = time.NewTimer(5 * time.Second)
 			}
@@ -588,7 +663,7 @@ func Test_StorageClient(t *testing.T) {
 					if !tt.checkJSON {
 						val, err = got.Fields.GetValue("message")
 						assert.NoError(t, err)
-						assert.True(t, tt.expected[val.(string)])
+						assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					} else {
 						val, err = got.Fields.GetValue("gcs.storage.object.json_data")
 						fVal := fmt.Sprintf("%v", val)
@@ -607,11 +682,23 @@ func Test_StorageClient(t *testing.T) {
 	}
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(t *testing.T) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	id, err := generateRandomID(8)
+	if err != nil {
+		t.Fatalf("failed to generate random id: %v", err)
+	}
 	return v2.Context{
 		Logger:      logp.NewLogger("gcs_test"),
-		ID:          "test_id",
+		ID:          "gcs_test-" + id,
 		Cancelation: ctx,
 	}, cancel
+}
+
+func generateRandomID(length int) (string, error) {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

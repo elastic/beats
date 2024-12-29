@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -54,7 +54,10 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
-	processCgroupPaths = cgroup.ProcessCgroupPaths
+	// cgroups resolver, turned to a stub function to make testing easier.
+	initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
 
 	instanceID atomic.Uint32
 )
@@ -128,7 +131,7 @@ func NewWithConfig(opts ...ConfigOption) (beat.Processor, error) {
 func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
+		id  = int(instanceID.Add(1))
 		log = logp.NewLogger(processorName).With("instance_id", id)
 	)
 
@@ -160,6 +163,13 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 		}
 	}
 
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostPath), false)
+	if errors.Is(err, cgroup.ErrCgroupsMissing) {
+		reader = &processors.NilCGReader{}
+	} else if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
 		if withCache && config.CgroupCacheExpireTime != 0 {
@@ -170,9 +180,9 @@ func newProcessMetadataProcessorWithProvider(config config, provider processMeta
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, p.cgroupsCache)
 		} else {
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, nil)
 		}
 	}
 

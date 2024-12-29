@@ -5,7 +5,7 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
   PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -88,7 +88,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -110,7 +111,6 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
@@ -122,7 +122,8 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -152,7 +153,8 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-          DEV: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
@@ -197,7 +199,6 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
@@ -266,7 +267,7 @@ steps:
           - packaging-snapshot
           - dashboards-snapshot
         command: |
-          buildkite-agent artifact download "build/**/*" . 
+          buildkite-agent artifact download "build/**/*" .
           .buildkite/scripts/packaging/prepare-release-manager.sh snapshot
           .buildkite/scripts/dra.sh
         agents:

@@ -15,10 +15,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/gofrs/uuid/v5"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -33,7 +34,7 @@ func TestSQSReceiver(t *testing.T) {
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 
-	const maxMessages = 5
+	const workerCount = 5
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -61,8 +62,6 @@ func TestSQSReceiver(t *testing.T) {
 			ReceiveMessage(gomock.Any(), gomock.Any()).
 			Times(1).
 			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
-				// Stop the test.
-				cancel()
 				return nil, nil
 			})
 
@@ -72,19 +71,43 @@ func TestSQSReceiver(t *testing.T) {
 				return map[string]string{sqsApproximateNumberOfMessages: "10000"}, nil
 			}).AnyTimes()
 
+		mockSQS.EXPECT().
+			DeleteMessage(gomock.Any(), gomock.Any()).Times(1).Do(
+			func(_ context.Context, _ *types.Message) {
+				cancel()
+			})
+
+		logger := logp.NewLogger(inputName)
+
 		// Expect the one message returned to have been processed.
 		mockMsgHandler.EXPECT().
-			ProcessSQS(gomock.Any(), gomock.Eq(&msg)).
+			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any()).
 			Times(1).
-			Return(nil)
+			DoAndReturn(
+				func(_ context.Context, _ *types.Message, _ func(e beat.Event)) sqsProcessingResult {
+					return sqsProcessingResult{
+						keepaliveCancel: func() {},
+						processor: &sqsS3EventProcessor{
+							log: logger,
+							sqs: mockSQS,
+						},
+					}
+				})
 
 		// Execute sqsReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
-		sqsReader.log = logp.NewLogger(inputName)
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
+		sqsReader.log = logger
 		sqsReader.sqs = mockSQS
-		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.pipeline = &fakePipeline{}
+		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.run(ctx)
+
+		select {
+		case <-ctx.Done():
+		case <-time.After(time.Second):
+			require.Fail(t, "Never observed SQS DeleteMessage call")
+		}
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -120,11 +143,12 @@ func TestSQSReceiver(t *testing.T) {
 			}).AnyTimes()
 
 		// Execute SQSReader and verify calls/state.
-		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
+		sqsReader := newSQSReaderInput(config{NumberOfWorkers: workerCount}, aws.Config{})
 		sqsReader.log = logp.NewLogger(inputName)
 		sqsReader.sqs = mockSQS
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.pipeline = &fakePipeline{}
 		sqsReader.run(ctx)
 	})
 }
