@@ -50,6 +50,7 @@ func trySyncPath(path string) {
 		return // ignore error, sync on dir must not be necessarily supported by the FS
 	}
 	defer f.Close()
+	//nolint:errcheck // ignore error
 	syncFile(f)
 }
 
