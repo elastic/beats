@@ -19,6 +19,10 @@ We do not recommend reading log files from network volumes. Whenever possible, i
 send the log files directly from there. Reading files from network volumes (especially on Windows) can have unexpected side
 effects. For example, changed file identifiers may result in {beatname_uc} reading a log file from scratch again.
 
+If it is not possible to read from the host, then using the
+<<filebeat-input-filestream-file-identity-fingerprint, `fingerprint`>>
+file identity is the next best option.
+
 [[filebeat-not-collecting-lines]]
 === {beatname_uc} isn't collecting lines from a file
 
@@ -70,6 +74,13 @@ On Linux file systems, {beatname_uc} uses the inode and device to identify files
 By default states are never removed from the registry file. To resolve the inode reuse issue, we recommend that you use the <<{beatname_lc}-input-log-clean-options,`clean_*`>> options, especially <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>, to remove the state of inactive files. For example, if your files get rotated every 24 hours, and the rotated files are not updated anymore, you can set <<{beatname_lc}-input-log-ignore-older,`ignore_older`>> to 48 hours and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>> to 72 hours.
 
 You can use <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> for files that are removed from disk. Be aware that `clean_removed` cleans the file state from the registry whenever a file cannot be found during a scan. If the file shows up again later, it will be sent again from scratch.
+
+Aside from that you should also change the
+<<filebeat-input-filestream-file-identity, `file_identity`>> to
+<<filebeat-input-filestream-file-identity-fingerprint,
+`fingerprint`>>. If you were using `native` (the default) or `path`,
+the state of the files will be automatically migrated to
+`fingerprint`.
 
 include::filebeat-log-rotation.asciidoc[]
 

@@ -142,13 +142,19 @@ func (r RateLimiter) Update(endpoint string, h http.Header, log *logp.Logger) er
 		}
 		r.byEndpoint[endpoint] = newEndpointRateLimiter
 
-		resetTimeUTC := resetTime.UTC()
-		log.Debugw("rate limit block until reset", "reset_time", resetTimeUTC)
-
 		// next gives us a sane next window estimate, but the
 		// estimate will be overwritten when we make the next
 		// permissible API request.
-		next := rate.Limit(lim / r.window.Seconds())
+		var next rate.Limit
+		if lim == 0 {
+			log.Debugw("exceeded the concurrent rate limit")
+			next = rate.Limit(1)
+		} else {
+			next = rate.Limit(lim / r.window.Seconds())
+		}
+
+		resetTimeUTC := resetTime.UTC()
+		log.Debugw("rate limit block until reset", "reset_time", resetTimeUTC)
 		waitFor := time.Until(resetTimeUTC)
 
 		time.AfterFunc(waitFor, func() {

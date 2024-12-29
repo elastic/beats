@@ -233,6 +233,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
+  - name: unifiedlogs
+    description: "macOS Unified logs"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
   - name: unix
     description: "Unix Socket"
     platforms: *platforms
@@ -504,6 +509,11 @@ inputs:
     command: *metricbeat_command
   - name: nginx/metrics
     description: "NGINX metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: openai/metrics
+    description: "OpenAI metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command

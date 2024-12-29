@@ -23,6 +23,7 @@ import (
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
+	xpacketbeat "github.com/elastic/beats/v7/x-pack/packetbeat/scripts/mage"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -85,7 +86,9 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return devtools.CrossBuild(
+		devtools.ImageSelector(xpacketbeat.ImageSelector),
+	)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
