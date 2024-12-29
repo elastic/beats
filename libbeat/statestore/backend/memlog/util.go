@@ -18,6 +18,7 @@
 package memlog
 
 import (
+	"errors"
 	"io"
 	"os"
 	"runtime"
@@ -37,7 +38,7 @@ func (c *countWriter) Write(p []byte) (int, error) {
 }
 
 func isRetryErr(err error) bool {
-	return err == syscall.EINTR || err == syscall.EAGAIN
+	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }
 
 // trySyncPath provides a best-effort fsync on path (directory). The fsync is required by some
