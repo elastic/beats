@@ -15,6 +15,8 @@
 # batch of events has been published successfully. The default value is 1s.
 #filebeat.registry.flush: 1s
 
+# The interval which to run the registry clean up
+#filebeat.registry.cleanup_interval: 5m
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
