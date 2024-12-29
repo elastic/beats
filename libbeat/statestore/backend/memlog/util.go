@@ -18,11 +18,9 @@
 package memlog
 
 import (
-	"errors"
 	"io"
 	"os"
 	"runtime"
-	"syscall"
 )
 
 // countWriter keeps track of the amount of bytes written over time.
