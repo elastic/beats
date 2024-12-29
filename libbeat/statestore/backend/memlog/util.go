@@ -37,7 +37,8 @@ func (c *countWriter) Write(p []byte) (int, error) {
 	return n, err
 }
 
-//nolint:unused // not true
+var _ = isRetryErr
+
 func isRetryErr(err error) bool {
 	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
 }
