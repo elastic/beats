@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Default Docker base image was reverted to Ubuntu 20.04 due to incompatability issues with glibc {pull}42144[42144]
 
 *Auditbeat*
 
@@ -117,6 +118,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
 - Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
 
 *Heartbeat*
 

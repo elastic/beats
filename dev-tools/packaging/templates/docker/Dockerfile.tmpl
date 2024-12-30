@@ -57,7 +57,6 @@ RUN for iter in {1..10}; do \
 {{- end }}
 
 {{- if contains .from "ubuntu" }}
-RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
 
 RUN for iter in {1..10}; do \
         apt-get update -y && \
