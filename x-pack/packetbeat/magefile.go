@@ -137,7 +137,12 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
+	// Buildkite (CI) images have preinstalled npcap
+	if os.Getenv("CI") == "true" {
+		mg.SerialDeps(devtools.BuildSystemTestBinary)
+	} else {
+		mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
+	}
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
