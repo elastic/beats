@@ -148,12 +148,8 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 			n, len(events), c.Host())
 
 		events = events[n:]
-<<<<<<< HEAD
-		st.Acked(n)
-=======
 		st.AckedEvents(n)
 		deadlockListener.ack(n)
->>>>>>> 0e62bf8f0 (Add upstream deadlock warning to the logstash output (#41960))
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)

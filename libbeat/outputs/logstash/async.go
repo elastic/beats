@@ -230,21 +230,8 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 	return client
 }
 
-<<<<<<< HEAD
-func (r *msgRef) callback(seq uint32, err error) {
-	if err != nil {
-		r.fail(seq, err)
-	} else {
-		r.done(seq)
-	}
-}
-
-func (r *msgRef) done(n uint32) {
-	r.client.observer.Acked(int(n))
-=======
 func (r *msgRef) callback(n uint32, err error) {
 	r.client.observer.AckedEvents(int(n))
->>>>>>> 0e62bf8f0 (Add upstream deadlock warning to the logstash output (#41960))
 	r.slice = r.slice[n:]
 	r.deadlockListener.ack(int(n))
 	if r.err == nil {
@@ -258,12 +245,6 @@ func (r *msgRef) callback(n uint32, err error) {
 			r.win.tryGrowWindow(r.batchSize)
 		}
 	}
-<<<<<<< HEAD
-
-	r.client.observer.Acked(int(n))
-
-=======
->>>>>>> 0e62bf8f0 (Add upstream deadlock warning to the logstash output (#41960))
 	r.dec()
 }
 
