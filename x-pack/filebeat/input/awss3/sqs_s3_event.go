@@ -43,7 +43,7 @@ func (e *nonRetryableError) Error() string {
 }
 
 func (e *nonRetryableError) Is(err error) bool {
-	_, ok := err.(*nonRetryableError) //nolint:errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
+	_, ok := err.(*nonRetryableError) //nolint:nolintlint,errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
 	return ok
 }
 
@@ -77,7 +77,8 @@ type s3EventV2 struct {
 			ARN  string `json:"arn"`
 		} `json:"bucket"`
 		Object struct {
-			Key string `json:"key"`
+			Key          string    `json:"key"`
+			LastModified time.Time `json:"lastModified"`
 		} `json:"object"`
 	} `json:"s3"`
 }

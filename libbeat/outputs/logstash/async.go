@@ -22,10 +22,10 @@ import (
 	"errors"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -155,6 +155,7 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		err:              nil,
 		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
 	}
+	ref.count.Store(1)
 	defer ref.dec()
 
 	for len(events) > 0 {
@@ -219,7 +220,7 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	for i := range events {
 		window[i] = &events[i].Content
 	}
-	ref.count.Inc()
+	ref.count.Add(1)
 	return client.Send(ref.callback, window)
 }
 
@@ -249,7 +250,7 @@ func (r *msgRef) callback(n uint32, err error) {
 }
 
 func (r *msgRef) dec() {
-	i := r.count.Dec()
+	i := r.count.Add(^uint32(0))
 	if i > 0 {
 		return
 	}
