@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Default Docker base image was reverted to Ubuntu 20.04 due to incompatability issues with glibc {pull}42144[42144]
 
 *Auditbeat*
 
@@ -116,6 +117,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
 - Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
 
 *Heartbeat*
 
@@ -175,7 +178,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.7. {pull}41018[41018]
+- Update to Go 1.22.10. {pull}42095[42095]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
