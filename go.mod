@@ -191,8 +191,13 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.17.4
 	github.com/elastic/elastic-agent-system-metrics v0.11.6
+=======
+	github.com/elastic/elastic-agent-libs v0.17.5
+	github.com/elastic/elastic-agent-system-metrics v0.11.7
+>>>>>>> 111a480d4 ([go.mod] update elastic-agent-system-metrics (#42177))
 	github.com/elastic/go-elasticsearch/v8 v8.14.0
 	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
