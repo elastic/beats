@@ -21,8 +21,10 @@ package instance
 
 import (
 	"bytes"
+	"crypto/tls"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -33,6 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -474,6 +477,50 @@ func TestLogSystemInfo(t *testing.T) {
 
 		tc.assertFn(t, buff)
 	}
+}
+
+func TestTLSDefaultVersions(t *testing.T) {
+	b, err := NewBeat("mockbeat", "testidx", "0.9", false, nil)
+	require.NoError(t, err)
+
+	cfg, err := cfgfile.Load(filepath.Join("testdata", "tls.yml"), nil)
+	require.NoError(t, err)
+	err = cfg.Unpack(&b.Config)
+	require.NoError(t, err)
+	assert.True(t, b.Config.Output.IsSet())
+	sslCfg, err := b.Config.Output.Config().Child("ssl", -1)
+	require.NoError(t, err)
+	var common tlscommon.Config
+	err = sslCfg.Unpack(&common)
+	require.NoError(t, err)
+	tlsCfg, err := tlscommon.LoadTLSConfig(&common)
+	require.NoError(t, err)
+
+	c := tlsCfg.ToConfig()
+	assert.Equal(t, uint16(tls.VersionTLS11), c.MinVersion)
+	assert.Equal(t, uint16(tls.VersionTLS13), c.MaxVersion)
+}
+
+func TestTLSVersion10(t *testing.T) {
+	b, err := NewBeat("mockbeat", "testidx", "0.9", false, nil)
+	require.NoError(t, err)
+
+	cfg, err := cfgfile.Load(filepath.Join("testdata", "tls10.yml"), nil)
+	require.NoError(t, err)
+	err = cfg.Unpack(&b.Config)
+	require.NoError(t, err)
+	assert.True(t, b.Config.Output.IsSet())
+	sslCfg, err := b.Config.Output.Config().Child("ssl", -1)
+	require.NoError(t, err)
+	var common tlscommon.Config
+	err = sslCfg.Unpack(&common)
+	require.NoError(t, err)
+	tlsCfg, err := tlscommon.LoadTLSConfig(&common)
+	require.NoError(t, err)
+
+	c := tlsCfg.ToConfig()
+	assert.Equal(t, uint16(tls.VersionTLS10), c.MinVersion)
+	assert.Equal(t, uint16(tls.VersionTLS10), c.MaxVersion)
 }
 
 type mockManager struct {
