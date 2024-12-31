@@ -59,7 +59,10 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
 	degradedConf := struct {
 		DegradeOnPartial bool `config:"degrade_on_partial"`
 	}{}
@@ -67,8 +70,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		logp.L().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
 	}
 	return &MetricSet{
-		BaseMetricSet: base,
-		sys:           sys,
+		BaseMetricSet:    base,
+		sys:              sys,
+		degradeOnPartial: degradedConf.DegradeOnPartial,
 	}, nil
 }
 
@@ -81,7 +85,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if degradeErr != nil && !errors.Is(degradeErr, process.NonFatalErr{}) {
 		// return only if the error is fatal in nature
 		return fmt.Errorf("error fetching process list: %w", degradeErr)
-	} else if (degradeErr != nil && errors.Is(degradeErr, process.NonFatalErr{}) && !m.degradeOnPartial) {
+	} else if (degradeErr != nil && errors.Is(degradeErr, process.NonFatalErr{})) {
+		if m.degradeOnPartial {
+			return fmt.Errorf("error fetching process list: %w", degradeErr)
+		}
 		degradeErr = mb.PartialMetricsError{Err: degradeErr}
 	}
 

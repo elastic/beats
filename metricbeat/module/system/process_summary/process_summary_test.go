@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -57,6 +58,27 @@ func TestFetch(t *testing.T) {
 	_, err := event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
+}
+func TestFetchDegradeOnPartial(t *testing.T) {
+	logp.DevelopmentSetup()
+	config := getConfig()
+	config["degrade_on_partial"] = true
+
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		for _, err := range errs {
+			assert.NotErrorIsf(t, err, mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
+		}
+	} else {
+		require.NotEmpty(t, events)
+		event := events[0].BeatEvent("system", "process_summary").Fields
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			event.StringToPrint())
+
+		_, err := event.GetValue("system.process.summary")
+		require.NoError(t, err)
+	}
 }
 
 func TestStateNames(t *testing.T) {

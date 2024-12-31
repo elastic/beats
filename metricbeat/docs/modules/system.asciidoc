@@ -270,6 +270,9 @@ metricbeat.modules:
   # Only effective for Windows.
   # You should use this option if running beats on machins with more than 64 cores.
   #use_performance_counters: false
+
+  # Enable below config to mark metricset as degraded if partial metrics are emitted 
+  #degrade_on_partial: false
 ----
 
 [float]

@@ -223,7 +223,15 @@ type PartialMetricsError struct {
 }
 
 func (p PartialMetricsError) Error() string {
+	if p.Err == nil {
+		return "Partial metrics error"
+	}
 	return p.Err.Error()
+}
+
+func (p PartialMetricsError) Is(other error) bool {
+	_, is := other.(PartialMetricsError)
+	return is
 }
 
 func (p PartialMetricsError) Unwrap() error {
