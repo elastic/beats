@@ -133,11 +133,11 @@ func initiateReplicaSet(t *testing.T, host string) error {
 }
 
 type ReplicaConfig struct {
-	id      string `bson:"_id"`
-	members []Host `bson:"hosts"`
+	id      string `bson:_id`
+	members []Host `bson:hosts`
 }
 
 type Host struct {
-	id   int    `bson:"_id"`
-	host string `bson:"host"`
+	id   int    `bson:_id`
+	host string `bson:host`
 }
