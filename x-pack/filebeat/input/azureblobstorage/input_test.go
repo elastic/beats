@@ -540,7 +540,8 @@ func Test_StorageClient(t *testing.T) {
 					var err error
 					val, err = got.Fields.GetValue("message")
 					assert.NoError(t, err)
-					assert.True(t, tt.expected[val.(string)])
+
+					assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					assert.Equal(t, tt.expectedError, err)
 					receivedCount += 1
 					if receivedCount == len(tt.expected) {
