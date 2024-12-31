@@ -697,12 +697,13 @@ include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 The parameter specifies the time duration during which bucket entries are accepted for processing.
 By default, this feature is disabled, allowing any entry in the bucket to be processed.
-It is recommended to set a suitable duration to prevent older bucket entries from being tracked, which can help reduce memory usage.
+It is recommended to set a suitable duration to prevent older bucket entries from being tracked, which helps to reduce the memory usage.
 
-If defined, bucket entries are processed only if their last modified timestamp falls within the specified time duration, relative to the current time.
+When defined, bucket entries are processed only if their last modified timestamp falls within the specified time duration, relative to the current time.
 However, when the start_timestamp is set, the initial processing will include all bucket entries up to that timestamp.
 
-NOTE: It is recommended to configure a sufficiently long duration based on your use case and current settings to avoid conflicts with bucket_list_interval.
+NOTE: Bucket entries that are older than the defined duration and have failed processing will not be re-processed.
+It is recommended to configure a sufficiently long duration based on your use case and current settings to avoid conflicts with the bucket_list_interval property.
 Additionally, this ensures that subsequent runs can include and re-process objects that failed due to unavoidable errors.
 
 [float]
@@ -713,6 +714,7 @@ By default, this is disabled, allowing all entries in the bucket to be processed
 
 This parameter is useful when configuring input for the first time, especially if you want to ingest logs starting from a specific time.
 The timestamp can also be set to a future time, offering greater flexibility.
+You can combine this property with ignore_older duration to improve memory usage by reducing tracked bucket entries.
 
 NOTE: It is recommended to update this value when updating or restarting filebeat
 
