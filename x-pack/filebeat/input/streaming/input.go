@@ -382,6 +382,8 @@ func formHeader(cfg config) map[string][]string {
 		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
 	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
+	case cfg.Auth.OAuth2.accessToken != "":
+		header["Authorization"] = []string{"Bearer " + cfg.Auth.OAuth2.accessToken}
 	case cfg.Auth.BasicToken != "":
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
 	}

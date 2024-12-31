@@ -88,6 +88,12 @@ type oAuth2Config struct {
 	EndpointParams map[string][]string `config:"endpoint_params"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
+	// accessToken is only used internally to set the initial headers via formHeader() if oauth2 is enabled
+	accessToken string
+}
+
+func (o oAuth2Config) isEnabled() bool {
+	return o.ClientID != "" && o.ClientSecret != "" && o.TokenURL != ""
 }
 
 type urlConfig struct {

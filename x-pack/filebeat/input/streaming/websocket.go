@@ -21,6 +21,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/oauth2"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -31,11 +32,13 @@ import (
 type websocketStream struct {
 	processor
 
-	id     string
-	cfg    config
-	cursor map[string]any
-
-	time func() time.Time
+	id              string
+	cfg             config
+	cursor          map[string]any
+	isOauth2Enabled bool
+	tokenSource     oauth2.TokenSource
+	tokenExpiry     <-chan time.Time
+	time            func() time.Time
 }
 
 // NewWebsocketFollower performs environment construction including CEL
@@ -53,9 +56,35 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			redact:  cfg.Redact,
 			metrics: newInputMetrics(id),
 		},
+		tokenExpiry: nil,
 	}
 	s.metrics.url.Set(cfg.URL.String())
 	s.metrics.errorsTotal.Set(0)
+	// initialize the oauth2 token source if oauth2 is enabled and set access token in the config
+	if cfg.Auth.OAuth2.isEnabled() {
+		config := &oauth2.Config{
+			ClientID:     cfg.Auth.OAuth2.ClientID,
+			ClientSecret: cfg.Auth.OAuth2.ClientSecret,
+			Endpoint: oauth2.Endpoint{
+				TokenURL: cfg.Auth.OAuth2.TokenURL,
+			},
+			Scopes: cfg.Auth.OAuth2.Scopes,
+		}
+		s.tokenSource = config.TokenSource(ctx, nil)
+		s.isOauth2Enabled = true
+		// get the initial token
+		token, err := s.tokenSource.Token()
+		if err != nil {
+			s.metrics.errorsTotal.Inc()
+			s.Close()
+			return nil, fmt.Errorf("failed to obtain oauth2 token: %w", err)
+		}
+		// set the initial token in the config if oauth2 is enabled
+		// this allows seamless header creation in formHeader() for the initial connection
+		s.cfg.Auth.OAuth2.accessToken = token.AccessToken
+		// set the initial token expiry channel with buffer of 2 mins
+		s.tokenExpiry = time.After(time.Until(token.Expiry) - 120*time.Second)
+	}
 
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
@@ -114,6 +143,32 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
 			return ctx.Err()
+		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
+		case <-s.tokenExpiry:
+			// get the new token
+			token, err := s.tokenSource.Token()
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to obtain oauth2 token during token refresh", "error", err)
+				return err
+			}
+			// gracefully close current connection
+			if err := c.Close(); err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+			}
+			// set the new token in the config
+			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
+			// set the new token expiry channel with 2 mins buffer
+			s.tokenExpiry = time.After(time.Until(token.Expiry) - 120*time.Second)
+			// establish a new connection with the new token
+			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+			handleConnectionResponse(resp, s.metrics, s.log)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to establish websocket connection on token refresh", "error", err)
+				return err
+			}
 		default:
 			_, message, err := c.ReadMessage()
 			if err != nil {
