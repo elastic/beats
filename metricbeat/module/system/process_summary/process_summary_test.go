@@ -102,7 +102,8 @@ func TestStateNames(t *testing.T) {
 	assert.NotZero(t, event["total"])
 
 	var sum int
-	total := event["total"].(int)
+	total, ok := event["total"].(int)
+	require.Truef(t, ok, "Expected int got %T", event["total"])
 	for key, val := range event {
 		if key == "total" {
 			continue
