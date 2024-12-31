@@ -33,13 +33,6 @@ func TestFilestreamMetrics(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-<<<<<<< HEAD
-		"id":                                   "fake-ID",
-		"paths":                                []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval":    "24h",
-		"close.on_state_change.check_interval": "100ms",
-		"close.on_state_change.inactive":       "2s",
-=======
 		"id":                                     "fake-ID",
 		"paths":                                  []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":      "24h",
@@ -60,7 +53,6 @@ func TestFilestreamMetrics(t *testing.T) {
 				},
 			},
 		},
->>>>>>> 7806f1a2c (filebeat/inputs/filestream: add metric for messages truncated (#41667))
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\nthis is a very long line exceeding message_max_bytes\nmultiline first line\nmultiline second line\n")
