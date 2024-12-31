@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -379,6 +380,15 @@ func (inp *filestream) readFromSource(
 		}
 
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
+
+		flags, err := message.Fields.GetValue("log.flags")
+		if err == nil {
+			if flags, ok := flags.([]string); ok {
+				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
+					metrics.MessagesTruncated.Add(1)
+				}
+			}
+		}
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
