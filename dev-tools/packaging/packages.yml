@@ -175,6 +175,16 @@ shared:
       from: '--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal'
       buildFrom: '--platform=linux/arm64 cgr.dev/chainguard/wolfi-base'
 
+  - &docker_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi'
+      from: '--platform=linux/amd64 docker.elastic.co/ubi9/ubi-minimal'
+
+  - &docker_arm_ubi_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-ubi'
+      from: '--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal'
+
   - &docker_wolfi_spec
     extra_vars:
       image_name: '{{.BeatName}}-wolfi'
@@ -400,6 +410,15 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
         <<: *docker_wolfi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
@@ -409,6 +428,15 @@ specs:
       types: [docker]
       spec:
         <<: *docker_arm_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
 
@@ -513,6 +541,18 @@ specs:
       types: [docker]
       spec:
         <<: *docker_spec
+        <<: *docker_ubi_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *docker_spec
         <<: *docker_wolfi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
@@ -525,6 +565,18 @@ specs:
       types: [docker]
       spec:
         <<: *docker_arm_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *docker_arm_spec
+        <<: *docker_arm_ubi_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
