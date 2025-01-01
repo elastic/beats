@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2024 Elasticsearch BV
+Copyright 2014-2025 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -435,11 +435,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.65
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/compute
-Version: v1.29.0
+Version: v1.31.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.29.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.31.0/LICENSE:
 
 
                                  Apache License
@@ -647,11 +647,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.29.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/monitoring
-Version: v1.21.2
+Version: v1.22.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.21.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.22.0/LICENSE:
 
 
                                  Apache License
@@ -859,11 +859,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/pubsub
-Version: v1.45.1
+Version: v1.45.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.45.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.45.3/LICENSE:
 
 
                                  Apache License
@@ -30699,11 +30699,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/iam
-Version: v1.2.2
+Version: v1.3.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.2.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.3.0/LICENSE:
 
 
                                  Apache License
@@ -31335,11 +31335,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/logging@v1.12.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/longrunning
-Version: v0.6.2
+Version: v0.6.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.6.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.6.3/LICENSE:
 
 
                                  Apache License
