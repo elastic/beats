@@ -132,7 +132,7 @@ require (
 	golang.org/x/crypto v0.31.0
 	golang.org/x/mod v0.21.0
 	golang.org/x/net v0.33.0
-	golang.org/x/oauth2 v0.22.0
+	golang.org/x/oauth2 v0.23.0
 	golang.org/x/sync v0.10.0
 	golang.org/x/sys v0.28.0
 	golang.org/x/text v0.21.0
@@ -140,8 +140,8 @@ require (
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.191.0
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
-	google.golang.org/grpc v1.66.0
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/grpc v1.67.1
+	google.golang.org/protobuf v1.35.2
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/gotestsum v1.7.0
@@ -233,7 +233,7 @@ require (
 	go.opentelemetry.io/collector/receiver v0.114.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.27.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
+	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -276,11 +276,7 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
-<<<<<<< HEAD
-=======
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
->>>>>>> a306a4e3f ([filebeat] Introduce otel mode (#41849))
 	github.com/cilium/ebpf v0.13.2 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
@@ -376,11 +372,8 @@ require (
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f // indirect
-<<<<<<< HEAD
-=======
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/common v0.114.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal v0.114.0 // indirect
->>>>>>> a306a4e3f ([filebeat] Introduce otel mode (#41849))
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
@@ -402,20 +395,6 @@ require (
 	go.elastic.co/apm/module/apmzap/v2 v2.6.0 // indirect
 	go.elastic.co/fastjson v1.3.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/collector/config/configtelemetry v0.109.0 // indirect
-	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
-	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
-	go.opentelemetry.io/otel v1.29.0 // indirect
-	go.opentelemetry.io/otel/metric v1.29.0 // indirect
-	go.opentelemetry.io/otel/trace v1.29.0 // indirect
-	go.uber.org/ratelimit v0.3.1 // indirect
-	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240822170219-fc7c04adadcd // indirect
-=======
 	go.opentelemetry.io/collector/client v1.20.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.114.0 // indirect
 	go.opentelemetry.io/collector/component/componenttest v0.114.0 // indirect
@@ -455,7 +434,6 @@ require (
 	go.opentelemetry.io/collector/service v0.114.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.6.0 // indirect
 	go.opentelemetry.io/contrib/config v0.10.0 // indirect
-	go.opentelemetry.io/contrib/detectors/gcp v1.29.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.56.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.31.0 // indirect
@@ -482,7 +460,6 @@ require (
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	gonum.org/v1/gonum v0.15.1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
->>>>>>> a306a4e3f ([filebeat] Introduce otel mode (#41849))
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
