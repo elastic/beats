@@ -31,14 +31,14 @@ const (
 
 var (
 	// TLSVersionMin is the min TLS version supported.
-	TLSVersionMin = TLSVersion10
+	TLSVersionMin = TLSVersion11
 
 	// TLSVersionMax is the max TLS version supported.
 	TLSVersionMax = TLSVersion13
 
 	// TLSVersionDefaultMin is the minimal default TLS version that is
 	// enabled by default. TLSVersionDefaultMin is >= TLSVersionMin
-	TLSVersionDefaultMin = TLSVersion11
+	TLSVersionDefaultMin = TLSVersion12
 
 	// TLSVersionDefaultMax is the max default TLS version that
 	// is enabled by default.
@@ -47,7 +47,6 @@ var (
 
 // TLSDefaultVersions list of versions of TLS we should support.
 var TLSDefaultVersions = []TLSVersion{
-	TLSVersion11,
 	TLSVersion12,
 	TLSVersion13,
 }
