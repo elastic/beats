@@ -266,7 +266,7 @@ paths:
 				logs := buff.String()
 				// Assert the logs contain the correct log message
 				assert.Contains(t, logs,
-					fmt.Sprintf("filestream input '%s' is duplicated:", tc.id))
+					fmt.Sprintf("filestream input ID '%s' is duplicated:", tc.id))
 
 				// Assert the error contains the correct text
 				assert.Contains(t, err.Error(),

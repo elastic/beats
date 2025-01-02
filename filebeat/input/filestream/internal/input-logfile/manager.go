@@ -175,7 +175,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		duplicatedInput := map[string]any{}
 		unpackErr := config.Unpack(&duplicatedInput)
 		if unpackErr != nil {
-			duplicatedInput["error"] = fmt.Errorf("failed to umpack dupliucated input config: %w", unpackErr).Error()
+			duplicatedInput["error"] = fmt.Errorf("failed to unpack duplicated input config: %w", unpackErr).Error()
 		}
 
 		// Keep old behaviour so users can upgrade to 9.0 without
@@ -191,7 +191,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		} else {
 			cim.Logger.Errorw(
 				fmt.Sprintf(
-					"filestream input '%s' is duplicated: input will NOT start",
+					"filestream input ID '%s' is duplicated: input will NOT start",
 					settings.ID,
 				),
 				"input.cfg", conf.DebugString(config, true))

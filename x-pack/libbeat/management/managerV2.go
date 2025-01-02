@@ -681,7 +681,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
 	if err := cm.reloadInputs(inputUnits); err != nil { // HERE
-		// cm.reloadInputs will use fmt.Errorf and join an erros slice
+		// cm.reloadInputs will use fmt.Errorf and join an error slice
 		// using errors.Join, so we need to unwrap the fmt wrapped error,
 		// then we can iterate over the errors list.
 		err = errors.Unwrap(err)

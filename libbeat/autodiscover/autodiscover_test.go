@@ -819,7 +819,7 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
 
-func TestTiago(t *testing.T) {
+func TestErrNonReloadableIsNotRetried(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
@@ -847,9 +847,6 @@ func TestTiago(t *testing.T) {
 			conf.MustNewConfigFrom(map[string]any{
 				"err_non_reloadable": true,
 			}),
-			// conf.MustNewConfigFrom(map[string]any{
-			// 	"lets-break-it": true,
-			// }),
 		},
 	}
 
