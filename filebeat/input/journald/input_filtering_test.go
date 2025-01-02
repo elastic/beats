@@ -22,7 +22,7 @@ package journald
 import (
 	"context"
 	"encoding/json"
-	"path"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -30,6 +30,8 @@ import (
 )
 
 func TestInputSyslogIdentifier(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
+
 	tests := map[string]struct {
 		identifiers      []string
 		expectedMessages []string
@@ -53,7 +55,7 @@ func TestInputSyslogIdentifier(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":              []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":              []string{out},
 				"syslog_identifiers": testCase.identifiers,
 			})
 
@@ -73,6 +75,7 @@ func TestInputSyslogIdentifier(t *testing.T) {
 }
 
 func TestInputUnits(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
 		units            []string
 		kernel           bool
@@ -110,7 +113,7 @@ func TestInputUnits(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":  []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":  []string{out},
 				"units":  testCase.units,
 				"kernel": testCase.kernel,
 			})
@@ -131,6 +134,7 @@ func TestInputUnits(t *testing.T) {
 }
 
 func TestInputIncludeMatches(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
 		includeMatches   map[string]interface{}
 		expectedMessages []string
@@ -168,7 +172,7 @@ func TestInputIncludeMatches(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":           []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":           []string{out},
 				"include_matches": testCase.includeMatches,
 			})
 
@@ -190,6 +194,7 @@ func TestInputIncludeMatches(t *testing.T) {
 // TestInputSeek test the output of various seek modes while reading
 // from input-multiline-parser.journal.
 func TestInputSeek(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	// Uncomment the following line to see all logs during the test execution
 	// logp.DevelopmentSetup()
 	timeAfterFirstEvent := time.Date(2021, time.November, 22, 17, 10, 20, 0, time.UTC).In(time.Local)
@@ -256,13 +261,13 @@ func TestInputSeek(t *testing.T) {
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)
 				}
-				if err := store.Set("journald::testdata/input-multiline-parser.journal", tmp); err != nil {
+				if err := store.Set("journald::"+out, tmp); err != nil {
 					t.Fatal(err)
 				}
 			}
 
 			conf := mapstr.M{
-				"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths": []string{out},
 			}
 
 			conf.DeepUpdate(testCase.config)

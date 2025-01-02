@@ -21,7 +21,7 @@ package journald
 
 import (
 	"context"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,9 +31,11 @@ import (
 // it only tests a single parser, but that is enough to ensure
 // we're correctly using the parsers
 func TestInputParsers(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "ndjson-parser.journal.gz"))
+
 	env := newInputTestingEnvironment(t)
 	inp := env.mustCreateInput(mapstr.M{
-		"paths": []string{path.Join("testdata", "ndjson-parser.journal")},
+		"paths": []string{out},
 		"parsers": []mapstr.M{
 			{
 				"ndjson": mapstr.M{
