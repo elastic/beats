@@ -229,11 +229,6 @@ func (p PartialMetricsError) Error() string {
 	return p.Err.Error()
 }
 
-func (p PartialMetricsError) Is(other error) bool {
-	_, is := other.(PartialMetricsError)
-	return is
-}
-
 func (p PartialMetricsError) Unwrap() error {
 	return p.Err
 }

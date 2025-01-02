@@ -68,7 +68,7 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		for _, err := range errs {
-			assert.NotErrorIsf(t, err, mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
+			assert.NotErrorIsf(t, err, &mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
 		}
 	} else {
 		require.NotEmpty(t, events)
