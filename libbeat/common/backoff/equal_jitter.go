@@ -18,7 +18,7 @@
 package backoff
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"time"
 )
 
@@ -55,7 +55,7 @@ func (b *EqualJitterBackoff) Reset() {
 func (b *EqualJitterBackoff) Wait() bool {
 	// Make sure we have always some minimal back off and jitter.
 	temp := int64(b.duration / 2)
-	backoff := time.Duration(temp + rand.Int63n(temp))
+	backoff := time.Duration(temp + rand.Int64N(temp))
 
 	// increase duration for next wait.
 	b.duration *= 2
