@@ -130,7 +130,7 @@ func BenchmarkFactory(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := NewFactory().CreateLogsReceiver(context.Background(), receiverSettings, cfg, nil)
+		_, err := NewFactory().CreateLogs(context.Background(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
 }
