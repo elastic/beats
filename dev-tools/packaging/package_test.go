@@ -600,23 +600,23 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 		for {
 			select {
 			case <-timer.C:
-				t.Fatalf("logs:\n%s\nnever saw %q within timeout", string(logs), sentinelLog)
-				goto done
+				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
+				return
 			case <-ticker.C:
 				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
 				if err != nil {
 					t.Logf("could not get logs: %s", err)
 				}
 				logs, err = io.ReadAll(out)
+				out.Close()
 				if err != nil {
 					t.Logf("error reading logs: %s", err)
 				}
 				if bytes.Contains(logs, []byte(sentinelLog)) {
-					goto done
+					return
 				}
 			}
 		}
-	done:
 	})
 }
 
