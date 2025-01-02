@@ -256,5 +256,6 @@ func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 	event.S3.Bucket.Name = state.Bucket
 	event.S3.Bucket.ARN = in.config.getBucketARN()
 	event.S3.Object.Key = state.Key
+	event.S3.Object.LastModified = state.LastModified
 	return event
 }
