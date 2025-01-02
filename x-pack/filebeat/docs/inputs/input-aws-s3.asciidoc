@@ -695,7 +695,7 @@ include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 [float]
 ==== `ignore_older`
 
-The parameter specifies the time duration during which bucket entries are accepted for processing.
+The parameter specifies the time duration (ex:- 30m, 2h or 48h) during which bucket entries are accepted for processing.
 By default, this feature is disabled, allowing any entry in the bucket to be processed.
 It is recommended to set a suitable duration to prevent older bucket entries from being tracked, which helps to reduce the memory usage.
 
