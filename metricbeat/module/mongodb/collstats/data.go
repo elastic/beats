@@ -26,7 +26,6 @@ import (
 
 func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 	names, err := splitKey(key)
-
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +97,8 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 			"storageSize":    mustGetMapStrValue(data, "stats.storageSize"),
 			"totalIndexSize": mustGetMapStrValue(data, "stats.totalIndexSize"),
 			"totalSize":      mustGetMapStrValue(data, "stats.totalSize"),
+			"max":            mustGetMapStrValue(data, "stats.max"),
+			"nindexes":       mustGetMapStrValue(data, "stats.nindexes"),
 		},
 	}
 
