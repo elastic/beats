@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -424,8 +423,8 @@ func testSendMultipleBatchesViaLogstash(
 	}
 
 	for _, batch := range batches {
-		ok := ls.BulkPublish(batch)
-		assert.Equal(t, true, ok)
+		result := ls.BulkPublish(batch)
+		assert.Equal(t, outest.BatchACK, result)
 	}
 
 	// wait for logstash event flush + elasticsearch
@@ -569,20 +568,17 @@ func (t *testOutputer) PublishEvent(event beat.Event) {
 	t.Publish(context.Background(), batch)
 }
 
-func (t *testOutputer) BulkPublish(events []beat.Event) bool {
-	ok := false
+func (t *testOutputer) BulkPublish(events []beat.Event) outest.BatchSignalTag {
+	resultChan := make(chan outest.BatchSignalTag, 1)
 	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
 
-	var wg sync.WaitGroup
-	wg.Add(1)
 	batch.OnSignal = func(sig outest.BatchSignal) {
-		ok = sig.Tag == outest.BatchACK
-		wg.Done()
+		resultChan <- sig.Tag
+		close(resultChan)
 	}
 
 	t.Publish(context.Background(), batch)
-	wg.Wait()
-	return ok
+	return <-resultChan
 }
 
 // encodeBatch encodes a publisher.Batch so it can be provided to
