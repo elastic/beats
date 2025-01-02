@@ -6,7 +6,12 @@ attrs==19.3.0
 autopep8==1.5.4
 backports.ssl-match-hostname==3.5.0.1
 cached-property==1.4.2
+<<<<<<< HEAD
 certifi==2018.1.18
+=======
+certifi==2024.7.4
+cffi==1.17.1
+>>>>>>> b7813206f (libbeat/system/tests: bump python libs to fix issues with Python 3.13 (#42183))
 chardet==3.0.4
 deepdiff==4.2.0
 docker-pycreds==0.4.0
@@ -14,7 +19,14 @@ dockerpty==0.4.1
 docopt==0.6.2
 elasticsearch==7.8.1
 enum34==1.1.6
+<<<<<<< HEAD
 idna==2.6
+=======
+exceptiongroup==1.2.0
+googleapis-common-protos==1.56.4
+grpcio==1.68.1
+idna==3.7
+>>>>>>> b7813206f (libbeat/system/tests: bump python libs to fix issues with Python 3.13 (#42183))
 importlib-metadata==1.7.0
 iniconfig==1.0.1
 ipaddress==1.0.19
