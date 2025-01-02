@@ -1007,7 +1007,7 @@ logging.files:
   #path: /var/log/osquerybeat
 
   # The name of the files where the logs are written to.
-  #name: osquerybeat-event-data
+  #name: osquerybeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
