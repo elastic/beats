@@ -142,7 +142,7 @@ func Test_oldestTimeFilter(t *testing.T) {
 		duration := time.Duration(1) * time.Second
 		entry := newState("bucket", "key", "eTag", time.Now())
 
-		oldTimeFilter := newOldestTimeFilter(duration)
+		oldTimeFilter := newOldestTimeFilter(duration, time.Now())
 
 		assert.Equal(t, filterOldestTime, oldTimeFilter.getID())
 		assert.True(t, oldTimeFilter.isValid(entry))
@@ -171,7 +171,7 @@ func Test_oldestTimeFilter(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			timeFilter := newOldestTimeFilter(test.duration)
+			timeFilter := newOldestTimeFilter(test.duration, time.Now())
 			assert.Equal(t, test.result, timeFilter.isValid(test.input))
 		})
 	}

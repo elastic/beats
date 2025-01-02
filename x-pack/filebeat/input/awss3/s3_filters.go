@@ -46,7 +46,7 @@ func (f *filterProvider) getApplierFunc() func(log *logp.Logger, s state) bool {
 	filters := map[string]filter{}
 
 	if f.cfg.IgnoreOlder != 0 {
-		timeFilter := newOldestTimeFilter(f.cfg.IgnoreOlder)
+		timeFilter := newOldestTimeFilter(f.cfg.IgnoreOlder, time.Now())
 		filters[timeFilter.getID()] = timeFilter
 	}
 
@@ -107,11 +107,10 @@ type oldestTimeFilter struct {
 	timeOldest time.Time
 }
 
-func newOldestTimeFilter(timespan time.Duration) *oldestTimeFilter {
-	oldest := time.Now().Add(-1 * timespan)
+func newOldestTimeFilter(timespan time.Duration, now time.Time) *oldestTimeFilter {
 	return &oldestTimeFilter{
 		id:         filterOldestTime,
-		timeOldest: oldest,
+		timeOldest: now.Add(-1 * timespan),
 	}
 }
 

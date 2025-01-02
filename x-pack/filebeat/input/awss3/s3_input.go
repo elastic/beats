@@ -202,7 +202,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 	defer close(workChan)
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
 
-	applyFilter := in.filterProvider.getApplierFunc()
+	isStateValid := in.filterProvider.getApplierFunc()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -235,7 +235,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			if !applyFilter(in.log, state) {
+			if !isStateValid(in.log, state) {
 				continue
 			}
 
