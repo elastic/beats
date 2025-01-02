@@ -362,6 +362,10 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
+	if b.Config.Logging == nil {
+		b.Config.Logging = config.NewConfig()
+	}
+
 	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
