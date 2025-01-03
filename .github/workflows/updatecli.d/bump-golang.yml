@@ -1,13 +1,13 @@
 ---
 name: Bump golang-version to latest version
-pipelineid: 'bump-golang-version'
+pipelineid: "bump-golang-version"
 
 scms:
   githubConfig:
     kind: github
     spec:
-      owner: '{{ .scm.owner }}'
-      repository: '{{ .scm.repository }}'
+      owner: "{{ .scm.owner }}"
+      repository: "{{ .scm.repository }}"
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
