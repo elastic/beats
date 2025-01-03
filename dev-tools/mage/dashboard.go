@@ -49,8 +49,8 @@ func ExportDashboard() error {
 	folder := CWD("module", module)
 
 	args := []string{
-		"-folder", folder,
-		"-dashboard", id,
+		"--folder", folder,
+		"--dashboard", id,
 	}
 	if kibanaURL := EnvOr("KIBANA_URL", ""); kibanaURL != "" {
 		args = append(args, "-kibana", kibanaURL)

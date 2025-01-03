@@ -998,7 +998,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
 func (b *Beat) handleFlags() error {
-	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	flag.Parse()
 	return cfgfile.HandleFlags()
 }

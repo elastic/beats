@@ -12,10 +12,10 @@ class KeystoreBase(BaseTest):
         """
         Add new secret using the --stdin option
         """
-        args = [self.test_binary, "-systemTest"]
+        args = [self.test_binary, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
         args += [

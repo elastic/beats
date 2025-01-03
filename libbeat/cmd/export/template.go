@@ -20,7 +20,6 @@ package export
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
@@ -60,11 +59,8 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es.version")
 	genTemplateConfigCmd.Flags().Bool("noilm", false, "Generate template with ILM disabled")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("noilm")
 	genTemplateConfigCmd.Flags().String("dir", "", "Specify directory for printing template files. By default templates are printed to stdout.")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("dir")
 
 	return genTemplateConfigCmd
 }

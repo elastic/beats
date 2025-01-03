@@ -163,7 +163,7 @@ func HasTests(pkg string) (bool, error) {
 }
 
 func (goTest) WithCoverage(to string) ArgOpt {
-	return combine(flagArg("-cover", ""), flagArgIf("-test.coverprofile", to))
+	return combine(flagArg("-cover", ""), flagArgIf("--test.coverprofile", to))
 }
 func (goTest) Short(b bool) ArgOpt        { return flagBoolIf("-test.short", b) }
 func (goTest) Use(bin string) ArgOpt      { return extraArgIf("use", bin) }
@@ -222,10 +222,6 @@ func runVGo(cmd string, args *Args) error {
 		_, err := sh.Exec(env, os.Stdout, os.Stderr, cmd, args...)
 		return err
 	}, cmd, args)
-}
-
-func runGo(cmd string, args *Args) error {
-	return execGoWith(sh.RunWith, cmd, args)
 }
 
 func execGoWith(

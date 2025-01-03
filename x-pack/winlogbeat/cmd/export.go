@@ -10,7 +10,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -49,9 +48,7 @@ func GenExportPipelineCmd(settings instance.Settings) *cobra.Command {
 	}
 
 	genExportPipelineCmd.Flags().String("es.version", settings.Version, "Elasticsearch version (required)")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es.version")
 	genExportPipelineCmd.Flags().String("dir", "", "Specify directory for exporting pipelines. Default is current directory.")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("dir")
 
 	return genExportPipelineCmd
 }

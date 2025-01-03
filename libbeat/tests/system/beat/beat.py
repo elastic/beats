@@ -269,10 +269,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + "-" + self.today + ".ndjson"
 
-        args = [cmd, "-systemTest"]
+        args = [cmd, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
@@ -281,7 +281,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             path_home = home
 
         args += [
-            "-path.home", path_home,
+            "--path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
