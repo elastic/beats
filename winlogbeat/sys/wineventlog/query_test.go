@@ -119,8 +119,8 @@ func TestCombinedQuery(t *testing.T) {
 func TestCombinedQuerySplit(t *testing.T) {
 	const expected = `<QueryList>
   <Query Id="0">
-    <Select Path="Application">*[System[(EventID=1 or EventID=2 or EventID=3 or EventID=4 or EventID=5 or EventID=6 or EventID=7 or EventID=8 or EventID=9 or EventID=10 or EventID=11 or EventID=12 or EventID=13 or EventID=14 or EventID=15 or EventID=16 or EventID=17 or EventID=18 or EventID=19) and (Level = 0 or Level = 4) and Provider[@Name='Microsoft-Windows-User Profiles Service' or @Name='Windows Error Reporting']]]</Select>
-    <Select Path="Application">*[System[((EventID &gt;= 20 and EventID &lt;= 100) or EventID=1001) and (Level = 0 or Level = 4) and Provider[@Name='Microsoft-Windows-User Profiles Service' or @Name='Windows Error Reporting']]]</Select>
+    <Select Path="Application">*[System[(EventID=1 or EventID=2 or EventID=3 or EventID=4 or EventID=5 or EventID=6 or EventID=7 or EventID=8 or EventID=9 or EventID=10 or EventID=11 or EventID=12 or EventID=13 or EventID=14 or EventID=15 or EventID=16 or EventID=17 or EventID=18) and (Level = 0 or Level = 4) and Provider[@Name='Microsoft-Windows-User Profiles Service' or @Name='Windows Error Reporting']]]</Select>
+    <Select Path="Application">*[System[(EventID=19 or (EventID &gt;= 20 and EventID &lt;= 100) or EventID=1001) and (Level = 0 or Level = 4) and Provider[@Name='Microsoft-Windows-User Profiles Service' or @Name='Windows Error Reporting']]]</Select>
     <Suppress Path="Application">*[System[(EventID=75 or (EventID &gt;= 97 and EventID &lt;= 99))]]</Suppress>
   </Query>
 </QueryList>`
