@@ -33,13 +33,12 @@ import (
 type websocketStream struct {
 	processor
 
-	id              string
-	cfg             config
-	cursor          map[string]any
-	isOauth2Enabled bool
-	tokenSource     oauth2.TokenSource
-	tokenExpiry     <-chan time.Time
-	time            func() time.Time
+	id          string
+	cfg         config
+	cursor      map[string]any
+	tokenSource oauth2.TokenSource
+	tokenExpiry <-chan time.Time
+	time        func() time.Time
 }
 
 type loggingRoundTripper struct {
@@ -94,9 +93,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			Transport: &loggingRoundTripper{http.DefaultTransport, log},
 		}
 		oauth2Ctx := context.WithValue(ctx, oauth2.HTTPClient, client)
-
 		s.tokenSource = config.TokenSource(oauth2Ctx)
-		s.isOauth2Enabled = true
 		// get the initial token
 		token, err := s.tokenSource.Token()
 		if err != nil {
