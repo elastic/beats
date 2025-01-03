@@ -378,12 +378,14 @@ func errorMessage(msg string) map[string]interface{} {
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
 	switch {
-	case cfg.Auth.CustomAuth != nil:
-		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
+	case cfg.Auth.OAuth2.accessToken != "":
+		header["Authorization"] = []string{"Bearer " + cfg.Auth.OAuth2.accessToken}
 	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
 	case cfg.Auth.BasicToken != "":
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
+	case cfg.Auth.CustomAuth != nil:
+		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
 	}
 	return header
 }

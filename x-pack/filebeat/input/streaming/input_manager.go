@@ -38,7 +38,6 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
-
 	if src.cfg.Program == "" {
 		// set default program
 		src.cfg.Program = `
