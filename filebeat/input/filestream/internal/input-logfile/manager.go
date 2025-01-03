@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
+	"github.com/elastic/beats/v7/filebeat/features"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -64,7 +65,7 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *conf.C) (Prospector, Harvester, error)
 
-	initOnce   sync.Once
+	initedFull bool
 	initErr    error
 	store      *store
 	ackUpdater *updateWriter
@@ -88,26 +89,40 @@ const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
 
-func (cim *InputManager) init() error {
-	cim.initOnce.Do(func() {
+// init initializes the state store
+// This function is called from:
+// 1. InputManager::Init on beat start
+// 2. InputManager::Create when the input is initialized with configuration
+// When Elasticsearch state storage is used for the input it will be only fully configured on InputManager::Create,
+// so skip reading the state from the storage on InputManager::Init in this case
+func (cim *InputManager) init(inputID string) error {
+	if cim.initedFull {
+		return nil
+	}
 
-		log := cim.Logger.With("input_type", cim.Type)
+	log := cim.Logger.With("input_type", cim.Type)
 
-		var store *store
-		store, cim.initErr = openStore(log, cim.StateStore, cim.Type)
-		if cim.initErr != nil {
-			return
-		}
+	var store *store
 
-		cim.store = store
-		cim.ackCH = newUpdateChan()
-		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
-		cim.ids = map[string]struct{}{}
-	})
+	useES := features.IsElasticsearchStateStoreEnabledForInput(cim.Type)
+	fullInit := !useES || (inputID != "" && useES)
+	store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, fullInit)
+	if cim.initErr != nil {
+		return cim.initErr
+	}
+
+	cim.store = store
+	cim.ackCH = newUpdateChan()
+	cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+	cim.ids = map[string]struct{}{}
+
+	if fullInit {
+		cim.initedFull = true
+	}
 
 	return cim.initErr
 }
@@ -115,7 +130,7 @@ func (cim *InputManager) init() error {
 // Init starts background processes for deleting old entries from the
 // persistent store if mode is ModeRun.
 func (cim *InputManager) Init(group unison.Group) error {
-	if err := cim.init(); err != nil {
+	if err := cim.init(""); err != nil {
 		return err
 	}
 
@@ -150,16 +165,16 @@ func (cim *InputManager) shutdown() {
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
 func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
-	if err := cim.init(); err != nil {
-		return nil, err
-	}
-
 	settings := struct {
 		ID             string        `config:"id"`
 		CleanInactive  time.Duration `config:"clean_inactive"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanInactive: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
+		return nil, err
+	}
+
+	if err := cim.init(settings.ID); err != nil {
 		return nil, err
 	}
 

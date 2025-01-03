@@ -35,7 +35,7 @@ type states struct {
 
 // newStates generates a new states registry.
 func newStates(log *logp.Logger, stateStore beater.StateStore, listPrefix string) (*states, error) {
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return nil, fmt.Errorf("can't access persistent store: %w", err)
 	}
