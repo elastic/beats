@@ -1523,6 +1523,7 @@ https://github.com/elastic/beats/compare/v8.8.2\...v8.9.0[View commits]
 
 *Filebeat*
 
+- Improve documentation for Okta module. {pull}36211[36211]
 - Add support in s3 input for JSON with array of objects. {pull}35475[35475]
 - RFC5424 syslog timestamps with offset 'Z' will be treated as UTC rather than using the default timezone. {pull}35360[35360]
 - Fixed a minor code error in the GCS input scheduler where a config value was being used directly instead of the source struct. {pull}35729[35729]
