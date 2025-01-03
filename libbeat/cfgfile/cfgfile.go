@@ -32,13 +32,12 @@ import (
 
 // Evil package level globals
 var (
-	once                            sync.Once
-	configfiles                     *config.StringsFlag
-	overwrites                      *config.C
-	defaults                        *config.C
-	homePath                        *string
-	configPath                      *string
-	allowedBackwardsCompatibleFlags []string
+	once        sync.Once
+	configfiles *config.StringsFlag
+	overwrites  *config.C
+	defaults    *config.C
+	homePath    *string
+	configPath  *string
 )
 
 func Initialize() {

@@ -224,10 +224,6 @@ func runVGo(cmd string, args *Args) error {
 	}, cmd, args)
 }
 
-func runGo(cmd string, args *Args) error {
-	return execGoWith(sh.RunWith, cmd, args)
-}
-
 func execGoWith(
 	fn func(map[string]string, string, ...string) error,
 	cmd string, args *Args,
