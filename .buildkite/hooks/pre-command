@@ -18,6 +18,13 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" && "$BUILDKITE_STEP_KEY" == *"agentbeat-it"* ]]; then
+    out=$(.buildkite/scripts/agentbeat/setup_agentbeat.py)
+    echo "$out"
+    AGENTBEAT_PATH=$(echo "$out" | tail -n 1)
+    export AGENTBEAT_PATH
+fi
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" || \
