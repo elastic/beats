@@ -19,11 +19,11 @@
         "mysqlenterprise.audit.connection_id": 0,
         "mysqlenterprise.audit.id": 0,
         "process.args": [
-            "--log-error=log.err",
+            "/usr/local/mysql/bin/mysqld",
             "--loose-audit-log-format=JSON",
+            "--log-error=log.err",
             "--pid-file=mysqld.pid",
-            "--port=3306",
-            "/usr/local/mysql/bin/mysqld"
+            "--port=3306"
         ],
         "process.args_count": 5,
         "process.command_line": "/usr/local/mysql/bin/mysqld --loose-audit-log-format=JSON --log-error=log.err --pid-file=mysqld.pid --port=3306",
