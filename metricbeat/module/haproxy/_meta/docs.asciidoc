@@ -38,7 +38,7 @@ To enable stats reporting via a UNIX socket, add the following line to the
 
 [source,shell]
 ----
- stats socket /path/to/haproxy.sock mode 660 level admin
+ stats socket /path/to/haproxy.sock mode 660 level user
 ----
 
 [float]
