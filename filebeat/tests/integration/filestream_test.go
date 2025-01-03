@@ -36,6 +36,8 @@ filebeat.inputs:
     paths:
       - %s
 
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     clean_inactive: 3s
     ignore_older: 2s
     close.on_state_change.inactive: 1s
@@ -104,4 +106,17 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
 	filebeat.WaitFileContains(registryFile, `"op":"remove"`, time.Second)
+}
+
+func requirePublishedEvents(
+	t *testing.T,
+	filebeat *integration.BeatProc,
+	expected int,
+	outputFile string) {
+
+	t.Helper()
+	publishedEvents := filebeat.CountFileLines(outputFile)
+	if publishedEvents != expected {
+		t.Fatalf("expecting %d published events after file migration, got %d instead", expected, publishedEvents)
+	}
 }

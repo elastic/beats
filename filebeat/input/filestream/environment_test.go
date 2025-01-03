@@ -386,6 +386,7 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
+	e.t.Helper()
 	msg := &strings.Builder{}
 	require.Eventuallyf(e.t, func() bool {
 		msg.Reset()
@@ -454,9 +455,14 @@ func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
 // waitUntilHarvesterIsDone detects Harvester stop by checking if the last client has been closed
 // as when a Harvester stops the client is closed.
 func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
-	for !e.pipeline.clients[len(e.pipeline.clients)-1].closed {
-		time.Sleep(10 * time.Millisecond)
-	}
+	require.Eventually(
+		e.t,
+		func() bool {
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+		},
+		time.Second*10,
+		time.Millisecond*10,
+		"The last connected client has not closed it's connection")
 }
 
 // requireEventsReceived requires that the list of messages has made it into the output.

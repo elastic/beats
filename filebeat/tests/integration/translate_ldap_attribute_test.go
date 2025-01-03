@@ -45,6 +45,8 @@ const translateguidCfg = `
 filebeat.inputs:
   - type: filestream
     id: "test-translateguidCfg"
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s
 

@@ -993,3 +993,8 @@ func (b *BeatProc) CountFileLines(glob string) int {
 
 	return bytes.Count(data, []byte{'\n'})
 }
+
+// ConfigFilePath returns the config file path
+func (b *BeatProc) ConfigFilePath() string {
+	return b.configFile
+}
