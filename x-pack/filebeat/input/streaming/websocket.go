@@ -89,7 +89,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			Scopes:         cfg.Auth.OAuth2.Scopes,
 			EndpointParams: cfg.Auth.OAuth2.EndpointParams,
 		}
-		// injecting a custom http client with loggingRoundTripper to debug log the request and response for oauth2 token
+		// injecting a custom http client with loggingRoundTripper to debug-log request and response attributes for oauth2 token
 		client := &http.Client{
 			Transport: &loggingRoundTripper{http.DefaultTransport, log},
 		}
