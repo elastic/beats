@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
 - Default Docker base image was reverted to Ubuntu 20.04 due to incompatability issues with glibc {pull}42144[42144]
+- Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 
 *Auditbeat*
 
