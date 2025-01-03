@@ -89,8 +89,6 @@ found:
 	err = r.Shutdown(context.Background())
 	assert.NoError(t, err, "Error shutting down filebeatreceiver")
 }
-<<<<<<< HEAD
-=======
 
 func BenchmarkFactory(b *testing.B) {
 	tmpDir := b.TempDir()
@@ -135,4 +133,3 @@ func BenchmarkFactory(b *testing.B) {
 		require.NoError(b, err)
 	}
 }
->>>>>>> 1430cfda7 (Fix Otel API change and update system test golden files to 2025 (#42199))
