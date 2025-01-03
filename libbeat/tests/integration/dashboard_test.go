@@ -172,7 +172,7 @@ queue.mem:
 		"-E", "setup.kibana.port="+kURL.Port(),
 		"-E", "setup.kibana.username=beats",
 		"-E", "setup.kibana.password=testing",
-		"-id", "Metricbeat-system-overview",
+		"--id", "Metricbeat-system-overview",
 		"--folder", filepath.Join(mockbeat.TempDir(), "system-overview"))
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
