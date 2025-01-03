@@ -82,7 +82,7 @@ ENV ELASTIC_PRODUCT=${ELASTIC_PRODUCT}
 
 # TODO: eventually /tinit will be replaced by /usr/bin/tini
 ENTRYPOINT ["/tinit", "--", "/usr/share/packetbeat/packetbeat", "-E", "http.enabled=true", "-E", "http.host=unix:///usr/share/packetbeat/data/packetbeat.sock"]
-CMD ["-environment", "container"]
+CMD ["--environment", "container"]
 
 # see https://www.elastic.co/guide/en/beats/packetbeat/current/http-endpoint.html
 HEALTHCHECK --interval=10s --timeout=5s --start-period=1m --retries=5 CMD curl -I -f --max-time 5 --unix-socket '/usr/share/packetbeat/data/packetbeat.sock' 'http:/stats/?pretty'
