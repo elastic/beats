@@ -49,6 +49,10 @@ type config struct {
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
 	TakeOver       bool               `config:"take_over"`
+
+	// AllowIDDuplication is used by InputManager.Create
+	// (see internal/input-logfile/manager.go).
+	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
 }
 
 type closerConfig struct {
@@ -140,6 +144,13 @@ func defaultReaderConfig() readerConfig {
 func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
+	}
+
+	if c.AllowIDDuplication {
+		logp.L().Named("input.filestream").Warn(
+			"setting `allow_deprecated_id_duplication` will lead to data " +
+				"duplication and incomplete input metrics, it's use is " +
+				"highly discouraged.")
 	}
 
 	return nil

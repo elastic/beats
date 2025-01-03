@@ -264,7 +264,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
+		moduleReloader := cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigModules)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
