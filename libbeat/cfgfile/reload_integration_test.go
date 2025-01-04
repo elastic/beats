@@ -21,25 +21,34 @@ package cfgfile
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestReloader(t *testing.T) {
 	// Create random temp directory
-	dir, err := ioutil.TempDir("", "libbeat-reloader")
-	defer os.RemoveAll(dir)
+	dir, err := os.MkdirTemp("", "libbeat-reloader")
+	defer func() {
+		if t.Failed() {
+			t.Logf("test failed, temp dir '%s' was kept", dir)
+			return
+		}
+		os.RemoveAll(dir)
+	}()
+
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("could not create temp dir: %s", err)
 	}
-	glob := dir + "/*.yml"
+	glob := filepath.Join(dir, "*.yml")
 
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"path": glob,
@@ -49,7 +58,7 @@ func TestReloader(t *testing.T) {
 		},
 	})
 	// config.C{}
-	reloader := NewReloader(nil, config)
+	reloader := NewReloader(logp.L().Named("cfgfile-test.reload"), nil, config)
 	retryCount := 10
 
 	go reloader.Run(nil)
@@ -70,11 +79,17 @@ func TestReloader(t *testing.T) {
 
 	// The first scan should cause a reload, but additional ones should not,
 	// so configReloads should still be 1.
-	assert.Equal(t, int64(1), configReloads.Get())
+	require.Equalf(
+		t,
+		int64(1),
+		configReloads.Get(),
+		"config reload should be called once, but it was called %d times",
+		configReloads.Get(),
+	)
 
 	// Write a file to the reloader path to trigger a real reload
 	content := []byte("test\n")
-	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err = os.WriteFile(filepath.Join(dir, "config1.yml"), content, 0644)
 	assert.NoError(t, err)
 
 	// Wait for the number of scans to increase at least twice. This is somewhat

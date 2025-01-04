@@ -101,6 +101,23 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 		"prospector.scanner.check_interval":      "1ms",
 		"prospector.scanner.fingerprint.enabled": false,
 		"file_identity.native":                   map[string]any{},
+		// For some reason this test became flaky, the root of the flakiness
+		// is not on the test, it is on how a rename operation is detected.
+		// Even though this test uses `os.Rename`, it does not seem to be an atomic
+		// operation. https://www.man7.org/linux/man-pages/man2/rename.2.html
+		// does not make it clear whether 'renameat' (used by `os.Rename`) is
+		// atomic.
+		//
+		// On a flaky execution, the file is actually perceived as removed
+		// and then a new file is created, both with the same inode. This
+		// happens on a system that does not reuse inodes as soon they're
+		// freed. Because the file is detected as removed, it's state is also
+		// removed. Then when more data is added, only the offset of the new
+		// data is tracked by the registry, causing the test to fail.
+		//
+		// A workaround for this is to not remove the state when the file is
+		// removed, hence `clean_removed: false` is set here.
+		"clean_removed": false,
 	})
 
 	testline := []byte("log line\n")
