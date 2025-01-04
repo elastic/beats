@@ -21,11 +21,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func init() {
@@ -70,10 +72,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 	}()
 
-	if err != nil {
-		return fmt.Errorf("could not get a list of databases: %w", err)
-	}
-
 	// This info is only stored in 'admin' database
 	db := client.Database("admin")
 	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "top"}})
@@ -95,6 +93,12 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return errors.New("collection 'totals' are not a map")
 	}
 
+	if err = res.Err(); err != nil {
+		return fmt.Errorf("'top' command failed: %w", err)
+	}
+
+	wg := &sync.WaitGroup{}
+
 	for group, info := range totals {
 		if group == "note" {
 			continue
@@ -106,16 +110,48 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		event, err := eventMapping(group, infoMap)
-		if err != nil {
-			reporter.Error(fmt.Errorf("mapping of the event data filed: %w", err))
-			continue
-		}
+		wg.Add(1)
+		go func(eventReporter mb.ReporterV2, mongoClient *mongo.Client, group string) {
+			defer wg.Done()
 
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-		})
+			names, err := splitKey(group)
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
+				return
+			}
+
+			collStats, err := fetchCollStats(mongoClient, names[0], names[1])
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
+				return
+			}
+
+			infoMap["stats"] = collStats
+
+			event, err := eventMapping(group, infoMap)
+			if err != nil {
+				eventReporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
+				return
+			}
+
+			eventReporter.Event(mb.Event{
+				MetricSetFields: event,
+			})
+		}(reporter, client, group)
 	}
 
+	wg.Wait()
+
 	return nil
+}
+
+func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+	db := client.Database(dbName)
+	colStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+	var statsRes map[string]interface{}
+	if err := colStats.Decode(&statsRes); err != nil {
+		return nil, fmt.Errorf("could not decode mongo response for database=%s, collection=%s: %w", dbName, collectionName, err)
+	}
+
+	return statsRes, nil
 }
