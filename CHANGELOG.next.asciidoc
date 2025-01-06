@@ -230,6 +230,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 
 *Osquerybeat*
 
