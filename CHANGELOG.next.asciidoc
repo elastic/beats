@@ -53,7 +53,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 - Add kafka compression support for ZSTD.
 - Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+
 *Heartbeat*
 
 
@@ -456,6 +459,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 - Make the experimental API GA and rename it to winlogbeat-raw {issue}39580[39580] {pull}41770[41770]
+- Remove 22 clause limitation {issue}35047[35047] {pull}42187[42187]
+- Add handling for recoverable publisher disabled errors {issue}35316[35316] {pull}42187[42187]
 
 
 *Functionbeat*
