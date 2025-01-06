@@ -454,3 +454,83 @@ func TestNext(t *testing.T) {
 		}
 	}
 }
+
+func TestRateLimitRetries(t *testing.T) {
+	logp.TestingSetup()
+	logger := logp.L()
+
+	t.Run("retries", func(t *testing.T) {
+		const window = time.Minute
+		var fixedLimit *int = nil
+		limiter := NewRateLimiter(window, fixedLimit)
+
+		const key = "token"
+		msg := `[{"id":"userid","status":"STATUS","created":"2023-05-14T13:37:20.000Z","activated":null,"statusChanged":"2023-05-15T01:50:30.000Z","lastLogin":"2023-05-15T01:59:20.000Z","lastUpdated":"2023-05-15T01:50:32.000Z","passwordChanged":"2023-05-15T01:50:32.000Z","recovery_question":{"question":"Who's a major player in the cowboy scene?","answer":"Annie Oakley"},"type":{"id":"typeid"},"profile":{"firstName":"name","lastName":"surname","mobilePhone":null,"secondEmail":null,"login":"name.surname@example.com","email":"name.surname@example.com"},"credentials":{"password":{"value":"secret"},"emails":[{"value":"name.surname@example.com","status":"VERIFIED","type":"PRIMARY"}],"provider":{"type":"OKTA","name":"OKTA"}},"_links":{"self":{"href":"https://localhost/api/v1/users/userid"}}}]`
+		want, err := mkWant[User](msg)
+		if err != nil {
+			t.Fatalf("failed to unmarshal entity data: %v", err)
+		}
+
+		responseNum := 0
+		ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			responseNum++
+
+			u, err := url.Parse(r.RequestURI)
+			if err != nil {
+				t.Errorf("unexpected error parsing request URI: %v", err)
+			}
+			endpoint := "/api/v1/users"
+			if u.Path != endpoint {
+				t.Errorf("unexpected API endpoint: got:%s want:%s", u.Path, endpoint)
+			}
+			if got := r.Header.Get("accept"); got != "application/json" {
+				t.Errorf("unexpected Accept header: got:%s want:%s", got, "application/json")
+			}
+			if got := r.Header.Get("authorization"); got != "SSWS "+key {
+				t.Errorf("unexpected Authorization header: got:%s want:%s", got, "SSWS "+key)
+			}
+
+			w.Header().Add("x-rate-limit-limit", "1000000") // Let requests come fast
+			w.Header().Add("x-rate-limit-reset", fmt.Sprint(time.Now().Unix()))
+
+			if responseNum == 3 || responseNum == 3+7 {
+				// Respond with data
+				w.Header().Add("x-rate-limit-remaining", "49")
+				fmt.Fprintln(w, msg)
+			} else {
+				// Respond with a 429 error
+				w.Header().Add("x-rate-limit-remaining", "0")
+				http.Error(w, "[]", http.StatusTooManyRequests) // We don't know what body is returned with 429s
+			}
+		}))
+		defer ts.Close()
+		u, err := url.Parse(ts.URL)
+		if err != nil {
+			t.Errorf("failed to parse server URL: %v", err)
+		}
+		host := u.Host
+
+		// retry until there's a non-429 response
+		query := make(url.Values)
+		query.Set("limit", "200")
+		got, _, err := GetUserDetails(context.Background(), ts.Client(), host, key, "", query, OmitNone, limiter, logger)
+		if err != nil {
+			t.Fatalf("unexpected error from Get_Details: %v", err)
+		}
+		if !cmp.Equal(want, got) {
+			t.Errorf("unexpected result:\n- want\n+ got\n%s", cmp.Diff(want, got))
+		}
+
+		// stop trying after the maximum retries
+		query = make(url.Values)
+		query.Set("limit", "200")
+		_, _, err = GetUserDetails(context.Background(), ts.Client(), host, key, "", query, OmitNone, limiter, logger)
+		expectedErrMsg := "maximum retries (5) finished without success"
+		if err == nil {
+			t.Errorf("expected the error '%s', but got no error", expectedErrMsg)
+		} else if err.Error() != expectedErrMsg {
+			t.Errorf("expected error message '%s', but got '%s'", expectedErrMsg, err.Error())
+		}
+
+	})
+}

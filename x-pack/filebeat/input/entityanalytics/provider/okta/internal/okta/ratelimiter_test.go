@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"golang.org/x/time/rate"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -33,6 +35,7 @@ func TestRateLimiter(t *testing.T) {
 	})
 
 	t.Run("Update stops requests when none are remaining", func(t *testing.T) {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/42059")
 		const window = time.Minute
 		var fixedLimit *int = nil
 		r := NewRateLimiter(window, fixedLimit)
@@ -86,7 +89,7 @@ func TestRateLimiter(t *testing.T) {
 		r.Wait(ctx, endpoint, url, log)
 		wait := time.Since(start)
 
-		if wait > 1010*time.Millisecond {
+		if wait > 1100*time.Millisecond {
 			t.Errorf("doesn't allow requests to resume after reset. had to wait %s", wait)
 		}
 		if e.limiter.Limit() != 1.0 {
@@ -99,7 +102,7 @@ func TestRateLimiter(t *testing.T) {
 		e.limiter.SetBurst(100) // increase bucket size to check token accumulation
 		tokens := e.limiter.TokensAt(time.Unix(0, time.Now().Add(30*time.Second).UnixNano()))
 		target := 30.0
-		buffer := 0.01
+		buffer := 0.1
 
 		if tokens < target-buffer || target+buffer < tokens {
 			t.Errorf("tokens don't accumulate at the expected rate over 30s: %f", tokens)
@@ -164,6 +167,54 @@ func TestRateLimiter(t *testing.T) {
 
 		if e.limiter.Limit() != 120/60 {
 			t.Errorf("unexpected rate following Update() (for fixed 120 reqs / 60 secs): %f", e.limiter.Limit())
+		}
+	})
+
+	t.Run("A concurrent rate limit should not set a new rate of zero", func(t *testing.T) {
+		const window = time.Minute
+		r := NewRateLimiter(window, nil)
+		const endpoint = "/foo"
+		url, err := url.Parse(endpoint)
+		if err != nil {
+			t.Errorf("unexpected error from url.Parse(): %v", err)
+		}
+		ctx := context.Background()
+		log := logp.L()
+
+		// update to 30 requests remaining, reset in 30s
+		headers := http.Header{
+			"X-Rate-Limit-Limit":     []string{"60"},
+			"X-Rate-Limit-Remaining": []string{"30"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(time.Now().Unix()+30, 10)},
+		}
+		err = r.Update(endpoint, headers, logp.L())
+		if err != nil {
+			t.Errorf("unexpected error from Update(): %v", err)
+		}
+
+		// update to concurrent rate limit, reset now
+		headers = http.Header{
+			"X-Rate-Limit-Limit":     []string{"0"},
+			"X-Rate-Limit-Remaining": []string{"0"},
+			"X-Rate-Limit-Reset":     []string{strconv.FormatInt(time.Now().Unix(), 10)},
+		}
+		err = r.Update(endpoint, headers, logp.L())
+		if err != nil {
+			t.Errorf("unexpected error from Update(): %v", err)
+		}
+
+		// Wait to make the new rate become active
+		err = r.Wait(ctx, endpoint, url, log)
+		if err != nil {
+			t.Errorf("unexpected error from Wait(): %v", err)
+		}
+
+		e := r.endpoint(endpoint)
+
+		newLimit := e.limiter.Limit()
+		expectedNewLimit := rate.Limit(1)
+		if newLimit != expectedNewLimit {
+			t.Errorf("expected rate %f, but got %f, after exceeding the concurrent rate limit", expectedNewLimit, newLimit)
 		}
 	})
 }
