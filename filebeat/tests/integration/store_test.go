@@ -41,6 +41,8 @@ filebeat.inputs:
     close.on_state_change.inactive: 8s
     ignore_older: 9s
     prospector.scanner.check_interval: 1s
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s
 
