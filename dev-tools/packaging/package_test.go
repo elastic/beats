@@ -26,7 +26,9 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -36,18 +38,20 @@ import (
 	"slices"
 	"strings"
 	"testing"
-
-	"errors"
+	"time"
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/client"
 )
 
 const (
-	expectedConfigMode     = os.FileMode(0600)
-	expectedManifestMode   = os.FileMode(0644)
+	expectedConfigMode     = os.FileMode(0o600)
+	expectedManifestMode   = os.FileMode(0o644)
 	expectedModuleFileMode = expectedManifestMode
-	expectedModuleDirMode  = os.FileMode(0755)
+	expectedModuleDirMode  = os.FileMode(0o755)
 )
 
 var (
@@ -234,15 +238,15 @@ func checkDocker(t *testing.T, file string) {
 		t.Errorf("error reading file %v: %v", file, err)
 		return
 	}
-
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
-	checkConfigPermissionsWithMode(t, p, os.FileMode(0644))
-	checkManifestPermissionsWithMode(t, p, os.FileMode(0644))
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0o644))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0o644))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
+	checkDockerImageRun(t, p, file)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -356,7 +360,7 @@ func checkModulesOwner(t *testing.T, p *packageFile, expectRoot bool) {
 // Verify that the systemd unit file has a mode of 0644. It should not be
 // executable.
 func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
-	const expectedMode = os.FileMode(0644)
+	const expectedMode = os.FileMode(0o644)
 	t.Run(p.Name+" systemd unit file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if systemdUnitFilePattern.MatchString(entry.File) {
@@ -443,7 +447,7 @@ func checkLicensesPresent(t *testing.T, prefix string, p *packageFile) {
 }
 
 func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
-	expectedMode := os.FileMode(0755)
+	expectedMode := os.FileMode(0o755)
 
 	t.Run(fmt.Sprintf("%s entrypoint", p.Name), func(t *testing.T) {
 		if len(info.Config.Entrypoint) == 0 {
@@ -507,6 +511,111 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
 		if expectRoot != (info.Config.User == "root") {
 			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
+}
+
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
+	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
+		var ctx context.Context
+		dl, ok := t.Deadline()
+		if !ok {
+			ctx = context.Background()
+		} else {
+			c, cancel := context.WithDeadline(context.Background(), dl)
+			ctx = c
+			defer cancel()
+		}
+		f, err := os.Open(imagePath)
+		if err != nil {
+			t.Fatalf("failed to open docker image %q: %s", imagePath, err)
+		}
+		defer f.Close()
+
+		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			t.Fatalf("failed to get a Docker client: %s", err)
+		}
+
+		loadResp, err := c.ImageLoad(ctx, f, true)
+		if err != nil {
+			t.Fatalf("error loading docker image: %s", err)
+		}
+
+		loadRespBody, err := io.ReadAll(loadResp.Body)
+		if err != nil {
+			t.Fatalf("failed to read image load response: %s", err)
+		}
+		loadResp.Body.Close()
+
+		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
+		if !found {
+			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
+		}
+		imageId := strings.TrimRight(after, "\\n\"}\r\n")
+
+		var caps strslice.StrSlice
+		if strings.Contains(imageId, "packetbeat") {
+			caps = append(caps, "NET_ADMIN")
+		}
+
+		createResp, err := c.ContainerCreate(ctx,
+			&container.Config{
+				Image: imageId,
+			},
+			&container.HostConfig{
+				CapAdd: caps,
+			},
+			nil,
+			nil,
+			"")
+		if err != nil {
+			t.Fatalf("error creating container from image: %s", err)
+		}
+		defer func() {
+			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			if err != nil {
+				t.Errorf("error removing container: %s", err)
+			}
+		}()
+
+		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		if err != nil {
+			t.Fatalf("failed to start container: %s", err)
+		}
+		defer func() {
+			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			if err != nil {
+				t.Errorf("error stopping container: %s", err)
+			}
+		}()
+
+		timer := time.NewTimer(15 * time.Second)
+		defer timer.Stop()
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		var logs []byte
+		sentinelLog := "Beat ID: "
+		for {
+			select {
+			case <-timer.C:
+				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
+				return
+			case <-ticker.C:
+				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				if err != nil {
+					t.Logf("could not get logs: %s", err)
+				}
+				logs, err = io.ReadAll(out)
+				out.Close()
+				if err != nil {
+					t.Logf("error reading logs: %s", err)
+				}
+				if bytes.Contains(logs, []byte(sentinelLog)) {
+					return
+				}
+			}
 		}
 	})
 }
