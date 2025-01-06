@@ -10,7 +10,7 @@ backports.ssl-match-hostname==3.5.0.1
 bcrypt==4.1.2
 cached-property==1.4.2
 certifi==2024.7.4
-cffi==1.16.0
+cffi==1.17.1
 chardet==3.0.4
 charset-normalizer==3.3.2
 cryptography==43.0.1
@@ -24,7 +24,7 @@ elasticsearch==7.8.1
 enum34==1.1.6
 exceptiongroup==1.2.0
 googleapis-common-protos==1.56.4
-grpcio==1.60.0
+grpcio==1.68.1
 idna==3.7
 importlib-metadata==1.7.0
 iniconfig==1.0.1
