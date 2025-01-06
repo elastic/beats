@@ -19,12 +19,12 @@ package replstatus
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type oplogInfo struct {
@@ -47,81 +47,60 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	// get oplog.rs collection
 	db := client.Database("local")
 
-	collections, err := db.ListCollectionNames(context.Background(), bson.D{})
-	if err != nil {
-		return nil, fmt.Errorf("could not retrieve collection names: %w", err)
+	// Get oplog size using collStats - this is lightweight
+	var oplogSize CollSize
+	res := db.RunCommand(context.Background(), bson.D{
+		{Key: "collStats", Value: oplogCol},
+		{Key: "scale", Value: 1}, // Reduce precision for better performance
+	})
+	if err := res.Err(); err != nil {
+		return nil, fmt.Errorf("collStats command failed: %w", err)
 	}
-
-	if !contains(collections, oplogCol) {
-		return nil, errors.New("collection oplog.rs was not found")
+	if err := res.Decode(&oplogSize); err != nil {
+		return nil, fmt.Errorf("decode error: %w", err)
 	}
 
 	collection := db.Collection(oplogCol)
-
-	// get oplog size
-	var oplogSize CollSize
-	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "collStats", Value: oplogCol}})
-	if err = res.Err(); err != nil {
-		return nil, fmt.Errorf("'collStats' command returned an error: %w", err)
-	}
-
-	if err = res.Decode(&oplogSize); err != nil {
-		return nil, fmt.Errorf("could not decode mongodb op log size: %w", err)
-	}
-
-	// get first and last items in the oplog
 	firstTs, lastTs, err := getOpTimestamp(collection)
 	if err != nil {
-		return nil, fmt.Errorf("could not get operation timestamp in op log: %w", err)
+		return nil, err
 	}
 
-	diff := lastTs - firstTs
-
-	return &oplogInfo{
+	info := &oplogInfo{
 		allocated: oplogSize.MaxSize,
 		used:      oplogSize.Size,
 		firstTs:   firstTs,
 		lastTs:    lastTs,
-		diff:      diff,
-	}, nil
+		diff:      lastTs - firstTs,
+	}
+
+	return info, nil
 }
 
 func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
-
-	// Find both first and last timestamps using $min and $max
-	pipeline := bson.A{
-		bson.M{"$group": bson.M{"_id": 1, "minTS": bson.M{"$min": "$ts"}, "maxTS": bson.M{"$max": "$ts"}}},
+	// Use natural order for efficiency
+	var firstDoc struct {
+		Timestamp time.Time `bson:"ts"`
 	}
 
-	cursor, err := collection.Aggregate(context.Background(), pipeline)
+	// Get oldest entry using natural order
+	firstOpts := options.FindOne().SetProjection(bson.D{{Key: "ts", Value: 1}})
+	err := collection.FindOne(context.TODO(), bson.D{}, firstOpts).Decode(&firstDoc)
 	if err != nil {
-		return 0, 0, fmt.Errorf("could not get operation timestamps in op log: %w", err)
-	}
-	defer cursor.Close(context.Background())
-
-	var result struct {
-		MinTS time.Time `bson:"minTS"`
-		MaxTS time.Time `bson:"maxTS"`
+		return 0, 0, fmt.Errorf("first timestamp query failed: %w", err)
 	}
 
-	if !cursor.Next(context.Background()) {
-		return 0, 0, errors.New("no documents found in op log")
+	// Get newest entry using reverse natural order
+	var lastDoc struct {
+		Timestamp time.Time `bson:"ts"`
 	}
-	if err := cursor.Decode(&result); err != nil {
-		return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
+	lastOpts := options.FindOne().
+		SetProjection(bson.D{{Key: "ts", Value: 1}}).
+		SetSort(bson.D{{Key: "$natural", Value: -1}})
+	err = collection.FindOne(context.TODO(), bson.D{}, lastOpts).Decode(&lastDoc)
+	if err != nil {
+		return 0, 0, fmt.Errorf("last timestamp query failed: %w", err)
 	}
 
-	minTS := uint32(result.MinTS.Unix())
-	maxTS := uint32(result.MaxTS.Unix())
-
-	return minTS, maxTS, nil
-}
-
-func contains(s []string, x string) bool {
-	for _, n := range s {
-		if x == n {
-			return true
-		}
-	}
-	return false
+	return uint32(firstDoc.Timestamp.Unix()), uint32(lastDoc.Timestamp.Unix()), nil
 }
