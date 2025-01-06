@@ -602,6 +602,7 @@ Set the location of the marker file the following way:
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
 
+[id="{beatname_lc}-input-{type}-file-identity-fingerprint"]
 *`fingerprint`*:: To identify files based on their content byte range.
 
 WARNING: In order to use this file identity option, you must enable the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint option in the scanner>>. Once this file identity is enabled, changing the fingerprint configuration (offset, length, or other settings) will lead to a global re-ingestion of all files that match the paths configuration of the input.
