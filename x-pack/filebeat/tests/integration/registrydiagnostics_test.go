@@ -45,10 +45,14 @@ func TestRegistryIsInDiagnostics(t *testing.T) {
 				{
 					Id: "stream-filestream-" + t.Name(),
 					Source: integration.RequireNewStruct(t, map[string]interface{}{
-						"id":      "stream-filestream-" + t.Name(),
-						"enabled": true,
-						"type":    "filestream",
-						"paths":   []interface{}{logfile},
+						"id":            "stream-filestream-" + t.Name(),
+						"enabled":       true,
+						"type":          "filestream",
+						"paths":         []interface{}{logfile},
+						"file.identity": map[string]any{},
+						"prospector.scanner.fingerprint": map[string]any{
+							"enabled": false,
+						},
 					}),
 				},
 			},
