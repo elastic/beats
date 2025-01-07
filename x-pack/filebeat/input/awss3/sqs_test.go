@@ -37,6 +37,7 @@ func TestSQSReceiver(t *testing.T) {
 	const workerCount = 5
 
 	t.Run("ReceiveMessage success", func(t *testing.T) {
+		t.Skip("Flaky test https://github.com/elastic/beats/issues/41458")
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
