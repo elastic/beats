@@ -118,7 +118,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
-				if !isRetryableError(err) {
+				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
@@ -230,21 +230,38 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 	}
 	if cfg.Retry != nil {
 		retryConfig := cfg.Retry
-		for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
-			conn, response, err = dialer.DialContext(ctx, url, headers)
-			if err == nil {
-				return conn, response, nil
+		if !retryConfig.InfiniteRetries {
+			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
+				conn, response, err = dialer.DialContext(ctx, url, headers)
+				if err == nil {
+					return conn, response, nil
+				}
+				//nolint:errorlint // it will never be a wrapped error at this point
+				if err == websocket.ErrBadHandshake {
+					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				} else {
+					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+				}
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				time.Sleep(waitTime)
 			}
-			//nolint:errorlint // it will never be a wrapped error at this point
-			if err == websocket.ErrBadHandshake {
-				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
-				continue
+			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
+		} else {
+			for attempt := 1; ; attempt++ {
+				conn, response, err = dialer.DialContext(ctx, url, headers)
+				if err == nil {
+					return conn, response, nil
+				}
+				//nolint:errorlint // it will never be a wrapped error at this point
+				if err == websocket.ErrBadHandshake {
+					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				} else {
+					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+				}
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				time.Sleep(waitTime)
 			}
-			log.Debugf("attempt %d: webSocket connection failed. retrying...\n", attempt)
-			waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
-			time.Sleep(waitTime)
 		}
-		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 	}
 
 	return dialer.DialContext(ctx, url, headers)

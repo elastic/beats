@@ -316,7 +316,7 @@ This specifies whether fields should be replaced with a `*` or deleted entirely 
 [float]
 ==== `retry`
 
-The `retry` configuration allows the user to specify the number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted. It has a `wait_min` and `wait_max` configuration which specifies the minimum and maximum time to wait between retries. 
+The `retry` configuration allows the user to specify the number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted. It has a `wait_min` and `wait_max` configuration which specifies the minimum and maximum time to wait between retries. It also supports blanket retries and infinite retries via the `blanket_retires` and `infinite_retries` configuration options. These are set to `false` by default.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -333,6 +333,8 @@ filebeat.inputs:
     max_attempts: 5
     wait_min: 1s
     wait_max: 10s
+    blanket_retries: false
+    infinite_retries: false
 ----
 [float]
 ==== `retry.max_attempts`
@@ -348,6 +350,16 @@ The minimum time to wait between retries. This ensures that retries are spaced o
 ==== `retry.wait_max`
 
 The maximum time to wait between retries. This prevents the retry mechanism from becoming too slow, ensuring that the client does not wait indefinitely between retries. This is crucial in systems where timeouts or user experience are critical. For example, `wait_max` might be set to 10 seconds, meaning that even if the calculated backoff is greater than this, the client will wait at most 10 seconds before retrying. The default value is `30` seconds.
+
+[float]
+==== `retry.blanket_retries`
+
+Normally the input will only retry when a connection error is found to be retryable based on the error type the  RFC 6455 error codes defined by the websocket protocol. If `blanket_retries` is set to `true` (`false` by default) the input will retry on any error. This is not recommended unless the user is certain that all errors are transient and can be resolved by retrying.
+
+[float]
+==== `retry.infinite_retries`
+
+Normally the input will only retry a maximum of `max_attempts` times. If `infinite_retries` is set to `true` (`false` by default) the input will retry indefinitely. This is not recommended unless the user is certain that the connection will eventually succeed.
 
 [float]
 === `timeout`
