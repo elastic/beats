@@ -33,7 +33,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func init() {
+func getRegexpsForRegistryFiles() ([]*regexp.Regexp, error) {
+	// We use regexps here because globs do not support specifying a character
+	// range like we do in the checkpoint file.
+
+	registryFileRegExps := []*regexp.Regexp{}
 	preFilesList := [][]string{
 		[]string{"^registry$"},
 		[]string{"^registry", "filebeat$"},
@@ -50,8 +54,20 @@ func init() {
 		} else {
 			path = filepath.Join(lst...)
 		}
-		registryFileRegExps = append(registryFileRegExps, regexp.MustCompile(path))
+
+		// Compile the reg exp, if there is an error, stop and return.
+		// There should be no error here as this code is tested in all
+		// supported OSes, however to avoid a code path that leads to a
+		// panic, we cannot use `regexp.MustCompile` and handle the error
+		re, err := regexp.Compile(path)
+		if err != nil {
+			return nil, fmt.Errorf("cannot compile reg exp: %w", err)
+		}
+
+		registryFileRegExps = append(registryFileRegExps, re)
 	}
+
+	return registryFileRegExps, nil
 }
 
 func gzipRegistry() []byte {
@@ -142,6 +158,16 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 	baseDir := filepath.Base(src)
 
 	logger.Debugf("starting to walk '%s'", fullPath)
+
+	// This error should never happen at runtime, if something
+	// breaks it should break the tests and be fixed before a
+	// release. We handle the error here to avoid a code path
+	// that can end into a panic.
+	registryFileRegExps, err := getRegexpsForRegistryFiles()
+	if err != nil {
+		return err
+	}
+
 	return filepath.Walk(fullPath, func(path string, info fs.FileInfo, prevErr error) error {
 		// Stop if there is any errors
 		if prevErr != nil {
@@ -149,7 +175,7 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 		}
 
 		pathInTar := filepath.Join(baseDir, strings.TrimPrefix(path, src))
-		if !matchRegistyFiles(pathInTar) {
+		if !matchRegistyFiles(registryFileRegExps, pathInTar) {
 			return nil
 		}
 		header, err := tar.FileInfoHeader(info, info.Name())
@@ -181,12 +207,7 @@ func tarFolder(logger *logp.Logger, src, dst string) error {
 	})
 }
 
-// We use regexps here because globs do not support specifying a character
-// range like we do in the checkpoint file. This slice is populated in the
-// `init` function because Windows path separators need to be escaped.
-var registryFileRegExps = []*regexp.Regexp{}
-
-func matchRegistyFiles(path string) bool {
+func matchRegistyFiles(registryFileRegExps []*regexp.Regexp, path string) bool {
 	for _, regExp := range registryFileRegExps {
 		if regExp.MatchString(path) {
 			return true

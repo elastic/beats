@@ -36,9 +36,13 @@ func TestMatchRegistryFiles(t *testing.T) {
 		filepath.Join("registry", "42.json"),
 		filepath.Join("nop", "active.dat"),
 	}
+	registryFileRegExps, err := getRegexpsForRegistryFiles()
+	if err != nil {
+		t.Fatalf("cannot compile regexps for registry paths: %s", err)
+	}
 
 	testFn := func(t *testing.T, path string, match bool) {
-		result := matchRegistyFiles(path)
+		result := matchRegistyFiles(registryFileRegExps, path)
 		if result != match {
 			t.Errorf(
 				"mathRegisryFiles('%s') should return %t, got %t instead",
