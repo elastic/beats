@@ -130,6 +130,18 @@ var configTests = []struct {
 			"url": "wss://localhost:443/v1/stream",
 		},
 	},
+	{
+		name: "valid_retry_with_infinite",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"infinite_retries": true,
+				"max_attempts":     0,
+				"wait_min":         "1s",
+				"wait_max":         "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
 }
 
 func TestConfig(t *testing.T) {
