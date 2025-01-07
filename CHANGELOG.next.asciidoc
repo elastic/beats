@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218] 
 
 *Heartbeat*
 
