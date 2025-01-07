@@ -31,7 +31,7 @@ import (
 func IsRecoverable(err error) bool {
 	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE ||
 		err == win.RPC_S_CALL_CANCELLED || err == win.ERROR_EVT_QUERY_RESULT_STALE ||
-		err == win.ERROR_INVALID_PARAMETER
+		err == win.ERROR_INVALID_PARAMETER || err == win.ERROR_EVT_PUBLISHER_DISABLED
 }
 
 // IsChannelNotFound returns true if the error indicates the channel was not found.

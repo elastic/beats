@@ -59,9 +59,11 @@ type redact struct {
 }
 
 type retry struct {
-	MaxAttempts int           `config:"max_attempts"`
-	WaitMin     time.Duration `config:"wait_min"`
-	WaitMax     time.Duration `config:"wait_max"`
+	MaxAttempts     int           `config:"max_attempts"`
+	WaitMin         time.Duration `config:"wait_min"`
+	WaitMax         time.Duration `config:"wait_max"`
+	BlanketRetries  bool          `config:"blanket_retries"`
+	InfiniteRetries bool          `config:"infinite_retries"`
 }
 
 type authConfig struct {
@@ -136,7 +138,7 @@ func (c config) Validate() error {
 
 	if c.Retry != nil {
 		switch {
-		case c.Retry.MaxAttempts <= 0:
+		case c.Retry.MaxAttempts <= 0 && !c.Retry.InfiniteRetries:
 			return errors.New("max_attempts must be greater than zero")
 		case c.Retry.WaitMin > c.Retry.WaitMax:
 			return errors.New("wait_min must be less than or equal to wait_max")
@@ -170,6 +172,11 @@ func defaultConfig() config {
 	return config{
 		Transport: httpcommon.HTTPTransportSettings{
 			Timeout: 180 * time.Second,
+		},
+		Retry: &retry{
+			MaxAttempts: 5,
+			WaitMin:     1 * time.Second,
+			WaitMax:     30 * time.Second,
 		},
 	}
 }
