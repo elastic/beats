@@ -73,7 +73,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			redact:  cfg.Redact,
 			metrics: newInputMetrics(id),
 		},
-		// this will never trigger unless a valid expiry time is assigned
+		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
 	}
 	s.metrics.url.Set(cfg.URL.String())

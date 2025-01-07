@@ -178,19 +178,19 @@ The `auth` configuration field has the following subfields:
   - `token_url`: The token URL to use for OAuth2.0 authentication.
   - `scopes`: The scopes to use for OAuth2.0 authentication.
   - `endpoint_params`: The endpoint parameters to use for OAuth2.0 authentication.
-  - `auth_style`: The authentication style to use for OAuth2.0 authentication. The default value is `AuthStyleAutoDetect`.
-  - `token_expiry_buffer`: The token expiry buffer to use for OAuth2.0 authentication. The default value is `2m`.
+  - `auth_style`: The authentication style to use for OAuth2.0 authentication. If left unset, the style will be automatically detected.
+  - `token_expiry_buffer`: Minimum valid time remaining before attempting an OAuth2 token renewal. The default value is `2m`.
 
 **Explanations for `auth_style` and `token_expiry_buffer`:**
 
-- `auth_style`: The authentication style to use for OAuth2.0 authentication which determines how the values of sensitive information like `client_id` and `client_secret` are sent in the token request. The default value is `AuthStyleAutoDetect` and is configured internally if no value is provided. With `AuthStyleAutoDetect`, the OAuth2 client decides the authentication style automatically based on internal handshakes with the OAuth2 server. The `auth_style` configuration field is optional and can be used to specify the authentication style to use for OAuth2.0 authentication. The `auth_style` configuration field supports the following configurable values:
+- `auth_style`: The authentication style to use for OAuth2.0 authentication which determines how the values of sensitive information like `client_id` and `client_secret` are sent in the token request. The default style value is automatically inferred and used appropriately if no value is provided. The `auth_style` configuration field is optional and can be used to specify the authentication style to use for OAuth2.0 authentication. The `auth_style` configuration field supports the following configurable values:
   
   * `in_header`: The `client_id` and `client_secret` is sent in the header as a base64 encoded `Authorization` header.
   * `in_params`: The `client_id` and `client_secret` is sent in the request body along with the other OAuth2 parameters.
 
 - `token_expiry_buffer`: The token expiry buffer to use for OAuth2.0 authentication. The `token_expiry_buffer` is used as a safety net to ensure that the token does not expire before the input can refresh it. The `token_expiry_buffer` configuration field is optional. If the `token_expiry_buffer` configuration field is not set, the default value of `2m` is used.
 
-NOTE: We recommend leaving the `auth_style` configuration field unset (`AuthStyleAutoDetect` is used internally) for most scenarios, except where manual intervention is required.
+NOTE: We recommend leaving the `auth_style` configuration field unset (automatically inferred internally) for most scenarios, except where manual intervention is required.
 
 ["source","yaml",subs="attributes"]
 ----

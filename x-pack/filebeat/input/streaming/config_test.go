@@ -131,17 +131,6 @@ var configTests = []struct {
 		},
 	},
 	{
-		name: "valid_authStyle_default",
-		config: map[string]interface{}{
-			"auth": map[string]interface{}{
-				"client_id":     "a_client_id",
-				"client_secret": "a_client_secret",
-				"token_url":     "https://localhost:443/token",
-			},
-			"url": "wss://localhost:443/v1/stream",
-		},
-	},
-	{
 		name: "valid_retry_with_infinite",
 		config: map[string]interface{}{
 			"retry": map[string]interface{}{
@@ -149,6 +138,17 @@ var configTests = []struct {
 				"max_attempts":     0,
 				"wait_min":         "1s",
 				"wait_max":         "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "valid_authStyle_default",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"token_url":     "https://localhost:443/token",
 			},
 			"url": "wss://localhost:443/v1/stream",
 		},
