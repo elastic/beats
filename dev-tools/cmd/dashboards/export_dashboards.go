@@ -56,7 +56,7 @@ func main() {
 	log.SetFlags(0)
 
 	if len(*fileOutput) > 0 {
-		log.Fatalf("-output is configured, please use --folder flag instead to get the expected formatting of assets")
+		log.Fatalf("--output is configured, please use --folder flag instead to get the expected formatting of assets")
 	}
 
 	u, err := url.Parse(*kibanaURL)
