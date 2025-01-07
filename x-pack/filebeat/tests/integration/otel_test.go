@@ -114,7 +114,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 
 			// Check for missing messages
 			allRetrieved := true
-			for msg, retrieved := range originalMessage {
+			for _, retrieved := range originalMessage {
 				if !retrieved {
 					allRetrieved = false
 				}
