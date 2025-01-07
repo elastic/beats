@@ -22,8 +22,9 @@ import (
 	"testing"
 	"time"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/google/go-cmp/cmp"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func createTestConfigs(n int) ([]*conf.C, error) {
