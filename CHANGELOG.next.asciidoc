@@ -241,7 +241,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
 - Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
-- Rate limiting fault tolerance improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42094[42094]
 - Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
 
 *Auditbeat*
