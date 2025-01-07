@@ -354,7 +354,7 @@ The maximum time to wait between retries. This prevents the retry mechanism from
 [float]
 ==== `retry.blanket_retries`
 
-Normally the input will only retry when a connection error is found to be retryable based on the error type and the  RFC 6455 error codes defined by the websocket protocol. If `blanket_retries` is set to `true` (`false` by default) the input will retry on any error. This is not recommended unless the user is certain that all errors are transient and can be resolved by retrying.
+Normally the input will only retry when a connection error is found to be retryable based on the error type and the RFC 6455 error codes defined by the websocket protocol. If `blanket_retries` is set to `true` (`false` by default) the input will retry on any error. This is not recommended unless the user is certain that all errors are transient and can be resolved by retrying.
 
 [float]
 ==== `retry.infinite_retries`
