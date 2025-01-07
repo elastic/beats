@@ -176,6 +176,9 @@ func isRetryableError(err error) bool {
 			websocket.CloseInternalServerErr,
 			websocket.CloseTryAgainLater,
 			websocket.CloseServiceRestart,
+			websocket.CloseAbnormalClosure,
+			websocket.CloseMessageTooBig,
+			websocket.CloseNoStatusReceived,
 			websocket.CloseTLSHandshake:
 			return true
 		}
