@@ -87,7 +87,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 		Password:  "testing",
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
 			},
 		},
 	}
@@ -105,7 +105,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 
 			//Mark retrieved messages
 			for _, hit := range docs.Hits.Hits {
-				message := hit.Source["Body"].(map[string]interface{})["message"].(string)
+				message := hit.Source["Body"].(map[string]interface{})["message"].(string) //nolint:nilerr // not check for err for each doc
 
 				if _, exists := originalMessage[message]; exists {
 					originalMessage[message] = true // Mark as found
@@ -116,7 +116,6 @@ func TestFilebeatOTelE2E(t *testing.T) {
 			allRetrieved := true
 			for msg, retrieved := range originalMessage {
 				if !retrieved {
-					fmt.Printf("Missing original message: %s\n", msg)
 					allRetrieved = false
 				}
 			}
