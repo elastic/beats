@@ -17,12 +17,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
+	"go.uber.org/mock/gomock"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-=======
-	"go.uber.org/mock/gomock"
->>>>>>> 4ba7d1c9a ([aws] [s3] Introduce ignore_older & start_timestamp for S3 input allowing better registry cleanups (#41817))
 )
 
 func TestS3Poller(t *testing.T) {
