@@ -62,6 +62,8 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	numEvents := 10
 	var msg string
 	var originalMessage = make(map[string]bool)
+
+	// write events to log file
 	for i := 0; i < numEvents; i++ {
 		msg = fmt.Sprintf("Line %d", i)
 		originalMessage[msg] = false
@@ -78,6 +80,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 
 	filebeat.Start()
 
+	// prepare to query ES
 	esCfg := elasticsearch.Config{
 		Addresses: []string{"http://localhost:9200"},
 		Username:  "admin",

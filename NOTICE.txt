@@ -12487,12 +12487,12 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
-Dependency : /Users/khushijain/Documents/elastic-agent-libs
-Version: 
+Dependency : github.com/elastic/elastic-agent-libs
+Version: v0.18.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file /Users/khushijain/Documents/elastic-agent-libs/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.18.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
