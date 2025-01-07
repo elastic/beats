@@ -446,6 +446,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 - Make the experimental API GA and rename it to winlogbeat-raw {issue}39580[39580] {pull}41770[41770]
+- Remove 22 clause limitation {issue}35047[35047] {pull}42187[42187]
+- Add handling for recoverable publisher disabled errors {issue}35316[35316] {pull}42187[42187]
 
 
 *Functionbeat*
