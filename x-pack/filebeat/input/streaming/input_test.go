@@ -450,7 +450,7 @@ var inputTests = []struct {
 				"wait_max":     "2s",
 			},
 		},
-		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake"),
+		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake and (status 403)"),
 	},
 	{
 		name:    "single_event_tls",
