@@ -130,6 +130,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
+- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 
 *Osquerybeat*
 
