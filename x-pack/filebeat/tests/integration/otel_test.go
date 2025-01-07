@@ -94,6 +94,9 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	es, err := elasticsearch.NewClient(esCfg)
 	require.NoError(t, err)
 
+	actualHits := &struct{ Hits int }{}
+	allRetrieved := true
+
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
@@ -113,15 +116,15 @@ func TestFilebeatOTelE2E(t *testing.T) {
 			}
 
 			// Check for missing messages
-			allRetrieved := true
 			for _, retrieved := range originalMessage {
 				if !retrieved {
 					allRetrieved = false
 				}
 			}
 
-			return docs.Hits.Total.Value == numEvents && allRetrieved
+			actualHits.Hits = docs.Hits.Total.Value
+			return (actualHits.Hits == numEvents) && allRetrieved
 		},
-		2*time.Minute, 1*time.Second)
+		2*time.Minute, 1*time.Second, fmt.Sprintf("actual hits: %s; expected hits: %s; and all messages retrieved: %b", actualHits.Hits, numEvents, allRetrieved))
 
 }
