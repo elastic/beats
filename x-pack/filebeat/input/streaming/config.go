@@ -12,8 +12,15 @@ import (
 	"regexp"
 	"time"
 
+	"golang.org/x/oauth2"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+)
+
+const (
+	authStyleInHeader = "in_header"
+	authStyleInParams = "in_params"
 )
 
 type config struct {
@@ -85,11 +92,30 @@ type customAuthConfig struct {
 
 type oAuth2Config struct {
 	// common oauth fields
-	ClientID       string              `config:"client_id"`
-	ClientSecret   string              `config:"client_secret"`
-	EndpointParams map[string][]string `config:"endpoint_params"`
-	Scopes         []string            `config:"scopes"`
-	TokenURL       string              `config:"token_url"`
+	AuthStyle         string        `config:"auth_style"`
+	ClientID          string        `config:"client_id"`
+	ClientSecret      string        `config:"client_secret"`
+	EndpointParams    url.Values    `config:"endpoint_params"`
+	Scopes            []string      `config:"scopes"`
+	TokenExpiryBuffer time.Duration `config:"token_expiry_buffer" validate:"min=0"`
+	TokenURL          string        `config:"token_url"`
+	// accessToken is only used internally to set the initial headers via formHeader() if oauth2 is enabled
+	accessToken string
+}
+
+func (o oAuth2Config) isEnabled() bool {
+	return o.ClientID != "" && o.ClientSecret != "" && o.TokenURL != ""
+}
+
+func (o oAuth2Config) getAuthStyle() oauth2.AuthStyle {
+	switch o.AuthStyle {
+	case authStyleInHeader:
+		return oauth2.AuthStyleInHeader
+	case authStyleInParams:
+		return oauth2.AuthStyleInParams
+	default:
+		return oauth2.AuthStyleAutoDetect
+	}
 }
 
 type urlConfig struct {
@@ -144,6 +170,12 @@ func (c config) Validate() error {
 			return errors.New("wait_min must be less than or equal to wait_max")
 		}
 	}
+
+	if c.Auth.OAuth2.isEnabled() {
+		if c.Auth.OAuth2.AuthStyle != authStyleInHeader && c.Auth.OAuth2.AuthStyle != authStyleInParams && c.Auth.OAuth2.AuthStyle != "" {
+			return fmt.Errorf("unsupported auth style: %s", c.Auth.OAuth2.AuthStyle)
+		}
+	}
 	return nil
 }
 
@@ -172,6 +204,11 @@ func defaultConfig() config {
 	return config{
 		Transport: httpcommon.HTTPTransportSettings{
 			Timeout: 180 * time.Second,
+		},
+		Auth: authConfig{
+			OAuth2: oAuth2Config{
+				TokenExpiryBuffer: 2 * time.Minute,
+			},
 		},
 		Retry: &retry{
 			MaxAttempts: 5,
