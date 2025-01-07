@@ -1,9 +1,11 @@
 module github.com/elastic/elastic-agent-libs
 
-go 1.21
+go 1.22.10
 
 require (
 	github.com/Microsoft/go-winio v0.5.2
+	github.com/elastic/elastic-transport-go/v8 v8.6.0
+	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-ucfg v0.8.5
 	github.com/elastic/pkcs8 v1.0.0
@@ -32,6 +34,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/elastic/go-sysinfo v1.14.0 // indirect
 	github.com/elastic/go-windows v1.0.1 // indirect
+	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/google/licenseclassifier v0.0.0-20200402202327-879cb1424de0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -45,6 +49,9 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.elastic.co/apm/v2 v2.6.0 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
+	go.opentelemetry.io/otel v1.28.0 // indirect
+	go.opentelemetry.io/otel/metric v1.28.0 // indirect
+	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
