@@ -18,9 +18,29 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	quark "github.com/elastic/go-quark"
 )
+
+var quarkMetrics = struct {
+	insertions      *monitoring.Uint
+	removals        *monitoring.Uint
+	aggregations    *monitoring.Uint
+	nonAggregations *monitoring.Uint
+	lost            *monitoring.Uint
+	backend         *monitoring.String
+}{}
+
+func init() {
+	reg := monitoring.Default.NewRegistry("process@quark")
+	quarkMetrics.insertions = monitoring.NewUint(reg, "insertions")
+	quarkMetrics.removals = monitoring.NewUint(reg, "removals")
+	quarkMetrics.aggregations = monitoring.NewUint(reg, "aggregations")
+	quarkMetrics.nonAggregations = monitoring.NewUint(reg, "non_aggregations")
+	quarkMetrics.lost = monitoring.NewUint(reg, "lost")
+	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
+}
 
 // QuarkMetricSet is a MetricSet with added members used only in by
 // quark QuarkMetricSet uses mb.PushReporterV2 instead of
@@ -70,11 +90,35 @@ func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	return &qm, nil
 }
 
+func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
+	if time.Since(*stamp) < time.Second*5 {
+		return
+	}
+
+	stats := ms.queue.Stats()
+	quarkMetrics.insertions.Set(stats.Insertions)
+	quarkMetrics.removals.Set(stats.Removals)
+	quarkMetrics.aggregations.Set(stats.Aggregations)
+	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
+	quarkMetrics.lost.Set(stats.Lost)
+	if stats.Backend == quark.QQ_EBPF {
+		quarkMetrics.backend.Set("ebpf")
+	} else if stats.Backend == quark.QQ_KPROBE {
+		quarkMetrics.backend.Set("kprobe")
+	} else {
+		quarkMetrics.backend.Set("invalid")
+	}
+
+	*stamp = time.Now()
+}
+
 // Run reads events from quark's queue and pushes them into output.
 // The queue is owned by this go-routine and should not be touched
 // from outside as there is no synchronization.
 func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 	ms.log.Info("Quark running")
+
+	metricsStamp := time.Now()
 
 MainLoop:
 	for {
@@ -84,6 +128,8 @@ MainLoop:
 			break MainLoop
 		default:
 		}
+
+		ms.maybeUpdateMetrics(&metricsStamp)
 
 		x := time.Now()
 		quarkEvents, err := ms.queue.GetEvents()
