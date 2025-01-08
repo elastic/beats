@@ -147,10 +147,8 @@ func (j *job) Timestamp() time.Time {
 }
 
 func (j *job) processAndPublishData(ctx context.Context, id string) error {
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, j.src.BucketTimeOut)
-	defer cancel()
 	obj := j.bucket.Object(j.object.Name)
-	reader, err := obj.NewReader(ctxWithTimeout)
+	reader, err := obj.NewReader(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to open reader for object: %s, with error: %w", j.object.Name, err)
 	}

@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -528,7 +529,6 @@ func Test_StorageClient(t *testing.T) {
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "1m",
-				"bucket_timeout":             "1m",
 				"buckets": []map[string]interface{}{
 					{
 						"name": "gcs-test-new",
@@ -550,7 +550,6 @@ func Test_StorageClient(t *testing.T) {
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"bucket_timeout":             "10s",
 				"retry": map[string]interface{}{
 					"max_attempts":             5,
 					"initial_backoff_duration": "1s",
@@ -578,7 +577,6 @@ func Test_StorageClient(t *testing.T) {
 				"max_workers":                1,
 				"poll":                       true,
 				"poll_interval":              "10s",
-				"bucket_timeout":             "10s",
 				"retry": map[string]interface{}{
 					"max_attempts":             5,
 					"initial_backoff_duration": "1s",
@@ -665,7 +663,7 @@ func Test_StorageClient(t *testing.T) {
 					if !tt.checkJSON {
 						val, err = got.Fields.GetValue("message")
 						assert.NoError(t, err)
-						assert.True(t, tt.expected[val.(string)])
+						assert.True(t, tt.expected[strings.ReplaceAll(val.(string), "\r\n", "\n")])
 					} else {
 						val, err = got.Fields.GetValue("gcs.storage.object.json_data")
 						fVal := fmt.Sprintf("%v", val)

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
@@ -123,15 +123,18 @@ func TestNetFlow(t *testing.T) {
 			conn, err := net.DialUDP("udp", nil, udpAddr)
 			require.NoError(t, err)
 
-			f, err := pcap.OpenOffline(file)
+			f, err := os.Open(file)
 			require.NoError(t, err)
 			defer f.Close()
+
+			r, err := pcapgo.NewReader(f)
+			require.NoError(t, err)
 
 			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
 
 			// Process packets in PCAP and get flow records.
 			var totalBytes, totalPackets int
-			packetSource := gopacket.NewPacketSource(f, f.LinkType())
+			packetSource := gopacket.NewPacketSource(r, r.LinkType())
 			for pkt := range packetSource.Packets() {
 				payloadData := pkt.TransportLayer().LayerPayload()
 
@@ -341,11 +344,12 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	t.Helper()
 
-	r, err := pcap.OpenOffline(pcapFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
+	f, err := os.Open(pcapFile)
+	require.NoError(t, err)
+	defer f.Close()
+
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
 
 	config := decoder.NewConfig().
 		WithProtocols(protocol.Registry.All()...).

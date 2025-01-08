@@ -7,6 +7,7 @@ package v9
 import (
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -84,7 +85,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 	var toDelete []TemplateKey
 	s.mutex.RLock()
 	for id, template := range s.Templates {
-		if !template.Delete.CAS(false, true) {
+		if !template.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, id)
 		}
 	}
@@ -184,7 +185,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 		a, r := session.ExpireTemplates()
 		aliveTemplates += a
 		removedTemplates += r
-		if !session.Delete.CAS(false, true) {
+		if !session.Delete.CompareAndSwap(false, true) {
 			toDelete = append(toDelete, key)
 		}
 	}

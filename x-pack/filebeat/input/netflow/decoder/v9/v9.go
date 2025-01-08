@@ -51,13 +51,14 @@ func New(config config.Config) protocol.Protocol {
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *logp.Logger) *NetflowV9Protocol {
 	ctx, cancel := context.WithCancel(context.Background())
 	pd := &NetflowV9Protocol{
-		ctx:         ctx,
-		cancel:      cancel,
-		decoder:     decoder,
-		logger:      logger,
-		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
-		timeout:     config.ExpirationTimeout(),
-		detectReset: config.SequenceResetEnabled(),
+		ctx:            ctx,
+		cancel:         cancel,
+		decoder:        decoder,
+		logger:         logger,
+		Session:        NewSessionMap(logger, config.ActiveSessionsMetric()),
+		timeout:        config.ExpirationTimeout(),
+		detectReset:    config.SequenceResetEnabled(),
+		shareTemplates: config.ShareTemplatesEnabled(),
 	}
 
 	if config.Cache() {
