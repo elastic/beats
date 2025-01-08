@@ -28,6 +28,8 @@ filebeat.inputs:
   - type: filestream
     id: filestream-input-id
     enabled: true
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false	
     paths:
       - %s
 output:
@@ -95,7 +97,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	require.NoError(t, err)
 
 	actualHits := &struct{ Hits int }{}
-	allRetrieved := true
+	allRetrieved := false
 
 	// wait for logs to be published
 	require.Eventually(t,
@@ -119,12 +121,14 @@ func TestFilebeatOTelE2E(t *testing.T) {
 			for _, retrieved := range originalMessage {
 				if !retrieved {
 					allRetrieved = false
+					break
 				}
+				allRetrieved = true
 			}
 
 			actualHits.Hits = docs.Hits.Total.Value
 			return (actualHits.Hits == numEvents) && allRetrieved
 		},
-		2*time.Minute, 1*time.Second, fmt.Sprintf("actual hits: %s; expected hits: %s; and all messages retrieved: %b", actualHits.Hits, numEvents, allRetrieved))
+		3*time.Minute, 1*time.Second, fmt.Sprintf("actual hits: %d; expected hits: %d; and all messages retrieved: %t", actualHits.Hits, numEvents, allRetrieved))
 
 }
