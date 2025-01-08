@@ -20,6 +20,7 @@ The websocket streaming input supports:
 ** Basic
 ** Bearer 
 ** Custom
+** OAuth2.0
 
 NOTE: The `streaming` input websocket handler does not currently support XML messages. Auto-reconnects are also not supported at the moment so reconnection will occur on input restart.
 
@@ -113,7 +114,7 @@ This will include any sensitive or secret information kept in the `state` object
 
 ==== Authentication
 
-The websocket streaming input supports authentication via Basic token authentication, Bearer token authentication and authentication via a custom auth config. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and custom auth contains any combination of custom header and value. These token/key values are are added to the request headers and are not exposed to the `state` object. The custom auth configuration is useful for constructing requests that require custom headers and values for authentication. The basic and bearer token configurations will always use the `Authorization` header and prepend the token with `Basic` or `Bearer` respectively.
+The websocket streaming input supports authentication via Basic token authentication, Bearer token authentication, authentication via a custom auth config and OAuth2 based authentication. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and custom auth contains any combination of custom header and value. These token/key values are are added to the request headers and are not exposed to the `state` object. The custom auth configuration is useful for constructing requests that require custom headers and values for authentication. The basic and bearer token configurations will always use the `Authorization` header and prepend the token with `Basic` or `Bearer` respectively.
 
 Example configurations with authentication:
 
@@ -164,6 +165,48 @@ filebeat.inputs:
     client_id: a23fcea2643868ef1a41565a1a8a1c7c
     client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
     token_url: https://api.crowdstrike.com/oauth2/token
+----
+
+==== Websocket OAuth2.0
+
+The `websocket` streaming input supports OAuth2.0 authentication. The `auth` configuration field is used to specify the OAuth2.0 configuration. These values are not exposed to the `state` object. 
+
+The `auth` configuration field has the following subfields:
+  
+  - `client_id`: The client ID to use for OAuth2.0 authentication.
+  - `client_secret`: The client secret to use for OAuth2.0 authentication.
+  - `token_url`: The token URL to use for OAuth2.0 authentication.
+  - `scopes`: The scopes to use for OAuth2.0 authentication.
+  - `endpoint_params`: The endpoint parameters to use for OAuth2.0 authentication.
+  - `auth_style`: The authentication style to use for OAuth2.0 authentication. If left unset, the style will be automatically detected.
+  - `token_expiry_buffer`: Minimum valid time remaining before attempting an OAuth2 token renewal. The default value is `2m`.
+
+**Explanations for `auth_style` and `token_expiry_buffer`:**
+
+- `auth_style`: The authentication style to use for OAuth2.0 authentication which determines how the values of sensitive information like `client_id` and `client_secret` are sent in the token request. The default style value is automatically inferred and used appropriately if no value is provided. The `auth_style` configuration field is optional and can be used to specify the authentication style to use for OAuth2.0 authentication. The `auth_style` configuration field supports the following configurable values:
+  
+  * `in_header`: The `client_id` and `client_secret` is sent in the header as a base64 encoded `Authorization` header.
+  * `in_params`: The `client_id` and `client_secret` is sent in the request body along with the other OAuth2 parameters.
+
+- `token_expiry_buffer`: The token expiry buffer to use for OAuth2.0 authentication. The `token_expiry_buffer` is used as a safety net to ensure that the token does not expire before the input can refresh it. The `token_expiry_buffer` configuration field is optional. If the `token_expiry_buffer` configuration field is not set, the default value of `2m` is used.
+
+NOTE: We recommend leaving the `auth_style` configuration field unset (automatically inferred internally) for most scenarios, except where manual intervention is required.
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: streaming
+  auth:
+    client_id: a23fcea2643868ef1a41565a1a8a1c7c
+    client_secret: c3VwZXJzZWNyZXRfY2xpZW50X3NlY3JldF9zaGhoaGgK
+    token_url: https://api.sample-url.com/oauth2/token
+    scopes: ["read", "write"]
+    endpoint_params:
+      param1: value1
+      param2: value2
+    auth_style: in_params
+    token_expiry_buffer: 5m
+  url: wss://localhost:443/_stream
 ----
 
 [[input-state-streaming]]
@@ -316,7 +359,7 @@ This specifies whether fields should be replaced with a `*` or deleted entirely 
 [float]
 ==== `retry`
 
-The `retry` configuration allows the user to specify the number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted. It has a `wait_min` and `wait_max` configuration which specifies the minimum and maximum time to wait between retries. 
+The `retry` configuration allows the user to specify the number of times the input should attempt to reconnect to the streaming data source in the event of a connection failure. The default value is `nil` which means no retries will be attempted. It has a `wait_min` and `wait_max` configuration which specifies the minimum and maximum time to wait between retries. It also supports blanket retries and infinite retries via the `blanket_retires` and `infinite_retries` configuration options. These are set to `false` by default.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -333,6 +376,8 @@ filebeat.inputs:
     max_attempts: 5
     wait_min: 1s
     wait_max: 10s
+    blanket_retries: false
+    infinite_retries: false
 ----
 [float]
 ==== `retry.max_attempts`
@@ -348,6 +393,16 @@ The minimum time to wait between retries. This ensures that retries are spaced o
 ==== `retry.wait_max`
 
 The maximum time to wait between retries. This prevents the retry mechanism from becoming too slow, ensuring that the client does not wait indefinitely between retries. This is crucial in systems where timeouts or user experience are critical. For example, `wait_max` might be set to 10 seconds, meaning that even if the calculated backoff is greater than this, the client will wait at most 10 seconds before retrying. The default value is `30` seconds.
+
+[float]
+==== `retry.blanket_retries`
+
+Normally the input will only retry when a connection error is found to be retryable based on the error type and the RFC 6455 error codes defined by the websocket protocol. If `blanket_retries` is set to `true` (`false` by default) the input will retry on any error. This is not recommended unless the user is certain that all errors are transient and can be resolved by retrying.
+
+[float]
+==== `retry.infinite_retries`
+
+Normally the input will only retry a maximum of `max_attempts` times. If `infinite_retries` is set to `true` (`false` by default) the input will retry indefinitely. This is not recommended unless the user is certain that the connection will eventually succeed.
 
 [float]
 === `timeout`
