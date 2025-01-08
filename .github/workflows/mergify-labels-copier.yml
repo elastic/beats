@@ -1,0 +1,20 @@
+name: mergify backport labels copier
+
+on:
+  pull_request_target:
+    types:
+      - opened
+
+permissions:
+  contents: read
+
+jobs:
+  mergify-backport-labels-copier:
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'mergify/bp/')
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: elastic/oblt-actions/mergify/labels-copier@v1
+        with:
+          excluded-labels-regex: "backport-*"
