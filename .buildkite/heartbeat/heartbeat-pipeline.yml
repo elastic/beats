@@ -12,11 +12,11 @@ env:
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
-  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
-  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1736329420"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1736329420"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1736329420"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1736329420"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1736329420"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -123,6 +123,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -143,6 +144,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -277,6 +279,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -297,6 +300,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -317,6 +321,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
