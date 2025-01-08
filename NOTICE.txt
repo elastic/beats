@@ -24532,11 +24532,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.mongodb.org/mongo-driver
-Version: v1.14.0
+Version: v1.17.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.mongodb.org/mongo-driver@v1.14.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.mongodb.org/mongo-driver@v1.17.2/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -27133,11 +27133,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.31.0
+Version: v0.32.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.31.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.32.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27318,11 +27318,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.28.0
+Version: v0.29.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.28.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.29.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27355,11 +27355,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.27.0
+Version: v0.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.27.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.28.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -54780,15 +54780,15 @@ Contents of probable licence file $GOMODCACHE/github.com/modern-go/reflect2@v1.0
 
 --------------------------------------------------------------------------------
 Dependency : github.com/montanaflynn/stats
-Version: v0.7.0
+Version: v0.7.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/montanaflynn/stats@v0.7.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/montanaflynn/stats@v0.7.1/LICENSE:
 
 The MIT License (MIT)
 
-Copyright (c) 2014-2020 Montana Flynn (https://montanaflynn.com)
+Copyright (c) 2014-2023 Montana Flynn (https://montanaflynn.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58609,11 +58609,11 @@ Contents of probable licence file $GOMODCACHE/github.com/xdg-go/stringprep@v1.0.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/youmark/pkcs8
-Version: v0.0.0-20201027041543-1326539a0a0a
+Version: v0.0.0-20240726163527-a2c0da244d78
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/youmark/pkcs8@v0.0.0-20201027041543-1326539a0a0a/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/youmark/pkcs8@v0.0.0-20240726163527-a2c0da244d78/LICENSE:
 
 The MIT License (MIT)
 
