@@ -50,7 +50,7 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 
 	// NOTE(shmsr):
 	// https://www.mongodb.com/docs/manual/reference/command/collStats/#syntax
-	// "scale" field is ommitted here as it is by default 1, i.e., it return sizes in bytes.
+	// "scale" field is omitted here as it is by default 1, i.e., it return sizes in bytes.
 	//
 	// Also, note that collStats is deprecated since v6.2 but as we support older
 	// versions i.e., >= 5.0, let's keep it for now as this still works.
