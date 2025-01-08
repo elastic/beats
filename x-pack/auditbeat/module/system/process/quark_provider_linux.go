@@ -61,7 +61,9 @@ func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	} else if stats.Backend == quark.QQ_KPROBE {
 		qm.log.Info("quark using KPROBES")
 	} else {
-		qm.log.Info("quark using VOODOO")
+		qm.queue.Close()
+		qm.cachedHasher.Close()
+		return nil, fmt.Errorf("quark has an invalid backend")
 	}
 	qm.SystemMetricSet = system.NewSystemMetricSet(base)
 
