@@ -98,7 +98,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	if runtime.GOOS == "linux" && ms.config.Backend == "quark" {
+	if runtime.GOOS == "linux" && ms.config.Backend == "kernel_tracing" {
 		if qm, err := NewFromQuark(base, ms); err == nil {
 			return qm, nil
 		} else {

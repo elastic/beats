@@ -25,7 +25,7 @@ func (c *Config) Validate() error {
 	if err := c.HasherConfig.Validate(); err != nil {
 		return err
 	}
-	if c.Backend != "quark" && c.Backend != "proc" {
+	if c.Backend != "kernel_tracing" && c.Backend != "proc" {
 		return fmt.Errorf("invalid process.backend '%s'", c.Backend)
 	}
 
