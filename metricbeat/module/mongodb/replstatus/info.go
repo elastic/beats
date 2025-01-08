@@ -119,13 +119,17 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 	// only need the timestamp (ts) field. FindOne() is used to retrieve a single
 	// document from the collection (limit: 1).
 
+	ctx := context.TODO()
+
 	var firstDoc struct {
 		Timestamp time.Time `bson:"ts"`
 	}
 
 	// Get oldest entry using natural order
-	firstOpts := options.FindOne().SetProjection(bson.D{{Key: "ts", Value: 1}})
-	err := collection.FindOne(context.TODO(), bson.D{}, firstOpts).Decode(&firstDoc)
+	firstOpts := options.
+		FindOne().
+		SetProjection(bson.D{{Key: "ts", Value: 1}})
+	err := collection.FindOne(ctx, bson.D{}, firstOpts).Decode(&firstDoc)
 	if err != nil {
 		return 0, 0, fmt.Errorf("first timestamp query failed: %w", err)
 	}
@@ -134,10 +138,11 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 	var lastDoc struct {
 		Timestamp time.Time `bson:"ts"`
 	}
-	lastOpts := options.FindOne().
+	lastOpts := options.
+		FindOne().
 		SetProjection(bson.D{{Key: "ts", Value: 1}}).
 		SetSort(bson.D{{Key: "$natural", Value: -1}})
-	err = collection.FindOne(context.TODO(), bson.D{}, lastOpts).Decode(&lastDoc)
+	err = collection.FindOne(ctx, bson.D{}, lastOpts).Decode(&lastDoc)
 	if err != nil {
 		return 0, 0, fmt.Errorf("last timestamp query failed: %w", err)
 	}
