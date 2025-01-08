@@ -112,6 +112,12 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 	// querying without any sort, it will return the first entry in natural order.
 	// When we sort in reverse natural order (i.e., $natural: -1), it will return
 	// the last entry in natural order.
+	//
+	// The queries use optimizations like FindOne() and SetProjection() to limit
+	// the amount of data that needs to be scanned and processed.
+	// Projection is used to limit the fields returned in the query results i.e., we
+	// only need the timestamp (ts) field. FindOne() is used to retrieve a single
+	// document from the collection (limit: 1).
 
 	var firstDoc struct {
 		Timestamp time.Time `bson:"ts"`
