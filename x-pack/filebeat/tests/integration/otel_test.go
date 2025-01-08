@@ -108,7 +108,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 			docs, err := estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
 			require.NoError(t, err)
 
-			//Mark retrieved messages
+			// Mark retrieved messages
 			for _, hit := range docs.Hits.Hits {
 				message := hit.Source["Body"].(map[string]interface{})["message"].(string) //nolint:errcheck // err check not required on accessing each doc
 
