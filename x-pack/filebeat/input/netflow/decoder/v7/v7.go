@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"log"
 	"net"
 	"time"
 
@@ -59,7 +58,7 @@ func init() {
 }
 
 func New(config config.Config) protocol.Protocol {
-	return v1.NewProtocol(ProtocolID, &v7template, ReadV7Header, log.New(config.LogOutput(), LogPrefix, 0))
+	return v1.NewProtocol(ProtocolID, &v7template, ReadV7Header, config.LogOutput().Named(LogPrefix))
 }
 
 type PacketHeader struct {

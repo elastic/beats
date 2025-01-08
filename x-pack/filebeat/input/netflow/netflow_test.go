@@ -293,7 +293,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithLogOutput(logp.NewLogger("netflow_test"))
 
 	for _, fieldFile := range testCase.Fields {
 		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
@@ -356,7 +356,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
 		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap")).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithLogOutput(logp.NewLogger("netflow_test"))
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
