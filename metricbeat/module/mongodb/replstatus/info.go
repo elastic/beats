@@ -51,7 +51,6 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	var oplogSize CollSize
 	res := db.RunCommand(context.Background(), bson.D{
 		{Key: "collStats", Value: oplogCol},
-		{Key: "scale", Value: 1}, // Reduce precision for better performance
 	})
 	if err := res.Err(); err != nil {
 		return nil, fmt.Errorf("collStats command failed: %w", err)
