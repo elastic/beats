@@ -17,4 +17,4 @@ jobs:
     steps:
       - uses: elastic/oblt-actions/mergify/labels-copier@v1
         with:
-          excluded-labels-regex: "backport-*"
+          excluded-labels-regex: "^backport-*"
