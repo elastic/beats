@@ -159,23 +159,32 @@ func httpPPROFEndpoint(accessString string, conf *confmap.Conf) error {
 	if v := conf.Get(accessString + "::http::pprof::enabled"); v != nil {
 		if v.(bool) {
 			var httpHost string
-			var httpPort int
+			var httpPort uint64
+
+			// Get http.host if set
 			if v := conf.Get(accessString + "::http::host"); v != nil {
-				httpHost = v.(string)
+				httpHost = v.(string) //nolint:errheck //we know this will always be a string
 			} else {
 				httpHost = "localhost"
 			}
 
+			// Get http.port if set
 			if v := conf.Get(accessString + "::http::port"); v != nil {
-				httpPort = v.(int)
+				switch v := v.(type) {
+				case uint64:
+					httpPort = v
+				case int: // we have only have this case from tests
+					httpPort = uint64(v) // Convert int to uint64
+				}
 			} else {
 				httpPort = 5066
 			}
 
+			// add pprof extension
 			out := map[string]any{
 				"extensions": map[string]any{
 					"pprof": map[string]any{
-						"endpoint": httpHost + ":" + strconv.Itoa(httpPort),
+						"endpoint": httpHost + ":" + strconv.FormatUint(httpPort, 10),
 					},
 				},
 				"service": map[string]any{
@@ -183,7 +192,6 @@ func httpPPROFEndpoint(accessString string, conf *confmap.Conf) error {
 			}
 
 			err := conf.Merge(confmap.NewFromStringMap(out))
-
 			if err != nil {
 				return err
 			}
