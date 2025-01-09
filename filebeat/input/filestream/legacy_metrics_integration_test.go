@@ -41,6 +41,8 @@ filebeat.inputs:
     enabled: true
     close.reader.after_interval: 1s
     prospector.scanner.check_interval: 500ms
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s/*.filestream
   - type: log
@@ -48,6 +50,8 @@ filebeat.inputs:
     enabled: true
     close_timeout: 1s
     scan_frequency: 500ms
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s/*.log
 
@@ -71,7 +75,9 @@ func TestLegacyMetrics(t *testing.T) {
 	filebeat.WriteConfigFile(cfg)
 	filebeat.Start()
 
-	filebeat.WaitForLogs("Metrics endpoint listening on:", 10*time.Second)
+	filebeat.WaitForLogs("Metrics endpoint listening on:",
+		10*time.Second,
+		"metrics endpoint did not start")
 
 	// After starting Filebeat all counters must be zero
 	waitForMetrics(t,

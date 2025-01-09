@@ -19,9 +19,14 @@ package apiserver
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -29,9 +34,11 @@ import (
 // Metricset for apiserver is a prometheus based metricset
 type Metricset struct {
 	mb.BaseMetricSet
+	http               *helper.HTTP
 	prometheusClient   prometheus.Prometheus
 	prometheusMappings *prometheus.MetricsMapping
 	clusterMeta        mapstr.M
+	mod                k8smod.Module
 }
 
 var _ mb.ReportingMetricSetV2Error = (*Metricset)(nil)
@@ -41,11 +48,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
+
+	http, err := pc.GetHttp()
+	if err != nil {
+		return nil, fmt.Errorf("the http connection is not valid")
+	}
 	ms := &Metricset{
 		BaseMetricSet:      base,
+		http:               http,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
 		clusterMeta:        util.AddClusterECSMeta(base),
+		mod:                mod,
 	}
 
 	return ms, nil
@@ -54,20 +73,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch gathers information from the apiserver and reports events with this information.
 func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
+	errorString := fmt.Sprintf("%s", err)
+	errorUnauthorisedMsg := fmt.Sprintf("unexpected status code %d", http.StatusUnauthorized)
+	if err != nil && strings.Contains(errorString, errorUnauthorisedMsg) {
+		count := 2 // We retry twice to refresh the Authorisation token in case of http.StatusUnauthorize = 401 Error
+		for count > 0 {
+			if _, errAuth := m.http.RefreshAuthorizationHeader(); errAuth == nil {
+				events, err = m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
+			}
+			if err != nil {
+				time.Sleep(m.mod.Config().Period)
+				count--
+			} else {
+				break
+			}
+		}
+	}
+	// We need to check for err again in case error is not 401 or RefreshAuthorizationHeader has failed
 	if err != nil {
 		return fmt.Errorf("error getting metrics: %w", err)
-	}
-
-	for _, e := range events {
-		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
-		if len(m.clusterMeta) != 0 {
-			event.RootFields.DeepUpdate(m.clusterMeta)
+	} else {
+		for _, e := range events {
+			event := mb.TransformMapStrToEvent("kubernetes", e, nil)
+			if len(m.clusterMeta) != 0 {
+				event.RootFields.DeepUpdate(m.clusterMeta)
+			}
+			isOpen := reporter.Event(event)
+			if !isOpen {
+				return nil
+			}
 		}
-		isOpen := reporter.Event(event)
-		if !isOpen {
-			return nil
-		}
+		return nil
 	}
-
-	return nil
 }

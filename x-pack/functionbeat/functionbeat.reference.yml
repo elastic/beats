@@ -1288,7 +1288,7 @@ logging.files:
   #path: /var/log/functionbeat
 
   # The name of the files where the logs are written to.
-  #name: functionbeat-event-data
+  #name: functionbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
