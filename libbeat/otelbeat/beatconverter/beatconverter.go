@@ -19,7 +19,6 @@ package beatconverter
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -184,9 +183,6 @@ func httpPPROFEndpoint(accessString string, conf *confmap.Conf) error {
 			}
 
 			err := conf.Merge(confmap.NewFromStringMap(out))
-
-			s, _ := json.MarshalIndent(conf.ToStringMap(), "", " ")
-			fmt.Println(string(s), "from outside handling cloud id")
 
 			if err != nil {
 				return err
