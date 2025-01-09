@@ -17,7 +17,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
 - Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 - Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
+- Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209] 
 
 *Auditbeat*
 
@@ -384,6 +386,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Rate limiting operability improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
 - Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
 - Rate limiting fault tolerance improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42094[42094]
+- Added OAuth2 support with auto token refresh for websocket streaming input. {issue}41989[41989] {pull}42212[42212]
+- Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 
 *Auditbeat*
 

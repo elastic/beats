@@ -52,7 +52,7 @@ of 10-20 seconds is usually enough. To record the trace, you can use the followi
 
 [source,shell]
 ------------------------------------------------------------
-packetbeat -e -dump trace.pcap
+packetbeat -e --dump trace.pcap
 ------------------------------------------------------------
 
 This command executes Packetbeat in normal mode (all processing happens as usual), but
