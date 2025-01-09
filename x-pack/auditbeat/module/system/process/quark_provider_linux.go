@@ -90,28 +90,6 @@ func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	return &qm, nil
 }
 
-func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
-	if time.Since(*stamp) < time.Second*5 {
-		return
-	}
-
-	stats := ms.queue.Stats()
-	quarkMetrics.insertions.Set(stats.Insertions)
-	quarkMetrics.removals.Set(stats.Removals)
-	quarkMetrics.aggregations.Set(stats.Aggregations)
-	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
-	quarkMetrics.lost.Set(stats.Lost)
-	if stats.Backend == quark.QQ_EBPF {
-		quarkMetrics.backend.Set("ebpf")
-	} else if stats.Backend == quark.QQ_KPROBE {
-		quarkMetrics.backend.Set("kprobe")
-	} else {
-		quarkMetrics.backend.Set("invalid")
-	}
-
-	*stamp = time.Now()
-}
-
 // Run reads events from quark's queue and pushes them into output.
 // The queue is owned by this go-routine and should not be touched
 // from outside as there is no synchronization.
@@ -330,4 +308,26 @@ func actionAndTypeOfEvent(quarkEvent quark.Event) (eventAction, []string) {
 	}
 
 	return action, evtype
+}
+
+func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
+	if time.Since(*stamp) < time.Second*5 {
+		return
+	}
+
+	stats := ms.queue.Stats()
+	quarkMetrics.insertions.Set(stats.Insertions)
+	quarkMetrics.removals.Set(stats.Removals)
+	quarkMetrics.aggregations.Set(stats.Aggregations)
+	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
+	quarkMetrics.lost.Set(stats.Lost)
+	if stats.Backend == quark.QQ_EBPF {
+		quarkMetrics.backend.Set("ebpf")
+	} else if stats.Backend == quark.QQ_KPROBE {
+		quarkMetrics.backend.Set("kprobe")
+	} else {
+		quarkMetrics.backend.Set("invalid")
+	}
+
+	*stamp = time.Now()
 }
