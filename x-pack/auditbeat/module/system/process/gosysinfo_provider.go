@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -33,7 +32,6 @@ const (
 
 // SysinfoMetricSet collects data about the host.
 type SysInfoMetricSet struct {
-	system.SystemMetricSet
 	MetricSet
 	hasher    *hasher.FileHasher
 	cache     *cache.Cache
@@ -81,7 +79,7 @@ func (p Process) toMapStr() mapstr.M {
 }
 
 // NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
-func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
@@ -117,7 +115,6 @@ func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	}
 
 	sm := &SysInfoMetricSet{
-		SystemMetricSet: system.NewSystemMetricSet(base),
 		MetricSet:       ms,
 		cache:           cache.New(),
 		bucket:          bucket,

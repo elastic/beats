@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -47,7 +46,6 @@ func init() {
 // mb.ReporterV2. More notably we don't do periodic state reports and
 // we don't need a cache as it is provided by quark.
 type QuarkMetricSet struct {
-	system.SystemMetricSet
 	MetricSet
 	queue        *quark.Queue // Quark runtime state
 	selfMntNsIno uint32       // Mnt inode from current process
@@ -55,7 +53,7 @@ type QuarkMetricSet struct {
 }
 
 // NewFromQuark instantiates the module with quark's backend.
-func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	var qm QuarkMetricSet
 
 	qm.MetricSet = ms
@@ -85,7 +83,6 @@ func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("quark has an invalid backend")
 	}
-	qm.SystemMetricSet = system.NewSystemMetricSet(base)
 
 	return &qm, nil
 }

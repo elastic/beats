@@ -27,6 +27,7 @@ const (
 
 // MetricSet collects data about the host.
 type MetricSet struct {
+	system.SystemMetricSet
 	config Config
 	log    *logp.Logger
 }
@@ -93,20 +94,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	ms.config = defaultConfig
 	ms.log = logp.NewLogger(metricsetName)
+	ms.SystemMetricSet = system.NewSystemMetricSet(base)
 
 	if err := base.Module().UnpackConfig(&ms.config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	if runtime.GOOS == "linux" && ms.config.Backend == "kernel_tracing" {
-		if qm, err := NewFromQuark(base, ms); err == nil {
+		if qm, err := NewFromQuark(ms); err == nil {
 			return qm, nil
 		} else {
 			ms.log.Errorf("can't use quark, falling back to sysinfo: %w", err)
 		}
 	}
 
-	return NewFromSysInfo(base, ms)
+	return NewFromSysInfo(ms)
 }
 
 // entityID creates an ID that uniquely identifies this process across machines.
