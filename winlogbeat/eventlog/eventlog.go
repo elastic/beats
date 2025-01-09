@@ -70,7 +70,6 @@ type EventLog interface {
 type Record struct {
 	winevent.Event
 	File   string                   // Source file when event is from a file.
-	API    string                   // The event log API type used to read the record.
 	XML    string                   // XML representation of the event.
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
 }
@@ -80,7 +79,6 @@ func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
 	_ = win.Delete("time_created")
-	_, _ = win.Put("api", e.API)
 
 	m := mapstr.M{
 		"winlog": win,
