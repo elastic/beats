@@ -9,11 +9,13 @@ import (
 	"fmt"
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
+	"github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/debugexporter"
+	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/receiver"
 
@@ -67,13 +69,23 @@ func getComponent() (otelcol.Factories, error) {
 		debugexporter.NewFactory(),
 		elasticsearchexporter.NewFactory(),
 	)
+
+	if err != nil {
+		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
+	}
+
+	extensions, err := extension.MakeFactoryMap(
+		pprofextension.NewFactory(),
+	)
+
 	if err != nil {
 		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
 	}
 
 	return otelcol.Factories{
-		Receivers: receivers,
-		Exporters: exporters,
+		Receivers:  receivers,
+		Exporters:  exporters,
+		Extensions: extensions,
 	}, nil
 
 }

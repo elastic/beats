@@ -27,35 +27,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var supportedInput = `
-receivers:
-  filebeatreceiver:
-    filebeat:
-      inputs:
-        - type: filestream
-          enabled: true
-          id: filestream-input-id
-          paths:
-            - /tmp/flog.log
-        - type: log
-          enabled: true
-          paths:
-            - /var/log/*.log			
-    output:
-      elasticsearch:
-        hosts: ["https://localhost:9200"]
-        username: elastic
-        password: changeme
-        index: form-otel-exporter
-
-service:
-  pipelines:
-    logs:
-      receivers:
-        - "filebeatreceiver"
-`
-
-var expectedOutput = `
+var esCommonOutput = `
 exporters:
   elasticsearch:
     api_key: ""
@@ -72,6 +44,39 @@ exporters:
       max_retries: 3
     user: elastic
     timeout: 1m30s
+`
+
+func TestConverter(t *testing.T) {
+	c := converter{}
+	t.Run("test converter functionality", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+        - type: log
+          enabled: true
+          paths:
+            - /var/log/*.log	
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+		var expectedOutput = esCommonOutput + `
 receivers:
   filebeatreceiver:
     filebeat:
@@ -96,7 +101,17 @@ service:
         - filebeatreceiver
 `
 
-var unsupportedOutputConfig = `
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+
+	})
+
+	t.Run("test failure if unsupported config is provided", func(t *testing.T) {
+		var unsupportedOutputConfig = `
 receivers:
   filebeatreceiver:
     filebeat:
@@ -117,34 +132,155 @@ service:
         - "filebeatreceiver"
 `
 
-func TestConverter(t *testing.T) {
-	c := converter{}
-	t.Run("test converter functionality", func(t *testing.T) {
-
-		input := newFromYamlString(t, supportedInput)
-		err := c.Convert(context.Background(), input)
-		require.NoError(t, err, "error converting beats output config")
-
-		expOutput := newFromYamlString(t, expectedOutput)
-
-		// convert it to a common type
-		want, err := yaml.Marshal(expOutput.ToStringMap())
-		require.NoError(t, err)
-		got, err := yaml.Marshal(input.ToStringMap())
-		require.NoError(t, err)
-
-		assert.Equal(t, string(want), string(got))
-
-	})
-
-	t.Run("test failure if unsupported config is provided", func(t *testing.T) {
 		input := newFromYamlString(t, unsupportedOutputConfig)
 		err := c.Convert(context.Background(), input)
 		require.ErrorContains(t, err, "output type \"kafka\" is unsupported in OTel mode")
 
 	})
 
-	// TODO: Add a test case with cloud id set
+	t.Run("test cloud id conversion", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+    cloud:
+      id: ZWxhc3RpYy5jbyRlcy1ob3N0bmFtZSRraWJhbmEtaG9zdG5hbWU=
+      auth: elastic-cloud:password
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+		var expectedOutput = `
+exporters:
+  elasticsearch:
+    api_key: ""
+    endpoints:
+      - https://es-hostname.elastic.co:443
+    idle_conn_timeout: 3s
+    logs_index: form-otel-exporter
+    num_workers: 0
+    password: password
+    retry:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 1m0s
+      max_retries: 3
+    user: elastic-cloud
+    timeout: 1m30s
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+          type: filestream  
+    output:
+      otelconsumer: null
+    cloud: null
+    setup:
+      kibana:
+        host: https://kibana-hostname.elastic.co:443
+service:
+  pipelines:
+    logs:
+      exporters:
+        - elasticsearch
+      receivers:
+        - filebeatreceiver
+`
+
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+
+	})
+
+	t.Run("test http pprof", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - type: filestream
+          enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+    http:
+      host: 127.0.0.1
+      port: 80
+      pprof:
+        enabled: true
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+		var expectedOutput = esCommonOutput + `
+extensions:
+   pprof:
+      endpoint: 127.0.0.1:80 
+receivers:
+  filebeatreceiver:
+    filebeat:
+      inputs:
+        - enabled: true
+          id: filestream-input-id
+          paths:
+            - /tmp/flog.log
+          type: filestream
+    http:
+      host: 127.0.0.1
+      port: 80
+      pprof:
+        enabled: true          
+    output:
+      otelconsumer: null
+service:
+  extensions: ["pprof"] 
+  pipelines:
+    logs:
+      exporters:
+        - elasticsearch
+      receivers:
+        - filebeatreceiver
+`
+
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+
+	})
+
 }
 
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
@@ -154,4 +290,15 @@ func newFromYamlString(t *testing.T, input string) *confmap.Conf {
 	require.NoError(t, err)
 
 	return confmap.NewFromStringMap(rawConf)
+}
+
+func compareAndAssert(t *testing.T, expectedOutput *confmap.Conf, gotOutput *confmap.Conf) {
+	t.Helper()
+	// convert it to a common type
+	want, err := yaml.Marshal(expectedOutput.ToStringMap())
+	require.NoError(t, err)
+	got, err := yaml.Marshal(gotOutput.ToStringMap())
+	require.NoError(t, err)
+
+	assert.Equal(t, string(want), string(got))
 }
