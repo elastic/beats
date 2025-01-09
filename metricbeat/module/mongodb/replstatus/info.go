@@ -73,7 +73,7 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	collection := db.Collection(oplogCol)
 	firstTs, lastTs, err := getOpTimestamp(collection)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not get operation timestamps from oplog: %w", err)
 	}
 
 	info := &oplogInfo{
