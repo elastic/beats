@@ -163,7 +163,7 @@ func httpPPROFEndpoint(accessString string, conf *confmap.Conf) error {
 
 			// Get http.host if set
 			if v := conf.Get(accessString + "::http::host"); v != nil {
-				httpHost = v.(string) //nolint:errheck //we know this will always be a string
+				httpHost = v.(string) //nolint:errcheck //we know this will always be a string
 			} else {
 				httpHost = "localhost"
 			}
