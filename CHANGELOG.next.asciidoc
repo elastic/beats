@@ -248,6 +248,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
+
 
 *Winlogbeat*
 
