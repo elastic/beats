@@ -25,7 +25,7 @@ func (c *Config) Validate() error {
 	if err := c.HasherConfig.Validate(); err != nil {
 		return err
 	}
-	if c.Backend != "kernel_tracing" && c.Backend != "proc" {
+	if c.Backend != "kernel_tracing" && c.Backend != "procfs" {
 		return fmt.Errorf("invalid process.backend '%s'", c.Backend)
 	}
 
@@ -49,5 +49,5 @@ var defaultConfig = Config{
 		ScanRatePerSec:      "50 MiB",
 		ScanRateBytesPerSec: 50 * 1024 * 1024,
 	},
-	Backend: "proc",
+	Backend: "procfs",
 }
