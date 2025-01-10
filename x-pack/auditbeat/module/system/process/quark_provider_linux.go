@@ -71,6 +71,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	attr := quark.DefaultQueueAttr()
 	qm.queue, err = quark.OpenQueue(attr, 1)
 	if err != nil {
+		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
 	}
 	stats := qm.queue.Stats()
