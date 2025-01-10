@@ -216,7 +216,7 @@ func drainFor(t *testing.T, qq *quark.Queue, d time.Duration) []quark.Event {
 		// Intentionally placed at the end so that we always
 		// get one more try after the last block
 		if len(qevs) == 0 {
-			qq.Block()
+			_ = qq.Block()
 		}
 	}
 
@@ -244,7 +244,7 @@ func drainFirstOfPid(t *testing.T, qq *quark.Queue, pid int) quark.Event {
 		// Intentionally placed at the end so that we always
 		// get one more try after the last block
 		if len(qevs) == 0 {
-			qq.Block()
+			_ = qq.Block()
 		}
 	}
 
