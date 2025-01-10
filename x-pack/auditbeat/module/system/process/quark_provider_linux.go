@@ -52,6 +52,9 @@ type QuarkMetricSet struct {
 	cachedHasher *hasher.CachedHasher
 }
 
+// Used for testing only and not exposed via config
+var quarkForceKprobe bool
+
 // NewFromQuark instantiates the module with quark's backend.
 func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	var qm QuarkMetricSet
@@ -69,6 +72,10 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	}
 
 	attr := quark.DefaultQueueAttr()
+	if quarkForceKprobe {
+		attr.Flags &= ^quark.QQ_ALL_BACKENDS
+		attr.Flags |= quark.QQ_KPROBE
+	}
 	qm.queue, err = quark.OpenQueue(attr, 1)
 	if err != nil {
 		qm.cachedHasher.Close()

@@ -23,9 +23,40 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestForkExecExit see if quark is generating snapshot events
-func TestInitialSnapshot(t *testing.T) {
-	qq := openQueue(t)
+type backend int
+
+const (
+	Ebpf backend = iota
+	Kprobe
+)
+
+func TestInitialSnapshotEbpf(t *testing.T) {
+	testInitialSnapshot(t, Ebpf)
+}
+
+func TestInitialSnapshotKprobe(t *testing.T) {
+	testInitialSnapshot(t, Kprobe)
+}
+
+func TestForkExecExitEbpf(t *testing.T) {
+	testForkExecExit(t, Ebpf)
+}
+
+func TestForkExecExitKprobe(t *testing.T) {
+	testForkExecExit(t, Kprobe)
+}
+
+func TestQuarkMetricSetEbpf(t *testing.T) {
+	testQuarkMetricSet(t, Ebpf)
+}
+
+func TestQuarkMetricSetKprobe(t *testing.T) {
+	testQuarkMetricSet(t, Kprobe)
+}
+
+// testInitialSnapshot see if quark is generating snapshot events
+func testInitialSnapshot(t *testing.T, be backend) {
+	qq := openQueue(t, be)
 	defer qq.Close()
 
 	// There should be events of kind quark.QUARK_EV_SNAPSHOT
@@ -40,9 +71,9 @@ func TestInitialSnapshot(t *testing.T) {
 	require.True(t, gotsnap)
 }
 
-// TestForkExecExit tests if a spawned process shows up in quark
-func TestForkExecExit(t *testing.T) {
-	qq := openQueue(t)
+// testForkExecExit tests if a spawned process shows up in quark
+func testForkExecExit(t *testing.T, be backend) {
+	qq := openQueue(t, be)
 	defer qq.Close()
 
 	// runNop will fork+exec+exit /bin/true
@@ -66,10 +97,13 @@ func TestForkExecExit(t *testing.T) {
 	require.Equal(t, qev.Process.Filename, cmd.Path)
 	require.Equal(t, qev.Process.Filename, cmd.Args[0])
 
-	// Check Cwd
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-	require.Equal(t, qev.Process.Cwd, cwd)
+	// Kprobe cwd path depth is limited
+	if be != Kprobe {
+		cwd, err := os.Getwd()
+		require.NoError(t, err)
+
+		require.Equal(t, cwd, qev.Process.Cwd)
+	}
 
 	// Check exit
 	require.True(t, qev.Process.Exit.Valid)
@@ -77,11 +111,11 @@ func TestForkExecExit(t *testing.T) {
 	// Don't care about ExitTime, it's also not precise
 }
 
-// TestQuarkMetricSet will start the module and check if the it
+// testQuarkMetricSet will start the module and check if the it
 // generates the correct event for os.Getpid() (an existing process),
 // and for a process we spawn ourselves via runNop().
-func TestQuarkMetricSet(t *testing.T) {
-	config := getConfigForQuark()
+func testQuarkMetricSet(t *testing.T, be backend) {
+	config := getConfigForQuark(be)
 
 	// Start the module, it will open its own queue
 	f := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
@@ -90,7 +124,7 @@ func TestQuarkMetricSet(t *testing.T) {
 
 	// Start our own queue in parallel, so we can compare some
 	// members we have no other way of fetching
-	qq := openQueue(t)
+	qq := openQueue(t, be)
 	defer qq.Close()
 
 	// The queue is open, so we can spawn something and it should show up
@@ -107,7 +141,7 @@ func TestQuarkMetricSet(t *testing.T) {
 	selfFromQQ, ok := qq.Lookup(os.Getpid())
 	require.True(t, ok)
 	// Make a fake event from self (Os.getpid())
-	selfTarget := makeSelfEvent(t, selfFromQQ)
+	selfTarget := makeSelfEvent(t, selfFromQQ, be)
 	// Lookup what we actually got from beats
 	selfActual := firstEventOfPid(t, events, os.Getpid())
 	// Compare
@@ -117,7 +151,7 @@ func TestQuarkMetricSet(t *testing.T) {
 	// need Proc.TimeBoot and Suid/Sgid
 	spawnedFromQQ := drainFirstOfPid(t, qq, cmd.Process.Pid)
 	// Make an event of the spawned cmd
-	spawnedTarget := makeEventOfCmd(t, cmd, spawnedFromQQ)
+	spawnedTarget := makeEventOfCmd(t, cmd, spawnedFromQQ, be)
 	// Lookup what we actually got from beats
 	spawnedActual := firstEventOfPid(t, events, cmd.Process.Pid)
 	// Compare
@@ -134,9 +168,16 @@ func checkEvent(t *testing.T, target mb.Event, actual mb.Event) {
 	}
 }
 
-func openQueue(t *testing.T) *quark.Queue {
+// openQueue opens a quark queue on a specific backend
+func openQueue(t *testing.T, be backend) *quark.Queue {
 	attr := quark.DefaultQueueAttr()
 	attr.HoldTime = 25
+	attr.Flags &= ^quark.QQ_ALL_BACKENDS
+	if be == Ebpf {
+		attr.Flags |= quark.QQ_EBPF
+	} else if be == Kprobe {
+		attr.Flags |= quark.QQ_KPROBE
+	}
 	qq, err := quark.OpenQueue(attr, 1)
 	require.NoError(t, err)
 
@@ -145,7 +186,6 @@ func openQueue(t *testing.T) *quark.Queue {
 
 // runNop does fork+exec+exit /bin/true
 func runNop(t *testing.T) *exec.Cmd {
-	//	cmd := exec.Command("/bin/sh", "-c", "exit 0")
 	cmd := exec.Command("/bin/true")
 	require.NotNil(t, cmd)
 	err := cmd.Run()
@@ -229,10 +269,7 @@ func firstEventOfPid(t *testing.T, events []mb.Event, pid int) mb.Event {
 
 // makeSelfEvent builds what should be the event that quark will
 // generate as a initial snapshot of the current process
-func makeSelfEvent(t *testing.T, qp quark.Process) mb.Event {
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-
+func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 	exe, err := os.Executable()
 	require.NoError(t, err)
 
@@ -256,7 +293,6 @@ func makeSelfEvent(t *testing.T, qp quark.Process) mb.Event {
 			"process.args":                          qp.Cmdline,
 			"process.args_count":                    len(qp.Cmdline),
 			"process.pid":                           uint32(os.Getpid()),
-			"process.working_directory":             cwd,
 			"process.executable":                    exe,
 			"process.parent.pid":                    uint32(os.Getppid()),
 			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
@@ -273,6 +309,14 @@ func makeSelfEvent(t *testing.T, qp quark.Process) mb.Event {
 		},
 	}
 
+	// Kprobe path depth is limited
+	if be != Kprobe {
+		cwd, err := os.Getwd()
+		require.NoError(t, err)
+
+		self.RootFields["process.working_directory"] = cwd
+	}
+
 	if qp.Proc.TtyMajor != 0 {
 		self.RootFields["process.tty.char_device.major"] = qp.Proc.TtyMajor
 		self.RootFields["process.tty.char_device.minor"] = qp.Proc.TtyMinor
@@ -282,7 +326,7 @@ func makeSelfEvent(t *testing.T, qp quark.Process) mb.Event {
 }
 
 // makeEventOfCmd builds an mb.Event out of cmd and qev
-func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event) mb.Event {
+func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb.Event {
 	// We should get at least FORK|EXEC|EXIT in the aggregation
 	require.Equal(t,
 		qev.Events&(quark.QUARK_EV_FORK|quark.QUARK_EV_EXEC|quark.QUARK_EV_EXIT),
@@ -291,9 +335,6 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event) mb.Event {
 	require.True(t, qev.Process.Proc.Valid)
 
 	qp := qev.Process
-
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
 
 	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: qp.Proc.TtyMajor,
@@ -315,7 +356,6 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event) mb.Event {
 			"process.args":                          []string{"/bin/true"},
 			"process.args_count":                    1,
 			"process.pid":                           uint32(cmd.Process.Pid),
-			"process.working_directory":             cwd,
 			"process.executable":                    "/bin/true",
 			"process.parent.pid":                    uint32(os.Getpid()),
 			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
@@ -332,16 +372,27 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event) mb.Event {
 		},
 	}
 
+	// Kprobe path depth is limited
+	if be != Kprobe {
+		cwd, err := os.Getwd()
+		require.NoError(t, err)
+
+		cmdEvent.RootFields["process.working_directory"] = cwd
+	}
+
 	return cmdEvent
 }
 
 // getConfigForQuark enables quark and allows hashing so we can test
 // the cached hasher.
-func getConfigForQuark() map[string]interface{} {
-	return map[string]interface{}{
+func getConfigForQuark(be backend) map[string]interface{} {
+	config := map[string]interface{}{
 		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 
 		"process.backend": "kernel_tracing",
 	}
+	quarkForceKprobe = be == Kprobe
+
+	return config
 }
