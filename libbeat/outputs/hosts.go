@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
-type hostWorkerCfg struct {
+type HostWorkerCfg struct {
 	Hosts []string `config:"hosts"  validate:"required"`
 
 	// Worker is the number of output workers desired.
@@ -34,7 +34,7 @@ type hostWorkerCfg struct {
 }
 
 // NumWorkers returns the number of output workers desired.
-func (hwc hostWorkerCfg) NumWorkers() int {
+func (hwc HostWorkerCfg) NumWorkers() int {
 	// Both Worker and Workers are set; give precedence to Worker.
 	if hwc.Worker != 0 && hwc.Workers != 0 {
 		return hwc.Worker
@@ -52,7 +52,7 @@ func (hwc hostWorkerCfg) NumWorkers() int {
 // object. If the `worker` settings is > 1, each host is duplicated in the final
 // host list by the number of `worker`.
 func ReadHostList(cfg *config.C) ([]string, error) {
-	var config hostWorkerCfg
+	var config HostWorkerCfg
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, err

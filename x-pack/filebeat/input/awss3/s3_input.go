@@ -36,6 +36,7 @@ type s3PollerInput struct {
 	metrics         *inputMetrics
 	s3ObjectHandler s3ObjectHandlerFactory
 	states          *states
+	filterProvider  *filterProvider
 }
 
 func newS3PollerInput(
@@ -43,11 +44,11 @@ func newS3PollerInput(
 	awsConfig awssdk.Config,
 	store beater.StateStore,
 ) (v2.Input, error) {
-
 	return &s3PollerInput{
-		config:    config,
-		awsConfig: awsConfig,
-		store:     store,
+		config:         config,
+		awsConfig:      awsConfig,
+		store:          store,
+		filterProvider: newFilterProvider(&config),
 	}, nil
 }
 
@@ -199,8 +200,9 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 // These IDs are intended to be used for state clean-up.
 func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, ok bool) {
 	defer close(workChan)
-
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+
+	isStateValid := in.filterProvider.getApplierFunc()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -233,10 +235,14 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			knownStateIDSlice = append(knownStateIDSlice, state.ID())
+			if !isStateValid(in.log, state) {
+				continue
+			}
 
+			// add to known states only if valid for processing
+			knownStateIDSlice = append(knownStateIDSlice, state.ID())
 			if in.states.IsProcessed(state) {
-				in.log.Debugw("skipping state.", "state", state)
+				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}
 
@@ -256,5 +262,6 @@ func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 	event.S3.Bucket.Name = state.Bucket
 	event.S3.Bucket.ARN = in.config.getBucketARN()
 	event.S3.Object.Key = state.Key
+	event.S3.Object.LastModified = state.LastModified
 	return event
 }

@@ -32,10 +32,17 @@ import (
 const (
 	query = `<QueryList>
   <Query Id="0">
-    <Select Path="{{.Path}}">*{{if .Select}}[System[{{join .Select " and "}}]]{{end}}</Select>{{if .Suppress}}
+{{- if .Select}}{{range $s := .Select}}
+    <Select Path="{{$.Path}}">*[System[{{join $s " and "}}]]</Select>{{end}}
+{{- else}}
+    <Select Path="{{.Path}}">*</Select>
+{{- end}}
+{{- if .Suppress}}
     <Suppress Path="{{.Path}}">*[System[{{.Suppress}}]]</Suppress>{{end}}
   </Query>
 </QueryList>`
+
+	queryClauseLimit = 21
 )
 
 var (
@@ -74,25 +81,9 @@ type Query struct {
 // Build builds a query from the given parameters. The query is returned as a
 // XML string and can be used with Subscribe function.
 func (q Query) Build() (string, error) {
-	var errs multierror.Errors
-	if q.Log == "" {
-		errs = append(errs, fmt.Errorf("empty log name"))
-	}
-
-	qp := &queryParams{Path: q.Log}
-	builders := []func(Query) error{
-		qp.ignoreOlderSelect,
-		qp.eventIDSelect,
-		qp.levelSelect,
-		qp.providerSelect,
-	}
-	for _, build := range builders {
-		if err := build(q); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	if len(errs) > 0 {
-		return "", errs.Err()
+	qp, err := newQueryParams(q)
+	if err != nil {
+		return "", err
 	}
 	return executeTemplate(queryTemplate, qp)
 }
@@ -100,23 +91,45 @@ func (q Query) Build() (string, error) {
 // queryParams are the parameters that are used to create a query from a
 // template.
 type queryParams struct {
+	ignoreOlder        string
+	level              string
+	provider           string
+	selectEventFilters []string
+
 	Path     string
-	Select   []string
+	Select   [][]string
 	Suppress string
 }
 
-func (qp *queryParams) ignoreOlderSelect(q Query) error {
-	if q.IgnoreOlder <= 0 {
-		return nil
+func newQueryParams(q Query) (*queryParams, error) {
+	var errs multierror.Errors
+	if q.Log == "" {
+		errs = append(errs, fmt.Errorf("empty log name"))
 	}
-
-	ms := q.IgnoreOlder.Nanoseconds() / int64(time.Millisecond)
-	qp.Select = append(qp.Select,
-		fmt.Sprintf("TimeCreated[timediff(@SystemTime) &lt;= %d]", ms))
-	return nil
+	qp := &queryParams{
+		Path: q.Log,
+	}
+	qp.withIgnoreOlder(q)
+	qp.withProvider(q)
+	if err := qp.withEventFilters(q); err != nil {
+		errs = append(errs, err)
+	}
+	if err := qp.withLevel(q); err != nil {
+		errs = append(errs, err)
+	}
+	qp.buildSelects()
+	return qp, errs.Err()
 }
 
-func (qp *queryParams) eventIDSelect(q Query) error {
+func (qp *queryParams) withIgnoreOlder(q Query) {
+	if q.IgnoreOlder <= 0 {
+		return
+	}
+	ms := q.IgnoreOlder.Nanoseconds() / int64(time.Millisecond)
+	qp.ignoreOlder = fmt.Sprintf("TimeCreated[timediff(@SystemTime) &lt;= %d]", ms)
+}
+
+func (qp *queryParams) withEventFilters(q Query) error {
 	if q.EventID == "" {
 		return nil
 	}
@@ -155,10 +168,26 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 		}
 	}
 
-	if len(includes) == 1 {
-		qp.Select = append(qp.Select, includes...)
-	} else if len(includes) > 1 {
-		qp.Select = append(qp.Select, "("+strings.Join(includes, " or ")+")")
+	actualLim := queryClauseLimit - len(q.Provider)
+	if q.IgnoreOlder > 0 {
+		actualLim--
+	}
+	if q.Level != "" {
+		actualLim--
+	}
+	// we split selects in chunks of at most queryClauseLim size
+	for i := 0; i < len(includes); i += actualLim {
+		end := i + actualLim
+		if end > len(includes) {
+			end = len(includes)
+		}
+		chunk := includes[i:end]
+
+		if len(chunk) == 1 {
+			qp.selectEventFilters = append(qp.selectEventFilters, chunk...)
+		} else if len(chunk) > 1 {
+			qp.selectEventFilters = append(qp.selectEventFilters, "("+strings.Join(chunk, " or ")+")")
+		}
 	}
 
 	if len(excludes) > 0 {
@@ -168,7 +197,7 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 	return nil
 }
 
-// levelSelect returns a xpath selector for the event Level. The returned
+// withLevel returns a xpath selector for the event Level. The returned
 // selector will select events with levels less than or equal to the specified
 // level. Note that level 0 is used as a catch-all/unknown level.
 //
@@ -179,7 +208,7 @@ func (qp *queryParams) eventIDSelect(q Query) error {
 //	warning,     warn - 3
 //	error,       err  - 2
 //	critical,    crit - 1
-func (qp *queryParams) levelSelect(q Query) error {
+func (qp *queryParams) withLevel(q Query) error {
 	if q.Level == "" {
 		return nil
 	}
@@ -208,15 +237,15 @@ func (qp *queryParams) levelSelect(q Query) error {
 	}
 
 	if len(levelSelect) > 0 {
-		qp.Select = append(qp.Select, "("+strings.Join(levelSelect, " or ")+")")
+		qp.level = "(" + strings.Join(levelSelect, " or ") + ")"
 	}
 
 	return nil
 }
 
-func (qp *queryParams) providerSelect(q Query) error {
+func (qp *queryParams) withProvider(q Query) {
 	if len(q.Provider) == 0 {
-		return nil
+		return
 	}
 
 	selects := make([]string, 0, len(q.Provider))
@@ -224,9 +253,31 @@ func (qp *queryParams) providerSelect(q Query) error {
 		selects = append(selects, fmt.Sprintf("@Name='%s'", p))
 	}
 
-	qp.Select = append(qp.Select,
-		fmt.Sprintf("Provider[%s]", strings.Join(selects, " or ")))
-	return nil
+	qp.provider = fmt.Sprintf("Provider[%s]", strings.Join(selects, " or "))
+}
+
+func (qp *queryParams) buildSelects() {
+	if len(qp.selectEventFilters) == 0 {
+		sel := appendIfNotEmpty(qp.ignoreOlder, qp.level, qp.provider)
+		if len(sel) == 0 {
+			return
+		}
+		qp.Select = append(qp.Select, sel)
+		return
+	}
+	for _, f := range qp.selectEventFilters {
+		qp.Select = append(qp.Select, appendIfNotEmpty(qp.ignoreOlder, f, qp.level, qp.provider))
+	}
+}
+
+func appendIfNotEmpty(ss ...string) []string {
+	var sel []string
+	for _, s := range ss {
+		if s != "" {
+			sel = append(sel, s)
+		}
+	}
+	return sel
 }
 
 // executeTemplate populates a template with the given data and returns the
