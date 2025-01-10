@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
@@ -20,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	quark "github.com/elastic/go-quark"
-	"github.com/stretchr/testify/require"
 )
 
 type backend int

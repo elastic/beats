@@ -115,11 +115,11 @@ func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
 	}
 
 	sm := &SysInfoMetricSet{
-		MetricSet:       ms,
-		cache:           cache.New(),
-		bucket:          bucket,
-		lastState:       lastState,
-		hasher:          hasher,
+		MetricSet: ms,
+		cache:     cache.New(),
+		bucket:    bucket,
+		lastState: lastState,
+		hasher:    hasher,
 	}
 
 	return sm, nil
