@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209] 
 
 *Auditbeat*
 
@@ -246,6 +247,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Packetbeat*
+
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
 
 
 *Winlogbeat*
