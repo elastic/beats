@@ -3,6 +3,12 @@
 [id="{beatname_lc}-input-{type}"]
 === Container input
 
+deprecated:[7.16.0]
+
+The container input is deprecated. Please use the the <<filebeat-input-filestream,`filestream input`>> and its <<filebeat-input-filestream-parsers-container,`container`>> parser.
+
+It's possible to use this input type only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
+
 ++++
 <titleabbrev>Container</titleabbrev>
 ++++
@@ -27,7 +33,7 @@ Example configuration:
 <1> `paths` is required. All other settings are optional.
 
 
-NOTE: '/var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log', 
+NOTE: '/var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log',
 so above path can be edited accordingly
 
 
