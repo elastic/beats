@@ -13,6 +13,6 @@ import (
 )
 
 // NewFromQuark instantiates the module with quark's backend.
-func NewFromQuark(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	return nil, errors.New("quark is only available on linux on amd64/arm64 and needs cgo")
 }
