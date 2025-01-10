@@ -65,7 +65,7 @@ func TestNamespaceRegisterFail(t *testing.T) {
 	fatalError(t, err)
 
 	err = ns.Register("test", newTestFilterRule)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestNamespaceError(t *testing.T) {

@@ -20,6 +20,7 @@ import (
 
 	quark "github.com/elastic/go-quark"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
@@ -38,15 +39,6 @@ type prvdr struct {
 	backoffSkipped int
 }
 
-type TTYType int
-
-const (
-	TTYUnknown TTYType = iota
-	Pts
-	TTY
-	TTYConsole
-)
-
 const (
 	Init         = "init"
 	Sshd         = "sshd"
@@ -56,14 +48,6 @@ const (
 	Kthread      = "kthread"
 	EntryConsole = "console"
 	EntryUnknown = "unknown"
-)
-
-const (
-	ptsMinMajor     = 136
-	ptsMaxMajor     = 143
-	ttyMajor        = 4
-	consoleMaxMinor = 63
-	ttyMaxMinor     = 255
 )
 
 var (
@@ -241,7 +225,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
 	}
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -303,7 +287,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	}
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -338,7 +322,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -373,7 +357,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -408,7 +392,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -473,28 +457,6 @@ func setSameAsProcess(process *types.Process) {
 		sameAsProcess := process.PID == process.EntryLeader.PID
 		process.EntryLeader.SameAsProcess = &sameAsProcess
 	}
-}
-
-// interactiveFromTTY returns if this is an interactive tty device.
-func interactiveFromTTY(tty types.TTYDev) bool {
-	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
-}
-
-// getTTYType returns the type of a TTY device based on its major and minor numbers.
-func getTTYType(major uint32, minor uint32) TTYType {
-	if major >= ptsMinMajor && major <= ptsMaxMajor {
-		return Pts
-	}
-
-	if ttyMajor == major {
-		if minor <= consoleMaxMinor {
-			return TTYConsole
-		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
-			return TTY
-		}
-	}
-
-	return TTYUnknown
 }
 
 // calculateEntityIDv1 calculates the entity ID for a process.

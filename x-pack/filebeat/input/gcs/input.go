@@ -63,7 +63,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			ProjectId:                config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -72,6 +71,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    config.Retry,
 		})
 	}
 
@@ -91,9 +91,6 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	}
 	if b.ParseJSON == nil {
 		b.ParseJSON = &cfg.ParseJSON
-	}
-	if b.BucketTimeOut == nil {
-		b.BucketTimeOut = &cfg.BucketTimeOut
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
@@ -158,9 +155,13 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	}
 
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithMaxAttempts to change the maximum number of attempts.
+		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial: 2 * time.Second,
+			Initial:    currentSource.Retry.InitialBackOffDuration,
+			Max:        currentSource.Retry.MaxBackOffDuration,
+			Multiplier: currentSource.Retry.BackOffMultiplier,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent

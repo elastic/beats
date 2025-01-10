@@ -20,20 +20,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-type TTYType int
-
-const (
-	TTYUnknown TTYType = iota
-	Pts
-	TTY
-	TTYConsole
 )
 
 type EntryType string
@@ -67,18 +59,13 @@ var filteredExecutables = [...]string{
 }
 
 const (
-	ptsMinMajor     = 136
-	ptsMaxMajor     = 143
-	ttyMajor        = 4
-	consoleMaxMinor = 63
-	ttyMaxMinor     = 255
-	retryCount      = 2
+	retryCount = 2
 )
 
 type Process struct {
 	PIDs     types.PIDInfo
 	Creds    types.CredInfo
-	CTTY     types.TTYDev
+	CTTY     tty.TTYDev
 	Argv     []string
 	Cwd      string
 	Env      map[string]string
@@ -142,8 +129,8 @@ func credInfoFromProto(p types.CredInfo) types.CredInfo {
 	}
 }
 
-func ttyTermiosFromProto(p types.TTYTermios) types.TTYTermios {
-	return types.TTYTermios{
+func ttyTermiosFromProto(p tty.TTYTermios) tty.TTYTermios {
+	return tty.TTYTermios{
 		CIflag: p.CIflag,
 		COflag: p.COflag,
 		CLflag: p.CLflag,
@@ -151,15 +138,15 @@ func ttyTermiosFromProto(p types.TTYTermios) types.TTYTermios {
 	}
 }
 
-func ttyWinsizeFromProto(p types.TTYWinsize) types.TTYWinsize {
-	return types.TTYWinsize{
+func ttyWinsizeFromProto(p tty.TTYWinsize) tty.TTYWinsize {
+	return tty.TTYWinsize{
 		Rows: p.Rows,
 		Cols: p.Cols,
 	}
 }
 
-func ttyDevFromProto(p types.TTYDev) types.TTYDev {
-	return types.TTYDev{
+func ttyDevFromProto(p tty.TTYDev) tty.TTYDev {
+	return tty.TTYDev{
 		Major:   p.Major,
 		Minor:   p.Minor,
 		Winsize: ttyWinsizeFromProto(p.Winsize),
@@ -319,15 +306,15 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 
 	// could be an entry leader
 	if p.PIDs.Tgid == p.PIDs.Sid {
-		ttyType := getTTYType(p.CTTY.Major, p.CTTY.Minor)
+		ttyType := tty.GetTTYType(p.CTTY.Major, p.CTTY.Minor)
 
 		procBasename := basename(p.Filename)
 		switch {
-		case ttyType == TTY:
+		case ttyType == tty.TTY:
 			db.createEntryLeader(pid, Terminal)
 			db.logger.Debugf("entry_eval %d: entry type is terminal", p.PIDs.Tgid)
 			return &pid
-		case ttyType == TTYConsole && procBasename == "login":
+		case ttyType == tty.TTYConsole && procBasename == "login":
 			db.createEntryLeader(pid, EntryConsole)
 			db.logger.Debugf("entry_eval %d: entry type is console", p.PIDs.Tgid)
 			return &pid
@@ -338,7 +325,7 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 		case !isFilteredExecutable(procBasename):
 			if parent, ok := db.processes[p.PIDs.Ppid]; ok {
 				parentBasename := basename(parent.Filename)
-				if ttyType == Pts && parentBasename == "ssm-session-worker" {
+				if ttyType == tty.Pts && parentBasename == "ssm-session-worker" {
 					db.createEntryLeader(pid, Ssm)
 					db.logger.Debugf("entry_eval %d: entry type is ssm", p.PIDs.Tgid)
 					return &pid
@@ -433,13 +420,9 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	})
 }
 
-func interactiveFromTTY(tty types.TTYDev) bool {
-	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
-}
-
 func fullProcessFromDBProcess(p Process) types.Process {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
-	interactive := interactiveFromTTY(p.CTTY)
+	interactive := tty.InteractiveFromTTY(p.CTTY)
 
 	ret := types.Process{
 		PID:              p.PIDs.Tgid,
@@ -475,7 +458,7 @@ func fullProcessFromDBProcess(p Process) types.Process {
 func fillParent(process *types.Process, parent Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(parent.CTTY)
+	interactive := tty.InteractiveFromTTY(parent.CTTY)
 	euid := parent.Creds.Euid
 	egid := parent.Creds.Egid
 	process.Parent.PID = parent.PIDs.Tgid
@@ -500,7 +483,7 @@ func fillParent(process *types.Process, parent Process) {
 func fillGroupLeader(process *types.Process, groupLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(groupLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(groupLeader.CTTY)
 	euid := groupLeader.Creds.Euid
 	egid := groupLeader.Creds.Egid
 	process.GroupLeader.PID = groupLeader.PIDs.Tgid
@@ -525,7 +508,7 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(sessionLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(sessionLeader.CTTY)
 	euid := sessionLeader.Creds.Euid
 	egid := sessionLeader.Creds.Egid
 	process.SessionLeader.PID = sessionLeader.PIDs.Tgid
@@ -550,7 +533,7 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(entryLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(entryLeader.CTTY)
 	euid := entryLeader.Creds.Euid
 	egid := entryLeader.Creds.Egid
 	process.EntryLeader.PID = entryLeader.PIDs.Tgid
@@ -741,22 +724,6 @@ func isContainerRuntime(executable string) bool {
 
 func isFilteredExecutable(executable string) bool {
 	return stringStartsWithEntryInList(executable, filteredExecutables[:])
-}
-
-func getTTYType(major uint32, minor uint32) TTYType {
-	if major >= ptsMinMajor && major <= ptsMaxMajor {
-		return Pts
-	}
-
-	if ttyMajor == major {
-		if minor <= consoleMaxMinor {
-			return TTYConsole
-		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
-			return TTY
-		}
-	}
-
-	return TTYUnknown
 }
 
 func (db *DB) Close() {

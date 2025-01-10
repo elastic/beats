@@ -59,11 +59,11 @@ class BaseTest(TestCase):
             "-e",
             "-I", os.path.join(self.beat_path + "/tests/system/pcaps", pcap),
             "-c", os.path.join(self.working_dir, config),
-            "-systemTest",
+            "--systemTest",
         ])
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
+                "--test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
             ]
 
         if extra_args:
@@ -107,11 +107,11 @@ class BaseTest(TestCase):
         args = [cmd,
                 "-e",
                 "-c", os.path.join(self.working_dir, config),
-                "-systemTest",
+                "--systemTest",
                 ]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
+                "--test.coverprofile", os.path.join(self.working_dir, "coverage.cov"),
             ]
 
         if extra_args:

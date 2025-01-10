@@ -49,6 +49,8 @@ class Test(BaseTest):
         input_config_template = """
 - type: filestream
   id: my-unique-id
+  file_identity.native: ~
+  prospector.scanner.fingerprint.enabled: false
   paths:
     - {}
 """
