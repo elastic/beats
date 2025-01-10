@@ -41,7 +41,7 @@ func init() {
 	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
 }
 
-// QuarkMetricSet is a MetricSet with added members used only in by
+// QuarkMetricSet is a MetricSet with added members used only in and by
 // quark QuarkMetricSet uses mb.PushReporterV2 instead of
 // mb.ReporterV2. More notably we don't do periodic state reports and
 // we don't need a cache as it is provided by quark.
