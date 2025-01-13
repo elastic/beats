@@ -20,6 +20,7 @@
 package wineventlog
 
 import (
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
@@ -51,10 +52,10 @@ type PublisherMetadataStore struct {
 	winevent.WinMeta
 
 	// Event ID to event metadata (message and event data param names).
-	Events map[uint16]*EventMetadata
+	Events map[uint32]*EventMetadata
 	// Event ID to map of fingerprints to event metadata. The fingerprint value
 	// is hash of the event data parameters count and types.
-	EventFingerprints map[uint16]map[uint64]*EventMetadata
+	EventFingerprints map[uint32]map[uint64]*EventMetadata
 	// Stores used messages by their ID. Message can be found in events as references
 	// such as %%1111. This need to be formatted the first time, and they are stored
 	// from that point after.
@@ -71,7 +72,7 @@ func NewPublisherMetadataStore(session EvtHandle, provider string, locale uint32
 	}
 	store := &PublisherMetadataStore{
 		Metadata:          md,
-		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		EventFingerprints: map[uint32]map[uint64]*EventMetadata{},
 		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider),
 	}
@@ -102,8 +103,8 @@ func NewEmptyPublisherMetadataStore(provider string, log *logp.Logger) *Publishe
 			Levels:   map[uint8]string{},
 			Tasks:    map[uint16]string{},
 		},
-		Events:            map[uint16]*EventMetadata{},
-		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		Events:            map[uint32]*EventMetadata{},
+		EventFingerprints: map[uint32]map[uint64]*EventMetadata{},
 		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider, "empty", true),
 	}
@@ -137,7 +138,7 @@ func (s *PublisherMetadataStore) initOpcodes() error {
 		if val == "" {
 			val = opcodeMeta.Name
 		}
-		s.Opcodes[uint8(opcodeMeta.Mask)] = val
+		s.Opcodes[uint8(opcodeMeta.Opcode)] = val
 	}
 	return nil
 }
@@ -182,7 +183,7 @@ func (s *PublisherMetadataStore) initEvents() error {
 	}
 	defer itr.Close()
 
-	s.Events = map[uint16]*EventMetadata{}
+	s.Events = map[uint32]*EventMetadata{}
 	for itr.Next() {
 		evt, err := newEventMetadataFromPublisherMetadata(itr, s.Metadata)
 		if err != nil {
@@ -190,15 +191,16 @@ func (s *PublisherMetadataStore) initEvents() error {
 				"error", err)
 			continue
 		}
-		s.Events[evt.EventID] = evt
+		s.Events[getEventCombinedID(evt.EventID, evt.Version)] = evt
 	}
 	return itr.Err()
 }
 
-func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFingerprint uint64, eventHandle EvtHandle) *EventMetadata {
+func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8, eventDataFingerprint uint64, eventHandle EvtHandle) *EventMetadata {
 	// Use a read lock to get a cached value.
 	s.mutex.RLock()
-	fingerprints, found := s.EventFingerprints[eventID]
+	combinedID := getEventCombinedID(eventID, version)
+	fingerprints, found := s.EventFingerprints[combinedID]
 	if found {
 		em, found := fingerprints[eventDataFingerprint]
 		if found {
@@ -212,10 +214,10 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	fingerprints, found = s.EventFingerprints[eventID]
+	fingerprints, found = s.EventFingerprints[combinedID]
 	if !found {
 		fingerprints = map[uint64]*EventMetadata{}
-		s.EventFingerprints[eventID] = fingerprints
+		s.EventFingerprints[combinedID] = fingerprints
 	}
 
 	em, found := fingerprints[eventDataFingerprint]
@@ -233,7 +235,7 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	// metadata then we just associate the fingerprint with a pointer to the
 	// providers metadata for the event ID.
 
-	defaultEM := s.Events[eventID]
+	defaultEM := s.Events[combinedID]
 
 	// Use XML to get the parameters names.
 	em, err := newEventMetadataFromEventHandle(s.Metadata, eventHandle)
@@ -248,6 +250,15 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 			fingerprints[eventDataFingerprint] = defaultEM
 		}
 		return defaultEM
+	}
+
+	// The first time we need to identify if the event has event data or
+	// user data from a handle, since this information is not available
+	// from the metadata or anywhere else. It is not ideal to update the defaultEM
+	// here but there is no way around it at the moment.
+	if em.EventData.IsUserData {
+		defaultEM.EventData.IsUserData = true
+		defaultEM.EventData.Name = em.EventData.Name
 	}
 
 	// Are the parameters the same as what the provider metadata listed?
@@ -324,13 +335,18 @@ func (s *PublisherMetadataStore) Close() error {
 	return nil
 }
 
+type EventDataParams struct {
+	IsUserData bool
+	Name       xml.Name
+	Params     []EventData
+}
+
 type EventMetadata struct {
 	EventID     uint16             // Event ID.
 	Version     uint8              // Event format version.
 	MsgStatic   string             // Used when the message has no parameters.
 	MsgTemplate *template.Template `json:"-"` // Template that expects an array of values as its data.
-	EventData   []EventData        // Names of parameters from XML template.
-	HasUserData bool               // Event has a UserData section or not.
+	EventData   EventDataParams    // Names of parameters from XML template.
 }
 
 // newEventMetadataFromEventHandle collects metadata about an event type using
@@ -354,12 +370,13 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 	}
 	if len(event.EventData.Pairs) > 0 {
 		for _, pair := range event.EventData.Pairs {
-			em.EventData = append(em.EventData, EventData{Name: pair.Key})
+			em.EventData.Params = append(em.EventData.Params, EventData{Name: pair.Key})
 		}
 	} else {
-		em.HasUserData = true
+		em.EventData.IsUserData = true
+		em.EventData.Name = event.UserData.Name
 		for _, pair := range event.UserData.Pairs {
-			em.EventData = append(em.EventData, EventData{Name: pair.Key})
+			em.EventData.Params = append(em.EventData.Params, EventData{Name: pair.Key})
 		}
 	}
 
@@ -435,7 +452,7 @@ func (em *EventMetadata) initEventDataTemplate(itr *EventMetadataIterator) error
 		kv.Name = eventDataNameTransform.Replace(kv.Name)
 	}
 
-	em.EventData = tmpl.Data
+	em.EventData.Params = tmpl.Data
 	return nil
 }
 
@@ -477,6 +494,10 @@ func (em *EventMetadata) setMessage(msg string) error {
 	return nil
 }
 
+func getEventCombinedID(eventID uint16, version uint8) uint32 {
+	return (uint32(eventID) << 16) | uint32(version)
+}
+
 // containsTemplatedValues traverses the template nodes to check if there are
 // any dynamic values.
 func containsTemplatedValues(tmpl *template.Template) bool {
@@ -513,7 +534,9 @@ func (em *EventMetadata) equal(other *EventMetadata) bool {
 
 	return em.EventID == other.EventID &&
 		em.Version == other.Version &&
-		eventDataNamesEqual(em.EventData, other.EventData)
+		em.EventData.IsUserData == other.EventData.IsUserData &&
+		em.EventData.Name == other.EventData.Name &&
+		eventDataNamesEqual(em.EventData.Params, other.EventData.Params)
 }
 
 type publisherMetadataCache struct {
