@@ -49,7 +49,6 @@ func readConfig(c *conf.C, config interface{}) error {
 }
 
 type config struct {
-	Renderer      string             `config:"renderer"`        // Name of the renderer to use. Optional.
 	Name          string             `config:"name"`            // Name of the event log or channel or file.
 	ID            string             `config:"id"`              // Identifier for the event log.
 	XMLQuery      string             `config:"xml_query"`       // Custom query XML. Must not be used with the keys from eventlog.query.
