@@ -55,7 +55,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (slack)
-        uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
         with:
           channel-id: '#ingest-notifications'
           payload:  ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
@@ -64,7 +64,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
+        uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           username: ${{ secrets.MAIL_USERNAME }}
