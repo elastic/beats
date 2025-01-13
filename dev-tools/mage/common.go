@@ -382,7 +382,8 @@ func unzip(sourceFile, destinationDir string) error {
 // See https://security.snyk.io/research/zip-slip-vulnerability.
 func sanitizeFilePath(filePath string, workdir string) (string, error) {
 	destPath := filepath.Join(workdir, filePath)
-	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+	prefix := filepath.Join(filepath.Clean(workdir), string(os.PathSeparator))
+	if !strings.HasPrefix(destPath, prefix) {
 		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
 	}
 	return destPath, nil
