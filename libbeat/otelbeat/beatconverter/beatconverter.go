@@ -48,19 +48,20 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
 
+		var accessString = "receivers::" + beatreceiver
 		// check if supported beat receiver is configured. Skip translation logic if not
-		if v := conf.Get("receivers::" + beatreceiver); v == nil {
+		if v := conf.Get(accessString); v == nil {
 			continue
 		}
 
 		// handle cloud id if set
-		if conf.IsSet("receivers::" + beatreceiver + "::cloud") {
+		if conf.IsSet(accessString + "::cloud") {
 			if err := handleCloudId(beatreceiver, conf); err != nil {
 				return fmt.Errorf("error handling cloud id %w", err)
 			}
 		}
 
-		receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+		receiverCfg, _ := conf.Sub(accessString)
 		output, _ := receiverCfg.Sub("output")
 
 		if len(output.ToStringMap()) > 1 {
@@ -92,14 +93,14 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 		// Replace output.[configured-output] with output.otelconsumer
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output": nil,
+			accessString + "::output": nil,
 		}
 		err := conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
 			return err
 		}
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output::otelconsumer": nil,
+			accessString + "::output::otelconsumer": nil,
 		}
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
