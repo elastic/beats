@@ -32,26 +32,32 @@ const (
 )
 
 func TestInitialSnapshotEbpf(t *testing.T) {
+	skipIfNotRoot(t)
 	testInitialSnapshot(t, Ebpf)
 }
 
 func TestInitialSnapshotKprobe(t *testing.T) {
+	skipIfNotRoot(t)
 	testInitialSnapshot(t, Kprobe)
 }
 
 func TestForkExecExitEbpf(t *testing.T) {
+	skipIfNotRoot(t)
 	testForkExecExit(t, Ebpf)
 }
 
 func TestForkExecExitKprobe(t *testing.T) {
+	skipIfNotRoot(t)
 	testForkExecExit(t, Kprobe)
 }
 
 func TestQuarkMetricSetEbpf(t *testing.T) {
+	skipIfNotRoot(t)
 	testQuarkMetricSet(t, Ebpf)
 }
 
 func TestQuarkMetricSetKprobe(t *testing.T) {
+	skipIfNotRoot(t)
 	testQuarkMetricSet(t, Kprobe)
 }
 
@@ -396,4 +402,10 @@ func getConfigForQuark(be backend) map[string]interface{} {
 	quarkForceKprobe = be == Kprobe
 
 	return config
+}
+
+func skipIfNotRoot(t *testing.T) {
+	if os.Getuid() != 0 {
+		t.Skip("must be root")
+	}
 }
