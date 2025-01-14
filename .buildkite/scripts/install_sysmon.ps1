@@ -28,7 +28,8 @@ try {
     $result = Invoke-WebRequest -Uri $downloadUrl -OutFile "$tempFolder\Sysmon.zip" -UseBasicParsing
 }
 catch {
-    ParseErrorForResponseBody($_)
+    $resp = ParseErrorForResponseBody($_)
+    Write-Host "$resp"
     exit 1
 }
 
