@@ -371,11 +371,6 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 			client.Log.Infof("Aggregations is %+v", strings.ToLower(batchMetrics[0].Aggregations))
 			client.Log.Infof("Filter is %+v", filter)
 			client.Log.Infof("Location is %+v", criteria.Location)
-			if criteria.Names == "ServiceAvailability,ReplicationLatency" {
-				client.Log.Infof("OOOOOOO TimeGrain is empty, setting timegrain")
-				// criteria.TimeGrain = "PT1H"
-				// criteria.Names = "ServiceAvailability"
-			}
 			// Make the batch API call (adjust parameters as needed)
 			response, err := client.AzureMonitorService.QueryResources(
 				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
@@ -398,20 +393,11 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 
 			// Process the response as needed
 			for i, v := range response {
-				if criteria.Names == "ServiceAvailability,ReplicationLatency" {
-					client.Log.Infof("OOOOOOO TimeGrain is PT1H")
-					client.Log.Infof("Response INTERVAL is %+v", *response[i].Interval)
-				}
 				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
 					timeGrain: *response[i].Interval,
 					timestamp: referenceTime,
 				})
 				values := mapMetricValues2(client, v)
-				if criteria.Names == "ServiceAvailability,ReplicationLatency" {
-					client.Log.Infof("OOOOOOO TimeGrain is PT1H")
-					client.Log.Infof("Response value is %+v", v)
-					client.Log.Infof("Values are %+v", values)
-				}
 				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
 				if metricsDefinitions[i].TimeGrain == "" {
 					metricsDefinitions[i].TimeGrain = *response[i].Interval
