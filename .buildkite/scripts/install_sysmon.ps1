@@ -25,6 +25,7 @@ function ParseErrorForResponseBody($Error) {
 }
 
 try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $result = Invoke-WebRequest -Uri $downloadUrl -OutFile "$tempFolder\Sysmon.zip" -UseBasicParsing
 }
 catch {
