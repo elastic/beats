@@ -34,9 +34,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// winEventLogRaw implements the EventLog interface for reading from the Windows
+// winEventLog implements the EventLog interface for reading from the Windows
 // Event Log API.
-type winEventLogRaw struct {
+type winEventLog struct {
 	config      config
 	query       string
 	id          string                   // Identifier of this event log.
@@ -98,7 +98,7 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
 	}
 
-	l := &winEventLogRaw{
+	l := &winEventLog{
 		config:      c,
 		query:       xmlQuery,
 		id:          id,
@@ -131,27 +131,27 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	return l, nil
 }
 
-func (l *winEventLogRaw) isForwarded() bool {
+func (l *winEventLog) isForwarded() bool {
 	c := l.config
 	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
 }
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
-func (l *winEventLogRaw) Name() string {
+func (l *winEventLog) Name() string {
 	return l.id
 }
 
 // Channel returns the event log's channel name.
-func (l *winEventLogRaw) Channel() string {
+func (l *winEventLog) Channel() string {
 	return l.channelName
 }
 
 // IsFile returns true if the event log is an evtx file.
-func (l *winEventLogRaw) IsFile() bool {
+func (l *winEventLog) IsFile() bool {
 	return l.file
 }
 
-func (l *winEventLogRaw) Open(state checkpoint.EventLogState) error {
+func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	l.lastRead = state
 	// we need to defer metrics initialization since when the event log
 	// is used from winlog input it would register it twice due to CheckConfig calls
@@ -168,7 +168,7 @@ func (l *winEventLogRaw) Open(state checkpoint.EventLogState) error {
 	return err
 }
 
-func (l *winEventLogRaw) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
+func (l *winEventLog) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
 	var bookmark win.Bookmark
 	if len(state.Bookmark) > 0 {
 		var err error
@@ -185,7 +185,7 @@ func (l *winEventLogRaw) open(state checkpoint.EventLogState) (win.EvtHandle, er
 	return l.openChannel(bookmark)
 }
 
-func (l *winEventLogRaw) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
+func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
 	path := l.channelName
 
 	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
@@ -222,7 +222,7 @@ func (l *winEventLogRaw) openFile(state checkpoint.EventLogState, bookmark win.B
 	return h, err
 }
 
-func (l *winEventLogRaw) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
+func (l *winEventLog) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
 	// Using a pull subscription to receive events. See:
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
@@ -264,7 +264,7 @@ func (l *winEventLogRaw) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	}
 }
 
-func (l *winEventLogRaw) Read() ([]Record, error) {
+func (l *winEventLog) Read() ([]Record, error) {
 	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
@@ -302,7 +302,7 @@ func (l *winEventLogRaw) Read() ([]Record, error) {
 	return records, nil
 }
 
-func (l *winEventLogRaw) processHandle(h win.EvtHandle) (*Record, error) {
+func (l *winEventLog) processHandle(h win.EvtHandle) (*Record, error) {
 	defer h.Close()
 
 	// NOTE: Render can return an error and a partial event.
@@ -339,7 +339,7 @@ func (l *winEventLogRaw) processHandle(h win.EvtHandle) (*Record, error) {
 	return r, nil
 }
 
-func (l *winEventLogRaw) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
 	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
 	if err != nil {
 		return "", fmt.Errorf("failed to create new bookmark from event handle: %w", err)
@@ -349,18 +349,18 @@ func (l *winEventLogRaw) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 	return bookmark.XML()
 }
 
-func (l *winEventLogRaw) Reset() error {
+func (l *winEventLog) Reset() error {
 	l.log.Debug("Closing event log reader handles for reset.")
 	return l.close()
 }
 
-func (l *winEventLogRaw) Close() error {
+func (l *winEventLog) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
 	return l.close()
 }
 
-func (l *winEventLogRaw) close() error {
+func (l *winEventLog) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}

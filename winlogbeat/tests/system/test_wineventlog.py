@@ -20,7 +20,6 @@ class Test(WriteReadTest):
 
     @classmethod
     def setUpClass(self):
-        self.api = "wineventlog"
         super(WriteReadTest, self).setUpClass()
 
     def test_read_one_event(self):
@@ -33,7 +32,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
         })
 
     def test_resume_reading_events(self):
@@ -46,7 +44,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
         })
 
         # remove the output file, otherwise there is a race condition
@@ -60,7 +57,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
         })
 
     def test_cleared_channel_restarts(self):
@@ -151,7 +147,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], eventID="1111", extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
         })
 
         self.assertEqual(
@@ -174,7 +169,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, sid=accountIdentifier, extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
         })
 
     def test_fields_under_root(self):
@@ -190,7 +184,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "tags": ["local"],
                     "fields_under_root": True,
                     "fields": {"local": "field", "env": "dev"}
@@ -200,7 +193,6 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, level="overwrite", extra={
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
             "global": "field",
             "env": "dev",
             "local": "field",
@@ -218,7 +210,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "fields": {"local": "field", "env": "dev", "num": 1}
                 }
             ]
@@ -227,7 +218,6 @@ class Test(WriteReadTest):
         self.assert_common_fields(evts[0], msg=msg, extra={
             "log.level": "information",
             "winlog.keywords": ["Classic"],
-            "winlog.opcode": "Info",
             "fields.global": "field",
             "fields.env": "dev",
             "fields.level": "overwrite",
@@ -273,7 +263,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "event_id": "50, 100-200, -150"
                 }
             ]
@@ -298,7 +287,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "level": "warning"
                 }
             ]
@@ -322,7 +310,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "level": "error, warning"
                 }
             ]
@@ -344,7 +331,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "ignore_older": "2s"
                 }
             ]
@@ -363,7 +349,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "provider": [self.otherAppName]
                 }
             ]
@@ -384,7 +369,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "event_id": "10-20, 30-40, -35, -18, 400-1000, -432",
                     "level": "warn, error",
                     "provider": [self.otherAppName]
@@ -407,7 +391,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "include_xml": True,
                 }
             ]
@@ -439,7 +422,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "extras": {
                         "processors": [
                             {

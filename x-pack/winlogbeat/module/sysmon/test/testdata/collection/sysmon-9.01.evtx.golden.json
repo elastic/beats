@@ -1347,9 +1347,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.4021191Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1362,18 +1359,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.387\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp\nCreationUtcTime: 2019-03-18 16:52:04.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.387\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.387",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp",
-        "param6": "2019-03-18 16:52:04.980",
-        "param7": "2019-03-18 16:57:52.387"
+        "CreationUtcTime": "2019-03-18 16:52:04.980",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.387",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\fe823684-c940-49f2-a940-14b02cbafba9.tmp",
+        "UtcTime": "2019-03-18 16:57:52.387"
       },
       "event_id": "2",
       "opcode": "Info",
@@ -1398,9 +1395,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.417733Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1413,18 +1407,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp\nCreationUtcTime: 2019-03-18 16:52:04.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.402\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.417",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp",
-        "param6": "2019-03-18 16:52:04.980",
-        "param7": "2019-03-18 16:57:52.402"
+        "CreationUtcTime": "2019-03-18 16:52:04.980",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.402",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\162d4140-cfab-4d05-9c92-bca60515a622.tmp",
+        "UtcTime": "2019-03-18 16:57:52.417"
       },
       "event_id": "2",
       "opcode": "Info",
@@ -1449,9 +1443,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.417733Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1464,18 +1455,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp\nCreationUtcTime: 2019-03-18 16:52:05.028\nPreviousCreationUtcTime: 2019-03-18 16:57:52.402\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.417",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp",
-        "param6": "2019-03-18 16:52:05.028",
-        "param7": "2019-03-18 16:57:52.402"
+        "CreationUtcTime": "2019-03-18 16:52:05.028",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.402",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\1450fedf-ac4c-4e35-b371-ed5d3bbe4776.tmp",
+        "UtcTime": "2019-03-18 16:57:52.417"
       },
       "event_id": "2",
       "opcode": "Info",
@@ -1500,9 +1491,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.417733Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1515,18 +1503,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.417\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp\nCreationUtcTime: 2019-03-18 16:51:54.980\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.417",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp",
-        "param6": "2019-03-18 16:51:54.980",
-        "param7": "2019-03-18 16:57:52.417"
+        "CreationUtcTime": "2019-03-18 16:51:54.980",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\37ed32e9-3c5f-4663-8457-c70743e9456d.tmp",
+        "UtcTime": "2019-03-18 16:57:52.417"
       },
       "event_id": "2",
       "opcode": "Info",
@@ -1596,9 +1584,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.4333673Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1611,18 +1596,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.433\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp\nCreationUtcTime: 2019-03-18 16:52:08.496\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.433",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp",
-        "param6": "2019-03-18 16:52:08.496",
-        "param7": "2019-03-18 16:57:52.417"
+        "CreationUtcTime": "2019-03-18 16:52:08.496",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\nmmhkkegccagdldgiimedpiccmgmieda\\def\\ecb9c915-c4c2-4600-a920-f2bc302990a8.tmp",
+        "UtcTime": "2019-03-18 16:57:52.433"
       },
       "event_id": "2",
       "opcode": "Info",
@@ -1647,9 +1632,6 @@
   },
   {
     "@timestamp": "2019-03-18T16:57:52.4333673Z",
-    "error": {
-      "message": "failed to get the event message string: failed in EvtFormatMessage: The message resource is present but the message was not found in the message table."
-    },
     "event": {
       "action": "File creation time changed (rule: FileCreateTime)",
       "code": "2",
@@ -1662,18 +1644,18 @@
     "log": {
       "level": "information"
     },
+    "message": "File creation time changed:\nRuleName: \nUtcTime: 2019-03-18 16:57:52.433\nProcessGuid: {42F11C3B-CCAA-5C8F-0000-0010B4E22700}\nProcessId: 1600\nImage: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp\nCreationUtcTime: 2019-03-18 16:52:05.339\nPreviousCreationUtcTime: 2019-03-18 16:57:52.417\nUser: %9",
     "winlog": {
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "error": {},
       "event_data": {
-        "param1": "2019-03-18 16:57:52.433",
-        "param2": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
-        "param3": "1600",
-        "param4": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-        "param5": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp",
-        "param6": "2019-03-18 16:52:05.339",
-        "param7": "2019-03-18 16:57:52.417"
+        "CreationUtcTime": "2019-03-18 16:52:05.339",
+        "Image": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "PreviousCreationUtcTime": "2019-03-18 16:57:52.417",
+        "ProcessGuid": "{42F11C3B-CCAA-5C8F-0000-0010B4E22700}",
+        "ProcessId": "1600",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Storage\\ext\\gfdkimpbcpahaombhbimeihdjnejgicl\\def\\ee4a6e45-bffd-49f4-98ae-32aebcc890b5.tmp",
+        "UtcTime": "2019-03-18 16:57:52.433"
       },
       "event_id": "2",
       "opcode": "Info",

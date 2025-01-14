@@ -157,9 +157,7 @@ func TestWinEventLogConfig_Validate(t *testing.T) {
 	}
 }
 
-func TestWindowsEventLogAPIRaw(t *testing.T) {
-	// for the raw api using include xml behave differently than not
-	// so we must test both settings
+func TestWindowsEventLogAPI(t *testing.T) {
 	testWindowsEventLog(t, true)
 	testWindowsEventLog(t, false)
 }
