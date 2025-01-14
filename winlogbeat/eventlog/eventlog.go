@@ -23,18 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-)
-
-// Debug selectors used in this package.
-const (
-	debugSelector = "eventlog"
-)
-
-// Debug logging functions for this package.
-var (
-	debugf = logp.MakeDebug(debugSelector)
 )
 
 // EventLog is an interface to a Windows Event Log.

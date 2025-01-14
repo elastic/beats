@@ -153,8 +153,12 @@ class Test(WriteReadTest):
             "winlog.keywords": ["Classic"],
             "winlog.opcode": "Info",
         })
-        # Oddly, no rendering error is being given.
-        self.assertTrue("error.message" not in evts[0])
+
+        self.assertEqual(
+            "failed to get the event message string: failed in EvtFormatMessage:"
+            " The message resource is present but the message was not found in the message table.",
+            evts[0]["error.message"]
+        )
 
     def test_read_unknown_sid(self):
         """
@@ -242,7 +246,6 @@ class Test(WriteReadTest):
             "event_logs": [
                 {
                     "name": self.providerName,
-                    "api": self.api,
                     "include_xml": True,
                 }
             ]
@@ -471,7 +474,6 @@ Logon Process Name:  IKE"""
         self.write_event_log(msg)
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
-        self.assertEqual(str(self.api), evts[0]["winlog.api"], msg=evts[0])
         self.assertNotIn("event.original", evts[0], msg=evts[0])
         self.assertIn("message", evts[0], msg=evts[0])
         self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
