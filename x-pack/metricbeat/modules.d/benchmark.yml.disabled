@@ -1,0 +1,9 @@
+# Module: benchmark
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-benchmark.html
+
+- module: benchmark
+  metricsets:
+    - info
+  enabled: false
+  period: 10s
+

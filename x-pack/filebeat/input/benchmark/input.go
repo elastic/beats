@@ -60,7 +60,7 @@ func (bi *benchmarkInput) Test(ctx v2.TestContext) error {
 // Run starts the data generation.
 func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	var wg sync.WaitGroup
-	metrics := newInputMetrics(ctx.ID)
+	metrics := newInputMetrics(ctx)
 
 	for i := uint8(0); i < bi.cfg.Threads; i++ {
 		wg.Add(1)
@@ -103,8 +103,8 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				//don't want to block on filling doPublish channel
-				//so only send as many as it can hold right now
+				// don't want to block on filling doPublish channel
+				// so only send as many as it can hold right now
 				numToSend := cap(pubChan) - len(pubChan)
 				for i := 0; i < numToSend; i++ {
 					pubChan <- true
@@ -157,8 +157,8 @@ type inputMetrics struct {
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
-func newInputMetrics(id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(ctx v2.Context) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, ctx.ID, ctx.Agent.Monitoring.Namespace.GetRegistry())
 	out := &inputMetrics{
 		unregister:      unreg,
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),

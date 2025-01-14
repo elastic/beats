@@ -108,6 +108,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - AWS CloudWatch Metrics record previous endTime to use for next collection period and change log.logger from cloudwatch to aws.cloudwatch. {pull}40870[40870]
 - Fix flaky test in cel and httpjson inputs of filebeat. {issue}40503[40503] {pull}41358[41358]
 - Fix documentation and implementation of raw message handling in Filebeat http_endpoint by removing it. {pull}41498[41498]
+- Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
 
 ==== Added
 
@@ -213,6 +214,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add field redaction package. {pull}40997[40997]
 - Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
 - Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
+- Add CEL input program evaluation coverage collection support. {pull}41884[41884]
 
 ==== Deprecated
 

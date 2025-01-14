@@ -37,13 +37,12 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
@@ -189,7 +188,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.MakeBool(false)
+	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)
@@ -993,4 +992,9 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	}
 
 	return bytes.Count(data, []byte{'\n'})
+}
+
+// ConfigFilePath returns the config file path
+func (b *BeatProc) ConfigFilePath() string {
+	return b.configFile
 }

@@ -77,7 +77,8 @@ type s3EventV2 struct {
 			ARN  string `json:"arn"`
 		} `json:"bucket"`
 		Object struct {
-			Key string `json:"key"`
+			Key          string    `json:"key"`
+			LastModified time.Time `json:"lastModified"`
 		} `json:"object"`
 	} `json:"s3"`
 }

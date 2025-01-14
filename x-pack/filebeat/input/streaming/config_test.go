@@ -130,6 +130,91 @@ var configTests = []struct {
 			"url": "wss://localhost:443/v1/stream",
 		},
 	},
+	{
+		name: "valid_retry_with_infinite",
+		config: map[string]interface{}{
+			"retry": map[string]interface{}{
+				"infinite_retries": true,
+				"max_attempts":     0,
+				"wait_min":         "1s",
+				"wait_max":         "2s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "valid_authStyle_default",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"token_url":     "https://localhost:443/token",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "valid_authStyle_in_params",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"auth_style":    "in_params",
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"token_url":     "https://localhost:443/token",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "valid_authStyle_in_header",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"auth_style":    "in_header",
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"token_url":     "https://localhost:443/token",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "invalid_authStyle",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"auth_style":    "in_query",
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"token_url":     "https://localhost:443/token",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("unsupported auth style: in_query accessing config"),
+	},
+	{
+		name: "valid_tokenExpiryBuffer",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":           "a_client_id",
+				"client_secret":       "a_client_secret",
+				"token_url":           "https://localhost:443/token",
+				"token_expiry_buffer": "5m",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+	},
+	{
+		name: "invalid_tokenExpiryBuffer",
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":           "a_client_id",
+				"client_secret":       "a_client_secret",
+				"token_url":           "https://localhost:443/token",
+				"token_expiry_buffer": "-1s",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("requires duration >= 0 accessing 'auth.token_expiry_buffer'"),
+	},
 }
 
 func TestConfig(t *testing.T) {

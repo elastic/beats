@@ -85,8 +85,8 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 				return &inputest.MockInput{
 					OnTest: func(_ v2.TestContext) error { countTest++; return nil },
 					OnRun: func(_ v2.Context, _ beat.PipelineConnector) error {
-						runWG.Done()
 						countRun++
+						runWG.Done()
 						return nil
 					},
 				}, nil
