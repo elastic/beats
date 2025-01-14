@@ -339,7 +339,7 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 		interval := client.Config.Period
 
 		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		endTime := referenceTime.Add(interval * (-1))
+		endTime := referenceTime
 		// startTime := endTime.Add(interval * (-1))
 		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
 		startTime := endTime.Add(timespanDuration * -1)
