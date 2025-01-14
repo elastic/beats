@@ -365,6 +365,7 @@ func (service *MonitorService) QueryResources(
 		return nil, err
 	}
 	service.log.Infof("QueryResources to be called. length of resources is %d", len(resourceIDs))
+	service.log.Infof("Filter is %v & Aggregation is %+v & Interval is %v & StartTime is %v & EndTime is %v & Top is %v & endpoint is %v & subscriptionID is %v & namespace is %v & metricNames is %+v & ResourceIDs is %+v ", metricsFilter, aggregations, timegrain, startTime, endTime, top, service.queryResourceClientConfig.endpoint, subscriptionID, namespace, metricNames, resourceIDs)
 	// call the query resources client passing 50 resourceIDs at a time
 	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
 		end := i + BatchApiResourcesLimit
@@ -394,15 +395,6 @@ func (service *MonitorService) QueryResources(
 
 		resp = append(resp, r.MetricResults.Values...)
 	}
-
-	//interval = *resp.Interval
-	//for _, v := range resp.Values {
-	//	//metrics = append(metrics, v)
-	//	fmt.Println(v)
-	//}
-	//
-	//}
-	//return metrics, nil
 
 	return resp, nil
 

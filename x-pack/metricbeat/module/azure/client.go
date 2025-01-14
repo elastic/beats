@@ -105,10 +105,10 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	var wg sync.WaitGroup
 	//reset client resources
 	client.Resources = []Resource{}
-	for _, resource := range client.Config.Resources {
+	for _, resourceConfig := range client.Config.Resources {
 		// retrieve azure resources information
-		client.Log.Infof("EEEEEEEEEE resource.Id is %v & resource.Group is %v & resource.Type is %v & resource.Query is %v", resource.Id, resource.Group, resource.Type, resource.Query)
-		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
+		client.Log.Infof("EEEEEEEEEE resource.Id is %v & resource.Group is %v & resource.Type is %v & resource.Query is %v & metrics are %v", resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query, resourceConfig.Metrics)
+		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query)
 		if err != nil {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
 			// Should we return here or continue?
@@ -117,7 +117,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 		if len(resourceList) == 0 {
 			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
-				resource.Id, resource.Group, resource.Type, resource.Query)
+				resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query)
 			client.Log.Error(err)
 			continue
 		}
@@ -143,7 +143,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 		// Collects and stores metrics definitions for the cloud resources.
 		wg.Add(1)
-		fn(client, resourceList, resource, &wg)
+		fn(client, resourceList, resourceConfig, &wg)
 		client.Log.Infof("Finished collection with %d metric definitions", len(resourceList))
 	}
 	go func() {
@@ -338,9 +338,11 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 		// Same end time for all metrics in the same batch.
 		interval := client.Config.Period
 
-		// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
+		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
 		endTime := referenceTime.Add(interval * (-1))
-		startTime := endTime.Add(interval * (-1))
+		// startTime := endTime.Add(interval * (-1))
+		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
+		startTime := endTime.Add(timespanDuration * -1)
 		// Limit batch size to 50 resources (if you have more, you can split the batch)
 		filter := ""
 		if len(metricsDefinitions[0].Dimensions) > 0 {
@@ -369,8 +371,13 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 			client.Log.Infof("Aggregations is %+v", strings.ToLower(batchMetrics[0].Aggregations))
 			client.Log.Infof("Filter is %+v", filter)
 			client.Log.Infof("Location is %+v", criteria.Location)
+			if criteria.Names == "ServiceAvailability,ReplicationLatency" {
+				client.Log.Infof("OOOOOOO TimeGrain is empty, setting timegrain")
+				// criteria.TimeGrain = "PT1H"
+				// criteria.Names = "ServiceAvailability"
+			}
 			// Make the batch API call (adjust parameters as needed)
-			r, err := client.AzureMonitorService.QueryResources(
+			response, err := client.AzureMonitorService.QueryResources(
 				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
 				criteria.SubscriptionID,
 				criteria.Namespace,
@@ -390,13 +397,26 @@ func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteri
 			}
 
 			// Process the response as needed
-			for i, v := range r {
+			for i, v := range response {
+				if criteria.Names == "ServiceAvailability,ReplicationLatency" {
+					client.Log.Infof("OOOOOOO TimeGrain is PT1H")
+					client.Log.Infof("Response INTERVAL is %+v", *response[i].Interval)
+				}
 				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
-					timeGrain: *r[i].Interval,
+					timeGrain: *response[i].Interval,
 					timestamp: referenceTime,
 				})
 				values := mapMetricValues2(client, v)
+				if criteria.Names == "ServiceAvailability,ReplicationLatency" {
+					client.Log.Infof("OOOOOOO TimeGrain is PT1H")
+					client.Log.Infof("Response value is %+v", v)
+					client.Log.Infof("Values are %+v", values)
+				}
 				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
+				if metricsDefinitions[i].TimeGrain == "" {
+					metricsDefinitions[i].TimeGrain = *response[i].Interval
+				}
+
 			}
 
 			result = append(result, metricsDefinitions...)
