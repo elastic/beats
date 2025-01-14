@@ -10,7 +10,7 @@ var:
   - name: oauth2
   - name: proxy_url
   - name: initial_interval
-    default: 24h
+    default: 5m
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/atp.yml
