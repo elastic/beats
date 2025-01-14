@@ -24,6 +24,7 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
 RUN retry --min 1 --max 180 -- curl -J -L -s -f --show-error -o /opt/jolokia-jvm-1.5.0-agent.jar \
     http://search.maven.org/remotecontent\?filepath\=org/jolokia/jolokia-jvm/1.5.0/jolokia-jvm-1.5.0-agent.jar
 
+ADD adminclient.properties /kafka/bin/adminclient.properties
 ADD kafka_server_jaas.conf /etc/kafka/server_jaas.conf
 ADD jaas-kafka-client-producer.conf /kafka/bin/jaas-kafka-client-producer.conf
 ADD sasl-producer.properties /kafka/bin/sasl-producer.properties

@@ -34,7 +34,7 @@ wait_for_port() {
     nc -z localhost $port
 }
 
-${KAFKA_HOME}/bin/kafka-topics.sh  --bootstrap-server localhost:9091 --create --partitions 1 --topic test --replication-factor 1
+${KAFKA_HOME}/bin/kafka-topics.sh  --bootstrap-server localhost:9091  --create --partitions 1 --topic test --replication-factor 1 --command-config ${KAFKA_HOME}/bin//adminclient.properties
 
 echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
@@ -53,6 +53,7 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override advertised.listeners=INSIDE://localhost:9091,OUTSIDE://$KAFKA_ADVERTISED_HOST \
     --override listener.security.protocol.map=INSIDE:SASL_PLAINTEXT,OUTSIDE:SASL_PLAINTEXT \
     --override inter.broker.listener.name=INSIDE \
+    --override zookeeper.set.acl=false \
     --override logs.dir=${KAFKA_LOGS_DIR} &
 
 wait_for_port 9092
@@ -62,22 +63,23 @@ wait_for_port 8779
 echo "Kafka load status code $?"
 
 # ACLS used to prepare tests
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
 
 # Minimal ACLs required by metricbeat. If this needs to be changed, please update docs too
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --add --allow-principal User:stats --operation Describe --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --add --allow-principal User:stats --operation Read --topic '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:stats --operation Describe --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:stats --operation Read --topic '*'
 
 touch /tmp/.acls_loaded
 
-
+echo "Kafka producer start"
 # Start a forever producer
 { while sleep 1; do echo message; done } | KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-producer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8775,host=0.0.0.0" \
  ${KAFKA_HOME}/bin/kafka-console-producer.sh --topic test --broker-list localhost:9091 --producer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
 
 wait_for_port 8775
 
+echo "Kafka consumer start"
 # Start a forever consumer
 KAFKA_OPTS="-Djava.security.auth.login.config=/kafka/bin/jaas-kafka-client-consumer.conf -javaagent:/opt/jolokia-jvm-1.5.0-agent.jar=port=8774,host=0.0.0.0" \
  ${KAFKA_HOME}/bin/kafka-console-consumer.sh --topic=test --bootstrap-server=localhost:9091 --consumer.config ${KAFKA_HOME}/bin/sasl-producer.properties > /dev/null &
