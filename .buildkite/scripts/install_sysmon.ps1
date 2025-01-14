@@ -6,14 +6,29 @@ if (!(Test-Path $tempFolder)) {
 }
 
 $ProgressPreference = 'SilentlyContinue'
+function ParseErrorForResponseBody($Error) {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        if ($Error.Exception.Response) {  
+            $Reader = New-Object System.IO.StreamReader($Error.Exception.Response.GetResponseStream())
+            $Reader.BaseStream.Position = 0
+            $Reader.DiscardBufferedData()
+            $ResponseBody = $Reader.ReadToEnd()
+            if ($ResponseBody.StartsWith('{')) {
+                $ResponseBody = $ResponseBody | ConvertFrom-Json
+            }
+            return $ResponseBody
+        }
+    }
+    else {
+        return $Error.ErrorDetails.Message
+    }
+}
+
 try {
-    Invoke-WebRequest -Uri $downloadUrl -OutFile "$tempFolder\Sysmon.zip" -UseBasicParsing
-} catch {
-    $result = $_.Exception.Response.GetResponseStream()
-    $reader = New-Object System.IO.StreamReader($result)
-    $reader.BaseStream.Position = 0
-    $reader.DiscardBufferedData()
-    $reader.ReadToEnd()
+    $result = Invoke-WebRequest -Uri $downloadUrl -OutFile "$tempFolder\Sysmon.zip" -UseBasicParsing
+}
+catch {
+    ParseErrorForResponseBody($_)
     exit 1
 }
 
