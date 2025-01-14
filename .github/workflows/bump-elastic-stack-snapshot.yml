@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@704a64517239e0993c5e3bf6749a063b8f950d9f # v0.76.1
+        uses: updatecli/updatecli-action@4aca518a70708e38063453d8de9c551af7f48ac3 # v0.76.1
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
@@ -41,7 +41,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - if: ${{ failure()  }}
-        uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
         with:
           channel-id: '#ingest-notifications'
           payload: |

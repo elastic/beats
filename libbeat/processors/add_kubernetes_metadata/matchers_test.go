@@ -20,6 +20,8 @@ package add_kubernetes_metadata
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -35,6 +37,7 @@ func TestFieldMatcher(t *testing.T) {
 	assert.NoError(t, err)
 	matcher, err := NewFieldMatcher(*fieldCfg)
 	assert.Error(t, err)
+	assert.Nil(t, matcher)
 
 	testCfg["lookup_fields"] = "foo"
 	fieldCfg, _ = config.NewConfigFrom(testCfg)
@@ -58,6 +61,47 @@ func TestFieldMatcher(t *testing.T) {
 	assert.Equal(t, out, "")
 }
 
+func TestFieldMatcherRegex(t *testing.T) {
+	testCfg := map[string]interface{}{
+		"lookup_fields": []string{"foo"},
+		"regex_pattern": "(?!)",
+	}
+	fieldCfg, err := config.NewConfigFrom(testCfg)
+	assert.NoError(t, err)
+	matcher, err := NewFieldMatcher(*fieldCfg)
+	assert.ErrorContains(t, err, "invalid regex:")
+	assert.Nil(t, matcher)
+
+	testCfg["regex_pattern"] = "(?P<invalid>.*)"
+	fieldCfg, _ = config.NewConfigFrom(testCfg)
+
+	matcher, err = NewFieldMatcher(*fieldCfg)
+	assert.ErrorContains(t, err, "regex missing required capture group `key`")
+	assert.Nil(t, matcher)
+
+	testCfg["regex_pattern"] = "bar-(?P<key>[^-]+)-suffix"
+	fieldCfg, _ = config.NewConfigFrom(testCfg)
+
+	matcher, err = NewFieldMatcher(*fieldCfg)
+	require.NoError(t, err)
+	require.NotNil(t, matcher)
+
+	input := mapstr.M{
+		"foo": "bar-keyvalue-suffix",
+	}
+
+	out := matcher.MetadataIndex(input)
+	assert.Equal(t, out, "keyvalue")
+
+	nonMatchInput := mapstr.M{
+		"not": "match",
+		"foo": "nomatch",
+	}
+
+	out = matcher.MetadataIndex(nonMatchInput)
+	assert.Equal(t, out, "")
+}
+
 func TestFieldFormatMatcher(t *testing.T) {
 	testCfg := map[string]interface{}{}
 	fieldCfg, err := config.NewConfigFrom(testCfg)
@@ -65,6 +109,7 @@ func TestFieldFormatMatcher(t *testing.T) {
 	assert.NoError(t, err)
 	matcher, err := NewFieldFormatMatcher(*fieldCfg)
 	assert.Error(t, err)
+	assert.Nil(t, matcher)
 
 	testCfg["format"] = `%{[namespace]}/%{[pod]}`
 	fieldCfg, _ = config.NewConfigFrom(testCfg)

@@ -54,6 +54,29 @@ filebeat.inputs:
   #  level: debug
   #  review: 1
 
+# journald is an input for collecting logs from Journald
+- type: journald
+
+  # Unique ID among all inputs, if the ID changes, all entries
+  # will be re-ingested
+  id: my-journald-id
+
+  # The position to start reading from the journal, valid options are:
+  #  - head: Starts reading at the beginning of the journal.
+  #  - tail: Starts reading at the end of the journal.
+  #    This means that no events will be sent until a new message is written.
+  #  - since: Use also the `since` option to determine when to start reading from.
+  #seek: head
+
+  # A time offset from the current time to start reading from.
+  # To use since, seek option must be set to since.
+  #since: -24h
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units:
+    #- docker.service
+
 # ============================== Filebeat modules ==============================
 
 filebeat.config.modules:

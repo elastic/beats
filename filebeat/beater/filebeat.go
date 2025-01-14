@@ -166,7 +166,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, fmt.Errorf("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and --once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
@@ -224,7 +224,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
+			modulesLoader := cfgfile.NewReloader(logp.L().Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -272,10 +272,18 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
+	var reg *monitoring.Registry
+
+	if b.Info.Monitoring.Namespace != nil {
+		reg = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
+		if reg == nil {
+			reg = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
+		}
+	}
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
-		added: monitoring.NewUint(nil, "filebeat.events.added"),
-		done:  monitoring.NewUint(nil, "filebeat.events.done"),
+		count: monitoring.NewInt(reg, "filebeat.events.active"), // Gauge
+		added: monitoring.NewUint(reg, "filebeat.events.added"),
+		done:  monitoring.NewUint(reg, "filebeat.events.done"),
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
