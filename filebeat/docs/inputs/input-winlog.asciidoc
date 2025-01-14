@@ -40,7 +40,7 @@ Here is a sample configuration:
 ==== `batch_read_size`
 
 The maximum number of event log records to read from the Windows API in a single
-batch. The default batch size is 100. Most Windows versions return an error if
+batch. The default batch size is 512. Most Windows versions return an error if
 the value is larger than 1024. *{vista_and_newer}*
 
 {beatname_uc} starts a goroutine (a lightweight thread) to read from each
