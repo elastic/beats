@@ -34,7 +34,7 @@ var defaultConfig = Config{
 	StatePeriod: 12 * time.Hour,
 
 	HasherConfig: hasher.Config{
-		HashTypes:           []hasher.HashType{hasher.SHA1},
+		HashTypes:           []hasher.HashType{hasher.SHA256},
 		MaxFileSize:         "100 MiB",
 		MaxFileSizeBytes:    100 * 1024 * 1024,
 		ScanRatePerSec:      "50 MiB",
