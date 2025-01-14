@@ -15372,15 +15372,6 @@ Field aliases based on Winlogbeat 6.x that point to the fields for this version 
 
 
 
-*`type`*::
-+
---
-type: alias
-
-alias to: winlog.api
-
---
-
 *`activity_id`*::
 +
 --
