@@ -16,6 +16,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
@@ -199,7 +200,17 @@ func PythonIntegTest(ctx context.Context) error {
 func Test() {
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.DefineModules)
+		mg.Deps(devtools.InstallWpd)
 	}
 
 	test.Test()
+}
+
+// Test runs all available tests (unitTest + integTest).
+func UnitTest() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.InstallWpd)
+	}
+
+	unittest.UnitTest()
 }
