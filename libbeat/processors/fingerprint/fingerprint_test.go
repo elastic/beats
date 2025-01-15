@@ -505,7 +505,7 @@ func nRandomEvents(num int) []beat.Event {
 	charsetLen := len(charset)
 	b := make([]byte, 200)
 
-	events := make([]beat.Event, num)
+	events := make([]beat.Event, 0, num)
 	for i := 0; i < num; i++ {
 		for j := range b {
 			b[j] = charset[prng.Intn(charsetLen)]
