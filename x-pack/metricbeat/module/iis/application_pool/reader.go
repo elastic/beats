@@ -112,6 +112,8 @@ func (r *Reader) initAppPools() error {
 		r.log.Info("no running application pools found")
 		return nil
 	}
+	// Helper function to identify known PDH errors, such as missing counters or instances.
+	// These errors are expected in certain cases (e.g. "No Managed Code" environments).
 	isPDHError := func(err error) bool {
 		return errors.Is(err, pdh.PdhErrno(syscall.ERROR_NOT_FOUND)) ||
 			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) ||
@@ -124,6 +126,7 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
+			// Handle known PDH errors as informational (e.g. missing counters).
 			if isPDHError(err) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value,
@@ -219,7 +222,6 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					}
 				}
 			}
-
 		}
 	}
 	return events
@@ -236,7 +238,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appPools = make(map[string][]int)
+	appPools := make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}
