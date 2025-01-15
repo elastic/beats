@@ -253,7 +253,7 @@ MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 
 [source,shell]
 ---------------
-./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -folder module/redis
+./filebeat export dashboard --id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b --folder module/redis
 ---------------
 
 This generates an appropriate folder under module/redis for the dashboard, separating assets into dashboards, searches, vizualizations, etc.
@@ -289,12 +289,12 @@ By passing the yml file to the `export_dashboards.go` script or to the Beat, you
 
 [source,shell]
 -------------------
-go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml -folder dashboards
+go run dev-tools/cmd/dashboards/export_dashboards.go --yml filebeat/module/system/module.yml --folder dashboards
 -------------------
 
 [source,shell]
 -------------------
-./filebeat export dashboard -yml filebeat/module/system/module.yml
+./filebeat export dashboard --yml filebeat/module/system/module.yml
 -------------------
 
 
