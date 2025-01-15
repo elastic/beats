@@ -46,7 +46,6 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
-	BulkMaxSize        int               `config:"bulk_max_size"`
 }
 
 type esToOTelOptions struct {
@@ -126,11 +125,10 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 		},
 
-		// Batcher is experimental and by not setting it, we are using the exporter's default batching mechanism
-		// "batcher": map[string]any{
-		// 	"enabled":        true,
-		// 	"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-		// },
+		"batcher": map[string]any{
+			"enabled":        true,
+			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
+		},
 	}
 
 	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
@@ -147,7 +145,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
-	// the  valued should match `elasticsearchexporter.Config` type.
+	// the  value should match `elasticsearchexporter.Config` type.
 	// it throws an error if non existing key names  are set
 	var result elasticsearchexporter.Config
 	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{

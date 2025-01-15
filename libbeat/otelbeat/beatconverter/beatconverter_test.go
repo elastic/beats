@@ -44,6 +44,9 @@ exporters:
       max_retries: 3
     user: elastic
     timeout: 1m30s
+    batcher:
+      enabled: true
+      max_size_items: 1600
 `
 
 func TestConverter(t *testing.T) {
@@ -181,6 +184,9 @@ exporters:
       max_retries: 3
     user: elastic-cloud
     timeout: 1m30s
+    batcher:
+      enabled: true
+      max_size_items: 1600
 receivers:
   filebeatreceiver:
     filebeat:

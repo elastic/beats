@@ -17,6 +17,3 @@ headers:
   X-Bar-Header: bar    
 
 
-## elastic.co$es-hostname$kibana-hostname
-# cloud.id: ZWxhc3RpYy5jbyRlcy1ob3N0bmFtZSRraWJhbmEtaG9zdG5hbWU=
-# cloud.auth: elastic-cloud:password
