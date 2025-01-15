@@ -347,11 +347,11 @@ type testMeta struct {
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": {
+			"test::key1": { // Active resource
 				TTL:  60 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
-			"test::key2": {
+			"test::key2": { // Deleted resource
 				TTL:  0 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
@@ -372,22 +372,25 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			return "", nil
 		})
 
-		var newState state
-		s.persistentStore.Get("test::key1::updated", &newState)
+		// The persistentStore is a mock that does not consider if a state has
+		// been removed before returning it, thus allowing us to get Updated
+		// timestamp from when the resource was deleted.
+		var deletedState state
+		s.persistentStore.Get("test::key1", &deletedState)
 
 		want := map[string]state{
-			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
-				TTL:     60 * time.Second,
+			"test::key1": { // old resource is deleted, TTL must be zero
+				Updated: deletedState.Updated,
+				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key2": {
+			"test::key2": { // Unchanged
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key1::updated": {
-				Updated: newState.Updated,
+			"test::key1::updated": { // Updated resource
+				Updated: s.Get("test::key1::updated").internalState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
 			},

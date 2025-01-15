@@ -46,7 +46,7 @@ func main() {
 	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
-	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use -folder instead")
+	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use --folder instead")
 	folderOutput := flag.String("folder", "", "Output folder to save all assets to more human friendly JSON format")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
@@ -56,7 +56,7 @@ func main() {
 	log.SetFlags(0)
 
 	if len(*fileOutput) > 0 {
-		log.Fatalf("-output is configured, please use -folder flag instead to get the expected formatting of assets")
+		log.Fatalf("--output is configured, please use --folder flag instead to get the expected formatting of assets")
 	}
 
 	u, err := url.Parse(*kibanaURL)
@@ -92,10 +92,10 @@ func main() {
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
 		flag.Usage()
-		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
+		log.Fatalf("Please specify a dashboard ID (--dashboard) or a manifest file (--yml)")
 	}
 	if len(*folderOutput) == 0 {
-		log.Fatalf("Please specify a target folder using -folder flag")
+		log.Fatalf("Please specify a target folder using --folder flag")
 	}
 
 	if len(*ymlFile) > 0 {

@@ -41,6 +41,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	opts  metrics.MetricOpts
 	cores *metrics.Monitor
+	sys   resolve.Resolver
 }
 
 // New returns a new core MetricSet.
@@ -58,11 +59,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
+
+	cpuOpts := make([]metrics.OptionFunc, 0)
+	if config.UserPerformanceCounters {
+		cpuOpts = append(cpuOpts, metrics.WithWindowsPerformanceCounter())
+	}
+	cpu, err := metrics.New(sys, cpuOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cores:         metrics.New(sys),
+		cores:         cpu,
+		sys:           sys,
 	}, nil
 }
 
@@ -109,6 +124,5 @@ func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (m *MetricSet) getDiagData() []byte {
-	sys := m.BaseMetricSet.Module().(resolve.Resolver)
-	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/stat")
 }
