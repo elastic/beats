@@ -154,9 +154,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	// ensures this is the last connection closed when the function returns
 	defer func() {
-		if err := c.Close(); err != nil {
-			s.metrics.errorsTotal.Inc()
-			s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+		if c != nil {
+			if err := c.Close(); err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+			}
 		}
 	}()
 
