@@ -140,7 +140,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
-			s.log.Debugw("received websocket message", logp.Namespace("websocket"), "msg", string(message))
+			s.log.Debugw("received websocket message", "msg", string(message))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
