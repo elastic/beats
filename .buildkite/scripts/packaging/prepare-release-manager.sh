@@ -15,6 +15,11 @@ FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
   FINAL_VERSION=$VERSION
 fi
+
+if [[ -n  "$VERSION_QUALIFIER" ]]; then
+  FINAL_VERSION=""$FINAL_VERSION-${VERSION_QUALIFIER}""
+fi
+
 echo "Rename dependencies to $FINAL_VERSION"
 mv build/distributions/dependencies.csv \
    build/distributions/dependencies-"$FINAL_VERSION".csv
