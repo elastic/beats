@@ -69185,17 +69185,6 @@ format: duration
 wmi
 
 
-
-*`windows.wmi.example`*::
-+
---
-Example field
-
-
-type: keyword
-
---
-
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
