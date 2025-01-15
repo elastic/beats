@@ -17,7 +17,7 @@ if [ "$TYPE" != "snapshot" ] ; then
 fi
 
 if [[ -n  "$VERSION_QUALIFIER" ]]; then
-  FINAL_VERSION=""$FINAL_VERSION-${VERSION_QUALIFIER}""
+  FINAL_VERSION="$FINAL_VERSION-${VERSION_QUALIFIER}"
 fi
 
 echo "Rename dependencies to $FINAL_VERSION"
