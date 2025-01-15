@@ -590,7 +590,7 @@ Prints the list of devices that are available for sniffing and then exits.
 endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-*`-dump FILE`*::
+*`--dump FILE`*::
 Writes all captured packets to the specified file. This option is useful for
 troubleshooting {beatname_uc}.
 endif::[]
@@ -907,7 +907,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
+{beatname_lc} --modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
 endif::[]
 
@@ -926,7 +926,7 @@ messages.
 *`-e, --e`*::
 Logs to stderr and disables syslog/file output.
 
-*`-environment`*::
+*`--environment`*::
 For logging purposes, specifies the environment that {beatname_uc} is running in.
 This setting is used to select a default log output when no log output is configured.
 Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`.
@@ -948,7 +948,7 @@ details.
 Sets the path for log files. See the <<directory-layout>> section for details.
 
 *`--strict.perms`*::
-Sets strict permission checking on configuration files. The default is `-strict.perms=true`.
+Sets strict permission checking on configuration files. The default is `--strict.perms=true`.
 ifndef::apm-server[]
 See {beats-ref}/config-file-permissions.html[Config file ownership and permissions]
 for more information.
