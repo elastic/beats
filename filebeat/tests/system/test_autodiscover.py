@@ -28,7 +28,7 @@ class TestAutodiscover(filebeat.BaseTest):
                           - condition:
                                 equals.docker.container.name: {container.name}
                             config:
-                              - type: log
+                              - type: filestream
                                 paths:
                                   - %s/${{data.docker.container.name}}.log
                         ''' % self.working_dir,
@@ -57,7 +57,8 @@ class TestAutodiscover(filebeat.BaseTest):
                         'cleanup_timeout': '0s',
                         'hints.enabled': 'true',
                         'hints.default_config': '''
-                          type: log
+                          type: filestream
+                          id: ${data.container.name}-${data.container.id}
                           paths:
                             - %s/${data.container.name}.log
                         ''' % self.working_dir,

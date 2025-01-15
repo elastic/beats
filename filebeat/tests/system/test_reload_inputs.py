@@ -5,10 +5,10 @@ from filebeat import BaseTest
 
 
 inputConfigTemplate = """
-- type: log
+- type: filestream
   paths:
     - {}
-  scan_frequency: 1s
+  prospector.scanner.check_interval: 1s
 """
 
 

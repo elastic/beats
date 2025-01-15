@@ -176,7 +176,7 @@ class Test(BaseTest):
         """
 
         input_raw = """
-- type: log
+- type: filestream
   paths: []
 """
 

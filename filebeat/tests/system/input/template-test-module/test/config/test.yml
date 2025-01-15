@@ -1,4 +1,4 @@
-type: log
+type: filestream
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
