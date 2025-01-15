@@ -149,10 +149,9 @@ class Test(WriteReadTest):
             "winlog.keywords": ["Classic"],
         })
 
-        self.assertEqual(
-            "failed to get the event message string: failed in EvtFormatMessage:"
-            " The message resource is present but the message was not found in the message table.",
-            evts[0]["error.message"]
+        # we just check the prefix since the specific message changes depending on the windows version
+        self.assertTrue(
+            evts[0]["error.message"].startswith("failed to get the event message string: failed in EvtFormatMessage:")
         )
 
     def test_read_unknown_sid(self):
