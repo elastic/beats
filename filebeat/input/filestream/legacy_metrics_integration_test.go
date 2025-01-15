@@ -46,6 +46,7 @@ filebeat.inputs:
     paths:
       - %s/*.filestream
   - type: log
+    allow_deprecated_use: true
     id: my-log-input
     enabled: true
     close_timeout: 1s
