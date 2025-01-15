@@ -28,7 +28,8 @@ class TestAutodiscover(filebeat.BaseTest):
                           - condition:
                                 equals.docker.container.name: {container.name}
                             config:
-                              - type: filestream
+                              - type: log
+                                allow_deprecated_use: true
                                 paths:
                                   - %s/${{data.docker.container.name}}.log
                         ''' % self.working_dir,
@@ -57,8 +58,8 @@ class TestAutodiscover(filebeat.BaseTest):
                         'cleanup_timeout': '0s',
                         'hints.enabled': 'true',
                         'hints.default_config': '''
-                          type: filestream
-                          id: ${data.container.name}-${data.container.id}
+                          type: log
+                          allow_deprecated_use: true
                           paths:
                             - %s/${data.container.name}.log
                         ''' % self.working_dir,

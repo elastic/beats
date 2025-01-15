@@ -176,7 +176,8 @@ class Test(BaseTest):
         """
 
         input_raw = """
-- type: filestream
+- type: log
+  allow_deprecated_use: true
   paths: []
 """
 
