@@ -17,16 +17,16 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*awsS3API, error) {
-	s3Client := s3.NewFromConfig(awsConfig, config.s3ConfigModifier)
-	regionName, err := getRegionForBucket(ctx, s3Client, config.getBucketName())
+func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {
+	s3Client := s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier)
+	regionName, err := getRegionForBucket(ctx, s3Client, in.config.getBucketName())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
 	}
 	// Can this really happen?
-	if regionName != awsConfig.Region {
-		awsConfig.Region = regionName
-		s3Client = s3.NewFromConfig(awsConfig, config.s3ConfigModifier)
+	if regionName != in.awsConfig.Region {
+		in.awsConfig.Region = regionName
+		s3Client = s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier)
 	}
 
 	return newAWSs3API(s3Client), nil

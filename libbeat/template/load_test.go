@@ -170,7 +170,7 @@ func TestFileLoader_Load(t *testing.T) {
 							"refresh_interval": "5s",
 							"mapping": mapstr.M{
 								"total_fields": mapstr.M{
-									"limit": 10000,
+									"limit": defaultTotalFieldsLimit,
 								},
 							},
 							"query": mapstr.M{

@@ -3,6 +3,80 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.15.5]]
+=== Beats version 8.15.5
+https://github.com/elastic/beats/compare/v8.15.4\...v8.15.5[View commits]
+
+==== Breaking changes
+
+*Packetbeat*
+
+- Expire source port mappings. {pull}41581[41581]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+
+*Filebeat*
+
+- Fix AWS region in `aws-s3` input S3 polling mode.  {pull}41572[41572]
+
+
+[[release-notes-8.15.4]]
+=== Beats version 8.15.4
+https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
+
+==== Known issues
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
+
+==== Breaking changes
+
+*Osquerybeat*
+
+- Disable `allow_unsafe` osquery configuration. {pull}40130[40130]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use. {pull}41356[41356]
+
+*Filebeat*
+
+- Log bad handshake details when websocket connection fails. {pull}41300[41300]
+- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
+- Fix double encoding of `client_secret` in the Entity Analytics input's Azure Active Directory provider. {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors. {pull}41469[41469]
+
+*Metricbeat*
+
+- Fix Kubernetes metadata sometimes not being present after startup. {pull}41216[41216]
+
+*Winlogbeat*
+
+- Fix truncated windows event log message. {pull}41327[41327]
+
+==== Added
+
+*Affecting all Beats*
+
+- Replace Ubuntu 20.04 with 24.04 for Docker base images. {issue}40743[40743] {pull}40942[40942]
+- Reduce memory consumption of k8s autodiscovery and the `add_kubernetes_metadata` processor when Deployment metadata is enabled.
+
+*Heartbeat*
+
+- Add monitor status reporter under managed mode. {pull}41077[41077]
+
+*Metricbeat*
+
+- Only watch metadata for ReplicaSets in metricbeat k8s module. {pull}41289[41289]
+
+
 [[release-notes-8.15.3]]
 === Beats version 8.15.3
 https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
@@ -12,6 +86,10 @@ https://github.com/elastic/beats/compare/v8.15.2\...v8.15.3[View commits]
 *Affecting all Beats*
 
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Breaking changes
 
@@ -59,6 +137,10 @@ https://github.com/elastic/beats/compare/v8.15.1\...v8.15.2[View commits]
 *Affecting all Beats*
 
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Bugfixes
 
@@ -114,6 +196,10 @@ https://github.com/elastic/beats/compare/v8.15.0\...v8.15.1[View commits]
 - Beats stop publishing data after a network error unless restarted. Avoid upgrading to 8.15.1. Affected Beats log `Get \"https://${ELASTICSEARCH_HOST}:443\": context canceled` repeatedly. {issue}40705{40705}
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
 
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -166,6 +252,23 @@ https://github.com/elastic/beats/compare/v8.14.3\...v8.15.0[View commits]
 
 - The Azure EventHub input in Filebeat is not found when running on Windows. Please refrain from upgrading to 8.15. See {issue}40608[40608] for details.
 - Memory usage is not correctly limited by the number of events actively in the memory queue, but rather the maximum size of the memory queue regardless of usage. {issue}41355[41355]
+*Filebeat*
+- The AWS S3 input polling mode is not working when the S3 bucket is not in the `us-east-1` default region. This also impacts all AWS integrations and any custom AWS log integration which uses the `aws-s3` input polling mode. When using Filebeat, please add a `default_region` configuration with the region of the S3 bucket. For example:
++
+["source","yaml"]
+----
+filebeat.inputs:
+- type: aws-s3
+  enabled: true
+  credential_profile_name: elastic-observability
+  default_region: us-east-2
+  number_of_workers: 5
+  bucket_arn: 'arn:aws:s3:::test1'
+----
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Breaking changes
 

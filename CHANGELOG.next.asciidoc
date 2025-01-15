@@ -36,7 +36,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
-- Disable allow_unsafe osquery configuration. {pull}40130[40130]
 
 *Packetbeat*
 
@@ -44,7 +43,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
-- Fix truncated windows event log message {pull}41327[41327]
 
 *Functionbeat*
 
@@ -70,10 +68,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use {pull}41356[41356]
 
 *Auditbeat*
 
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
 
 *Filebeat*
 
@@ -100,8 +101,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
-- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
 
 *Heartbeat*
 
@@ -114,7 +115,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
-- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 
 *Osquerybeat*
 
@@ -141,8 +141,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
-- Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
-- Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 
 *Auditbeat*
 
@@ -150,6 +148,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Split module/system/process into common and provider bits. {pull}41868[41868]
 
 *Auditbeat*
 
@@ -196,7 +195,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Added status to monitor run log report.
-- Add monitor status reporter under managed mode. {pull}41077[41077]
 
 *Metricbeat*
 
@@ -210,7 +208,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-- Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 
 *Metricbeat*
 
@@ -261,6 +258,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 
