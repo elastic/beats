@@ -22,9 +22,13 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
+
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
@@ -32,11 +36,7 @@ import (
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
@@ -131,4 +131,23 @@ func fieldDocs() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards("protos")
+}
+
+// Test runs all available tests (unitTest + integTest).
+func Test() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+		mg.Deps(devtools.InstallWpd)
+	}
+
+	test.Test()
+}
+
+// Test runs all available unit tests (Go + Python).
+func UnitTest() {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.InstallWpd)
+	}
+
+	unittest.UnitTest()
 }

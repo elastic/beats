@@ -189,7 +189,7 @@ func PythonIntegTest(ctx context.Context) error {
 		mg.Deps(devtools.BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
 		args.Env["MODULES_PATH"] = devtools.CWD("module")
-		// Always create a fresh virtual environment when running tests in a container, until we get
+		// Always create a fresh virtual environment when running tests in a container, until we
 		// get the requirements installed as part of the container build.
 		args.ForceCreateVenv = true
 		return devtools.PythonTest(args)
@@ -206,7 +206,7 @@ func Test() {
 	test.Test()
 }
 
-// Test runs all available tests (unitTest + integTest).
+// Test runs all available unit tests (Go + Python).
 func UnitTest() {
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.InstallWpd)
