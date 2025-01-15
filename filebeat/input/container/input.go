@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	errDeprecated = errors.New("Container input is deprecated. Use Filestream input withe container parser instead. https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html#_container")
+	errDeprecated = errors.New("Container input is deprecated. Use Filestream input with its container parser instead. https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html#_container")
 )
 
 func init() {
