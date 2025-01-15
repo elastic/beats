@@ -242,7 +242,7 @@ func TestBuildNamespaceQueryIndex(t *testing.T) {
 			config := &Config{Queries: tt.queries}
 
 			// Build the namespace index
-			config.BuildNamespaceIndex()
+			config.BuildNamespaceQueryIndex()
 
 			// Assert that the namespace index matches the expected result
 			assert.Equal(t, tt.expectedIndex, config.NamespaceQueryIndex, tt.description)
