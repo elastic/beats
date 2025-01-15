@@ -33,7 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
-var update = flag.Bool("update", true, "update golden files")
+var update = flag.Bool("update", false, "update golden files")
 
 // Option configures the test behavior.
 type Option func(*params)
