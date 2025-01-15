@@ -130,7 +130,6 @@ func makeES(
 		clients[i] = client
 	}
 
-	logp.Info("%v this is queue", esConfig.Queue)
 	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
 }
 
