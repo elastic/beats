@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
 - Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 - Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
+- Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 
 *Auditbeat*
 
@@ -52,7 +53,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 - Add kafka compression support for ZSTD.
 - Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+
 *Heartbeat*
 
 
@@ -233,7 +237,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
-
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 
 *Osquerybeat*
 
@@ -454,6 +458,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Format embedded messages in the experimental api {pull}41525[41525]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 - Make the experimental API GA and rename it to winlogbeat-raw {issue}39580[39580] {pull}41770[41770]
+- Remove 22 clause limitation {issue}35047[35047] {pull}42187[42187]
+- Add handling for recoverable publisher disabled errors {issue}35316[35316] {pull}42187[42187]
 
 
 *Functionbeat*

@@ -29,14 +29,15 @@ import (
 type Metrics struct {
 	unregister func()
 
-	FilesOpened      *monitoring.Uint // Number of files that have been opened.
-	FilesClosed      *monitoring.Uint // Number of files closed.
-	FilesActive      *monitoring.Uint // Number of files currently open (gauge).
-	MessagesRead     *monitoring.Uint // Number of messages read.
-	BytesProcessed   *monitoring.Uint // Number of bytes processed.
-	EventsProcessed  *monitoring.Uint // Number of events processed.
-	ProcessingErrors *monitoring.Uint // Number of processing errors.
-	ProcessingTime   metrics.Sample   // Histogram of the elapsed time for processing an event.
+	FilesOpened       *monitoring.Uint // Number of files that have been opened.
+	FilesClosed       *monitoring.Uint // Number of files closed.
+	FilesActive       *monitoring.Uint // Number of files currently open (gauge).
+	MessagesRead      *monitoring.Uint // Number of messages read.
+	MessagesTruncated *monitoring.Uint // Number of messages truncated.
+	BytesProcessed    *monitoring.Uint // Number of bytes processed.
+	EventsProcessed   *monitoring.Uint // Number of events processed.
+	ProcessingErrors  *monitoring.Uint // Number of processing errors.
+	ProcessingTime    metrics.Sample   // Histogram of the elapsed time for processing an event.
 
 	// Those metrics use the same registry/keys as the log input uses
 	HarvesterStarted   *monitoring.Int
@@ -65,15 +66,16 @@ func NewMetrics(id string) *Metrics {
 
 	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
 	m := Metrics{
-		unregister:       unreg,
-		FilesOpened:      monitoring.NewUint(reg, "files_opened_total"),
-		FilesClosed:      monitoring.NewUint(reg, "files_closed_total"),
-		FilesActive:      monitoring.NewUint(reg, "files_active"),
-		MessagesRead:     monitoring.NewUint(reg, "messages_read_total"),
-		BytesProcessed:   monitoring.NewUint(reg, "bytes_processed_total"),
-		EventsProcessed:  monitoring.NewUint(reg, "events_processed_total"),
-		ProcessingErrors: monitoring.NewUint(reg, "processing_errors_total"),
-		ProcessingTime:   metrics.NewUniformSample(1024),
+		unregister:        unreg,
+		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),
+		FilesClosed:       monitoring.NewUint(reg, "files_closed_total"),
+		FilesActive:       monitoring.NewUint(reg, "files_active"),
+		MessagesRead:      monitoring.NewUint(reg, "messages_read_total"),
+		MessagesTruncated: monitoring.NewUint(reg, "messages_truncated_total"),
+		BytesProcessed:    monitoring.NewUint(reg, "bytes_processed_total"),
+		EventsProcessed:   monitoring.NewUint(reg, "events_processed_total"),
+		ProcessingErrors:  monitoring.NewUint(reg, "processing_errors_total"),
+		ProcessingTime:    metrics.NewUniformSample(1024),
 
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
 		HarvesterClosed:    monitoring.NewInt(harvesterMetrics, "closed"),
