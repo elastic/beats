@@ -34,7 +34,7 @@ release_manager_login
 chmod -R a+r build/*
 chmod -R a+w build
 
-if [[ -z "$VERSION_QUALIFIER" ]]; then
+if [[ ! -z "$VERSION_QUALIFIER" ]]; then
   mv build/distributions/dependencies.csv build/distributions/dependencies-${BRANCH}-${VERSION_QUALIFIER}.csv
 fi
 
