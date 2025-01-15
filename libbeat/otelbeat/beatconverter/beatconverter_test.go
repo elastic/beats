@@ -220,6 +220,59 @@ service:
 
 	})
 
+	t.Run("test local queue setting is promoted to global level", func(t *testing.T) {
+		var supportedInput = `
+receivers:
+  filebeatreceiver:
+    output:
+      elasticsearch:
+        hosts: ["https://localhost:9200"]
+        username: elastic
+        password: changeme
+        index: form-otel-exporter
+        queue:
+          mem:
+            events: 3200
+            flush:
+              min_events: 1600
+              timeout: 10s
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - "filebeatreceiver"
+`
+
+		var expectedOutput = esCommonOutput + `
+receivers:
+  filebeatreceiver:
+    queue:
+      mem:
+        events: 3200
+        flush:
+          min_events: 1600
+          timeout: 10s    	  
+    output:
+      otelconsumer: null
+service:
+  pipelines:
+    logs:
+      exporters:
+        - elasticsearch
+      receivers:
+        - filebeatreceiver
+`
+
+		input := newFromYamlString(t, supportedInput)
+		err := c.Convert(context.Background(), input)
+		require.NoError(t, err, "error converting beats output config")
+
+		expOutput := newFromYamlString(t, expectedOutput)
+		compareAndAssert(t, expOutput, input)
+
+	})
+
 }
 
 func newFromYamlString(t *testing.T, input string) *confmap.Conf {
