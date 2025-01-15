@@ -9,6 +9,7 @@ package application_pool
 import (
 	"fmt"
 	"strings"
+	"syscall"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -92,16 +93,31 @@ func (r *Reader) initAppPools() error {
 		r.log.Info("no running application pools found")
 		return nil
 	}
+	// Helper function to identify known PDH errors, such as missing counters or instances.
+	// These errors are expected in certain cases (e.g. "No Managed Code" environments).
+	isPDHError := func(err error) bool {
+		return errors.Is(err, pdh.PdhErrno(syscall.ERROR_NOT_FOUND)) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT)
+	}
 	var newQueries []string
 	r.workerProcesses = make(map[string]string)
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
+<<<<<<< HEAD
 			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
+=======
+			// Handle known PDH errors as informational (e.g. missing counters).
+			if isPDHError(err) {
+>>>>>>> a3cefc060 ([x-pack][metricbeat][iis] improve error handling on pdh counters in application_pool data stream (#42274))
 				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("application pool"), "query", value)
+					logp.Namespace("application pool"), "query", value,
+				)
 			} else {
-				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
+				r.log.Errorf(`failed to expand counter path (query= "%v"): %w`, value, err)
 			}
 			continue
 		}
@@ -191,7 +207,6 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					}
 				}
 			}
-
 		}
 	}
 	return events
@@ -208,7 +223,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appPools = make(map[string][]int)
+	appPools := make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}

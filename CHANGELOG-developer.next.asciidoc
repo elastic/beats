@@ -107,6 +107,9 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add the Offset property to libbeat/reader.Message to store the total number of bytes read and discarded before generating the message. This enables inputs to accurately determine how much data has been read up to the message, using Message.Bytes + Message.Offset. {pull}39873[39873] {issue}39653[39653]
 - AWS CloudWatch Metrics record previous endTime to use for next collection period and change log.logger from cloudwatch to aws.cloudwatch. {pull}40870[40870]
 - Fix flaky test in cel and httpjson inputs of filebeat. {issue}40503[40503] {pull}41358[41358]
+- Fix documentation and implementation of raw message handling in Filebeat http_endpoint by removing it. {pull}41498[41498]
+- Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
+- Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 
 ==== Added
 
