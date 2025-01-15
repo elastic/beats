@@ -206,6 +206,10 @@ func toFilesConfig(cfg *conf.C) (*conf.C, error) {
 		return nil, fmt.Errorf("cannot set 'type': %w", err)
 	}
 
+	if err := newCfg.SetBool("allow_deprecated_use", -1, true); err != nil {
+		return nil, fmt.Errorf("cannot set 'allow_deprecated_use': %w", err)
+	}
+
 	if err := cfg.SetString("type", -1, pluginName); err != nil {
 		return nil, fmt.Errorf("cannot set type back to '%s': %w", pluginName, err)
 	}

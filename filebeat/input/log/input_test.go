@@ -201,8 +201,9 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 
 	// Setup the input
 	config, _ := conf.NewConfigFrom(mapstr.M{
-		"paths":     path.Join(tmpdir, "*.log"),
-		"close_eof": true,
+		allowDeprecatedUseField: true,
+		"paths":                 path.Join(tmpdir, "*.log"),
+		"close_eof":             true,
 	})
 
 	events := make(chan beat.Event, 100)
@@ -244,7 +245,8 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 
 func TestNewInputDone(t *testing.T) {
 	config := mapstr.M{
-		"paths": path.Join(os.TempDir(), "logs", "*.log"),
+		allowDeprecatedUseField: true,
+		"paths":                 path.Join(os.TempDir(), "logs", "*.log"),
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
