@@ -11,8 +11,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
@@ -20,7 +18,6 @@ import (
 
 type TestLogWriter struct {
 	testing.TB
-	log *logp.Logger
 }
 
 func MakeAddress(t testing.TB, ipPortPair string) net.Addr {
