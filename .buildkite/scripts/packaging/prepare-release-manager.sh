@@ -16,7 +16,7 @@ if [ "$TYPE" != "snapshot" ] ; then
   FINAL_VERSION=$VERSION
 fi
 
-if [[ -n  "$VERSION_QUALIFIER" ]]; then
+if [[ -n "$VERSION_QUALIFIER" ]]; then
   FINAL_VERSION="$FINAL_VERSION-${VERSION_QUALIFIER}"
 fi
 
