@@ -35,7 +35,7 @@ chmod -R a+r build/*
 chmod -R a+w build
 
 if [[ ! -z "$VERSION_QUALIFIER" ]]; then
-  cp build/distributions/dependencies.csv build/distributions/dependencies-${BRANCH}-${VERSION_QUALIFIER}.csv
+  cp build/distributions/dependencies-${BRANCH}.csv build/distributions/dependencies-${BRANCH}-${VERSION_QUALIFIER}.csv
 fi
 
 echo "+++ :clipboard: Listing DRA artifacts for version [$BEAT_VERSION], branch [$BRANCH] and workflow [$DRA_WORKFLOW]"
