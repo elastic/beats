@@ -36,7 +36,6 @@ import (
 // indices
 // pipelines
 // parameters
-// preset
 // setup.ilm.* -> supported but the logic is not in place yet
 // proxy_disable -> supported but the logic is not in place yet
 // proxy_headers

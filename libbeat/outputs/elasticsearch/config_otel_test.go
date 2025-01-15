@@ -22,11 +22,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/confmap"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestToOtelConfig(t *testing.T) {
@@ -85,7 +86,7 @@ batcher:
 
 	})
 
-	// we only test worker, bulk_max_size, idle_connection_timeout here when preset is configured
+	// when preset is configured, we only test worker, bulk_max_size, idle_connection_timeout here
 	// TODO: Check for compression_level when we add support upstream
 	t.Run("check preset config translation", func(t *testing.T) {
 		commonInput := `
