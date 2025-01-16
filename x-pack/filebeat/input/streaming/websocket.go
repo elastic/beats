@@ -219,7 +219,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
-			s.log.Debugw("received websocket message", "msg", string(message))
+			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
@@ -296,7 +296,7 @@ func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *l
 			buf.WriteString("... truncated")
 		}
 
-		log.Debugw("websocket connection response", "body", &buf)
+		log.Debugw("websocket connection response", "http.response.body.content", &buf)
 	}
 }
 
