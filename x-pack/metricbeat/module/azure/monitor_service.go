@@ -313,47 +313,25 @@ func (service *MonitorService) QueryResources(
 		tg = &timegrain
 	}
 
-	// orderBy := ""
-	//resultTypeData := azmetrics.ResultTypeData
-
-	// check for limit of requested metrics (20)
-	//var metrics []armmonitor.Metric
-
 	// API fails with bad request if filter value is sent empty.
 	var metricsFilter *string
 	var top int32
 
 	if filter != "" {
 		metricsFilter = &filter
-		top = int32(10)
+		// top = int32(10)
 	}
-
-	//for i := 0; i < len(metricNames); i += metricNameLimit {
-	//	end := i + metricNameLimit
-	//
-	//	if end > len(metricNames) {
-	//		end = len(metricNames)
-	//	}
-	//
-	//metricNames := strings.Join(metricNames[i:end], ",")
 
 	opts := azmetrics.QueryResourcesOptions{
 		Aggregation: &aggregations,
 		Filter:      metricsFilter,
 		Interval:    tg,
-		//Metricnames: &metricNames,
-		//Timespan:    &timespan,
-		StartTime: &startTime,
-		EndTime:   &endTime,
-
-		Top: &top,
-		// Orderby:         &orderBy,
-		//ResultType: &resultTypeData,
+		StartTime:   &startTime,
+		EndTime:     &endTime,
+		Top:         nil,
 	}
 
 	resp := []azmetrics.MetricData{}
-
-	// len(resourceIDs) 5, 50, 500
 
 	service.queryResourceClientConfig.endpoint = fmt.Sprintf("https://%s.metrics.monitor.azure.com", location)
 	queryResourceClient, err := azmetrics.NewClient(
