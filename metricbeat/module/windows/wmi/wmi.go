@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
@@ -137,7 +136,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
 
 			if err != nil {
-				logp.Warn("Could not execute query: %v", err)
+				m.Logger().Warn("Could not execute query: %v", err)
 				continue
 			}
 
@@ -167,7 +166,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				for _, fieldName := range properties {
 					fieldValue, err := instance.GetProperty(fieldName)
 					if err != nil {
-						logp.Err("Unable to get propery by name: %v", err)
+						m.Logger().Error("Unable to get propery by name: %v", err)
 						continue
 					}
 
@@ -190,7 +189,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						if !ok {
 							convertFun, err = GetConvertFunction(instance, fieldName)
 							if err != nil {
-								logp.Warn("Skipping addition of field %s: Unable to retrieve the conversion function: %v", fieldName, err)
+								m.Logger().Warn("Skipping addition of field %s: Unable to retrieve the conversion function: %v", fieldName, err)
 								continue
 							}
 							conversionTable[fieldName] = convertFun
@@ -198,7 +197,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						// Perform the conversion at this point it's safe to cast to string.
 						convertedValue, err := convertFun(fieldValue.(string))
 						if err != nil {
-							logp.Warn("Skipping addition of field %s. Cannot convert: %v", fieldName, err)
+							m.Logger().Warn("Skipping addition of field %s. Cannot convert: %v", fieldName, err)
 							continue
 						}
 						finalValue = convertedValue
