@@ -233,6 +233,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			err := dec.Decode(&msg)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				//nolint:errorlint // will not be a wrapped error here.
 				if err == io.EOF {
 					s.log.Info("stream ended, restarting")
 					return state, nil
