@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	"github.com/elastic/beats/v7/heartbeat/include"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -82,7 +81,6 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 `
 	setup.ResetFlags()
 	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
-	cfgfile.AddAllowedBackwardsCompatibleFlag(cmd.IndexManagementKey)
 
 	return rootCmd
 }

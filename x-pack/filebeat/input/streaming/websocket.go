@@ -21,6 +21,8 @@ import (
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -31,11 +33,29 @@ import (
 type websocketStream struct {
 	processor
 
-	id     string
-	cfg    config
-	cursor map[string]any
+	id          string
+	cfg         config
+	cursor      map[string]any
+	tokenSource oauth2.TokenSource
+	tokenExpiry <-chan time.Time
+	time        func() time.Time
+}
 
-	time func() time.Time
+type loggingRoundTripper struct {
+	rt  http.RoundTripper
+	log *logp.Logger
+}
+
+func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	resp, err := l.rt.RoundTrip(req)
+	// avoided logging request and and response body as it may contain sensitive information and can be huge
+	if l.log.Core().Enabled(zapcore.DebugLevel) {
+		l.log.Debugf("request: %v %v\nHeaders: %v\n", req.Method, req.URL, req.Header)
+		if err == nil {
+			l.log.Debugf("response: %v\nHeaders: %v\n", resp.Status, resp.Header)
+		}
+	}
+	return resp, err
 }
 
 // NewWebsocketFollower performs environment construction including CEL
@@ -53,9 +73,40 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			redact:  cfg.Redact,
 			metrics: newInputMetrics(id),
 		},
+		// the token expiry handler will never trigger unless a valid expiry time is assigned
+		tokenExpiry: nil,
 	}
 	s.metrics.url.Set(cfg.URL.String())
 	s.metrics.errorsTotal.Set(0)
+	// initialize the oauth2 token source if oauth2 is enabled and set access token in the config
+	if cfg.Auth.OAuth2.isEnabled() {
+		config := &clientcredentials.Config{
+			AuthStyle:      cfg.Auth.OAuth2.getAuthStyle(),
+			ClientID:       cfg.Auth.OAuth2.ClientID,
+			ClientSecret:   cfg.Auth.OAuth2.ClientSecret,
+			TokenURL:       cfg.Auth.OAuth2.TokenURL,
+			Scopes:         cfg.Auth.OAuth2.Scopes,
+			EndpointParams: cfg.Auth.OAuth2.EndpointParams,
+		}
+		// injecting a custom http client with loggingRoundTripper to debug-log request and response attributes for oauth2 token
+		client := &http.Client{
+			Transport: &loggingRoundTripper{http.DefaultTransport, log},
+		}
+		oauth2Ctx := context.WithValue(ctx, oauth2.HTTPClient, client)
+		s.tokenSource = config.TokenSource(oauth2Ctx)
+		// get the initial token
+		token, err := s.tokenSource.Token()
+		if err != nil {
+			s.metrics.errorsTotal.Inc()
+			s.Close()
+			return nil, fmt.Errorf("failed to obtain oauth2 token: %w", err)
+		}
+		// set the initial token in the config if oauth2 is enabled
+		// this allows seamless header creation in formHeader() for the initial connection
+		s.cfg.Auth.OAuth2.accessToken = token.AccessToken
+		// set the initial token expiry channel with buffer of 2 mins
+		s.tokenExpiry = time.After(time.Until(token.Expiry) - cfg.Auth.OAuth2.TokenExpiryBuffer)
+	}
 
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
@@ -114,11 +165,37 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
 			return ctx.Err()
+		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
+		case <-s.tokenExpiry:
+			// get the new token
+			token, err := s.tokenSource.Token()
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to obtain oauth2 token during token refresh", "error", err)
+				return err
+			}
+			// gracefully close current connection
+			if err := c.Close(); err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("encountered an error while closing the existing websocket connection during token refresh", "error", err)
+			}
+			// set the new token in the config
+			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
+			// set the new token expiry channel with 2 mins buffer
+			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
+			// establish a new connection with the new token
+			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+			handleConnectionResponse(resp, s.metrics, s.log)
+			if err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
+				return err
+			}
 		default:
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
-				if !isRetryableError(err) {
+				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
@@ -176,6 +253,9 @@ func isRetryableError(err error) bool {
 			websocket.CloseInternalServerErr,
 			websocket.CloseTryAgainLater,
 			websocket.CloseServiceRestart,
+			websocket.CloseAbnormalClosure,
+			websocket.CloseMessageTooBig,
+			websocket.CloseNoStatusReceived,
 			websocket.CloseTLSHandshake:
 			return true
 		}
@@ -230,21 +310,38 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 	}
 	if cfg.Retry != nil {
 		retryConfig := cfg.Retry
-		for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
-			conn, response, err = dialer.DialContext(ctx, url, headers)
-			if err == nil {
-				return conn, response, nil
+		if !retryConfig.InfiniteRetries {
+			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
+				conn, response, err = dialer.DialContext(ctx, url, headers)
+				if err == nil {
+					return conn, response, nil
+				}
+				//nolint:errorlint // it will never be a wrapped error at this point
+				if err == websocket.ErrBadHandshake {
+					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				} else {
+					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+				}
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				time.Sleep(waitTime)
 			}
-			//nolint:errorlint // it will never be a wrapped error at this point
-			if err == websocket.ErrBadHandshake {
-				log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
-				continue
+			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
+		} else {
+			for attempt := 1; ; attempt++ {
+				conn, response, err = dialer.DialContext(ctx, url, headers)
+				if err == nil {
+					return conn, response, nil
+				}
+				//nolint:errorlint // it will never be a wrapped error at this point
+				if err == websocket.ErrBadHandshake {
+					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				} else {
+					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+				}
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				time.Sleep(waitTime)
 			}
-			log.Debugf("attempt %d: webSocket connection failed. retrying...\n", attempt)
-			waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
-			time.Sleep(waitTime)
 		}
-		return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 	}
 
 	return dialer.DialContext(ctx, url, headers)
