@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2024-08-04T16:49:49.268Z",
+    "event": {
+        "dataset": "pgbouncer.stats",
+        "duration": 3184900,
+        "module": "pgbouncer"
+    },
+    "metricset": {
+        "name": "stats",
+        "period": 10000
+    },
+    "pgbouncer": {
+        "stats": {
+            "database": "pgbouncer",
+            "server_assignment_count": {
+                "total": 0,
+                "avg": 0
+            },
+            "received": {
+                "total": 0,
+                "avg": 0
+            },
+            "query_time_us": {
+                "total": 0,
+                "avg": 0
+            },
+            "sent": {
+                "total": 0,
+                "avg": 0
+            },
+            "xact_count": {
+                "total": 5,
+                "avg": 0
+            },
+            "wait_time_us": {
+                "avg": 0,
+                "total": 0
+            },
+            "query_count": {
+                "avg": 0,
+                "total": 5
+            },
+            "xact_time_us": {
+                "avg": 0,
+                "total": 0
+            }
+        }
+    },
+    "service": {
+        "address": "postgresql://localhost:6432/pgbouncer?connect_timeout=10&sslmode=disable",
+        "type": "pgbouncer"
+    }
+}
