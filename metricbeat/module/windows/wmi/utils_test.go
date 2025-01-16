@@ -24,9 +24,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type MockWmiSession struct {
