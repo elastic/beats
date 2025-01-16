@@ -41,6 +41,7 @@ func TestPublisherMetadataStore(t *testing.T) {
 	defer s.Close()
 
 	assert.NotEmpty(t, s.EventsByVersion)
+	assert.NotEmpty(t, s.EventsNewest)
 	assert.Empty(t, s.EventFingerprints)
 
 	t.Run("event_metadata_from_handle", func(t *testing.T) {
