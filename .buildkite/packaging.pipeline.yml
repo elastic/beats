@@ -24,7 +24,13 @@ steps:
     key: start-gate-snapshot
 
   - name: Start of concurrency group for DRA Staging
+<<<<<<< HEAD
     if: build.branch =~ /^\d+\.\d+$$/
+=======
+    # exceptionally allow building staging from main when VERSION_QUALIFIER is set, to allow prerelease testing
+    # TODO remove OR clause below and above comment, and only allow matching /^[0-9]+\.[0-9x]+\$/ for build.branch
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+>>>>>>> c7b6ad875 (Allow use of version qualifier for staging artifacts (#42304))
     command: echo "--> Start of concurrency gate dra-staging"
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -58,7 +64,12 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
+<<<<<<< HEAD
         if: build.branch =~ /^\d+\.\d+$$/
+=======
+        # TODO remove OR clause below (see earlier comment)
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+>>>>>>> c7b6ad875 (Allow use of version qualifier for staging artifacts (#42304))
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -150,8 +161,13 @@ steps:
   - group: Packaging staging
     key: packaging-staging
     depends_on: start-gate-staging
+<<<<<<< HEAD
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
+=======
+    # TODO remove OR clause below (see earlier comment)
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+>>>>>>> c7b6ad875 (Allow use of version qualifier for staging artifacts (#42304))
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -239,8 +255,13 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
+<<<<<<< HEAD
         ## Only for release branches
         if: build.branch =~ /^\d+\.\d+$$/
+=======
+        # TODO remove OR clause below (see earlier comment)
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+>>>>>>> c7b6ad875 (Allow use of version qualifier for staging artifacts (#42304))
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
