@@ -1,5 +1,6 @@
-$downloadUrl = "https://download.sysinternals.com/files/Sysmon.zip"
+$downloadUrl = "https://live.sysinternals.com/Sysmon64.exe"
 $tempFolder = "$env:TEMP\SysmonDownload"
+$sysmonPath = "$tempFolder\Sysmon64.exe"
 
 if (!(Test-Path $tempFolder)) {
     New-Item -ItemType Directory -Path $tempFolder
@@ -26,7 +27,7 @@ function ParseErrorForResponseBody($Error) {
 
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $result = Invoke-WebRequest -Uri $downloadUrl -OutFile "$tempFolder\Sysmon.zip" -UseBasicParsing
+    $result = Invoke-WebRequest -Uri $downloadUrl -OutFile $sysmonPath -UseBasicParsing
 }
 catch {
     $resp = ParseErrorForResponseBody($_)
@@ -34,11 +35,7 @@ catch {
     exit 1
 }
 
-Write-Host "Sysmon.zip downloaded successfully."
-
-Expand-Archive -Path "$tempFolder\Sysmon.zip" -DestinationPath $tempFolder
-
-$sysmonPath = Get-ChildItem -Path "$tempFolder" -Filter "Sysmon64.exe" | Select-Object -ExpandProperty FullName
+Write-Host "Sysmon64.exe downloaded successfully."
 
 if ($sysmonPath) {
     Start-Process -FilePath $sysmonPath -ArgumentList "-m" -Wait
@@ -48,6 +45,4 @@ if ($sysmonPath) {
     Write-Host "Sysmon executable not found in the downloaded archive."
 }
 
-# Clean up the downloaded file
-Remove-Item -Path "$tempFolder\Sysmon.zip"
 Remove-Item -Path $tempFolder -Force -Recurse
