@@ -114,7 +114,6 @@ func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Lo
 			logger.Debugf("failed to release connection: %w", err)
 		}
 	}()
-	defer rawResult.Clear()
 
 	// Get the property
 	sWbemProperty, err := oleutil.CallMethod(sWbemObjectExAsIDispatch, "Item", propertyName)
