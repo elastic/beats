@@ -24,6 +24,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	wmi "github.com/microsoft/wmi/pkg/wmiinstance"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,8 +47,8 @@ func TestExecuteGuardedQueryInstances(t *testing.T) {
 	timeout := 200 * time.Millisecond
 
 	startTime := time.Now()
-	expectedError := fmt.Errorf("the execution of the query'%s' exceeded the threshold of %s", query, timeout)
-	_, err := ExecuteGuardedQueryInstances(mockSession, query, timeout)
+	expectedError := fmt.Errorf("the execution of the query '%s' exceeded the warning threshold of %s", query, timeout)
+	_, err := ExecuteGuardedQueryInstances(mockSession, query, timeout, logp.NewLogger("wmi"))
 	// Make sure the return time is less than the MockTimeout
 	assert.Less(t, time.Since(startTime), MockTimeout, "The return time should be less than the sleep time")
 	// Make sure the error returned is the expected one

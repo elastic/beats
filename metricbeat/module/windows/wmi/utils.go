@@ -98,7 +98,7 @@ func getPropertyType(property *ole.IDispatch) base.WmiType {
 // https://github.com/microsoft/wmi/issues/150
 // Once this issue is resolved, we can instantiate a wmi.WmiProperty and eliminate
 // the need for the "getPropertyType" function.
-func getProperty(instance *wmi.WmiInstance, propertyName string) (*ole.IDispatch, error) {
+func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (*ole.IDispatch, error) {
 	// Documentation: https://learn.microsoft.com/en-us/windows/win32/wmisdk/swbemobject-properties-
 	rawResult, err := oleutil.GetProperty(instance.GetIDispatch(), "Properties_")
 	if err != nil {
@@ -109,6 +109,11 @@ func getProperty(instance *wmi.WmiInstance, propertyName string) (*ole.IDispatch
 	// an SWbemPropertySet object that contains the collection
 	// of properties for the c class
 	sWbemObjectExAsIDispatch := rawResult.ToIDispatch()
+	defer func() {
+		if cerr := rawResult.Clear(); cerr != nil {
+			logger.Debugf("failed to release connection: %w", err)
+		}
+	}()
 	defer rawResult.Clear()
 
 	// Get the property
@@ -121,8 +126,8 @@ func getProperty(instance *wmi.WmiInstance, propertyName string) (*ole.IDispatch
 }
 
 // Given an instance and a property Name, it returns the appropriate conversion function
-func GetConvertFunction(instance *wmi.WmiInstance, propertyName string) (WmiStringConversionFunction, error) {
-	rawProperty, err := getProperty(instance, propertyName)
+func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (WmiStringConversionFunction, error) {
+	rawProperty, err := getProperty(instance, propertyName, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +160,7 @@ type WmiQueryInterface interface {
 // after which we stop actively waiting.
 // Note that the underlying query will continue to run, until the query completes or the WMI Arbitrator stops the query
 // https://learn.microsoft.com/en-us/troubleshoot/windows-server/system-management-components/new-wmi-arbitrator-behavior-in-windows-server
-func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeout time.Duration) ([]*wmi.WmiInstance, error) {
+func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeout time.Duration, logger *logp.Logger) ([]*wmi.WmiInstance, error) {
 	var rows []*wmi.WmiInstance
 	var err error
 	done := make(chan error)
@@ -172,13 +177,15 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 		} else {
 			timeSince := time.Since(start_time)
 			baseMessage := fmt.Sprintf("The query '%s' that exceeded the warning threshold terminated after %s", query, timeSince)
+			var tailMessage string
 			// We eventually fetched the documents, let us free them
 			if err == nil {
-				logp.Warn("%s successfully. The result will be ignored", baseMessage)
+				tailMessage = "successfully. The result will be ignored"
 				wmi.CloseAllInstances(rows)
 			} else {
-				logp.Warn("%s with an error %v", baseMessage, err)
+				tailMessage = fmt.Sprintf("with an error %v", err)
 			}
+			logger.Warn("%s %s", baseMessage, tailMessage)
 		}
 	}()
 

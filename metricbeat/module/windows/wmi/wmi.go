@@ -133,7 +133,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			query := queryConfig.QueryStr
 
-			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold)
+			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 			if err != nil {
 				m.Logger().Warn("Could not execute query: %v", err)
@@ -187,7 +187,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						convertFun, ok := conversionTable[fieldName]
 						// If the function is not found let us fetch it and cache it
 						if !ok {
-							convertFun, err = GetConvertFunction(instance, fieldName)
+							convertFun, err = GetConvertFunction(instance, fieldName, m.Logger())
 							if err != nil {
 								m.Logger().Warn("Skipping addition of field %s: Unable to retrieve the conversion function: %v", fieldName, err)
 								continue
