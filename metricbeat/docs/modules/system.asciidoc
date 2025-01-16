@@ -270,18 +270,6 @@ metricbeat.modules:
   # Only effective for Windows.
   # You should use this option if running beats on machins with more than 64 cores.
   #use_performance_counters: false
-
-  # While running in unprivileged mode, process/process_summary metricsets can emit
-  # partial metrics. Some metrics that require privileged access can be missing.
-  # On Windows, non-administrator users may not be able to access protected processes, leading 
-  # to missing details like command line and arguments. On Unix, non-root users can't access 
-  # procfs without the right permissions. 
-  # Errors like ERROR_ACCESS_DENIED, EPERM, and EACCESS may result in partial metrics. 
-  # Enabling the config below will mark the metricset as degraded when this occurs.
-  # You may want to enable it to identify potential permission-related issues.
-  # If you're unable to provide the necessary access, you can disable this config to keep
-  # metricsets healthy.
-  #degrade_on_partial: false
 ----
 
 [float]
