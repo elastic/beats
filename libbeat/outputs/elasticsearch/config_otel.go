@@ -40,6 +40,7 @@ import (
 // proxy_disable -> supported but the logic is not in place yet
 // proxy_headers
 type unsupportedConfig struct {
+	CompressionLevel   int               `config:"compression_level" `
 	LoadBalance        bool              `config:"loadbalance"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
