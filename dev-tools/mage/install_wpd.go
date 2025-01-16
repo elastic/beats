@@ -32,17 +32,17 @@ const (
 // google/gopacket expects to find this in C:/WpdPack/.
 // see https://elastic.slack.com/archives/C0522G6FBNE/p1708356267963779?thread_ts=1708356249.822359&cid=C0522G6FBNE
 func InstallWpd() {
-	tempPath := os.TempDir()
+	homeDir, _ := os.UserHomeDir()
 	url := fmt.Sprintf(wpdPackUrl, wpdPackVer)
-	downloadPath := fmt.Sprintf("%s\\%s", tempPath, wpdPackVer)
+	downloadPath := fmt.Sprintf("%s/%s", homeDir, wpdPackVer)
 
-	fmt.Println("Downloading WPD Pack")
+	fmt.Println("--- Downloading WPD Pack")
 	file, err := DownloadFile(url, downloadPath)
 	if err != nil {
 		panic("Error downloading WpdPack: " + err.Error())
 	}
 
-	fmt.Println("Extracting WPD Pack")
+	fmt.Println("--- Extracting WPD Pack")
 	err = Extract(file, "C:/")
 	if err != nil {
 		panic("Error extracting the archive: " + err.Error())

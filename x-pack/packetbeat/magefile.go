@@ -122,7 +122,10 @@ func Test() {
 
 // Test runs all available unit tests (Go + Python).
 func UnitTest() {
+	fmt.Print("--- STARTING UNIT TESTS")
+
 	if os.Getenv("CI") == "true" {
+		fmt.Print("--- INSTALLING WPD")
 		mg.Deps(devtools.InstallWpd)
 	}
 

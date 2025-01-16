@@ -27,8 +27,6 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/scripts/mage/generate"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 func init() {
