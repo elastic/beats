@@ -15,7 +15,7 @@ set -euo pipefail
 BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
 BEAT_VERSION=$(make get-version)
-
+VERSION_QUALIFIER="${VERSION_QUALIFIER:=""}"
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 function release_manager_login {
@@ -49,7 +49,9 @@ docker run --rm \
         --commit "${BUILDKITE_COMMIT}" \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
-        --artifact-set "main"
+        --artifact-set "main" \
+        --qualifier "${VERSION_QUALIFIER}"
+
 
 echo "+++ :hammer_and_pick: Publishing DRA artifacts for version [$BEAT_VERSION], branch [$BRANCH], workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
 
@@ -68,6 +70,7 @@ docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "main" \
+        --qualifier "${VERSION_QUALIFIER}" \
         ${DRY_RUN} | tee rm-output.txt
 
 
