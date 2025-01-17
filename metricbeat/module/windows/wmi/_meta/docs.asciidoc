@@ -1,0 +1,44 @@
+The `wmi` metricset of the Windows module reads metrics via Windows Management Instrumentation  link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi[(WMI)], a core management technology in the Windows Operating system.
+
+By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed
+system information and metrics to monitor the health and performance of Windows
+Systems.
+
+This metricset leverages the link:https://github.com/microsoft/wmi[Microsoft WMI], library a
+convenient wrapper around the link:https://github.com/go-ole[GO-OLE] library which allows to
+invoke the WMI Api.
+
+=== WMI Query Language (WQL) Support
+
+This metricset supports the execution of link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/wql-sql-for-wmi[WQL] queries, a SQL-like query language for retrieving information from WMI namespaces.
+
+As of now, we only support and execute queries with `SELECT`, `FROM` and `WHERE` clauses.
+
+=== Configuration
+
+[source,yaml]
+----
+- module: windows
+  metricsets: ["wmi"]
+  period: 60s
+  namespace: "root\\cimv2" # Namespace
+  queries:
+  - class: Win32_OperatingSystem
+    fields:
+    - FreePhysicalMemory
+    - FreeSpaceInPaginFiles
+    - NumberOfUsers
+    # Where Clasue
+    where: ""
+----
+
+[float]
+=== Compatibility
+
+This module has been tested on the following platform:
+
+- Operating System: Microsoft Windows Server 2019 Datacenter
+- Architecture: x86
+
+Other Windows versions and architectures may also work but have not been explicitly tested.
+
