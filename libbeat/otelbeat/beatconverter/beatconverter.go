@@ -48,19 +48,20 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
 
+		var accessString = "receivers::" + beatreceiver
 		// check if supported beat receiver is configured. Skip translation logic if not
-		if v := conf.Get("receivers::" + beatreceiver); v == nil {
+		if v := conf.Get(accessString); v == nil {
 			continue
 		}
 
 		// handle cloud id if set
-		if conf.IsSet("receivers::" + beatreceiver + "::cloud") {
+		if conf.IsSet(accessString + "::cloud") {
 			if err := handleCloudId(beatreceiver, conf); err != nil {
 				return fmt.Errorf("error handling cloud id %w", err)
 			}
 		}
 
-		receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+		receiverCfg, _ := conf.Sub(accessString)
 		output, _ := receiverCfg.Sub("output")
 
 		if len(output.ToStringMap()) > 1 {
@@ -75,6 +76,14 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
+
+				// when output.queue is set by user or it comes from "preset" config, promote it to global level
+				if ok := esConfig.HasField("queue"); ok {
+					if err := promoteOutputQueueSettings(beatreceiver, esConfig, conf); err != nil {
+						return err
+					}
+				}
+
 				out = map[string]any{
 					"service::pipelines::logs::exporters": []string{"elasticsearch"},
 					"exporters": map[string]any{
@@ -92,14 +101,14 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 		// Replace output.[configured-output] with output.otelconsumer
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output": nil,
+			accessString + "::output": nil,
 		}
 		err := conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
 			return err
 		}
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output::otelconsumer": nil,
+			accessString + "::output::otelconsumer": nil,
 		}
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
@@ -139,6 +148,25 @@ func handleCloudId(beatreceiver string, conf *confmap.Conf) error {
 	// we set this to nil to ensure cloudid check does not throw error when output is next set to otelconsumer
 	out = map[string]any{
 		"receivers::" + beatreceiver + "::cloud": nil,
+	}
+	err = conf.Merge(confmap.NewFromStringMap(out))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// promoteOutputQueueSettings promotes output.queue settings to global level
+func promoteOutputQueueSettings(beatreceiver string, outputConfig *config.C, conf *confmap.Conf) error {
+
+	var queueOutput map[string]any
+	err := outputConfig.Unpack(&queueOutput)
+	if err != nil {
+		return err
+	}
+	out := map[string]any{
+		"receivers::" + beatreceiver + "::queue": queueOutput["queue"],
 	}
 	err = conf.Merge(confmap.NewFromStringMap(out))
 	if err != nil {
