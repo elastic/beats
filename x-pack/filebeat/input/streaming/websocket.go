@@ -219,11 +219,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
-<<<<<<< HEAD
-			s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
-=======
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
->>>>>>> ef3bd69d3 ([streaming] - Made namespace consistent in logging & put a null check to stop paincs on shutdown (#42315))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
