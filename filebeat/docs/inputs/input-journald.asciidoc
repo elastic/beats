@@ -225,6 +225,203 @@ does not translate all fields from the journal. For custom fields, use the name
 specified in the systemd journal.
 
 [float]
+===== `parsers`
+
+This option expects a list of parsers that the entry has to go through.
+
+Available parsers:
+
+* `multiline`
+* `ndjson`
+* `container`
+* `syslog`
+* `include_message`
+
+In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
+and are encapsulated in single-line JSON objects.
+The multiline message is stored under the key `msg`.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - ndjson:
+        target: ""
+        message_key: msg
+    - multiline:
+        type: count
+        count_lines: 3
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
+
+[float]
+[id="{beatname_lc}-input-{type}-ndjson"]
+===== `ndjson`
+
+These options make it possible for {beatname_uc} to decode logs structured as
+JSON messages. {beatname_uc} processes the entry by line, so the JSON
+decoding only works if there is one JSON object per message.
+
+The decoding happens before line filtering. You can combine JSON
+decoding with filtering if you set the `message_key` option. This
+can be helpful in situations where the application logs are wrapped in JSON
+objects, like when using Docker.
+
+Example configuration:
+
+[source,yaml]
+----
+- ndjson:
+    target: ""
+    add_error_key: true
+    message_key: log
+----
+
+*`target`*:: The name of the new JSON object that should contain the parsed key value pairs. If you
+leave it empty, the new keys will go under root.
+
+*`overwrite_keys`*:: Values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts. Disable it if you want
+to keep previously added values.
+
+*`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
+de-dot keys in the decoded JSON, and expand them into a hierarchical object
+structure. For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+This setting should be enabled when the input is produced by an
+https://github.com/elastic/ecs-logging[ECS logger].
+
+*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds an
+"error.message" and "error.type: json" key in case of JSON unmarshalling errors
+or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the key
+must be at the top level in the JSON object and the value associated with the
+key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+JSON document and stored in `@metadata._id`
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if
+JSON decoding errors should be logged or not. If set to true, errors will not
+be logged. The default is false.
+
+[float]
+===== `container`
+
+Use the `container` parser to extract information from  containers log files.
+It parses lines into common message lines, extracting timestamps too.
+
+*`stream`*:: Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+*`format`*:: Use the given format when parsing logs: `auto`, `docker` or `cri`. The
+default is `auto`, it will automatically detect the format. To disable
+autodetection set any of the other options.
+
+The following snippet configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Kubernetes logs path:
+
+[source,yaml]
+----
+  parsers:
+    - container:
+        stream: stdout
+----
+
+[float]
+===== `syslog`
+
+The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+
+The supported configuration options are:
+
+*`format`*:: (Optional) The syslog format to use, `rfc3164`, or `rfc5424`. To automatically
+detect the format from the log entries, set this option to `auto`. The default is `auto`.
+
+*`timezone`*:: (Optional) IANA time zone name(e.g. `America/New York`) or a
+fixed time offset (e.g. +0200) to use when parsing syslog timestamps that do not contain
+a time zone. `Local` may be specified to use the machine's local time zone. Defaults to `Local`.
+
+*`log_errors`*:: (Optional) If `true` the parser will log syslog parsing errors. Defaults to `false`.
+
+*`add_error_key`*:: (Optional) If this setting is enabled, the parser adds or appends to an
+`error.message` key with the parsing error that was encountered. Defaults to `true`.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- syslog:
+    format: rfc3164
+    timezone: America/Chicago
+    log_errors: true
+    add_error_key: true
+-------------------------------------------------------------------------------
+
+*Timestamps*
+
+The RFC 3164 format accepts the following forms of timestamps:
+
+* Local timestamp (`Mmm dd hh:mm:ss`):
+** `Jan 23 14:09:01`
+* RFC-3339*:
+** `2003-10-11T22:14:15Z`
+** `2003-10-11T22:14:15.123456Z`
+** `2003-10-11T22:14:15-06:00`
+** `2003-10-11T22:14:15.123456-06:00`
+
+*Note*: The local timestamp (for example, `Jan 23 14:09:01`) that accompanies an
+RFC 3164 message lacks year and time zone information. The time zone will be enriched
+using the `timezone` configuration option, and the year will be enriched using the
+{beatname_uc} system's local time (accounting for time zones). Because of this, it is possible
+for messages to appear in the future. An example of when this might happen is logs
+generated on December 31 2021 are ingested on January 1 2022. The logs would be enriched
+with the year 2022 instead of 2021.
+
+The RFC 5424 format accepts the following forms of timestamps:
+
+* RFC-3339:
+** `2003-10-11T22:14:15Z`
+** `2003-10-11T22:14:15.123456Z`
+** `2003-10-11T22:14:15-06:00`
+** `2003-10-11T22:14:15.123456-06:00`
+
+Formats with an asterisk (*) are a non-standard allowance.
+
+[float]
+===== `include_message`
+
+Use the `include_message` parser to filter messages in the parsers pipeline. Messages that
+match the provided pattern are passed to the next parser, the others are dropped.
+
+You should use `include_message` instead of `include_lines` if you would like to
+control when the filtering happens. `include_lines` runs after the parsers, `include_message`
+runs in the parsers pipeline.
+
+*`patterns`*:: List of regexp patterns to match.
+
+This example shows you how to include messages that start with the string ERR or WARN:
+
+[source,yaml]
+----
+  parsers:
+    - include_message.patterns: ["^ERR", "^WARN"]
+----
+
+[float]
 [id="{beatname_lc}-input-{type}-translated-fields"]
 === Translated field names
 
