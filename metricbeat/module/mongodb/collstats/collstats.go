@@ -21,10 +21,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+	"golang.org/x/sync/errgroup"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -97,7 +97,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("'top' command failed: %w", err)
 	}
 
-	wg := &sync.WaitGroup{}
+	collStatsErrGroup := &errgroup.Group{}
+	collStatsErrGroup.SetLimit(10) // limit number of goroutines running at the same time
 
 	for group, info := range totals {
 		if group == "note" {
@@ -110,39 +111,46 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		wg.Add(1)
-		go func(eventReporter mb.ReporterV2, mongoClient *mongo.Client, group string) {
-			defer wg.Done()
-
+		collStatsErrGroup.Go(func() error {
 			names, err := splitKey(group)
 			if err != nil {
-				eventReporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
-				return
+				reporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
+
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
 			}
 
 			database, collection := names[0], names[1]
 
-			collStats, err := fetchCollStats(mongoClient, database, collection)
+			collStats, err := fetchCollStats(client, database, collection)
 			if err != nil {
-				eventReporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
-				return
+				reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
+
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
 			}
 
 			infoMap["stats"] = collStats
 
 			event, err := eventMapping(group, infoMap)
 			if err != nil {
-				eventReporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
-				return
+				reporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
+
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
 			}
 
-			eventReporter.Event(mb.Event{
+			reporter.Event(mb.Event{
 				MetricSetFields: event,
 			})
-		}(reporter, client, group)
+
+			return nil
+		})
 	}
 
-	wg.Wait()
+	if err := collStatsErrGroup.Wait(); err != nil {
+		return fmt.Errorf("error processing mongodb collstats: %w", err)
+	}
 
 	return nil
 }
