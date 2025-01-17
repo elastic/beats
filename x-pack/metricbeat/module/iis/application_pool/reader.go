@@ -7,6 +7,7 @@
 package application_pool
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"syscall"
