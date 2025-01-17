@@ -5,6 +5,7 @@
 package process
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
@@ -16,11 +17,19 @@ type Config struct {
 	ProcessStatePeriod time.Duration `config:"process.state.period"`
 
 	HasherConfig hasher.Config `config:"process.hash"`
+	Backend      string        `config:"process.backend"`
 }
 
 // Validate validates the config.
 func (c *Config) Validate() error {
-	return c.HasherConfig.Validate()
+	if err := c.HasherConfig.Validate(); err != nil {
+		return err
+	}
+	if c.Backend != "kernel_tracing" && c.Backend != "procfs" {
+		return fmt.Errorf("invalid process.backend '%s'", c.Backend)
+	}
+
+	return nil
 }
 
 func (c *Config) effectiveStatePeriod() time.Duration {
@@ -40,4 +49,5 @@ var defaultConfig = Config{
 		ScanRatePerSec:      "50 MiB",
 		ScanRateBytesPerSec: 50 * 1024 * 1024,
 	},
+	Backend: "procfs",
 }
