@@ -21,7 +21,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
