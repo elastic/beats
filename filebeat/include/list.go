@@ -34,7 +34,6 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/input/redis"
 	_ "github.com/elastic/beats/v7/filebeat/input/stdin"
 	_ "github.com/elastic/beats/v7/filebeat/input/syslog"
-	_ "github.com/elastic/beats/v7/filebeat/input/systemlogs"
 	_ "github.com/elastic/beats/v7/filebeat/module/apache"
 	_ "github.com/elastic/beats/v7/filebeat/module/auditd"
 	_ "github.com/elastic/beats/v7/filebeat/module/elasticsearch"
