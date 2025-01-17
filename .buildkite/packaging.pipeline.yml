@@ -17,11 +17,7 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-=======
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+    if: (build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -42,11 +38,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-<<<<<<< HEAD
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-=======
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+        if: (build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -91,11 +83,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-=======
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+    if: (build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -236,11 +224,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-<<<<<<< HEAD
-        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-=======
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+        if: (build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -279,21 +263,13 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-=======
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+    if: (build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-<<<<<<< HEAD
-    if: build.branch =~ /^\d+\.\d+$$/
-=======
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
->>>>>>> a122a9fbe (Don't run packaging snapshot with prereleases (#42326))
+    if: build.branch =~ /^\d+\.\d+$$/ || build.env('VERSION_QUALIFIER') != null
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
