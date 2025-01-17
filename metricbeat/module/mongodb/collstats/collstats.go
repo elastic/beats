@@ -90,7 +90,7 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 	totals, ok := result["totals"].(map[string]interface{})
 	if !ok {
-		return errors.New("collection 'totals' are not a map")
+		return errors.New("collection 'totals' is not a map")
 	}
 
 	if err = res.Err(); err != nil {
@@ -120,7 +120,9 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 				return
 			}
 
-			collStats, err := fetchCollStats(mongoClient, names[0], names[1])
+			database, collection := names[0], names[1]
+
+			collStats, err := fetchCollStats(mongoClient, database, collection)
 			if err != nil {
 				eventReporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
 				return
@@ -147,9 +149,12 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
 	db := client.Database(dbName)
-	colStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+	collStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+	if err := collStats.Err(); err != nil {
+		return nil, fmt.Errorf("collStats command failed: %w", err)
+	}
 	var statsRes map[string]interface{}
-	if err := colStats.Decode(&statsRes); err != nil {
+	if err := collStats.Decode(&statsRes); err != nil {
 		return nil, fmt.Errorf("could not decode mongo response for database=%s, collection=%s: %w", dbName, collectionName, err)
 	}
 

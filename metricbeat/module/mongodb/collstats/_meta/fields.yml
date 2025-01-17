@@ -117,19 +117,19 @@
         - name: stats.avgObjSize
           type: long
           description: >
-            The average size of an object in the collection.
+            The average size of an object in the collection (in bytes).
         - name: stats.storageSize
           type: long
           description: >
-            The total amount of storage allocated to this collection for document storage.
+            The total amount of storage allocated to this collection for document storage (in bytes).
         - name: stats.totalIndexSize
           type: long
           description: >
-            The total size of all indexes.
+            The total size of all indexes (in bytes).
         - name: stats.totalSize
           type: long
           description: >
-            The sum of the storageSize and totalIndexSize.
+            The sum of the storageSize and totalIndexSize (in bytes).
         - name: stats.max
           type: long
           description: >

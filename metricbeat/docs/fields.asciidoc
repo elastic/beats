@@ -51027,7 +51027,7 @@ type: long
 *`mongodb.collstats.stats.stats.avgObjSize`*::
 +
 --
-The average size of an object in the collection.
+The average size of an object in the collection (in bytes).
 
 
 type: long
@@ -51037,7 +51037,7 @@ type: long
 *`mongodb.collstats.stats.stats.storageSize`*::
 +
 --
-The total amount of storage allocated to this collection for document storage.
+The total amount of storage allocated to this collection for document storage (in bytes).
 
 
 type: long
@@ -51047,7 +51047,7 @@ type: long
 *`mongodb.collstats.stats.stats.totalIndexSize`*::
 +
 --
-The total size of all indexes.
+The total size of all indexes (in bytes).
 
 
 type: long
@@ -51057,7 +51057,7 @@ type: long
 *`mongodb.collstats.stats.stats.totalSize`*::
 +
 --
-The sum of the storageSize and totalIndexSize.
+The sum of the storageSize and totalIndexSize (in bytes).
 
 
 type: long

@@ -30,9 +30,12 @@ func eventMapping(key string, data mapstr.M) (mapstr.M, error) {
 		return nil, err
 	}
 
+	// NOTE: splitKey handles the case where the collection can have "." in the name
+	database, collection := names[0], names[1]
+
 	event := mapstr.M{
-		"db":         names[0],
-		"collection": names[1],
+		"db":         database,
+		"collection": collection,
 		"name":       key,
 		"total": mapstr.M{
 			"time": mapstr.M{
@@ -111,11 +114,11 @@ func mustGetMapStrValue(m mapstr.M, key string) interface{} {
 }
 
 func splitKey(key string) ([]string, error) {
-	names := strings.SplitN(key, ".", 2)
+	dbColl := strings.SplitN(key, ".", 2)
 
-	if len(names) < 2 {
+	if len(dbColl) < 2 {
 		return nil, errors.New("collection name invalid")
 	}
 
-	return names, nil
+	return dbColl, nil
 }
