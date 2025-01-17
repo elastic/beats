@@ -70,8 +70,6 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 	} else {
 		assert.NotEmpty(t, events)
 
-		time.Sleep(2 * time.Second)
-
 		events, errs = mbtest.ReportingFetchV2Error(f)
 		for _, err := range errs {
 			assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
