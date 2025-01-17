@@ -107,12 +107,8 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-<<<<<<< HEAD
-			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
-=======
 			// Handle known PDH errors as informational (e.g. missing counters).
 			if isPDHError(err) {
->>>>>>> a3cefc060 ([x-pack][metricbeat][iis] improve error handling on pdh counters in application_pool data stream (#42274))
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value,
 				)
