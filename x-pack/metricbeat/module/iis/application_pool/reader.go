@@ -36,7 +36,6 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
-	counters         map[string]string
 }
 
 // WorkerProcess struct contains the worker process details
@@ -190,7 +189,7 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
 					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
-					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+					if errors.Is(val.Err.Error, pdh.PDH_CALC_NEGATIVE_VALUE) || errors.Is(val.Err.Error, pdh.PDH_INVALID_DATA) {
 						r.log.Debugw("Counter value retrieval returned",
 							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("application_pool"), "query", counterPath)
 						continue
