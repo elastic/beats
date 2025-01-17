@@ -6,6 +6,7 @@ from filebeat import BaseTest
 
 inputConfigTemplate = """
 - type: log
+  allow_deprecated_use: true
   paths:
     - {}
   scan_frequency: 1s

@@ -29,11 +29,11 @@ example:
 
 
 Each file found by the `path` Glob must contain a list of one or more input
-definitions. 
- 
+definitions.
+
 TIP: The first line of each external configuration file must be an input
 definition that starts with `- type`. Make sure you omit the line
-+{beatname_lc}.config.inputs+ from this file. All <<filebeat-input-types,`input type configuration options`>> 
++{beatname_lc}.config.inputs+ from this file. All <<filebeat-input-types,`input type configuration options`>>
 must be specified within each external configuration file.  Specifying these
 configuration options at the global `filebeat.config.inputs` level is not supported.
 
@@ -41,15 +41,17 @@ Example external configuration file:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-- type: log
+- type: filestream
+  id: first
   paths:
     - /var/log/mysql.log
-  scan_frequency: 10s
+  prospector.scanner.check_interval: 10s
 
-- type: log
+- type: filestream
+  id: second
   paths:
     - /var/log/apache.log
-  scan_frequency: 5s
+  prospector.scanner.check_interval: 5s
 ------------------------------------------------------------------------------
 
 
@@ -79,8 +81,8 @@ the <<modules-command,`modules`>> command to enable and disable module
 configurations.
 
 Each file found by the Glob must contain a list of one or more module
-definitions. 
- 
+definitions.
+
 TIP: The first line of each external configuration file must be a module
 definition that starts with `- module`. Make sure you omit the line
 +{beatname_lc}.config.modules+ from this file.

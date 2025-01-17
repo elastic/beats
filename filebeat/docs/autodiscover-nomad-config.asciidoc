@@ -14,13 +14,14 @@ filebeat.autodiscover:
             equals:
               nomad.namespace: web
           config:
-            - type: log
+            - type: filestream
+              id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
               paths:
                 - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.stderr.[0-9]*
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
 -------------------------------------------------------------------------------------
 
-This configuration launches a `log` input for all jobs under the `web` Nomad namespace.
+This configuration launches a `filestream` input for all jobs under the `web` Nomad namespace.
 
 If you are using modules, you can override the default input and customize it to read from the
 `${data.nomad.task.name}.stdout` and/or `${data.nomad.task.name}.stderr` files.
@@ -38,7 +39,8 @@ filebeat.autodiscover:
             - module: redis
               log:
                 input:
-                  type: log
+                  type: filestream
+                  id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
                   paths:
                     - /var/lib/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -------------------------------------------------------------------------------------

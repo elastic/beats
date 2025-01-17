@@ -46,6 +46,7 @@ func TestTakeOverLogInputStates(t *testing.T) {
 	noTakeOver := newInputConfigFrom(t,
 		`
 type: log
+allow_deprecated_use: true
 paths:
   - "/path/log*.log"
 `,

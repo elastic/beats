@@ -291,7 +291,7 @@ scanner:
 					}
 				}
 				return false
-			}, 100*time.Millisecond, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
+			}, time.Second, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
 		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {

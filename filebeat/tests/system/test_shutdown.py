@@ -177,6 +177,7 @@ class Test(BaseTest):
 
         input_raw = """
 - type: log
+  allow_deprecated_use: true
   paths: []
 """
 
