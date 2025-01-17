@@ -34,10 +34,10 @@ type Notifier struct {
 }
 
 func NewNotifier() *Notifier {
-	n := &Notifier{
+	return &Notifier{
 		listeners: make(map[int]OnConfigUpdateFunc),
+		id:        0,
 	}
-	return n
 }
 
 func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
