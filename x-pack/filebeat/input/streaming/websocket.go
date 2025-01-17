@@ -154,9 +154,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	// ensures this is the last connection closed when the function returns
 	defer func() {
-		if err := c.Close(); err != nil {
-			s.metrics.errorsTotal.Inc()
-			s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+		if c != nil {
+			if err := c.Close(); err != nil {
+				s.metrics.errorsTotal.Inc()
+				s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+			}
 		}
 	}()
 
@@ -217,7 +219,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
+<<<<<<< HEAD
 			s.log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
+=======
+			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
+>>>>>>> ef3bd69d3 ([streaming] - Made namespace consistent in logging & put a null check to stop paincs on shutdown (#42315))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
@@ -294,7 +300,7 @@ func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *l
 			buf.WriteString("... truncated")
 		}
 
-		log.Debugw("websocket connection response", "body", &buf)
+		log.Debugw("websocket connection response", "http.response.body.content", &buf)
 	}
 }
 
