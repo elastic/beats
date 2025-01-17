@@ -102,6 +102,8 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	collStatsErrGroup.SetLimit(10) // limit number of goroutines running at the same time
 
 	for group, info := range totals {
+		group := group // make sure it works properly on older Go versions
+
 		if group == "note" {
 			continue
 		}
