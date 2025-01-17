@@ -24,7 +24,9 @@ steps:
     key: start-gate-snapshot
 
   - name: Start of concurrency group for DRA Staging
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    # exceptionally allow building staging from main when VERSION_QUALIFIER is set, to allow prerelease testing
+    # TODO remove OR clause below and above comment, and only allow matching /^[0-9]+\.[0-9x]+\$/ for build.branch
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     command: echo "--> Start of concurrency gate dra-staging"
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -58,7 +60,8 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+        # TODO remove OR clause below (see earlier comment)
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -170,8 +173,8 @@ steps:
   - group: Packaging Staging
     key: packaging-staging
     depends_on: start-gate-staging
-    ## Only for release
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    # TODO remove OR clause below (see earlier comment)
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -276,8 +279,8 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
-        ## Only for release branches
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+        # TODO remove OR clause below (see earlier comment)
+        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
         key: dra-staging
         env:
           DRA_WORKFLOW: staging

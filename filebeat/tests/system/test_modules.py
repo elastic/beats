@@ -168,11 +168,11 @@ class Test(BaseTest):
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
         cmd = [
-            self.filebeat, "-systemTest",
-            "-d", "*", "-once",
+            self.filebeat, "--systemTest",
+            "-d", "*", "--once",
             "-c", cfgfile,
             "-E", "setup.ilm.enabled=false",
-            "-modules={}".format(module),
+            "--modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(
                 module=module, fileset=fileset),
@@ -191,7 +191,7 @@ class Test(BaseTest):
                 module=module, fileset=fileset))
 
         if ".journal" in test_file:
-            cmd.remove("-once")
+            cmd.remove("--once")
             cmd.append("-M")
             cmd.append("{module}.{fileset}.var.use_journald=true".format(
                 module=module, fileset=fileset))
@@ -224,7 +224,7 @@ class Test(BaseTest):
                                     stderr=subprocess.STDOUT,
                                     bufsize=0)
             # The journald input (used by some modules like 'system') does not
-            # support the -once flag, hence we run Filebeat for at most
+            # support the --once flag, hence we run Filebeat for at most
             # 15 seconds, if it does not finish, then kill the process.
             # If for any reason the Filebeat process gets stuck, only SIGKILL
             # will terminate it. We use SIGKILL to avoid leaking any running
