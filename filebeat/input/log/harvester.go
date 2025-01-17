@@ -164,6 +164,9 @@ func NewHarvester(
 	if h.config.CleanInactive > 0 {
 		h.state.TTL = h.config.CleanInactive
 	}
+	if h.config.CleanRemoved {
+		h.state.CleanRemoved = h.config.CleanRemoved
+	}
 
 	// Add outlet signal so harvester can also stop itself
 	return h, nil
