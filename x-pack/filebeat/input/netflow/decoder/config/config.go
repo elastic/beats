@@ -5,10 +5,10 @@
 package config
 
 import (
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ActiveSessionsMetric interface {
@@ -19,7 +19,7 @@ type ActiveSessionsMetric interface {
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
 	protocols            []string
-	logOutput            io.Writer
+	logOutput            *logp.Logger
 	expiration           time.Duration
 	detectReset          bool
 	fields               fields.FieldDict
@@ -30,7 +30,7 @@ type Config struct {
 
 var defaultCfg = Config{
 	protocols:       []string{},
-	logOutput:       io.Discard,
+	logOutput:       logp.L().Named("netflow"),
 	expiration:      time.Hour,
 	detectReset:     true,
 	sharedTemplates: false,
@@ -53,7 +53,7 @@ func (c *Config) WithProtocols(protos ...string) *Config {
 }
 
 // WithLogOutput sets the output io.Writer for logging.
-func (c *Config) WithLogOutput(output io.Writer) *Config {
+func (c *Config) WithLogOutput(output *logp.Logger) *Config {
 	c.logOutput = output
 	return c
 }
@@ -121,7 +121,7 @@ func (c *Config) Protocols() []string {
 }
 
 // LogOutput returns the io.Writer where logs are to be written.
-func (c *Config) LogOutput() io.Writer {
+func (c *Config) LogOutput() *logp.Logger {
 	return c.logOutput
 }
 

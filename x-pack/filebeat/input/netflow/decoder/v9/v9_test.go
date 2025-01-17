@@ -10,6 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
@@ -162,7 +164,7 @@ func TestSessionReset(t *testing.T) {
 	}
 	t.Run("Reset disabled", func(t *testing.T) {
 		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(false).WithLogOutput(test.TestLogWriter{TB: t})
+		cfg.WithSequenceResetEnabled(false).WithLogOutput(logp.NewLogger("v9_test"))
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
@@ -173,7 +175,7 @@ func TestSessionReset(t *testing.T) {
 	})
 	t.Run("Reset enabled", func(t *testing.T) {
 		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(true).WithLogOutput(test.TestLogWriter{TB: t})
+		cfg.WithSequenceResetEnabled(true).WithLogOutput(logp.NewLogger("v9_test"))
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
@@ -193,7 +195,7 @@ func TestSessionReset(t *testing.T) {
 			return test.MakePacket(tmp)
 		}
 		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(true).WithLogOutput(test.TestLogWriter{TB: t})
+		cfg.WithSequenceResetEnabled(true).WithLogOutput(logp.NewLogger("v9_test"))
 		proto := New(cfg)
 		flows, err := proto.OnPacket(mkPack(templatePacket, 1, 1000), addr)
 		assert.NoError(t, err)

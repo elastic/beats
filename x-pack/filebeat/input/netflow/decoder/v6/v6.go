@@ -5,8 +5,6 @@
 package v6
 
 import (
-	"log"
-
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -53,5 +51,5 @@ func init() {
 }
 
 func New(config config.Config) protocol.Protocol {
-	return v1.NewProtocol(ProtocolID, &templateV6, v5.ReadV5Header, log.New(config.LogOutput(), LogPrefix, 0))
+	return v1.NewProtocol(ProtocolID, &templateV6, v5.ReadV5Header, config.LogOutput().Named(LogPrefix))
 }
