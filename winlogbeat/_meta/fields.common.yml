@@ -23,13 +23,6 @@
         All fields specific to the Windows Event Log are defined here.
       fields:
 
-        - name: api
-          required: true
-          description: >
-            The event log API type used to read the record. The possible values are
-            "wineventlog" for the Windows Event Log XML reader or "wineventlog-raw" for its
-            more performant implementation.
-
         - name: activity_id
           type: keyword
           required: false
@@ -499,10 +492,6 @@
     version of Winlogbeat. These are added to the index template when
     `migration.6_to_7.enable: true` is set in the configuration.
   fields:
-    - name: type
-      type: alias
-      path: winlog.api
-      migration: true
 
     - name: activity_id
       type: alias

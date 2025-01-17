@@ -16,7 +16,6 @@
     },
     "message": "Kerberos pre-authentication failed.\n\nAccount Information:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-3057\n\tAccount Name:\t\tMPUIG\n\nService Information:\n\tService Name:\t\tkrbtgt/test.saas\n\nNetwork Information:\n\tClient Address:\t\t::ffff:192.168.5.44\n\tClient Port:\t\t53366\n\nAdditional Information:\n\tTicket Options:\t\t0x40810010\n\tFailure Code:\t\t0x12\n\tPre-Authentication Type:\t0\n\nCertificate Information:\n\tCertificate Issuer Name:\t\t\n\tCertificate Serial Number: \t\n\tCertificate Thumbprint:\t\t\n\nCertificate information is only provided if a certificate was used for pre-authentication.\n\nPre-authentication types, ticket options and failure codes are defined in RFC 4120.\n\nIf the ticket was malformed or damaged during transit and could not be decrypted, then many fields in this event might not be present.",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "DC_TEST2k12.TEST.SAAS",
       "event_data": {
@@ -40,7 +39,7 @@
           "id": 4552
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 5027836,
       "task": "Kerberos Authentication Service"

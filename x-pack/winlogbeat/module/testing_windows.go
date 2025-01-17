@@ -65,7 +65,6 @@ func testCollectionPipeline(t testing.TB, evtx string, p *params) {
 	// Open evtx file.
 	log, err := eventlog.New(config.MustNewConfigFrom(mapstr.M{
 		"name":           path,
-		"api":            "wineventlog",
 		"no_more_events": "stop",
 	}))
 	if err != nil {

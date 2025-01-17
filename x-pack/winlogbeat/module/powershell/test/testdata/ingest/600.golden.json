@@ -8,7 +8,7 @@
       "action": "Provider Lifecycle",
       "category": "process",
       "code": "600",
-      "ingested": "2022-06-08T06:07:25.978294200Z",
+      "ingested": "2025-01-15T10:02:22.120659443Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -16,7 +16,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -47,14 +51,12 @@
       "title": "Windows PowerShell ISE Host"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "600",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1089",
       "task": "Provider Lifecycle"
@@ -69,7 +71,7 @@
       "action": "Provider Lifecycle",
       "category": "process",
       "code": "600",
-      "ingested": "2022-06-08T06:07:25.978319400Z",
+      "ingested": "2025-01-15T10:02:22.120717968Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -77,7 +79,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -105,14 +111,12 @@
       "title": "ConsoleHost"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "600",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1266",
       "task": "Provider Lifecycle"
@@ -127,7 +131,7 @@
       "action": "Provider Lifecycle",
       "category": "process",
       "code": "600",
-      "ingested": "2022-06-08T06:07:25.978335600Z",
+      "ingested": "2025-01-15T10:02:22.120732760Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -135,7 +139,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -155,14 +163,12 @@
       "title": "ConsoleHost"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "600",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "18640",
       "task": "Provider Lifecycle"

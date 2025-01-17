@@ -58,21 +58,17 @@ func TestBenchmarkRead(t *testing.T) {
 		safeWriteEvent(t, writer, uint32(rand.Int63()%1000), strconv.Itoa(i)+" "+randomSentence(256))
 	}
 
-	for _, api := range []string{winEventLogAPIName, winEventLogExpAPIName} {
-		t.Run("api="+api, func(t *testing.T) {
-			for _, includexml := range []bool{true, false} {
-				for _, batchSize := range []int{10, 100, 500, 1000} {
-					t.Run(fmt.Sprintf("include_xml=%v/batch_size=%d", includexml, batchSize), func(t *testing.T) {
-						result := testing.Benchmark(benchmarkEventLog(api, includexml, batchSize))
-						outputBenchmarkResults(t, result)
-					})
-				}
-			}
-		})
+	for _, includexml := range []bool{true, false} {
+		for _, batchSize := range []int{10, 100, 500, 1000} {
+			t.Run(fmt.Sprintf("include_xml=%v/batch_size=%d", includexml, batchSize), func(t *testing.T) {
+				result := testing.Benchmark(benchmarkEventLog(includexml, batchSize))
+				outputBenchmarkResults(t, result)
+			})
+		}
 	}
 }
 
-func benchmarkEventLog(api string, includexml bool, batchSize int) func(b *testing.B) {
+func benchmarkEventLog(includexml bool, batchSize int) func(b *testing.B) {
 	return func(b *testing.B) {
 		conf := mapstr.M{
 			"name":            providerName,
@@ -81,7 +77,7 @@ func benchmarkEventLog(api string, includexml bool, batchSize int) func(b *testi
 			"include_xml":     includexml,
 		}
 
-		log := openLog(b, api, nil, conf)
+		log := openLog(b, nil, conf)
 		defer log.Close()
 
 		events := 0

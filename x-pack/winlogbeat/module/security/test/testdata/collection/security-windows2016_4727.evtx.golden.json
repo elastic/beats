@@ -16,7 +16,6 @@
     },
     "message": "A security-enabled global group was created.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x27438\n\nNew Group:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-1110\n\tGroup Name:\t\tDnsUpdateProxy\n\tGroup Domain:\t\tWLBEAT\n\nAttributes:\n\tSAM Account Name:\tDnsUpdateProxy\n\tSID History:\t\t-\n\nAdditional Information:\n\tPrivileges:\t\t-",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
@@ -42,7 +41,7 @@
           "id": 1664
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 4105,
       "task": "Security Group Management"

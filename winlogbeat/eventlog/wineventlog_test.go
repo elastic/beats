@@ -58,98 +58,89 @@ const (
 
 func TestWinEventLogConfig_Validate(t *testing.T) {
 	tests := []struct {
-		In      winEventLogConfig
+		In      config
 		WantErr bool
 		Desc    string
 	}{
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:       "test",
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: false,
 			Desc:    "xml query: all good",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
-				},
+			In: config{
+
+				ID:       "test",
+				XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
+
 			},
 			WantErr: true,
 			Desc:    "xml query: malformed XML",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: true,
 			Desc:    "xml query: missing ID",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					Name:     "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:       "test",
+				Name:     "test",
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and name)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{IgnoreOlder: 1},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and ignore_older)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{Level: "error"},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and level)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{EventID: "1000"},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and event_id)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{Provider: []string{providerName}},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and provider)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{},
-			},
+			In:      config{},
 			WantErr: true,
 			Desc:    "missing name",
 		},
@@ -167,17 +158,11 @@ func TestWinEventLogConfig_Validate(t *testing.T) {
 }
 
 func TestWindowsEventLogAPI(t *testing.T) {
-	testWindowsEventLog(t, winEventLogAPIName, false)
+	testWindowsEventLog(t, true)
+	testWindowsEventLog(t, false)
 }
 
-func TestWindowsEventLogAPIRaw(t *testing.T) {
-	// for the raw api using include xml behave differently than not
-	// so we must test both settings
-	testWindowsEventLog(t, winEventLogRawAPIName, true)
-	testWindowsEventLog(t, winEventLogRawAPIName, false)
-}
-
-func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
+func testWindowsEventLog(t *testing.T, includeXML bool) {
 	writer, teardown := createLog(t)
 	defer teardown()
 
@@ -191,7 +176,7 @@ func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
-		return openLog(t, api, nil, config)
+		return openLog(t, nil, config)
 	}
 
 	t.Run("has_message", func(t *testing.T) {
@@ -292,11 +277,6 @@ func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
 
 		records, err := log.Read()
 
-		// This implementation returns the EOF on the next call.
-		if err == nil && api == winEventLogAPIName {
-			_, err = log.Read()
-		}
-
 		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
 			assert.Equal(t, io.EOF, err)
 		}
@@ -320,11 +300,6 @@ func testWindowsEventLog(t *testing.T, api string, includeXML bool) {
 		defer log.Close()
 
 		records, err := log.Read()
-
-		// This implementation returns the EOF on the next call.
-		if err == nil && api == winEventLogAPIName {
-			_, err = log.Read()
-		}
 
 		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
 			assert.Equal(t, io.EOF, err)
@@ -397,21 +372,13 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 	}
 }
 
-func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
+func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
 	cfg, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var log EventLog
-	switch api {
-	case winEventLogAPIName:
-		log, err = newWinEventLog(cfg)
-	case winEventLogRawAPIName:
-		log, err = newWinEventLogRaw(cfg)
-	default:
-		t.Fatalf("Unknown API name: '%s'", api)
-	}
+	log, err := newWinEventLog(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

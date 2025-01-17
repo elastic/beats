@@ -26,7 +26,7 @@
     "log": {
       "level": "information"
     },
-    "message": "An attempt was made to register a security event source.\n\nSubject :\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nProcess:\n\tProcess ID:\t0xe18\n\tProcess Name:\tC:\\Windows\\System32\\inetsrv\\inetinfo.exe\n\nEvent Source:\n\tSource Name:\tIIS-METABASE\n\tEvent Source ID:\t0x460422",
+    "message": "An attempt was made to register a security event source.\n\nSubject :\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3e7\n\nProcess:\n\tProcess ID:\t0xe18\n\tProcess Name:\tC:\\Windows\\System32\\inetsrv\\inetinfo.exe\n\nEvent Source:\n\tSource Name:\tIIS-METABASE\n\tEvent Source ID:\t0x460422",
     "process": {
       "executable": "C:\\Windows\\System32\\inetsrv\\inetinfo.exe",
       "name": "inetinfo.exe",
@@ -43,8 +43,7 @@
       "name": "WIN-BVM4LI1L1Q6$"
     },
     "winlog": {
-      "activity_id": "{dab46f85-75ee-0000-c36f-b4daee75d601}",
-      "api": "wineventlog",
+      "activity_id": "{DAB46F85-75EE-0000-C36F-B4DAEE75D601}",
       "channel": "Security",
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
@@ -69,7 +68,7 @@
           "id": 824
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "146939",
       "task": "Audit Policy Change"
