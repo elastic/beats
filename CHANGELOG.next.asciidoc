@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
 - Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
+- Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}99999[99999]
 
 *Auditbeat*
 
