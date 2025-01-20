@@ -114,6 +114,9 @@ func TestPackages() error {
 func Test() {
 	if os.Getenv("CI") == "true" {
 		mg.Deps(devtools.DefineModules)
+	}
+
+	if os.Getenv("INSTALL_WPD") == "true" {
 		mg.Deps(devtools.InstallWpd)
 	}
 
@@ -124,8 +127,7 @@ func Test() {
 func UnitTest() {
 	fmt.Print("--- STARTING UNIT TESTS")
 
-	if os.Getenv("CI") == "true" {
-		fmt.Print("--- INSTALLING WPD")
+	if os.Getenv("INSTALL_WPD") == "true" {
 		mg.Deps(devtools.InstallWpd)
 	}
 

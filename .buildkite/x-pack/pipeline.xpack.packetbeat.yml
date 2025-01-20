@@ -113,6 +113,8 @@ steps:
               context: "x-pack/packetbeat: Linux arm64 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat Win-2019 Unit Tests"
+        env:
+          INSTALL_WPD: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -140,6 +142,8 @@ steps:
 
     steps:
       - label: ":windows: x-pack/packetbeat Win 10 Unit Tests"
+        env:
+          INSTALL_WPD: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -162,6 +166,8 @@ steps:
               context: "x-pack/packetbeat: Win-10 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat Win-2016 Unit Tests"
+        env:
+          INSTALL_WPD: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
