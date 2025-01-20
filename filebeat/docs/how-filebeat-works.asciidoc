@@ -37,6 +37,7 @@ The following example configures {beatname_uc} to harvest lines from all log fil
 -------------------------------------------------------------------------------------
 {beatname_lc}.inputs:
 - type: filestream
+  id: unique-ID
   paths:
     - /var/log/*.log
     - /var/path2/*.log
