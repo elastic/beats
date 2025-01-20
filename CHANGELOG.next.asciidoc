@@ -107,6 +107,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
+- Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
+- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218] 
+- In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 
 *Heartbeat*
 
