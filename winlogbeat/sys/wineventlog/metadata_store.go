@@ -52,7 +52,11 @@ type PublisherMetadataStore struct {
 	winevent.WinMeta
 
 	// Event ID to event metadata (message and event data param names).
-	Events map[uint32]*EventMetadata
+	// Keeps track of the latest metadata available for each event.
+	EventsNewest map[uint16]*EventMetadata
+	// Event ID to event metadata (message and event data param names).
+	// Keeps track of all available versions for each event.
+	EventsByVersion map[uint32]*EventMetadata
 	// Event ID to map of fingerprints to event metadata. The fingerprint value
 	// is hash of the event data parameters count and types.
 	EventFingerprints map[uint32]map[uint64]*EventMetadata
@@ -103,7 +107,8 @@ func NewEmptyPublisherMetadataStore(provider string, log *logp.Logger) *Publishe
 			Levels:   map[uint8]string{},
 			Tasks:    map[uint16]string{},
 		},
-		Events:            map[uint32]*EventMetadata{},
+		EventsNewest:      map[uint16]*EventMetadata{},
+		EventsByVersion:   map[uint32]*EventMetadata{},
 		EventFingerprints: map[uint32]map[uint64]*EventMetadata{},
 		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider, "empty", true),
@@ -183,7 +188,8 @@ func (s *PublisherMetadataStore) initEvents() error {
 	}
 	defer itr.Close()
 
-	s.Events = map[uint32]*EventMetadata{}
+	s.EventsNewest = map[uint16]*EventMetadata{}
+	s.EventsByVersion = map[uint32]*EventMetadata{}
 	for itr.Next() {
 		evt, err := newEventMetadataFromPublisherMetadata(itr, s.Metadata)
 		if err != nil {
@@ -191,7 +197,8 @@ func (s *PublisherMetadataStore) initEvents() error {
 				"error", err)
 			continue
 		}
-		s.Events[getEventCombinedID(evt.EventID, evt.Version)] = evt
+		s.EventsNewest[evt.EventID] = evt
+		s.EventsByVersion[getEventCombinedID(evt.EventID, evt.Version)] = evt
 	}
 	return itr.Err()
 }
@@ -235,8 +242,12 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8,
 	// metadata then we just associate the fingerprint with a pointer to the
 	// providers metadata for the event ID.
 
-	defaultEM := s.Events[combinedID]
-
+	defaultEM, found := s.EventsByVersion[combinedID]
+	if !found {
+		// if we do not have a specific metadata for this event version
+		// we fallback to get the newest available one
+		defaultEM = s.EventsNewest[eventID]
+	}
 	// Use XML to get the parameters names.
 	em, err := newEventMetadataFromEventHandle(s.Metadata, eventHandle)
 	if err != nil {
