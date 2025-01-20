@@ -20,6 +20,7 @@ package elasticsearch
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
