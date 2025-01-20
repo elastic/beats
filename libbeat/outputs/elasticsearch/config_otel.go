@@ -92,9 +92,8 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		}
 		logp.Info("Applying performance preset '%v': %v",
 			preset, config.DebugString(presetConfig, false))
-		for _, field := range overriddenFields {
-			logp.Warn("Performance preset '%v' overrides user setting for field '%v'", preset, field)
-		}
+		logp.Warn("Performance preset '%v' overrides user setting for field(s): %s",
+			preset, strings.Join(overriddenFields, ","))
 	}
 
 	// unpack and validate ES config
