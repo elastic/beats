@@ -58,7 +58,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
 - Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
-- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs {pull}42295[42295]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
 
 *Heartbeat*
 
