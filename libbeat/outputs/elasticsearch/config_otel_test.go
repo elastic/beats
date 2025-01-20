@@ -33,7 +33,7 @@ import (
 func TestToOtelConfig(t *testing.T) {
 
 	t.Run("basic config translation", func(t *testing.T) {
-		basicInput := `
+		beatCfg := `
 hosts:
   - localhost:9200
   - localhost:9300
@@ -52,7 +52,7 @@ headers:
   X-Header-1: foo
   X-Bar-Header: bar`
 
-		basicOp := `
+		OTelCfg := `
 api_key: ""
 endpoints:
   - http://localhost:9200/foo/bar
@@ -77,11 +77,11 @@ batcher:
   enabled: true
   max_size_items: 1600
  `
-		input := newFromYamlString(t, basicInput)
+		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
 		got, err := ToOTelConfig(cfg)
 		require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
-		expOutput := newFromYamlString(t, basicOp)
+		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
 
 	})
@@ -89,7 +89,7 @@ batcher:
 	// when preset is configured, we only test worker, bulk_max_size, idle_connection_timeout here
 	// TODO: Check for compression_level when we add support upstream
 	t.Run("check preset config translation", func(t *testing.T) {
-		commonInput := `
+		commonBeatCfg := `
 hosts:
   - localhost:9200
 index: "some-index"
@@ -98,7 +98,7 @@ password: changeme
 preset: %s
 `
 
-		commonOutput := `
+		commonOTelCfg := `
 api_key: ""
 endpoints:
   - http://localhost:9200
@@ -119,7 +119,7 @@ timeout: 1m30s
 		}{
 			{
 				presetName: "balanced",
-				output: commonOutput + `
+				output: commonOTelCfg + `
 idle_conn_timeout: 3s
 num_workers: 1
 batcher:
@@ -129,7 +129,7 @@ batcher:
 			},
 			{
 				presetName: "throughput",
-				output: commonOutput + `
+				output: commonOTelCfg + `
 idle_conn_timeout: 15s
 num_workers: 4
 batcher:
@@ -139,7 +139,7 @@ batcher:
 			},
 			{
 				presetName: "scale",
-				output: commonOutput + `
+				output: commonOTelCfg + `
 idle_conn_timeout: 1s
 num_workers: 1
 batcher:
@@ -149,7 +149,7 @@ batcher:
 			},
 			{
 				presetName: "latency",
-				output: commonOutput + `
+				output: commonOTelCfg + `
 idle_conn_timeout: 1m0s
 num_workers: 1
 batcher:
@@ -159,7 +159,7 @@ batcher:
 			},
 			{
 				presetName: "custom",
-				output: commonOutput + `
+				output: commonOTelCfg + `
 idle_conn_timeout: 3s
 num_workers: 0
 batcher:
@@ -171,7 +171,7 @@ batcher:
 
 		for _, test := range tests {
 			t.Run("config translation w/"+test.presetName, func(t *testing.T) {
-				input := newFromYamlString(t, fmt.Sprintf(commonInput, test.presetName))
+				input := newFromYamlString(t, fmt.Sprintf(commonBeatCfg, test.presetName))
 				cfg := config.MustNewConfigFrom(input.ToStringMap())
 				got, err := ToOTelConfig(cfg)
 				require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
