@@ -34,7 +34,7 @@ wait_for_port() {
     nc -z localhost $port
 }
 
-${KAFKA_HOME}/bin/kafka-topics.sh  --bootstrap-server localhost:9091  --create --partitions 1 --topic test --replication-factor 1 --command-config ${KAFKA_HOME}/bin//adminclient.properties
+${KAFKA_HOME}/bin/kafka-topics.sh  --bootstrap-server localhost:9091  --create --partitions 1 --topic test --replication-factor 1 --command-config ${KAFKA_HOME}/bin/adminclient.properties
 
 echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
@@ -63,12 +63,12 @@ wait_for_port 8779
 echo "Kafka load status code $?"
 
 # ACLS used to prepare tests
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin/adminclient.properties --add --allow-principal User:producer --operation All --cluster --topic '*' --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin/adminclient.properties --add --allow-principal User:consumer --operation All --cluster --topic '*' --group '*'
 
 # Minimal ACLs required by metricbeat. If this needs to be changed, please update docs too
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:stats --operation Describe --group '*'
-${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin//adminclient.properties --add --allow-principal User:stats --operation Read --topic '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin/adminclient.properties --add --allow-principal User:stats --operation Describe --group '*'
+${KAFKA_HOME}/bin/kafka-acls.sh --bootstrap-server localhost:9091 --command-config ${KAFKA_HOME}/bin/adminclient.properties --add --allow-principal User:stats --operation Read --topic '*'
 
 touch /tmp/.acls_loaded
 
