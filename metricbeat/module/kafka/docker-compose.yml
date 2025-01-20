@@ -1,6 +1,6 @@
 services:
   kafka:
-    image: kafka-test:latest
+    image: docker.elastic.co/integrations-ci/beats-kafka:${KAFKA_VERSION:-3.6.0}-2
     build:
       context: ./_meta
       args:
