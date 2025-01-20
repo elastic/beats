@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+- Default to use raw api and delete older xml implementation. {pull}42275[42275]
 
 *Functionbeat*
 
