@@ -5,15 +5,35 @@
 
 deprecated:[7.16.0]
 
-The container input is deprecated. Please use the the <<filebeat-input-filestream,`filestream input`>> and its <<filebeat-input-filestream-parsers-container,`container`>> parser.
+The container input is just a preset for the <<filebeat-input-log,`log`>> input. The <<filebeat-input-log,`log`>> input has been deprecated since 7.16.0, therefore the container input is also deprecated. Please use the <<filebeat-input-filestream,`filestream`>> input and its <<filebeat-input-filestream-parsers-container,`container`>> parser instead.
 
-It's possible to use this input type only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
+Example configuration of using the <<filebeat-input-filestream-parsers-container,`container`>> parser with the <<filebeat-input-filestream,`filestream`>> input:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: filestream
+  id: unique-input-id <1>
+  take_over: true <2>
+  prospector.scanner.symlinks: true <3>
+  parsers:
+    - container:
+        stream: stdout
+        format: docker
+  paths: <4>
+    - '/var/log/containers/*.log'
+----
+
+<1> all <<filebeat-input-filestream,`filestream`>> inputs require a <<filebeat-input-filestream-id,`unique ID`>>.
+<2> <<filebeat-input-filestream-take-over,`take_over: true`>> would migrate all states from the previously used container input to the <<filebeat-input-filestream,`filestream`>> input.
+<3> container logs use symlinks, so they need to be <<filebeat-input-filestream-prospector-scanner-symlinks,`enabled`>>.
+<4> `paths` is required.
 
 ++++
 <titleabbrev>Container</titleabbrev>
 ++++
 
-Use the `container` input to read containers log files.
+Due to deprecation of this input, it's possible to use it only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
 
 This input searches for container logs under the given path, and parse them into
 common message lines, extracting timestamps too. Everything happens before line
