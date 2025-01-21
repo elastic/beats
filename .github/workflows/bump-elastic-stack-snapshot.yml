@@ -48,7 +48,7 @@ jobs:
           payload: |
             {
               "channel": "#ingest-notifications",
-              "text": "${{ env.MESSAGE }}",
+              "text": "${{ env.SLACK_MESSAGE }}",
               "blocks": [
                 {
                   "type": "section",
