@@ -223,8 +223,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
-- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
-- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 
 *Auditbeat*
 
