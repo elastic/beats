@@ -67,7 +67,7 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	// Get MaxSize and Size from collStats by using db.runCommand
 	var oplogSize CollSize
 	if err := res.Decode(&oplogSize); err != nil {
-		return nil, fmt.Errorf("decode error: %w", err)
+		return nil, fmt.Errorf("could not decode mongodb oplog size: %w", err)
 	}
 
 	collection := db.Collection(oplogCol)
