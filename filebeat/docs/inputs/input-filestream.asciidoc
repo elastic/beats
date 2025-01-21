@@ -175,19 +175,20 @@ include::../inputs/input-filestream-reader-options.asciidoc[]
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
 These metrics are exposed under the `/inputs` path. They can be used to
-observe the activity of the input.
+observe the activity of the input. Note that metrics from processors are not included.
 
 [options="header"]
 |=======
-| Metric                    | Description
-| `files_opened_total`      | Total number of files opened.
-| `files_closed_total`      | Total number of files closed.
-| `files_active`            | Number of files currently open (gauge).
-| `messages_read_total`     | Total number of messages read.
-| `bytes_processed_total`   | Total number of bytes processed.
-| `events_processed_total`  | Total number of events processed.
-| `processing_errors_total` | Total number of processing errors.
-| `processing_time`         | Histogram of the elapsed time to process messages (expressed in nanoseconds).
+| Metric                     | Description
+| `files_opened_total`        | Total number of files opened.
+| `files_closed_total`        | Total number of files closed.
+| `files_active`              | Number of files currently open (gauge).
+| `messages_read_total`      | Total number of messages read.
+| `messages_truncated_total` | Total number of messages truncated.
+| `bytes_processed_total`    | Total number of bytes processed.
+| `events_processed_total`   | Total number of events processed.
+| `processing_errors_total`  | Total number of processing errors.
+| `processing_time`          | Histogram of the elapsed time to process messages (expressed in nanoseconds).
 |=======
 
 Note:

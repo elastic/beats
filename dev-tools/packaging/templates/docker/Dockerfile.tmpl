@@ -49,21 +49,10 @@ RUN for iter in {1..10}; do \
 {{- if contains .from "ubi-minimal" }}
 RUN for iter in {1..10}; do \
         microdnf -y update && \
-        microdnf -y install findutils shadow-utils && \
+        microdnf -y install findutils shadow-utils ca-certificates \
+        gawk libcap xz tar && \
         microdnf clean all && \
         exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
-    done; \
-    (exit $exit_code)
-{{- end }}
-
-{{- if contains .from "ubuntu" }}
-RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
-
-RUN for iter in {1..10}; do \
-        apt-get update -y && \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
-        apt-get clean all && \
-        exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
     (exit $exit_code)
 {{- end }}
@@ -166,7 +155,7 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubuntu")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi-minimal")) }}
 USER root
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
@@ -217,12 +206,23 @@ USER root
 # We don't use npx playwright install-deps because that could pull a newer version
 # Install additional fonts as well
 RUN for iter in {1..10}; do \
-    apt-get update -y && \
-    $NODE_PATH/node/lib/node_modules/@elastic/synthetics/node_modules/.bin/playwright install-deps chromium && \
-    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
-    fonts-noto \
-    fonts-noto-cjk && \
-    exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+    microdnf -y update && \
+    microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
+    at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
+    libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
+    dbus-glib libicu mesa-libGL unzip -y && \
+    mkdir -p /usr/share/fonts/google-noto && \
+    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
+    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
+    rm -f NotoSansCJKjp-hinted.zip && \
+    microdnf -y remove unzip && \
+    curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
+    mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
+    curl -LO https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf && \
+    mv NotoColorEmoji.ttf /usr/share/fonts/google-noto && \
+    fc-cache -fv && \
+    microdnf clean all && \
+    exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
 done; \
 (exit $exit_code)
 {{- end }}
@@ -244,4 +244,4 @@ ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 
 WORKDIR {{ $beatHome }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
-CMD ["-environment", "container"]
+CMD ["--environment", "container"]

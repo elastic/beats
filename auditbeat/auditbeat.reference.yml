@@ -1573,7 +1573,7 @@ logging.files:
   #path: /var/log/auditbeat
 
   # The name of the files where the logs are written to.
-  #name: auditbeat-event-data
+  #name: auditbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

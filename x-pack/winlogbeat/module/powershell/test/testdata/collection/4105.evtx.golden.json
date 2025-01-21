@@ -15,8 +15,7 @@
     },
     "message": "Started invocation of ScriptBlock ID: f4a378ab-b74f-41a7-a5ef-6dd55562fdb9\nRunspace ID: 9c031e5c-8d5a-4b91-a12e-b3624970b623",
     "winlog": {
-      "activity_id": "{dd68516a-2930-0000-5962-68dd3029d601}",
-      "api": "wineventlog",
+      "activity_id": "{DD68516A-2930-0000-5962-68DD3029D601}",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -31,7 +30,7 @@
           "id": 1476
         }
       },
-      "provider_guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}",
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
       "provider_name": "Microsoft-Windows-PowerShell",
       "record_id": 790,
       "task": "Starting Command",
