@@ -8,6 +8,7 @@ package sessionmd
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
@@ -340,7 +341,7 @@ func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		t.Run(tt.testName, func(t *testing.T) {
 			reader := procfs.NewMockReader()
-			db, err := processdb.NewDB(reader, *logger)
+			db, err := processdb.NewDB(reader, *logger, time.Second*30)
 			require.Nil(t, err)
 
 			for _, ev := range tt.mockProcesses {

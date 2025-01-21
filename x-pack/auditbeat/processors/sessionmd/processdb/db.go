@@ -7,7 +7,6 @@
 package processdb
 
 import (
-	"container/heap"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -68,7 +67,6 @@ type Process struct {
 	CTTY     tty.TTYDev
 	Argv     []string
 	Cwd      string
-	Env      map[string]string
 	Filename string
 	ExitCode int32
 }
@@ -175,10 +173,14 @@ type DB struct {
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
-	removalCandidates        rcHeap
+	removalMap               map[uint32]removalCandidate
+	// how often the reaper runs
+	reaperPeriod time.Duration
+	// used for testing
+	skipReaper bool
 }
 
-func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
+func NewDB(reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
 		return &DB{}, initError
@@ -190,8 +192,11 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
 		stopChan:                 make(chan struct{}),
-		removalCandidates:        make(rcHeap, 0),
+		removalMap:               make(map[uint32]removalCandidate),
+		reaperPeriod:             reaperPeriod,
+		skipReaper:               false,
 	}
+	logger.Infof("starting sessionDB reaper with interval %s", db.reaperPeriod)
 	db.startReaper()
 	return &db, nil
 }
@@ -260,6 +265,7 @@ func (db *DB) insertProcess(process Process) {
 	}
 }
 
+// InsertExec adds an exec event
 func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
@@ -270,8 +276,18 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 		CTTY:     ttyDevFromProto(exec.CTTY),
 		Argv:     exec.Argv,
 		Cwd:      exec.CWD,
-		Env:      exec.Env,
 		Filename: exec.Filename,
+	}
+
+	// check to see if an orphaned exit event maps to this exec event.
+	// the out-of-order problem where we get the exit before the exec usually happens under load.
+	// if we don't track orphaned processes like this, we'll never scrub them from the DB.
+	if evt, ok := db.removalMap[proc.PIDs.Tgid]; ok {
+		proc.ExitCode = evt.exitCode
+		db.logger.Debugf("resolved orphan exit for pid %d", proc.PIDs.Tgid)
+		evt.removeAttempt = exitRemoveAttempts + 1 // set it to remove on the next reaper pass
+		evt.startTime = proc.PIDs.StartTimeNS
+		db.removalMap[proc.PIDs.Tgid] = evt
 	}
 
 	db.processes[exec.PIDs.Tgid] = proc
@@ -387,37 +403,44 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	return nil
 }
 
+// InsertSetsid adds a set SID event
 func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
 	if entry, ok := db.processes[setsid.PIDs.Tgid]; ok {
+		db.logger.Debugf("updating process for tgid %d", setsid.PIDs.Tgid)
 		entry.PIDs = pidInfoFromProto(setsid.PIDs)
 		db.processes[setsid.PIDs.Tgid] = entry
 	} else {
+		db.logger.Debugf("adding setsid event for tgid %d", setsid.PIDs.Tgid)
 		db.processes[setsid.PIDs.Tgid] = Process{
 			PIDs: pidInfoFromProto(setsid.PIDs),
 		}
 	}
 }
 
+// InsertExit adds a process exit event
 func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-
 	pid := exit.PIDs.Tgid
+	newRemoval := removalCandidate{
+		pid:           pid,
+		exitTime:      time.Now(),
+		removeAttempt: 0,
+		exitCode:      exit.ExitCode,
+	}
 	process, ok := db.processes[pid]
 	if !ok {
-		db.logger.Debugf("could not insert exit, pid %v not found in db", pid)
-		return
+		db.logger.Debugf("pid %v for exit event not found in db, adding as orphan", pid)
+	} else {
+		// If we already have the process, add our exit info
+		process.ExitCode = exit.ExitCode
+		db.processes[pid] = process
+		newRemoval.startTime = process.PIDs.StartTimeNS
 	}
-	process.ExitCode = exit.ExitCode
-	db.processes[pid] = process
-	heap.Push(&db.removalCandidates, removalCandidate{
-		pid:       pid,
-		startTime: process.PIDs.StartTimeNS,
-		exitTime:  time.Now(),
-	})
+	db.removalMap[pid] = newRemoval
 }
 
 func fullProcessFromDBProcess(p Process) types.Process {
@@ -695,7 +718,6 @@ func (db *DB) ScrapeProcfs() []uint32 {
 			CTTY:     ttyDevFromProto(procInfo.CTTY),
 			Argv:     procInfo.Argv,
 			Cwd:      procInfo.Cwd,
-			Env:      procInfo.Env,
 			Filename: procInfo.Filename,
 		}
 

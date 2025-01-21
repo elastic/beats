@@ -7,48 +7,28 @@
 package processdb
 
 import (
-	"container/heap"
 	"time"
 )
 
 const (
-	reaperInterval = 30 * time.Second // run the reaper process at this interval
-	removalTimeout = 10 * time.Second // remove processes that have been exited longer than this
+	removalTimeout     = 10 * time.Second // remove processes that have been exited longer than this
+	exitRemoveAttempts = 2                // Number of times to run the reaper before we remove an orphaned exit event
 )
+
+// the reaper logic for removing a process.
+// split out to a new function to ease testing.
+var functionTimeoutReached = func(now, exitTime time.Time) bool {
+	return now.Sub(exitTime) < removalTimeout
+}
 
 type removalCandidate struct {
 	pid       uint32
 	exitTime  time.Time
 	startTime uint64
-}
 
-type rcHeap []removalCandidate
-
-func (h rcHeap) Len() int {
-	return len(h)
-}
-
-func (h rcHeap) Less(i, j int) bool {
-	return h[i].exitTime.Sub(h[j].exitTime) < 0
-}
-
-func (h rcHeap) Swap(i, j int) {
-	h[i], h[j] = h[j], h[i]
-}
-
-func (h *rcHeap) Push(x any) {
-	v, ok := x.(removalCandidate)
-	if ok {
-		*h = append(*h, v)
-	}
-}
-
-func (h *rcHeap) Pop() any {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
+	// only used for orphan exst events
+	removeAttempt uint32
+	exitCode      int32
 }
 
 // The reaper will remove exited processes from the DB a short time after they have exited.
@@ -60,50 +40,59 @@ func (h *rcHeap) Pop() any {
 // assumption will need to be revisited.
 func (db *DB) startReaper() {
 	go func(db *DB) {
-		ticker := time.NewTicker(reaperInterval)
+		ticker := time.NewTicker(db.reaperPeriod)
 		defer ticker.Stop()
 
-		h := &db.removalCandidates
-		heap.Init(h)
 		for {
 			select {
 			case <-ticker.C:
-				db.mutex.Lock()
-				now := time.Now()
-				for {
-					if len(db.removalCandidates) == 0 {
-						break
-					}
-					v := heap.Pop(h)
-					c, ok := v.(removalCandidate)
-					if !ok {
-						db.logger.Debugf("unexpected item in removal queue: \"%v\"", v)
-						continue
-					}
-					if now.Sub(c.exitTime) < removalTimeout {
-						// this candidate hasn't reached its timeout, put it back on the heap
-						// everything else will have a later exit time, so end this run
-						heap.Push(h, c)
-						break
-					}
-					p, ok := db.processes[c.pid]
-					if !ok {
-						db.logger.Debugf("pid %v was candidate for removal, but was already removed", c.pid)
-						continue
-					}
-					if p.PIDs.StartTimeNS != c.startTime {
-						// this could happen if the PID has already rolled over and reached this PID again.
-						db.logger.Debugf("start times of removal candidate %v differs, not removing (PID had been reused?)", c.pid)
-						continue
-					}
-					delete(db.processes, c.pid)
-					delete(db.entryLeaders, c.pid)
-					delete(db.entryLeaderRelationships, c.pid)
+				if !db.skipReaper {
+					db.reapProcs()
 				}
-				db.mutex.Unlock()
 			case <-db.stopChan:
 				return
 			}
 		}
 	}(db)
+}
+
+// run as a separate function to make testing easier
+func (db *DB) reapProcs() {
+	now := time.Now()
+	db.mutex.Lock()
+	db.logger.Debugf("REAPER: processes: %d removal candidates: %d", len(db.processes), len(db.removalMap))
+	for pid, cand := range db.removalMap {
+		if functionTimeoutReached(now, cand.exitTime) {
+			// this candidate hasn't reached its timeout
+			continue
+		}
+
+		p, ok := db.processes[pid]
+		if !ok {
+			// this represents an orphaned exit event with no matching exec event.
+			// in this case, give us a few iterations for us to get the exec, since things can arrive out of order.
+			if cand.removeAttempt < exitRemoveAttempts {
+				cand.removeAttempt += 1
+				db.removalMap[pid] = cand
+			} else {
+				// in our current state, we'll have a lot of orphaned exit events,
+				// as we don't track `fork` events.
+				db.logger.Debugf("reaping orphaned exit event for pid %d", pid)
+				delete(db.removalMap, pid)
+			}
+
+			db.logger.Debugf("pid %v was candidate for removal, but was not found", pid)
+			continue
+		}
+		if p.PIDs.StartTimeNS != cand.startTime {
+			// this could happen if the PID has already rolled over and reached this PID again.
+			db.logger.Debugf("start times of removal candidate %v differs, not removing (PID had been reused?)", pid)
+			continue
+		}
+		delete(db.removalMap, pid)
+		delete(db.processes, pid)
+		delete(db.entryLeaders, pid)
+		delete(db.entryLeaderRelationships, pid)
+	}
+	db.mutex.Unlock()
 }

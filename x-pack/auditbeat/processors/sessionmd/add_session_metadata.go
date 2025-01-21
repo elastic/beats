@@ -58,7 +58,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(reader, *logger)
+	db, err := processdb.NewDB(reader, *logger, c.DBReaperPeriod)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)
@@ -182,7 +182,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugf("PID %d not found in provider: %s", pid, err)
 			return nil, e
 		}
 	}

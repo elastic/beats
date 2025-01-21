@@ -9,6 +9,7 @@ package processdb
 import (
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -190,7 +191,7 @@ func populateProcfsWithInit(reader *procfs.MockReader) {
 
 func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -214,7 +215,7 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 
 func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -243,7 +244,7 @@ func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -273,7 +274,7 @@ func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -309,7 +310,7 @@ func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -344,7 +345,7 @@ func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -379,7 +380,7 @@ func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -415,7 +416,7 @@ func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 
 func TestSingleProcessEmptyProcess(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -448,7 +449,7 @@ func TestSingleProcessEmptyProcess(t *testing.T) {
 // EntryLeaderEntryMetaType
 func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -519,7 +520,7 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 func TestInitSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -602,7 +603,7 @@ func TestInitSshdBashLs(t *testing.T) {
 func TestInitSshdSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -694,7 +695,7 @@ func TestInitSshdSshdBashLs(t *testing.T) {
 func TestInitSshdSshdSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -803,7 +804,7 @@ func TestInitSshdSshdSshdBashLs(t *testing.T) {
 func TestInitContainerdContainerdShim(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -856,7 +857,7 @@ func TestInitContainerdContainerdShim(t *testing.T) {
 func TestInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -925,7 +926,7 @@ func TestInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
 func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -997,7 +998,7 @@ func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 func TestInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -1084,7 +1085,7 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
 func TestInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -1166,7 +1167,7 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
 // entry meta type of "unknown" and making it an entry leader.
 func TestGrepInIsolation(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -1199,7 +1200,7 @@ func TestGrepInIsolation(t *testing.T) {
 // Kernel threads should never have an entry meta type or entry leader set.
 func TestKernelThreads(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 
 	kthreaddPID := uint32(2)
@@ -1251,7 +1252,7 @@ func TestKernelThreads(t *testing.T) {
 func TestPIDReuseSameSession(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 
@@ -1356,7 +1357,7 @@ func TestPIDReuseSameSession(t *testing.T) {
 func TestPIDReuseNewSession(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db, err := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger, time.Second*30)
 	require.Nil(t, err)
 	db.ScrapeProcfs()
 

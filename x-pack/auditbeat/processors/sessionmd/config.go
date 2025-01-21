@@ -6,15 +6,19 @@
 
 package sessionmd
 
+import "time"
+
 // Config for add_session_metadata processor.
 type config struct {
-	Backend  string `config:"backend"`
-	PIDField string `config:"pid_field"`
+	Backend        string        `config:"backend"`
+	PIDField       string        `config:"pid_field"`
+	DBReaperPeriod time.Duration `config:"db_reaper_config"`
 }
 
 func defaultConfig() config {
 	return config{
-		Backend:  "auto",
-		PIDField: "process.pid",
+		Backend:        "auto",
+		PIDField:       "process.pid",
+		DBReaperPeriod: time.Second * 30,
 	}
 }
