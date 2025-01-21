@@ -1,9 +1,21 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
+  ASDF_NODEJS_VERSION: 18.17.1
+
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
+  AGENTBEAT_SPEC: "./agentbeat.spec.yml"
 
 steps:
   - group: "Check/Update"
@@ -58,38 +70,15 @@ steps:
           - github_commit_status:
               context: "agentbeat: Packaging"
 
-      - label: ":linux: Agentbeat/Integration tests Linux"
-        key: "agentbeat-it-linux"
+      - label: ":ubuntu: x-pack/agentbeat: Ubuntu x86_64 Spec tests"
+        key: "agentbeat-it-linux-x86-64"
+        env:
+          PLATFORM: "linux/amd64"
         depends_on:
           - agentbeat-package-linux
-        env:
-          ASDF_NODEJS_VERSION: 18.17.1
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
         command: |
-          set -euo pipefail
-          echo "~~~ Downloading artifacts"
-          buildkite-agent artifact download x-pack/agentbeat/build/distributions/** . --step 'agentbeat-package-linux'
-          ls -lah x-pack/agentbeat/build/distributions/
-          echo "~~~ Installing @elastic/synthetics with npm"
-          npm install -g @elastic/synthetics
-          echo "~~~ Running tests"
           cd x-pack/agentbeat
-          mage goIntegTest
-        artifact_paths:
-          - x-pack/agentbeat/build/distributions/**/*
-          - "x-pack/agentbeat/build/*.xml"
-          - "x-pack/agentbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/agentbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 60
+          mage -v testWithSpec
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -98,4 +87,76 @@ steps:
           disk_type: "pd-ssd"
         notify:
           - github_commit_status:
-              context: "agentbeat: Integration tests"
+              context: "agentbeat: Ubuntu x86_64 Spec tests"
+
+      - label: ":ubuntu: x-pack/agentbeat: Ubuntu arm64 Spec tests"
+        key: "agentbeat-it-linux-arm64"
+        env:
+          PLATFORM: "linux/arm64"
+        depends_on:
+          - agentbeat-package-linux
+        command: |
+          cd x-pack/agentbeat
+          mage -v testWithSpec
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Ubuntu arm64 Spec tests"
+
+      - label: ":windows: x-pack/agentbeat: Windows x86_64 Spec tests"
+        key: "agentbeat-it-windows"
+        env:
+          PLATFORM: "windows/amd64"
+        depends_on:
+          - agentbeat-package-linux
+        command: |
+          Set-Location -Path x-pack/agentbeat
+          mage -v testWithSpec
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Windows x86_64 Spec tests"
+
+      - label: ":macos: x-pack/agentbeat: macOS x86_64 Spec tests"
+        key: "agentbeat-it-macos-x86-64"
+        depends_on:
+          - agentbeat-package-linux
+        env:
+          PLATFORM: "darwin/amd64"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/agentbeat
+          mage -v testWithSpec
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: macOS x86_64 Spec tests"
+
+      - label: ":macos: x-pack/agentbeat: macOS arm64 Spec tests"
+        key: "agentbeat-it-macos-arm64"
+        depends_on:
+          - agentbeat-package-linux
+        env:
+          PLATFORM: "darwin/arm64"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/agentbeat
+          mage -v testWithSpec
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: macOS arm64 Spec tests"
