@@ -201,7 +201,6 @@ me1zqwZ6EX7XHaa6j1mx9tcX
 				"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA"},
 			},
 			err: false,
-			// TODO: Add  more  scenarios
 		},
 	}
 
