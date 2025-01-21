@@ -267,10 +267,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Collect .NET CLR (IIS) Memory, Exceptions and LocksAndThreads metrics {pull}41929[41929]
-- Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
-- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 - Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
-- Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 
 *Metricbeat*
 
