@@ -142,6 +142,11 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   metricsets: ['broker', 'queue', 'topic']
@@ -404,6 +409,14 @@ metricbeat.modules:
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
 
+#------------------------------ Benchmark Module ------------------------------
+- module: benchmark
+  metricsets:
+    - info
+  enabled: false
+  period: 10s
+
+
 #--------------------------------- Ceph Module ---------------------------------
 # Metricsets depending on the Ceph REST API (default port: 5000)
 - module: ceph
@@ -513,6 +526,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
+
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
@@ -618,6 +634,7 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
@@ -1267,6 +1284,42 @@ metricbeat.modules:
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
 
+#-------------------------------- Openai Module --------------------------------
+- module: openai
+  metricsets: ["usage"]
+  enabled: false
+  period: 1h
+
+  # # Project API Keys - Multiple API keys can be specified for different projects
+  # api_keys:
+  # - key: "api_key1"
+  # - key: "api_key2"
+
+  # # API Configuration
+  # ## Base URL for the OpenAI usage API endpoint
+  # api_url: "https://api.openai.com/v1/usage"
+  # ## Custom headers to be included in API requests
+  # headers:
+  # - "k1: v1"
+  # - "k2: v2"
+  ## Rate Limiting Configuration
+  # rate_limit:
+  #   limit: 12 # seconds between requests
+  #   burst: 1  # max concurrent requests
+  # ## Request Timeout Duration
+  # timeout: 30s
+
+  # # Data Collection Configuration
+  # collection:
+  #   ## Number of days to look back when collecting usage data
+  #   lookback_days: 30
+  #   ## Whether to collect usage data in realtime. Defaults to false as how
+  #   # OpenAI usage data is collected will end up adding duplicate data to ES
+  #   # and also making it harder to do analytics. Best approach is to avoid
+  #   # realtime collection and collect only upto last day (in UTC). So, there's
+  #   # at most 24h delay.
+  #   realtime: false
+
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
   metricsets: ['collector']
@@ -1355,6 +1408,67 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
+#------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
+
 #----------------------- Prometheus Typed Metrics Module -----------------------
 - module: prometheus
   period: 10s
@@ -1405,67 +1519,6 @@ metricbeat.modules:
   #types_patterns:
   #  counter_patterns: []
   #  histogram_patterns: []
-
-# Metrics that will be collected using a PromQL
-#- module: prometheus
-#  metricsets: ["query"]
-#  hosts: ["localhost:9090"]
-#  period: 10s
-#  queries:
-#  - name: "instant_vector"
-#    path: "/api/v1/query"
-#    params:
-#      query: "sum(rate(prometheus_http_requests_total[1m]))"
-#  - name: "range_vector"
-#    path: "/api/v1/query_range"
-#    params:
-#      query: "up"
-#      start: "2019-12-20T00:00:00.000Z"
-#      end:  "2019-12-21T00:00:00.000Z"
-#      step: 1h
-#  - name: "scalar"
-#    path: "/api/v1/query"
-#    params:
-#      query: "100"
-#  - name: "string"
-#    path: "/api/v1/query"
-#    params:
-#      query: "some_value"
-
-#------------------------------ Prometheus Module ------------------------------
-# Metrics collected from a Prometheus endpoint
-- module: prometheus
-  period: 10s
-  metricsets: ["collector"]
-  hosts: ["localhost:9090"]
-  metrics_path: /metrics
-  #metrics_filters:
-  #  include: []
-  #  exclude: []
-  #username: "user"
-  #password: "secret"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # This can be used for service account based authorization:
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  #ssl.certificate_authorities:
-  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-
-
-# Metrics sent by a Prometheus server using remote_write option
-#- module: prometheus
-#  metricsets: ["remote_write"]
-#  host: "localhost"
-#  port: "9201"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # Secure settings for the server using TLS/SSL:
-  #ssl.certificate: "/etc/pki/server/cert.pem"
-  #ssl.key: "/etc/pki/server/cert.key"
 
 # Metrics that will be collected using a PromQL
 #- module: prometheus
@@ -3075,7 +3128,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

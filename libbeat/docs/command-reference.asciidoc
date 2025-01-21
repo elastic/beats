@@ -103,9 +103,6 @@ more information, see https://www.elastic.co/subscriptions and
 [options="header"]
 |=======================
 |Commands |
-ifeval::["{beatname_lc}"=="functionbeat"]
-|<<deploy-command,`deploy`>> | {deploy-command-short-desc}.
-endif::[]
 ifdef::apm-server[]
 |<<apikey-command,`apikey`>> |{apikey-command-short-desc}.
 endif::[]
@@ -113,10 +110,6 @@ endif::[]
 |<<help-command,`help`>> |{help-command-short-desc}.
 ifndef::serverless[]
 |<<keystore-command,`keystore`>> |{keystore-command-short-desc}.
-endif::[]
-ifeval::["{beatname_lc}"=="functionbeat"]
-|<<package-command,`package`>> |{package-command-short-desc}.
-|<<remove-command,`remove`>> |{remove-command-short-desc}.
 endif::[]
 ifdef::has_modules_command[]
 |<<modules-command,`modules`>> |{modules-command-short-desc}.
@@ -126,9 +119,6 @@ ifndef::serverless[]
 endif::[]
 |<<setup-command,`setup`>> |{setup-command-short-desc}.
 |<<test-command,`test`>> |{test-command-short-desc}.
-ifeval::["{beatname_lc}"=="functionbeat"]
-|<<update-command,`update`>> |{update-command-short-desc}.
-endif::[]
 |<<version-command,`version`>> |{version-command-short-desc}.
 |=======================
 
@@ -230,39 +220,6 @@ When used with `info`, only returns valid API Keys (not expired or invalidated).
 
 For more information, see <<api-key>>.
 
-endif::[]
-
-ifeval::["{beatname_lc}"=="functionbeat"]
-[[deploy-command]]
-==== `deploy` command
-
-{deploy-command-short-desc}. Before deploying functions, make sure the user has
-the credentials required by your cloud service provider.
-
-*SYNOPSIS*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} deploy FUNCTION_NAME [FLAGS]
-----
-
-*`FUNCTION_NAME`*::
-Specifies the name of the function to deploy.
-
-*FLAGS*
-
-*`-h, --help`*::
-Shows help for the `deploy` command.
-
-{global-flags}
-
-*EXAMPLES*
-
-["source","sh",subs="attributes"]
------
-{beatname_lc} deploy cloudwatch
-{beatname_lc} deploy sqs
------
 endif::[]
 
 [[export-command]]
@@ -521,68 +478,6 @@ See <<keystore>> for more examples.
 
 endif::[]
 
-ifeval::["{beatname_lc}"=="functionbeat"]
-[[package-command]]
-==== `package` command
-
-{package-command-short-desc}.
-
-*SYNOPSIS*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} package [FLAGS]
-----
-
-*FLAGS*
-
-*`-h, --help`*::
-Shows help for the `package` command.
-
-*`-o, --output`*::
-Specifies the full path pattern to use when creating the packages.
-
-{global-flags}
-
-*EXAMPLES*
-
-["source","sh",subs="attributes"]
------
-{beatname_lc} package --output /path/to/folder/package-{{.Provider}}.zip
------
-
-[[remove-command]]
-==== `remove` command
-
-{remove-command-short-desc}. Before removing functions, make sure the user has
-the credentials required by your cloud service provider.
-
-*SYNOPSIS*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} remove FUNCTION_NAME [FLAGS]
-----
-
-*`FUNCTION_NAME`*::
-Specifies the name of the function to remove.
-
-*FLAGS*
-
-*`-h, --help`*::
-Shows help for the `remove` command.
-
-{global-flags}
-
-*EXAMPLES*
-
-["source","sh",subs="attributes"]
------
-{beatname_lc} remove cloudwatch
-{beatname_lc} remove sqs
------
-endif::[]
-
 ifdef::has_modules_command[]
 [[modules-command]]
 ==== `modules` command
@@ -695,7 +590,7 @@ Prints the list of devices that are available for sniffing and then exits.
 endif::[]
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-*`-dump FILE`*::
+*`--dump FILE`*::
 Writes all captured packets to the specified file. This option is useful for
 troubleshooting {beatname_uc}.
 endif::[]
@@ -748,7 +643,7 @@ endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
 
-Specifies the mount point of the host's filesystem for use in monitoring a host. 
+Specifies the mount point of the host's filesystem for use in monitoring a host.
 This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 
@@ -961,39 +856,6 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 -----
 endif::[]
 
-ifeval::["{beatname_lc}"=="functionbeat"]
-[[update-command]]
-==== `update` command
-
-{update-command-short-desc}. Before updating functions, make sure the user has
-the credentials required by your cloud service provider.
-
-*SYNOPSIS*
-
-["source","sh",subs="attributes"]
-----
-{beatname_lc} update FUNCTION_NAME [FLAGS]
-----
-
-*`FUNCTION_NAME`*::
-Specifies the name of the function to update.
-
-*FLAGS*
-
-*`-h, --help`*::
-Shows help for the `update` command.
-
-{global-flags}
-
-*EXAMPLES*
-
-["source","sh",subs="attributes"]
------
-{beatname_lc} update cloudwatch
-{beatname_lc} update sqs
------
-endif::[]
-
 [[version-command]]
 ==== `version` command
 
@@ -1045,7 +907,7 @@ ifeval::["{beatname_lc}"=="filebeat"]
 +
 ["source","sh",subs="attributes"]
 ----------------------------------------------------------------------
-{beatname_lc} -modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
+{beatname_lc} --modules=nginx -M "nginx.access.var.paths=['/var/log/nginx/access.log*']" -M "nginx.access.var.pipeline=no_plugins"
 ----------------------------------------------------------------------
 endif::[]
 
@@ -1064,7 +926,7 @@ messages.
 *`-e, --e`*::
 Logs to stderr and disables syslog/file output.
 
-*`-environment`*::
+*`--environment`*::
 For logging purposes, specifies the environment that {beatname_uc} is running in.
 This setting is used to select a default log output when no log output is configured.
 Supported values are: `systemd`, `container`, `macos_service`, and `windows_service`.
@@ -1086,7 +948,7 @@ details.
 Sets the path for log files. See the <<directory-layout>> section for details.
 
 *`--strict.perms`*::
-Sets strict permission checking on configuration files. The default is `-strict.perms=true`.
+Sets strict permission checking on configuration files. The default is `--strict.perms=true`.
 ifndef::apm-server[]
 See {beats-ref}/config-file-permissions.html[Config file ownership and permissions]
 for more information.

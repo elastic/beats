@@ -20,13 +20,13 @@ package scheduler
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
-	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -72,7 +72,7 @@ func TestSchedJobRun(t *testing.T) {
 
 			wg := &sync.WaitGroup{}
 			wg.Add(1)
-			executed := batomic.MakeBool(false)
+			executed := &atomic.Bool{}
 
 			tf := func(ctx context.Context) []TaskFunc {
 				executed.Store(true)
@@ -102,14 +102,14 @@ func TestRecursiveForkingJob(t *testing.T) {
 	s := Create(1000, monitoring.NewRegistry(), tarawaTime(), map[string]*config.JobLimit{
 		"atype": {Limit: 1},
 	}, false)
-	ran := batomic.NewInt(0)
+	var ran atomic.Int64
 
 	var terminalTf TaskFunc = func(ctx context.Context) []TaskFunc {
-		ran.Inc()
+		ran.Add(1)
 		return nil
 	}
 	var forkingTf TaskFunc = func(ctx context.Context) []TaskFunc {
-		ran.Inc()
+		ran.Add(1)
 		return []TaskFunc{
 			terminalTf, terminalTf, terminalTf,
 		}
@@ -118,6 +118,6 @@ func TestRecursiveForkingJob(t *testing.T) {
 	sj := newSchedJob(context.Background(), s, "myid", "atype", forkingTf)
 
 	sj.run()
-	require.Equal(t, 4, ran.Load())
+	require.Equal(t, int64(4), ran.Load())
 
 }

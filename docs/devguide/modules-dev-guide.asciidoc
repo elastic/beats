@@ -100,7 +100,7 @@ Then run `export_dashboards` like this:
 ----
 $ cd dev-tools/cmd/dashboards
 $ make # if export_dashboard is not built yet
-$ ./export_dashboards -yml '../../../filebeat/module/{module}/module.yml'
+$ ./export_dashboards --yml '../../../filebeat/module/{module}/module.yml'
 ----
 
 New Filebeat modules might not be compatible with Kibana 5.x. To export dashboards

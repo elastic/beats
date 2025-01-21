@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -23,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -247,6 +247,7 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 	if err != nil {
 		t.Fatal(err)
 	}
+	//nolint:errcheck // ignore
 	pubsubInput := in.(*pubsubInput)
 	defer pubsubInput.Stop()
 
@@ -421,13 +422,14 @@ func TestRunStop(t *testing.T) {
 func TestEndToEndACK(t *testing.T) {
 	cfg := defaultTestConfig()
 
-	var count atomic.Int
+	var count atomic.Int64
 	seen := make(map[string]struct{})
 	// ACK every other message
 	halfAcker := func(ev beat.Event, clientConfig beat.ClientConfig) bool {
+		//nolint:errcheck // ignore
 		msg := ev.Private.(*pubsub.Message)
 		seen[msg.ID] = struct{}{}
-		if count.Inc()&1 != 0 {
+		if count.Add(1)&1 != 0 {
 			// Nack will result in the Message being redelivered more quickly than if it were allowed to expire.
 			msg.Nack()
 			return false
@@ -453,6 +455,7 @@ func TestEndToEndACK(t *testing.T) {
 		assert.Len(t, events, len(seen))
 		got := make(map[string]struct{})
 		for _, ev := range events {
+			//nolint:errcheck // ignore
 			msg := ev.Private.(*pubsub.Message)
 			got[msg.ID] = struct{}{}
 		}

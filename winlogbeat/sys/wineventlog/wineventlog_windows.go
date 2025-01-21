@@ -219,7 +219,7 @@ func RenderEvent(
 	eventHandle EvtHandle,
 	lang uint32,
 	renderBuf []byte,
-	pubHandleProvider func(string) sys.MessageFiles,
+	pubHandleProvider func(string) EvtHandle,
 	out io.Writer,
 ) error {
 	providerName, err := evtRenderProviderName(renderBuf, eventHandle)
@@ -227,19 +227,9 @@ func RenderEvent(
 		return err
 	}
 
-	var publisherHandle uintptr
-	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(providerName)
-		if messageFiles.Err == nil {
-			// There is only ever a single handle when using the Windows Event
-			// Log API.
-			publisherHandle = messageFiles.Handles[0].Handle
-		}
-	}
-
 	// Only a single string is returned when rendering XML.
 	err = FormatEventString(EvtFormatMessageXml,
-		eventHandle, providerName, EvtHandle(publisherHandle), lang, renderBuf, out)
+		eventHandle, providerName, pubHandleProvider(providerName), lang, renderBuf, out)
 	// Recover by rendering the XML without the RenderingInfo (message string).
 	if err != nil {
 		err = RenderEventXML(eventHandle, renderBuf, out)
@@ -250,22 +240,13 @@ func RenderEvent(
 
 // Message reads the event data associated with the EvtHandle and renders
 // and returns the message only.
-func Message(h EvtHandle, renderBuf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
+func Message(h EvtHandle, renderBuf []byte, pubHandleProvider func(string) EvtHandle) (message string, err error) {
 	providerName, err := evtRenderProviderName(renderBuf, h)
 	if err != nil {
 		return "", err
 	}
 
-	var pub EvtHandle
-	if pubHandleProvider != nil {
-		messageFiles := pubHandleProvider(providerName)
-		if messageFiles.Err == nil {
-			// There is only ever a single handle when using the Windows Event
-			// Log API.
-			pub = EvtHandle(messageFiles.Handles[0].Handle)
-		}
-	}
-	return getMessageStringFromHandle(&PublisherMetadata{Handle: pub}, h, nil)
+	return getMessageStringFromHandle(&PublisherMetadata{Handle: pubHandleProvider(providerName)}, h, nil)
 }
 
 // RenderEventXML renders the event as XML. If the event is already rendered, as

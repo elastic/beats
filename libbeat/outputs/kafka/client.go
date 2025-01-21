@@ -26,8 +26,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/eapache/go-resiliency/breaker"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -113,7 +114,7 @@ func newKafkaClient(
 	return c, nil
 }
 
-func (c *client) Connect() error {
+func (c *client) Connect(_ context.Context) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
@@ -257,7 +258,11 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.log.Debug("Stop kafka ack worker")
 
 	for libMsg := range ch {
-		msg := libMsg.Metadata.(*message)
+		msg, ok := libMsg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.done()
 	}
 }
@@ -268,7 +273,11 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg := errMsg.Msg.Metadata.(*message)
+		msg, ok := errMsg.Msg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.fail(msg, errMsg.Err)
 
 		if errors.Is(errMsg.Err, breaker.ErrBreakerOpen) {

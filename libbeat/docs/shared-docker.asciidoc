@@ -35,6 +35,16 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 
 ifndef::apm-server[]
 
+As another option, you can use the hardened link:https://wolfi.dev/[Wolfi] image.
+Using Wolfi images requires Docker version 20.10.10 or higher.
+For details about why the Wolfi images have been introduced, refer to our article 
+link:https://www.elastic.co/blog/reducing-cves-in-elastic-container-images[Reducing CVEs in Elastic container images].
+
+[source,terminal,subs="attributes"]
+----
+docker pull {dockerimage-wolfi}
+----
+
 ==== Optional: Verify the image
 
 You can use the https://docs.sigstore.dev/cosign/installation/[Cosign application] to verify the {beatname_uc} Docker image signature.
@@ -62,6 +72,8 @@ The following checks were performed on each of these signatures:
 ----
 
 ==== Run the {beatname_uc} setup
+
+IMPORTANT: A link:https://github.com/elastic/beats/issues/42038[known issue] in version 8.17.0 prevents {beats} Docker images from starting when no options are provided. When running an image on that version, add an `--environment container` parameter to avoid the problem. This is planned to be addressed in issue link:https://github.com/elastic/beats/pull/42060[#42060].
 
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations

@@ -6,7 +6,6 @@ package gcs
 
 import (
 	"context"
-	"time"
 
 	"cloud.google.com/go/storage"
 	gax "github.com/googleapis/gax-go/v2"
@@ -55,7 +54,6 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		source = &Source{
 			ProjectId:                in.config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -64,6 +62,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    in.config.Retry,
 		}
 
 		st := newState()
@@ -80,15 +79,18 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		}()
 
 		bkt := client.Bucket(currentSource.BucketName).Retryer(
+			// Use WithMaxAttempts to change the maximum number of attempts.
+			storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 			// Use WithBackoff to change the timing of the exponential backoff.
 			storage.WithBackoff(gax.Backoff{
-				Initial: 2 * time.Second,
+				Initial:    currentSource.Retry.InitialBackOffDuration,
+				Max:        currentSource.Retry.MaxBackOffDuration,
+				Multiplier: currentSource.Retry.BackOffMultiplier,
 			}),
 			// RetryAlways will retry the operation even if it is non-idempotent.
 			// Since we are only reading, the operation is always idempotent
 			storage.WithPolicy(storage.RetryAlways),
 		)
-
 		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic

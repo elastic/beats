@@ -98,7 +98,7 @@ winlogbeat.event_logs:
 ==== `event_logs.batch_read_size`
 
 The maximum number of event log records to read from the Windows API in a single
-batch. The default batch size is 100. Most Windows versions return an error if
+batch. The default batch size is 512. Most Windows versions return an error if
 the value is larger than 1024. *{vista_and_newer}*
 
 {beatname_uc} starts a goroutine (a lightweight thread) to read from each
@@ -241,40 +241,6 @@ winlogbeat.event_logs:
     event_id: 4624, 4625, 4700-4800, -4735, -4701-4710
 --------------------------------------------------------------------------------
 
-[WARNING]
-=======================================
-If you specify more than 22 query conditions (event IDs or event ID ranges), some
-versions of Windows will prevent {beatname_uc} from reading the event log due to
-limits in the query system. If this occurs a similar warning as shown below will
-be logged by {beatname_uc}, and it will continue processing data from other event
-logs.
-
-`WARN EventLog[Application] Open() error. No events will be read from this
-source. The specified query is invalid.`
-
-In some cases, the limit may be lower than 22 conditions. For instance, using a
-mixture of ranges and single event IDs, along with an additional parameter such
-as `ignore older`, results in a limit of 21 conditions.
-
-If you have more than 22 conditions, you can workaround this Windows limitation
-by using a drop_event[drop-event] processor to do the filtering after
-{beatname_uc} has received the events from Windows. The filter shown below is
-equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22
-event IDs.
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    processors:
-      - drop_event.when.not.or:
-        - equals.winlog.event_id: 903
-        - equals.winlog.event_id: 1024
-        - equals.winlog.event_id: 4624
---------------------------------------------------------------------------------
-
-=======================================
-
 [float]
 ==== `event_logs.language`
 
@@ -410,6 +376,9 @@ winlogbeat.event_logs:
     include_xml: true
 --------------------------------------------------------------------------------
 
+* This can have a significant impact on performance that can vary depending
+on your system specs.
+
 [float]
 ==== `event_logs.tags`
 
@@ -495,29 +464,6 @@ stopped. *{vista_and_newer}*
 Setting `no_more_events` to `stop` is useful when reading from archived event
 log files where you want to read the whole file then exit. There's a complete
 example of how to read from an `.evtx` file in the <<reading-from-evtx,FAQ>>.
-
-[float]
-==== `event_logs.api`
-
-This selects the event log reader implementation that is used to read events
-from the Windows APIs. You should only set this option when testing experimental
-features. When the value is set to `wineventlog-experimental` Winlogbeat will
-replace the default event log reader with the **experimental** implementation.
-We are evaluating this implementation to see if it can provide increased
-performance and reduce CPU usage. *{vista_and_newer}*
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: ForwardedEvents
-    api: wineventlog-experimental
---------------------------------------------------------------------------------
-
-There are a few notable differences in the events:
-
-* Events that contained data under `winlog.user_data` will now have it under
-  `winlog.event_data`.
-* Setting `include_xml: true` has no effect.
 
 
 [float]

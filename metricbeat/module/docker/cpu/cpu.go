@@ -40,6 +40,7 @@ type MetricSet struct {
 	cpuService   *CPUService
 	dockerClient *client.Client
 	dedot        bool
+	podman       bool
 }
 
 // New creates a new instance of the docker cpu MetricSet.
@@ -68,12 +69,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		dockerClient:  client,
 		cpuService:    &CPUService{Cores: cpuConfig.Cores},
 		dedot:         config.DeDot,
+		podman:        config.Podman,
 	}, nil
 }
 
 // Fetch returns a list of docker CPU stats.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout, m.podman, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to get docker stats: %w", err)
 	}
