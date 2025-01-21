@@ -77,22 +77,29 @@ A string to filter the results to include only log events from log streams that 
 
 ### `start_position` [_start_position]
 
-`start_position` allows user to specify if this input should read log files from the `beginning` or from the `end`.
+`start_position` allows user to specify if this input should read log files from the `beginning`, `end` or from the last known successful sync (`lastSync`).
 
-* `beginning`: reads from the beginning of the log group (default).
-* `end`: read only new messages from current time minus `scan_frequency` going forward
+* `beginning`: Reads from the beginning of the log group (default).
+* `end`: Read only new messages from current time minus `scan_frequency` going forward
+* `lastSync`: Read messages starting from the last known sync time if available. If there is no last known sync, then
+  falls back to beginning (default mode). This value is stored in the registry, so it persists across restarts.
 
-For example, with `scan_frequency` equals to `30s` and current timestamp is `2020-06-24 12:00:00`:
+For example, with `scan_frequency: 30s` and if the current timestamp is `2020-06-24 12:00:00`:
 
-* with `start_position = beginning`:
+* When `start_position: beginning`, reading starts from the earliest possible timestamp of unix epoch zero value,
 
-    * first iteration: startTime=0, endTime=2020-06-24 12:00:00
-    * second iteration: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
+    * First read: startTime=0, endTime=2020-06-24 12:00:00
+    * Next read: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
 
-* with `start_position = end`:
+* When `start_position: end`, reading starts with a look back equals to the `scan_frequency`,
 
-    * first iteration: startTime=2020-06-24 11:59:30, endTime=2020-06-24 12:00:00
-    * second iteration: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
+    * First read: startTime=2020-06-24 11:59:30, endTime=2020-06-24 12:00:00
+    * Next read: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
+
+* When `start_position: lastSync`, reading starts from the last known sync timestamp. Assuming last sync timestamp stored in the registry is `2020-06-23 12:00:00`,
+
+    * First read: startTime=2020-06-23 12:00:00, endTime=2020-06-24 12:00:00
+    * Next read: startTime=2020-06-24 12:00:00, endTime=2020-06-24 12:00:30
 
 
 
