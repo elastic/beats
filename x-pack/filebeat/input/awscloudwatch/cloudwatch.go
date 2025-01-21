@@ -18,10 +18,12 @@ import (
 )
 
 type cloudwatchPoller struct {
-	config               config
-	region               string
-	log                  *logp.Logger
-	metrics              *inputMetrics
+	config       config
+	region       string
+	log          *logp.Logger
+	metrics      *inputMetrics
+	stateHandler *stateHandler
+
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
 
@@ -42,7 +44,7 @@ type workResponse struct {
 }
 
 func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
-	awsRegion string, config config) *cloudwatchPoller {
+	awsRegion string, config config, stateHandler *stateHandler) *cloudwatchPoller {
 	if metrics == nil {
 		metrics = newInputMetrics("", nil)
 	}
@@ -52,6 +54,7 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		metrics:              metrics,
 		region:               awsRegion,
 		config:               config,
+		stateHandler:         stateHandler,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
 		// workRequestChan is unbuffered to guarantee that
@@ -152,14 +155,30 @@ func (p *cloudwatchPoller) startWorkers(
 // equal time.Now) to allow deterministic unit tests.
 func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, clock func() time.Time) {
 	defer p.workerWg.Wait()
+
 	// startTime and endTime are the bounds of the current scanning interval.
-	// If we're starting at the end of the logs, advance the start time to the
-	// most recent scan window
-	var startTime time.Time
 	endTime := clock().Add(-p.config.Latency)
-	if p.config.StartPosition == "end" {
+
+	var startTime time.Time
+	// If we're starting at the end of the logs, advance the start time to the most recent scan window
+	if p.config.StartPosition == end {
 		startTime = endTime.Add(-p.config.ScanFrequency)
 	}
+
+	if p.config.StartPosition == beginning {
+		startTime = time.Unix(0, 0)
+	}
+
+	if p.config.StartPosition == lastSync {
+		state, err := p.stateHandler.GetState(p.config)
+		if err != nil {
+			p.log.Errorf("error retrieving state from stateHandler: %v, falling back to %s", err, beginning)
+			startTime = time.Unix(0, 0)
+		} else {
+			startTime = time.UnixMilli(state.LastSyncEpoch)
+		}
+	}
+
 	for ctx.Err() == nil {
 		for _, lg := range logGroupIDs {
 			select {
@@ -184,6 +203,11 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, cl
 
 		// Advance to the next time span
 		startTime, endTime = endTime, clock().Add(-p.config.Latency)
+
+		// Store the last sync timestamp
+		if err := p.stateHandler.StoreState(p.config, StorableState{LastSyncEpoch: startTime.UnixMilli()}); err != nil {
+			p.log.Errorf("error storing state: %v, next sync(s) will continue without state storage support", err)
+		}
 	}
 }
 
