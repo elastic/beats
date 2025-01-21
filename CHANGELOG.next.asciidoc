@@ -12,6 +12,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Filebeat now needs `dup3`, `faccessat2`, `prctl` and `setrlimit` syscalls to run the journald input. If this input is not being used, the syscalls are not needed. All Beats have those syscalls allowed now because the default seccomp policy is global to all Beats. {pull}40061[40061]
+- Beats will rate limit the logs about errors when indexing events on Elasticsearch, logging a summary every 10s. The logs sent to the event log is unchanged. {issue}40157[40157]
+- Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+- Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
+- Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
+- Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
 *Auditbeat*
 
@@ -43,8 +51,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
-
-*Osquerybeat*
 
 
 *Packetbeat*
@@ -132,6 +138,30 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
+- Fixed failed job handling and removed false-positive error logs in the GCS input. {pull}41142[41142]
+- Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
+- Log bad handshake details when websocket connection fails {pull}41300[41300]
+- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
+- Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Fix missing key in streaming input logging. {pull}41600[41600]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
+- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
+- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
+- In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 
 *Heartbeat*
 
@@ -296,6 +326,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
 
