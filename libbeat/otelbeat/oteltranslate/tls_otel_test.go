@@ -18,6 +18,7 @@
 package oteltranslate
 
 import (
+	"crypto/tls"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -57,7 +58,18 @@ func TestTLSCommonToOTel(t *testing.T) {
 			err:  true,
 		},
 		{
-			name: "when ca, cert, key and key_passphrase is provided",
+			name: "when ssl.verification_mode:none ",
+			input: &tlscommon.Config{
+				VerificationMode: tlscommon.VerifyNone,
+			},
+			want: map[string]any{
+				"insecure_skip_verify":         true,
+				"include_system_ca_certs_pool": true,
+			},
+			err: false,
+		},
+		{
+			name: "when ca, cert, key and key_passphrase, cipher_suites is provided",
 			input: &tlscommon.Config{
 				CAs: []string{
 					"testdata/certs/rootCA.crt",
@@ -85,6 +97,7 @@ sxSmbIUfc2SGJGCJD4I=
 					Key:         "testdata/certs/client.key",
 					Passphrase:  "changeme",
 				},
+				CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA)},
 			},
 			want: map[string]any{
 				"ca_pem": `-----BEGIN CERTIFICATE-----
@@ -183,9 +196,9 @@ m8TtceUhSOnXNrrO5agyMRmL0aYf8D425ot/uwTiSkOd4bdFeEaYs0ahHosxHq2N
 me1zqwZ6EX7XHaa6j1mx9tcX
 -----END RSA PRIVATE KEY-----
 `,
-				"cipher_suites":                []string{},
 				"insecure_skip_verify":         false,
 				"include_system_ca_certs_pool": false,
+				"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA"},
 			},
 			err: false,
 			// TODO: Add  more  scenarios
