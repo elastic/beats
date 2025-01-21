@@ -18,7 +18,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
     echo "${PRIVATE_CI_GCS_CREDENTIALS_SECRET}" > ./gcp.json
     GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
-    export GOOGLE_APPLICATION_CREDENTIALS        
+    export GOOGLE_APPLICATION_CREDENTIALS
+    gcloud auth activate-service-account --key-file="${GOOGLE_APPLICATION_CREDENTIALS}"
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
