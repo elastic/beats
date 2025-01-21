@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -27,17 +28,18 @@ const (
 	inputName = "aws-cloudwatch"
 )
 
-func Plugin() v2.Plugin {
+func Plugin(store beater.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "Collect logs from cloudwatch",
-		Manager:    &cloudwatchInputManager{},
+		Manager:    &cloudwatchInputManager{store: store},
 	}
 }
 
 type cloudwatchInputManager struct {
+	store beater.StateStore
 }
 
 func (im *cloudwatchInputManager) Init(grp unison.Group) error {
@@ -50,17 +52,18 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config)
+	return newInput(config, im.store)
 }
 
 // cloudwatchInput is an input for reading logs from CloudWatch periodically.
 type cloudwatchInput struct {
-	config    config
-	awsConfig awssdk.Config
-	metrics   *inputMetrics
+	config       config
+	awsConfig    awssdk.Config
+	stateHandler *stateHandler
+	metrics      *inputMetrics
 }
 
-func newInput(config config) (*cloudwatchInput, error) {
+func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) {
 	cfgwarn.Beta("aws-cloudwatch input type is used")
 
 	// perform AWS configuration validation
@@ -69,9 +72,15 @@ func newInput(config config) (*cloudwatchInput, error) {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
+	handler, err := createStateHandler(store)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create state handler: %w", err)
+	}
+
 	return &cloudwatchInput{
-		config:    config,
-		awsConfig: awsConfig,
+		config:       config,
+		stateHandler: handler,
+		awsConfig:    awsConfig,
 	}, nil
 }
 
@@ -120,7 +129,8 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		log.Named("cloudwatch_poller"),
 		in.metrics,
 		region,
-		in.config)
+		in.config,
+		in.stateHandler)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
 	cwPoller.startWorkers(ctx, svc, logProcessor)
