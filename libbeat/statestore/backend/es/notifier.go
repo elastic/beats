@@ -40,6 +40,12 @@ func NewNotifier() *Notifier {
 	}
 }
 
+// Subscribe adds a listener to the notifier. The listener will be called when Notify is called.
+// Each OnConfigUpdateFunc is called asynchronously in a separate goroutine in each Notify call.
+//
+// Returns an UnsubscribeFunc that can be used to remove the listener.
+//
+// Note: Make sure to call Subscribe before any calls to Notify, otherwise updates to the config could be missed.
 func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 	n.mx.Lock()
 	defer n.mx.Unlock()
