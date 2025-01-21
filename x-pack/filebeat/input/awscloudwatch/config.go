@@ -6,10 +6,17 @@ package awscloudwatch
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+)
+
+const (
+	Beginning = "beginning"
+	End       = "end"
+	LastSync  = "last_sync"
 )
 
 type config struct {
@@ -35,7 +42,7 @@ func defaultConfig() config {
 		ForwarderConfig: harvester.ForwarderConfig{
 			Type: "aws-cloudwatch",
 		},
-		StartPosition:   "beginning",
+		StartPosition:   Beginning,
 		ScanFrequency:   10 * time.Second,
 		APITimeout:      120 * time.Second,
 		APISleep:        200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
@@ -44,9 +51,8 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.StartPosition != "beginning" && c.StartPosition != "end" {
-		return errors.New("start_position config parameter can only be " +
-			"either 'beginning' or 'end'")
+	if c.StartPosition != Beginning && c.StartPosition != End && c.StartPosition != LastSync {
+		return errors.New(fmt.Sprintf("start_position config parameter can only be one of %s, %s or %s", Beginning, End, LastSync))
 	}
 
 	if c.LogGroupARN == "" && c.LogGroupName == "" && c.LogGroupNamePrefix == "" {
