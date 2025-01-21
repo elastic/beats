@@ -82,8 +82,22 @@ Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS
   expand_event_list_from_field: Records
 ----
 
+[float]
+=== Handling Compressed Objects
+
+S3 objects that use the gzip format
+(https://rfc-editor.org/rfc/rfc1952.html[RFC 1952]) with the DEFLATE compression
+algorithm are automatically decompressed during processing. This is achieved by
+checking for the gzip file magic header.
+
+[float]
+=== Configuration
+
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
+
+NOTE: For time durations, valid time units are - "ns", "us" (or "µs"), "ms",
+"s", "m", "h". For example, "2h"
 
 [float]
 ==== `api_timeout`
