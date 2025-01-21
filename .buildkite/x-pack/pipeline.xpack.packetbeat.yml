@@ -77,7 +77,6 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu x86_64 Unit Tests"
-        skip: true
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/packetbeat
@@ -128,7 +127,6 @@ steps:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
 
       - label: ":rhel: x-pack/packetbeat: RHEL9 Unit Tests"
-        skip: true
         key: "mandatory-rhel9-unit-test"
         command: |
           cd x-pack/packetbeat
@@ -154,7 +152,6 @@ steps:
               context: "x-pack/packetbeat: RHEL9 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2016 Unit Tests"
-        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -182,7 +179,6 @@ steps:
               context: "x-pack/packetbeat: Win 2016 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2022 Unit Tests"
-        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -212,7 +208,7 @@ steps:
       - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
         command: |
-          gcloud auth list
+          source .buildkite/scripts/gcp_auth.sh
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -243,7 +239,6 @@ steps:
 
     steps:
       - label: ":windows: x-pack/packetbeat: Win 10 Unit Tests"
-        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -271,7 +266,6 @@ steps:
               context: "x-pack/packetbeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 11 Unit Tests"
-        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -299,7 +293,6 @@ steps:
               context: "x-pack/packetbeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2019 Unit Tests"
-        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -329,6 +322,7 @@ steps:
       - label: ":windows: x-pack/packetbeat: Win 10 System Tests"
         key: "extended-win-10-system-tests"
         command: |
+          source .buildkite/scripts/gcp_auth.sh
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -354,7 +348,6 @@ steps:
               context: "x-pack/packetbeat: Win 10 System Tests"
 
   - group: "Extended Tests"
-    skip: true
     key: "x-pack-packetbeat-extended-linux-arm-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
@@ -446,7 +439,6 @@ steps:
               context: "x-pack/packetbeat: macOS arm64 Unit Tests"
 
   - group: "Packaging"
-    skip: true
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
