@@ -452,8 +452,5 @@ performance and reduce CPU usage. *{vista_and_newer}*
   api: wineventlog-experimental
 --------------------------------------------------------------------------------
 
-There are a few notable differences in the events:
-
-* Events that contained data under `winlog.user_data` will now have it under
-  `winlog.event_data`.
-* Setting `include_xml: true` has no effect.
+* If `include_xml` is `true` the performance will be the same as the default API,
+as performance improvements are lost when parsing the XML.
