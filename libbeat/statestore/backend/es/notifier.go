@@ -27,7 +27,7 @@ type OnConfigUpdateFunc func(c *conf.C)
 type UnsubscribeFunc func()
 
 type Notifier struct {
-	mx sync.RWMutex
+	mx sync.Mutex
 
 	listeners map[int]OnConfigUpdateFunc
 	id        int
@@ -56,8 +56,8 @@ func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 }
 
 func (n *Notifier) Notify(c *conf.C) {
-	n.mx.RLock()
-	defer n.mx.RUnlock()
+	n.mx.Lock()
+	defer n.mx.Unlock()
 
 	for _, listener := range n.listeners {
 		go listener(c)
