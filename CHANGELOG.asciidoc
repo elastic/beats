@@ -7,6 +7,11 @@
 === Beats version 8.17.0
 https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 
+==== Known issue
+
+- Standalone Beats docker image will not start if `-e` option is not added {issue}42038[42038].
+
+
 ==== Breaking changes
 
 *Affecting all Beats*
