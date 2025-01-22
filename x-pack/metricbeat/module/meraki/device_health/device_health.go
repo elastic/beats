@@ -105,10 +105,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceChannelUtilization failed; %w", err)
 		}
 
-		err = getDeviceLicenses(m.client, org, devices)
-		if err != nil {
-			return fmt.Errorf("getDeviceLicenses failed; %w", err)
-		}
+		getDeviceLicenses(m.client, org, devices)
 
 		err = getDeviceUplinks(m.client, org, devices, collectionPeriod)
 		if err != nil {
