@@ -72,9 +72,9 @@ type msgRef struct {
 var (
 	errNoTopicsSelected = errors.New("no topic could be selected")
 
-	// authErros are authentication/authorisation errors that will cause
+	// authErrors are authentication/authorisation errors that will cause
 	// the event to be dropped
-	authErros = []error{
+	authErrors = []error{
 		sarama.ErrTopicAuthorizationFailed,
 		sarama.ErrGroupAuthorizationFailed,
 		sarama.ErrClusterAuthorizationFailed,
@@ -454,7 +454,7 @@ func (c *client) Test(d testing.Driver) {
 }
 
 func isAuthError(err error) bool {
-	for _, e := range authErros {
+	for _, e := range authErrors {
 		if errors.Is(err, e) {
 			return true
 		}

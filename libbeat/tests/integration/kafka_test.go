@@ -98,7 +98,7 @@ func TestAuthorisationErrors(t *testing.T) {
 	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
 	leader.Returns(metadataResponse)
 
-	authErros := []sarama.KError{
+	authErrors := []sarama.KError{
 		sarama.ErrTopicAuthorizationFailed,
 		sarama.ErrGroupAuthorizationFailed,
 		sarama.ErrClusterAuthorizationFailed,
@@ -106,7 +106,7 @@ func TestAuthorisationErrors(t *testing.T) {
 
 	// The mock broker must return one produce response per error we want
 	// to test. If less calls are made, the test will fail
-	for _, err := range authErros {
+	for _, err := range authErrors {
 		producerResponse := new(sarama.ProduceResponse)
 		producerResponse.AddTopicPartition(kafkaTopic, 0, err)
 		leader.Returns(producerResponse)
@@ -118,7 +118,7 @@ func TestAuthorisationErrors(t *testing.T) {
 	mockbeat.Start()
 
 	// Wait for mockbeat to log each of the errors.
-	for _, err := range authErros {
+	for _, err := range authErrors {
 		t.Log("waiting for:", err)
 		mockbeat.WaitForLogs(
 			fmt.Sprintf("Kafka (topic=test_topic): authorisation error: %s", err),
