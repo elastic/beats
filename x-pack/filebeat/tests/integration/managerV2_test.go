@@ -234,30 +234,15 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		"-E", "management.enabled=true",
 	)
 
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Can only start an input when all related states are finished")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'Can only start an input when all related states are finished' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'file 'flog.log' is not finished, will retry starting the input soon' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("ForceReload set to TRUE")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'ForceReload set to TRUE' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Reloading Beats inputs because forceReload is true")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'Reloading Beats inputs because forceReload is true' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("ForceReload set to FALSE")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'ForceReload set to FALSE' not found on Filebeat logs")
+	for _, contains := range []string{
+		"Can only start an input when all related states are finished",
+		"file 'flog.log' is not finished, will retry starting the input soon",
+		"ForceReload set to TRUE",
+		"Reloading Beats inputs because forceReload is true",
+		"ForceReload set to FALSE",
+	} {
+		checkFilebeatLogs(t, filebeat, contains)
+	}
 }
 
 // TestFailedOutputReportsUnhealthy ensures that if an output
@@ -993,16 +978,30 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		"-E", "management.enabled=true",
 	)
 
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Configure ES store")
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"String 'Configure ES store' not found on Filebeat logs")
+	for _, contains := range []string{
+		"Configure ES store",
+	} {
+		checkFilebeatLogs(t, filebeat, contains)
+	}
+
 	require.Eventually(t, func() bool {
 		mx.Lock()
 		defer mx.Unlock()
 		return final
 	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"Failed to reach the final state")
+}
+
+func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains string) {
+	t.Helper()
+	const tick = 100 * time.Millisecond
+
+	require.Eventually(t,
+		func() bool { return filebeat.LogContains(contains) },
+		waitDeadlineOr5Min(t),
+		tick,
+		fmt.Sprintf("String '%s' not found on Filebeat logs", contains),
+	)
 }
 
 // waitDeadlineOr5Min looks at the test deadline and returns a reasonable value of waiting for a condition to be met.
@@ -1012,13 +1011,13 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 // - otherwise return the time left minus 0.5 second.
 func waitDeadlineOr5Min(t *testing.T) time.Duration {
 	deadline, deadlineSet := t.Deadline()
-	if deadlineSet {
-		left := time.Until(deadline)
-		final := left - 500*time.Millisecond
-		if final <= 0 {
-			return left
-		}
-		return final
+	if !deadlineSet {
+		return 5 * time.Minute
 	}
-	return 5 * time.Minute
+	left := time.Until(deadline)
+	final := left - 500*time.Millisecond
+	if final <= 0 {
+		return left
+	}
+	return final
 }
