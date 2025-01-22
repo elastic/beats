@@ -1034,9 +1034,9 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	}
 
 	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Elasticsearch state store is enabled")
+		return filebeat.LogContains("Configure ES store")
 	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'Elasticsearch state store is enabled' not found on Filebeat logs")
+		"String 'Configure ES store' not found on Filebeat logs")
 	require.Eventually(t, func() bool {
 		mx.Lock()
 		defer mx.Unlock()

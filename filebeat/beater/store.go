@@ -54,7 +54,6 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 	)
 
 	if features.IsElasticsearchStateStoreEnabled() {
-		logger.Debug("Elasticsearch state store is enabled")
 		notifier = es.NewNotifier()
 		esreg, err = es.New(ctx, logger, notifier)
 		if err != nil {
