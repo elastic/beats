@@ -25,7 +25,7 @@
     "log": {
       "level": "information"
     },
-    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x1D22ED\n\tLogon GUID:\t{c25cdf73-2322-651f-f4fb-db862c0e03a8}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}",
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3e7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x1d22ed\n\tLogon GUID:\t{C25CDF73-2322-651F-F4FB-DB862C0E03A8}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}",
     "related": {
       "user": [
         "Administrator"
@@ -37,8 +37,7 @@
       "name": "Administrator"
     },
     "winlog": {
-      "activity_id": "{af6b9825-ffd8-0000-2f9a-6bafd8ffd501}",
-      "api": "wineventlog",
+      "activity_id": "{AF6B9825-FFD8-0000-2F9A-6BAFD8FFD501}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
@@ -49,7 +48,7 @@
         "SubjectUserName": "WIN-41OB2LO92CR$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "WLBEAT",
-        "TargetLogonGuid": "{c25cdf73-2322-651f-f4fb-db862c0e03a8}",
+        "TargetLogonGuid": "{C25CDF73-2322-651F-F4FB-DB862C0E03A8}",
         "TargetLogonId": "0x1d22ed",
         "TargetUserName": "Administrator",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
@@ -68,7 +67,7 @@
           "id": 828
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "68259",
       "task": "Special Logon"
@@ -100,7 +99,7 @@
     "log": {
       "level": "information"
     },
-    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x7C0BE\n\tLogon GUID:\t{38fec9bc-577f-76f6-5d29-e0175ce19797}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-512}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-1007}",
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3e7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x7c0be\n\tLogon GUID:\t{38FEC9BC-577F-76F6-5D29-E0175CE19797}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-512}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-1007}",
     "related": {
       "user": [
         "Administrator"
@@ -112,8 +111,7 @@
       "name": "Administrator"
     },
     "winlog": {
-      "activity_id": "{a22b4bf4-ffdc-0000-ee4d-2ba2dcffd501}",
-      "api": "wineventlog",
+      "activity_id": "{A22B4BF4-FFDC-0000-EE4D-2BA2DCFFD501}",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
       "event_data": {
@@ -124,7 +122,7 @@
         "SubjectUserName": "WIN-41OB2LO92CR$",
         "SubjectUserSid": "S-1-5-18",
         "TargetDomainName": "WLBEAT",
-        "TargetLogonGuid": "{38fec9bc-577f-76f6-5d29-e0175ce19797}",
+        "TargetLogonGuid": "{38FEC9BC-577F-76F6-5D29-E0175CE19797}",
         "TargetLogonId": "0x7c0be",
         "TargetUserName": "Administrator",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
@@ -143,7 +141,7 @@
           "id": 2608
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "68620",
       "task": "Special Logon"
