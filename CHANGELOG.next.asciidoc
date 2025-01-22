@@ -58,7 +58,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
 - Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
-- The fields produced by the Journald input are updated to better match ECS. Renamed fields: `syslog.priority` -> `log.syslog.priority`, `syslog.facility` -> `log.syslog.facility.code`, `syslog.identifier` -> `log.syslog.appname`, `syslog.pid` -> `log.syslog.procid`. Dropped fields: `container.id_truncated`, `container.log.tag`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`, otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields: `syslog.priority` -> `log.syslog.priority`, `syslog.facility` -> `log.syslog.facility.code`, `syslog.identifier` -> `log.syslog.appname`, `syslog.pid` -> `log.syslog.procid`. Dropped fields (they're duplicated): `container.id_truncated`, `container.log.tag`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`, otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Heartbeat*
 
