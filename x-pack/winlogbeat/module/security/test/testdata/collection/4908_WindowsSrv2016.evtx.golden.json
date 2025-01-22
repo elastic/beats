@@ -16,7 +16,6 @@
     },
     "message": "Special Groups Logon table modified.\n\nSpecial Groups:\t\n\t\t%{S-1-5-32-544}\n\t\t%{S-1-5-32-123-54-65}\n\nThis event is generated when the list of special groups is updated in the registry or through security policy. The updated list of special groups is indicated in the event.",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
@@ -33,7 +32,7 @@
           "id": 808
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": 140274,
       "task": "Audit Policy Change"

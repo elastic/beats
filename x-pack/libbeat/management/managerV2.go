@@ -680,15 +680,19 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
-	if err := cm.reloadInputs(inputUnits); err != nil {
-		// reloadInputs wraps the multierror so we have to call Unwrap
-		wr := errors.Unwrap(err)
-
-		//nolint:errorlint // ignore
-		if u, ok := wr.(interface {
+	if err := cm.reloadInputs(inputUnits); err != nil { // HERE
+		// cm.reloadInputs will use fmt.Errorf and join an error slice
+		// using errors.Join, so we need to unwrap the fmt wrapped error,
+		// then we can iterate over the errors list.
+		err = errors.Unwrap(err)
+		type unwrapList interface {
 			Unwrap() []error
-		}); ok {
-			for _, err := range u.Unwrap() {
+		}
+
+		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				unitErr := cfgfile.UnitError{}
 				if errors.As(err, &unitErr) {
 					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
@@ -834,11 +838,14 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
 		// filebeat/input/log/input.go.
 		// If they change the way they report errors, this will break.
-		//nolint:errorlint // ignore
-		if u, ok := err.(interface {
+		// TODO (Tiago): update all layers to use the most recent features from
+		// the standard library errors package.
+		type unwrapList interface {
 			Unwrap() []error
-		}); ok {
-			for _, err := range u.Unwrap() {
+		}
+		errList, isErrList := err.(unwrapList) //nolint:errorlint // see the comment above
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,

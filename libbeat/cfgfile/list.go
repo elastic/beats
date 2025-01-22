@@ -70,8 +70,7 @@ func (r *RunnerList) Runners() []Runner {
 //
 // Runners might fail to start, it's the callers responsibility to
 // handle any error. During execution, any encountered errors are
-// accumulated in a `multierror.Errors` and returned as
-// a `multierror.MultiError` upon completion.
+// accumulated in a []errors and returned as errors.Join(errs) upon completion.
 //
 // While the stopping of runners occurs on separate goroutines,
 // Reload will wait for all runners to finish before starting any new runners.
