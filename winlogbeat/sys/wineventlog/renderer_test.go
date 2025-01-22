@@ -40,8 +40,8 @@ import (
 func TestRenderer(t *testing.T) {
 	logp.TestingSetup()
 
-	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
-		log := openLog(t, sysmon9File)
+	t.Run(filepath.Base(security4738File), func(t *testing.T) {
+		log := openLog(t, security4738File)
 		defer log.Close()
 
 		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())

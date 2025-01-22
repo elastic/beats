@@ -40948,6 +40948,160 @@ type: float
 
 --
 
+*`iis.application_pool.net_clr.exceptions_thrown_per_sec`*::
++
+--
+Number of Exceptions Thrown / sec.
+
+
+type: float
+
+--
+
+[float]
+=== memory
+
+Memory overview.
+
+
+
+*`iis.application_pool.net_clr.memory.bytes_in_all_heaps`*::
++
+--
+Number of bytes in all heaps.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_0_collections`*::
++
+--
+Number of Gen 0 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_1_collections`*::
++
+--
+Number of Gen 1 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_2_collections`*::
++
+--
+Number of Gen 2 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.total_committed_bytes`*::
++
+--
+Number of total committed bytes.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.allocated_bytes_per_sec`*::
++
+--
+Allocated Bytes/sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_0_heap_size`*::
++
+--
+Gen 0 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_1_heap_size`*::
++
+--
+Gen 1 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_2_heap_size`*::
++
+--
+Gen 2 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.large_object_heap_size`*::
++
+--
+Large Object Heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.time_in_gc_perc`*::
++
+--
+% Time in GC.
+
+
+type: float
+
+--
+
+[float]
+=== locks_and_threads
+
+LocksAndThreads overview.
+
+
+
+*`iis.application_pool.net_clr.locks_and_threads.contention_rate_per_sec`*::
++
+--
+Contention Rate / sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.locks_and_threads.current_queue_length`*::
++
+--
+Current Queue Length.
+
+
+type: float
+
+--
+
 [float]
 === webserver
 
@@ -50843,6 +50997,87 @@ type: long
 +
 --
 Number of database commands executed.
+
+
+type: long
+
+--
+
+
+*`mongodb.collstats.stats.stats.size`*::
++
+--
+The total uncompressed size in memory of all records in a collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.count`*::
++
+--
+The number of objects or documents in this collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.avgObjSize`*::
++
+--
+The average size of an object in the collection (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.storageSize`*::
++
+--
+The total amount of storage allocated to this collection for document storage (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalIndexSize`*::
++
+--
+The total size of all indexes (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalSize`*::
++
+--
+The sum of the storageSize and totalIndexSize (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.max`*::
++
+--
+Shows the maximum number of documents that may be present in a capped collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.nindexes`*::
++
+--
+The number of indexes on the collection. All collections have at least one index on the _id field.
 
 
 type: long

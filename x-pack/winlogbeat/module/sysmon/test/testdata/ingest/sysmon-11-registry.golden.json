@@ -5,6 +5,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Registry value set (rule: RegistryEvent)",
       "category": [
         "configuration",
         "registry"
@@ -23,8 +24,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:40.589\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1\nDetails: DWORD (0x00000004)\nUser: %9",
     "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
       "executable": "C:\\Windows\\regedit.exe",
       "name": "regedit.exe",
       "pid": 6072
@@ -45,7 +47,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -59,9 +60,10 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2682",
+      "task": "Registry value set (rule: RegistryEvent)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -77,6 +79,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Registry value set (rule: RegistryEvent)",
       "category": [
         "configuration",
         "registry"
@@ -95,8 +98,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-7554-5EB1-6D00-000000000800}\nProcessId: 0\nImage: C:\\Windows\\Explorer.EXE\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA\nDetails: Binary Data\nUser: %9",
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -117,7 +121,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -131,9 +134,10 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2686",
+      "task": "Registry value set (rule: RegistryEvent)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -149,6 +153,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Registry value set (rule: RegistryEvent)",
       "category": [
         "configuration",
         "registry"
@@ -167,8 +172,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:44.714\nProcessGuid: {5B522F6E-77AE-5EB1-2C03-000000000800}\nProcessId: 0\nImage: C:\\Windows\\regedit.exe\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2\nDetails: QWORD (0x00000000-0x00000005)\nUser: %9",
     "process": {
-      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "entity_id": "{5B522F6E-77AE-5EB1-2C03-000000000800}",
       "executable": "C:\\Windows\\regedit.exe",
       "name": "regedit.exe",
       "pid": 6072
@@ -189,7 +195,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -203,9 +208,10 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2687",
+      "task": "Registry value set (rule: RegistryEvent)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -221,6 +227,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Registry value set (rule: RegistryEvent)",
       "category": [
         "configuration",
         "registry"
@@ -239,8 +246,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:46.808\nProcessGuid: {5B522F6E-7554-5EB1-6D00-000000000800}\nProcessId: 0\nImage: C:\\Windows\\Explorer.EXE\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr\nDetails: Binary Data\nUser: %9",
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -261,7 +269,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -275,9 +282,10 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2690",
+      "task": "Registry value set (rule: RegistryEvent)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -293,6 +301,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Registry value set (rule: RegistryEvent)",
       "category": [
         "configuration",
         "registry"
@@ -311,8 +320,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Registry value set:\nRuleName: -\nEventType: SetValue\nUtcTime: 2020-05-05 14:57:46.808\nProcessGuid: {5B522F6E-7554-5EB1-6D00-000000000800}\nProcessId: 0\nImage: C:\\Windows\\Explorer.EXE\nTargetObject: HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA\nDetails: Binary Data\nUser: %9",
     "process": {
-      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "entity_id": "{5B522F6E-7554-5EB1-6D00-000000000800}",
       "executable": "C:\\Windows\\Explorer.EXE",
       "name": "Explorer.EXE",
       "pid": 4320
@@ -333,7 +343,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -347,9 +356,10 @@
           "id": 876
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "2691",
+      "task": "Registry value set (rule: RegistryEvent)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

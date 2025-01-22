@@ -166,11 +166,9 @@ linters-settings:
     require-specific: false
 
   staticcheck:
-    # Select the Go version to target. The default is '1.13'.
     checks: ["all"]
 
   stylecheck:
-    # Select the Go version to target. The default is '1.13'.
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]

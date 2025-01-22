@@ -5,6 +5,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Process Tampering (rule: ProcessTampering)",
       "category": [
         "process"
       ],
@@ -22,9 +23,9 @@
     "log": {
       "level": "information"
     },
-    "message": "Image is replaced",
+    "message": "Process Tampering:\nRuleName: -\nUtcTime: 2021-02-25 14:43:23.550\nProcessGuid: {9497D8D9-B78B-6037-6F13-000000001000}\nProcessId: 0\nImage: C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe\nType: Image is replaced\nUser: %7",
     "process": {
-      "entity_id": "{9497d8d9-b78b-6037-6f13-000000001000}",
+      "entity_id": "{9497D8D9-B78B-6037-6F13-000000001000}",
       "executable": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
       "name": "git.exe",
       "pid": 2628
@@ -33,9 +34,11 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "DESKTOP-I9CQVAQ",
+      "event_data": {
+        "Type": "Image is replaced"
+      },
       "event_id": "25",
       "opcode": "Info",
       "process": {
@@ -44,9 +47,10 @@
           "id": 5080
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "10737797",
+      "task": "Process Tampering (rule: ProcessTampering)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

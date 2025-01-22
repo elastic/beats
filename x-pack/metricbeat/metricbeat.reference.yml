@@ -145,7 +145,7 @@ metricbeat.modules:
   # This option enables the use of performance counters to collect data for cpu/core metricset.
   # Only effective for Windows.
   # You should use this option if running beats on machins with more than 64 cores.
-  #use_performance_counters: true
+  #use_performance_counters: false
 
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
@@ -3128,7 +3128,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.
