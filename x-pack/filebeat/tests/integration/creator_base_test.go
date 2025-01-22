@@ -7,16 +7,11 @@
 package integration
 
 import (
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
-func NewFilebeat(t *testing.T, env ...string) *integration.BeatProc {
-	b := integration.NewBeat(t, "filebeat", "../../filebeat.test")
-	if len(env) > 0 {
-		b.Env = append(os.Environ(), env...)
-	}
-	return b
+func NewFilebeat(t *testing.T) *integration.BeatProc {
+	return integration.NewBeat(t, "filebeat", "../../filebeat.test")
 }

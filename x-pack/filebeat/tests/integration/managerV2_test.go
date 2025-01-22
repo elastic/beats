@@ -838,10 +838,9 @@ type response struct {
 	Message string `json:"message"`
 }
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
+func helloHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	response := response{Message: "Hello"}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(response{Message: "Hello"})
 }
 
 func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T) {
@@ -855,7 +854,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	defer tserv.Close()
 
 	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
-	filebeat := NewFilebeat(t, ``)
+	filebeat := NewFilebeat(t)
 
 	var units = [][]*proto.UnitExpected{
 		{
