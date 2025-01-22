@@ -1022,8 +1022,8 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	//   0.5 second left, return the time left
 	// - otherwise return the time left minus 0.5 second.
 	waitDeadlineOr5Min := func() time.Duration {
-		deadline, deadileSet := t.Deadline()
-		if deadileSet {
+		deadline, deadlineSet := t.Deadline()
+		if deadlineSet {
 			left := time.Until(deadline)
 			final := left - 500*time.Millisecond
 			if final <= 0 {
