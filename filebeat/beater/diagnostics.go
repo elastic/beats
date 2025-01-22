@@ -85,7 +85,7 @@ func gzipRegistry() []byte {
 
 	defer func() {
 		if err := os.Remove(f.Name()); err != nil {
-			logp.L().Named("diagnostics").Warnf("cannot remove temporary registry archive '%s': '%s'", f.Name(), err)
+			logger.Warnf("cannot remove temporary registry archive '%s': '%s'", f.Name(), err)
 		}
 	}()
 

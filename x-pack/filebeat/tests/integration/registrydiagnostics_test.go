@@ -110,7 +110,16 @@ func TestFilestreamRegistryIsInDiagnostics(t *testing.T) {
 		// Ensure we don't have any diagnostics being requested already.
 		if waitingForDiagnostics.CompareAndSwap(false, true) {
 			// Request the diagnostics asynchronously
-			go requestDiagnosticsAndVerifyRegistry(t, filebeat, outputGlob, logfile, 100, &waitingForDiagnostics, server, testDone, false)
+			go requestDiagnosticsAndVerifyRegistry(
+				t,
+				filebeat,
+				outputGlob,
+				logfile,
+				100,
+				&waitingForDiagnostics,
+				server,
+				testDone,
+				false)
 		}
 		return &checkinExpected
 	}
@@ -274,9 +283,11 @@ func requestDiagnosticsAndVerifyRegistry(
 	testDone chan<- struct{},
 	emtpyRegistyLogFile bool) {
 
-	assert.Eventuallyf(t, func() bool {
-		return filebeat.CountFileLines(outputGlob) == 2
-	},
+	assert.Eventuallyf(
+		t,
+		func() bool {
+			return filebeat.CountFileLines(outputGlob) == 2
+		},
 		1*time.Minute,
 		100*time.Millisecond,
 		"output file '%s' does not contain two events", outputGlob)
