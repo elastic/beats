@@ -1154,8 +1154,6 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-<<<<<<< HEAD
-=======
   name: beats-macos-tests
   description: 'Runs of Beats macOS tests'
   links:
@@ -1199,7 +1197,6 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
->>>>>>> 47f15027a1 (Update catalog-info file with correct system property (#41618))
   name: beats-pipeline-scheduler
   description: 'Scheduled runs of various Beats pipelines per release branch'
   links:
