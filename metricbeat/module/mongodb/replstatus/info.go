@@ -30,9 +30,9 @@ import (
 type oplogInfo struct {
 	allocated int64
 	used      float64
-	firstTs   uint32
-	lastTs    uint32
-	diff      uint32
+	firstTs   int64
+	lastTs    int64
+	diff      int64
 }
 
 // CollSize contains data about collection size
@@ -88,7 +88,7 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 }
 
 // getOpTimestamp returns the first and last timestamp of the oplog collection.
-func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
+func getOpTimestamp(collection *mongo.Collection) (int64, int64, error) {
 	// NOTE(shmsr):
 	//
 	// When you do db.getReplicationInfo() in monogo shell (mongosh), you can see
@@ -131,7 +131,7 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 		SetProjection(bson.D{{Key: "ts", Value: 1}})
 	err := collection.FindOne(ctx, bson.D{}, firstOpts).Decode(&firstDoc)
 	if err != nil {
-		return 0, 0, fmt.Errorf("first timestamp query failed: %w", err)
+		return 0, 0, fmt.Errorf("first timestamp query failed for collection %s: %w", collection.Name(), err)
 	}
 
 	// Get newest entry using reverse natural order
@@ -147,5 +147,5 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 		return 0, 0, fmt.Errorf("last timestamp query failed: %w", err)
 	}
 
-	return uint32(firstDoc.Timestamp.Unix()), uint32(lastDoc.Timestamp.Unix()), nil
+	return firstDoc.Timestamp.Unix(), lastDoc.Timestamp.Unix(), nil
 }
