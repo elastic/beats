@@ -46,7 +46,6 @@ import (
 )
 
 type BeatProc struct {
-	Env                 []string
 	Args                []string
 	baseArgs            []string
 	Binary              string
@@ -244,7 +243,6 @@ func (b *BeatProc) startBeat() {
 		Args:   b.Args,
 		Stdout: b.stdout,
 		Stderr: b.stderr,
-		Env:    b.Env,
 	}
 
 	var err error
