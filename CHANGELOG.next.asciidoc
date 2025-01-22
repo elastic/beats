@@ -19,7 +19,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
-- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209] 
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
 *Auditbeat*
 
@@ -79,8 +79,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Disable allow_unsafe osquery configuration. {pull}40130[40130]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
-
-*Osquerybeat*
 
 
 *Packetbeat*
@@ -208,7 +206,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
 - The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
-- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218] 
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 
 *Heartbeat*
@@ -458,6 +456,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
 
