@@ -234,49 +234,29 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		"-E", "management.enabled=true",
 	)
 
-	// waitDeadlineOr5Mins looks at the test deadline
-	// and returns a reasonable value of waiting for a
-	// condition to be met. The possible values are:
-	// - if no test deadline is set, return 5 minutes
-	// - if a deadline is set and there is less than
-	//   0.5 second left, return the time left
-	// - otherwise return the time left minus 0.5 second.
-	waitDeadlineOr5Min := func() time.Duration {
-		deadline, deadileSet := t.Deadline()
-		if deadileSet {
-			left := time.Until(deadline)
-			final := left - 500*time.Millisecond
-			if final <= 0 {
-				return left
-			}
-			return final
-		}
-		return 5 * time.Minute
-	}
-
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("Can only start an input when all related states are finished")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'Can only start an input when all related states are finished' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'file 'flog.log' is not finished, will retry starting the input soon' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("ForceReload set to TRUE")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'ForceReload set to TRUE' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("Reloading Beats inputs because forceReload is true")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'Reloading Beats inputs because forceReload is true' not found on Filebeat logs")
 
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("ForceReload set to FALSE")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'ForceReload set to FALSE' not found on Filebeat logs")
 }
 
@@ -1013,34 +993,32 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		"-E", "management.enabled=true",
 	)
 
-	// waitDeadlineOr5Mins looks at the test deadline
-	// and returns a reasonable value of waiting for a
-	// condition to be met. The possible values are:
-	// - if no test deadline is set, return 5 minutes
-	// - if a deadline is set and there is less than
-	//   0.5 second left, return the time left
-	// - otherwise return the time left minus 0.5 second.
-	waitDeadlineOr5Min := func() time.Duration {
-		deadline, deadlineSet := t.Deadline()
-		if deadlineSet {
-			left := time.Until(deadline)
-			final := left - 500*time.Millisecond
-			if final <= 0 {
-				return left
-			}
-			return final
-		}
-		return 5 * time.Minute
-	}
-
 	require.Eventually(t, func() bool {
 		return filebeat.LogContains("Configure ES store")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"String 'Configure ES store' not found on Filebeat logs")
 	require.Eventually(t, func() bool {
 		mx.Lock()
 		defer mx.Unlock()
 		return final
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
 		"Failed to reach the final state")
+}
+
+// waitDeadlineOr5Min looks at the test deadline and returns a reasonable value of waiting for a condition to be met.
+// The possible values are:
+// - if no test deadline is set, return 5 minutes
+// - if a deadline is set and there is less than 0.5 second left, return the time left
+// - otherwise return the time left minus 0.5 second.
+func waitDeadlineOr5Min(t *testing.T) time.Duration {
+	deadline, deadlineSet := t.Deadline()
+	if deadlineSet {
+		left := time.Until(deadline)
+		final := left - 500*time.Millisecond
+		if final <= 0 {
+			return left
+		}
+		return final
+	}
+	return 5 * time.Minute
 }
