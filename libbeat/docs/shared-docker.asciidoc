@@ -35,6 +35,16 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 
 ifndef::apm-server[]
 
+As another option, you can use the hardened link:https://wolfi.dev/[Wolfi] image.
+Using Wolfi images requires Docker version 20.10.10 or higher.
+For details about why the Wolfi images have been introduced, refer to our article 
+link:https://www.elastic.co/blog/reducing-cves-in-elastic-container-images[Reducing CVEs in Elastic container images].
+
+[source,terminal,subs="attributes"]
+----
+docker pull {dockerimage-wolfi}
+----
+
 ==== Optional: Verify the image
 
 You can use the https://docs.sigstore.dev/cosign/installation/[Cosign application] to verify the {beatname_uc} Docker image signature.
