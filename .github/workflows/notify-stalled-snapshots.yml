@@ -57,10 +57,24 @@ jobs:
         name: Report obsoleted branches (slack)
         uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
         with:
-          channel-id: '#ingest-notifications'
-          payload:  ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+              "channel": "#ingest-notifications",
+              "text": "${{ env.MESSAGE }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ env.SLACK_MESSAGE }}"
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_MESSAGE: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
