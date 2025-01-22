@@ -838,11 +838,6 @@ type response struct {
 	Message string `json:"message"`
 }
 
-func helloHandler(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response{Message: "Hello"})
-}
-
 func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T) {
 	// First things first, ensure ES is running and we can connect to it.
 	// If ES is not running, the test will timeout and the only way to know
@@ -850,8 +845,12 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	integration.EnsureESIsRunning(t)
 
 	// Create a test httpjson server for httpjson input
-	tserv := httptest.NewServer(http.HandlerFunc(helloHandler))
-	defer tserv.Close()
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(response{Message: "Hello"})
+		require.NoError(t, err)
+	}))
+	defer testServer.Close()
 
 	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
 	filebeat := NewFilebeat(t)
@@ -897,7 +896,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 								"enabled":        true,
 								"type":           "httpjson",
 								"interval":       "1m",
-								"request.url":    tserv.URL,
+								"request.url":    testServer.URL,
 								"request.method": "GET",
 								"cursor": map[string]any{
 									"published": map[string]any{
@@ -950,7 +949,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 								"enabled":        true,
 								"type":           "httpjson",
 								"interval":       "1m",
-								"request.url":    tserv.URL,
+								"request.url":    testServer.URL,
 								"request.method": "GET",
 								"cursor": map[string]any{
 									"published": map[string]any{
