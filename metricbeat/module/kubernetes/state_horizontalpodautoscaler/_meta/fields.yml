@@ -1,0 +1,35 @@
+- name: pod
+  type: group
+  description: >
+    kubernetes pod metrics
+  release: ga
+  fields:
+    - name: host_ip
+      type: ip
+      description: >
+        Kubernetes pod host IP
+    - name: status
+      type: group
+      description: >
+        Kubernetes pod status metrics
+      fields:
+        - name: phase
+          type: keyword
+          description: >
+            Kubernetes pod phase (Running, Pending...)
+        - name: ready
+          type: keyword
+          description: >
+            Kubernetes pod ready status (true, false or unknown)
+        - name: scheduled
+          type: keyword
+          description: >
+            Kubernetes pod scheduled status (true, false, unknown)
+        - name: reason
+          type: keyword
+          description: >
+            The reason the pod is in its current state (Evicted, NodeAffinity, NodeLost, Shutdown or UnexpectedAdmissionError)
+        - name: ready_time
+          type: double
+          description: >
+            Readiness achieved time in unix timestamp for a pod 
