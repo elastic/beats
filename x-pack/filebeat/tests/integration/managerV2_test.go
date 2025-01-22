@@ -854,7 +854,8 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	tserv := httptest.NewServer(http.HandlerFunc(helloHandler))
 	defer tserv.Close()
 
-	filebeat := NewFilebeat(t, `AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES="httpjson,cel"`)
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
+	filebeat := NewFilebeat(t, ``)
 
 	var units = [][]*proto.UnitExpected{
 		{
@@ -987,13 +988,6 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			if len(observed.Units) == 0 {
-				fmt.Println("Zero units")
-			} else {
-				for i, u := range observed.Units {
-					fmt.Printf("Unit [%d]: %s\n", i, u.String())
-				}
-			}
 			if management.DoesStateMatch(observed, units[idx], 0) {
 				if idx < len(units)-1 {
 					nextState()
@@ -1004,9 +998,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				}
 			}
 			for _, unit := range observed.GetUnits() {
-				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
-					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
-				}
+				require.Containsf(t, []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING, proto.State_STOPPING}, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 			}
 			return &proto.CheckinExpected{
 				Units: units[idx],
@@ -1043,6 +1035,12 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		return 5 * time.Minute
 	}
 
+	require.Eventually(t, func() bool {
+		mx.Lock()
+		defer mx.Unlock()
+		return final
+	}, waitDeadlineOr5Min(), 100*time.Millisecond,
+		"Elasticsearch state store is enabled")
 	require.Eventually(t, func() bool {
 		mx.Lock()
 		defer mx.Unlock()
