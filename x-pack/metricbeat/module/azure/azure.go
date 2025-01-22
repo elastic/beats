@@ -61,9 +61,13 @@ func (s *MetricStore) Size() int {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Client     *Client
-	MapMetrics mapResourceMetrics
+	Client         *Client
+	MapMetrics     mapResourceMetrics
+	BatchClient    *BatchClient
+	ConcMapMetrics concurrentMapResourceMetrics // In combination with BatchClient only
 }
+
+var monitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account"}
 
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
@@ -105,20 +109,37 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		config.Resources = resources
 	}
 	// instantiate monitor client
-	monitorClient, err := NewClient(config)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
+	var monitorClient *Client
+	var monitorBatchClient *BatchClient
+	if containsString(monitorMetricsets, metricsetName) && config.EnableBatchApi {
+		monitorBatchClient, err = NewBatchClient(config)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
+		}
+	} else {
+		// default case
+		monitorClient, err = NewClient(config)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
+		}
 	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		Client:        monitorClient,
+		BatchClient:   monitorBatchClient,
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right metricset
-// It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	if m.BatchClient != nil {
+		// EnableBatchApi is true
+		return fetchBatch(m, report)
+	}
+	return fetch(m, report)
+}
+
+func fetch(m *MetricSet, report mb.ReporterV2) error {
 	// Set the reference time for the current fetch.
 	//
 	// The reference time is used to calculate time intervals
@@ -145,13 +166,72 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// The metricset periodically refreshes the information
 	// after `RefreshListInterval` (default 600s for
 	// most metricsets).
-	m.Client.Log.Infof("Fetch called at %s", referenceTime)
 	err := m.Client.InitResources(m.MapMetrics)
 	if err != nil {
 		return err
 	}
+
+	if len(m.Client.ResourceConfigurations.Metrics) == 0 {
+		// error message is previously logged in the InitResources,
+		// no error event should be created
+		return nil
+	}
+
+	// Group metric definitions by cloud resource ID.
+	//
+	// We group the metric definitions by resource ID to fetch
+	// metric values for each cloud resource in one API call.
+	metricsByResourceId := groupMetricsDefinitionsByResourceId(m.Client.ResourceConfigurations.Metrics)
+
+	for _, metricsDefinition := range metricsByResourceId {
+		// Fetch metric values for each resource.
+		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
+
+		// Turns metric values into events and sends them to Elasticsearch.
+		if err := m.Client.MapToEvents(metricValues, report); err != nil {
+			return fmt.Errorf("error mapping metrics to events: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// Fetch methods implements the data gathering and data conversion to the right metricset
+// It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
+	// Set the reference time for the current fetch.
+	//
+	// The reference time is used to calculate time intervals
+	// and compare with collection info in the metric
+	// registry to decide whether to collect metrics or not,
+	// depending on metric time grain (check `MetricRegistry`
+	// for more information).
+	//
+	// We round the reference time to the nearest second to avoid
+	// millisecond variations in the collection period causing
+	// skipped collections.
+	//
+	// See "Round outer limits" and "Round inner limits" tests in
+	// the metric_registry_test.go for more information.
+	referenceTime := time.Now().UTC()
+
+	// Initialize cloud resources and monitor metrics
+	// information.
+	//
+	// The client collects and stores:
+	// - existing cloud resource definitions (e.g. VMs, DBs, etc.)
+	// - metric definitions for the resources (e.g. CPU, memory, etc.)
+	//
+	// The metricset periodically refreshes the information
+	// after `RefreshListInterval` (default 600s for
+	// most metricsets).
+	err := m.BatchClient.InitResources(m.ConcMapMetrics)
+	if err != nil {
+		return err
+	}
 	// Check if the channel is nil before entering the loop
-	if m.Client.ResourceConfigurations.MetricDefinitionsChan == nil {
+	if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil {
 		return fmt.Errorf("no resources were found based on all the configurations options entered")
 	}
 
@@ -159,72 +239,71 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for {
 		select {
-		case resMetricDefinition, ok := <-m.Client.ResourceConfigurations.MetricDefinitionsChan:
+		case resMetricDefinition, ok := <-m.BatchClient.ResourceConfigurations.MetricDefinitionsChan:
 			if !ok {
 				// Data channel closed, stop processing further data
-				m.Client.Log.Infof("MetricDefinitionsChan channel closed")
-				if len(m.Client.ResourceConfigurations.MetricDefinitionsChan) == 0 {
-					m.Client.Log.Debug("no resources were found based on all the configurations options entered")
+				m.BatchClient.Log.Infof("MetricDefinitionsChan channel closed")
+				if len(m.BatchClient.ResourceConfigurations.MetricDefinitionsChan) == 0 {
+					m.BatchClient.Log.Debug("no resources were found based on all the configurations options entered")
 				}
 				// process all stores in case there are remaining metricstores for which values are not collected.
-				m.Client.Log.Infof("processAllStores")
-				metricValues := processAllStores(m.Client, metricStores, referenceTime, report)
+				m.BatchClient.Log.Infof("processAllStores")
+				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
 				if len(metricValues) > 0 {
-					if err := mapToEvents(metricValues, m.Client, report); err != nil {
-						m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+					if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
+						m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 					}
 				}
-				m.Client.Log.Infof("MetricDefinitionsChan is not ok closing")
-				m.Client.ResourceConfigurations.MetricDefinitionsChan = nil
+				m.BatchClient.Log.Infof("MetricDefinitionsChan is not ok closing")
+				m.BatchClient.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
 				// Process each metric definition as it arrives
-				m.Client.Log.Infof("AAAAAAAAAAAAAAA MetricDefinitionsChan channel got %+v", resMetricDefinition)
 				if len(resMetricDefinition) == 0 {
 					return fmt.Errorf("error mapping metrics to events: %w", err)
 				}
-				if m.Client.ResourceConfigurations.MetricDefinitions.Update {
+				if m.BatchClient.ResourceConfigurations.MetricDefinitions.Update {
 					// Update MetricDefinitions because they have expired
 					resId := resMetricDefinition[0].ResourceId
-					m.Client.Log.Infof("MetricDefinitions Data need update")
-					m.Client.ResourceConfigurations.MetricDefinitions.Metrics[resId] = resMetricDefinition
+					m.BatchClient.Log.Infof("MetricDefinitions Data need update")
+					m.BatchClient.ResourceConfigurations.MetricDefinitions.Metrics[resId] = resMetricDefinition
 				}
-				m.Client.GroupAndStoreMetrics(resMetricDefinition, referenceTime, metricStores)
+				m.BatchClient.GroupAndStoreMetrics(resMetricDefinition, referenceTime, metricStores)
 				var metricValues []Metric
 				// check if the store size is >= BatchApiResourcesLimit and then process the store(collect metric values)
 				for criteria, store := range metricStores {
-					m.Client.Log.Infof("Store %+v size is %d", criteria, store.Size())
+					m.BatchClient.Log.Infof("Store %+v size is %d", criteria, store.Size())
 					if store.Size() >= BatchApiResourcesLimit {
-						metricValues = append(metricValues, processStore(m.Client, criteria, store, referenceTime, report)...)
+						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report)...)
 					}
 				}
 				// Map the collected metric values into events and publish them.
 				if len(metricValues) > 0 {
-					if err := mapToEvents(metricValues, m.Client, report); err != nil {
-						m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+					if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
+						m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 					}
 				}
 			}
-		case err, ok := <-m.Client.ResourceConfigurations.ErrorChan:
+		case err, ok := <-m.BatchClient.ResourceConfigurations.ErrorChan:
 			if ok && err != nil {
 				// Handle error received from error channel
 				return err
 			}
-			m.Client.Log.Infof("ErrorChan channel closed")
+			m.BatchClient.Log.Infof("ErrorChan channel closed")
 			// Error channel is closed, stop error handling
-			m.Client.ResourceConfigurations.ErrorChan = nil
+			m.BatchClient.ResourceConfigurations.ErrorChan = nil
 		}
 
 		// Break the loop when both Data and Error channels are closed
-		if m.Client.ResourceConfigurations.MetricDefinitionsChan == nil && m.Client.ResourceConfigurations.ErrorChan == nil {
-			m.Client.Log.Infof("Both channels closed. breaking")
+		if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil && m.BatchClient.ResourceConfigurations.ErrorChan == nil {
+			m.BatchClient.Log.Infof("Both channels closed. breaking")
 			break
 		}
 	}
 	// process all stores in case there are remaining metricstores for which values are not collected.
-	metricValues := processAllStores(m.Client, metricStores, referenceTime, report)
+	metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
 	if len(metricValues) > 0 {
-		if err := mapToEvents(metricValues, m.Client, report); err != nil {
-			m.Client.Log.Errorf("error mapping metrics to events: %v", err)
+		if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
+			m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 		}
 	}
 	return nil

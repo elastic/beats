@@ -44,6 +44,8 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
+	// Use BatchApi
+	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
 }
 
 // ResourceConfig contains resource and metric list specific configuration.

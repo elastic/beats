@@ -319,7 +319,7 @@ func (service *MonitorService) QueryResources(
 
 	if filter != "" {
 		metricsFilter = &filter
-		// top = int32(10)
+		top = int32(10)
 	}
 
 	opts := azmetrics.QueryResourcesOptions{
@@ -328,7 +328,7 @@ func (service *MonitorService) QueryResources(
 		Interval:    tg,
 		StartTime:   &startTime,
 		EndTime:     &endTime,
-		Top:         nil,
+		Top:         &top,
 	}
 
 	resp := []azmetrics.MetricData{}
@@ -343,7 +343,6 @@ func (service *MonitorService) QueryResources(
 		return nil, err
 	}
 	service.log.Infof("QueryResources to be called. length of resources is %d", len(resourceIDs))
-	service.log.Infof("Filter is %v & Aggregation is %+v & Interval is %v & StartTime is %v & EndTime is %v & Top is %v & endpoint is %v & subscriptionID is %v & namespace is %v & metricNames is %+v & ResourceIDs is %+v ", metricsFilter, aggregations, timegrain, startTime, endTime, top, service.queryResourceClientConfig.endpoint, subscriptionID, namespace, metricNames, resourceIDs)
 	// call the query resources client passing 50 resourceIDs at a time
 	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
 		end := i + BatchApiResourcesLimit
@@ -361,11 +360,6 @@ func (service *MonitorService) QueryResources(
 			},
 			&opts,
 		)
-
-		// check for applied charges before returning any errors
-		//if resp.Cost != nil && *resp.Cost != 0 {
-		//	service.log.Warnf("Charges amounted to %v are being applied while retrieving the metric values from the resource %s ", *resp.Cost, resourceId)
-		//}
 
 		if err != nil {
 			return nil, err

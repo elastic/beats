@@ -67,8 +67,8 @@ type MetricDefinitions struct {
 	Metrics map[string][]Metric
 }
 
-// ResourceConfiguration represents the resource related configuration entered by the user
-type ResourceConfiguration struct {
+// ConcurrentResourceConfig represents the resource related configuration entered by the user
+type ConcurrentResourceConfig struct {
 	MetricDefinitions MetricDefinitions
 	RefreshInterval   time.Duration
 	lastUpdate        struct {
@@ -79,8 +79,32 @@ type ResourceConfiguration struct {
 	ErrorChan             chan error
 }
 
+// ResourceConfiguration represents the resource related configuration entered by the user
+type ResourceConfiguration struct {
+	Metrics         []Metric
+	RefreshInterval time.Duration
+	lastUpdate      struct {
+		time.Time
+		sync.Mutex
+	}
+}
+
 // Expired will check for an expiration time and assign a new one
 func (p *ResourceConfiguration) Expired() bool {
+	if p.RefreshInterval <= 0 {
+		return true
+	}
+	p.lastUpdate.Lock()
+	defer p.lastUpdate.Unlock()
+	if p.lastUpdate.Add(p.RefreshInterval).After(time.Now()) {
+		return false
+	}
+	p.lastUpdate.Time = time.Now()
+	return true
+}
+
+// Expired will check for an expiration time and assign a new one
+func (p *ConcurrentResourceConfig) Expired() bool {
 	if p.RefreshInterval <= 0 {
 		return true
 	}

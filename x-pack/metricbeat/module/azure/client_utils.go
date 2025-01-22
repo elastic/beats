@@ -243,22 +243,21 @@ func getResourceIDs(metrics []Metric) []string {
 	return resourceIDs
 }
 
-// metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
-func metricIsEmpty2(metric azmetrics.MetricValue) bool {
+// batchMetricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func batchMetricIsEmpty(metric azmetrics.MetricValue) bool {
 	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
 		return true
 	}
 	return false
 }
 
-func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []MetricValue {
+func mapBatchMetricValues(client *BatchClient, metricValues azmetrics.MetricData) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metricValues.Values {
 		for _, t := range v.TimeSeries {
 			for _, mv := range t.Data {
-				//if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
-				if metricIsEmpty2(mv) {
+				if batchMetricIsEmpty(mv) {
 					continue
 				}
 				//// remove metric values that are not part of the timeline selected
@@ -298,7 +297,7 @@ func mapMetricValues2(client *Client, metricValues azmetrics.MetricData) []Metri
 }
 
 // processStore collects and return the metric values of the store using the batchAPI. After the metric values are collected, the store gets cleared.
-func processStore(client *Client, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
 	groupedMetrics := map[ResDefGroupingCriteria][]Metric{
 		criteria: store.GetMetrics(),
 	}
@@ -309,7 +308,7 @@ func processStore(client *Client, criteria ResDefGroupingCriteria, store *Metric
 }
 
 // processAllStores collects and return the metrics of all the stores using the batchAPI
-func processAllStores(client *Client, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
 	var metricValues []Metric
 	for criteria, store := range stores {
 		if store.Size() > 0 {
@@ -317,4 +316,14 @@ func processAllStores(client *Client, stores map[ResDefGroupingCriteria]*MetricS
 		}
 	}
 	return metricValues
+}
+
+// Function to check if a string is in an array of strings
+func containsString(arr []string, str string) bool {
+	for _, v := range arr {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

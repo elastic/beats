@@ -6,7 +6,6 @@ package storage
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -18,8 +17,8 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig, wg *sync.WaitGroup) {
-
+func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+	var metrics []azure.Metric
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}
 	// if serviceType is configured, add only the selected serviceType namespaces
@@ -32,20 +31,17 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			namespaces = append(namespaces, fmt.Sprintf("%s%s", defaultStorageAccountNamespace, service))
 		}
 	}
-	go func() {
-		defer wg.Done()
-		for _, resource := range resources {
-			res, err := getStorageMappedResourceDefinitions(client, *resource.ID, *resource.Location, client.Config.SubscriptionId, namespaces)
-			if err != nil {
-				client.ResourceConfigurations.ErrorChan <- err // Send error and stop processing
-				return
-			}
-			client.ResourceConfigurations.MetricDefinitionsChan <- res
+	for _, resource := range resources {
+		res, err := getStorageMappedResourceDefinitions(client, *resource.ID, namespaces)
+		if err != nil {
+			return nil, err
 		}
-	}()
+		metrics = append(metrics, res...)
+	}
+	return metrics, nil
 }
 
-func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, location string, subscriptionId string, namespaces []string) ([]azure.Metric, error) {
+func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, namespaces []string) ([]azure.Metric, error) {
 
 	var metrics []azure.Metric
 
@@ -86,7 +82,7 @@ func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string
 					dimensions = []azure.Dimension{{Name: dimension, Value: "*"}}
 				}
 
-				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, location, subscriptionId, resourceID, namespace, dimensions, time)...)
+				metrics = append(metrics, client.MapMetricByPrimaryAggregation(mets, resourceId, resourceID, namespace, dimensions, time)...)
 			}
 		}
 	}

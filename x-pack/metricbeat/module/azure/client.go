@@ -7,7 +7,6 @@ package azure
 import (
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -35,19 +34,8 @@ type Client struct {
 	MetricRegistry         *MetricRegistry
 }
 
-// Resource definitions grouping criteria
-type ResDefGroupingCriteria struct {
-	Namespace      string
-	SubscriptionID string
-	Location       string
-	Names          string
-	Aggregations   string
-	TimeGrain      string
-	Dimensions     string
-}
-
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
-type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig, wg *sync.WaitGroup)
+type mapResourceMetrics func(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error)
 
 // NewClient instantiates the Azure monitoring client
 func NewClient(config Config) (*Client, error) {
@@ -64,13 +52,8 @@ func NewClient(config Config) (*Client, error) {
 		Log:                 logger,
 		MetricRegistry:      NewMetricRegistry(logger),
 	}
-	client.ResourceConfigurations.MetricDefinitions = MetricDefinitions{
-		Update:  true,
-		Metrics: make(map[string][]Metric),
-	}
+
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
-	client.ResourceConfigurations.MetricDefinitionsChan = nil
-	client.ResourceConfigurations.ErrorChan = nil
 
 	return client, nil
 }
@@ -84,47 +67,25 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 
 	// check if refresh interval has been set and if it has expired
 	if !client.ResourceConfigurations.Expired() {
-		client.Log.Infof("MetricDefinitions are not expired. Writing metrics to MetricDefinitionsChan")
-		client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
-		client.ResourceConfigurations.ErrorChan = make(chan error, 1)
-		// MetricDefinitions do not need update
-		client.ResourceConfigurations.MetricDefinitions.Update = false
-		go func() {
-			defer close(client.ResourceConfigurations.MetricDefinitionsChan)
-			defer close(client.ResourceConfigurations.ErrorChan)
-			for _, metrics := range client.ResourceConfigurations.MetricDefinitions.Metrics {
-				client.ResourceConfigurations.MetricDefinitionsChan <- metrics
-			}
-		}()
 		return nil
 	}
-	// MetricDefinitions need update
-	client.ResourceConfigurations.MetricDefinitions.Update = true
 
-	// Initialize a WaitGroup to track all goroutines
-	var wg sync.WaitGroup
+	var metrics []Metric
 	//reset client resources
 	client.Resources = []Resource{}
-	for _, resourceConfig := range client.Config.Resources {
+	for _, resource := range client.Config.Resources {
 		// retrieve azure resources information
-		client.Log.Infof("EEEEEEEEEE resource.Id is %v & resource.Group is %v & resource.Type is %v & resource.Query is %v & metrics are %v", resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query, resourceConfig.Metrics)
-		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query)
+		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resource.Id, resource.Group, resource.Type, resource.Query)
 		if err != nil {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
-			// Should we return here or continue?
 			return err
 		}
 
 		if len(resourceList) == 0 {
 			err = fmt.Errorf("failed to retrieve resources: No resources returned using the configuration options resource ID %s, resource group %s, resource type %s, resource query %s",
-				resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query)
+				resource.Id, resource.Group, resource.Type, resource.Query)
 			client.Log.Error(err)
 			continue
-		}
-		// create the channels if they are not already created by a previous itteration
-		if client.ResourceConfigurations.MetricDefinitionsChan == nil && client.ResourceConfigurations.ErrorChan == nil {
-			client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
-			client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 		}
 
 		// Map resources to the client
@@ -142,17 +103,20 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 		}
 
 		// Collects and stores metrics definitions for the cloud resources.
-		wg.Add(1)
-		fn(client, resourceList, resourceConfig, &wg)
-		client.Log.Infof("Finished collection with %d metric definitions", len(resourceList))
+		resourceMetrics, err := fn(client, resourceList, resource)
+		if err != nil {
+			return err
+		}
+
+		metrics = append(metrics, resourceMetrics...)
 	}
-	go func() {
-		wg.Wait() // Wait for all the resource collection goroutines to finish
-		// Once all the goroutines are done, close the channels
-		client.Log.Infof("All collections finished. Closing channels ")
-		close(client.ResourceConfigurations.MetricDefinitionsChan)
-		close(client.ResourceConfigurations.ErrorChan)
-	}()
+	// users could add or remove resources while metricbeat is running so we could encounter the situation where resources are unavailable we log an error message (see above)
+	// we also log a debug message when absolutely no resources are found
+	if len(metrics) == 0 {
+		client.Log.Debug("no resources were found based on all the configurations options entered")
+	}
+	client.ResourceConfigurations.Metrics = metrics
+
 	return nil
 }
 
@@ -300,180 +264,53 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 			timeGrain: timeGrain,
 			timestamp: referenceTime,
 		})
-		if prevMetrics, ok := client.ResourceConfigurations.MetricDefinitions.Metrics[metric.ResourceId]; ok {
-			for i, currentMetric := range prevMetrics {
-				if matchMetrics(currentMetric, metric) {
-					// Map the metric values from the API response.
-					current := mapMetricValues(resp, currentMetric.Values)
-					prevMetrics[i].Values = current
 
-					// Some predefined metricsets configuration do not have a time grain.
-					// Here is an example:
-					// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
-					//
-					// Predefined metricsets sometimes have long lists of metrics
-					// with no time grains. Or users can configure their own
-					// custom metricsets with no time grain.
-					//
-					// In this case, we track the time grain returned by the API. Azure
-					// provides a default time grain for each metric.
-					if prevMetrics[i].TimeGrain == "" {
-						prevMetrics[i].TimeGrain = timeGrain
-					}
+		for i, currentMetric := range client.ResourceConfigurations.Metrics {
+			if matchMetrics(currentMetric, metric) {
+				// Map the metric values from the API response.
+				current := mapMetricValues(resp, currentMetric.Values)
+				client.ResourceConfigurations.Metrics[i].Values = current
 
-					result = append(result, prevMetrics[i])
-				}
-			}
-		}
-
-	}
-
-	return result
-}
-
-// GetMetricsInBatch will query the batch API for each group
-func (client *Client) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCriteria][]Metric, referenceTime time.Time, reporter mb.ReporterV2) []Metric {
-	var result []Metric
-	for criteria, metricsDefinitions := range groupedMetrics {
-		// Same end time for all metrics in the same batch.
-		interval := client.Config.Period
-
-		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
-		endTime := referenceTime
-		// startTime := endTime.Add(interval * (-1))
-		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
-		startTime := endTime.Add(timespanDuration * -1)
-		// Limit batch size to 50 resources (if you have more, you can split the batch)
-		filter := ""
-		if len(metricsDefinitions[0].Dimensions) > 0 {
-			var filterList []string
-			for _, dim := range metricsDefinitions[0].Dimensions {
-				filterList = append(filterList, dim.Name+" eq '"+dim.Value+"'")
-			}
-			filter = strings.Join(filterList, " AND ")
-		}
-		for i := 0; i < len(metricsDefinitions); i += BatchApiResourcesLimit {
-			end := i + BatchApiResourcesLimit
-			if end > len(metricsDefinitions) {
-				end = len(metricsDefinitions)
-			}
-
-			// Slice the metrics to form the batch request
-			batchMetrics := metricsDefinitions[i:end]
-			client.Log.Infof("resource ids are %+v", getResourceIDs(batchMetrics))
-			client.Log.Infof("SubscriptionID is %+v", criteria.SubscriptionID)
-			client.Log.Infof("Namespace is %+v", criteria.Namespace)
-			client.Log.Infof("TimeGrain is %+v", criteria.TimeGrain)
-			client.Log.Infof("startTime is %+v", startTime.Format("2006-01-02T15:04:05.000Z07:00"))
-			client.Log.Infof("endTime is %+v", endTime.Format("2006-01-02T15:04:05.000Z07:00"))
-			client.Log.Infof("Names unsplitted is %+v", criteria.Names)
-			client.Log.Infof("Names is %+v", strings.Split(criteria.Names, ","))
-			client.Log.Infof("Aggregations is %+v", strings.ToLower(batchMetrics[0].Aggregations))
-			client.Log.Infof("Filter is %+v", filter)
-			client.Log.Infof("Location is %+v", criteria.Location)
-			// Make the batch API call (adjust parameters as needed)
-			response, err := client.AzureMonitorService.QueryResources(
-				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
-				criteria.SubscriptionID,
-				criteria.Namespace,
-				criteria.TimeGrain,
-				startTime.Format("2006-01-02T15:04:05.000Z07:00"),
-				endTime.Format("2006-01-02T15:04:05.000Z07:00"),
-				strings.Split(criteria.Names, ","),
-				strings.ToLower(batchMetrics[0].Aggregations),
-				filter,
-				criteria.Location,
-			)
-			if err != nil {
-				err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
-				client.Log.Error(err)
-				reporter.Error(err)
-				continue
-			}
-
-			// Process the response as needed
-			for i, v := range response {
-				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
-					timeGrain: *response[i].Interval,
-					timestamp: referenceTime,
-				})
-				values := mapMetricValues2(client, v)
-				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
-				if metricsDefinitions[i].TimeGrain == "" {
-					metricsDefinitions[i].TimeGrain = *response[i].Interval
+				// Some predefined metricsets configuration do not have a time grain.
+				// Here is an example:
+				// https://github.com/elastic/beats/blob/024a9cec6608c6f371ad1cb769649e024124ff92/x-pack/metricbeat/module/azure/database_account/manifest.yml#L11-L13
+				//
+				// Predefined metricsets sometimes have long lists of metrics
+				// with no time grains. Or users can configure their own
+				// custom metricsets with no time grain.
+				//
+				// In this case, we track the time grain returned by the API. Azure
+				// provides a default time grain for each metric.
+				if client.ResourceConfigurations.Metrics[i].TimeGrain == "" {
+					client.ResourceConfigurations.Metrics[i].TimeGrain = timeGrain
 				}
 
+				result = append(result, client.ResourceConfigurations.Metrics[i])
 			}
-
-			result = append(result, metricsDefinitions...)
 		}
 	}
 
 	return result
-}
-
-func (client *Client) GroupAndStoreMetrics(metricsDefinitions []Metric, referenceTime time.Time, store map[ResDefGroupingCriteria]*MetricStore) {
-	for _, metric := range metricsDefinitions {
-
-		criteria := ResDefGroupingCriteria{
-			Namespace:      metric.Namespace,
-			SubscriptionID: metric.SubscriptionId,
-			Location:       metric.Location,
-			Names:          strings.Join(metric.Names, ","),
-			TimeGrain:      metric.TimeGrain,
-			Dimensions:     getDimensionKey(metric.Dimensions),
-		}
-
-		//
-		// Before fetching the metric values, check if the metric
-		// has been collected within the time grain.
-		//
-		// Why do we need this?
-		//
-		// Some metricsets contains metrics with long time grains (e.g. 1 hour).
-		//
-		// If we collect the metric values every 5 minutes, we will end up fetching
-		// the same data over and over again for all metrics with a time grain
-		// larger than 5 minutes.
-		//
-		// The registry keeps track of the last timestamp the metricset collected
-		// the metric values and the time grain used.
-		//
-		// By comparing the last collection time with the current time, and
-		// the time grain of the metric, we can determine if the metric needs
-		// to be collected again, or if we can skip it.
-		//
-		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
-			continue
-		}
-		if _, exists := store[criteria]; !exists {
-			store[criteria] = &MetricStore{}
-		}
-		store[criteria].AddMetric(metric)
-	}
 }
 
 // CreateMetric function will create a client metric based on the resource and metrics configured
-func (client *Client) CreateMetric(resourceId string, subResourceId string, namespace string, location string, subscriptionId string, metrics []string, aggregations string, dimensions []Dimension, timeGrain string) Metric {
+func (client *Client) CreateMetric(resourceId string, subResourceId string, namespace string, metrics []string, aggregations string, dimensions []Dimension, timeGrain string) Metric {
 	if subResourceId == "" {
 		subResourceId = resourceId
 	}
 	met := Metric{
-		ResourceId:     resourceId,
-		ResourceSubId:  subResourceId,
-		Namespace:      namespace,
-		Names:          metrics,
-		Dimensions:     dimensions,
-		Aggregations:   aggregations,
-		TimeGrain:      timeGrain,
-		Location:       location,
-		SubscriptionId: subscriptionId,
+		ResourceId:    resourceId,
+		ResourceSubId: subResourceId,
+		Namespace:     namespace,
+		Names:         metrics,
+		Dimensions:    dimensions,
+		Aggregations:  aggregations,
+		TimeGrain:     timeGrain,
 	}
-	if prevMetrics, ok := client.ResourceConfigurations.MetricDefinitions.Metrics[resourceId]; ok {
-		for _, prevMet := range prevMetrics {
-			if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
-				met.Values = prevMet.Values
-			}
+
+	for _, prevMet := range client.ResourceConfigurations.Metrics {
+		if len(prevMet.Values) != 0 && matchMetrics(prevMet, met) {
+			met.Values = prevMet.Values
 		}
 	}
 
@@ -481,7 +318,7 @@ func (client *Client) CreateMetric(resourceId string, subResourceId string, name
 }
 
 // MapMetricByPrimaryAggregation will map the primary aggregation of the metric definition to the client metric
-func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, location string, subscriptionId string, subResourceId string, namespace string, dim []Dimension, timeGrain string) []Metric {
+func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricDefinition, resourceId string, subResourceId string, namespace string, dim []Dimension, timeGrain string) []Metric {
 	clientMetrics := make([]Metric, 0)
 	metricGroups := make(map[string][]armmonitor.MetricDefinition)
 
@@ -494,7 +331,7 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 		for _, metricName := range metricGroup {
 			metricNames = append(metricNames, *metricName.Name.Value)
 		}
-		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, namespace, location, subscriptionId, metricNames, key, dim, timeGrain))
+		clientMetrics = append(clientMetrics, client.CreateMetric(resourceId, subResourceId, namespace, metricNames, key, dim, timeGrain))
 	}
 
 	return clientMetrics
@@ -587,15 +424,90 @@ func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
 	}
 }
 
-// // NewMockClient instantiates a new client with the mock azure service
-// func NewMockClient() *Client {
-// 	azureMockService := new(MockService)
-// 	logger := logp.NewLogger("test azure monitor")
-// 	client := &Client{
-// 		AzureMonitorService: azureMockService,
-// 		Config:              Config{},
-// 		Log:                 logger,
-// 		MetricRegistry:      NewMetricRegistry(logger),
-// 	}
-// 	return client
-// }
+// mapToEvents maps the metric values to events and reports them to Elasticsearch.
+func (client *Client) MapToEvents(metrics []Metric, reporter mb.ReporterV2) error {
+
+	// Map the metric values into a list of key/value points.
+	//
+	// This makes it easier to group the metrics by timestamp
+	// and dimensions.
+	points := mapToKeyValuePoints(metrics)
+
+	// Group the points by timestamp and other fields we consider
+	// as dimensions for the whole event.
+	//
+	// Metrics have their own dimensions, and this is fine at the
+	// metric level.
+	//
+	// We identified a set of field we consider as dimensions
+	// at the event level. The event level dimensions define
+	// the time series when TSDB is enabled.
+	groupedPoints := make(map[string][]KeyValuePoint)
+	for _, point := range points {
+		groupingKey := fmt.Sprintf(
+			"%s,%s,%s,%s,%s,%s",
+			point.Timestamp,
+			point.Namespace,
+			point.ResourceId,
+			point.ResourceSubId,
+			point.Dimensions,
+			point.TimeGrain,
+		)
+
+		groupedPoints[groupingKey] = append(groupedPoints[groupingKey], point)
+	}
+
+	// Create an event for each group of points and send
+	// it to Elasticsearch.
+	for _, _points := range groupedPoints {
+		if len(_points) == 0 {
+			// This should never happen, but I don't feel like
+			// writing points[0] without checking the length first.
+			continue
+		}
+
+		// We assume that all points have the same timestamp and
+		// dimensions because they were grouped by the same key.
+		//
+		// We use the reference point to get the resource ID and
+		// all other information common to all points.
+		referencePoint := _points[0]
+
+		// Look up the full cloud resource information in the cache.
+		resource := client.LookupResource(referencePoint.ResourceId)
+
+		// Build the event using all the information we have.
+		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType)
+		if err != nil {
+			return err
+		}
+
+		//
+		// Enrich the event with cloud metadata.
+		//
+		if client.Config.AddCloudMetadata {
+			vm := client.GetVMForMetadata(&resource, referencePoint)
+			addCloudVMMetadata(&event, vm, resource.Subscription)
+		}
+
+		//
+		// Report the event to Elasticsearch.
+		//
+		reporter.Event(event)
+	}
+
+	return nil
+}
+
+// NewMockClient instantiates a new client with the mock azure service
+func NewMockClient() *Client {
+	azureMockService := new(MockService)
+	logger := logp.NewLogger("test azure monitor")
+	client := &Client{
+		AzureMonitorService: azureMockService,
+		Config:              Config{},
+		Log:                 logger,
+		MetricRegistry:      NewMetricRegistry(logger),
+	}
+	return client
+}
