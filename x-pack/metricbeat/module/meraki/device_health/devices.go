@@ -147,17 +147,24 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 	return nil
 }
 
-func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) {
-	val, _, _ := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
+func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
+	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
+	if err != nil {
+		// Ignore 400 error for per-device licensing not supported
+		if res.StatusCode() == 400 {
+			return nil
+		}
+		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+	}
 
-	if val != nil {
-		for i := range *val {
-			license := (*val)[i]
-			if device, ok := devices[Serial(license.DeviceSerial)]; ok {
-				device.license = &license
-			}
+	for i := range *val {
+		license := (*val)[i]
+		if device, ok := devices[Serial(license.DeviceSerial)]; ok {
+			device.license = &license
 		}
 	}
+
+	return nil
 }
 
 func deviceDetailsToMapstr(details *meraki.ResponseItemOrganizationsGetOrganizationDevices) mapstr.M {
