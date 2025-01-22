@@ -171,6 +171,11 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 		t.Fatalf("expecting %d events, got %d", len(goldenEvents), len(events))
 	}
 
+	// After the golden events were generated we changed some field names
+	// to better align with ECS, so we do the same conversion in the golden
+	// events.
+	updateGoldenEvents(goldenEvents)
+
 	// The timestamps can have different locations set, but still be equal,
 	// this causes the require.EqualValues to fail, so we compare them manually
 	// and set them all to the same time.
@@ -188,6 +193,36 @@ func TestCompareGoSystemdWithJournalctl(t *testing.T) {
 	}
 
 	require.EqualValues(t, goldenEvents, events, "events do not match reference")
+}
+
+func updateGoldenEvents(events []beat.Event) {
+	convTable := map[string]string{
+		"message_id":        "log.syslog.msgid",
+		"syslog.priority":   "log.syslog.priority",
+		"syslog.facility":   "log.syslog.facility.code",
+		"syslog.identifier": "log.syslog.appname",
+		"syslog.pid":        "log.syslog.procid",
+	}
+	for _, evt := range events {
+		for oldKey, newKey := range convTable {
+			value, err := evt.Fields.GetValue(oldKey)
+			// an error means the key does not exist
+			if err != nil {
+				continue
+			}
+			// Ignore any error
+			_ = evt.Fields.Delete(oldKey)
+			_, _ = evt.Fields.Put(newKey, value)
+		}
+		syslog, err := evt.Fields.GetValue("syslog")
+		if err != nil {
+			continue
+		}
+		syslogMap, isMap := syslog.(map[string]any)
+		if isMap && len(syslogMap) == 0 {
+			_ = evt.Fields.Delete("syslog")
+		}
+	}
 }
 
 func TestMatchers(t *testing.T) {
