@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var logger = logp.NewLogger("processdb")
@@ -37,7 +38,7 @@ func TestProcessOrphanResolve(t *testing.T) {
 	// uncomment if you want some logs
 	//_ = logp.DevelopmentSetup()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(reader, *logp.L(), time.Minute)
+	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute)
 	require.NoError(t, err)
 	testDB.skipReaper = true
 	functionTimeoutReached = testAlwaysTimeout
@@ -88,7 +89,7 @@ func TestReapExitOrphans(t *testing.T) {
 	//test to make sure that orphaned exit events are still cleaned up
 
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(reader, *logp.L(), time.Minute)
+	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute)
 	require.NoError(t, err)
 	testDB.skipReaper = true
 	functionTimeoutReached = testAlwaysTimeout

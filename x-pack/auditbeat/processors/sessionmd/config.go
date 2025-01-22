@@ -12,7 +12,7 @@ import "time"
 type config struct {
 	Backend        string        `config:"backend"`
 	PIDField       string        `config:"pid_field"`
-	DBReaperPeriod time.Duration `config:"db_reaper_config"`
+	DBReaperPeriod time.Duration `config:"db_reaper_period"`
 }
 
 func defaultConfig() config {

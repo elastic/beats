@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -341,7 +342,7 @@ func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		t.Run(tt.testName, func(t *testing.T) {
 			reader := procfs.NewMockReader()
-			db, err := processdb.NewDB(reader, *logger, time.Second*30)
+			db, err := processdb.NewDB(monitoring.NewRegistry(), reader, *logger, time.Second*30)
 			require.Nil(t, err)
 
 			for _, ev := range tt.mockProcesses {

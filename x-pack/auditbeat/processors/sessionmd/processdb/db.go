@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type EntryType string
@@ -178,9 +179,11 @@ type DB struct {
 	reaperPeriod time.Duration
 	// used for testing
 	skipReaper bool
+	// used for metrics reporting
+	stats *Stats
 }
 
-func NewDB(reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration) (*DB, error) {
+func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
 		return &DB{}, initError
@@ -195,6 +198,7 @@ func NewDB(reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration)
 		removalMap:               make(map[uint32]removalCandidate),
 		reaperPeriod:             reaperPeriod,
 		skipReaper:               false,
+		stats:                    NewStats(metrics),
 	}
 	logger.Infof("starting sessionDB reaper with interval %s", db.reaperPeriod)
 	db.startReaper()
@@ -284,6 +288,7 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	// if we don't track orphaned processes like this, we'll never scrub them from the DB.
 	if evt, ok := db.removalMap[proc.PIDs.Tgid]; ok {
 		proc.ExitCode = evt.exitCode
+		db.stats.resolvedOrphans.Add(1)
 		db.logger.Debugf("resolved orphan exit for pid %d", proc.PIDs.Tgid)
 		evt.removeAttempt = exitRemoveAttempts + 1 // set it to remove on the next reaper pass
 		evt.startTime = proc.PIDs.StartTimeNS
@@ -409,11 +414,9 @@ func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	defer db.mutex.Unlock()
 
 	if entry, ok := db.processes[setsid.PIDs.Tgid]; ok {
-		db.logger.Debugf("updating process for tgid %d", setsid.PIDs.Tgid)
 		entry.PIDs = pidInfoFromProto(setsid.PIDs)
 		db.processes[setsid.PIDs.Tgid] = entry
 	} else {
-		db.logger.Debugf("adding setsid event for tgid %d", setsid.PIDs.Tgid)
 		db.processes[setsid.PIDs.Tgid] = Process{
 			PIDs: pidInfoFromProto(setsid.PIDs),
 		}

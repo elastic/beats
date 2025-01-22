@@ -23,6 +23,7 @@ import (
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -58,7 +59,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(reader, *logger, c.DBReaperPeriod)
+	db, err := processdb.NewDB(monitoring.Default, reader, *logger, c.DBReaperPeriod)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)

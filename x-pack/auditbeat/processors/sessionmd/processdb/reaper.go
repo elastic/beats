@@ -12,7 +12,7 @@ import (
 
 const (
 	removalTimeout     = 10 * time.Second // remove processes that have been exited longer than this
-	exitRemoveAttempts = 2                // Number of times to run the reaper before we remove an orphaned exit event
+	exitRemoveAttempts = 5                // Number of times to run the reaper before we remove an orphaned exit event
 )
 
 // the reaper logic for removing a process.
@@ -26,7 +26,7 @@ type removalCandidate struct {
 	exitTime  time.Time
 	startTime uint64
 
-	// only used for orphan exst events
+	// only used for orphan exit events
 	removeAttempt uint32
 	exitCode      int32
 }
@@ -61,6 +61,8 @@ func (db *DB) reapProcs() {
 	now := time.Now()
 	db.mutex.Lock()
 	db.logger.Debugf("REAPER: processes: %d removal candidates: %d", len(db.processes), len(db.removalMap))
+	db.stats.currentExit.Set(uint64(len(db.removalMap)))
+	db.stats.currentProcs.Set(uint64(len(db.processes)))
 	for pid, cand := range db.removalMap {
 		if functionTimeoutReached(now, cand.exitTime) {
 			// this candidate hasn't reached its timeout
@@ -78,6 +80,7 @@ func (db *DB) reapProcs() {
 				// in our current state, we'll have a lot of orphaned exit events,
 				// as we don't track `fork` events.
 				db.logger.Debugf("reaping orphaned exit event for pid %d", pid)
+				db.stats.reapedOrphans.Add(1)
 				delete(db.removalMap, pid)
 			}
 
