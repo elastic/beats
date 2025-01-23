@@ -815,6 +815,10 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	integration.EnsureESIsRunning(t)
 
 	// Create a test httpjson server for httpjson input
+	called := atomic.Uint32{}
+	defer func() {
+		assert.EqualValues(t, 2, called.Load(), "HTTP server should be called twice")
+	}()
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		const formatRFC3339Like = "2006-01-02T15:04:05.999Z"
 		w.Header().Set("Content-Type", "application/json")
@@ -823,6 +827,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 			Published: time.Now().Format(formatRFC3339Like),
 		})
 		require.NoError(t, err)
+		called.Add(1)
 	}))
 	defer testServer.Close()
 
