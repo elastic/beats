@@ -35,6 +35,11 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
+const (
+	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
+	esDocumentIDAttribute = "elasticsearch.document_id"
+)
+
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
 }
@@ -91,6 +96,17 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		meta["beat"] = out.beatInfo.Beat
 		meta["version"] = out.beatInfo.Version
 		meta["type"] = "_doc"
+
+		if id, ok := meta["_id"]; ok {
+			// Set a log record attribute for the document ID, this is used for deduplication
+			// in the elasticsearchexporter.
+			//
+			// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+			switch id := id.(type) {
+			case string:
+				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+			}
+		}
 
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp

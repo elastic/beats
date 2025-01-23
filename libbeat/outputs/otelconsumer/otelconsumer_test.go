@@ -43,6 +43,7 @@ func TestPublish(t *testing.T) {
 	event1 := beat.Event{Fields: mapstr.M{"field": 1}}
 	event2 := beat.Event{Fields: mapstr.M{"field": 2}}
 	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
+	event4 := beat.Event{Meta: mapstr.M{"_id": "abc123"}}
 
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
@@ -116,6 +117,26 @@ func TestPublish(t *testing.T) {
 		assert.ErrorIs(t, err, context.Canceled)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
+	})
+
+	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
+		batch := outest.NewBatch(event4)
+
+		var docID string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(esDocumentIDAttribute)
+			assert.True(t, ok, "document ID attribute should be set")
+			docID = attr.AsString()
+
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, event4.Meta["_id"], docID)
 	})
 }
 
