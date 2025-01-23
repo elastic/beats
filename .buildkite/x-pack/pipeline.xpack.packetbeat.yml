@@ -328,7 +328,7 @@ steps:
         key: "extended-win-10-system-tests"
         # skip: "skipping due to elastic/beats#38142"
         command: |
-          source .buildkite/scripts/gcp_auth.sh
+          . .buildkite/scripts/gcp_auth.sh
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
