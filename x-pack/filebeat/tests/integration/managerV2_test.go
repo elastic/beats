@@ -970,6 +970,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 
 	for _, contains := range []string{
 		"Configure ES store",
+		"input-cursor::openStore: prefix: httpjson inputID: " + inputID,
 		"input-cursor store, read 0",
 		"input-cursor store, read 1",
 	} {
