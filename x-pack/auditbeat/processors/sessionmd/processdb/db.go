@@ -434,6 +434,7 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 		removeAttempt: 0,
 		exitCode:      exit.ExitCode,
 	}
+
 	process, ok := db.processes[pid]
 	if !ok {
 		db.logger.Debugf("pid %v for exit event not found in db, adding as orphan", pid)

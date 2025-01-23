@@ -12,7 +12,7 @@ import (
 
 const (
 	removalTimeout     = 10 * time.Second // remove processes that have been exited longer than this
-	exitRemoveAttempts = 5                // Number of times to run the reaper before we remove an orphaned exit event
+	exitRemoveAttempts = 2                // Number of times to run the reaper before we remove an orphaned exit event
 )
 
 // the reaper logic for removing a process.
@@ -63,6 +63,7 @@ func (db *DB) reapProcs() {
 	db.logger.Debugf("REAPER: processes: %d removal candidates: %d", len(db.processes), len(db.removalMap))
 	db.stats.currentExit.Set(uint64(len(db.removalMap)))
 	db.stats.currentProcs.Set(uint64(len(db.processes)))
+
 	for pid, cand := range db.removalMap {
 		if functionTimeoutReached(now, cand.exitTime) {
 			// this candidate hasn't reached its timeout
