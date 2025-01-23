@@ -299,7 +299,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullIn
 
 			var st state
 			if err := dec.Decode(&st); err != nil {
-				log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+				log.Errorf("Failed to read registry state for '%v', cursor state will be ignored. Error was: %+v",
 					key, err)
 				return true, nil
 			}
@@ -321,6 +321,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullIn
 
 			return true, nil
 		})
+		log.Debugf("input-cursor store, read %d keys", len(states.table))
 		if err != nil {
 			return nil, err
 		}

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/testing/certutil"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -800,7 +801,8 @@ func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
 
 // Response structure for JSON
 type response struct {
-	Message string `json:"message"`
+	Message   string `json:"message"`
+	Published string `json:"published"`
 }
 
 func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T) {
@@ -811,19 +813,20 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 
 	// Create a test httpjson server for httpjson input
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		const formatRFC3339Like = "2006-01-02T15:04:05.999Z"
 		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(response{Message: "Hello"})
+		err := json.NewEncoder(w).Encode(response{
+			Message:   "Hello",
+			Published: time.Now().Format(formatRFC3339Like),
+		})
 		require.NoError(t, err)
 	}))
 	defer testServer.Close()
 
-	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
-	filebeat := NewFilebeat(t)
-
 	var units = [][]*proto.UnitExpected{
 		{
 			{
-				Id:             "output-unit",
+				Id:             "output-unit-1",
 				Type:           proto.UnitType_OUTPUT,
 				ConfigStateIdx: 1,
 				State:          proto.State_HEALTHY,
@@ -831,7 +834,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				Config: &proto.UnitExpectedConfig{
 					Id:   "default",
 					Type: "elasticsearch",
-					Name: "elasticsearch",
+					Name: "elasticsearch1",
 					Source: integration.RequireNewStruct(t,
 						map[string]interface{}{
 							"type":                 "elasticsearch",
@@ -851,13 +854,20 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				State:          proto.State_HEALTHY,
 				LogLevel:       proto.UnitLogLevel_DEBUG,
 				Config: &proto.UnitExpectedConfig{
-					Id:   "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+					Id: "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+					Source: tests.RequireNewStruct(map[string]any{
+						"id":      "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+						"type":    "httpjson",
+						"name":    "httpjson-1",
+						"enabled": true,
+					}),
 					Type: "httpjson",
 					Name: "httpjson-1",
 					Streams: []*proto.Stream{
 						{
 							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
 							Source: integration.RequireNewStruct(t, map[string]interface{}{
+								"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
 								"enabled":        true,
 								"type":           "httpjson",
 								"interval":       "1m",
@@ -876,7 +886,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		},
 		{
 			{
-				Id:             "output-unit",
+				Id:             "output-unit-2",
 				Type:           proto.UnitType_OUTPUT,
 				ConfigStateIdx: 1,
 				State:          proto.State_HEALTHY,
@@ -884,11 +894,11 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				Config: &proto.UnitExpectedConfig{
 					Id:   "default",
 					Type: "elasticsearch",
-					Name: "elasticsearch",
+					Name: "elasticsearch2",
 					Source: integration.RequireNewStruct(t,
 						map[string]interface{}{
 							"type":                 "elasticsearch",
-							"hosts":                []interface{}{"server.URL"},
+							"hosts":                []interface{}{"http://localhost:9200"},
 							"username":             "admin",
 							"password":             "testing",
 							"protocol":             "http",
@@ -898,19 +908,26 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				},
 			},
 			{
-				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
+				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
 				Type:           proto.UnitType_INPUT,
 				ConfigStateIdx: 1,
 				State:          proto.State_HEALTHY,
 				LogLevel:       proto.UnitLogLevel_DEBUG,
 				Config: &proto.UnitExpectedConfig{
+					Source: tests.RequireNewStruct(map[string]any{
+						"id":      "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+						"type":    "httpjson",
+						"name":    "httpjson-1",
+						"enabled": true,
+					}),
 					Id:   "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
 					Type: "httpjson",
-					Name: "httpjson-2",
+					Name: "httpjson-1",
 					Streams: []*proto.Stream{
 						{
-							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
+							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
 							Source: integration.RequireNewStruct(t, map[string]interface{}{
+								"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
 								"enabled":        true,
 								"type":           "httpjson",
 								"interval":       "1m",
@@ -973,13 +990,19 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	require.NoError(t, server.Start())
 	t.Cleanup(server.Stop)
 
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
+	filebeat := NewFilebeat(t)
+	filebeat.RestartOnBeatOnExit = true
 	filebeat.Start(
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
+		"-E", "management.restart_on_output_change=true",
 	)
 
 	for _, contains := range []string{
 		"Configure ES store",
+		// TODO: uuid id, 0 and then 1
+		"input-cursor store, read",
 	} {
 		checkFilebeatLogs(t, filebeat, contains)
 	}

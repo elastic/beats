@@ -104,7 +104,7 @@ func (cim *InputManager) init(inputID string) error {
 	log := cim.Logger.With("input_type", cim.Type)
 	var store *store
 	useES := features.IsElasticsearchStateStoreEnabledForInput(cim.Type)
-	fullInit := !useES || (inputID != "" && useES)
+	fullInit := !useES || inputID != ""
 	store, cim.initErr = openStore(log, cim.StateStore, cim.Type, inputID, fullInit)
 	if cim.initErr != nil {
 		return cim.initErr
