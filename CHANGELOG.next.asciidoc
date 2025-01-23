@@ -19,7 +19,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
-- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209] 
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
 *Auditbeat*
 
@@ -80,8 +80,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
 
-*Osquerybeat*
-
 
 *Packetbeat*
 
@@ -127,6 +125,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
 - Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
+- Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
 
 *Auditbeat*
 
@@ -206,7 +205,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
 - The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
-- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218] 
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 
 *Heartbeat*
@@ -456,6 +455,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
 
