@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
 - Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
+- The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
 
 *Auditbeat*
 
