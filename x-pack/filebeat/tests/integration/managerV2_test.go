@@ -823,6 +823,43 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	}))
 	defer testServer.Close()
 
+	inputUnit := &proto.UnitExpected{
+		Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id: "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+			Source: tests.RequireNewStruct(map[string]any{
+				"id":      "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+				"type":    "httpjson",
+				"name":    "httpjson-1",
+				"enabled": true,
+			}),
+			Type: "httpjson",
+			Name: "httpjson-1",
+			Streams: []*proto.Stream{
+				{
+					Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+					Source: integration.RequireNewStruct(t, map[string]interface{}{
+						"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+						"enabled":        true,
+						"type":           "httpjson",
+						"interval":       "1m",
+						"request.url":    testServer.URL,
+						"request.method": "GET",
+						"cursor": map[string]any{
+							"published": map[string]any{
+								"value": "[[.last_event.published]]",
+							},
+						},
+					}),
+				},
+			},
+		},
+	}
+
 	var units = [][]*proto.UnitExpected{
 		{
 			{
@@ -847,42 +884,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 						}),
 				},
 			},
-			{
-				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-				Config: &proto.UnitExpectedConfig{
-					Id: "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-					Source: tests.RequireNewStruct(map[string]any{
-						"id":      "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-						"type":    "httpjson",
-						"name":    "httpjson-1",
-						"enabled": true,
-					}),
-					Type: "httpjson",
-					Name: "httpjson-1",
-					Streams: []*proto.Stream{
-						{
-							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
-								"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-								"enabled":        true,
-								"type":           "httpjson",
-								"interval":       "1m",
-								"request.url":    testServer.URL,
-								"request.method": "GET",
-								"cursor": map[string]any{
-									"published": map[string]any{
-										"value": "[[.last_event.published]]",
-									},
-								},
-							}),
-						},
-					},
-				},
-			},
+			inputUnit,
 		},
 		{
 			{
@@ -907,42 +909,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 						}),
 				},
 			},
-			{
-				Id:             "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-				Config: &proto.UnitExpectedConfig{
-					Source: tests.RequireNewStruct(map[string]any{
-						"id":      "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-						"type":    "httpjson",
-						"name":    "httpjson-1",
-						"enabled": true,
-					}),
-					Id:   "httpjson-generic-2d5a8b82-bd93-4f36-970d-1b78d080c69d",
-					Type: "httpjson",
-					Name: "httpjson-1",
-					Streams: []*proto.Stream{
-						{
-							Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
-								"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
-								"enabled":        true,
-								"type":           "httpjson",
-								"interval":       "1m",
-								"request.url":    testServer.URL,
-								"request.method": "GET",
-								"cursor": map[string]any{
-									"published": map[string]any{
-										"value": "[[.last_event.published]]",
-									},
-								},
-							}),
-						},
-					},
-				},
-			},
+			inputUnit,
 		},
 	}
 
