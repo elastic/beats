@@ -1143,6 +1143,8 @@ func (b *Beat) configure(settings Settings) error {
 		debug.SetGCPercent(gcPercent)
 	}
 
+	b.Info.Monitoring.Namespace = monitoring.GetNamespace("dataset")
+
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {
 		return err
