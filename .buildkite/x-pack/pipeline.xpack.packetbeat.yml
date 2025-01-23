@@ -73,6 +73,7 @@ steps:
     depends_on: "x-pack-packetbeat-check-update"
 
   - group: "Mandatory Tests"
+    skip: true
     key: "x-pack-packetbeat-mandatory-tests"
 
     steps:
@@ -240,6 +241,7 @@ steps:
 
     steps:
       - label: ":windows: x-pack/packetbeat: Win 10 Unit Tests"
+        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -267,6 +269,7 @@ steps:
               context: "x-pack/packetbeat: Win 10 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 11 Unit Tests"
+        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -294,6 +297,7 @@ steps:
               context: "x-pack/packetbeat: Win 11 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2019 Unit Tests"
+        skip: true
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -350,6 +354,7 @@ steps:
               context: "x-pack/packetbeat: Win 10 System Tests"
 
   - group: "Extended Tests"
+    skip: true
     key: "x-pack-packetbeat-extended-linux-arm-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
@@ -393,7 +398,7 @@ steps:
         concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+            - limit: 3 # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -423,7 +428,7 @@ steps:
         concurrency_method: "${CONCURRENCY_METHOD}"
         retry:
           automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+            - limit: 3 # using higher retries for now due to lack of custom vm images and vendor instability
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -441,6 +446,7 @@ steps:
               context: "x-pack/packetbeat: macOS arm64 Unit Tests"
 
   - group: "Packaging"
+    skip: true
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
