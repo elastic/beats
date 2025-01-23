@@ -84,8 +84,5 @@ func (e *ErrorOperation) Error() string {
 // IsClosed returns true if the cause for an Error is ErrorClosed.
 func IsClosed(err error) bool {
 	var tmp *ErrorClosed
-	if errors.As(err, &tmp) {
-		return true
-	}
-	return false
+	return errors.As(err, &tmp)
 }
