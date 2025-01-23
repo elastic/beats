@@ -10,6 +10,10 @@ if [[ "${BUILDKITE_LABEL:-}" == *"Pipeline upload"* || "${BUILDKITE_LABEL:-}" ==
   fi
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
+    source "$BUILDKITE_BUILD_CHECKOUT_PATH/.buildkite/scripts/gcp_auth.sh"
+fi
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" || \
