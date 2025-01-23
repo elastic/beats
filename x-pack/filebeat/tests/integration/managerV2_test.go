@@ -870,8 +870,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	waiting := false
 	when := time.Now()
 
-	var mx sync.Mutex
-	final := false
+	final := atomic.Bool{}
 
 	nextState := func() {
 		if waiting {
@@ -892,9 +891,7 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				if idx < len(units)-1 {
 					nextState()
 				} else {
-					mx.Lock()
-					final = true
-					mx.Unlock()
+					final.Store(true)
 				}
 			}
 			for _, unit := range observed.GetUnits() {
@@ -928,12 +925,12 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		checkFilebeatLogs(t, filebeat, contains)
 	}
 
-	require.Eventually(t, func() bool {
-		mx.Lock()
-		defer mx.Unlock()
-		return final
-	}, waitDeadlineOr5Min(t), 100*time.Millisecond,
-		"Failed to reach the final state")
+	require.Eventually(t,
+		final.Load,
+		waitDeadlineOr5Min(t),
+		100*time.Millisecond,
+		"Failed to reach the final state",
+	)
 }
 
 func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains string) {
