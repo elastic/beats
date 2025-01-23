@@ -141,7 +141,9 @@ func (r *Registrar) Run() {
 	defer r.store.Close()
 
 	defer func() {
-		writeStates(r.store, r.states.GetStates())
+		if err := writeStates(r.store, r.states.GetStates()); err != nil {
+			r.log.Errorf("Error writing stopping registrar state to statestore: %v", err)
+		}
 	}()
 
 	var (
@@ -242,8 +244,7 @@ func (r *Registrar) gcStates() {
 
 	beforeCount := r.states.Count()
 	cleanedStates, pendingClean := r.states.CleanupWith(func(id string) {
-		// TODO: report error
-		r.store.Remove(fileStatePrefix + id)
+		r.store.Remove(fileStatePrefix + id) //nolint:errcheck // TODO: report error
 	})
 	statesCleanup.Add(int64(cleanedStates))
 
@@ -274,13 +275,13 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 			return true, nil
 		}
 
-		// try to decode. Ingore faulty/incompatible values.
+		// try to decode. Ignore faulty/incompatible values.
 		var st file.State
 		if err := dec.Decode(&st); err != nil {
 			// XXX: Do we want to log here? In case we start to store other
 			// state types in the registry, then this operation will likely fail
 			// quite often, producing some false-positives in the logs...
-			return true, nil
+			return true, nil //nolint:nilerr // Ignore per comment above
 		}
 
 		st.Id = key[len(fileStatePrefix):]
