@@ -13,7 +13,7 @@
       "always_trigger_comment_regex": "^(?:(?:buildkite\\W+)?(?:build|test)\\W+(?:this|it))|^/test$",
       "skip_ci_labels": [ ],
       "skip_target_branches": [ ],
-      "skip_ci_on_only_changed": [ ],
+      "skip_ci_on_only_changed": ["^.github/"],
       "always_require_ci_on_changed": [ ]
     }
   ]
