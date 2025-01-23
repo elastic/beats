@@ -158,7 +158,13 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for the benchmark processor.
 func newInputMetrics(ctx v2.Context) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, ctx.ID, ctx.Agent.Monitoring.Namespace.GetRegistry())
+	var globalRegistry *monitoring.Registry
+	// When running under Elastic-Agent Namespace can be nil.
+	// Passing a nil registry to inputmon.NewInputRegistry is not a problem.
+	if ctx.Agent.Monitoring.Namespace != nil {
+		globalRegistry = ctx.Agent.Monitoring.Namespace.GetRegistry()
+	}
+	reg, unreg := inputmon.NewInputRegistry(inputName, ctx.ID, globalRegistry)
 	out := &inputMetrics{
 		unregister:      unreg,
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
