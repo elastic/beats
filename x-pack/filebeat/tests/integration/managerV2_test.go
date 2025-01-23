@@ -843,9 +843,9 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 			Name: "httpjson-1",
 			Streams: []*proto.Stream{
 				{
-					Id: "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+					Id: inputID,
 					Source: integration.RequireNewStruct(t, map[string]interface{}{
-						"id":             "httpjson-httpjson.generic-2d5a8b82-bd93-4f36-970d-1b78d080c69f",
+						"id":             inputID,
 						"enabled":        true,
 						"type":           "httpjson",
 						"interval":       "1m",
@@ -970,8 +970,8 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 
 	for _, contains := range []string{
 		"Configure ES store",
-		// TODO: uuid id, 0 and then 1
-		"input-cursor store, read",
+		"input-cursor store, read 0",
+		"input-cursor store, read 1",
 	} {
 		checkFilebeatLogs(t, filebeat, contains)
 	}
