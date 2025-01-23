@@ -113,7 +113,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
-		return fmt.Errorf("error loading state: %v", err)
+		return fmt.Errorf("error loading state: %w", err)
 	}
 
 	r.wg.Add(1)
