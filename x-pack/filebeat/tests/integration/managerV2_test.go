@@ -861,58 +861,9 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 			},
 		},
 	}
-
-	var units = [][]*proto.UnitExpected{
-		{
-			{
-				Id:             "output-unit-1",
-				Type:           proto.UnitType_OUTPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-				Config: &proto.UnitExpectedConfig{
-					Id:   "default",
-					Type: "elasticsearch",
-					Name: "elasticsearch1",
-					Source: integration.RequireNewStruct(t,
-						map[string]interface{}{
-							"type":                 "elasticsearch",
-							"hosts":                []interface{}{"http://localhost:9200"},
-							"username":             "admin",
-							"password":             "testing",
-							"protocol":             "http",
-							"enabled":              true,
-							"allow_older_versions": true,
-						}),
-				},
-			},
-			inputUnit,
-		},
-		{
-			{
-				Id:             "output-unit-2",
-				Type:           proto.UnitType_OUTPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-				Config: &proto.UnitExpectedConfig{
-					Id:   "default",
-					Type: "elasticsearch",
-					Name: "elasticsearch2",
-					Source: integration.RequireNewStruct(t,
-						map[string]interface{}{
-							"type":                 "elasticsearch",
-							"hosts":                []interface{}{"http://localhost:9200"},
-							"username":             "admin",
-							"password":             "testing",
-							"protocol":             "http",
-							"enabled":              true,
-							"allow_older_versions": true,
-						}),
-				},
-			},
-			inputUnit,
-		},
+	units := [][]*proto.UnitExpected{
+		{outputUnitES(t, 1), inputUnit},
+		{outputUnitES(t, 2), inputUnit},
 	}
 
 	idx := 0
@@ -1013,4 +964,29 @@ func waitDeadlineOr5Min(t *testing.T) time.Duration {
 		return left
 	}
 	return final
+}
+
+func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
+	return &proto.UnitExpected{
+		Id:             fmt.Sprintf("output-unit-%d", id),
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "elasticsearch",
+			Name: fmt.Sprintf("elasticsearch-%d", id),
+			Source: integration.RequireNewStruct(t,
+				map[string]interface{}{
+					"type":                 "elasticsearch",
+					"hosts":                []interface{}{"http://localhost:9200"},
+					"username":             "admin",
+					"password":             "testing",
+					"protocol":             "http",
+					"enabled":              true,
+					"allow_older_versions": true,
+				}),
+		},
+	}
 }
