@@ -217,9 +217,11 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 				nextState()
 			}
 			for _, unit := range observed.GetUnits() {
-				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
-					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+				expected := []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING}
+				if !waiting {
+					expected = append(expected, proto.State_STOPPING)
 				}
+				require.Containsf(t, expected, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 			}
 			return &proto.CheckinExpected{
 				Units: units[idx],
