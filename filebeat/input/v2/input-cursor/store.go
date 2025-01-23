@@ -130,7 +130,7 @@ var closeStore = (*store).close
 func openStore(log *logp.Logger, statestore StateStore, prefix string, inputID string, fullInit bool) (*store, error) {
 	ok := false
 
-	log.Debugf("input-cursor::openStore: prefix: %v", prefix)
+	log.Debugf("input-cursor::openStore: prefix: %v inputID: %s", prefix, inputID)
 	persistentStore, err := statestore.Access(prefix)
 	if err != nil {
 		return nil, err
