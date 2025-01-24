@@ -112,10 +112,12 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// instantiate monitor client
 	var monitorClient *Client
 	var monitorBatchClient *BatchClient
+	// check wether metricset is part of supported metricsets and if BatchApi is enabled
 	if slices.Contains(monitorMetricsets, metricsetName) && config.EnableBatchApi {
+		// instantiate Batch Client which enables fetching metric values for multiple resources using azure batch api
 		monitorBatchClient, err = NewBatchClient(config)
 		if err != nil {
-			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
+			return nil, fmt.Errorf("error initializing the monitor batch client: module azure - %s metricset: %w", metricsetName, err)
 		}
 	} else {
 		// default case
@@ -132,14 +134,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
+// Fetch methods implements the data gathering and data conversion to the right metricset
+// It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.BatchClient != nil {
 		// EnableBatchApi is true
 		return fetchBatch(m, report)
 	}
+	// default case
 	return fetch(m, report)
 }
 
+// fetch fetches metric definitions of requested resources, collects the metric values and publishes them
 func fetch(m *MetricSet, report mb.ReporterV2) error {
 	// Set the reference time for the current fetch.
 	//
@@ -197,9 +204,8 @@ func fetch(m *MetricSet, report mb.ReporterV2) error {
 	return nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right metricset
-// It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
+// fetchBatch uses concurrency to collect metric definitions of requested resources,
+// collects the metrics using the batch Api and publishes them
 func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 	// Set the reference time for the current fetch.
 	//

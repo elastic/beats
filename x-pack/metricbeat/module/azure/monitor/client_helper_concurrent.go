@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
-// concurrentMapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
+// concurrentMapMetrics fetches concurrently metric definitions and writes them in MetricDefinitionsChan channel
 func concurrentMapMetrics(client *azure.BatchClient, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig, wg *sync.WaitGroup) {
 	go func() {
 		defer wg.Done()
@@ -30,6 +30,7 @@ func concurrentMapMetrics(client *azure.BatchClient, resources []*armresources.G
 	}()
 }
 
+// getMappedResourceDefinitions fetches metric definitions and maps the metric related configuration to relevant azure monitor api parameters
 func getMappedResourceDefinitions(client *azure.BatchClient, resourceId string, location string, subscriptionId string, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 
 	var metrics []azure.Metric

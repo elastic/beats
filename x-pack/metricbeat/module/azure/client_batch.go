@@ -216,6 +216,7 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 	return result
 }
 
+// GroupAndStoreMetrics groups received metricsDefinitions and stores them in a in memory store
 func (client *BatchClient) GroupAndStoreMetrics(metricsDefinitions []Metric, referenceTime time.Time, store map[ResDefGroupingCriteria]*MetricStore) {
 	for _, metric := range metricsDefinitions {
 

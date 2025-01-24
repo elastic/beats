@@ -24,7 +24,8 @@ type MetricCollectionInfo struct {
 	timeGrain string
 }
 
-// Client represents the azure client which will make use of the azure sdk go metrics related clients
+// BaseClient represents the base azure client which will make use of the azure sdk go metrics related clients
+// It implements all the common methods between Client and BatchClient
 type BaseClient struct {
 	AzureMonitorService Service
 	Config              Config
@@ -380,10 +381,10 @@ func (client *BaseClient) GetVMForMetadata(resource *Resource, referencePoint Ke
 		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
 				if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
-					vm.Size = vmSz.(string)
+					vm.Size, _ = vmSz.(string)
 				}
 				if vmID, ok := properties["vmId"]; ok {
-					vm.Id = vmID.(string)
+					vm.Id, _ = vmID.(string)
 				}
 			}
 		}

@@ -41,6 +41,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 	return metrics, nil
 }
 
+// getStorageMappedResourceDefinitions fetches metric definitions and maps the metric related configuration to relevant azure monitor api parameters
 func getStorageMappedResourceDefinitions(client *azure.Client, resourceId string, namespaces []string) ([]azure.Metric, error) {
 
 	var metrics []azure.Metric
