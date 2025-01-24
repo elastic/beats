@@ -24,7 +24,6 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -72,7 +71,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-				esOTelConfig, err := elasticsearch.ToOTelConfig(esConfig)
+				esOTelConfig, err := ToOTelConfig(esConfig)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}

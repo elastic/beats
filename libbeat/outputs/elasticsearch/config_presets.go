@@ -63,6 +63,8 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.flush.timeout":    20 * time.Second,
 		"compression_level":          1,
 		"idle_connection_timeout":    1 * time.Second,
+		"backoff.init":               5 * time.Second,
+		"backoff.max":                300 * time.Second,
 	}),
 	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              50,

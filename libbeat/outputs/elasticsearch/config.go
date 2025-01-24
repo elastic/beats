@@ -79,6 +79,10 @@ var (
 	}
 )
 
+func DefaultConfig() ElasticsearchConfig {
+	return defaultConfig
+}
+
 func esDefaultTransportSettings() httpcommon.HTTPTransportSettings {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	// The ES output differs from the common transport settings by having
