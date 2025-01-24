@@ -23,7 +23,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
@@ -269,7 +268,7 @@ func TestESLoader_Load(t *testing.T) {
 		})
 
 		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
-			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 			require.NoError(t, err)
 			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
 			setup.mustLoad(fields)
@@ -309,7 +308,7 @@ func TestESLoader_Load(t *testing.T) {
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
-		fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+		fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 		require.NoError(t, err)
 		for run, data := range map[string]struct {
 			cfg        TemplateConfig
@@ -473,7 +472,8 @@ func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	setup.mustLoadFromFile([]string{"testdata", "fields.yml"})
 
-	esClient := setup.client.(*eslegclient.Connection)
+	esClient, ok := setup.client.(*eslegclient.Connection)
+	assert.True(t, ok)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
@@ -497,7 +497,8 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 
 	templates, _ := response.GetValue("index_templates")
 	templatesList, _ := templates.([]interface{})
-	templateElem := templatesList[0].(map[string]interface{})
+	templateElem, ok := templatesList[0].(map[string]interface{})
+	require.True(t, ok)
 
 	return testTemplate{
 		t:      t,

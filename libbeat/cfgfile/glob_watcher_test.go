@@ -18,7 +18,6 @@
 package cfgfile
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -34,9 +33,9 @@ func TestGlobWatcher(t *testing.T) {
 	gcd := NewGlobWatcher(glob)
 
 	content := []byte("test\n")
-	err := ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err := os.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
-	err = ioutil.WriteFile(dir+"/config2.yml", content, 0644)
+	err = os.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)
 
 	// Make sure not inside compensation time
@@ -52,7 +51,7 @@ func TestGlobWatcher(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, changed)
 
-	err = ioutil.WriteFile(dir+"/config3.yml", content, 0644)
+	err = os.WriteFile(dir+"/config3.yml", content, 0644)
 	assert.NoError(t, err)
 
 	files, changed, err = gcd.Scan()
