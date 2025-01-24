@@ -213,9 +213,11 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 				nextState()
 			}
 			for _, unit := range observed.GetUnits() {
-				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
-					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+				expected := []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING}
+				if !waiting {
+					expected = append(expected, proto.State_STOPPING)
 				}
+				require.Containsf(t, expected, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 			}
 			return &proto.CheckinExpected{
 				Units: units[idx],
@@ -240,8 +242,8 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 	//   0.5 second left, return the time left
 	// - otherwise return the time left minus 0.5 second.
 	waitDeadlineOr5Min := func() time.Duration {
-		deadline, deadileSet := t.Deadline()
-		if deadileSet {
+		deadline, deadlineSet := t.Deadline()
+		if deadlineSet {
 			left := time.Until(deadline)
 			final := left - 500*time.Millisecond
 			if final <= 0 {
