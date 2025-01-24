@@ -65,21 +65,7 @@ func TestFormatMessage(t *testing.T) {
 			}
 
 			assert.Contains(t, msg, `{{eventParam $ 2}}`)
-
-			// NOTE: In this test case I noticed the messages contains
-			//   "Logon ID:               0x0"
-			// but it should contain
-			//   "Logon ID:               {{eventParam $ 9}}"
-			//
-			// This may mean that certain windows.GUID values cannot be
-			// substituted with string values. So we shouldn't rely on this
-			// method to create text/templates. Instead we can use the
-			// getMessageStringFromMessageID (see test below) that works as
-			// expected.
-			//
-			// Note: This is not the case under 32-bit Windows 7.
-			//       Disabling the assertion for now.
-			//assert.NotContains(t, msg, `{{eventParam $ 9}}`)
+			assert.NotContains(t, msg, `{{eventParam $ 9}}`)
 		})
 	})
 
