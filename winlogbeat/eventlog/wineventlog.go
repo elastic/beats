@@ -20,6 +20,7 @@
 package eventlog
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -363,7 +364,7 @@ func (l *winEventLog) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}
-	return multierr.Combine(
+	return errors.Join(
 		l.iterator.Close(),
 		l.renderer.Close(),
 	)
