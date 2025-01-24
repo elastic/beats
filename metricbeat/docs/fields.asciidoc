@@ -51295,6 +51295,87 @@ type: long
 
 --
 
+
+*`mongodb.collstats.stats.stats.size`*::
++
+--
+The total uncompressed size in memory of all records in a collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.count`*::
++
+--
+The number of objects or documents in this collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.avgObjSize`*::
++
+--
+The average size of an object in the collection (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.storageSize`*::
++
+--
+The total amount of storage allocated to this collection for document storage (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalIndexSize`*::
++
+--
+The total size of all indexes (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalSize`*::
++
+--
+The sum of the storageSize and totalIndexSize (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.max`*::
++
+--
+Shows the maximum number of documents that may be present in a capped collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.nindexes`*::
++
+--
+The number of indexes on the collection. All collections have at least one index on the _id field.
+
+
+type: long
+
+--
+
 [float]
 === dbstats
 
@@ -69538,16 +69619,6 @@ type: long
 `mntr` contains the metrics reported by the four-letter `mntr` command.
 
 
-
-*`zookeeper.mntr.hostname`*::
-+
---
-ZooKeeper hostname.
-
-
-type: keyword
-
---
 
 *`zookeeper.mntr.approximate_data_size`*::
 +
