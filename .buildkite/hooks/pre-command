@@ -2,20 +2,12 @@
 
 set -euo pipefail
 
-# Secrets must be redacted
-# https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
-PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
 if [[ "${BUILDKITE_LABEL:-}" == *"Pipeline upload"* || "${BUILDKITE_LABEL:-}" == *"Upload Pipeline"* ]]; then
 
   if [[ "${GITHUB_PR_TRIGGER_COMMENT:-}" != "" ]]; then
     buildkite-agent annotate "**No changes.** Triggered from comment: _${GITHUB_PR_TRIGGER_COMMENT}_" --style "info" --context 'ctx-info'
   fi
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
-    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
-    export PRIVATE_CI_GCS_CREDENTIALS_SECRET
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \

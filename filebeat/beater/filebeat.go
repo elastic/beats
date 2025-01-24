@@ -145,6 +145,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 				}
 				return data
 			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry)
 	}
 
 	// Add inputs created by the modules
@@ -166,7 +173,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, fmt.Errorf("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and --once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {

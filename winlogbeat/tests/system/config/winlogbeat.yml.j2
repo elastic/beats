@@ -4,9 +4,6 @@
 winlogbeat.event_logs:
   {% for log in event_logs -%}
   - name: {{ log.name }}
-    {%- if log.api is defined %}
-    api: {{ log.api }}
-    {% endif %}
     {%- if log.ignore_older is defined %}
     ignore_older: {{ log.ignore_older }}
     {% endif %}
