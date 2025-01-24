@@ -2871,7 +2871,7 @@ filebeat.inputs:
 
   # Unique ID among all inputs, if the ID changes, all entries
   # will be re-ingested
-  #id: my-journald-id
+  id: my-journald-id
 
   # Specify paths to read from custom journal files.
   # Leave it unset to read the system's journal
@@ -2992,22 +2992,22 @@ filebeat.inputs:
 
 #------------------------------ AWS S3 input --------------------------------
 # Beta: Config options for AWS S3 input
-- type: aws-s3
+#- type: aws-s3
   #enabled: false
 
   # AWS Credentials
   # If access_key_id and secret_access_key are configured, then use them to make api calls.
   # If not, aws-s3 input will load default AWS config or load with given profile name.
-  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
-  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
-  session_token: '${AWS_SESSION_TOKEN:""}'
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-aws-s3-input
 
   # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
   # Number of workers on S3 bucket or SQS queue
-  number_of_workers: 5
+  #number_of_workers: 5
 
   # Maximum duration of an AWS API call (excluding S3 GetObject calls).
   #api_timeout: 120s
@@ -3027,7 +3027,7 @@ filebeat.inputs:
   #sqs.wait_time: 20s
 
   # Bucket ARN used for polling AWS S3 buckets
-  bucket_arn: arn:aws:s3:::gizas-5559-cloudflare-sdh
+  #bucket_arn: arn:aws:s3:::test-s3-bucket
 
   # Access Point ARN used for polling AWS S3 buckets
   #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
@@ -4939,4 +4939,3 @@ logging.files:
 #features:
 #  fqdn:
 #    enabled: true
-
