@@ -14,20 +14,18 @@ Example configuration of using the <<filebeat-input-filestream-parsers-container
 {beatname_lc}.inputs:
 - type: filestream
   id: unique-input-id <1>
-  take_over: true <2>
-  prospector.scanner.symlinks: true <3>
+  prospector.scanner.symlinks: true <2>
   parsers:
     - container:
         stream: stdout
         format: docker
-  paths: <4>
+  paths: <3>
     - '/var/log/containers/*.log'
 ----
 
 <1> all <<filebeat-input-filestream,`filestream`>> inputs require a <<filebeat-input-filestream-id,`unique ID`>>.
-<2> <<filebeat-input-filestream-take-over,`take_over: true`>> would migrate all states from the previously used container input to the <<filebeat-input-filestream,`filestream`>> input.
-<3> container logs use symlinks, so they need to be <<filebeat-input-filestream-prospector-scanner-symlinks,`enabled`>>.
-<4> `paths` is required.
+<2> container logs use symlinks, so they need to be <<filebeat-input-filestream-prospector-scanner-symlinks,`enabled`>>.
+<3> `paths` is required.
 
 ++++
 <titleabbrev>Container</titleabbrev>
