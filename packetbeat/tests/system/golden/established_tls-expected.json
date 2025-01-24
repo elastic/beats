@@ -127,7 +127,7 @@
                 "not_before": "2013-03-08T12:00:00.000Z",
                 "public_key_algorithm": "RSA",
                 "public_key_size": 2048,
-                "serial_number": "2646203786665923649276728595390119057",
+                "serial_number": "1FDA3EB6ECA75C888438B724BCFBC91",
                 "signature_algorithm": "SHA256-RSA",
                 "subject": {
                     "common_name": "DigiCert SHA2 Secure Server CA",
@@ -149,7 +149,7 @@
                 "not_before": "2006-11-10T00:00:00.000Z",
                 "public_key_algorithm": "RSA",
                 "public_key_size": 2048,
-                "serial_number": "10944719598952040374951832963794454346",
+                "serial_number": "83BE056904246B1A1756AC95991C74A",
                 "signature_algorithm": "SHA1-RSA",
                 "subject": {
                     "common_name": "DigiCert Global Root CA",
@@ -204,7 +204,7 @@
         "tls.server.x509.not_before": "2018-11-28T00:00:00.000Z",
         "tls.server.x509.public_key_algorithm": "RSA",
         "tls.server.x509.public_key_size": 2048,
-        "tls.server.x509.serial_number": "21020869104500376438182461249190639870",
+        "tls.server.x509.serial_number": "FD078DD48F1A2BD4D0F2BA96B6038FE",
         "tls.server.x509.signature_algorithm": "SHA256-RSA",
         "tls.server.x509.subject.common_name": "www.example.org",
         "tls.server.x509.subject.country": "US",

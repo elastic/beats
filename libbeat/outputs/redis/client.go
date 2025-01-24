@@ -90,7 +90,7 @@ func newClient(
 	}
 }
 
-func (c *client) Connect() error {
+func (c *client) Connect(_ context.Context) error {
 	c.log.Debug("connect")
 	err := c.Client.Connect()
 	if err != nil {

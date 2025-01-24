@@ -608,9 +608,77 @@ func drainSQS(t *testing.T, region string, queueURL string, cfg aws.Config) {
 	t.Logf("Drained %d SQS messages.", deletedCount)
 }
 
+func TestGetRegionFromAccessPointARN(t *testing.T) {
+	// Define test cases
+	testCases := []struct {
+		name     string
+		arn      string
+		expected string
+	}{
+		{
+			name:     "Valid Access Point ARN",
+			arn:      "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point",
+			expected: "us-east-1",
+		},
+		{
+			name:     "Invalid ARN with missing region",
+			arn:      "arn:aws:s3::123456789:accesspoint/my-access-point",
+			expected: "",
+		},
+		{
+			name:     "Invalid ARN with too few parts",
+			arn:      "arn:aws:s3",
+			expected: "",
+		},
+		{
+			name:     "Standard bucket ARN (not an Access Point)",
+			arn:      "arn:aws:s3:::my_corporate_bucket",
+			expected: "",
+		},
+		{
+			name:     "Malformed ARN with extra colons",
+			arn:      "arn:aws:s3:::us-west-2:123456789:accesspoint/my-access-point",
+			expected: "",
+		},
+		{
+			name:     "Access Point ARN with additional elements",
+			arn:      "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point/extra",
+			expected: "us-east-1",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			region := getRegionFromAccessPointARN(tc.arn)
+			assert.Equal(t, tc.expected, region)
+		})
+	}
+}
+
 func TestGetBucketNameFromARN(t *testing.T) {
-	bucketName := getBucketNameFromARN("arn:aws:s3:::my_corporate_bucket")
-	assert.Equal(t, "my_corporate_bucket", bucketName)
+	testCases := []struct {
+		name      string
+		bucketARN string
+		expected  string
+	}{
+		{
+			name:      "Standard bucket ARN",
+			bucketARN: "arn:aws:s3:::my_corporate_bucket",
+			expected:  "my_corporate_bucket",
+		},
+		{
+			name:      "Access Point ARN",
+			bucketARN: "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point",
+			expected:  "arn:aws:s3:us-east-1:123456789:accesspoint/my-access-point",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			bucketName := getBucketNameFromARN(tc.bucketARN)
+			assert.Equal(t, tc.expected, bucketName)
+		})
+	}
 }
 
 func TestGetRegionForBucketARN(t *testing.T) {

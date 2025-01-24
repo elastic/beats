@@ -36,6 +36,7 @@ type s3PollerInput struct {
 	metrics         *inputMetrics
 	s3ObjectHandler s3ObjectHandlerFactory
 	states          *states
+	filterProvider  *filterProvider
 }
 
 func newS3PollerInput(
@@ -43,11 +44,11 @@ func newS3PollerInput(
 	awsConfig awssdk.Config,
 	store beater.StateStore,
 ) (v2.Input, error) {
-
 	return &s3PollerInput{
-		config:    config,
-		awsConfig: awsConfig,
-		store:     store,
+		config:         config,
+		awsConfig:      awsConfig,
+		store:          store,
+		filterProvider: newFilterProvider(&config),
 	}, nil
 }
 
@@ -66,14 +67,14 @@ func (in *s3PollerInput) Run(
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store)
+	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 	defer in.states.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
-	in.s3, err = createS3API(ctx, in.config, in.awsConfig)
+	in.s3, err = in.createS3API(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to create S3 API: %w", err)
 	}
@@ -115,8 +116,19 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Start reading data and wait for its processing to be done
-	in.readerLoop(ctx, workChan)
+	ids, ok := in.readerLoop(ctx, workChan)
 	workerWg.Wait()
+
+	if !ok {
+		in.log.Warn("skipping state registry cleanup as object reading ended with a non-ok return")
+		return
+	}
+
+	// Perform state cleanup operation
+	err := in.states.CleanUp(ids)
+	if err != nil {
+		in.log.Errorf("failed to cleanup states: %v", err.Error())
+	}
 }
 
 func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
@@ -183,10 +195,14 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	}
 }
 
-func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) {
+// readerLoop performs the S3 object listing and emit state to work listeners if object needs to be processed.
+// Returns all tracked state IDs correlates to all tracked S3 objects iff listing is successful.
+// These IDs are intended to be used for state clean-up.
+func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, ok bool) {
 	defer close(workChan)
-
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+
+	isStateValid := in.filterProvider.getApplierFunc()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -202,7 +218,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 				circuitBreaker++
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
-					break
+					return nil, false
 				}
 			}
 			// add a backoff delay and try again
@@ -219,8 +235,14 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
+			if !isStateValid(in.log, state) {
+				continue
+			}
+
+			// add to known states only if valid for processing
+			knownStateIDSlice = append(knownStateIDSlice, state.ID())
 			if in.states.IsProcessed(state) {
-				in.log.Debugw("skipping state.", "state", state)
+				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}
 
@@ -229,6 +251,8 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) 
 			in.metrics.s3ObjectsProcessedTotal.Inc()
 		}
 	}
+
+	return knownStateIDSlice, true
 }
 
 func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
@@ -238,5 +262,6 @@ func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 	event.S3.Bucket.Name = state.Bucket
 	event.S3.Bucket.ARN = in.config.getBucketARN()
 	event.S3.Object.Key = state.Key
+	event.S3.Object.LastModified = state.LastModified
 	return event
 }

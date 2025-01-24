@@ -36,7 +36,6 @@ import (
 )
 
 func TestFileWatcher(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/41209")
 	dir := t.TempDir()
 	paths := []string{filepath.Join(dir, "*.log")}
 	cfgStr := `
@@ -223,6 +222,7 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 10ms
 `
 
@@ -261,10 +261,11 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  fingerprint.enabled: false
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())
@@ -371,6 +372,7 @@ scanner:
 		}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 100ms
 `
 
@@ -616,6 +618,7 @@ scanner:
 			name: "returns no symlink if the original file is excluded",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   exclude_files: ['.*exclude.*', '.*traveler.*']
   symlinks: true
 `,
@@ -662,6 +665,7 @@ scanner:
 			name: "returns no included symlink if the original file is not included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*']
   symlinks: true
 `,
@@ -679,6 +683,7 @@ scanner:
 			name: "returns an included symlink if the original file is included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
   symlinks: true
 `,

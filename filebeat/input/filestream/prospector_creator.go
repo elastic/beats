@@ -53,9 +53,8 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, fmt.Errorf("error while creating file identifier: %w", err)
 	}
 
-	logp.L().
-		With("filestream_id", config.ID).
-		Debugf("file identity is set to %s", identifier.Name())
+	logger := logp.L().Named("input.filestream").With("filestream_id", config.ID)
+	logger.Debugf("file identity is set to %s", identifier.Name())
 
 	fileprospector := fileProspector{
 		filewatcher:         filewatcher,
@@ -64,6 +63,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		ignoreInactiveSince: config.IgnoreInactive,
 		cleanRemoved:        config.CleanRemoved,
 		stateChangeCloser:   config.Close.OnStateChange,
+		logger:              logger.Named("prospector"),
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

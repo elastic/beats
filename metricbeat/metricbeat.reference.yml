@@ -142,6 +142,11 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
@@ -151,6 +156,16 @@ metricbeat.modules:
 
   # Aerospike Cluster Name
   #cluster_name: myclustername
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
 
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
@@ -257,6 +272,9 @@ metricbeat.modules:
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
 
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
@@ -2479,7 +2497,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

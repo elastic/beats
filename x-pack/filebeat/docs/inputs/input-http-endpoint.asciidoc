@@ -40,6 +40,7 @@ These are the possible response codes from the server.
 | 406                 | Not Acceptable          | Returned if the POST request does not contain a body.
 | 415                 | Unsupported Media Type  | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip.
 | 500                 | Internal Server Error   | Returned if an I/O error occurs reading the request.
+| 503                 | Service Unavailable     | Returned if the length of the request body would take the total number of in-flight bytes above the configured `max_in_flight_bytes` value.
 | 504                 | Gateway Timeout         | Returned if a request publication cannot be ACKed within the required timeout.
 |=========================================================================================================================================================
 
@@ -284,6 +285,16 @@ The prefix for the signature. Certain webhooks prefix the HMAC signature with a 
 
 By default the input expects the incoming POST to include a Content-Type of `application/json` to try to enforce the incoming data to be valid JSON.
 In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null.
+
+[float]
+==== `max_in_flight_bytes`
+
+The total sum of request body lengths that are allowed at any given time. If non-zero, the input will compare this value to the sum of in-flight request body lengths from requests that include a `wait_for_completion_timeout` request query and will return a 503 HTTP status code, along with a Retry-After header configured with the `retry_after` option. The default value for this option is zero, no limit.
+
+[float]
+==== `retry_after`
+
+If a request has exceeded the `max_in_flight_bytes` limit, the response to the client will include a Retry-After header specifying how many seconds the client should wait to retry again. The default value for this option is 10 seconds.
 
 [float]
 ==== `program`

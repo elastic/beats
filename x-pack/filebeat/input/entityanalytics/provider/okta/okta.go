@@ -23,7 +23,6 @@ import (
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"golang.org/x/time/rate"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -60,7 +59,7 @@ type oktaInput struct {
 	cfg conf
 
 	client *http.Client
-	lim    *rate.Limiter
+	lim    *okta.RateLimiter
 
 	metrics *inputMetrics
 	logger  *logp.Logger
@@ -111,7 +110,7 @@ func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.C
 	updateTimer := time.NewTimer(updateWaitTime)
 
 	// Allow a single fetch operation to obtain limits from the API.
-	p.lim = rate.NewLimiter(1, 1)
+	p.lim = okta.NewRateLimiter(p.cfg.LimitWindow, p.cfg.LimitFixed)
 
 	if p.cfg.Tracer != nil {
 		id := sanitizeFileName(inputCtx.IDWithoutName)
@@ -452,7 +451,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.cfg.LimitWindow, p.logger)
+		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d users from API", len(users))
 			return nil, err
@@ -513,7 +512,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		return su
 	}
 	if slices.Contains(p.cfg.EnrichWith, "groups") {
-		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow, p.logger)
+		groups, _, err := okta.GetUserGroupDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user group membership for %s: %v", u.ID, err)
 		} else {
@@ -521,7 +520,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "factors") {
-		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow, p.logger)
+		factors, _, err := okta.GetUserFactors(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user factors for %s: %v", u.ID, err)
 		} else {
@@ -529,7 +528,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 		}
 	}
 	if slices.Contains(p.cfg.EnrichWith, "roles") {
-		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.cfg.LimitWindow, p.logger)
+		roles, _, err := okta.GetUserRoles(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, u.ID, p.lim, p.logger)
 		if err != nil {
 			p.logger.Warnf("failed to get user roles for %s: %v", u.ID, err)
 		} else {
@@ -581,7 +580,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		lastUpdated time.Time
 	)
 	for {
-		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.cfg.LimitWindow, p.logger)
+		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.logger)
 		if err != nil {
 			p.logger.Debugf("received %d devices from API", len(devices))
 			return nil, err
@@ -600,7 +599,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 				const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
-				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.cfg.LimitWindow, p.logger)
+				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
 					return nil, err
