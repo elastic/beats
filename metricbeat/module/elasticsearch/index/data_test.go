@@ -26,6 +26,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"fmt"
 
 	"github.com/stretchr/testify/require"
 
@@ -43,7 +44,7 @@ var info = elasticsearch.Info{
 
 func TestMapper(t *testing.T) {
 
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	mux := createEsMuxer("8.17.0", "platinum", false)
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
@@ -88,16 +89,16 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	}
 	rootHandler := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "_stats") {
-			input, _ := ioutil.ReadFile("./_meta/test/stats.800.snapshot.20201118.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/stats.%s.json", esVersion))
 			w.Write(input)
 			return
 		} else if r.URL.Path != "/" {
-			input, _ := ioutil.ReadFile("./_meta/test/settings.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/settings.%s.json", esVersion))
 			w.Write(input)
 			return
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/root.%s.json", esVersion))
 		w.Write(input)
 
 	}
@@ -113,13 +114,13 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/xpack-usage.%s.json", esVersion))
 			w.Write(input)
 		}))
 
-	mux.Handle("/_cluster/state/metadata,routing_table", http.HandlerFunc(
+	mux.Handle("/_cluster/state/routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/cluster_state.%s.json", esVersion))
 			w.Write(input)
 		}))
 
@@ -129,7 +130,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 }
 
 func TestData(t *testing.T) {
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	mux := createEsMuxer("8.17.0", "platinum", false)
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
