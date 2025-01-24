@@ -119,7 +119,10 @@ func getOpTimestamp(collection *mongo.Collection) (int64, int64, error) {
 	// only need the timestamp (ts) field. FindOne() is used to retrieve a single
 	// document from the collection (limit: 1).
 
-	ctx := context.TODO()
+	// NOTE(shmsr):
+	// Timeout is set to 10m for: https://github.com/elastic/beats/pull/42224#discussion_r1928519896
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
 
 	var firstDoc struct {
 		Timestamp time.Time `bson:"ts"`
