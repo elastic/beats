@@ -42,7 +42,6 @@ var info = elasticsearch.Info{
 }
 
 func TestMapper(t *testing.T) {
-	t.Skip("Skipping to fix in a follow up")
 
 	mux := createEsMuxer("7.6.0", "platinum", false)
 
