@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/hashicorp/go-memdb"
 )
 
 type EntryType string
@@ -63,6 +64,7 @@ const (
 )
 
 type Process struct {
+	Tgid     int
 	PIDs     types.PIDInfo
 	Creds    types.CredInfo
 	CTTY     tty.TTYDev
@@ -70,6 +72,10 @@ type Process struct {
 	Cwd      string
 	Filename string
 	ExitCode int32
+
+	// ProcfsLookupFail is true if procfs couldn't find a matching PID for us
+	ProcfsLookupFail bool
+	InsertTime       time.Time
 }
 
 var (
@@ -167,6 +173,8 @@ func initialize() {
 }
 
 type DB struct {
+	memdb *memdb.MemDB
+
 	mutex                    sync.RWMutex
 	logger                   *logp.Logger
 	processes                map[uint32]Process
@@ -175,15 +183,23 @@ type DB struct {
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
 	removalMap               map[uint32]removalCandidate
+
+	// used for metrics reporting
+	stats *Stats
+
+	// knobs for the reaper thread follows
+
 	// how often the reaper runs
 	reaperPeriod time.Duration
 	// used for testing
 	skipReaper bool
-	// used for metrics reporting
-	stats *Stats
+	// the reaper will remove processes events, an well as exit events
+	reapProcesses bool
+	// the age at which we'll reap a process that has no procfs data
+	processReapAfter time.Duration
 }
 
-func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration) (*DB, error) {
+func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration, reapProcesses bool) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
 		return &DB{}, initError
@@ -199,8 +215,13 @@ func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logge
 		reaperPeriod:             reaperPeriod,
 		skipReaper:               false,
 		stats:                    NewStats(metrics),
+		reapProcesses:            reapProcesses,
+		processReapAfter:         time.Minute * 10,
 	}
 	logger.Infof("starting sessionDB reaper with interval %s", db.reaperPeriod)
+	if db.reapProcesses {
+		logger.Info("WARNING: reaping orphaned processes. May result in data loss.")
+	}
 	db.startReaper()
 	return &db, nil
 }
@@ -275,12 +296,17 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	defer db.mutex.Unlock()
 
 	proc := Process{
-		PIDs:     pidInfoFromProto(exec.PIDs),
-		Creds:    credInfoFromProto(exec.Creds),
-		CTTY:     ttyDevFromProto(exec.CTTY),
-		Argv:     exec.Argv,
-		Cwd:      exec.CWD,
-		Filename: exec.Filename,
+		PIDs:             pidInfoFromProto(exec.PIDs),
+		Creds:            credInfoFromProto(exec.Creds),
+		CTTY:             ttyDevFromProto(exec.CTTY),
+		Argv:             exec.Argv,
+		Cwd:              exec.CWD,
+		Filename:         exec.Filename,
+		ProcfsLookupFail: exec.ProcfsLookupFail,
+		InsertTime:       time.Now(),
+	}
+	if proc.ProcfsLookupFail {
+		db.stats.procfsLookupFail.Add(1)
 	}
 
 	// check to see if an orphaned exit event maps to this exec event.
@@ -288,9 +314,9 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	// if we don't track orphaned processes like this, we'll never scrub them from the DB.
 	if evt, ok := db.removalMap[proc.PIDs.Tgid]; ok {
 		proc.ExitCode = evt.exitCode
-		db.stats.resolvedOrphans.Add(1)
+		db.stats.resolvedOrphanExits.Add(1)
 		db.logger.Debugf("resolved orphan exit for pid %d", proc.PIDs.Tgid)
-		evt.removeAttempt = exitRemoveAttempts + 1 // set it to remove on the next reaper pass
+		//evt.orphanTime // set it to remove on the next reaper pass
 		evt.startTime = proc.PIDs.StartTimeNS
 		db.removalMap[proc.PIDs.Tgid] = evt
 	}
@@ -429,14 +455,14 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 	pid := exit.PIDs.Tgid
 	newRemoval := removalCandidate{
-		pid:           pid,
-		exitTime:      time.Now(),
-		removeAttempt: 0,
-		exitCode:      exit.ExitCode,
+		pid:      pid,
+		exitTime: time.Now(),
+		exitCode: exit.ExitCode,
 	}
 
 	process, ok := db.processes[pid]
 	if !ok {
+		newRemoval.orphanTime = time.Now()
 		db.logger.Debugf("pid %v for exit event not found in db, adding as orphan", pid)
 	} else {
 		// If we already have the process, add our exit info
@@ -637,8 +663,10 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	process, ok := db.processes[pid]
 	if !ok {
+		db.stats.failedToFindProcessCount.Add(1)
 		return types.Process{}, errors.New("process not found")
 	}
+	db.stats.servedProcessCount.Add(1)
 
 	ret := fullProcessFromDBProcess(process)
 

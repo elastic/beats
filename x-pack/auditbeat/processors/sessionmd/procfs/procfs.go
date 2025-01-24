@@ -31,6 +31,7 @@ func MinorTTY(ttyNr uint32) uint32 {
 type Reader interface {
 	GetProcess(pid uint32) (ProcessInfo, error)
 	GetAllProcesses() ([]ProcessInfo, error)
+	ProcessExists(pid uint32) bool
 }
 
 type ProcfsReader struct {
@@ -184,6 +185,15 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 		return ProcessInfo{}, err
 	}
 	return r.getProcessInfo(proc)
+}
+
+func (r ProcfsReader) ProcessExists(pid uint32) bool {
+	_, err := procfs.NewProc(int(pid))
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 // returns empty slice on error

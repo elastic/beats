@@ -342,7 +342,7 @@ func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		t.Run(tt.testName, func(t *testing.T) {
 			reader := procfs.NewMockReader()
-			db, err := processdb.NewDB(monitoring.NewRegistry(), reader, *logger, time.Second*30)
+			db, err := processdb.NewDB(monitoring.NewRegistry(), reader, *logger, time.Second*30, false)
 			require.Nil(t, err)
 
 			for _, ev := range tt.mockProcesses {

@@ -26,6 +26,10 @@ var testAlwaysTimeout = func(_, _ time.Time) bool {
 	return false
 }
 
+var testNeverTimeout = func(_, _ time.Time) bool {
+	return true
+}
+
 func TestGetTTYType(t *testing.T) {
 	require.Equal(t, tty.TTYConsole, tty.GetTTYType(4, 0))
 	require.Equal(t, tty.Pts, tty.GetTTYType(136, 0))
@@ -38,19 +42,13 @@ func TestProcessOrphanResolve(t *testing.T) {
 	// uncomment if you want some logs
 	//_ = logp.DevelopmentSetup()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute)
+	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
 	require.NoError(t, err)
 	testDB.skipReaper = true
-	functionTimeoutReached = testAlwaysTimeout
+	removalFuncTimeoutWaiting = testAlwaysTimeout
 
-	pid1 := types.PIDInfo{
-		Tgid:        10,
-		StartTimeNS: 19,
-	}
-	pid2 := types.PIDInfo{
-		Tgid:        11,
-		StartTimeNS: 25,
-	}
+	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
+	pid2 := types.PIDInfo{Tgid: 11, StartTimeNS: 25}
 
 	exitCode1 := int32(24)
 	exitCode2 := int32(30)
@@ -89,10 +87,11 @@ func TestReapExitOrphans(t *testing.T) {
 	//test to make sure that orphaned exit events are still cleaned up
 
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute)
+	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
 	require.NoError(t, err)
 	testDB.skipReaper = true
-	functionTimeoutReached = testAlwaysTimeout
+	removalFuncTimeoutWaiting = testAlwaysTimeout
+	orphanFuncTimeoutWaiting = testAlwaysTimeout
 
 	testDB.InsertExit(types.ProcessExitEvent{PIDs: types.PIDInfo{Tgid: 10, StartTimeNS: 19}, ExitCode: 0})
 	testDB.InsertExit(types.ProcessExitEvent{PIDs: types.PIDInfo{Tgid: 11, StartTimeNS: 20}, ExitCode: 0})
@@ -100,10 +99,112 @@ func TestReapExitOrphans(t *testing.T) {
 
 	require.Len(t, testDB.removalMap, 3)
 
-	/// run four times, to pass over the iterations needed for the reaper
-	testDB.reapProcs()
-	testDB.reapProcs()
 	testDB.reapProcs()
 
 	require.Len(t, testDB.removalMap, 0)
+}
+
+func TestReapProcesses(t *testing.T) {
+	reader := procfs.NewProcfsReader(*logger)
+	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
+	require.NoError(t, err)
+	testDB.skipReaper = true
+	testDB.reapProcesses = true
+	testDB.processReapAfter = time.Duration(0)
+	removalFuncTimeoutWaiting = testNeverTimeout
+
+	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
+	pid2 := types.PIDInfo{Tgid: 11, StartTimeNS: 25}
+	pid3 := types.PIDInfo{Tgid: 13, StartTimeNS: 40}
+	pid4 := types.PIDInfo{Tgid: 14, StartTimeNS: 50}
+
+	exec1 := types.ProcessExecEvent{PIDs: pid1, ProcfsLookupFail: true}
+	exec2 := types.ProcessExecEvent{PIDs: pid2, ProcfsLookupFail: true}
+	exec3 := types.ProcessExecEvent{PIDs: pid3, ProcfsLookupFail: true}
+	// if we got a procfs lookup, don't reap
+	exec4 := types.ProcessExecEvent{PIDs: pid4, ProcfsLookupFail: false}
+
+	testDB.InsertExec(exec1)
+	testDB.InsertExec(exec2)
+	testDB.InsertExec(exec3)
+	testDB.InsertExec(exec4)
+
+	// if a process has a corrisponding exit, do not reap
+	testDB.InsertExit(types.ProcessExitEvent{PIDs: pid3, ExitCode: 0})
+
+	testDB.reapProcs()
+
+	// make sure processes are removed
+	require.NotContains(t, testDB.processes, pid1.Tgid)
+	require.NotContains(t, testDB.processes, pid2.Tgid)
+	require.Contains(t, testDB.processes, pid3.Tgid)
+	require.Contains(t, testDB.processes, pid4.Tgid)
+
+}
+
+func TestReapProcessesWithProcFS(t *testing.T) {
+	mockReader := procfs.NewMockReader()
+	testDB, err := NewDB(monitoring.NewRegistry(), mockReader, *logp.L(), time.Minute, false)
+	require.NoError(t, err)
+	testDB.skipReaper = true
+	testDB.reapProcesses = true
+	testDB.processReapAfter = time.Duration(0)
+	removalFuncTimeoutWaiting = testNeverTimeout
+	orphanFuncTimeoutWaiting = testAlwaysTimeout
+
+	// insert procfs entries for two of the pids
+	mockReader.AddEntry(10, procfs.ProcessInfo{})
+	mockReader.AddEntry(11, procfs.ProcessInfo{})
+
+	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
+	pid2 := types.PIDInfo{Tgid: 11, StartTimeNS: 25}
+	pid3 := types.PIDInfo{Tgid: 13, StartTimeNS: 40}
+
+	exec1 := types.ProcessExecEvent{PIDs: pid1, ProcfsLookupFail: false}
+	exec2 := types.ProcessExecEvent{PIDs: pid2, ProcfsLookupFail: false}
+	exec3 := types.ProcessExecEvent{PIDs: pid3, ProcfsLookupFail: false}
+
+	testDB.InsertExec(exec1)
+	testDB.InsertExec(exec2)
+	testDB.InsertExec(exec3)
+
+	testDB.reapProcs()
+	// after one iteration, 3 should be marked as `LookupFail`, others should be fine
+	require.True(t, testDB.processes[pid3.Tgid].ProcfsLookupFail)
+	require.False(t, testDB.processes[pid2.Tgid].ProcfsLookupFail)
+	require.False(t, testDB.processes[pid1.Tgid].ProcfsLookupFail)
+
+	// after a second reap, they should be removed
+	testDB.reapProcs()
+
+	require.NotContains(t, testDB.processes, pid3.Tgid)
+	require.Contains(t, testDB.processes, pid1.Tgid)
+	require.Contains(t, testDB.processes, pid2.Tgid)
+}
+
+func TestReapingProcessesOrphanResolvedRace(t *testing.T) {
+	// test to make sure that if we resolve a process in between mutex holds, we won't prematurely reap it
+	mockReader := procfs.NewMockReader()
+	testDB, err := NewDB(monitoring.NewRegistry(), mockReader, *logp.L(), time.Minute, false)
+	require.NoError(t, err)
+	testDB.skipReaper = true
+	testDB.reapProcesses = true
+	testDB.processReapAfter = time.Duration(0)
+	removalFuncTimeoutWaiting = testNeverTimeout
+	orphanFuncTimeoutWaiting = testAlwaysTimeout
+
+	// insert procfs entries for two of the pids
+	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
+	exec1 := types.ProcessExecEvent{PIDs: pid1, ProcfsLookupFail: false}
+	testDB.InsertExec(exec1)
+
+	testDB.reapProcs()
+	// should now be marked as lookup fail
+	require.True(t, testDB.processes[pid1.Tgid].ProcfsLookupFail)
+
+	// now we get our exit
+	testDB.InsertExit(types.ProcessExitEvent{PIDs: pid1})
+	testDB.reapProcs()
+	// process should still exist
+	require.Contains(t, testDB.processes, pid1.Tgid)
 }

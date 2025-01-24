@@ -32,6 +32,15 @@ func (r *MockReader) GetProcess(pid uint32) (ProcessInfo, error) {
 	return entry, nil
 }
 
+func (r *MockReader) ProcessExists(pid uint32) bool {
+	_, ok := r.entries[pid]
+	if !ok {
+		return false
+	}
+	return true
+
+}
+
 func (r *MockReader) GetAllProcesses() ([]ProcessInfo, error) {
 	ret := make([]ProcessInfo, 0, len(r.entries))
 

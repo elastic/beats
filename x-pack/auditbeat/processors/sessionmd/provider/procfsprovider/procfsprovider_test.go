@@ -111,7 +111,7 @@ func TestExecveEvent(t *testing.T) {
 	}
 
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30)
+	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -221,7 +221,7 @@ func TestExecveatEvent(t *testing.T) {
 	}
 
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30)
+	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -308,7 +308,7 @@ func TestSetSidEvent(t *testing.T) {
 	}
 
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30)
+	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -390,7 +390,7 @@ func TestSetSidEventFailed(t *testing.T) {
 	}
 
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30)
+	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -461,7 +461,7 @@ func TestSetSidSessionLeaderNotScraped(t *testing.T) {
 	}
 
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30)
+	db, err := processdb.NewDB(monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)

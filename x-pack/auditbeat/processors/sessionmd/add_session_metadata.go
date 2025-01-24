@@ -59,7 +59,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(monitoring.Default, reader, *logger, c.DBReaperPeriod)
+	db, err := processdb.NewDB(monitoring.Default, reader, *logger, c.DBReaperPeriod, c.ReapProcesses)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)

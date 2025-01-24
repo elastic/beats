@@ -12,21 +12,36 @@ import (
 
 type Stats struct {
 	// number of orphans we have resolved
-	resolvedOrphans *monitoring.Uint
+	resolvedOrphanExits *monitoring.Uint
 	// orphan exit events that were never matched
-	reapedOrphans *monitoring.Uint
+	reapedOrphanExits *monitoring.Uint
 	// current size of the process map
 	currentProcs *monitoring.Uint
 	// current size of the exit map
 	currentExit *monitoring.Uint
+	// number of processes that were removed by the reaper
+	reapedOrphanProcesses *monitoring.Uint
+	// count of times we successfully served a process upstream
+	servedProcessCount *monitoring.Uint
+	// count of times we could not find a process for upstream
+	failedToFindProcessCount *monitoring.Uint
+	// count of processes removed after exits are resolved
+	reapedProcesses *monitoring.Uint
+	// processes where we couldn't find a matching hostfs entry
+	procfsLookupFail *monitoring.Uint
 }
 
 func NewStats(reg *monitoring.Registry) *Stats {
 	obj := &Stats{
-		resolvedOrphans: monitoring.NewUint(reg, "processdb.resolved_orphans"),
-		reapedOrphans:   monitoring.NewUint(reg, "processdb.reaped_orphans"),
-		currentProcs:    monitoring.NewUint(reg, "processdb.processes"),
-		currentExit:     monitoring.NewUint(reg, "processdb.exit_events"),
+		resolvedOrphanExits:      monitoring.NewUint(reg, "processdb.resolved_orphan_exits"),
+		reapedOrphanExits:        monitoring.NewUint(reg, "processdb.reaped_orphan_exits"),
+		currentProcs:             monitoring.NewUint(reg, "processdb.processes"),
+		currentExit:              monitoring.NewUint(reg, "processdb.exit_events"),
+		reapedOrphanProcesses:    monitoring.NewUint(reg, "processdb.reaped_orphan_processes"),
+		servedProcessCount:       monitoring.NewUint(reg, "processdb.served_process_count"),
+		failedToFindProcessCount: monitoring.NewUint(reg, "processdb.failed_process_lookup_count"),
+		reapedProcesses:          monitoring.NewUint(reg, "processdb.reaped_processes"),
+		procfsLookupFail:         monitoring.NewUint(reg, "processdb.procfs_lookup_fail"),
 	}
 	return obj
 }
