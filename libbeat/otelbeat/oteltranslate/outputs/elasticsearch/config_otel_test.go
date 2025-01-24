@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beatconverter
+package elasticsearchtranslate
 
 import (
 	_ "embed"
@@ -24,6 +24,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/confmap"
+	"gopkg.in/yaml.v2"
+	"gotest.tools/v3/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -180,4 +182,24 @@ batcher:
 
 	})
 
+}
+
+func newFromYamlString(t *testing.T, input string) *confmap.Conf {
+	t.Helper()
+	var rawConf map[string]any
+	err := yaml.Unmarshal([]byte(input), &rawConf)
+	require.NoError(t, err)
+
+	return confmap.NewFromStringMap(rawConf)
+}
+
+func compareAndAssert(t *testing.T, expectedOutput *confmap.Conf, gotOutput *confmap.Conf) {
+	t.Helper()
+	// convert it to a common type
+	want, err := yaml.Marshal(expectedOutput.ToStringMap())
+	require.NoError(t, err)
+	got, err := yaml.Marshal(gotOutput.ToStringMap())
+	require.NoError(t, err)
+
+	assert.Equal(t, string(want), string(got))
 }
