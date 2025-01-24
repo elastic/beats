@@ -139,7 +139,19 @@ batcher:
 			},
 			{
 				presetName: "scale",
-				output: commonOTelCfg + `
+				output: `
+api_key: ""
+endpoints:
+  - http://localhost:9200
+retry:
+  enabled: true
+  initial_interval: 5s
+  max_interval: 5m0s
+  max_retries: 3  
+logs_index: some-index 
+password: changeme
+user: elastic  
+timeout: 1m30s 
 idle_conn_timeout: 1s
 num_workers: 1
 batcher:
