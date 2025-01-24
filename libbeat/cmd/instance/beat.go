@@ -337,6 +337,10 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
+	if b.Config.Logging == nil {
+		b.Config.Logging = config.NewConfig()
+	}
+
 	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
@@ -969,7 +973,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
 func (b *Beat) handleFlags() error {
-	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	flag.Parse()
 	return cfgfile.HandleFlags()
 }
@@ -1113,6 +1116,8 @@ func (b *Beat) configure(settings Settings) error {
 		logp.Info("Set gc percentage to: %v", gcPercent)
 		debug.SetGCPercent(gcPercent)
 	}
+
+	b.Info.Monitoring.Namespace = monitoring.GetNamespace("dataset")
 
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {

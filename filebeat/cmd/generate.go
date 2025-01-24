@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/generator/fields"
 	"github.com/elastic/beats/v7/filebeat/generator/fileset"
 	"github.com/elastic/beats/v7/filebeat/generator/module"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -64,9 +63,7 @@ func genGenerateModuleCmd() *cobra.Command {
 	}
 
 	genModuleCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
 	genModuleCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 
 	return genModuleCmd
 }
@@ -91,9 +88,7 @@ func genGenerateFilesetCmd() *cobra.Command {
 	}
 
 	genFilesetCmd.Flags().String("modules-path", defaultHomePath, "Path to modules directory")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("modules-path")
 	genFilesetCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 
 	return genFilesetCmd
 }
@@ -118,9 +113,7 @@ func genGenerateFieldsCmd() *cobra.Command {
 	}
 
 	genFieldsCmd.Flags().String("es-beats", defaultHomePath, "Path to Elastic Beats")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("es-beats")
 	genFieldsCmd.Flags().Bool("without-documentation", false, "Do not add description fields")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("without-documentation")
 
 	return genFieldsCmd
 }

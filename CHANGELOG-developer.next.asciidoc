@@ -71,6 +71,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Rename x-pack/filebeat websocket input to streaming. {issue}40264[40264] {pull}40421[40421]
 - Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
 - System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files, however the ingest pipeline sets it back to the original input (log or journald). {pull}41246[41246]
+- The system-logs input is removed because it's not used anymore {pull}42328[42328]
 
 ==== Bugfixes
 
@@ -109,6 +110,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix flaky test in cel and httpjson inputs of filebeat. {issue}40503[40503] {pull}41358[41358]
 - Fix documentation and implementation of raw message handling in Filebeat http_endpoint by removing it. {pull}41498[41498]
 - Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
+- Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 
 ==== Added
 
