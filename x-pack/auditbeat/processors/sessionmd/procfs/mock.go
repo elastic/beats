@@ -34,10 +34,7 @@ func (r *MockReader) GetProcess(pid uint32) (ProcessInfo, error) {
 
 func (r *MockReader) ProcessExists(pid uint32) bool {
 	_, ok := r.entries[pid]
-	if !ok {
-		return false
-	}
-	return true
+	return ok
 
 }
 

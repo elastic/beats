@@ -129,7 +129,7 @@ func TestReapProcesses(t *testing.T) {
 	testDB.InsertExec(exec3)
 	testDB.InsertExec(exec4)
 
-	// if a process has a corrisponding exit, do not reap
+	// if a process has a corresponding exit, do not reap
 	testDB.InsertExit(types.ProcessExitEvent{PIDs: pid3, ExitCode: 0})
 
 	testDB.reapProcs()

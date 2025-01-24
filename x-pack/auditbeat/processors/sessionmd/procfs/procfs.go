@@ -189,11 +189,7 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 
 func (r ProcfsReader) ProcessExists(pid uint32) bool {
 	_, err := procfs.NewProc(int(pid))
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 // returns empty slice on error
