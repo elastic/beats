@@ -11383,11 +11383,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dgraph-io/badger/v4
-Version: v4.4.0
+Version: v4.5.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.5.1/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -18915,11 +18915,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/flatbuffers
-Version: v24.3.25+incompatible
+Version: v24.12.23+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v24.3.25+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v24.12.23+incompatible/LICENSE:
 
 
                                  Apache License
@@ -23551,11 +23551,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.9.0
+Version: v1.10.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.9.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.10.0/LICENSE:
 
 MIT License
 
@@ -26322,11 +26322,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.31.0
+Version: v0.32.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.31.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.32.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -26396,11 +26396,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.33.0
+Version: v0.34.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.33.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.34.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -26507,11 +26507,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.28.0
+Version: v0.29.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.28.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.29.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -26544,11 +26544,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.27.0
+Version: v0.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.27.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.28.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27153,11 +27153,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.66.0/LIC
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/protobuf
-Version: v1.34.2
+Version: v1.36.3
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.34.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/protobuf@v1.36.3/LICENSE:
 
 Copyright (c) 2018 The Go Authors. All rights reserved.
 
@@ -38534,11 +38534,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dgraph-io/ristretto/v2
-Version: v2.0.0
+Version: v2.1.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto/v2@v2.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto/v2@v2.1.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
