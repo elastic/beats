@@ -104,12 +104,12 @@ var (
 			}),
 			"translog": c.Dict("translog", s.Schema{
 				"operations": s.Object{
-					"count": c.Int("total_operations"),
+					"count": c.Int("operations"),
 				},
 				"size": s.Object{
-					"bytes": c.Int("total_size_in_bytes"),
+					"bytes": c.Int("size_in_bytes"),
 				},
-			}),
+			}, c.DictOptional),
 			"fielddata": c.Dict("fielddata", s.Schema{
 				"evictions": s.Object{
 					"count": c.Int("evictions"),
@@ -300,22 +300,22 @@ var (
 			}),
 			"mem": c.Dict("mem", s.Schema{
 				"total_virtual": s.Object{
-					"bytes": c.Str("total_virtual_in_bytes"),
+					"bytes": c.Int("total_virtual_in_bytes"),
 				},
 			}),
 			"open_file_descriptors": c.Int("open_file_descriptors"),
 		}),
 		"transport": c.Dict("transport", s.Schema{
 			"rx": s.Object{
-				"count": c.Str("rx_count"),
+				"count": c.Int("rx_count"),
 				"size": s.Object{
-					"bytes": c.Str("rx_size_in_bytes"),
+					"bytes": c.Int("rx_size_in_bytes"),
 				},
 			},
 			"tx": s.Object{
-				"count": c.Str("tx_count"),
+				"count": c.Int("tx_count"),
 				"size": s.Object{
-					"bytes": c.Str("tx_size_in_bytes"),
+					"bytes": c.Int("tx_size_in_bytes"),
 				},
 			},
 		}),
@@ -327,10 +327,10 @@ var (
 			"get":           c.Dict("get", threadPoolStatsSchema),
 			"index":         c.Dict("index", threadPoolStatsSchema, c.DictOptional),
 			"search":        c.Dict("search", threadPoolStatsSchema),
-			"search_worker": c.Dict("search_worker", threadPoolStatsSchema),
-			"snapshot":      c.Dict("snapshot", threadPoolStatsSchema),
-			"system_read":   c.Dict("system_read", threadPoolStatsSchema),
-			"system_write":  c.Dict("system_write", threadPoolStatsSchema),
+			"search_worker": c.Dict("search_worker", threadPoolStatsSchema, c.DictOptional),
+			"snapshot":      c.Dict("snapshot", threadPoolStatsSchema, c.DictOptional),
+			"system_read":   c.Dict("system_read", threadPoolStatsSchema, c.DictOptional),
+			"system_write":  c.Dict("system_write", threadPoolStatsSchema, c.DictOptional),
 			"write":         c.Dict("write", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
