@@ -15,17 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
+//go:build windows
 
-package systemlogs
+package eventlog
 
 import (
-	"errors"
-
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	return nil, nil, errors.New("journald is only supported on Linux")
+// New creates and returns a new EventLog instance based on the given config.
+func New(options *conf.C) (EventLog, error) {
+	var config config
+	if err := readConfig(options, &config); err != nil {
+		return nil, err
+	}
+	return newWinEventLog(options)
 }

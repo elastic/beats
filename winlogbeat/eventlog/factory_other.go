@@ -15,40 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build !windows
 
-package systemlogs
+package eventlog
 
 import (
-	"testing"
+	"errors"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func TestJournaldInputIsCreated(t *testing.T) {
-	c := map[string]any{
-		"files.paths": []string{"/file/does/not/exist"},
-		// The 'journald' object needs to exist for the input to be instantiated
-		"journald.enabled": true,
-	}
-
-	cfg := conf.MustNewConfigFrom(c)
-
-	_, inp, err := configure(cfg)
-	if err != nil {
-		t.Fatalf("did not expect an error calling newV1Input: %s", err)
-	}
-
-	type namer interface {
-		Name() string
-	}
-
-	i, isNamer := inp.(namer)
-	if !isNamer {
-		t.Fatalf("expecting an instance of *log.Input, got '%T' instead", inp)
-	}
-
-	if got, expected := i.Name(), "journald"; got != expected {
-		t.Fatalf("expecting '%s' input, got '%s'", expected, got)
-	}
+// New creates and returns a new EventLog instance based on the given config.
+func New(options *conf.C) (EventLog, error) {
+	return nil, errors.New("only supported on windows platform")
 }
