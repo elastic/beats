@@ -297,13 +297,14 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 	return cgroups, nil
 }
 
+var re = regexp.MustCompile(`[\w]{64}`)
+
 // getContainerIDFromCgroups checks all of the processes' paths to see if any
 // of them are associated with Docker. For cgroups V1, Docker uses /docker/<CID> when
 // naming cgroups and we use this to determine the container ID. For V2,
 // it's part of a more complex string.
 func getContainerIDFromCgroups(cgroups cgroup.PathList) (string, error) {
 	for _, path := range cgroups.Flatten() {
-		re := regexp.MustCompile(`[\w]{64}`)
 		rs := re.FindStringSubmatch(path.ControllerPath)
 		if rs != nil {
 			return rs[0], nil
