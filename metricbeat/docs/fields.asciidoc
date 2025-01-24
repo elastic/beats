@@ -69328,16 +69328,6 @@ type: long
 
 
 
-*`zookeeper.mntr.hostname`*::
-+
---
-ZooKeeper hostname.
-
-
-type: keyword
-
---
-
 *`zookeeper.mntr.approximate_data_size`*::
 +
 --

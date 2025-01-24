@@ -5,10 +5,6 @@
     command.
   release: ga
   fields:
-    - name: hostname
-      type: keyword
-      description: >
-        ZooKeeper hostname.
     - name: approximate_data_size
       type: long
       description: >
