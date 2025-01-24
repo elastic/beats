@@ -88,7 +88,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	if err == nil {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, presetConfig, err := applyPreset(preset, output)
+		overriddenFields, presetConfig, err := elasticsearch.ApplyPreset(preset, output)
 		if err != nil {
 			return nil, err
 		}

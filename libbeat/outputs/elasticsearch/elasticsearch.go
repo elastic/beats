@@ -50,7 +50,7 @@ func makeES(
 	if err == nil && preset != "" {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, presetConfig, err := applyPreset(preset, cfg)
+		overriddenFields, presetConfig, err := ApplyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
