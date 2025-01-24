@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package elasticsearch
+package beatconverter
 
 import (
 	"fmt"
@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	oteltranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -50,8 +51,8 @@ type unsupportedConfig struct {
 }
 
 type esToOTelOptions struct {
-	ElasticsearchConfig   `config:",inline"`
-	outputs.HostWorkerCfg `config:",inline"`
+	elasticsearch.ElasticsearchConfig `config:",inline"`
+	outputs.HostWorkerCfg             `config:",inline"`
 
 	Index    string `config:"index"`
 	Pipeline string `config:"pipeline"`
@@ -59,7 +60,7 @@ type esToOTelOptions struct {
 }
 
 var defaultOptions = esToOTelOptions{
-	ElasticsearchConfig: defaultConfig,
+	ElasticsearchConfig: elasticsearch.DefaultConfig(),
 
 	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
 	Pipeline: "",
