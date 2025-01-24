@@ -315,11 +315,9 @@ func (service *MonitorService) QueryResources(
 
 	// API fails with bad request if filter value is sent empty.
 	var metricsFilter *string
-	var top int32
 
 	if filter != "" {
 		metricsFilter = &filter
-		top = int32(10)
 	}
 
 	opts := azmetrics.QueryResourcesOptions{
@@ -328,7 +326,7 @@ func (service *MonitorService) QueryResources(
 		Interval:    tg,
 		StartTime:   &startTime,
 		EndTime:     &endTime,
-		Top:         &top,
+		Top:         nil,
 	}
 
 	resp := []azmetrics.MetricData{}

@@ -317,13 +317,3 @@ func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*Me
 	}
 	return metricValues
 }
-
-// Function to check if a string is in an array of strings
-func containsString(arr []string, str string) bool {
-	for _, v := range arr {
-		if v == str {
-			return true
-		}
-	}
-	return false
-}

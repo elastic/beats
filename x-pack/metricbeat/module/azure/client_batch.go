@@ -20,12 +20,8 @@ import (
 
 // BatchClient represents the azure batch client which will make use of the azure sdk go metrics related clients
 type BatchClient struct {
-	AzureMonitorService    Service
-	Config                 Config
+	*BaseClient
 	ResourceConfigurations ConcurrentResourceConfig
-	Log                    *logp.Logger
-	Resources              []Resource
-	MetricRegistry         *MetricRegistry
 }
 
 // Resource definitions grouping criteria
@@ -52,10 +48,12 @@ func NewBatchClient(config Config) (*BatchClient, error) {
 	logger := logp.NewLogger("azure monitor client")
 
 	client := &BatchClient{
-		AzureMonitorService: azureMonitorService,
-		Config:              config,
-		Log:                 logger,
-		MetricRegistry:      NewMetricRegistry(logger),
+		BaseClient: &BaseClient{
+			AzureMonitorService: azureMonitorService,
+			Config:              config,
+			Log:                 logger,
+			MetricRegistry:      NewMetricRegistry(logger),
+		},
 	}
 	client.ResourceConfigurations.MetricDefinitions = MetricDefinitions{
 		Update:  true,
@@ -304,166 +302,4 @@ func (client *BatchClient) MapMetricByPrimaryAggregation(metrics []armmonitor.Me
 	}
 
 	return clientMetrics
-}
-
-// GetVMForMetadata func will retrieve the VM details in order to fill in the cloud metadata
-// and also update the client resources
-func (client *BatchClient) GetVMForMetadata(resource *Resource, referencePoint KeyValuePoint) VmResource {
-	var (
-		vm           VmResource
-		resourceName = resource.Name
-		resourceId   = resource.Id
-	)
-
-	// Search the dimensions for the "VMName" dimension. This dimension is present for VM Scale Sets.
-	if dimensionValue, ok := getDimension("VMName", referencePoint.Dimensions); ok {
-		instanceId := getInstanceId(dimensionValue)
-		if instanceId != "" {
-			resourceId += fmt.Sprintf("/virtualMachines/%s", instanceId)
-			resourceName = dimensionValue
-		}
-	}
-
-	// if vm has been already added to the resource then it should be returned
-	if existingVM, ok := getVM(resourceName, resource.Vms); ok {
-		return existingVM
-	}
-
-	// an additional call is necessary in order to retrieve the vm specific details
-	expandedResource, err := client.AzureMonitorService.GetResourceDefinitionById(resourceId)
-	if err != nil {
-		client.Log.Error(err, "could not retrieve the resource details by resource ID %s", resourceId)
-		return VmResource{}
-	}
-
-	vm.Name = *expandedResource.Name
-
-	if expandedResource.Properties != nil {
-		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
-			if hardware, ok := properties["hardwareProfile"]; ok {
-				if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
-					vm.Size = vmSz.(string)
-				}
-				if vmID, ok := properties["vmId"]; ok {
-					vm.Id = vmID.(string)
-				}
-			}
-		}
-	}
-
-	if len(vm.Size) == 0 && expandedResource.SKU != nil && expandedResource.SKU.Name != nil {
-		vm.Size = *expandedResource.SKU.Name
-	}
-
-	// the client resource and selected resources are being updated in order to avoid additional calls
-	client.AddVmToResource(resource.Id, vm)
-
-	resource.Vms = append(resource.Vms, vm)
-
-	return vm
-}
-
-// GetResourceForMetaData will retrieve resource details for the selected metric configuration
-func (client *BatchClient) GetResourceForMetaData(grouped Metric) Resource {
-	for _, res := range client.Resources {
-		if res.Id == grouped.ResourceId {
-			return res
-		}
-	}
-	return Resource{}
-}
-
-func (client *BatchClient) LookupResource(resourceId string) Resource {
-	for _, res := range client.Resources {
-		if res.Id == resourceId {
-			return res
-		}
-	}
-	return Resource{}
-}
-
-// AddVmToResource will add the vm details to the resource
-func (client *BatchClient) AddVmToResource(resourceId string, vm VmResource) {
-	if len(vm.Id) > 0 && len(vm.Name) > 0 {
-		for i, res := range client.Resources {
-			if res.Id == resourceId {
-				client.Resources[i].Vms = append(client.Resources[i].Vms, vm)
-			}
-		}
-	}
-}
-
-// mapToEvents maps the metric values to events and reports them to Elasticsearch.
-func (client *BatchClient) MapToEvents(metrics []Metric, reporter mb.ReporterV2) error {
-
-	// Map the metric values into a list of key/value points.
-	//
-	// This makes it easier to group the metrics by timestamp
-	// and dimensions.
-	points := mapToKeyValuePoints(metrics)
-
-	// Group the points by timestamp and other fields we consider
-	// as dimensions for the whole event.
-	//
-	// Metrics have their own dimensions, and this is fine at the
-	// metric level.
-	//
-	// We identified a set of field we consider as dimensions
-	// at the event level. The event level dimensions define
-	// the time series when TSDB is enabled.
-	groupedPoints := make(map[string][]KeyValuePoint)
-	for _, point := range points {
-		groupingKey := fmt.Sprintf(
-			"%s,%s,%s,%s,%s,%s",
-			point.Timestamp,
-			point.Namespace,
-			point.ResourceId,
-			point.ResourceSubId,
-			point.Dimensions,
-			point.TimeGrain,
-		)
-
-		groupedPoints[groupingKey] = append(groupedPoints[groupingKey], point)
-	}
-
-	// Create an event for each group of points and send
-	// it to Elasticsearch.
-	for _, _points := range groupedPoints {
-		if len(_points) == 0 {
-			// This should never happen, but I don't feel like
-			// writing points[0] without checking the length first.
-			continue
-		}
-
-		// We assume that all points have the same timestamp and
-		// dimensions because they were grouped by the same key.
-		//
-		// We use the reference point to get the resource ID and
-		// all other information common to all points.
-		referencePoint := _points[0]
-
-		// Look up the full cloud resource information in the cache.
-		resource := client.LookupResource(referencePoint.ResourceId)
-
-		// Build the event using all the information we have.
-		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType)
-		if err != nil {
-			return err
-		}
-
-		//
-		// Enrich the event with cloud metadata.
-		//
-		if client.Config.AddCloudMetadata {
-			vm := client.GetVMForMetadata(&resource, referencePoint)
-			addCloudVMMetadata(&event, vm, resource.Subscription)
-		}
-
-		//
-		// Report the event to Elasticsearch.
-		//
-		reporter.Event(event)
-	}
-
-	return nil
 }

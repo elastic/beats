@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -111,7 +112,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// instantiate monitor client
 	var monitorClient *Client
 	var monitorBatchClient *BatchClient
-	if containsString(monitorMetricsets, metricsetName) && config.EnableBatchApi {
+	if slices.Contains(monitorMetricsets, metricsetName) && config.EnableBatchApi {
 		monitorBatchClient, err = NewBatchClient(config)
 		if err != nil {
 			return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
