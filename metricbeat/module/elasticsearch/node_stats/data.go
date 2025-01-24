@@ -52,6 +52,9 @@ var (
 					"old":      c.Dict("old", poolSchema),
 				}),
 			}),
+			"threads": c.Dict("threads", s.Schema{
+				"count": c.Int("count"),
+			}),
 			"gc": c.Dict("gc", s.Schema{
 				"collectors": c.Dict("collectors", s.Schema{
 					"young": c.Dict("young", collectorSchema),
@@ -83,7 +86,34 @@ var (
 				"count":   c.Int("count"),
 				"deleted": c.Int("deleted"),
 			}),
+			"get": c.Dict("get", s.Schema{
+				"time": s.Object{
+					"ms": c.Int("time_in_millis"),
+				},
+				"total": s.Object{
+					"count": c.Int("total"),
+				},
+			}),
+			"merges": c.Dict("merges", s.Schema{
+				"total_time": s.Object{
+					"ms": c.Int("total_time_in_millis"),
+				},
+				"total": s.Object{
+					"count": c.Int("total"),
+				},
+			}),
+			"translog": c.Dict("translog", s.Schema{
+				"operations": s.Object{
+					"count": c.Int("total_operations"),
+				},
+				"size": s.Object{
+					"bytes": c.Int("total_size_in_bytes"),
+				},
+			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
+				"evictions": s.Object{
+					"count": c.Int("evictions"),
+				},
 				"memory": s.Object{
 					"bytes": c.Int("memory_size_in_bytes"),
 				},
@@ -110,6 +140,12 @@ var (
 				},
 			}),
 			"search": c.Dict("search", s.Schema{
+				"fetch_time": s.Object{
+					"ms": c.Int("fetch_time_in_millis"),
+				},
+				"fetch_total": s.Object{
+					"count": c.Int("fetch_total"),
+				},
 				"query_time": s.Object{
 					"ms": c.Int("query_time_in_millis"),
 				},
@@ -262,14 +298,40 @@ var (
 			"cpu": c.Dict("cpu", s.Schema{
 				"pct": c.Int("percent"),
 			}),
+			"mem": c.Dict("mem", s.Schema{
+				"total_virtual": s.Object{
+					"bytes": c.Str("total_virtual_in_bytes"),
+				},
+			}),
+			"open_file_descriptors": c.Int("open_file_descriptors"),
+		}),
+		"transport": c.Dict("transport", s.Schema{
+			"rx": s.Object{
+				"count": c.Str("rx_count"),
+				"size": s.Object{
+					"bytes": c.Str("rx_size_in_bytes"),
+				},
+			},
+			"tx": s.Object{
+				"count": c.Str("tx_count"),
+				"size": s.Object{
+					"bytes": c.Str("tx_size_in_bytes"),
+				},
+			},
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk":        c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
-			"force_merge": c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
-			"index":       c.Dict("index", threadPoolStatsSchema, c.DictOptional),
-			"write":       c.Dict("write", threadPoolStatsSchema, c.DictOptional),
-			"get":         c.Dict("get", threadPoolStatsSchema),
-			"search":      c.Dict("search", threadPoolStatsSchema),
+			"bulk":          c.Dict("bulk", threadPoolStatsSchema, c.DictOptional),
+			"esql_worker":   c.Dict("esql_worker", threadPoolStatsSchema, c.DictOptional),
+			"force_merge":   c.Dict("force_merge", threadPoolStatsSchema, c.DictOptional),
+			"flush":         c.Dict("flush", threadPoolStatsSchema, c.DictOptional),
+			"get":           c.Dict("get", threadPoolStatsSchema),
+			"index":         c.Dict("index", threadPoolStatsSchema, c.DictOptional),
+			"search":        c.Dict("search", threadPoolStatsSchema),
+			"search_worker": c.Dict("search_worker", threadPoolStatsSchema),
+			"snapshot":      c.Dict("snapshot", threadPoolStatsSchema),
+			"system_read":   c.Dict("system_read", threadPoolStatsSchema),
+			"system_write":  c.Dict("system_write", threadPoolStatsSchema),
+			"write":         c.Dict("write", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
 			"memory": c.Dict("memory", s.Schema{
@@ -350,6 +412,9 @@ var (
 	}
 
 	threadPoolStatsSchema = s.Schema{
+		"active": s.Object{
+			"count": c.Int("active"),
+		},
 		"queue": s.Object{
 			"count": c.Int("queue"),
 		},
