@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/hashicorp/go-memdb"
 )
 
 type EntryType string
@@ -173,8 +172,6 @@ func initialize() {
 }
 
 type DB struct {
-	memdb *memdb.MemDB
-
 	mutex                    sync.RWMutex
 	logger                   *logp.Logger
 	processes                map[uint32]Process
