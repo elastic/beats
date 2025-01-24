@@ -10,11 +10,6 @@ if [[ "${BUILDKITE_LABEL:-}" == *"Pipeline upload"* || "${BUILDKITE_LABEL:-}" ==
   fi
 fi
 
-<<<<<<< HEAD
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
-    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
-    export PRIVATE_CI_GCS_CREDENTIALS_SECRET
-=======
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
   "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" || \
@@ -31,7 +26,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
   echo "--- Prepare BK test analytics token :vault:"
   BUILDKITE_ANALYTICS_TOKEN=$(vault kv get -field token kv/ci-shared/platform-ingest/buildkite_beats_analytics_token)
   export BUILDKITE_ANALYTICS_TOKEN
->>>>>>> 5bd76b0d5 (CI: x-pack/packetbeat: Enable GCP authentication for system tests (#42391))
 fi
 
 CPU_ARCH=$(uname -m)
