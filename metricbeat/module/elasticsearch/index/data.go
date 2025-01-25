@@ -196,6 +196,9 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
 	}
 
+	// Under some very rare circumstances, an index in the stats response might not have an entry in the settings or cluster state.
+	// This can happen if the index got deleted between the time the settings and cluster state were retrieved and the time the stats were retrieved.
+
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
