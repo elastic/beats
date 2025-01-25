@@ -116,7 +116,10 @@ func (g *guessStructCreds) Terminate() error {
 
 // Extract receives the struct cred dump and discovers the offsets.
 func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
-	raw := ev.([]byte)
+	raw, ok := ev.([]byte)
+	if !ok {
+		return nil, false
+	}
 	if len(raw) != credDumpBytes {
 		return nil, false
 	}
