@@ -158,7 +158,7 @@ func (c *dnsCapture) run(ctx context.Context, consumer parent.Consumer) {
 		}
 		data, _, err := source.ZeroCopyReadPacketData()
 		if err != nil {
-			if err == afpacket.ErrTimeout {
+			if errors.Is(err, afpacket.ErrTimeout) {
 				continue
 			}
 			c.log.Error("DNS capture error", err)
