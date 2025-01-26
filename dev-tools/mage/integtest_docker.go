@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"go/build"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -356,7 +355,7 @@ func StartIntegTestContainers() error {
 
 func StopIntegTestContainers() error {
 	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
-	out := ioutil.Discard
+	out := io.Discard
 	if mg.Verbose() {
 		out = os.Stderr
 	}
@@ -368,7 +367,7 @@ func StopIntegTestContainers() error {
 
 	_, err = sh.Exec(
 		composeEnv,
-		ioutil.Discard,
+		io.Discard,
 		out,
 		"docker-compose",
 		"-p", DockerComposeProjectName(),
