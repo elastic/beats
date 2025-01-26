@@ -123,6 +123,7 @@ steps:
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
+          go env
           mage pythonIntegTest
         retry:
           automatic:
