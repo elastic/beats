@@ -121,6 +121,7 @@ steps:
         key: "mandatory-python-int-test"
         env:
           TEST_TAGS: "oracle"
+          GOPROXY: "https://proxy.golang.org,direct"
         command: |
           cd x-pack/metricbeat
           mage pythonIntegTest
