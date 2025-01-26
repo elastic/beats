@@ -52,8 +52,7 @@ func init() {
 // using docker-compose. The tests are run from inside a special beat container.
 // Prefer using GoIntegTest and PythonIntegTest below which run the tests directly
 // from the host system, avoiding the need to compile beats inside a test container.
-type DockerIntegrationTester struct {
-}
+type DockerIntegrationTester struct{}
 
 // Name returns docker name.
 func (d *DockerIntegrationTester) Name() string {
@@ -106,7 +105,8 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	dockerGoPkgCache := "/gocache"
 
 	// Execute the inside of docker-compose.
-	args := []string{"-p", DockerComposeProjectName(), "run",
+	args := []string{
+		"-p", DockerComposeProjectName(), "run",
 		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + DockerComposeProjectName(),
 		// Disable strict.perms because we mount host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
@@ -315,7 +315,6 @@ func BuildIntegTestContainers() error {
 		os.Stderr,
 		"docker-compose", args...,
 	)
-
 	// This sleep is to avoid hitting the docker build issues when resources are not available.
 	if err != nil {
 		fmt.Println(">> Building docker images again")
@@ -334,7 +333,8 @@ func StartIntegTestContainers() error {
 	// Start the docker-compose services and wait for them to become healthy.
 	// Using --detach causes the command to exit successfully only if the proxy_dep for health
 	// completed successfully.
-	args := []string{"-p", DockerComposeProjectName(),
+	args := []string{
+		"-p", DockerComposeProjectName(),
 		"up",
 		"--detach",
 	}
@@ -450,6 +450,7 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 	}
 
 	return map[string]string{
+		"GOPROXY":           "https://proxy.golang.org,direct",
 		"ES_BEATS":          esBeatsDir,
 		"STACK_ENVIRONMENT": StackEnvironment,
 		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).
@@ -480,7 +481,7 @@ func WriteDockerComposeEnvFile() (string, error) {
 	err = os.WriteFile(
 		envFile,
 		[]byte(strings.Join(envFileContent, "\n")),
-		0644,
+		0o644,
 	)
 	if err != nil {
 		return "", err
