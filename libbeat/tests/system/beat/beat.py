@@ -676,7 +676,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             for key in o.keys():
                 known = key in expected_fields
                 ismeta = key.startswith('@metadata.')
-                if not(known or ismeta):
+                if not (known or ismeta):
                     raise Exception(f"Unexpected key '{key}' found")
 
     def load_fields(self, fields_doc=None):
@@ -844,7 +844,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # Range keys as used in 'date_range' etc will not have docs of course
             is_range_key = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
 
-            if not(is_documented(key, expected_fields) or meta_key or is_range_key):
+            if not (is_documented(key, expected_fields) or meta_key or is_range_key):
                 undocumented_keys.append(key)
 
             if is_documented(key, aliases):
