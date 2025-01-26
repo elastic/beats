@@ -49,7 +49,7 @@ paramiko==3.4.0
 pluggy==0.13.1
 protobuf==3.19.5
 py==1.11.0
-pycodestyle==2.6.0
+pycodestyle==2.12.1
 pycparser==2.21
 PyNaCl==1.5.0
 pyparsing==2.4.7
