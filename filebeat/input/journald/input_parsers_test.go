@@ -31,6 +31,9 @@ import (
 // it only tests a single parser, but that is enough to ensure
 // we're correctly using the parsers
 func TestInputParsers(t *testing.T) {
+	// If this test fails, uncomment the lopg setup line
+	// to send logs to stderr
+	// logp.DevelopmentSetup()
 	out := decompress(t, filepath.Join("testdata", "ndjson-parser.journal.gz"))
 
 	env := newInputTestingEnvironment(t)
