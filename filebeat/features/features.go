@@ -26,25 +26,22 @@ const (
 	envAgentlessElasticsearchStateStoreInputTypes = "AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES"
 )
 
-type void struct{}
-
 // List of input types Elasticsearch state store is enabled for
-var esTypesEnabled map[string]void
+var esTypesEnabled map[string]struct{}
 
 var isESEnabled bool
 
 func init() {
-	esTypesEnabled = make(map[string]void)
+	esTypesEnabled = make(map[string]struct{})
 
-	s := os.Getenv(envAgentlessElasticsearchStateStoreInputTypes)
-	arr := strings.Split(s, ",")
+	arr := strings.Split(os.Getenv(envAgentlessElasticsearchStateStoreInputTypes), ",")
 	for _, e := range arr {
 		k := strings.TrimSpace(e)
 		if k != "" {
-			esTypesEnabled[k] = void{}
+			esTypesEnabled[k] = struct{}{}
 		}
 	}
-	isESEnabled = (len(esTypesEnabled) > 0)
+	isESEnabled = len(esTypesEnabled) > 0
 }
 
 // IsElasticsearchStateStoreEnabled returns true if feature is enabled for agentless
@@ -55,9 +52,8 @@ func IsElasticsearchStateStoreEnabled() bool {
 // IsElasticsearchStateStoreEnabledForInput returns true if the provided input type uses Elasticsearch for state storage if the Elasticsearch state store feature is enabled
 func IsElasticsearchStateStoreEnabledForInput(inputType string) bool {
 	if IsElasticsearchStateStoreEnabled() {
-		if _, ok := esTypesEnabled[inputType]; ok {
-			return true
-		}
+		_, ok := esTypesEnabled[inputType]
+		return ok
 	}
 	return false
 }
