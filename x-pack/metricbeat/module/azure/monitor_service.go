@@ -307,6 +307,7 @@ func (service *MonitorService) QueryResources(
 	location string) ([]azmetrics.MetricData, error) {
 
 	var tg *string
+	var top int32
 	//var interval string
 
 	if timegrain != "" {
@@ -318,6 +319,8 @@ func (service *MonitorService) QueryResources(
 
 	if filter != "" {
 		metricsFilter = &filter
+		// set top as a high value, otherwise default is only 10
+		top = int32(1000)
 	}
 
 	opts := azmetrics.QueryResourcesOptions{
@@ -326,7 +329,7 @@ func (service *MonitorService) QueryResources(
 		Interval:    tg,
 		StartTime:   &startTime,
 		EndTime:     &endTime,
-		Top:         nil,
+		Top:         &top,
 	}
 
 	resp := []azmetrics.MetricData{}

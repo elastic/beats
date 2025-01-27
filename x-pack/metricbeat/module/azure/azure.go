@@ -68,7 +68,7 @@ type MetricSet struct {
 	ConcMapMetrics concurrentMapResourceMetrics // In combination with BatchClient only
 }
 
-var monitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account"}
+var supportedMonitorMetricsets = []string{"monitor", "container_registry", "container_instance", "container_service", "compute_vm", "compute_vm_scaleset", "database_account"}
 
 // NewMetricSet will instantiate a new azure metricset
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
@@ -113,7 +113,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	var monitorClient *Client
 	var monitorBatchClient *BatchClient
 	// check wether metricset is part of supported metricsets and if BatchApi is enabled
-	if slices.Contains(monitorMetricsets, metricsetName) && config.EnableBatchApi {
+	if slices.Contains(supportedMonitorMetricsets, metricsetName) && config.EnableBatchApi {
 		// instantiate Batch Client which enables fetching metric values for multiple resources using azure batch api
 		monitorBatchClient, err = NewBatchClient(config)
 		if err != nil {
