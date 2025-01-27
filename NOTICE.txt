@@ -54399,12 +54399,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 --------------------------------------------------------------------------------
-Dependency : go.opencensus.io
+Dependency : github.com/census-instrumentation/opencensus-go
 Version: v0.24.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.24.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/census-instrumentation/opencensus-go@v0.24.0/LICENSE:
 
 
                                  Apache License
