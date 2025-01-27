@@ -105,21 +105,6 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
 	}
 
-	//https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics#NewClient
-	// queryResourceClient, err := azmetrics.NewClient(
-	// 	//"global",
-	// 	"https://eastus.metrics.monitor.azure.com",
-	// 	//"https://westus3.metrics.monitor.azure.com",
-	// 	credential,
-	// 	&azmetrics.ClientOptions{
-	// 		ClientOptions: clientOptions,
-	// 	},
-	// )
-	// if err != nil {
-	// 	return nil, fmt.Errorf("couldn't create query resources client: %w", err)
-
-	// }
-
 	queryResourceClientConfig := queryResourceClientConfig{
 		credential: credential,
 		options: &azmetrics.ClientOptions{

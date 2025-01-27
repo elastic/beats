@@ -304,3 +304,18 @@ func (client *BatchClient) MapMetricByPrimaryAggregation(metrics []armmonitor.Me
 
 	return clientMetrics
 }
+
+// NewMockBatchClient instantiates a new batch client with the mock azure service
+func NewMockBatchClient() *BatchClient {
+	azureMockService := new(MockService)
+	logger := logp.NewLogger("test azure monitor")
+	client := &BatchClient{
+		BaseClient: &BaseClient{
+			AzureMonitorService: azureMockService,
+			Config:              Config{},
+			Log:                 logger,
+			MetricRegistry:      NewMetricRegistry(logger),
+		},
+	}
+	return client
+}
