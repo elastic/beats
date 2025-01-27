@@ -729,6 +729,7 @@ the filename option to be deleted.
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
 
 [float]
 ==== `resource.tracer.maxage`
