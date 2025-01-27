@@ -49,7 +49,8 @@ func loadDB(t *testing.T, count uint32, procHandler procfs.MockReader, prov prvd
 		evt := constructEvt(i, "execve")
 		procHandler.AddEntry(i, procfs.ProcessInfo{PIDs: types.PIDInfo{Tgid: i, Ppid: 1234}})
 
-		prov.Sync(evt, i)
+		err := prov.Sync(evt, i)
+		require.NoError(t, err)
 
 		// verify that we got the process
 		found, err := prov.db.GetProcess(i)
@@ -58,7 +59,8 @@ func loadDB(t *testing.T, count uint32, procHandler procfs.MockReader, prov prvd
 
 		// now insert the exit
 		exitEvt := constructEvt(i, "exit_group")
-		prov.Sync(exitEvt, i)
+		err = prov.Sync(exitEvt, i)
+		require.NoError(t, err)
 
 	}
 }
@@ -74,7 +76,7 @@ func TestProviderLoadMetrics(t *testing.T) {
 	defer cancel()
 	testProvider, err := NewProvider(ctx, logp.L(), procDB, testProc, "process.pid")
 	require.NoError(t, err)
-	rawPrvdr := testProvider.(prvdr)
+	rawPrvdr, _ := testProvider.(prvdr)
 
 	events := 100_000
 	loadDB(t, uint32(events), *testProc, rawPrvdr)
