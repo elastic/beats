@@ -16,6 +16,7 @@ import (
 	"math"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -815,20 +816,11 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	integration.EnsureESIsRunning(t)
 
 	// Create a test httpjson server for httpjson input
-	called := atomic.Uint32{}
+	h := serverHelper{t: t}
 	defer func() {
-		assert.EqualValues(t, 2, called.Load(), "HTTP server should be called twice")
+		assert.GreaterOrEqual(t, h.called, 2, "HTTP server should be called at least twice")
 	}()
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		const formatRFC3339Like = "2006-01-02T15:04:05.999Z"
-		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(response{
-			Message:   "Hello",
-			Published: time.Now().Format(formatRFC3339Like),
-		})
-		require.NoError(t, err)
-		called.Add(1)
-	}))
+	testServer := httptest.NewServer(http.HandlerFunc(h.handler))
 	defer testServer.Close()
 
 	inputID := "httpjson-generic-" + uuid.Must(uuid.NewV4()).String()
@@ -851,13 +843,22 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 			Streams: []*proto.Stream{
 				{
 					Id: inputID,
-					Source: integration.RequireNewStruct(t, map[string]interface{}{
+					Source: integration.RequireNewStruct(t, map[string]any{
 						"id":             inputID,
 						"enabled":        true,
 						"type":           "httpjson",
-						"interval":       "1m",
+						"interval":       "5s",
 						"request.url":    testServer.URL,
 						"request.method": "GET",
+						"request.transforms": []any{
+							map[string]any{
+								"set": map[string]any{
+									"target":  "url.params.since",
+									"value":   "[[.cursor.published]]",
+									"default": `[[formatDate (now (parseDuration "-24h")) "RFC3339"]]`,
+								},
+							},
+						},
 						"cursor": map[string]any{
 							"published": map[string]any{
 								"value": "[[.last_event.published]]",
@@ -878,12 +879,13 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 	when := time.Now()
 
 	final := atomic.Bool{}
-
 	nextState := func() {
 		if waiting {
 			if time.Now().After(when) {
+				t.Log("Next state")
 				idx = (idx + 1) % len(units)
 				waiting = false
+				h.notifyChange()
 				return
 			}
 			return
@@ -902,7 +904,11 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 				}
 			}
 			for _, unit := range observed.GetUnits() {
-				require.Containsf(t, []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING, proto.State_STOPPING}, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+				expected := []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING}
+				if !waiting {
+					expected = append(expected, proto.State_STOPPING)
+				}
+				require.Containsf(t, expected, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 			}
 			return &proto.CheckinExpected{
 				Units: units[idx],
@@ -938,6 +944,69 @@ func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T)
 		100*time.Millisecond,
 		"Failed to reach the final state",
 	)
+}
+
+type serverHelper struct {
+	t            *testing.T
+	lock         sync.Mutex
+	previous     time.Time
+	called       int
+	stateChanged bool
+}
+
+func (h *serverHelper) verifyTime(since time.Time) time.Time {
+	h.lock.Lock()
+	defer h.lock.Unlock()
+
+	h.called++
+
+	if h.previous.IsZero() {
+		require.WithinDurationf(h.t, time.Now().Add(-24*time.Hour), since, 15*time.Minute, "since should be ~24h ago")
+	} else {
+		// XXX: `since` field is expected to be equal to the last published time. However, between unit restarts, the last
+		// updated field might not be persisted successfully. As a workaround, we allow a larger delta between restarts.
+		// However, we are still checking that the `since` field is not too far in the past, like 24h ago which is the
+		// initial value.
+		delta := 1 * time.Second
+		if h.stateChanged {
+			delta = 1 * time.Minute
+			h.stateChanged = false
+		}
+		require.WithinDurationf(h.t, h.previous, since, delta, "since should re-use last value")
+	}
+	h.previous = time.Now()
+	return h.previous
+}
+
+func (h *serverHelper) handler(w http.ResponseWriter, r *http.Request) {
+	since := parseParams(h.t, r.RequestURI)
+	published := h.verifyTime(since)
+
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(response{
+		Message:   "Hello",
+		Published: published.Format(time.RFC3339),
+	})
+	require.NoError(h.t, err)
+}
+
+func (h *serverHelper) notifyChange() {
+	h.lock.Lock()
+	defer h.lock.Unlock()
+	h.stateChanged = true
+}
+
+func parseParams(t *testing.T, uri string) time.Time {
+	myUrl, err := url.Parse(uri)
+	require.NoError(t, err)
+	params, err := url.ParseQuery(myUrl.RawQuery)
+	require.NoError(t, err)
+	since := params["since"]
+	require.NotEmpty(t, since)
+	sinceStr := since[0]
+	sinceTime, err := time.Parse(time.RFC3339, sinceStr)
+	require.NoError(t, err)
+	return sinceTime
 }
 
 func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains string) {
