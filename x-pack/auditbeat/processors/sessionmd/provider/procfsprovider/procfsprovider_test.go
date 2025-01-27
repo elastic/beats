@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -26,6 +27,71 @@ var (
 	logger    = *logp.NewLogger("procfs_test")
 	timestamp = time.Now()
 )
+
+func constructEvt(tgid uint32, syscall string) *beat.Event {
+	evt := &beat.Event{Fields: mapstr.M{}}
+	evt.Fields.Put("process.pid", tgid)
+	evt.Fields.Put(syscallField, syscall)
+	return evt
+}
+
+func assertRegistryUint(t require.TestingT, reg *monitoring.Registry, key string, expected uint64, message string) {
+	entry := reg.Get(key)
+	assert.NotNil(t, entry)
+
+	value, ok := reg.Get(key).(*monitoring.Uint)
+	assert.True(t, ok)
+	assert.Equal(t, expected, value.Get(), message)
+}
+
+func loadDB(t *testing.T, count uint32, procHandler procfs.MockReader, prov prvdr) {
+	for i := uint32(1); i < count; i++ {
+		evt := constructEvt(i, "execve")
+		procHandler.AddEntry(i, procfs.ProcessInfo{PIDs: types.PIDInfo{Tgid: i, Ppid: 1234}})
+
+		prov.Sync(evt, i)
+
+		// verify that we got the process
+		found, err := prov.db.GetProcess(i)
+		require.NoError(t, err)
+		require.NotNil(t, found)
+
+		// now insert the exit
+		exitEvt := constructEvt(i, "exit_group")
+		prov.Sync(exitEvt, i)
+
+	}
+}
+
+func TestProviderLoadMetrics(t *testing.T) {
+	testReg := monitoring.NewRegistry()
+	testProc := procfs.NewMockReader()
+
+	procDB, err := processdb.NewDB(testReg, testProc, *logp.L(), time.Second*2, true)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
+	testProvider, err := NewProvider(ctx, logp.L(), procDB, testProc, "process.pid")
+	require.NoError(t, err)
+	rawPrvdr := testProvider.(prvdr)
+
+	events := 100_000
+	loadDB(t, uint32(events), *testProc, rawPrvdr)
+
+	// wait for the maps to empty to the correct amount as the reaper runs
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assertRegistryUint(collect, testReg, "processdb.processes", 0, "processdb.processes")
+		assertRegistryUint(collect, testReg, "processdb.exit_events", 0, "processdb.exit_events")
+	}, time.Minute*5, time.Second*10)
+
+	// ensure processes are getting resolved properly
+	assertRegistryUint(t, testReg, "processdb.resolved_orphan_exits", 0, "resolved_orphan_exits")
+	assertRegistryUint(t, testReg, "processdb.reaped_orphan_exits", 0, "reaped_orphan_exits")
+	assertRegistryUint(t, testReg, "processdb.failed_process_lookup_count", 0, "processdb.failed_process_lookup_count")
+	assertRegistryUint(t, testReg, "processdb.procfs_lookup_fail", 0, "processdb.procfs_lookup_fail")
+
+}
 
 func TestExecveEvent(t *testing.T) {
 	var pid uint32 = 100
