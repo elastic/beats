@@ -154,19 +154,44 @@ func (m M) CopyFieldsTo(to M, key string) error {
 }
 
 // Clone returns a copy of the M. It recursively makes copies of inner
-// maps.
+// maps. Nested arrays and non-map types are not cloned.
 func (m M) Clone() M {
 	result := make(M, len(m))
+	cloneMap(result, m)
+	return result
+}
 
-	for k := range m {
-		if innerMap, ok := tryToMapStr(m[k]); ok {
-			result[k] = innerMap.Clone()
-		} else {
-			result[k] = m[k]
+func cloneMap(dst, src M) {
+	for k, v := range src {
+		switch v := v.(type) {
+		case M:
+			d := make(M, len(v))
+			dst[k] = d
+			cloneMap(d, v)
+		case map[string]interface{}:
+			d := make(map[string]interface{}, len(v))
+			dst[k] = d
+			cloneMap(d, v)
+		case []M:
+			a := make([]M, 0, len(v))
+			for _, m := range v {
+				d := make(M, len(m))
+				cloneMap(d, m)
+				a = append(a, d)
+			}
+			dst[k] = a
+		case []map[string]interface{}:
+			a := make([]map[string]interface{}, 0, len(v))
+			for _, m := range v {
+				d := make(map[string]interface{}, len(m))
+				cloneMap(d, m)
+				a = append(a, d)
+			}
+			dst[k] = a
+		default:
+			dst[k] = v
 		}
 	}
-
-	return result
 }
 
 // HasKey returns true if the key exist. If an error occurs then false is

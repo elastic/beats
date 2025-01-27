@@ -348,6 +348,7 @@ func TestClone(t *testing.T) {
 			"c31": 1,
 			"c32": 2,
 		},
+		"c4": []M{{"c41": 1}},
 	}
 
 	// Clone the original mapstr and then increment every value in it. Ensures the test will fail if
@@ -364,6 +365,7 @@ func TestClone(t *testing.T) {
 				"c31": 1,
 				"c32": 2,
 			},
+			"c4": []M{{"c41": 1}},
 		},
 		cloned,
 	)
@@ -377,6 +379,10 @@ func incrementMapstrValues(m M) {
 			m[k] = v + 1
 		case M:
 			incrementMapstrValues(m[k].(M))
+		case []M:
+			for _, c := range v {
+				incrementMapstrValues(c)
+			}
 		}
 
 	}
