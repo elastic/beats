@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
 - Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
 
 *Heartbeat*
 
@@ -127,6 +128,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
 - Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
 - The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
+- Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
 
 *Auditbeat*
 
@@ -244,6 +246,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 
 *Osquerybeat*
 
