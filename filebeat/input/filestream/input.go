@@ -165,10 +165,8 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	// The only error readFromSource can return is the error from `ctx`,
-	// there is no point in reporting it to the Manager (aka Elastic-Agent).
-	// Also, the caller of Run, will correctly report the error and filter
-	// out 'context cancelled'.
+	// The caller of Run already reports the error and filters out errors that
+	// must not be reported, like 'context cancelled'.
 	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
