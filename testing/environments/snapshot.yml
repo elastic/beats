@@ -14,8 +14,9 @@ services:
     # >>> The next two environment variables are a workaround for
     # running the Elasticsearch Docker image on Macs with the M4 CPU
     # see https://github.com/elastic/elasticsearch/issues/118583#issuecomment-2546897726
-    - 'ES_JAVA_OPTS=-XX:UseSVE=0'
-    - 'CLI_JAVA_OPTS=-XX:UseSVE=0'
+    # Uncomment the next 2 lines if you run the tests on Mac M4.
+    # - 'ES_JAVA_OPTS=-XX:UseSVE=0'
+    # - 'CLI_JAVA_OPTS=-XX:UseSVE=0'
     # <<< end of the workaround
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
