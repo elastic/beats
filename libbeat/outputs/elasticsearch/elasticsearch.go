@@ -40,23 +40,17 @@ func makeES(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
-	if !cfg.HasField("bulk_max_size") {
-		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
-			return outputs.Fail(err)
-		}
-	}
-
+	esConfig := defaultConfig
 	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	esConfig := defaultConfig
 	preset, err := cfg.String("preset", -1)
 	if err == nil && preset != "" {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, presetConfig, err := applyPreset(preset, cfg)
+		overriddenFields, presetConfig, err := ApplyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
