@@ -304,8 +304,6 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullIn
 				return true, nil
 			}
 
-			log.Debugf("input-cursor store.Each, got: key:%v, val: %#v", key, st)
-
 			resource := &resource{
 				key:            key,
 				stored:         true,
@@ -321,7 +319,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullIn
 
 			return true, nil
 		})
-		log.Debugf("input-cursor store, read %d keys", len(states.table))
+		log.Debugf("input-cursor store read %d keys", len(states.table))
 		if err != nil {
 			return nil, err
 		}
