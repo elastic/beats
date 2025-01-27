@@ -961,21 +961,30 @@ func (h *serverHelper) verifyTime(since time.Time) time.Time {
 	h.called++
 
 	if h.previous.IsZero() {
-		require.WithinDurationf(h.t, time.Now().Add(-24*time.Hour), since, 15*time.Minute, "since should be ~24h ago")
+		assert.WithinDurationf(h.t, time.Now().Add(-24*time.Hour), since, 15*time.Minute, "since should be ~24h ago")
 	} else {
 		// XXX: `since` field is expected to be equal to the last published time. However, between unit restarts, the last
 		// updated field might not be persisted successfully. As a workaround, we allow a larger delta between restarts.
 		// However, we are still checking that the `since` field is not too far in the past, like 24h ago which is the
 		// initial value.
-		delta := 1 * time.Second
-		if h.stateChanged {
-			delta = 1 * time.Minute
-			h.stateChanged = false
-		}
-		require.WithinDurationf(h.t, h.previous, since, delta, "since should re-use last value")
+		assert.WithinDurationf(h.t, h.previous, since, h.getDelta(since), "since should re-use last value")
 	}
 	h.previous = time.Now()
 	return h.previous
+}
+
+func (h *serverHelper) getDelta(actual time.Time) time.Duration {
+	const delta = 1 * time.Second
+	if !h.stateChanged {
+		return delta
+	}
+
+	dt := h.previous.Sub(actual)
+	if dt < -delta || dt > delta {
+		h.stateChanged = false
+		return time.Minute
+	}
+	return delta
 }
 
 func (h *serverHelper) handler(w http.ResponseWriter, r *http.Request) {
