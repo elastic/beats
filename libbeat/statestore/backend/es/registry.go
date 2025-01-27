@@ -34,14 +34,12 @@ type Registry struct {
 	notifier *Notifier
 }
 
-func New(ctx context.Context, log *logp.Logger, notifier *Notifier) (*Registry, error) {
-	r := &Registry{
+func New(ctx context.Context, log *logp.Logger, notifier *Notifier) *Registry {
+	return &Registry{
 		ctx:      ctx,
 		log:      log,
 		notifier: notifier,
 	}
-
-	return r, nil
 }
 
 func (r *Registry) Access(name string) (backend.Store, error) {

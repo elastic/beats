@@ -55,10 +55,7 @@ func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cf
 
 	if features.IsElasticsearchStateStoreEnabled() {
 		notifier = es.NewNotifier()
-		esreg, err = es.New(ctx, logger, notifier)
-		if err != nil {
-			return nil, err
-		}
+		esreg = es.New(ctx, logger, notifier)
 	}
 
 	reg, err = memlog.New(logger, memlog.Settings{
