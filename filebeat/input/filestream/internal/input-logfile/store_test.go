@@ -70,7 +70,7 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test", "", true)
+		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
 		require.Error(t, err)
 	})
 
@@ -481,7 +481,7 @@ func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *sto
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix, "", true)
+	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
@@ -508,7 +508,7 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access(_ string) (*statestore.Store, error) {
+func (ts testStateStore) Access() (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}

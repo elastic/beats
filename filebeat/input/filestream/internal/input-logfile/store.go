@@ -141,19 +141,16 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string, inputID string, fullInit bool) (*store, error) {
+func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
 	ok := false
 
-	log.Debugf("input-logfile::openStore: prefix: %v", prefix)
-
-	persistentStore, err := statestore.Access(prefix)
+	persistentStore, err := statestore.Access("")
 	if err != nil {
 		return nil, err
 	}
 	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
-	persistentStore.SetID(inputID)
 
-	states, err := readStates(log, persistentStore, prefix, fullInit)
+	states, err := readStates(log, persistentStore, prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -560,43 +557,41 @@ func (r *resource) stateSnapshot() state {
 	}
 }
 
-func readStates(log *logp.Logger, store *statestore.Store, prefix string, fullInit bool) (*states, error) {
+func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*states, error) {
 	keyPrefix := prefix + "::"
 	states := &states{
 		table: map[string]*resource{},
 	}
 
-	if fullInit {
-		err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-			if !strings.HasPrefix(key, keyPrefix) {
-				return true, nil
-			}
-
-			var st state
-			if err := dec.Decode(&st); err != nil {
-				log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
-					key, err)
-				return true, nil
-			}
-
-			resource := &resource{
-				key:    key,
-				stored: true,
-				lock:   unison.MakeMutex(),
-				internalState: stateInternal{
-					TTL:     st.TTL,
-					Updated: st.Updated,
-				},
-				cursor:     st.Cursor,
-				cursorMeta: st.Meta,
-			}
-			states.table[resource.key] = resource
-
+	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+		if !strings.HasPrefix(key, keyPrefix) {
 			return true, nil
-		})
-		if err != nil {
-			return nil, err
 		}
+
+		var st state
+		if err := dec.Decode(&st); err != nil {
+			log.Errorf("Failed to read regisry state for '%v', cursor state will be ignored. Error was: %+v",
+				key, err)
+			return true, nil
+		}
+
+		resource := &resource{
+			key:    key,
+			stored: true,
+			lock:   unison.MakeMutex(),
+			internalState: stateInternal{
+				TTL:     st.TTL,
+				Updated: st.Updated,
+			},
+			cursor:     st.Cursor,
+			cursorMeta: st.Meta,
+		}
+		states.table[resource.key] = resource
+
+		return true, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	return states, nil
 }
