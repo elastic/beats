@@ -94,9 +94,9 @@ var (
 					"count": c.Int("total"),
 				},
 			}),
-			"merges":  c.Dict("merges", indicesTotalsSchema),
-			"refresh": c.Dict("refresh", indicesTotalsSchema),
-			"flush":   c.Dict("flush", indicesTotalsSchema),
+			"merges":  c.Dict("merges", indicesTotalsSchema, c.DictOptional),
+			"refresh": c.Dict("refresh", indicesTotalsSchema, c.DictOptional),
+			"flush":   c.Dict("flush", indicesTotalsSchema, c.DictOptional),
 			"translog": c.Dict("translog", s.Schema{
 				"operations": s.Object{
 					"count": c.Int("operations"),
@@ -420,7 +420,7 @@ var (
 
 	indicesTotalsSchema = s.Schema{
 		"total_time": s.Object{
-			"ms": c.Int("time_in_millis"),
+			"ms": c.Int("total_time_in_millis"),
 		},
 		"total": s.Object{
 			"count": c.Int("total"),
