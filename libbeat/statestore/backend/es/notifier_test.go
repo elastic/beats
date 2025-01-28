@@ -192,10 +192,7 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 	wgWait(t, &wgSub)
 
 	// Notify
-	c, err := conf.NewConfigFrom(map[string]any{
-		"id": 1,
-	})
-	require.NoError(t, err)
+	c := createTestConfigs(t, 1)[0]
 	notifier.Notify(c)
 
 	// Wait for all
