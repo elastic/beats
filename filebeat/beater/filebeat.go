@@ -316,8 +316,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	defer stateStore.Close()
 
-<<<<<<< HEAD
-=======
 	// If notifier is set, configure the listener for output configuration
 	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
 	// in order to allow it fully configure
@@ -334,12 +332,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		})
 	}
 
-	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
-	if err != nil {
-		logp.Err("invalid filestream configuration: %+v", err)
-		return err
-	}
->>>>>>> 8180f23fb ([filebeat] Elasticsearch state storage for httpjson and cel inputs (#41446))
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
 		logp.Err("Failed to attempt filestream state take over: %+v", err)
