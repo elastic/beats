@@ -248,6 +248,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 
 *Osquerybeat*
 
