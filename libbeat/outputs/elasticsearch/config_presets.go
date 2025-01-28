@@ -81,7 +81,7 @@ var presetConfigs = map[string]*config.C{
 // config overrides.
 // Returns a list of the user fields that were overwritten, and the full
 // preset config that was applied.
-func applyPreset(preset string, userConfig *config.C) ([]string, *config.C, error) {
+func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, error) {
 	presetConfig := presetConfigs[preset]
 	if presetConfig == nil {
 		return nil, nil, fmt.Errorf("unknown preset value %v", preset)

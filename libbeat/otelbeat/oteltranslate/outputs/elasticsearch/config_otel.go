@@ -15,11 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beatconverter
+package elasticsearchtranslate
 
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
@@ -30,13 +31,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // TODO: add  following unuspported params to below struct
 // indices
 // pipelines
 // parameters
-// preset
 // setup.ilm.* -> supported but the logic is not in place yet
 // proxy_disable -> supported but the logic is not in place yet
 // proxy_headers
@@ -47,7 +48,6 @@ type unsupportedConfig struct {
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
 	EscapeHTML         bool              `config:"escape_html"`
 	Kerberos           *kerberos.Config  `config:"kerberos"`
-	BulkMaxSize        int               `config:"bulk_max_size"`
 }
 
 type esToOTelOptions struct {
@@ -57,6 +57,7 @@ type esToOTelOptions struct {
 	Index    string `config:"index"`
 	Pipeline string `config:"pipeline"`
 	ProxyURL string `config:"proxy_url"`
+	Preset   string `config:"preset"`
 }
 
 var defaultOptions = esToOTelOptions{
@@ -65,6 +66,7 @@ var defaultOptions = esToOTelOptions{
 	Index:    "filebeat-9.0.0", // TODO. Default value should be filebeat-%{[agent.version]}
 	Pipeline: "",
 	ProxyURL: "",
+	Preset:   "custom", // default is custom if not set
 }
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
@@ -78,6 +80,22 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 	if !isStructEmpty(temp) {
 		return nil, fmt.Errorf("these configuration parameters are not supported %+v", temp)
+	}
+
+	// apply preset here
+	// It is important to apply preset before unpacking the config, as preset can override output fields
+	preset, err := output.String("preset", -1)
+	if err == nil {
+		// Performance preset is present, apply it and log any fields that
+		// were overridden
+		overriddenFields, presetConfig, err := elasticsearch.ApplyPreset(preset, output)
+		if err != nil {
+			return nil, err
+		}
+		logp.Info("Applying performance preset '%v': %v",
+			preset, config.DebugString(presetConfig, false))
+		logp.Warn("Performance preset '%v' overrides user setting for field(s): %s",
+			preset, strings.Join(overriddenFields, ","))
 	}
 
 	// unpack and validate ES config
@@ -127,11 +145,11 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 		},
 
-		// Batcher is experimental and by not setting it, we are using the exporter's default batching mechanism
-		// "batcher": map[string]any{
-		// 	"enabled":        true,
-		// 	"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-		// },
+		// Batcher is experimental
+		"batcher": map[string]any{
+			"enabled":        true,
+			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
+		},
 	}
 
 	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
@@ -148,7 +166,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 // For type safety check
 func typeSafetyCheck(value map[string]any) error {
-	// the  valued should match `elasticsearchexporter.Config` type.
+	// the  value should match `elasticsearchexporter.Config` type.
 	// it throws an error if non existing key names  are set
 	var result elasticsearchexporter.Config
 	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
