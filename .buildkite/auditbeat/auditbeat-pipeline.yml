@@ -17,11 +17,11 @@ env:
   IMAGE_UBUNTU_2204_ARM64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_2404_X86_64: "family/platform-ingest-beats-ubuntu-2404"
   IMAGE_UBUNTU_2404_ARM64: "platform-ingest-beats-ubuntu-2404-aarch64"
-  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
-  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
-  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1738059920"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1738059920"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1738059920"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1738059920"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1738059920"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -139,6 +139,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
@@ -165,6 +166,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
@@ -367,6 +369,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -394,6 +397,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -421,6 +425,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
