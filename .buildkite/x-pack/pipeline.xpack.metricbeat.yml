@@ -108,7 +108,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "platform-ingest-beats-ubuntu-2204-1737995800"
+          image: "platform-ingest-beats-ubuntu-2204-1738063532"
           imageProject: "elastic-images-qa"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
@@ -130,7 +130,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "platform-ingest-beats-ubuntu-2204-1737995800"
+          image: "platform-ingest-beats-ubuntu-2204-1738063532"
           imageProject: "elastic-images-qa"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
