@@ -9,11 +9,11 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
-  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
-  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1738059920"
+  IMAGE_WIN_11: "platform-ingest-beats-windows-11-1738059920"
+  IMAGE_WIN_2016: "platform-ingest-beats-windows-2016-1738059920"
+  IMAGE_WIN_2019: "platform-ingest-beats-windows-2019-1738059920"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1738059920"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
@@ -121,6 +121,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -213,6 +214,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -233,6 +235,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
@@ -253,6 +256,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
+          imageProject: elastic-images-qa
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
