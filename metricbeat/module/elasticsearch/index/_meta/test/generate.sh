@@ -11,8 +11,8 @@
 
 # It is assumed you used elastic-package to start the elasticsearch server
 USER=elastic
-PASS=changeme
-ENDPOINT=https://localhost:9200
+PASS=elastic
+ENDPOINT=http://localhost:9200
 
 # Delete index first
 curl --insecure -u ${USER}:${PASS} -XDELETE ${ENDPOINT}/testindex

@@ -42,28 +42,34 @@ var info = elasticsearch.Info{
 	ClusterName: "helloworld",
 }
 
+var testedVersions = []string{"8.17.0", "7.17.27"}
+
 func TestMapper(t *testing.T) {
 
-	mux := createEsMuxer("8.17.0", "platinum", false)
+	for _, version := range testedVersions {
 
-	server := httptest.NewServer(mux)
-	defer server.Close()
+		mux := createEsMuxer(version, "platinum", false)
 
-	httpClient, err := helper.NewHTTPFromConfig(helper.Config{
-		ConnectTimeout: 30 * time.Second,
-		Transport: httpcommon.HTTPTransportSettings{
-			Timeout: 30 * time.Second,
-		},
-	}, mb.HostData{
-		URI:          server.URL,
-		SanitizedURI: server.URL,
-		Host:         server.URL,
-	})
-	if err != nil {
-		t.Fatal(err)
+		server := httptest.NewServer(mux)
+		defer server.Close()
+
+		httpClient, err := helper.NewHTTPFromConfig(helper.Config{
+			ConnectTimeout: 30 * time.Second,
+			Transport: httpcommon.HTTPTransportSettings{
+				Timeout: 30 * time.Second,
+			},
+		}, mb.HostData{
+			URI:          server.URL,
+			SanitizedURI: server.URL,
+			Host:         server.URL,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		statsFileGlob := fmt.Sprintf("./_meta/test/stats*.%s.json", version)
+		elasticsearch.TestMapperWithHttpHelper(t, statsFileGlob, httpClient, eventsMapping)
 	}
-
-	elasticsearch.TestMapperWithHttpHelper(t, "../index/_meta/test/stats.*.json", httpClient, eventsMapping)
 }
 
 func TestEmpty(t *testing.T) {
