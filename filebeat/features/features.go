@@ -22,19 +22,19 @@ import (
 	"strings"
 )
 
-const (
-	envAgentlessElasticsearchStateStoreInputTypes = "AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES"
-)
-
 // List of input types Elasticsearch state store is enabled for
 var esTypesEnabled map[string]struct{}
 
 var isESEnabled bool
 
 func init() {
+	initFromEnv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES")
+}
+
+func initFromEnv(envName string) {
 	esTypesEnabled = make(map[string]struct{})
 
-	arr := strings.Split(os.Getenv(envAgentlessElasticsearchStateStoreInputTypes), ",")
+	arr := strings.Split(os.Getenv(envName), ",")
 	for _, e := range arr {
 		k := strings.TrimSpace(e)
 		if k != "" {
