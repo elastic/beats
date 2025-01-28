@@ -38,7 +38,7 @@ require (
 	github.com/bsm/sarama-cluster v2.1.14-0.20180625083203-7e67d87a6b3f+incompatible
 	github.com/cavaliercoder/badio v0.0.0-20160213150051-ce5280129e9e // indirect
 	github.com/cavaliercoder/go-rpm v0.0.0-20190131055624-7a9c54e3d83e
-	github.com/cespare/xxhash/v2 v2.2.0
+	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/cloudfoundry-community/go-cfclient v0.0.0-20190808214049-35bcce23fc5f
 	github.com/cloudfoundry/noaa v2.1.0+incompatible
 	github.com/cloudfoundry/sonde-go v0.0.0-20171206171820-b33733203bb4
@@ -48,7 +48,6 @@ require (
 	github.com/davecgh/go-xdr v0.0.0-20161123171359-e6a2ba005892 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/devigned/tab v0.1.2-0.20190607222403-0c15cf42f9a2 // indirect
-	github.com/dgraph-io/badger/v3 v3.2103.1
 	github.com/digitalocean/go-libvirt v0.0.0-20180301200012-6075ea3c39a1
 	github.com/dlclark/regexp2 v1.1.7-0.20171009020623-7632a260cbaf // indirect
 	github.com/docker/docker v1.4.2-0.20190924003213-a8608b5b67c7
@@ -93,7 +92,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
-	github.com/google/flatbuffers v23.5.26+incompatible
+	github.com/google/flatbuffers v24.3.25+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.6.0
@@ -145,9 +144,9 @@ require (
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
 	github.com/shirou/gopsutil v3.20.12+incompatible
 	github.com/shopspring/decimal v1.2.0
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
@@ -167,7 +166,7 @@ require (
 	golang.org/x/crypto v0.31.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.26.0
+	golang.org/x/net v0.30.0
 	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sync v0.10.0
 	golang.org/x/sys v0.28.0
@@ -196,6 +195,7 @@ require (
 )
 
 require (
+	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/golang/protobuf v1.5.4
@@ -226,7 +226,7 @@ require (
 	github.com/containerd/containerd v1.5.18 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgraph-io/ristretto v0.1.0 // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.0 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
@@ -267,7 +267,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/karrick/godirwalk v1.15.8 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
@@ -284,7 +284,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e // indirect
 	github.com/urso/magetools v0.0.0-20190919040553-290c89e0c230 // indirect
