@@ -249,19 +249,18 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 		case resMetricDefinition, ok := <-m.BatchClient.ResourceConfigurations.MetricDefinitionsChan:
 			if !ok {
 				// Data channel closed, stop processing further data
-				m.BatchClient.Log.Infof("MetricDefinitionsChan channel closed")
+				m.BatchClient.Log.Debug("MetricDefinitionsChan channel closed")
 				if len(m.BatchClient.ResourceConfigurations.MetricDefinitionsChan) == 0 {
 					m.BatchClient.Log.Debug("no resources were found based on all the configurations options entered")
 				}
 				// process all stores in case there are remaining metricstores for which values are not collected.
-				m.BatchClient.Log.Infof("processAllStores")
+				m.BatchClient.Log.Debug("processAllStores")
 				metricValues := processAllStores(m.BatchClient, metricStores, referenceTime, report)
 				if len(metricValues) > 0 {
 					if err := m.BatchClient.MapToEvents(metricValues, report); err != nil {
 						m.BatchClient.Log.Errorf("error mapping metrics to events: %v", err)
 					}
 				}
-				m.BatchClient.Log.Infof("MetricDefinitionsChan is not ok closing")
 				m.BatchClient.ResourceConfigurations.MetricDefinitionsChan = nil
 			} else {
 				// Process each metric definition as it arrives
@@ -271,15 +270,15 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				if m.BatchClient.ResourceConfigurations.MetricDefinitions.Update {
 					// Update MetricDefinitions because they have expired
 					resId := resMetricDefinition[0].ResourceId
-					m.BatchClient.Log.Infof("MetricDefinitions Data need update")
+					m.BatchClient.Log.Debug("MetricDefinitions Data need update")
 					m.BatchClient.ResourceConfigurations.MetricDefinitions.Metrics[resId] = resMetricDefinition
 				}
 				m.BatchClient.GroupAndStoreMetrics(resMetricDefinition, referenceTime, metricStores)
 				var metricValues []Metric
 				// check if the store size is >= BatchApiResourcesLimit and then process the store(collect metric values)
 				for criteria, store := range metricStores {
-					m.BatchClient.Log.Infof("Store %+v size is %d", criteria, store.Size())
 					if store.Size() >= BatchApiResourcesLimit {
+						m.BatchClient.Log.Debugf("Store %+v size is %d. Process the Store", criteria, store.Size())
 						metricValues = append(metricValues, processStore(m.BatchClient, criteria, store, referenceTime, report)...)
 					}
 				}
@@ -295,14 +294,14 @@ func fetchBatch(m *MetricSet, report mb.ReporterV2) error {
 				// Handle error received from error channel
 				return err
 			}
-			m.BatchClient.Log.Infof("ErrorChan channel closed")
+			m.BatchClient.Log.Debug("ErrorChan channel closed")
 			// Error channel is closed, stop error handling
 			m.BatchClient.ResourceConfigurations.ErrorChan = nil
 		}
 
 		// Break the loop when both Data and Error channels are closed
 		if m.BatchClient.ResourceConfigurations.MetricDefinitionsChan == nil && m.BatchClient.ResourceConfigurations.ErrorChan == nil {
-			m.BatchClient.Log.Infof("Both channels closed. breaking")
+			m.BatchClient.Log.Debug("Both channels closed. breaking")
 			break
 		}
 	}

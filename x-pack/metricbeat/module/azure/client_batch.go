@@ -75,7 +75,7 @@ func (client *BatchClient) InitResources(fn concurrentMapResourceMetrics) error 
 
 	// check if refresh interval has been set and if it has expired
 	if !client.ResourceConfigurations.Expired() {
-		client.Log.Infof("MetricDefinitions are not expired. Writing metrics to MetricDefinitionsChan")
+		client.Log.Debug("MetricDefinitions are not expired. Writing metrics to MetricDefinitionsChan")
 		client.ResourceConfigurations.MetricDefinitionsChan = make(chan []Metric)
 		client.ResourceConfigurations.ErrorChan = make(chan error, 1)
 		// MetricDefinitions do not need update
@@ -101,7 +101,6 @@ func (client *BatchClient) InitResources(fn concurrentMapResourceMetrics) error 
 		resourceList, err := client.AzureMonitorService.GetResourceDefinitions(resourceConfig.Id, resourceConfig.Group, resourceConfig.Type, resourceConfig.Query)
 		if err != nil {
 			err = fmt.Errorf("failed to retrieve resources: %w", err)
-			// Should we return here or continue?
 			return err
 		}
 
@@ -139,7 +138,7 @@ func (client *BatchClient) InitResources(fn concurrentMapResourceMetrics) error 
 	go func() {
 		wg.Wait() // Wait for all the resource collection goroutines to finish
 		// Once all the goroutines are done, close the channels
-		client.Log.Infof("All collections finished. Closing channels ")
+		client.Log.Debug("All collections finished. Closing channels ")
 		close(client.ResourceConfigurations.MetricDefinitionsChan)
 		close(client.ResourceConfigurations.ErrorChan)
 	}()
@@ -155,7 +154,6 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 
 		// // Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
 		endTime := referenceTime
-		// startTime := endTime.Add(interval * (-1))
 		timespanDuration := max(asDuration(criteria.TimeGrain), interval)
 		startTime := endTime.Add(timespanDuration * -1)
 		// Limit batch size to 50 resources (if you have more, you can split the batch)

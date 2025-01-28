@@ -302,7 +302,6 @@ func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *M
 		criteria: store.GetMetrics(),
 	}
 	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
-	// client.Log.Infof("metricValues received at %s for criteria %+v", referenceTime, criteria)
 	store.ClearMetrics()
 	return metricValues
 }

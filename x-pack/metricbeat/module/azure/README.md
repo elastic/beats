@@ -1,4 +1,4 @@
-### Azure Monitor Walkthrough
+### Azure Monitor Walkthrough when EnableBatchApi is True
 
 #### Initialization Phase
 
