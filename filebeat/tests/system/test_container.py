@@ -14,6 +14,7 @@ class Test(BaseTest):
         """
         input_raw = """
 - type: container
+  allow_deprecated_use: true
   paths:
     - {}/logs/*.log
 """
@@ -44,6 +45,7 @@ class Test(BaseTest):
         """
         input_raw = """
 - type: container
+  allow_deprecated_use: true
   paths:
     - {}/logs/*.log
 """
@@ -74,6 +76,7 @@ class Test(BaseTest):
         """
         input_raw = """
 - type: container
+  allow_deprecated_use: true
   paths:
     - {}/logs/*.log
 """
