@@ -13,7 +13,7 @@ env:
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_10: "platform-ingest-beats-windows-10-1738059920"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
@@ -248,6 +248,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -329,6 +330,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
