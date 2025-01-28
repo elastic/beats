@@ -46,6 +46,7 @@ filebeat.inputs:
     paths:
       - %s/*.filestream
   - type: log
+    allow_deprecated_use: true
     id: my-log-input
     enabled: true
     close_timeout: 1s
@@ -198,26 +199,6 @@ func waitForMetrics(t *testing.T, expect LegacyHarvesterMetrics, msgAndArgs ...a
 	}
 }
 
-func compareMetrics(t *testing.T, expect, got LegacyHarvesterMetrics) {
-	t.Helper()
-
-	if expect.Closed != got.Closed {
-		t.Errorf("expecting 'closed' to be %d, got %d instead", expect.Closed, got.Closed)
-	}
-
-	if expect.OpenFiles != got.OpenFiles {
-		t.Errorf("expecting 'open_files' to be %d, got %d instead", expect.OpenFiles, got.OpenFiles)
-	}
-
-	if expect.Running != got.Running {
-		t.Errorf("expecting 'running' to be %d, got %d instead", expect.Running, got.Running)
-	}
-
-	if expect.Started != got.Started {
-		t.Errorf("expecting 'started' to be %d, got %d instead", expect.Started, got.Started)
-	}
-}
-
 type LegacyHarvesterMetrics struct {
 	Closed    int `json:"closed"`
 	OpenFiles int `json:"open_files"`
@@ -227,20 +208,16 @@ type LegacyHarvesterMetrics struct {
 
 func getHarvesterMetrics(t *testing.T) LegacyHarvesterMetrics {
 	// The host is ignored because we're connecting via Unix sockets.
+	//nolint:noctx // it's okay for testing purposes
 	resp, err := http.Get("http://localhost:5066/stats")
 	if err != nil {
 		t.Fatalf("could not execute HTTP call: %s", err)
 	}
+	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("could not read request body: %s", err)
-	}
-
-	type foo struct {
-		F struct {
-			H LegacyHarvesterMetrics `json:"harvester"`
-		} `json:"filebeat"`
 	}
 
 	m := struct {
