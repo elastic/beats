@@ -61,7 +61,9 @@ func (client *MockService) QueryResources(
 	filter string,
 	location string) ([]azmetrics.MetricData, error) {
 
-	return []azmetrics.MetricData{}, nil
+	args := client.Called(resourceIDs, subscriptionID, namespace, timegrain, startTime, endTime, metricNames, aggregations, filter, location)
+
+	return args.Get(0).([]azmetrics.MetricData), args.Error(1)
 }
 
 // MockReporterV2 mock implementation for testing purposes
