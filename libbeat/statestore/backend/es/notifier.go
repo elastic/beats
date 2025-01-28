@@ -29,8 +29,9 @@ type UnsubscribeFunc func()
 type Notifier struct {
 	mx sync.Mutex
 
-	listeners map[int]OnConfigUpdateFunc
-	id        int
+	lastConfig *conf.C
+	listeners  map[int]OnConfigUpdateFunc
+	id         int
 }
 
 func NewNotifier() *Notifier {
@@ -45,7 +46,7 @@ func NewNotifier() *Notifier {
 //
 // Returns an UnsubscribeFunc that can be used to remove the listener.
 //
-// Note: Make sure to call Subscribe before any calls to Notify, otherwise updates to the config could be missed.
+// Note: Subscribe will call the listener with the last config that was passed to Notify.
 func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 	n.mx.Lock()
 	defer n.mx.Unlock()
@@ -53,6 +54,10 @@ func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 	id := n.id
 	n.id++
 	n.listeners[id] = fn
+
+	if n.lastConfig != nil {
+		go fn(n.lastConfig)
+	}
 
 	return func() {
 		n.mx.Lock()
@@ -64,6 +69,7 @@ func (n *Notifier) Subscribe(fn OnConfigUpdateFunc) UnsubscribeFunc {
 func (n *Notifier) Notify(c *conf.C) {
 	n.mx.Lock()
 	defer n.mx.Unlock()
+	n.lastConfig = c
 
 	for _, listener := range n.listeners {
 		go listener(c)

@@ -23,6 +23,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -83,7 +85,6 @@ func getMatchOrdered(t *testing.T, conf1, conf2 []*conf.C) []*conf.C {
 	return matchingOrdered
 }
 
-// Test subscribing and notifying
 func TestSubscribeAndNotify(t *testing.T) {
 	notifier := NewNotifier()
 
@@ -110,40 +111,35 @@ func TestSubscribeAndNotify(t *testing.T) {
 	})
 	defer unsubSecond()
 
-	const (
-		totalNotifications = 3
-	)
+	const totalNotifications = 3
 
 	configs, err := createTestConfigs(totalNotifications)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	wg.Add(totalNotifications * 2)
 	for i := 0; i < totalNotifications; i++ {
 		notifier.Notify(configs[i])
 	}
 
-	if !waitWithTimeout(&wg, time.Second) {
-		t.Fatal("Wait for notifications failed with timeout")
-	}
+	require.True(t, waitWithTimeout(&wg, time.Second))
 
 	receivedFirst = getMatchOrdered(t, configs, receivedFirst)
-	diff := cmp.Diff(totalNotifications, len(receivedFirst))
-	if diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Len(t, receivedFirst, totalNotifications)
 
 	receivedSecond = getMatchOrdered(t, configs, receivedSecond)
-	diff = cmp.Diff(totalNotifications, len(receivedSecond))
-	if diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Len(t, receivedSecond, totalNotifications)
+
+	// Receive old config
+	wg.Add(1)
+	notifier.Subscribe(func(c *conf.C) {
+		mx.Lock()
+		defer mx.Unlock()
+		defer wg.Done()
+	})
+	require.True(t, waitWithTimeout(&wg, time.Second))
 }
 
-// Test unsubscribing
 func TestUnsubscribe(t *testing.T) {
-
 	var (
 		wg                            sync.WaitGroup
 		mx                            sync.Mutex
@@ -168,14 +164,10 @@ func TestUnsubscribe(t *testing.T) {
 	})
 	defer unsubSecond()
 
-	const (
-		totalNotifications = 3
-	)
+	const totalNotifications = 3
 
 	configs, err := createTestConfigs(totalNotifications)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	// Unsubscribe first
 	unsubFirst()
@@ -186,23 +178,13 @@ func TestUnsubscribe(t *testing.T) {
 		notifier.Notify(configs[i])
 	}
 
-	if !waitWithTimeout(&wg, time.Second) {
-		t.Fatal("Wait for notifications failed with timeout")
-	}
-
-	diff := cmp.Diff(0, len(receivedFirst))
-	if diff != "" {
-		t.Fatal(diff)
-	}
+	require.True(t, waitWithTimeout(&wg, time.Second))
+	assert.Empty(t, receivedFirst)
 
 	receivedSecond = getMatchOrdered(t, configs, receivedSecond)
-	diff = cmp.Diff(totalNotifications, len(receivedSecond))
-	if diff != "" {
-		t.Fatal(diff)
-	}
+	assert.Len(t, receivedSecond, totalNotifications)
 }
 
-// Test concurrency
 func TestConcurrentSubscribeAndNotify(t *testing.T) {
 	notifier := NewNotifier()
 
@@ -232,8 +214,8 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 		}()
 	}
 	defer func() {
-		for _, unsubfn := range unsubFns {
-			unsubfn()
+		for _, unsubFn := range unsubFns {
+			unsubFn()
 		}
 	}()
 
@@ -244,18 +226,10 @@ func TestConcurrentSubscribeAndNotify(t *testing.T) {
 	c, err := conf.NewConfigFrom(map[string]any{
 		"id": 1,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	notifier.Notify(c)
 
 	// Wait for all
-	if !waitWithTimeout(&wg, time.Second) {
-		t.Fatal("Wait for notifications failed with timeout")
-	}
-
-	diff := cmp.Diff(count, len(received))
-	if diff != "" {
-		t.Fatal(diff)
-	}
+	require.True(t, waitWithTimeout(&wg, time.Second))
+	assert.Len(t, received, count)
 }
