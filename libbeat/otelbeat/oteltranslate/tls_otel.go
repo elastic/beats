@@ -78,7 +78,7 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	}
 
 	//unpacks -> ssl.verification_mode
-	// not completelty supported yet
+	// not fully supported yet
 	switch tlscfg.VerificationMode {
 	case tlscommon.VerifyNone:
 		insecureSkipVerify = true
