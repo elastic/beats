@@ -231,6 +231,7 @@ require (
 	golang.org/x/term v0.27.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	gotest.tools/v3 v3.5.1
 )
 
 require (
