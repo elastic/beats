@@ -21,9 +21,10 @@ package include
 
 import (
 	// Import packages to perform 'func InitializeModule()' when in-use.
-	m1 "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
 	m0 "github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
+	m1 "github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
 	m2 "github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
+
 	// Import packages that perform 'func init()'.
 )
 
