@@ -1045,6 +1045,13 @@ To differentiate the trace files generated from different input instances, a pla
 filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
+==== `tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
+
+[float]
 ==== Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
