@@ -93,7 +93,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
-	github.com/google/flatbuffers v23.5.26+incompatible
+	github.com/google/flatbuffers v24.3.25+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.6.0
@@ -196,11 +196,84 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/golang/protobuf v1.5.4
 	golang.org/x/tools/go/vcs v0.1.0-deprecated
 	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237
+=======
+	cloud.google.com/go v0.115.0
+	cloud.google.com/go/compute v1.27.4
+	cloud.google.com/go/redis v1.16.4
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
+	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/Azure/go-autorest/autorest/adal v0.9.24
+	github.com/aerospike/aerospike-client-go/v7 v7.7.1
+	github.com/apache/arrow/go/v14 v14.0.2
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.25.8
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.53.5
+	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
+	github.com/aws/aws-sdk-go-v2/service/kinesis v1.29.5
+	github.com/aws/smithy-go v1.20.4
+	github.com/awslabs/goformation/v7 v7.14.9
+	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
+	github.com/dgraph-io/badger/v4 v4.4.0
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/ebpfevents v0.6.0
+	github.com/elastic/elastic-agent-autodiscover v0.9.0
+	github.com/elastic/elastic-agent-libs v0.17.4
+	github.com/elastic/elastic-agent-system-metrics v0.11.6
+	github.com/elastic/go-elasticsearch/v8 v8.14.0
+	github.com/elastic/go-quark v0.2.0
+	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
+	github.com/elastic/mito v1.15.0
+	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/tk-btf v0.1.0
+	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
+	github.com/go-ldap/ldap/v3 v3.4.6
+	github.com/gofrs/uuid/v5 v5.2.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/cel-go v0.19.0
+	github.com/googleapis/gax-go/v2 v2.13.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/websocket v1.5.0
+	github.com/icholy/digest v0.1.22
+	github.com/klauspost/compress v1.17.11
+	github.com/meraki/dashboard-api-go/v3 v3.0.9
+	github.com/otiai10/copy v1.12.0
+	github.com/pierrec/lz4/v4 v4.1.18
+	github.com/pkg/xattr v0.4.9
+	github.com/prometheus/prometheus v0.54.1
+	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/tklauser/go-sysconf v0.3.12
+	github.com/xdg-go/scram v1.1.2
+	github.com/zyedidia/generic v1.2.1
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
+	go.elastic.co/apm/v2 v2.6.0
+	go.mongodb.org/mongo-driver v1.14.0
+	go.opentelemetry.io/collector/component v0.109.0
+	go.opentelemetry.io/collector/consumer v0.109.0
+	go.opentelemetry.io/collector/pdata v1.15.0
+	go.opentelemetry.io/collector/receiver v0.109.0
+	golang.org/x/term v0.27.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+>>>>>>> b6044742f (Upgrade dbadger-io to v4.4.0 (#42434))
 )
 
 require (
@@ -222,6 +295,7 @@ require (
 	github.com/apache/thrift v0.17.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+<<<<<<< HEAD
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/containerd/containerd v1.5.18 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
@@ -229,6 +303,18 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dimchansky/utfbom v1.1.0 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
+=======
+	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
+	github.com/cilium/ebpf v0.13.2 // indirect
+	github.com/containerd/log v0.1.0 // indirect
+	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgraph-io/ristretto/v2 v2.0.0 // indirect
+	github.com/distribution/reference v0.6.0 // indirect
+	github.com/dnephin/pflag v1.0.7 // indirect
+	github.com/docker/go-metrics v0.0.1 // indirect
+>>>>>>> b6044742f (Upgrade dbadger-io to v4.4.0 (#42434))
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
