@@ -128,6 +128,25 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
+	t := e.t
+	t.Helper()
+	got := e.statusReporter.GetUpdates()
+	if len(got) != len(expected) {
+		t.Fatalf("expecting %d updates, got %d", len(expected), len(got))
+	}
+
+	for i := range expected {
+		g, e := got[i], expected[i]
+		if g != e {
+			t.Errorf(
+				"expecting [%d] status update to be {state:%s, msg:%s}, got  {state:%s, msg:%s}",
+				i, e.state.String(), e.msg, g.state.String(), g.msg,
+			)
+		}
+	}
+}
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
@@ -275,23 +294,4 @@ func (m *mockStatusReporter) GetUpdates() []statusUpdate {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	return append([]statusUpdate{}, m.updates...)
-}
-
-func (env *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
-	t := env.t
-	t.Helper()
-	got := env.statusReporter.GetUpdates()
-	if len(got) != len(expected) {
-		t.Fatalf("expecting %d updates, got %d", len(expected), len(got))
-	}
-
-	for i := range expected {
-		g, e := got[i], expected[i]
-		if g != e {
-			t.Errorf(
-				"expecting [%d] status update to be {state:%s, msg:%s}, got  {state:%s, msg:%s}",
-				i, e.state.String(), e.msg, g.state.String(), g.msg,
-			)
-		}
-	}
 }
