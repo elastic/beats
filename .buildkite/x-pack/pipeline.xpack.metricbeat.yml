@@ -108,8 +108,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "platform-ingest-beats-ubuntu-2204-1738063532"
-          imageProject: "elastic-images-qa"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
@@ -130,8 +129,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "platform-ingest-beats-ubuntu-2204-1738063532"
-          imageProject: "elastic-images-qa"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
