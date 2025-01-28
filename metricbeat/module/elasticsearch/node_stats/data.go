@@ -102,6 +102,22 @@ var (
 					"count": c.Int("total"),
 				},
 			}),
+			"refresh": c.Dict("refresh", s.Schema{
+				"total_time": s.Object{
+					"ms": c.Int("total_time_in_millis"),
+				},
+				"total": s.Object{
+					"count": c.Int("total"),
+				},
+			}),
+			"flush": c.Dict("flush", s.Schema{
+				"total_time": s.Object{
+					"ms": c.Int("total_time_in_millis"),
+				},
+				"total": s.Object{
+					"count": c.Int("total"),
+				},
+			}),
 			"translog": c.Dict("translog", s.Schema{
 				"operations": s.Object{
 					"count": c.Int("operations"),
