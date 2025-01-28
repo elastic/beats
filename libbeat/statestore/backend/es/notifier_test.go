@@ -62,6 +62,12 @@ func wgWait(t *testing.T, wg *sync.WaitGroup) {
 	}
 }
 
+func TestSanity(t *testing.T) {
+	assert.Equal(t, createTestConfigs(t, 5), createTestConfigs(t, 5))
+	assert.NotEqual(t, createTestConfigs(t, 4), createTestConfigs(t, 5))
+	assert.NotEqual(t, createTestConfigs(t, 5)[3], createTestConfigs(t, 5)[4])
+}
+
 func TestSubscribeAndNotify(t *testing.T) {
 	notifier := NewNotifier()
 
