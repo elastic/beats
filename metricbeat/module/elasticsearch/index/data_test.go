@@ -20,13 +20,13 @@
 package index
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
-	"fmt"
 
 	"github.com/stretchr/testify/require"
 
