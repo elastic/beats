@@ -160,7 +160,7 @@ func cfgRandomPartitioner(_ *logp.Logger, config *config.C) (func() partitioner,
 		return func(_ *message, numPartitions int32) (int32, error) {
 			if N == count {
 				count = 0
-				partition = int32(rand.IntN(int(numPartitions)))
+				partition = rand.Int32N(numPartitions)
 			}
 			count++
 			return partition, nil
@@ -221,7 +221,7 @@ func makeHashPartitioner() partitioner {
 
 	return func(msg *message, numPartitions int32) (int32, error) {
 		if msg.key == nil {
-			return int32(rand.IntN(int(numPartitions))), nil
+			return rand.Int32N(numPartitions), nil
 		}
 
 		hash := msg.hash
