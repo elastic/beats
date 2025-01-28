@@ -379,6 +379,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 - Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
+- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
