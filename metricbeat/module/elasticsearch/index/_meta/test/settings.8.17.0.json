@@ -1110,16 +1110,8 @@
   "testindex" : {
     "settings" : {
       "index" : {
-        "routing" : {
-          "allocation" : {
-            "include" : {
-              "_tier_preference" : "data_content"
-            }
-          }
-        },
         "number_of_shards" : "1",
         "provided_name" : "testindex",
-        "creation_date" : "1737764217525",
         "number_of_replicas" : "1",
         "uuid" : "ZhZrAICFSxKFtO2vbhz9Mg",
         "version" : {

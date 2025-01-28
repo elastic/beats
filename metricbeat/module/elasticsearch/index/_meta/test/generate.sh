@@ -38,6 +38,8 @@ curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/?pretty > root.${1}.json
 curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/_stats?pretty > stats.${1}.json
 
 # Read index settings
+# /!\ A test case with missing settings is required! Make sure you curate the result accordingly
+# See data.go and the things logged as debug for more information
 curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/*,.*/_settings?pretty > settings.${1}.json
 
 # Read cluster state
