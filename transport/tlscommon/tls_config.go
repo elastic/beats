@@ -143,7 +143,7 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	// because all slice/pointer fields won't be modified.
 	cc := *c
 
-	// Keep a copy of the host (wheather an IP or hostname)
+	// Keep a copy of the host (whether an IP or hostname)
 	// for later validation. It is used by makeVerifyConnection
 	cc.ServerName = host
 	config := cc.ToConfig()

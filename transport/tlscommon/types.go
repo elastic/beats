@@ -125,7 +125,7 @@ var tlsClientAuthTypes = map[string]TLSClientAuth{
 }
 
 // TLSVerificationMode represents the type of verification to do on the remote host:
-// `none`, `certificate`, and `full` and we default to `full`.
+// `none`, `certificate`, `full` and `strict` - we default to `full`.
 // Internally this option is transformed into the `insecure` field in the `tls.Config` struct.
 type TLSVerificationMode uint8
 

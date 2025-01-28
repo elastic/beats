@@ -25,7 +25,7 @@ import (
 // Config defines the user configurable options in the yaml file.
 type Config struct {
 	Enabled              *bool                   `config:"enabled" yaml:"enabled,omitempty"`
-	VerificationMode     TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
+	VerificationMode     TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full', 'certificate' and 'strict'
 	Versions             []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
 	CipherSuites         []CipherSuite           `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
 	CAs                  []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
