@@ -17,7 +17,7 @@
 
 package kafka
 
-import "math/rand"
+import "math/rand/v2"
 
 // common helpers used by unit+integration tests
 
@@ -35,8 +35,8 @@ func randASCIIBytes(length int) []byte {
 
 func randChar() byte {
 	start, end := 'a', 'z'
-	if rand.Int31n(2) == 1 {
+	if rand.Int32N(2) == 1 {
 		start, end = 'A', 'Z'
 	}
-	return byte(rand.Int31n(end-start+1) + start)
+	return byte(rand.Int32N(end-start+1) + start)
 }
