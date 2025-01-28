@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"hash"
 	"hash/fnv"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -153,7 +153,6 @@ func cfgRandomPartitioner(_ *logp.Logger, config *config.C) (func() partitioner,
 	}
 
 	return func() partitioner {
-		generator := rand.New(rand.NewSource(rand.Int63()))
 		N := cfg.GroupEvents
 		count := cfg.GroupEvents
 		partition := int32(0)
@@ -161,7 +160,7 @@ func cfgRandomPartitioner(_ *logp.Logger, config *config.C) (func() partitioner,
 		return func(_ *message, numPartitions int32) (int32, error) {
 			if N == count {
 				count = 0
-				partition = int32(generator.Intn(int(numPartitions)))
+				partition = rand.Int32N(numPartitions)
 			}
 			count++
 			return partition, nil
@@ -182,7 +181,7 @@ func cfgRoundRobinPartitioner(_ *logp.Logger, config *config.C) (func() partitio
 	return func() partitioner {
 		N := cfg.GroupEvents
 		count := N
-		partition := rand.Int31()
+		partition := rand.Int32()
 
 		return func(_ *message, numPartitions int32) (int32, error) {
 			if N == count {
@@ -218,12 +217,11 @@ func cfgHashPartitioner(log *logp.Logger, config *config.C) (func() partitioner,
 }
 
 func makeHashPartitioner() partitioner {
-	generator := rand.New(rand.NewSource(rand.Int63()))
 	hasher := fnv.New32a()
 
 	return func(msg *message, numPartitions int32) (int32, error) {
 		if msg.key == nil {
-			return int32(generator.Intn(int(numPartitions))), nil
+			return rand.Int32N(numPartitions), nil
 		}
 
 		hash := msg.hash
@@ -242,7 +240,6 @@ func makeHashPartitioner() partitioner {
 }
 
 func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool) partitioner {
-	generator := rand.New(rand.NewSource(rand.Int63()))
 	hasher := fnv.New32a()
 
 	return func(msg *message, numPartitions int32) (int32, error) {
@@ -264,7 +261,7 @@ func makeFieldsHashPartitioner(log *logp.Logger, fields []string, dropFail bool)
 					return -1, err
 				}
 
-				msg.hash = generator.Uint32()
+				msg.hash = rand.Uint32()
 			} else {
 				msg.hash = hasher.Sum32()
 			}

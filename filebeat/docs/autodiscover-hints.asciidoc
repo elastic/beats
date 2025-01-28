@@ -23,8 +23,7 @@ Multiline settings. See <<multiline-examples>> for a full list of all supported 
 [float]
 ===== `co.elastic.logs/json.*`
 
-JSON settings. In case of `filestream` input(default) see <<filebeat-input-filestream-ndjson>> for a full list of all supported options.
-In case of `container` or `log` input see <<filebeat-input-log-config-json>> for a full list of all supported options.
+JSON settings. See <<filebeat-input-filestream-ndjson>> for a full list of all supported options.
 
 For example, the following hints with json options:
 [source,yaml]
@@ -34,7 +33,7 @@ co.elastic.logs/json.add_error_key: "true"
 -----
 will lead to the following input configuration:
 
-* `filestream`
+`filestream`
 [source,yaml]
 -----
 parsers:
@@ -42,15 +41,6 @@ parsers:
       message_key: "log"
       add_error_key: "true"
 -----
-
-* `log`
-[source,yaml]
------
-json.message_key: "log"
-json.add_error_key: "true"
------
-
-NOTE: `keys_under_root` json option of `log` input is replaced with `target` option in filestream input. Read the documentation(<<filebeat-input-filestream-ndjson>>) on how to use it correctly.
 
 [float]
 ===== `co.elastic.logs/include_lines`
@@ -380,7 +370,8 @@ filebeat.autodiscover:
     - type: nomad
       hints.enabled: true
       hints.default_config:
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
@@ -396,7 +387,8 @@ filebeat.autodiscover:
       hints.enabled: true
       hints.default_config:
         enabled: false
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
@@ -430,7 +422,8 @@ filebeat.autodiscover:
       hints.enabled: true
       hints.default_config:
         enabled: false <1>
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
         processors:
