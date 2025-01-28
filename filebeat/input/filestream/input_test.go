@@ -247,7 +247,7 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) Access() (*statestore.Store, error) {
+func (s *testStore) Access(_ string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
