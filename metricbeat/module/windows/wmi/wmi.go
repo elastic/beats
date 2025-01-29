@@ -139,6 +139,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				continue
 			}
 
+			if len(rows) == 0 {
+				m.Logger().Warnf("The query '%s' did not produce results. This can be expected, but it can also be the result of querying an invalid field. Make sure all required fields do exist or check the WMI-Activity Operational Log for more information.", query)
+			}
+
 			defer wmi.CloseAllInstances(rows)
 
 			for _, instance := range rows {
