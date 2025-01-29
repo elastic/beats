@@ -130,7 +130,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 	}
 	propType, err := getPropertyType(rawProperty)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch CIMType for property '%s' with error %v", propertyName, err)
+		return nil, fmt.Errorf("could not fetch CIMType for property '%s' with error %w", propertyName, err)
 	}
 
 	var f WmiStringConversionFunction
