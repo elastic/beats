@@ -124,11 +124,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		defer session.Dispose()
 
-		// We create a shared conversion table for entries with the same schema.
-		// This avoids repeatedly fetching the schema for each individual entry, improving efficiency.
-		conversionTable := make(map[string]WmiStringConversionFunction)
-
 		for _, queryConfig := range queries {
+
+			// We create a shared conversion table for entries with the same schema.
+			// This avoids repeatedly fetching the schema for each individual entry, improving efficiency.
+			conversionTable := make(map[string]WmiStringConversionFunction)
 
 			query := queryConfig.QueryStr
 
@@ -145,7 +145,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				event := mb.Event{
 					MetricSetFields: mapstr.M{
 						"class":     queryConfig.Class,
-						"namespace": m.config.Namespace,
+						"namespace": namespace,
 						"host":      m.config.Host,
 					},
 				}
