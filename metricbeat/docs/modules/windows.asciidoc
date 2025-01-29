@@ -60,8 +60,9 @@ metricbeat.modules:
     include_null: false          # Exclude fields with null values from the output
     include_queries: false       # Do not include the query string in the output
     include_empty_string: false  # Exclude fields with empty string values from the output
-    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning
-    # Default namespace for queries can be specified here. Uncomment if needed. Default is root\\cimv2
+    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning (defaults to period)
+    # Default WMI namespace for all queries (if not specified per query)
+    # Uncomment to override the default, which is "root\\cimv2".
     # namespace: "root\\cimv2"
     queries:
     - class: Win32_OperatingSystem # FROM: Class to fetch
@@ -72,8 +73,9 @@ metricbeat.modules:
        - LocalDateTime
        - NumberOfUsers
       where: ""                   # Optional WHERE clause to filter query results
-      # Namespace for this specific query. Uncomment to override the default namespace.
-      # namespace: "root\\cimv2"----
+      # Override the WMI namespace for this specific query (optional).
+      # If set, this takes precedence over the default namespace above.
+      # namespace: "root\\cimv2" # Overrides the metric----
 
 [float]
 === Metricsets
