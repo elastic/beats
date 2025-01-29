@@ -210,6 +210,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
 - Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
+- Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
 
 *Heartbeat*
@@ -455,6 +456,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
 - Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
+- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
