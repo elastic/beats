@@ -53,7 +53,7 @@ var templateV5 = template.Template{
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	_ := protocol.Registry.Register(ProtocolName, New)
 }
 
 func New(config config.Config) protocol.Protocol {

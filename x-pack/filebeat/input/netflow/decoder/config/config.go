@@ -28,21 +28,19 @@ type Config struct {
 	activeSessionsMetric ActiveSessionsMetric
 }
 
-var defaultCfg = Config{
-	protocols:       []string{},
-	logOutput:       logp.L().Named("netflow"),
-	expiration:      time.Hour,
-	detectReset:     true,
-	sharedTemplates: false,
-	withCache:       false,
-}
-
 // Defaults returns a configuration object with defaults settings:
 // - no protocols are enabled.
 // - log output is discarded
 // - session expiration is checked once every hour.
-func Defaults() Config {
-	return defaultCfg
+func Defaults(logger *logp.Logger) Config {
+	return Config{
+		protocols:       []string{},
+		logOutput:       logger,
+		expiration:      time.Hour,
+		detectReset:     true,
+		sharedTemplates: false,
+		withCache:       false,
+	}
 }
 
 // WithProtocols modifies an existing configuration object to enable the

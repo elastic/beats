@@ -129,10 +129,9 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error
-	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
+	n.decoder, err = decoder.NewDecoder(decoder.NewConfig(n.logger).
 		WithProtocols(n.cfg.Protocols...).
 		WithExpiration(n.cfg.ExpirationTimeout).
-		WithLogOutput(n.logger).
 		WithCustomFields(n.customFields...).
 		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
 		WithSharedTemplates(n.cfg.ShareTemplates).
