@@ -140,6 +140,25 @@ func TestPublish(t *testing.T) {
 	})
 }
 
+func TestMapstrToPcommonMapTime(t *testing.T) {
+	tests := []struct {
+		mapstr_val  string
+		pcommon_val string
+	}{
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T15:04:05.000Z"},
+		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
+	}
+	for _, tc := range tests {
+		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
+		assert.NoError(t, err, "Error parsing time")
+		a := mapstr.M{"test": origTime}
+		want := pcommon.NewMap()
+		want.PutStr("test", tc.pcommon_val)
+		got := mapstrToPcommonMap(a)
+		assert.Equal(t, want, got)
+	}
+}
+
 func TestMapstrToPcommonMapString(t *testing.T) {
 	tests := map[string]struct {
 		mapstr_val  interface{}
@@ -323,10 +342,10 @@ func TestMapstrToPcommonMapSliceMapstr(t *testing.T) {
 func TestMapstrToPcommonMapSliceTime(t *testing.T) {
 	times := []struct {
 		mapstr_val  string
-		pcommon_val int64
+		pcommon_val string
 	}{
-		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: 1136189045000},
-		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: 0},
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T15:04:05.000Z"},
+		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
 	}
 	var sliceTimes []time.Time
 	pcommonSlice := pcommon.NewSlice()
@@ -335,7 +354,7 @@ func TestMapstrToPcommonMapSliceTime(t *testing.T) {
 		assert.NoError(t, err, "Error parsing time")
 		sliceTimes = append(sliceTimes, targetTime)
 		pVal := pcommonSlice.AppendEmpty()
-		pVal.SetInt(tc.pcommon_val)
+		pVal.SetStr(tc.pcommon_val)
 	}
 	inputMap := mapstr.M{
 		"slice": sliceTimes,
