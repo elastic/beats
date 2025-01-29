@@ -15,40 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
-
-package systemlogs
+package es
 
 import (
-	"testing"
+	"context"
+	"sync"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestJournaldInputIsCreated(t *testing.T) {
-	c := map[string]any{
-		"files.paths": []string{"/file/does/not/exist"},
-		// The 'journald' object needs to exist for the input to be instantiated
-		"journald.enabled": true,
-	}
+type Registry struct {
+	ctx context.Context
 
-	cfg := conf.MustNewConfigFrom(c)
+	log *logp.Logger
+	mx  sync.Mutex
 
-	_, inp, err := configure(cfg)
-	if err != nil {
-		t.Fatalf("did not expect an error calling newV1Input: %s", err)
-	}
+	notifier *Notifier
+}
 
-	type namer interface {
-		Name() string
+func New(ctx context.Context, log *logp.Logger, notifier *Notifier) *Registry {
+	return &Registry{
+		ctx:      ctx,
+		log:      log,
+		notifier: notifier,
 	}
+}
 
-	i, isNamer := inp.(namer)
-	if !isNamer {
-		t.Fatalf("expecting an instance of *log.Input, got '%T' instead", inp)
-	}
+func (r *Registry) Access(name string) (backend.Store, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	return openStore(r.ctx, r.log, name, r.notifier)
+}
 
-	if got, expected := i.Name(), "journald"; got != expected {
-		t.Fatalf("expecting '%s' input, got '%s'", expected, got)
-	}
+func (r *Registry) Close() error {
+	return nil
 }

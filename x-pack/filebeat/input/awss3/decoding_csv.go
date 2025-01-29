@@ -17,6 +17,7 @@ type csvDecoder struct {
 	r *csv.Reader
 
 	header  []string
+	offset  int64
 	current []string
 
 	err error
@@ -51,6 +52,7 @@ func (d *csvDecoder) next() bool {
 	if d.err != nil {
 		return false
 	}
+	d.offset = d.r.InputOffset()
 	d.current, d.err = d.r.Read()
 	return d.err == nil
 }
@@ -58,7 +60,7 @@ func (d *csvDecoder) next() bool {
 // decode returns the JSON encoded value of the current CSV line. next must
 // have been called before any calls to decode.
 func (d *csvDecoder) decode() ([]byte, error) {
-	v, err := d.decodeValue()
+	_, v, err := d.decodeValue()
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +70,12 @@ func (d *csvDecoder) decode() ([]byte, error) {
 // decodeValue returns the value of the current CSV line interpreted as
 // an object with fields based on the header held by the receiver. next must
 // have been called before any calls to decode.
-func (d *csvDecoder) decodeValue() (any, error) {
+func (d *csvDecoder) decodeValue() (offset int64, val any, _ error) {
 	if d.err != nil {
-		return nil, d.err
+		return d.offset, nil, d.err
 	}
 	if len(d.current) == 0 {
-		return nil, fmt.Errorf("decode called before next")
+		return d.offset, nil, fmt.Errorf("decode called before next")
 	}
 	m := make(map[string]string, len(d.header))
 	// By the time we are here, current must be the same
@@ -83,7 +85,7 @@ func (d *csvDecoder) decodeValue() (any, error) {
 	for i, n := range d.header {
 		m[n] = d.current[i]
 	}
-	return m, nil
+	return d.offset, m, nil
 }
 
 // close closes the parquet decoder and releases the resources.

@@ -15,17 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
+package es
 
-package systemlogs
+import "errors"
 
-import (
-	"errors"
-
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	conf "github.com/elastic/elastic-agent-libs/config"
+var (
+	ErrKeyUnknown = errors.New("key unknown")
 )
-
-func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	return nil, nil, errors.New("journald is only supported on Linux")
-}

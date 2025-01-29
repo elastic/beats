@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -80,7 +81,9 @@ type Filebeat struct {
 type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	// Access returns the storage registry depending on the type. This is needed for the Elasticsearch state store which
+	// is guarded by the feature.IsElasticsearchStateStoreEnabledForInput(typ) check.
+	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
 
@@ -144,6 +147,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 				}
 				return data
 			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry)
 	}
 
 	// Add inputs created by the modules
@@ -292,12 +302,35 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	stateStore, err := openStateStore(b.Info, logp.NewLogger("filebeat"), config.Registry)
+	// Use context, like normal people do, hooking up to the beat.done channel
+	ctx, cn := context.WithCancel(context.Background())
+	go func() {
+		<-fb.done
+		cn()
+	}()
+
+	stateStore, err := openStateStore(ctx, b.Info, logp.NewLogger("filebeat"), config.Registry)
 	if err != nil {
 		logp.Err("Failed to open state store: %+v", err)
 		return err
 	}
 	defer stateStore.Close()
+
+	// If notifier is set, configure the listener for output configuration
+	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
+	// in order to allow it fully configure
+	if stateStore.notifier != nil {
+		b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
+			outCfg := conf.Namespace{}
+			if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+				logp.Err("Failed to unpack the output config: %v", err)
+				return nil
+			}
+
+			stateStore.notifier.Notify(outCfg.Config())
+			return nil
+		})
+	}
 
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
@@ -344,6 +377,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	defer func() {
 		_ = inputTaskGroup.Stop()
 	}()
+
+	// Store needs to be fully configured at this point
 	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
@@ -528,7 +563,7 @@ func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
 		return nil
 	}
 
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
 	}
