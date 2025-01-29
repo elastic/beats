@@ -32,11 +32,11 @@ func TestGetServiceURI(t *testing.T) {
 	}{
 		"scope_node": {
 			scope:       elasticsearch.ScopeNode,
-			expectedURI: "/_nodes/_local/stats",
+			expectedURI: "/_nodes/_local/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
 		},
 		"scope_cluster": {
 			scope:       elasticsearch.ScopeCluster,
-			expectedURI: "/_nodes/_all/stats",
+			expectedURI: "/_nodes/_all/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
 		},
 	}
 
