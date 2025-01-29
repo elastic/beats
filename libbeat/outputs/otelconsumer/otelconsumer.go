@@ -87,14 +87,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		meta := event.Content.Meta.Clone()
-		meta["beat"] = out.beatInfo.Beat
-		meta["version"] = out.beatInfo.Version
-		meta["type"] = "_doc"
-
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
-		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
@@ -260,7 +254,7 @@ func mapstrToPcommonMap(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutInt(k, x.UnixMilli())
+			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
