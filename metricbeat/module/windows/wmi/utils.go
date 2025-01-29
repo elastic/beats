@@ -74,17 +74,15 @@ func RequiresExtraConversion(fieldValue interface{}) bool {
 
 // Given a Property it returns its CIM Type Qualifier
 // https://learn.microsoft.com/en-us/windows/win32/wmisdk/cimtype-qualifier
-// We assume that it is **always** defined for every property to simiplifying
-// The error handling
-func getPropertyType(property *ole.IDispatch) base.WmiType {
+func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
 	rawType := oleutil.MustGetProperty(property, "CIMType")
 
 	value, err := wmi.GetVariantValue(rawType)
 	if err != nil {
-		panic("Error retrieving the wmi property type")
+		return base.WmiType(0), err
 	}
 
-	return base.WmiType(value.(int32))
+	return base.WmiType(value.(int32)), nil
 }
 
 // Returns the "raw" SWbemProperty containing type information for a given field.
@@ -130,7 +128,10 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 	if err != nil {
 		return nil, err
 	}
-	propType := getPropertyType(rawProperty)
+	propType, err := getPropertyType(rawProperty)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch CIMType for property '%s' with error %v", propertyName, err)
+	}
 
 	var f WmiStringConversionFunction
 
