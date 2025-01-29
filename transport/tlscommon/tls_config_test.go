@@ -18,21 +18,12 @@
 package tlscommon
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/hex"
-	"encoding/pem"
 	"errors"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -682,126 +673,4 @@ func startTestServer(t *testing.T, serverAddr string, serverCerts []tls.Certific
 	}()
 
 	return *serverURL
-}
-
-// GetCertFingerPrint takes a certificate and returns its HEX encoded SHA-256
-func GetCertFingerprint(cert *x509.Certificate) string {
-	caSHA256 := sha256.Sum256(cert.Raw)
-	return hex.EncodeToString(caSHA256[:])
-}
-
-func GenTestCerts(t *testing.T) map[string]*x509.Certificate {
-	t.Helper()
-	ca, err := genCA()
-	if err != nil {
-		t.Fatalf("cannot generate root CA: %s", err)
-	}
-
-	unknownCA, err := genCA()
-	if err != nil {
-		t.Fatalf("cannot generate second root CA: %s", err)
-	}
-
-	certs := map[string]*x509.Certificate{
-		"ca": ca.Leaf,
-	}
-
-	certData := map[string]struct {
-		ca       tls.Certificate
-		keyUsage x509.KeyUsage
-		isCA     bool
-		dnsNames []string
-		ips      []net.IP
-		expired  bool
-	}{
-		"wildcard": {
-			ca:       ca,
-			keyUsage: x509.KeyUsageDigitalSignature,
-			isCA:     false,
-			dnsNames: []string{"*.example.com"},
-		},
-		"correct": {
-			ca:       ca,
-			keyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-			isCA:     false,
-			dnsNames: []string{"localhost"},
-			// IPV4 and IPV6
-			ips: []net.IP{{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-		},
-		"unknown_authority": {
-			ca:       unknownCA,
-			keyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-			isCA:     false,
-			dnsNames: []string{"localhost"},
-			// IPV4 and IPV6
-			ips: []net.IP{{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-		},
-		"expired": {
-			ca:       ca,
-			keyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-			isCA:     false,
-			dnsNames: []string{"localhost"},
-			// IPV4 and IPV6
-			ips:     []net.IP{{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-			expired: true,
-		},
-	}
-
-	tmpDir := t.TempDir()
-	for certName, data := range certData {
-		cert, err := genSignedCert(
-			data.ca,
-			data.keyUsage,
-			data.isCA,
-			certName,
-			data.dnsNames,
-			data.ips,
-			data.expired,
-		)
-		if err != nil {
-			t.Fatalf("could not generate certificate '%s': %s", certName, err)
-		}
-		certs[certName] = cert.Leaf
-
-		// We write the certificate to disk, so if the test fails the certs can
-		// be inspected/reused
-		certPEM := new(bytes.Buffer)
-		err = pem.Encode(certPEM, &pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: cert.Leaf.Raw,
-		})
-		require.NoErrorf(t, err, "failed to encode certificste to PEM")
-
-		serverCertFile, err := os.Create(filepath.Join(tmpDir, certName+".crt"))
-		if err != nil {
-			t.Fatalf("creating file to write server certificate: %v", err)
-		}
-		if _, err := serverCertFile.Write(certPEM.Bytes()); err != nil {
-			t.Fatalf("writing server certificate: %v", err)
-		}
-
-		if err := serverCertFile.Close(); err != nil {
-			t.Fatalf("could not close certificate file: %s", err)
-		}
-	}
-
-	t.Cleanup(func() {
-		if t.Failed() {
-			finalDir := filepath.Join(os.TempDir(), cleanStr(t.Name())+strconv.Itoa(rand.Int()))
-			if err := os.Rename(tmpDir, finalDir); err != nil {
-				t.Fatalf("could not rename directory with certificates: %s", err)
-			}
-
-			t.Logf("certificates persisted on: '%s'", finalDir)
-		}
-	})
-
-	return certs
-}
-
-var cleanRegExp = regexp.MustCompile(`[^a-zA-Z0-9]`)
-
-// cleanStr replaces all characters that do not match 'a-zA-Z0-9' by '_'
-func cleanStr(path string) string {
-	return cleanRegExp.ReplaceAllString(path, "_")
 }
