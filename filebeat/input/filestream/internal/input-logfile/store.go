@@ -144,7 +144,7 @@ var closeStore = (*store).close
 func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.Access()
+	persistentStore, err := statestore.Access("")
 	if err != nil {
 		return nil, err
 	}
