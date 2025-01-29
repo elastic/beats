@@ -15,28 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kafka
+package es
 
-import "math/rand/v2"
+import "errors"
 
-// common helpers used by unit+integration tests
-
-func randString(length int) string {
-	return string(randASCIIBytes(length))
-}
-
-func randASCIIBytes(length int) []byte {
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = randChar()
-	}
-	return b
-}
-
-func randChar() byte {
-	start, end := 'a', 'z'
-	if rand.Int32N(2) == 1 {
-		start, end = 'A', 'Z'
-	}
-	return byte(rand.Int32N(end-start+1) + start)
-}
+var (
+	ErrKeyUnknown = errors.New("key unknown")
+)

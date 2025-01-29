@@ -15,28 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kafka
+package es
 
-import "math/rand/v2"
+import (
+	"context"
+	"sync"
 
-// common helpers used by unit+integration tests
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
-func randString(length int) string {
-	return string(randASCIIBytes(length))
+type Registry struct {
+	ctx context.Context
+
+	log *logp.Logger
+	mx  sync.Mutex
+
+	notifier *Notifier
 }
 
-func randASCIIBytes(length int) []byte {
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = randChar()
+func New(ctx context.Context, log *logp.Logger, notifier *Notifier) *Registry {
+	return &Registry{
+		ctx:      ctx,
+		log:      log,
+		notifier: notifier,
 	}
-	return b
 }
 
-func randChar() byte {
-	start, end := 'a', 'z'
-	if rand.Int32N(2) == 1 {
-		start, end = 'A', 'Z'
-	}
-	return byte(rand.Int32N(end-start+1) + start)
+func (r *Registry) Access(name string) (backend.Store, error) {
+	r.mx.Lock()
+	defer r.mx.Unlock()
+	return openStore(r.ctx, r.log, name, r.notifier)
+}
+
+func (r *Registry) Close() error {
+	return nil
 }
