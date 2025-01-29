@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -181,6 +182,8 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
+var logger = logp.NewLogger("elasticsearch.index")
+
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	clusterStateMetrics := []string{"routing_table"}
 	clusterStateFilterPaths := []string{"routing_table"}
@@ -195,6 +198,9 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	if err != nil {
 		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
 	}
+
+	// Under some very rare circumstances, an index in the stats response might not have an entry in the settings or cluster state.
+	// This can happen if the index got deleted between the time the settings and cluster state were retrieved and the time the stats were retrieved.
 
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
@@ -211,14 +217,16 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
+			// We can't continue processing this index, so we skip it.
 			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
 			continue
 		}
 
 		err = addIndexSettings(&idx, indicesSettings)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("failure adding index settings: %w", err))
-			continue
+			// Failure to add index settings is sometimes expected and won't be breaking,
+			// so we log it as debug and carry on with regular processing.
+			logger.Debugf("failure adding index settings: %v", err)
 		}
 
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
