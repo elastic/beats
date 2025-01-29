@@ -21,7 +21,6 @@ package wmi
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -76,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	config.BuildNamespaceQueryIndex()
 
-	if config.WarningThreshold == 0*time.Second {
+	if config.WarningThreshold == 0 {
 		config.WarningThreshold = base.Module().Config().Period
 	}
 
