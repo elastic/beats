@@ -94,7 +94,7 @@ func (qc *QueryConfig) applyDefaultNamespace(defaultNamespace string) {
 
 func (c *Config) CompileQueries() error {
 	if len(c.Queries) == 0 {
-		return fmt.Errorf("at least a query is needed")
+		return fmt.Errorf("at least one query is needed")
 	}
 
 	for i := range c.Queries {
