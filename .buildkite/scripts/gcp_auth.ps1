@@ -7,7 +7,7 @@ $tempFileName = "google-cloud-credentials.json"
 $secretFileLocation = Join-Path $env:TEMP $tempFileName
 
 $serviceAccountJsonSecret = Retry-Command -ScriptBlock {
-    vault kv get -field=plaintext -format=json $privateCIGCSServiceAccount | ConvertFrom-Json
+    vault kv get -field=data -format=json $privateCIGCSServiceAccount | ConvertFrom-Json
     if ( -not $? ) { throw "Error during vault kv get" }
 }
 
