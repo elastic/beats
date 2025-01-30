@@ -8,6 +8,7 @@
 set -ueo pipefail
 
 readonly TYPE=${1:-snapshot}
+readonly VERSION_QUALIFIER="${VERSION_QUALIFIER:-""}"
 
 # rename dependencies.csv to the name expected by release-manager.
 VERSION=$(make get-version)

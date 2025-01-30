@@ -15,6 +15,7 @@ set -euo pipefail
 BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
 BEAT_VERSION=$(make get-version)
+VERSION_QUALIFIER="${VERSION_QUALIFIER:=""}"
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 function release_manager_login {
