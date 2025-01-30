@@ -198,7 +198,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 							conversionTable[fieldName] = convertFun
 						}
 						// Perform the conversion at this point it's safe to cast to string.
-						convertedValue, err := convertFun(fieldValue.(string))
+						fieldValueString, ok := fieldValue.(string)
+						if !ok {
+							m.Logger().Warn("Skipping addition of field %s: it's expected to be a string found %v", fieldName, fieldValue)
+							continue
+						}
+						convertedValue, err := convertFun(fieldValueString)
 						if err != nil {
 							m.Logger().Warn("Skipping addition of field %s. Cannot convert: %v", fieldName, err)
 							continue
