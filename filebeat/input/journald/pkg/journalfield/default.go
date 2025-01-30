@@ -25,7 +25,7 @@ var journaldEventFields = FieldConversion{
 	"COREDUMP_UNIT":            text("journald.coredump.unit"),
 	"COREDUMP_USER_UNIT":       text("journald.coredump.user_unit"),
 	"MESSAGE":                  text("message"),
-	"MESSAGE_ID":               text("log.syslog.msgid"),
+	"MESSAGE_ID":               text("message_id"),
 	"OBJECT_AUDIT_LOGINUID":    integer("journald.object.audit.login_uid"),
 	"OBJECT_AUDIT_SESSION":     integer("journald.object.audit.session"),
 	"OBJECT_CMDLINE":           text("journald.object.process.command_line"),
