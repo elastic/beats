@@ -10,7 +10,6 @@
         "input.type": "journald",
         "log.syslog.appname": "systemd",
         "log.syslog.facility.code": 3,
-        "log.syslog.msgid": "9d1aaa27d60140bd96365438aad20286",
         "log.syslog.priority": 6,
         "message": "Stopped target getty.target - Login Prompts.",
         "process.args": [
