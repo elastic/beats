@@ -75,7 +75,8 @@ metricbeat.modules:
       where: ""                   # Optional WHERE clause to filter query results
       # Override the WMI namespace for this specific query (optional).
       # If set, this takes precedence over the default namespace above.
-      # namespace: "root\\cimv2" # Overrides the metric----
+      # namespace: "root\\cimv2" # Overrides the metric
+----
 
 [float]
 === Metricsets
