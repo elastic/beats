@@ -1,5 +1,5 @@
 # Module: crowdstrike
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.18/filebeat-module-crowdstrike.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.x/filebeat-module-crowdstrike.html
 
 - module: crowdstrike
   
