@@ -385,3 +385,32 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+<<<<<<< HEAD
+=======
+  - name: backport patches to 8.18 branch
+    conditions:
+      - merged
+      - label=backport-8.18
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.18"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 9.0 branch
+    conditions:
+      - merged
+      - label=backport-9.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "9.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+>>>>>>> f7e951cee ([Release] add-backport-next (#42491))
