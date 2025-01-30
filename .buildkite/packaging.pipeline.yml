@@ -61,7 +61,7 @@ steps:
 
       - label: Staging dashboards
         # TODO remove OR clause below (see earlier comment)
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -73,9 +73,10 @@ steps:
         retry:
           automatic:
             - limit: 1
-        commands:
-          - make build/distributions/dependencies.csv
-          - make beats-dashboards
+        commands: |
+          source .buildkite/scripts/version_qualifier.sh
+          make build/distributions/dependencies.csv
+          make beats-dashboards
         env:
           SNAPSHOT: false
           DEV: false
@@ -172,14 +173,16 @@ steps:
     key: packaging-staging
     depends_on: start-gate-staging
     # TODO remove OR clause below (see earlier comment)
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
     steps:
       - label: "STAGING: {{matrix}}"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -213,7 +216,9 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -243,7 +248,9 @@ steps:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -279,7 +286,7 @@ steps:
 
       - label: DRA Staging
         # TODO remove OR clause below (see earlier comment)
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -288,6 +295,7 @@ steps:
           - packaging-staging
           - dashboards-staging
         command: |
+          source .buildkite/scripts/version_qualifier.sh
           buildkite-agent artifact download "build/**" .
           .buildkite/scripts/packaging/prepare-release-manager.sh staging
           .buildkite/scripts/dra.sh
