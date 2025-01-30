@@ -39,6 +39,10 @@ type Metrics struct {
 	ProcessingErrors  *monitoring.Uint // Number of processing errors.
 	ProcessingTime    metrics.Sample   // Histogram of the elapsed time for processing an event.
 
+	EventsPublished *monitoring.Uint
+	EventsDropped   *monitoring.Uint
+	EventsFiltered  *monitoring.Uint
+
 	// Those metrics use the same registry/keys as the log input uses
 	HarvesterStarted   *monitoring.Int
 	HarvesterClosed    *monitoring.Int
@@ -76,6 +80,10 @@ func NewMetrics(id string) *Metrics {
 		EventsProcessed:   monitoring.NewUint(reg, "events_processed_total"),
 		ProcessingErrors:  monitoring.NewUint(reg, "processing_errors_total"),
 		ProcessingTime:    metrics.NewUniformSample(1024),
+
+		EventsPublished: monitoring.NewUint(reg, "events_published_total"),
+		EventsFiltered:  monitoring.NewUint(reg, "events_filtered_total"),
+		EventsDropped:   monitoring.NewUint(reg, "events_dropped_total"),
 
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
 		HarvesterClosed:    monitoring.NewInt(harvesterMetrics, "closed"),

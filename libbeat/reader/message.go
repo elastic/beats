@@ -91,9 +91,10 @@ func (m *Message) ToEvent() beat.Event {
 	}
 
 	return beat.Event{
-		Timestamp: m.Ts,
-		Meta:      m.Meta,
-		Fields:    m.Fields,
-		Private:   m.Private,
+		Timestamp:       m.Ts,
+		Meta:            m.Meta,
+		Fields:          m.Fields,
+		Private:         m.Private,
+		PublishStatusCh: make(chan string, 1),
 	}
 }

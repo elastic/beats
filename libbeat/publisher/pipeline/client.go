@@ -124,6 +124,7 @@ func (c *client) publish(e beat.Event) {
 
 	if published {
 		c.onPublished()
+		e.SetPublishStatus("published")
 	} else {
 		c.onDroppedOnPublish(e)
 	}
@@ -183,10 +184,12 @@ func (c *client) onPublished() {
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
+	e.SetPublishStatus("filtered")
 	c.observer.filteredEvent()
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
+	e.SetPublishStatus("dropped")
 	c.observer.failedPublishEvent()
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
