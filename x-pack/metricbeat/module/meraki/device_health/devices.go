@@ -150,6 +150,10 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
 	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
 	if err != nil {
+		// Ignore 400 error for per-device licensing not supported
+		if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
+			return nil
+		}
 		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
