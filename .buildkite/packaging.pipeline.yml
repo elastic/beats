@@ -74,8 +74,9 @@ steps:
           automatic:
             - limit: 1
         commands:
-          - make build/distributions/dependencies.csv
-          - make beats-dashboards
+          source .buildkite/scripts/version_qualifier.sh
+          make build/distributions/dependencies.csv
+          make beats-dashboards
         env:
           SNAPSHOT: false
           DEV: false
@@ -181,7 +182,9 @@ steps:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -214,7 +217,9 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -244,7 +249,9 @@ steps:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -289,6 +296,7 @@ steps:
           - packaging-staging
           - dashboards-staging
         command: |
+          source .buildkite/scripts/version_qualifier.sh
           buildkite-agent artifact download "build/**" .
           .buildkite/scripts/packaging/prepare-release-manager.sh staging
           .buildkite/scripts/dra.sh
