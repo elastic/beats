@@ -1,5 +1,5 @@
 # Module: meraki
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/9.0/metricbeat-module-meraki.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-meraki.html
 
 - module: meraki
   metricsets: ["device_health"]
