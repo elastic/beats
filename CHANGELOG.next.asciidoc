@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
+- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 
 *Osquerybeat*
 
