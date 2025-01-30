@@ -1,5 +1,5 @@
 # Module: http
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.x/metricbeat-module-http.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-module-http.html
 
 - module: http
   #metricsets:
