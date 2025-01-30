@@ -67,14 +67,19 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
-    - depguard
+    - gomodguard # check for blocked dependencies in go.mod
+    - depguard # check for blocked dependencies in Go files
     - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
   depguard:
     rules:
+      main:
+        list-mode: lax
+        deny:
+          - pkg: "math/rand$"
+            desc: "superseded by math/rand/v2"
       apache-licensed-code:
         list-mode: lax
         files:
