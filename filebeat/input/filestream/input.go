@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/text/transform"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/go-concert/ctxtool"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -399,15 +400,31 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		if err := p.Publish(message.ToEvent(), s); err != nil {
+		// one of several calls to publish
+		ev := message.ToEvent()
+		if err := p.Publish(ev, s); err != nil {
+			setEventPublishedStatus(metrics, ev)
 			metrics.ProcessingErrors.Inc()
 			return err
 		}
 
+		setEventPublishedStatus(metrics, ev)
 		metrics.EventsProcessed.Inc()
 		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
+}
+
+func setEventPublishedStatus(m *loginp.Metrics, ev beat.Event) {
+	status := ev.PublishStatus()
+	switch status {
+	case "publishes":
+		m.EventsPublished.Inc()
+	case "dropped":
+		m.EventsDropped.Inc()
+	case "filtered":
+		m.EventsFiltered.Inc()
+	}
 }
 
 // isDroppedLine decides if the line is exported or not based on
